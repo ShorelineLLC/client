@@ -139,11 +139,14 @@ public class AutoCrystalModule extends RotationModule {
     private DamageData<BlockPos> placeCrystal;
     //
     private BlockPos renderPos;
+    private BlockPos lastRenderPos;
     private BlockPos renderSpawnPos;
     //
     private Vec3d crystalRotation;
     private boolean attackRotate;
     private boolean rotated;
+    private int boxOpacity = 80;
+    private int outlineOpacity = 147;
     private float[] silentRotations;
     //
     private static final Box FULL_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 2.0, 1.0);
@@ -273,6 +276,12 @@ public class AutoCrystalModule extends RotationModule {
                 setStage("PLACING");
                 lastPlaceTimer.reset();
             }
+            lastRenderPos = renderPos;
+        } else {
+            if (boxOpacity > 0 || outlineOpacity > 0) {
+                boxOpacity = Math.max(0, Math.min(255, boxOpacity - 5));
+                outlineOpacity = Math.max(0, Math.min(255, outlineOpacity - 7));
+            }
         }
     }
 
@@ -290,16 +299,27 @@ public class AutoCrystalModule extends RotationModule {
 
     @EventListener
     public void onRenderWorld(RenderWorldEvent event) {
-        if (renderPos != null && isHoldingCrystal() && renderConfig.getValue()) {
-            RenderManager.renderBox(event.getMatrices(), renderPos, Modules.COLORS.getRGB(80));
-            RenderManager.renderBoundingBox(event.getMatrices(), renderPos, 1.5f,
-                    Modules.COLORS.getRGB(145));
-            if (damageNametagConfig.getValue() && placeCrystal != null) {
-                DecimalFormat format = new DecimalFormat("0.0");
-                RenderManager.post(() -> {
-                    RenderManager.renderSign(event.getMatrices(),
-                            format.format(placeCrystal.getDamage()), renderPos.toCenterPos());
-                });
+        if (renderConfig.getValue()) {
+            if (isHoldingCrystal()) {
+                if (renderPos != null) {
+                    boxOpacity = 80;
+                    outlineOpacity = 147;
+                    RenderManager.renderBox(event.getMatrices(), renderPos, Modules.COLORS.getRGB(boxOpacity));
+                    RenderManager.renderBoundingBox(event.getMatrices(), renderPos, 1.5f,
+                            Modules.COLORS.getRGB(outlineOpacity));
+                    if (damageNametagConfig.getValue() && placeCrystal != null) {
+                        DecimalFormat format = new DecimalFormat("0.0");
+                        RenderManager.post(() -> {
+                            RenderManager.renderSign(event.getMatrices(),
+                                    format.format(placeCrystal.getDamage()), renderPos.toCenterPos());
+                        });
+                    }
+                } else {
+                    if (lastRenderPos != null) {
+                        RenderManager.renderBox(event.getMatrices(), lastRenderPos, Modules.COLORS.getRGB(boxOpacity));
+                        RenderManager.renderBoundingBox(event.getMatrices(), lastRenderPos, 1.5f, Modules.COLORS.getRGB(outlineOpacity));
+                    }
+                }
             }
         }
     }
