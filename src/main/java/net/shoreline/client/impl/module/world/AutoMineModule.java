@@ -37,10 +37,10 @@ public final class AutoMineModule extends RotationModule
     Config<Boolean> multitaskConfig = new BooleanConfig("Multitask", "Allows mining while using items", true);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates before mining", false);
     Config<Boolean> grimConfig = new BooleanConfig("Grim", "trade secrets", false);
-    Config<Boolean> autoCityConfig = new BooleanConfig("Auto", "Automatically mines city blocks (including burrow)", false);
-    Config<Float> enemyRangeConfig = new NumberConfig<>("EnemyRange", "The range to mine enemies", 1.0f, 5.0f, 10.0f, () -> autoCityConfig.getValue());
-    Config<Boolean> autoRemineConfig = new BooleanConfig("AutoRemine", "Automatically remines blocks that were previously mined", false, () -> autoCityConfig.getValue());
-    Config<Boolean> strictDirectionConfig = new BooleanConfig("StrictDirection", "Only mines on visible faces", false, () -> autoCityConfig.getValue());
+    Config<Boolean> autoConfig = new BooleanConfig("Auto", "Automatically mines city blocks (including burrow)", false);
+    Config<Float> enemyRangeConfig = new NumberConfig<>("EnemyRange", "The range to mine enemies", 1.0f, 5.0f, 10.0f, () -> autoConfig.getValue());
+    Config<Boolean> autoRemineConfig = new BooleanConfig("AutoRemine", "Automatically remines blocks that were previously mined", false, () -> autoConfig.getValue());
+    Config<Boolean> strictDirectionConfig = new BooleanConfig("StrictDirection", "Only mines on visible faces", false, () -> autoConfig.getValue());
     Config<Float> breakRangeConfig = new NumberConfig<>("Range", "How far to break blocks from", 1.0f, 4.5f, 6.0f);
     Config<Float> damageConfig = new NumberConfig<>("Damage", "The minimum amount of damage done to a block before attempting to break", 0.0f, 0.7f, 1.0f, NumberDisplay.PERCENT);
     Config<Boolean> instantRemineConfig = new BooleanConfig("Instant", "Instantly remines a block that was previously mined", true);
@@ -80,31 +80,33 @@ public final class AutoMineModule extends RotationModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
-        if (autoCityConfig.getValue() && !manualOverride && (data == null || mc.world.isAir(data.getPos())))
+        if (autoConfig.getValue() && !manualOverride && (data == null || data.getState().isAir()))
         {
-            final BlockPos cityBlockPos = getAutoMineTarget();
-            if (cityBlockPos != null  && !isThrottling())
+            final BlockPos targetBlockPos = getAutoMineTarget();
+            if (targetBlockPos != null && !isThrottling())
             {
-                // If we are re-mining, bypass throttle check below
-                if (data instanceof AutoBlockBreakData && data.isRemine() && !mc.world.isAir(data.getPos()) && autoRemineConfig.getValue())
+                if (data instanceof AutoBlockBreakData
+                        && data.isRemine()
+                        && !data.getState().isAir()
+                        && autoRemineConfig.getValue())
                 {
                     attemptMine(data);
                 }
-                else if (!mc.world.isAir(cityBlockPos))
+                else if (!mc.world.isAir(targetBlockPos))
                 {
                     if (data != null && data.getBlockDamage() > 0.0f)
                     {
                         abortMining(data);
                     }
-                    if (rotateConfig.getValue()) {
-                        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), cityBlockPos.toCenterPos());
-                        setRotation(rotations[0], rotations[1]);
-                    }
-                    data = new AutoBlockBreakData(cityBlockPos,
-                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(cityBlockPos, false) : Direction.UP,
-                            Modules.AUTO_TOOL.getBestToolNoFallback(mc.world.getBlockState(cityBlockPos)));
+                    data = new AutoBlockBreakData(targetBlockPos,
+                            strictDirectionConfig.getValue()
+                                    ? Managers.INTERACT.getPlaceDirectionNCP(targetBlockPos, false)
+                                    : Direction.UP,
+                            Modules.AUTO_TOOL.getBestToolNoFallback(mc.world.getBlockState(targetBlockPos)));
                     startMining(data);
                 }
+
+                return;
             }
         }
         if (data != null)
@@ -113,7 +115,10 @@ public final class AutoMineModule extends RotationModule
                     mc.player.getX(), mc.player.getY(), mc.player.getZ());
             if (distance > ((NumberConfig<Float>) breakRangeConfig).getValueSq())
             {
-                abortMining(data);
+                if (!data.isThrottled())
+                {
+                    abortMining(data);
+                }
                 data = null;
                 return;
             }
@@ -134,7 +139,6 @@ public final class AutoMineModule extends RotationModule
                         return;
                     }
                     data.setRemine(true);
-                    data.setDamage(1.0f);
                 }
                 else
                 {
@@ -142,21 +146,22 @@ public final class AutoMineModule extends RotationModule
                 }
                 return;
             }
+            if (data.isThrottled())
+            {
+                if (!isThrottling())
+                {
+                    data.setThrottled(false);
+                    startMining(data);
+                }
+                return;
+            }
             final float damageDelta = Modules.SPEEDMINE.calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
-            if (data.damage(damageDelta) >= damageConfig.getValue() || data.isRemine())
+            if ((data.damage(damageDelta) >= damageConfig.getValue() || data.isRemine()) && !data.getState().isAir())
             {
-                if (mc.world.isAir(data.getPos()))
-                {
-                    return;
-                }
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                 {
                     return;
-                }
-                if (rotateConfig.getValue()) {
-                    float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), data.getPos().toCenterPos());
-                    setRotation(rotations[0], rotations[1]);
                 }
                 attemptMine(data);
             }
@@ -166,11 +171,14 @@ public final class AutoMineModule extends RotationModule
     @EventListener
     public void onAttackBlock(final AttackBlockEvent event)
     {
-        // Do not try to break unbreakable blocks
-        if (event.getState().getBlock().getHardness() == -1.0f || mc.player.isCreative())
+        // Ignore unbreakable blocks, if creative mode, or if there's nothing at that block
+        if (event.getState().getBlock().getHardness() == -1.0f
+                || mc.player.isCreative()
+                || event.getState().isAir())
         {
             return;
         }
+        // Prevent player from continuing to mine
         event.cancel();
         if (data != null)
         {
@@ -180,7 +188,7 @@ public final class AutoMineModule extends RotationModule
             }
             abortMining(data);
         }
-        else if (autoCityConfig.getValue())
+        if (autoConfig.getValue())
         {
             // Only count as an override if AutoCity is doing something
             if (data instanceof AutoBlockBreakData)
@@ -192,7 +200,11 @@ public final class AutoMineModule extends RotationModule
         data = new BlockBreakData(event.getPos(),
                 event.getDirection(),
                 Modules.AUTO_TOOL.getBestToolNoFallback(event.getState()));
-        startMining(data);
+        data.setThrottled(isThrottling());
+        if (!data.isThrottled())
+        {
+            startMining(data);
+        }
     }
 
     @EventListener
@@ -222,6 +234,7 @@ public final class AutoMineModule extends RotationModule
 
     private void startMining(final BlockBreakData blockBreakData)
     {
+        rotateTo(blockBreakData);
         // Grim does not check for slot changes, and it bases its original predicted block
         // break calculation on the ItemStack you have when you first send the START_DESTROY_BLOCK
         // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
@@ -232,8 +245,8 @@ public final class AutoMineModule extends RotationModule
         {
             Managers.INVENTORY.setSlot(blockBreakData.getSlot());
         }
-        Managers.NETWORK.sendSequencedPacket((sequence) -> new PlayerActionC2SPacket(
-                START_DESTROY_BLOCK, blockBreakData.getPos(), blockBreakData.getDirection(), sequence));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                START_DESTROY_BLOCK, blockBreakData.getPos(), blockBreakData.getDirection()));
         if (blockBreakData.getSlot() != -1 && grimConfig.getValue())
         {
             Managers.INVENTORY.syncToClient();
@@ -242,17 +255,23 @@ public final class AutoMineModule extends RotationModule
 
     private void attemptMine(final BlockBreakData blockBreakData)
     {
+        // Do not throttle instant re-mines
+        if (!blockBreakData.isRemine())
+        {
+            lastBreakTime = System.currentTimeMillis();
+        }
+        rotateTo(blockBreakData);
         if (blockBreakData.getSlot() != -1)
         {
             Managers.INVENTORY.setSlot(blockBreakData.getSlot());
         }
-        Managers.NETWORK.sendSequencedPacket((sequence) -> new PlayerActionC2SPacket(
-                STOP_DESTROY_BLOCK, blockBreakData.getPos(), blockBreakData.getDirection(), sequence));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                STOP_DESTROY_BLOCK, blockBreakData.getPos(), blockBreakData.getDirection()));
         if (grimConfig.getValue() && damageConfig.getValue() == 0.7f)
         {
-            Managers.NETWORK.sendSequencedPacket((sequence) -> new PlayerActionC2SPacket(
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     ABORT_DESTROY_BLOCK, blockBreakData.getPos().up(500),
-                    blockBreakData.getDirection(), sequence));
+                    blockBreakData.getDirection()));
         }
         if (blockBreakData.getSlot() != -1)
         {
@@ -264,12 +283,22 @@ public final class AutoMineModule extends RotationModule
     {
         if (blockBreakData.getBlockDamage() > 0.0f)
         {
-            Managers.NETWORK.sendSequencedPacket((sequence) -> new PlayerActionC2SPacket(
-                    ABORT_DESTROY_BLOCK, blockBreakData.getPos(), blockBreakData.getDirection(), sequence));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    ABORT_DESTROY_BLOCK, blockBreakData.getPos(), blockBreakData.getDirection()));
             if (blockBreakData.getSlot() != -1)
             {
                 Managers.INVENTORY.syncToClient();
             }
+        }
+    }
+
+    private void rotateTo(final BlockBreakData blockBreakData)
+    {
+        if (rotateConfig.getValue() && blockBreakData != null)
+        {
+            float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(),
+                    blockBreakData.getPos().toCenterPos());
+            setRotation(rotations[0], rotations[1]);
         }
     }
 
@@ -325,7 +354,8 @@ public final class AutoMineModule extends RotationModule
             {
                 continue;
             }
-            if (!mc.world.isAir(player.getBlockPos())) {
+            if (!mc.world.isAir(player.getBlockPos()))
+            {
                 return player.getBlockPos();
             }
             Set<BlockPos> mineTargets = getPotentialBlockTargets(player, player.getBlockPos());
@@ -357,7 +387,7 @@ public final class AutoMineModule extends RotationModule
         private final int slot;
 
         private float blockDamage;
-        private boolean remine;
+        private boolean remine, throttled;
 
         public BlockBreakData(final BlockPos pos, final Direction direction, final int slot)
         {
@@ -415,6 +445,16 @@ public final class AutoMineModule extends RotationModule
         public boolean isRemine()
         {
             return remine;
+        }
+
+        public void setThrottled(boolean throttled)
+        {
+            this.throttled = throttled;
+        }
+
+        public boolean isThrottled()
+        {
+            return throttled;
         }
     }
 }
