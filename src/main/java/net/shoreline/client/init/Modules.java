@@ -67,7 +67,7 @@ public class Modules {
     public static ReachModule REACH;
     // Misc
     public static AntiAimModule ANTI_AIM;
-    public static AntiBookBanModule ANTI_BOOK_BAN;
+    public static NoPacketKickModule ANTI_BOOK_BAN;
     public static AntiSpamModule ANTI_SPAM;
     public static AutoAcceptModule AUTO_ACCEPT;
     public static AutoEatModule AUTO_EAT;
@@ -81,6 +81,7 @@ public class Modules {
     public static FakePlayerModule FAKE_PLAYER;
     public static InvCleanerModule INV_CLEANER;
     public static MiddleClickModule MIDDLE_CLICK;
+    public static NoPacketKickModule NO_PACKET_KICK;
     public static NoSoundLagModule NO_SOUND_LAG;
     public static TimerModule TIMER;
     public static TrueDurabilityModule TRUE_DURABILITY;
@@ -133,11 +134,11 @@ public class Modules {
     public static ViewModelModule VIEW_MODEL;
     // public static WaypointsModule WAYPOINTS;
     // World
-    public static AirPlaceModule AIR_PLACE;
     public static AntiInteractModule ANTI_INTERACT;
     public static AutoMineModule AUTO_MINE;
     public static AutoToolModule AUTO_TOOL;
     public static AvoidModule AVOID;
+    public static BlockInteractModule BLOCK_INTERACT;
     public static FastDropModule FAST_DROP;
     public static FastPlaceModule FAST_PLACE;
     public static MultitaskModule MULTITASK;
@@ -240,6 +241,7 @@ public class Modules {
             FAKE_PLAYER = (FakePlayerModule) getRegisteredModule("fakeplayer-module");
             INV_CLEANER = (InvCleanerModule) getRegisteredModule("invcleaner-module");
             MIDDLE_CLICK = (MiddleClickModule) getRegisteredModule("middleclick-module");
+            NO_PACKET_KICK = (NoPacketKickModule) getRegisteredModule("nopacketkick-module");
             NO_SOUND_LAG = (NoSoundLagModule) getRegisteredModule("nosoundlag-module");
             TIMER = (TimerModule) getRegisteredModule("timer-module");
             TRUE_DURABILITY = (TrueDurabilityModule) getRegisteredModule("truedurability-module");
@@ -289,11 +291,11 @@ public class Modules {
             VIEW_CLIP = (ViewClipModule) getRegisteredModule("viewclip-module");
             VIEW_MODEL = (ViewModelModule) getRegisteredModule("viewmodel-module");
             // WAYPOINTS = (WaypointsModule) getRegisteredModule("waypoints-module");
-            AIR_PLACE = (AirPlaceModule) getRegisteredModule("airplace-module");
             ANTI_INTERACT = (AntiInteractModule) getRegisteredModule("antiinteract-module");
             AUTO_MINE = (AutoMineModule) getRegisteredModule("automine-module");
             AUTO_TOOL = (AutoToolModule) getRegisteredModule("autotool-module");
             AVOID = (AvoidModule) getRegisteredModule("avoid-module");
+            BLOCK_INTERACT = (BlockInteractModule) getRegisteredModule("blockinteract-module");
             FAST_DROP = (FastDropModule) getRegisteredModule("fastdrop-module");
             FAST_PLACE = (FastPlaceModule) getRegisteredModule("fastplace-module");
             MULTITASK = (MultitaskModule) getRegisteredModule("multitask-module");

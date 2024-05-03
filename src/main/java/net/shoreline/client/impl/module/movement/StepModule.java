@@ -31,7 +31,7 @@ public class StepModule extends ToggleModule {
     //
     Config<StepMode> modeConfig = new EnumConfig<>("Mode", "Step mode", StepMode.NORMAL, StepMode.values());
     Config<Float> heightConfig = new NumberConfig<>("Height", "The maximum height for stepping up blocks", 1.0f, 2.5f, 10.0f);
-    Config<Boolean> useTimerConfig = new BooleanConfig("UseTimer", "Slows down packets by applying timer when stepping", true);
+    Config<Boolean> useTimerConfig = new BooleanConfig("UseTimer", "Slows down packets by applying timer when stepping", true, () -> modeConfig.getValue() == StepMode.NORMAL);
     Config<Boolean> strictConfig = new BooleanConfig("Strict", "Confirms the step height for NCP servers", false, () -> heightConfig.getValue() <= 2.5f);
     Config<Boolean> entityStepConfig = new BooleanConfig("EntityStep", "Allows entities to step up blocks", false);
     private boolean cancelTimer;

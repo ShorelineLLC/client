@@ -5,9 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.ItemListConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
@@ -32,12 +35,11 @@ import java.util.List;
 public class InvCleanerModule extends ToggleModule {
 
     //
+    Config<List<Item>> blacklistConfig = new ItemListConfig<>("Blacklist", "The items to throw");
     Config<Float> delayConfig = new NumberConfig<>("Delay", "The delay between removing items from the inventory", 0.05f, 0.0f, 1.0f);
     Config<Boolean> hotbarConfig = new BooleanConfig("Hotbar", "Cleans the hotbar inventory slots", true);
     //
     private final Timer invCleanTimer = new CacheTimer();
-    //
-    private final List<Item> blacklist = new ArrayList<>();
 
     /**
      *
@@ -52,17 +54,17 @@ public class InvCleanerModule extends ToggleModule {
         if (event.getStage() != EventStage.PRE) {
             return;
         }
-        for (Item item : blacklist) {
-            for (int i = 9; i < (hotbarConfig.getValue() ? 45 : 36); i++) {
+        for (Item item : blacklistConfig.getValue()) {
+            for (int i = 35; i >= (hotbarConfig.getValue() ? 0 : 9); i--) {
                 ItemStack stack = mc.player.getInventory().getStack(i);
                 if (stack.isEmpty()) {
                     continue;
                 }
                 if (stack.getItem() == item && invCleanTimer.passed(delayConfig.getValue() * 1000)) {
-                    Managers.INVENTORY.throwSlot(i);
-                    // mc.interactionManager.clickSlot(0, ScreenHandler.EMPTY_SPACE_SLOT_INDEX,
-                    //         0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, ScreenHandler.EMPTY_SPACE_SLOT_INDEX, 0, SlotActionType.PICKUP, mc.player);
                     invCleanTimer.reset();
+                    break;
                 }
             }
         }
@@ -91,7 +93,7 @@ public class InvCleanerModule extends ToggleModule {
                 JsonObject json = new JsonObject();
                 //
                 JsonArray itemArray = new JsonArray();
-                for (Item item : blacklist) {
+                for (Item item : blacklistConfig.getValue()) {
                     itemArray.add(item.getTranslationKey());
                 }
                 json.add("items", itemArray);

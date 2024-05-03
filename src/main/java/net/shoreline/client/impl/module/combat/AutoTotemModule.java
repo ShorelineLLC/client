@@ -4,10 +4,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -26,7 +23,7 @@ import java.util.List;
 
 /**
  * @author xgraza
- * @since 03/29/24
+ * @since 1.0
  */
 public final class AutoTotemModule extends ToggleModule
 {
@@ -40,6 +37,7 @@ public final class AutoTotemModule extends ToggleModule
     BooleanConfig gappleConfig = new BooleanConfig("OffhandGapple", "If to equip a golden apple if holding down the item use button", true);
     BooleanConfig crappleConfig = new BooleanConfig("Crapple", "If to use a normal golden apple if Absorption is present", true);
     Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculate lethal damage sources", false);
+    Config<Boolean> fastConfig = new BooleanConfig("FastSwap", "Allows you to swap using faster packets", false);
     private int lastSlot;
 
     public AutoTotemModule()
@@ -80,8 +78,17 @@ public final class AutoTotemModule extends ToggleModule
                 lastSlot = itemSlot;
             }
             // Do another quick swap (equivalent to hovering over an item & pressing F)
-            mc.interactionManager.clickSlot(INVENTORY_SYNC_ID,
-                    itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
+            if (fastConfig.getValue()) {
+                mc.interactionManager.clickSlot(INVENTORY_SYNC_ID,
+                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
+            } else {
+                mc.interactionManager.clickSlot(INVENTORY_SYNC_ID, itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+                mc.interactionManager.clickSlot(INVENTORY_SYNC_ID, 45, 0, SlotActionType.PICKUP, mc.player);
+                if (!mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
+                    mc.interactionManager.clickSlot(INVENTORY_SYNC_ID,
+                            itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+                }
+            }
         }
     }
 
@@ -141,7 +148,8 @@ public final class AutoTotemModule extends ToggleModule
             }
         }
         // If offhand gap is enabled & the use key is pressed down, equip a golden apple.
-        if (gappleConfig.getValue() && mc.options.useKey.isPressed() && mc.player.getMainHandStack().getItem() instanceof SwordItem)
+        if (gappleConfig.getValue() && mc.options.useKey.isPressed() && (mc.player.getMainHandStack().getItem() instanceof SwordItem
+                || mc.player.getMainHandStack().getItem() instanceof TridentItem || mc.player.getMainHandStack().getItem() instanceof AxeItem))
         {
             return getGoldenAppleType();
         }

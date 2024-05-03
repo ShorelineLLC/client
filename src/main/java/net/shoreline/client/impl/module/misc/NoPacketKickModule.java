@@ -9,15 +9,16 @@ import net.shoreline.client.impl.event.network.DecodePacketEvent;
  * @author linus
  * @since 1.0
  */
-public class AntiBookBanModule extends ToggleModule {
+public class NoPacketKickModule extends ToggleModule {
 
     /**
      *
      */
-    public AntiBookBanModule() {
-        super("AntiBookBan", "Prevents getting book banned (Causes connection issues, only use if actually book banned)", ModuleCategory.MISCELLANEOUS);
+    public NoPacketKickModule() {
+        super("NoPacketKick", "Prevents getting kicked by packets", ModuleCategory.MISCELLANEOUS);
     }
 
+    // TODO: Add more packet kick checks
     @EventListener
     public void onDecodePacket(DecodePacketEvent event) {
         event.cancel();

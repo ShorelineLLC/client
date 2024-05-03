@@ -29,6 +29,7 @@ import net.shoreline.client.impl.event.render.entity.RenderArmorEvent;
 import net.shoreline.client.impl.event.render.entity.RenderFireworkRocketEvent;
 import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
 import net.shoreline.client.impl.event.render.entity.RenderWitherSkullEvent;
+import net.shoreline.client.impl.event.toast.RenderToastEvent;
 import net.shoreline.client.impl.event.world.BlindnessEvent;
 
 /**
@@ -59,6 +60,7 @@ public class NoRenderModule extends ToggleModule {
     Config<Boolean> interpolationConfig = new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false);
     Config<FogRender> fogConfig = new EnumConfig<>("Fog", "Prevents fog from rendering in the world", FogRender.OFF, FogRender.values());
     Config<ItemRender> itemsConfig = new EnumConfig<>("Items", "Prevents dropped items from rendering", ItemRender.OFF, ItemRender.values());
+    Config<Boolean> guiToastConfig = new BooleanConfig("GuiToast", "Prevents advancements from rendering", true);
 
     public NoRenderModule() {
         super("NoRender", "Prevents certain game elements from rendering",
@@ -251,6 +253,13 @@ public class NoRenderModule extends ToggleModule {
     @EventListener
     public void onRenderItem(RenderItemEvent event) {
         if (itemsConfig.getValue() == ItemRender.HIDE) {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onRenderToast(RenderToastEvent event) {
+        if (guiToastConfig.getValue()) {
             event.cancel();
         }
     }

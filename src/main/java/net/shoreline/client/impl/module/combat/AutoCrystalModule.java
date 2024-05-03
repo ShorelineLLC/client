@@ -514,11 +514,11 @@ public class AutoCrystalModule extends RotationModule {
                     }
                 }
                 attackInternal(entity, Hand.MAIN_HAND);
-                if (isSilentSwap(antiWeaknessConfig.getValue()) && canSwap) {
+                if (canSwap) {
                     if (antiWeaknessConfig.getValue() == Swap.SILENT_ALT) {
                         mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
                                 slot + 36, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    } else {
+                    } else if (antiWeaknessConfig.getValue() == Swap.SILENT) {
                         Managers.INVENTORY.syncToClient();
                     }
                 }
@@ -572,11 +572,11 @@ public class AutoCrystalModule extends RotationModule {
                 }
                 placeInternal(result, Hand.MAIN_HAND);
                 placePackets.put(blockPos, System.currentTimeMillis());
-                if (isSilentSwap(autoSwapConfig.getValue()) && canSwap) {
+                if (canSwap) {
                     if (autoSwapConfig.getValue() == Swap.SILENT_ALT) {
                         mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
                                 crystalSlot + 36, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    } else {
+                    } else if (autoSwapConfig.getValue() == Swap.SILENT) {
                         Managers.INVENTORY.syncToClient();
                     }
                 }

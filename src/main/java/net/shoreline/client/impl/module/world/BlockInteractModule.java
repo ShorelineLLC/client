@@ -19,14 +19,14 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
  * @author xgraza
  * @since 04/13/24
  */
-public final class AirPlaceModule extends ToggleModule
+public final class BlockInteractModule extends ToggleModule
 {
     Config<Float> range = new NumberConfig<>("Range", "", 1.0f, 4.0f, 10.0f, NumberDisplay.DEFAULT);
     Config<Boolean> fluids = new BooleanConfig("Fluids", "", false);
 
-    public AirPlaceModule()
+    public BlockInteractModule()
     {
-        super("AirPlace", "Allows you to place blocks in the air", ModuleCategory.WORLD);
+        super("BlockInteract", "Allows you to place blocks in the air", ModuleCategory.WORLD);
     }
 
     @EventListener

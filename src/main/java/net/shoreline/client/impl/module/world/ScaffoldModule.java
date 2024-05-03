@@ -44,7 +44,6 @@ public final class ScaffoldModule extends RotationModule
     Config<Boolean> safeWalkConfig = new BooleanConfig("SafeWalk", "If to prevent you from falling off edges", true);
     Config<BlockPicker> pickerConfig = new EnumConfig<>("BlockPicker", "How to pick a block from the hotbar", BlockPicker.NORMAL, BlockPicker.values());
     Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where scaffold is placing blocks", false);
-    Config<Boolean> fadeConfig = new BooleanConfig("Fade", "Fades old renders out", true, () -> renderConfig.getValue());
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false);
 
     private Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
@@ -169,23 +168,20 @@ public final class ScaffoldModule extends RotationModule
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
-        if (fadeConfig.getValue())
+        for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
         {
-            for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
-            {
-                set.getValue().setState(false);
-                int alpha = (int) set.getValue().getCurrent();
-                Color color = Modules.COLORS.getColor(alpha);
-                RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
-            }
+            set.getValue().setState(false);
+            int alpha = (int) set.getValue().getCurrent();
+            Color color = Modules.COLORS.getColor(alpha);
+            RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
+        }
 
-            for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
-            {
-                set.getValue().setState(false);
-                int alpha = (int) set.getValue().getCurrent();
-                Color color = Modules.COLORS.getColor(alpha);
-                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
-            }
+        for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
+        {
+            set.getValue().setState(false);
+            int alpha = (int) set.getValue().getCurrent();
+            Color color = Modules.COLORS.getColor(alpha);
+            RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
         }
 
         if (lastBlockData == null || lastBlockData.getHitResult() == null)
@@ -195,17 +191,10 @@ public final class ScaffoldModule extends RotationModule
 
         if (renderConfig.getValue())
         {
-            if (!fadeConfig.getValue())
-            {
-                RenderManager.renderBox(event.getMatrices(), lastBlockData.getPos().offset(lastBlockData.getSide()), Modules.COLORS.getRGB(80));
-            }
-            else
-            {
-                TimeAnimation box = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
-                TimeAnimation line = new TimeAnimation(true, 0, 150, fadeTimeConfig.getValue());
-                fadeBoxes.put(lastBlockData.getPos().offset(lastBlockData.getSide()), box);
-                fadeLines.put(lastBlockData.getPos().offset(lastBlockData.getSide()), line);
-            }
+            TimeAnimation box = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
+            TimeAnimation line = new TimeAnimation(true, 0, 150, fadeTimeConfig.getValue());
+            fadeBoxes.put(lastBlockData.getPos().offset(lastBlockData.getSide()), box);
+            fadeLines.put(lastBlockData.getPos().offset(lastBlockData.getSide()), line);
         }
     }
 

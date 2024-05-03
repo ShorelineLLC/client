@@ -56,7 +56,6 @@ public class SurroundModule extends ObsidianPlacerModule {
     Config<Integer> shiftDelayConfig = new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5);
     Config<Boolean> jumpDisableConfig = new BooleanConfig("AutoDisable", "Disables after moving out of the hole", true);
     Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where scaffold is placing blocks", false);
-    Config<Boolean> fadeConfig = new BooleanConfig("Fade", "Fades old renders out.", true, () -> renderConfig.getValue());
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false);
 
     private final Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
@@ -103,7 +102,7 @@ public class SurroundModule extends ObsidianPlacerModule {
     public void onPlayerTick(PlayerTickEvent event) {
         // Do we need this check?? Surround is always highest prio
         blocksPlaced = 0;
-        if (jumpDisableConfig.getValue() && mc.player.getY() > prevY) {
+        if (jumpDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5) {
             disable();
             return;
         }
@@ -121,7 +120,7 @@ public class SurroundModule extends ObsidianPlacerModule {
         }
 
         surround = getSurroundPositions(pos);
-        placements = surround.stream().filter(mc.world::isAir).toList();
+        placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
         // We should not be doing anything if we have nothing to place
         if (placements.isEmpty())
         {
@@ -168,44 +167,20 @@ public class SurroundModule extends ObsidianPlacerModule {
         {
             if (rotateConfig.getValue())
             {
-                if (grimConfig.getValue())
+                if (state)
                 {
-                    if (state)
-                    {
-                        Managers.ROTATION.setRotationSilent(angles[0], angles[1], true);
-                    }
-                    else
-                    {
-                        Managers.ROTATION.setRotationSilentSync(true);
-                    }
+                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
                 }
-                else if (state)
+                else
                 {
-                    setRotation(angles[0], angles[1]);
+                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
                 }
             }
         });
     }
 
     public List<BlockPos> getSurroundPositions(BlockPos pos) {
-        List<BlockPos> entities = new LinkedList<>();
-        entities.add(pos);
-        if (extendConfig.getValue()) {
-            for (Direction dir : Direction.values()) {
-                if (!dir.getAxis().isHorizontal()) {
-                    continue;
-                }
-                BlockPos pos1 = pos.add(dir.getVector());
-                List<Entity> box = mc.world.getOtherEntities(null, new Box(pos1))
-                        .stream().filter(e -> !isEntityBlockingSurround(e)).toList();
-                if (box.isEmpty()) {
-                    continue;
-                }
-                for (Entity entity : box) {
-                    entities.addAll(PositionUtil.getAllInBox(entity.getBoundingBox(), pos));
-                }
-            }
-        }
+        List<BlockPos> entities = getSurroundEntities(pos);
         List<BlockPos> blocks = new CopyOnWriteArrayList<>();
         for (BlockPos epos : entities) {
             for (Direction dir2 : Direction.values()) {
@@ -238,6 +213,64 @@ public class SurroundModule extends ObsidianPlacerModule {
             blocks.add(entityPos.down());
         }
         Collections.reverse(blocks);
+        return blocks;
+    }
+
+    public List<BlockPos> getSurroundEntities(Entity entity) {
+        List<BlockPos> entities = new LinkedList<>();
+        entities.add(entity.getBlockPos());
+        if (extendConfig.getValue()) {
+            for (Direction dir : Direction.values()) {
+                if (!dir.getAxis().isHorizontal()) {
+                    continue;
+                }
+                entities.addAll(PositionUtil.getAllInBox(entity.getBoundingBox(), entity.getBlockPos()));
+            }
+        }
+        return entities;
+    }
+
+    public List<BlockPos> getSurroundEntities(BlockPos pos) {
+        List<BlockPos> entities = new LinkedList<>();
+        entities.add(pos);
+        if (extendConfig.getValue()) {
+            for (Direction dir : Direction.values()) {
+                if (!dir.getAxis().isHorizontal()) {
+                    continue;
+                }
+                BlockPos pos1 = pos.add(dir.getVector());
+                List<Entity> box = mc.world.getOtherEntities(null, new Box(pos1))
+                        .stream().filter(e -> !isEntityBlockingSurround(e)).toList();
+                if (box.isEmpty()) {
+                    continue;
+                }
+                for (Entity entity : box) {
+                    entities.addAll(PositionUtil.getAllInBox(entity.getBoundingBox(), pos));
+                }
+            }
+        }
+        return entities;
+    }
+
+    public List<BlockPos> getEntitySurroundNoSupport(Entity entity) {
+        List<BlockPos> entities = getSurroundEntities(entity);
+        List<BlockPos> blocks = new CopyOnWriteArrayList<>();
+        for (BlockPos epos : entities) {
+            for (Direction dir2 : Direction.values()) {
+                if (!dir2.getAxis().isHorizontal()) {
+                    continue;
+                }
+                BlockPos pos2 = epos.add(dir2.getVector());
+                if (entities.contains(pos2) || blocks.contains(pos2)) {
+                    continue;
+                }
+                double dist = mc.player.squaredDistanceTo(pos2.toCenterPos());
+                if (dist > ((NumberConfig) placeRangeConfig).getValueSq()) {
+                    continue;
+                }
+                blocks.add(pos2);
+            }
+        }
         return blocks;
     }
 
@@ -288,44 +321,32 @@ public class SurroundModule extends ObsidianPlacerModule {
     {
         if (renderConfig.getValue())
         {
-            if (fadeConfig.getValue())
+            for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
             {
-                for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
-                {
-                    set.getValue().setState(false);
-                    set.getValue().setState(false);
-                    int alpha = (int) set.getValue().getCurrent();
-                    Color color = Modules.COLORS.getColor(alpha);
-                    RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
-                }
-
-                for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
-                {
-                    set.getValue().setState(false);
-                    int alpha = (int) set.getValue().getCurrent();
-                    Color color = Modules.COLORS.getColor(alpha);
-                    RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
-                }
+                set.getValue().setState(false);
+                set.getValue().setState(false);
+                int alpha = (int) set.getValue().getCurrent();
+                Color color = Modules.COLORS.getColor(alpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
             }
 
+            for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
+            {
+                set.getValue().setState(false);
+                int alpha = (int) set.getValue().getCurrent();
+                Color color = Modules.COLORS.getColor(alpha);
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
+            }
             if (placements.isEmpty())
             {
                 return;
             }
             for (BlockPos pos : placements)
             {
-                if (!fadeConfig.getValue())
-                {
-                    RenderManager.renderBox(event.getMatrices(), pos, Modules.COLORS.getRGB(80));
-                    RenderManager.renderBoundingBox(event.getMatrices(), pos, 1.5f, Modules.COLORS.getRGB(145));
-                }
-                else
-                {
-                    TimeAnimation boxAnimation = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
-                    TimeAnimation lineAnimation = new TimeAnimation(true, 0, 145, fadeTimeConfig.getValue());
-                    fadeBoxes.put(pos, boxAnimation);
-                    fadeLines.put(pos, lineAnimation);
-                }
+                TimeAnimation boxAnimation = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
+                TimeAnimation lineAnimation = new TimeAnimation(true, 0, 145, fadeTimeConfig.getValue());
+                fadeBoxes.put(pos, boxAnimation);
+                fadeLines.put(pos, lineAnimation);
             }
         }
     }

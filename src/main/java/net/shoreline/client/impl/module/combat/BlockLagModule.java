@@ -1,20 +1,25 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
-import net.shoreline.client.api.module.ObsidianPlacerModule;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.event.ScreenOpenEvent;
-import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.api.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
+import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.math.position.PositionUtil;
+
+import java.util.List;
 
 /**
  * @author linus
@@ -22,19 +27,18 @@ import net.shoreline.client.init.Managers;
  */
 public class BlockLagModule extends ObsidianPlacerModule {
     //
-    Config<Boolean> selfFillConfig = new BooleanConfig("SelfFill", "Fills in the block beneath you", false);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates before placing the block", false);
-    Config<Boolean> strictConfig = new BooleanConfig("Strict", "NCP-Updated bypass for lagging", false);
-    Config<Boolean> attackConfig = new BooleanConfig("Attack", "crystals in the way of block", true);
+    // Config<Boolean> strictConfig = new BooleanConfig("Strict", "Allows you to fake lag on strict servers", false);
+    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of block", true);
     Config<Boolean> autoDisableConfig = new BooleanConfig("AutoDisable", "Automatically disables after placing block", false);
     //
-    private BlockPos prevPos;
+    private double prevY;
 
     /**
      *
      */
     public BlockLagModule() {
-        super("BlockLag", "Rubberband clips you into a block", ModuleCategory.COMBAT);
+        super("BlockLag", "Lags you into a block", ModuleCategory.COMBAT);
     }
 
     @Override
@@ -42,7 +46,7 @@ public class BlockLagModule extends ObsidianPlacerModule {
         if (mc.player == null) {
             return;
         }
-        prevPos = mc.player.getBlockPos();
+        prevY = mc.player.getY();
     }
 
     @EventListener
@@ -51,67 +55,84 @@ public class BlockLagModule extends ObsidianPlacerModule {
     }
 
     @EventListener
-    public void onScreenOpen(ScreenOpenEvent event) {
-        if (event.getScreen() instanceof DeathScreen) {
-            disable();
-        }
-    }
-
-    @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() != EventStage.PRE) {
-            return;
-        }
-        if (prevPos != mc.player.getBlockPos() || !mc.player.isOnGround()) {
+    public void onPlayerTick(PlayerTickEvent event) {
+        if (Math.abs(mc.player.getY() - prevY) > 0.5) {
             disable();
             return;
         }
-        final BlockPos pos = BlockPos.ofFloored(mc.player.getX(),
-                mc.player.getY(), mc.player.getZ());
-        final BlockState state = mc.world.getBlockState(pos);
-        if (!isInsideBlock(state)) {
+        final BlockPos pos = mc.player.getBlockPos();
+        if (!isInsideBlock()) {
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                    mc.player.getX(), mc.player.getY() + 0.41999998688698,
+                    mc.player.getX(), mc.player.getY() + 0.42,
                     mc.player.getZ(), true));
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                    mc.player.getX(), mc.player.getY() + 0.7531999805211997,
+                    mc.player.getX(), mc.player.getY() + 0.75,
                     mc.player.getZ(), true));
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                    mc.player.getX(), mc.player.getY() + 1.00133597911214,
+                    mc.player.getX(), mc.player.getY() + 1.01,
                     mc.player.getZ(), true));
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                    mc.player.getX(), mc.player.getY() + 1.16610926093821,
+                    mc.player.getX(), mc.player.getY() + 1.16,
                     mc.player.getZ(), true));
-            Managers.POSITION.setPosition(mc.player.getX(),
-                    mc.player.getY() + 1.16610926093821, mc.player.getZ());
-            // placeObsidianBlock(pos);
-            if (selfFillConfig.getValue()) {
-                Managers.POSITION.setPosition(mc.player.getX(),
-                        mc.player.getY() - 0.16610926093821,
-                        mc.player.getZ());
-            } else {
-                Managers.POSITION.setPosition(mc.player.getX(),
-                        mc.player.getY() - 1.16610926093821, mc.player.getZ());
-                final Vec3d dist = getLagOffsetVec();
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        dist.x, dist.y, dist.z, false));
-            }
+            Managers.POSITION.setPositionClient(mc.player.getX(),
+                    mc.player.getY() + 1.167, mc.player.getZ());
+            attackPlace(pos);
+            Managers.POSITION.setPositionClient(mc.player.getX(),
+                    mc.player.getY() - 1.167, mc.player.getZ());
+            final Vec3d dist = getLagOffsetVec();
+            Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                    dist.x, dist.y, dist.z, false));
         }
         if (autoDisableConfig.getValue()) {
             disable();
         }
     }
 
-    /**
-     * @param state
-     * @return
-     */
-    private boolean isInsideBlock(BlockState state) {
-        return state.blocksMovement() && !mc.player.verticalCollision;
+    private void attack(Entity entity) {
+        Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
 
+    private void attackPlace(BlockPos targetPos)
+    {
+        final int slot = getResistantBlockItem();
+        if (slot == -1)
+        {
+            return;
+        }
+        attackPlace(targetPos, slot);
+    }
+
+    private void attackPlace(BlockPos targetPos, int slot) {
+        if (attackConfig.getValue()) {
+            List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
+            for (Entity entity : entities) {
+                attack(entity);
+            }
+        }
+
+        Managers.INTERACT.placeBlock(targetPos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+        {
+            if (rotateConfig.getValue())
+            {
+                if (state)
+                {
+                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
+                }
+                else
+                {
+                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+                }
+            }
+        });
+    }
+
+    public boolean isInsideBlock() {
+        return PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()).stream().anyMatch(pos -> !mc.world.getBlockState(pos).isReplaceable());
+    }
+
+    // TODO: strict offset calcs
     public Vec3d getLagOffsetVec() {
-        // TODO: strict calcs
         return new Vec3d(mc.player.getX(), mc.player.getY() + 3.5, mc.player.getZ());
     }
 }

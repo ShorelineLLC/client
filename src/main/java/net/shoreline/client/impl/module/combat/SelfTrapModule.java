@@ -56,7 +56,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     Config<Integer> shiftDelayConfig = new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5);
     Config<Boolean> autoDisableConfig = new BooleanConfig("AutoDisable", "Disables after placing the blocks", true);
     Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where selftrap is placing blocks", false);
-    Config<Boolean> fadeConfig = new BooleanConfig("Fade", "Fades old renders out.", true, () -> renderConfig.getValue());
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false);
 
     private final Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
@@ -72,7 +71,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     public SelfTrapModule()
     {
-        super("SelfTrap", "Fully surrounds the player with blocks", ModuleCategory.COMBAT);
+        super("SelfTrap", "Fully surrounds the player with blocks", ModuleCategory.COMBAT, 900);
     }
 
     @Override
@@ -111,7 +110,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     {
         // Do we need this check?? Surround is always highest prio
         blocksPlaced = 0;
-        if (autoDisableConfig.getValue() && mc.player.getY() > prevY) {
+        if (autoDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5) {
             disable();
             return;
         }
@@ -122,7 +121,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             return;
         }
         surround = getSelfTrapPositions(pos);
-        placements = surround.stream().filter(mc.world::isAir).toList();
+        placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
 
         if (placements.isEmpty())
         {
@@ -170,20 +169,13 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         {
             if (rotateConfig.getValue())
             {
-                if (grimConfig.getValue())
+                if (state)
                 {
-                    if (state)
-                    {
-                        Managers.ROTATION.setRotationSilent(angles[0], angles[1], true);
-                    }
-                    else
-                    {
-                        Managers.ROTATION.setRotationSilentSync(true);
-                    }
+                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
                 }
-                else if (state)
+                else
                 {
-                    setRotation(angles[0], angles[1]);
+                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
                 }
             }
         });
@@ -355,24 +347,21 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     {
         if (renderConfig.getValue())
         {
-            if (fadeConfig.getValue())
+            for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
             {
-                for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
-                {
-                    set.getValue().setState(false);
-                    set.getValue().setState(false);
-                    int alpha = (int) set.getValue().getCurrent();
-                    Color color = Modules.COLORS.getColor(alpha);
-                    RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
-                }
+                set.getValue().setState(false);
+                set.getValue().setState(false);
+                int alpha = (int) set.getValue().getCurrent();
+                Color color = Modules.COLORS.getColor(alpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
+            }
 
-                for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
-                {
-                    set.getValue().setState(false);
-                    int alpha = (int) set.getValue().getCurrent();
-                    Color color = Modules.COLORS.getColor(alpha);
-                    RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
-                }
+            for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
+            {
+                set.getValue().setState(false);
+                int alpha = (int) set.getValue().getCurrent();
+                Color color = Modules.COLORS.getColor(alpha);
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
             }
 
             if (placements.isEmpty())
@@ -381,18 +370,10 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
             for (BlockPos pos : placements)
             {
-                if (!fadeConfig.getValue())
-                {
-                    RenderManager.renderBox(event.getMatrices(), pos, Modules.COLORS.getRGB(80));
-                    RenderManager.renderBoundingBox(event.getMatrices(), pos, 1.5f, Modules.COLORS.getRGB(145));
-                }
-                else
-                {
-                    TimeAnimation boxAnimation = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
-                    TimeAnimation lineAnimation = new TimeAnimation(true, 0, 145, fadeTimeConfig.getValue());
-                    fadeBoxes.put(pos, boxAnimation);
-                    fadeLines.put(pos, lineAnimation);
-                }
+                TimeAnimation boxAnimation = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
+                TimeAnimation lineAnimation = new TimeAnimation(true, 0, 145, fadeTimeConfig.getValue());
+                fadeBoxes.put(pos, boxAnimation);
+                fadeLines.put(pos, lineAnimation);
             }
         }
     }

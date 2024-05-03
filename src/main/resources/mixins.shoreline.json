@@ -93,6 +93,7 @@
     "render.entity.MixinWitherSkullEntityRenderer",
     "render.item.MixinHeldItemRenderer",
     "text.MixinTextVisitFactory",
+    "toast.MixinToastManager",
     "world.MixinBlockCollisionSpliterator",
     "world.MixinClientWorld"
   ],
