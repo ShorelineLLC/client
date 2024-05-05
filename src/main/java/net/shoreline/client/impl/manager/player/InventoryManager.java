@@ -22,13 +22,12 @@ import net.shoreline.client.util.Globals;
 import java.util.ArrayList;
 
 /**
- * @author linus
+ * @author xgraza & linus
  * @since 1.0
  */
 public class InventoryManager implements Globals {
 
-    // The serverside selected hotbar slot. This will determine the held item
-    // serverside
+    // The serverside selected hotbar slot.
     private int slot;
 
     /**
@@ -41,7 +40,12 @@ public class InventoryManager implements Globals {
     @EventListener
     public void onPacketOutBound(final PacketEvent.Outbound event) {
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet) {
-            slot = packet.getSelectedSlot();
+            final int packetSlot = packet.getSelectedSlot();
+            if (!PlayerInventory.isValidHotbarIndex(packetSlot) || slot == packetSlot) {
+                event.setCanceled(true);
+                return;
+            }
+            slot = packetSlot;
         }
     }
 
@@ -73,7 +77,7 @@ public class InventoryManager implements Globals {
      */
     public void setClientSlot(final int barSlot) {
         if (mc.player.getInventory().selectedSlot != barSlot
-            && PlayerInventory.isValidHotbarIndex(barSlot)) {
+                && PlayerInventory.isValidHotbarIndex(barSlot)) {
             mc.player.getInventory().selectedSlot = barSlot;
             setSlotForced(barSlot);
         }
@@ -169,6 +173,10 @@ public class InventoryManager implements Globals {
      */
     public int getServerSlot() {
         return slot;
+    }
+
+    public int getClientSlot() {
+        return mc.player.getInventory().selectedSlot;
     }
 
     /**

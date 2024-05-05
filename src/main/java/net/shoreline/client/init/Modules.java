@@ -40,7 +40,7 @@ public class Modules {
     public static AutoTotemModule AUTO_TOTEM;
     public static AutoTrapModule AUTO_TRAP;
     public static AutoXPModule AUTO_XP;
-    public static BacktrackModule BACK_TRACK;
+    public static BackTrackModule BACK_TRACK;
     public static BlockLagModule BLOCK_LAG;
     public static BowAimModule BOW_AIM;
     public static CriticalsModule CRITICALS;

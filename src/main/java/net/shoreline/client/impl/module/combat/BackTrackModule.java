@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author xgraza
  * @since 1.0
  */
-public final class BacktrackModule extends ToggleModule
+public final class BackTrackModule extends ToggleModule
 {
     Config<Integer> delayConfig = new NumberConfig<>("Delay", "The delay before throttling packets again", 0, 100, 1000);
 
@@ -42,7 +42,7 @@ public final class BacktrackModule extends ToggleModule
     private Vec3d lastServerPos, serverPos;
     private Box hitBox;
 
-    public BacktrackModule()
+    public BackTrackModule()
     {
         super("Backtrack", "funny", ModuleCategory.COMBAT);
     }
