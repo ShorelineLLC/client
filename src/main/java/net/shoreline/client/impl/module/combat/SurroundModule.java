@@ -39,6 +39,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * @author linus
@@ -119,12 +120,21 @@ public class SurroundModule extends ObsidianPlacerModule {
         }
 
         surround = getSurroundPositions(pos);
-        placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
+        placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).collect(Collectors.toList());
         // We should not be doing anything if we have nothing to place
         if (placements.isEmpty())
         {
             return;
         }
+        if (supportConfig.getValue()) {
+            for (BlockPos block : new ArrayList<>(placements)) {
+                Direction direction = Managers.INTERACT.getInteractDirection(block, grimConfig.getValue(), strictDirectionConfig.getValue());
+                if (direction == null) {
+                    placements.add(block.down());
+                }
+            }
+        }
+        Collections.reverse(placements);
         final int shiftTicks = shiftTicksConfig.getValue();
         while (blocksPlaced < shiftTicks && !placements.isEmpty()) {
             if (blocksPlaced >= placements.size()) {
@@ -162,7 +172,7 @@ public class SurroundModule extends ObsidianPlacerModule {
             }
         }
 
-        Managers.INTERACT.placeBlock(targetPos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
@@ -197,21 +207,12 @@ public class SurroundModule extends ObsidianPlacerModule {
                 blocks.add(pos2);
             }
         }
-        if (supportConfig.getValue()) {
-            for (BlockPos block : blocks) {
-                Direction direction = Managers.INTERACT.getInteractDirection(block, strictDirectionConfig.getValue());
-                if (direction == null) {
-                    blocks.add(block.down());
-                }
-            }
-        }
         for (BlockPos entityPos : entities) {
             if (entityPos == pos) {
                 continue;
             }
             blocks.add(entityPos.down());
         }
-        Collections.reverse(blocks);
         return blocks;
     }
 

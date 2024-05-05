@@ -47,13 +47,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class AutoTrapModule extends ObsidianPlacerModule
 {
-    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 5.0f);
+    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 5.0f);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
-    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of surround", true);
-    Config<Boolean> extendConfig = new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true);
-    Config<Boolean> supportConfig = new BooleanConfig("Support", "Creates a floor for the surround if there is none", false);
+    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of trap", true);
+    Config<Boolean> extendConfig = new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true);
     Config<Boolean> headConfig = new BooleanConfig("Head", "If to place over the target's head", true);
-    Config<Boolean> cityConfig = new BooleanConfig("City", "If to not replace \"city\" blocks when AutoCrystal is on", true);
+    Config<Boolean> cityConfig = new BooleanConfig("City", "Should replace \"city\" blocks when AutoCrystal is on", true);
     Config<Integer> shiftTicksConfig = new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5);
     Config<Integer> shiftDelayConfig = new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5);
     Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where autotrap is placing blocks", false);
@@ -163,7 +162,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        Managers.INTERACT.placeBlock(targetPos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
@@ -236,17 +235,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 blocks.add(pos2);
             }
         }
-        if (supportConfig.getValue())
-        {
-            for (BlockPos block : blocks)
-            {
-                Direction direction = Managers.INTERACT.getInteractDirection(block, strictDirectionConfig.getValue());
-                if (direction == null)
-                {
-                    blocks.add(block.down());
-                }
-            }
-        }
         for (BlockPos entityPos : entities)
         {
             blocks.add(entityPos.down());
@@ -302,7 +290,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                     }
 
                     final Direction neighboringDirection = Managers.INTERACT.getInteractDirection(
-                            neighbor, strictDirectionConfig.getValue());
+                            neighbor, grimConfig.getValue(), strictDirectionConfig.getValue());
                     if (neighboringDirection != null)
                     {
                         // We need to assure that the head block would have a visible side to place on
