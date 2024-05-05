@@ -175,6 +175,10 @@ public class InventoryManager implements Globals {
         return slot;
     }
 
+    public int getClientSlot() {
+        return mc.player.getInventory().selectedSlot;
+    }
+
     /**
      * @return
      */
