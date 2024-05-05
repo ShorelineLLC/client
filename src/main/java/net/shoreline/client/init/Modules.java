@@ -40,7 +40,7 @@ public class Modules {
     public static AutoTotemModule AUTO_TOTEM;
     public static AutoTrapModule AUTO_TRAP;
     public static AutoXPModule AUTO_XP;
-    public static BackTrackModule BACK_TRACK;
+    public static BacktrackModule BACK_TRACK;
     public static BlockLagModule BLOCK_LAG;
     public static BowAimModule BOW_AIM;
     public static CriticalsModule CRITICALS;
@@ -75,6 +75,7 @@ public class Modules {
     public static AutoReconnectModule AUTO_RECONNECT;
     public static AutoRespawnModule AUTO_RESPAWN;
     public static BeaconSelectorModule BEACON_SELECTOR;
+    public static BetterChatModule BETTER_CHAT;
     // public static BetterChatModule BETTER_CHAT;
     public static ChatNotifierModule CHAT_NOTIFIER;
     public static ChestSwapModule CHEST_SWAP;
@@ -235,7 +236,7 @@ public class Modules {
             AUTO_RECONNECT = (AutoReconnectModule) getRegisteredModule("autoreconnect-module");
             AUTO_RESPAWN = (AutoRespawnModule) getRegisteredModule("autorespawn-module");
             BEACON_SELECTOR = (BeaconSelectorModule) getRegisteredModule("beaconselector-module");
-            // BETTER_CHAT = (BetterChatModule) getRegisteredModule("betterchat-module");
+            BETTER_CHAT = (BetterChatModule) getRegisteredModule("betterchat-module");
             CHAT_NOTIFIER = (ChatNotifierModule) getRegisteredModule("chatnotifier-module");
             CHEST_SWAP = (ChestSwapModule) getRegisteredModule("chestswap-module");
             FAKE_PLAYER = (FakePlayerModule) getRegisteredModule("fakeplayer-module");

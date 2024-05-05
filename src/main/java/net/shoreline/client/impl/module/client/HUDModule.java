@@ -24,17 +24,18 @@ import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.api.render.anim.Animation;
+import net.shoreline.client.impl.event.ScreenOpenEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.StreamUtils;
 import net.shoreline.client.util.render.ColorUtil;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.string.EnumFormatter;
 
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -74,9 +75,10 @@ public class HUDModule extends ToggleModule {
     //
     private final DecimalFormat decimal = new DecimalFormat("0.0");
 
-    int rainbowOffset;
-    float topLeft, topRight, bottomLeft, bottomRight;
-    boolean renderingUp;
+    private int rainbowOffset;
+    private float topLeft, topRight, bottomLeft, bottomRight;
+    private boolean renderingUp;
+    private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
 
     public HUDModule() {
         super("HUD", "Displays the HUD (heads up display) screen.",
@@ -85,7 +87,7 @@ public class HUDModule extends ToggleModule {
 
     private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule) {
         final Animation anim = toggleModule.getAnimation();
-        float factor = anim.getScaledTime();
+        float factor = (float) anim.getFactor();
         if (factor <= 0.01f || toggleModule.isHidden()) {
             return;
         }
@@ -118,10 +120,8 @@ public class HUDModule extends ToggleModule {
             bottomRight = bottomLeft;
             // center = res.getScaledHeight() - 11 / 2.0f
             renderingUp = renderingConfig.getValue() == Rendering.UP;
-            if (mc.currentScreen instanceof ChatScreen) {
-                bottomLeft -= 14.0f;
-                bottomRight -= 14.0f;
-            }
+            bottomLeft -= (float) (14.0f * chatOpenAnimation.getFactor());
+            bottomRight -= (float) (14.0f * chatOpenAnimation.getFactor());
             if (potionHudConfig.getValue() == VanillaHud.MOVE
                     && !mc.player.getStatusEffects().isEmpty()) {
                 topRight += 27.0f;
@@ -143,7 +143,6 @@ public class HUDModule extends ToggleModule {
                     case ALPHABETICAL -> StreamUtils.sortCached(moduleStream, Module::getName);
                     case LENGTH -> StreamUtils.sortCached(moduleStream, m -> -RenderManager.textWidth(getFormattedModule(m)));
                 };
-
                 moduleStream.forEach(t -> arrayListRenderModule(event, t));
             }
             if (potionEffectsConfig.getValue()) {
@@ -322,6 +321,15 @@ public class HUDModule extends ToggleModule {
     }
 
     @EventListener
+    public void onChatOpen(ScreenOpenEvent event) {
+        if (event.getScreen() == null && chatOpenAnimation.getState()) {
+            chatOpenAnimation.setState(false);
+        } else if (event.getScreen() instanceof ChatScreen) {
+            chatOpenAnimation.setState(true);
+        }
+    }
+
+    @EventListener
     public void onRenderOverlayStatusEffect(RenderOverlayEvent.StatusEffect event) {
         if (potionHudConfig.getValue() == VanillaHud.HIDE) {
             event.cancel();
@@ -384,6 +392,10 @@ public class HUDModule extends ToggleModule {
         brightness = 0.5f + 0.5f * brightness;
         hsb[2] = brightness % 2;
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+    }
+
+    public float getChatAnimation() {
+        return (float) chatOpenAnimation.getFactor();
     }
 
     public enum VanillaHud {

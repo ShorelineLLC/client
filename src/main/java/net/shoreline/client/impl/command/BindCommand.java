@@ -31,7 +31,7 @@ public class BindCommand extends Command {
                             Module module = ModuleArgumentType.getModule(c, "module");
                             if (module instanceof ToggleModule t) {
                                 final String key = StringArgumentType.getString(c, "key");
-                                if (key == null || key.length() > 1) {
+                                if (key == null) {
                                     ChatUtil.error("Invalid key!");
                                     return 0;
                                 }

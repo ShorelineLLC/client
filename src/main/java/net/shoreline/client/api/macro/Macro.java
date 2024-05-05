@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.config.Serializable;
 import net.shoreline.client.impl.manager.client.MacroManager;
+import net.shoreline.client.util.KeyboardUtil;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -89,8 +90,7 @@ public class Macro implements Identifiable, Serializable<Macro> {
      */
     public String getKeyName() {
         if (keycode != GLFW.GLFW_KEY_UNKNOWN) {
-            final String name = GLFW.glfwGetKeyName(keycode,
-                    GLFW.glfwGetKeyScancode(keycode));
+            final String name = KeyboardUtil.getKeyName(keycode);
             return name != null ? name.toUpperCase() : "NONE";
         }
         return "NONE";

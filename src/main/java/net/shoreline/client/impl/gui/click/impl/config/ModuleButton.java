@@ -6,11 +6,11 @@ import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.api.render.anim.Animation;
-import net.shoreline.client.api.render.anim.Easing;
 import net.shoreline.client.impl.gui.click.component.Button;
 import net.shoreline.client.impl.gui.click.impl.config.setting.*;
 import net.shoreline.client.init.Modules;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -32,7 +32,7 @@ public class ModuleButton extends Button {
     private float off;
     //
     private boolean open;
-    private final Animation settingsAnimation = new Animation(Easing.CUBIC_IN_OUT, 200);
+    private final Animation settingsAnimation = new Animation(false, 200, Easing.CUBIC_IN_OUT);
 
     /**
      * @param module
@@ -99,14 +99,14 @@ public class ModuleButton extends Button {
         x = ix;
         y = iy;
         float scaledTime = 1.0f;
-        boolean fill = !(module instanceof ToggleModule t) || (scaledTime = t.getAnimation().getScaledTime()) > 0.01f;
+        boolean fill = !(module instanceof ToggleModule t) || (scaledTime = (float) t.getAnimation().getFactor()) > 0.01f;
         scaledTime *= 1.7f;
         if (module.getName().equalsIgnoreCase("ClickGui")) {
             scaledTime = 1.7f;
         }
         rectGradient(context, fill ? Modules.CLICK_GUI.getColor(scaledTime) : 0x555555, fill ? Modules.CLICK_GUI.getColor1(scaledTime) : 0x555555);
         RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? -1 : 0xaaaaaa);
-        if (settingsAnimation.getScaledTime() > 0.01f) {
+        if (settingsAnimation.getFactor() > 0.01f) {
             off = y + height + 1.0f;
             float fheight = 0.0f;
             for (ConfigButton<?> configButton : configComponents) {
@@ -118,14 +118,14 @@ public class ModuleButton extends Button {
                     fheight += colorPicker.getPickerHeight() * colorPicker.getScaledTime() * getScaledTime();
                 }
             }
-            enableScissor((int) x, (int) (off - 1.0f), (int) (x + width), (int) (off + 2.0f + (fheight * settingsAnimation.getScaledTime())));
+            enableScissor((int) x, (int) (off - 1.0f), (int) (x + width), (int) (off + 2.0f + (fheight * settingsAnimation.getFactor())));
             for (ConfigButton<?> configButton : configComponents) {
                 if (!configButton.getConfig().isVisible()) {
                     continue;
                 }
                 // run draw event
                 configButton.render(context, ix + 2.0f, off, mouseX, mouseY, delta);
-                ((CategoryFrame) frame).offset(configButton.getHeight() * settingsAnimation.getScaledTime());
+                ((CategoryFrame) frame).offset((float) (configButton.getHeight() * settingsAnimation.getFactor()));
                 off += configButton.getHeight();
             }
             if (fill) {
@@ -134,7 +134,7 @@ public class ModuleButton extends Button {
                 fillGradient(context, ix, off + 1.0f, ix + width, off + 2.0f, Modules.CLICK_GUI.getColor(scaledTime),  Modules.CLICK_GUI.getColor1(scaledTime));
             }
             disableScissor();
-            ((CategoryFrame) frame).offset(3.0f * settingsAnimation.getScaledTime());
+            ((CategoryFrame) frame).offset((float) (3.0f * settingsAnimation.getFactor()));
         }
     }
 
@@ -205,7 +205,7 @@ public class ModuleButton extends Button {
     }
 
     public float getScaledTime() {
-        return settingsAnimation.getScaledTime();
+        return (float) settingsAnimation.getFactor();
     }
 
     /**

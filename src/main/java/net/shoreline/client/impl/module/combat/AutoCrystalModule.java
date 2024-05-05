@@ -44,6 +44,7 @@ import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
+import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 import net.shoreline.client.util.world.EndCrystalUtil;
 import net.shoreline.client.util.world.EntityUtil;
@@ -167,9 +168,7 @@ public class AutoCrystalModule extends RotationModule {
     private final Map<BlockPos, Long> placePackets =
             Collections.synchronizedMap(new ConcurrentHashMap<>());
 
-    //gonna make a better solution for this in the future.
-    private final Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
-    private final Map<BlockPos, TimeAnimation> fadeLines = new HashMap<>();
+    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
 
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
@@ -195,6 +194,7 @@ public class AutoCrystalModule extends RotationModule {
         silentRotations = null;
         attackPackets.clear();
         placePackets.clear();
+        fadeList.clear();
         setStage("NONE");
     }
 
@@ -303,7 +303,7 @@ public class AutoCrystalModule extends RotationModule {
         {
             if (fadeConfig.getValue())
             {
-                for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
+                for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
                 {
                     if (set.getKey() == renderPos)
                     {
@@ -311,22 +311,12 @@ public class AutoCrystalModule extends RotationModule {
                     }
 
                     set.getValue().setState(false);
-                    int alpha = (int) set.getValue().getCurrent();
-                    Color color = Modules.COLORS.getColor(alpha);
-                    RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
-                }
-
-                for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
-                {
-                    if (set.getKey() == renderPos)
-                    {
-                        continue;
-                    }
-
-                    set.getValue().setState(false);
-                    int alpha = (int) set.getValue().getCurrent();
-                    Color color = Modules.COLORS.getColor(alpha);
-                    RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
+                    int boxAlpha = (int) (80 * set.getValue().getFactor());
+                    int lineAlpha = (int) (145 * set.getValue().getFactor());
+                    Color boxColor = Modules.COLORS.getColor(boxAlpha);
+                    Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                    RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
+                    RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
                 }
             }
 
@@ -348,16 +338,12 @@ public class AutoCrystalModule extends RotationModule {
                 }
                 else
                 {
-                    TimeAnimation boxAnimation = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
-                    TimeAnimation lineAnimation = new TimeAnimation(true, 0, 145, fadeTimeConfig.getValue());
-                    fadeBoxes.put(renderPos, boxAnimation);
-                    fadeLines.put(renderPos, lineAnimation);
+                    Animation animation = new Animation(true, fadeTimeConfig.getValue());
+                    fadeList.put(renderPos, animation);
                 }
             }
 
-            fadeBoxes.entrySet().removeIf(e ->
-                    e.getValue().getFactor() == 0.0);
-            fadeLines.entrySet().removeIf(e ->
+            fadeList.entrySet().removeIf(e ->
                     e.getValue().getFactor() == 0.0);
         }
     }

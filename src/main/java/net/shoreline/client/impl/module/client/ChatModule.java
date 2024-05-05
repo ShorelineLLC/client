@@ -1,9 +1,17 @@
 package net.shoreline.client.impl.module.client;
 
+import net.minecraft.client.gui.hud.ChatHudLine;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.util.render.animation.Easing;
+import net.shoreline.client.util.render.animation.TimeAnimation;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author linus

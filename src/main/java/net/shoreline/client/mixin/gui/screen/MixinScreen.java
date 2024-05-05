@@ -1,10 +1,12 @@
 package net.shoreline.client.mixin.gui.screen;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +31,14 @@ public abstract class MixinScreen {
     @Final
     private List<Drawable> drawables;
 
+    @Shadow
+    @Final
+    protected Text title;
+
+    @Shadow
+    @Nullable
+    protected MinecraftClient client;
+
     /**
      * @param drawableElement
      * @param <T>
@@ -44,8 +54,6 @@ public abstract class MixinScreen {
     public void tick() {
 
     }
-
-    @Shadow @Final protected Text title;
 
     /**
      * @return

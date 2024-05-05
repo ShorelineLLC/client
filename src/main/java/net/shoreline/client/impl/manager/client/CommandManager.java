@@ -54,7 +54,7 @@ public class CommandManager implements Globals {
                 new OpenFolderCommand(),
                 new PrefixCommand(),
                 new ResetCommand(),
-                new SoundReloadCommand(),
+                new ReloadSoundCommand(),
                 new ToggleCommand(),
                 new VanishCommand(),
                 new VClipCommand()

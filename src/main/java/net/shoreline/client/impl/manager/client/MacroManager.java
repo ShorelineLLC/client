@@ -4,10 +4,8 @@ import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.api.macro.Macro;
-import net.shoreline.client.api.module.Module;
-import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.MouseClickEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
-import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 import org.lwjgl.glfw.GLFW;
 
@@ -50,6 +48,26 @@ public class MacroManager implements Globals {
         for (Macro macro : macros) {
             if ((event.getAction() == GLFW.GLFW_PRESS) && event.getKeycode() != GLFW.GLFW_KEY_UNKNOWN
                     && event.getKeycode() == macro.getKeycode()) {
+                macro.runMacro();
+            }
+        }
+    }
+
+    @EventListener
+    public void onMouseInput(MouseClickEvent event) {
+        if (mc.player == null || mc.world == null
+                || mc.currentScreen != null) {
+            return;
+        }
+        // module keybind impl
+        //
+        if (macros.isEmpty()) {
+            return;
+        }
+        for (Macro macro : macros) {
+            // Mouse binds start at 1000 here
+            if ((event.getAction() == GLFW.GLFW_PRESS) && event.getButton() != GLFW.GLFW_KEY_UNKNOWN
+                    && event.getButton() + 1000 == macro.getKeycode()) {
                 macro.runMacro();
             }
         }

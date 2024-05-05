@@ -5,9 +5,9 @@ import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.util.chat.ChatUtil;
 
-public class SoundReloadCommand extends Command {
-    public SoundReloadCommand() {
-        super("SoundReload", "Reloads the Minecraft sound system", literal("soundreload"));
+public class ReloadSoundCommand extends Command {
+    public ReloadSoundCommand() {
+        super("ReloadSound", "Reloads the Minecraft sound system", literal("reloadsound"));
     }
 
     @Override

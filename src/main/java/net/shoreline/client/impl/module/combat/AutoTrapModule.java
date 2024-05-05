@@ -34,7 +34,7 @@ import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.player.PlayerUtil;
-import net.shoreline.client.util.render.animation.TimeAnimation;
+import net.shoreline.client.util.render.animation.Animation;
 
 import java.awt.*;
 import java.util.*;
@@ -59,8 +59,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where autotrap is placing blocks", false);
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false);
 
-    private final Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
-    private final Map<BlockPos, TimeAnimation> fadeLines = new HashMap<>();
+    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
 
     private List<BlockPos> surround = new ArrayList<>();
     private List<BlockPos> placements = new ArrayList<>();
@@ -412,34 +411,32 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     {
         if (renderConfig.getValue())
         {
-            for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
+
+            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 set.getValue().setState(false);
-                set.getValue().setState(false);
-                int alpha = (int) set.getValue().getCurrent();
-                Color color = Modules.COLORS.getColor(alpha);
-                RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
+                int boxAlpha = (int) (80 * set.getValue().getFactor());
+                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                Color boxColor = Modules.COLORS.getColor(boxAlpha);
+                Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
 
-            for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
-            {
-                set.getValue().setState(false);
-                int alpha = (int) set.getValue().getCurrent();
-                Color color = Modules.COLORS.getColor(alpha);
-                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
-            }
 
             if (placements.isEmpty())
             {
                 return;
             }
+
             for (BlockPos pos : placements)
             {
-                TimeAnimation boxAnimation = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
-                TimeAnimation lineAnimation = new TimeAnimation(true, 0, 145, fadeTimeConfig.getValue());
-                fadeBoxes.put(pos, boxAnimation);
-                fadeLines.put(pos, lineAnimation);
+                Animation animation = new Animation(true, fadeTimeConfig.getValue());
+                fadeList.put(pos, animation);
             }
         }
+
+        fadeList.entrySet().removeIf(e ->
+                e.getValue().getFactor() == 0.0);
     }
 }

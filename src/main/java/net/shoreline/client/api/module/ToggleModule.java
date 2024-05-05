@@ -6,8 +6,8 @@ import net.shoreline.client.api.config.setting.MacroConfig;
 import net.shoreline.client.api.config.setting.ToggleConfig;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.Hideable;
-import net.shoreline.client.api.render.anim.Animation;
-import net.shoreline.client.api.render.anim.Easing;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -28,7 +28,7 @@ import org.lwjgl.glfw.GLFW;
  */
 public class ToggleModule extends Module implements Hideable {
     //
-    private final Animation animation = new Animation(Easing.CUBIC_IN_OUT);
+    private final Animation animation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
     // Config representing the module enabled state. Cannot interact with
     // this configuration unless using #toggle() #enable() or #disable().
     Config<Boolean> enabledConfig = new ToggleConfig("Enabled", "The module" +

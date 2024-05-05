@@ -26,7 +26,7 @@ import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RayCastUtil;
 import net.shoreline.client.util.player.RotationUtil;
-import net.shoreline.client.util.render.animation.TimeAnimation;
+import net.shoreline.client.util.render.animation.Animation;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -46,8 +46,7 @@ public final class ScaffoldModule extends RotationModule
     Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where scaffold is placing blocks", false);
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false);
 
-    private Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
-    private Map<BlockPos, TimeAnimation> fadeLines = new HashMap<>();
+    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
     private BlockData lastBlockData;
     private boolean sneakOverride;
 
@@ -168,33 +167,32 @@ public final class ScaffoldModule extends RotationModule
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
-        for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
-        {
-            set.getValue().setState(false);
-            int alpha = (int) set.getValue().getCurrent();
-            Color color = Modules.COLORS.getColor(alpha);
-            RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
-        }
-
-        for (Map.Entry<BlockPos, TimeAnimation> set : fadeLines.entrySet())
-        {
-            set.getValue().setState(false);
-            int alpha = (int) set.getValue().getCurrent();
-            Color color = Modules.COLORS.getColor(alpha);
-            RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
-        }
-
-        if (lastBlockData == null || lastBlockData.getHitResult() == null)
-        {
-            return;
-        }
-
         if (renderConfig.getValue())
         {
-            TimeAnimation box = new TimeAnimation(true, 0, 80, fadeTimeConfig.getValue());
-            TimeAnimation line = new TimeAnimation(true, 0, 150, fadeTimeConfig.getValue());
-            fadeBoxes.put(lastBlockData.getPos().offset(lastBlockData.getSide()), box);
-            fadeLines.put(lastBlockData.getPos().offset(lastBlockData.getSide()), line);
+            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
+            {
+                set.getValue().setState(false);
+                int boxAlpha = (int) (80 * set.getValue().getFactor());
+                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                Color boxColor = Modules.COLORS.getColor(boxAlpha);
+                Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
+            }
+
+            if (lastBlockData == null || lastBlockData.getHitResult() == null)
+            {
+                return;
+            }
+
+            if (renderConfig.getValue())
+            {
+                Animation animation = new Animation(true, fadeTimeConfig.getValue());
+                fadeList.put(lastBlockData.getPos().offset(lastBlockData.getSide()), animation);
+            }
+
+            fadeList.entrySet().removeIf(e ->
+                    e.getValue().getFactor() == 0.0);
         }
     }
 

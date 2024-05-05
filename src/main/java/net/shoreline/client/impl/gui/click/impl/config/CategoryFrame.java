@@ -5,14 +5,14 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.api.render.anim.Animation;
-import net.shoreline.client.api.render.anim.Easing;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.component.Frame;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ColorButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.string.EnumFormatter;
 import org.lwjgl.glfw.GLFW;
 
@@ -42,7 +42,7 @@ public class CategoryFrame extends Frame {
     private boolean open;
     private boolean drag;
     //
-    private final Animation categoryAnimation = new Animation(Easing.CUBIC_IN_OUT, 200);
+    private final Animation categoryAnimation = new Animation(false, 200, Easing.CUBIC_IN_OUT);
 
     /**
      * @param x
@@ -61,7 +61,7 @@ public class CategoryFrame extends Frame {
                 moduleButtons.add(new ModuleButton(module, this, x, y));
             }
         }
-        categoryAnimation.setStateHard(true);
+        categoryAnimation.setState(true);
         open = true;
     }
 
@@ -115,14 +115,14 @@ public class CategoryFrame extends Frame {
         }
         rect(context, Modules.CLICK_GUI.getColor(1.7f));
         RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, -1);
-        if (categoryAnimation.getScaledTime() > 0.01f) {
-            enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getScaledTime()));
+        if (categoryAnimation.getFactor() > 0.01f) {
+            enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));
             fill(context, x, y + height, width, fheight, 0x77000000);
             off = y + height + 1.0f;
             inner = off;
             for (ModuleButton moduleButton : moduleButtons) {
                 moduleButton.render(context, x + 1.0f, inner + 1.0f, mouseX, mouseY, delta);
-                off += (moduleButton.getHeight() + 1.0f) * categoryAnimation.getScaledTime();
+                off += (float) ((moduleButton.getHeight() + 1.0f) * categoryAnimation.getFactor());
                 inner += moduleButton.getHeight() + 1.0f;
             }
             disableScissor();

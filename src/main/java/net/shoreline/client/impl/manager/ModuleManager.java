@@ -81,6 +81,7 @@ public class ModuleManager {
                 new AutoReconnectModule(),
                 new AutoRespawnModule(),
                 new BeaconSelectorModule(),
+                new BetterChatModule(),
                 // new BetterChatModule(),
                 new ChatNotifierModule(),
                 new ChestSwapModule(),

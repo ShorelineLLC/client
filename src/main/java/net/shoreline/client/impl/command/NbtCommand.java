@@ -22,7 +22,7 @@ public class NbtCommand extends Command {
                 ChatUtil.error("No Nbt tags on this item!");
                 return 0;
             }
-            ChatUtil.clientSendMessage(mc.player.getMainHandStack().getNbt().toString());
+            ChatUtil.clientSendMessage(mainhand.getNbt().toString());
             return 1;
         });
     }

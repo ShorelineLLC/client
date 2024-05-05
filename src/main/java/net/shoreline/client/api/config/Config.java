@@ -6,9 +6,9 @@ import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.render.anim.Animation;
-import net.shoreline.client.api.render.anim.Easing;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 import java.util.function.Supplier;
@@ -49,7 +49,7 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
     //
     private Supplier<Boolean> visible;
     //
-    protected final Animation configAnimation = new Animation(Easing.CUBIC_IN_OUT, 200);
+    protected final Animation configAnimation = new Animation(false, 200, Easing.CUBIC_IN_OUT);
 
     /**
      * Initializes the config with a default value. This constructor should

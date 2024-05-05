@@ -1,18 +1,24 @@
 package net.shoreline.client.mixin.gui.screen;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.gui.chat.ChatInputEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatKeyInputEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatRenderEvent;
+import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorTextFieldWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -22,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(ChatScreen.class)
-public class MixinChatScreen {
+public class MixinChatScreen extends MixinScreen {
     @Shadow
     protected TextFieldWidget chatField;
 
@@ -88,5 +94,16 @@ public class MixinChatScreen {
                 chatField.getY();
         ChatRenderEvent chatTextRenderEvent = new ChatRenderEvent(context, x, y);
         Shoreline.EVENT_HANDLER.dispatch(chatTextRenderEvent);
+    }
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
+    private void hookFill(DrawContext instance, int x1, int y1, int x2, int y2, int color) {
+        float openAnimation = Modules.HUD.isEnabled() ? 12.0f * Modules.HUD.getChatAnimation() : 12.0f;
+        RenderManager.rect(instance.getMatrices(), 2, this.height - 2.0f , this.width - 4, -openAnimation, client.options.getTextBackgroundColor(Integer.MIN_VALUE));
+    }
+
+    @Override
+    protected <T extends Element & Drawable & Selectable> T addDrawableChild(T drawableElement) {
+        return null;
     }
 }

@@ -48,6 +48,7 @@
     "entity.projectile.MixinFireworkRocketEntity",
     "gui.hud.MixinBossBarHud",
     "gui.hud.MixinChatHud",
+    "gui.hud.MixinChatHudLine",
     "gui.hud.MixinInGameHud",
     "gui.hud.MixinInGameOverlayRenderer",
     "gui.hud.MixinPlayerListHud",

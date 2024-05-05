@@ -1,51 +1,27 @@
 package net.shoreline.client.util.render.animation;
 
-public class TimeAnimation
+public class Animation
 {
     private Easing easing;
-    private double start;
-    private double target;
     private float length;
     private long last = 0L;
     private boolean state;
 
-    public TimeAnimation(double start, double target, float length)
+    public Animation(float length)
     {
-        this(false, start, target, length);
+        this(false, length);
     }
 
-    public TimeAnimation(boolean initial, double start, double target, float length)
+    public Animation(boolean initial, float length)
     {
-        this(initial, start, target, length, Easing.LINEAR);
+        this(initial, length, Easing.LINEAR);
     }
 
-    public TimeAnimation(boolean initial, double start, double target, float length, Easing easing)
+    public Animation(boolean initial, float length, Easing easing)
     {
-        this.start = start;
-        this.target = target;
         this.length = length;
         this.state = initial;
         this.easing = easing;
-    }
-
-    public double getStart()
-    {
-        return start;
-    }
-
-    public void setStart(double start)
-    {
-        this.start = start;
-    }
-
-    public double getTarget()
-    {
-        return target;
-    }
-
-    public void setTarget(double target)
-    {
-        this.target = target;
     }
 
     public void setState(boolean state)
@@ -71,7 +47,7 @@ public class TimeAnimation
 
     public double getCurrent()
     {
-        return start + ((target - start)) * getFactor();
+        return 1 + ((2 - 1)) * getFactor();
     }
 
     private double clamp(double in)

@@ -18,7 +18,7 @@ public class BooleanConfig extends Config<Boolean> {
     public BooleanConfig(String name, String desc, Boolean val,
                          Supplier<Boolean> visible) {
         super(name, desc, val, visible);
-        configAnimation.setStateHard(val);
+        configAnimation.setState(val);
     }
 
     @Override

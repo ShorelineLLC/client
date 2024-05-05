@@ -5,12 +5,12 @@ import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.api.render.anim.Animation;
-import net.shoreline.client.api.render.anim.Easing;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.init.Modules;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 
 import java.awt.*;
 
@@ -21,7 +21,7 @@ import java.awt.*;
 public class ColorButton extends ConfigButton<Color> {
 
     private boolean open;
-    private final Animation pickerAnimation = new Animation(Easing.CUBIC_IN_OUT, 200);
+    private final Animation pickerAnimation = new Animation(false, 200, Easing.CUBIC_IN_OUT);
     private float[] selectedColor;
 
     /**
@@ -44,7 +44,7 @@ public class ColorButton extends ConfigButton<Color> {
         //
         fill(context, ix + width - 11.0f, iy + 2.0f, 10.0f, 10.0f, ((ColorConfig) config).getRgb());
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, -1);
-        if (pickerAnimation.getScaledTime() > 0.01f) {
+        if (pickerAnimation.getFactor() > 0.01f) {
             ColorConfig colorConfig = (ColorConfig) config;
             if (ClickGuiScreen.MOUSE_LEFT_HOLD) {
                 if (isMouseOver(mouseX, mouseY, x + 1.0f, y + height + 2.0f, width - 2.0f, width) && !colorConfig.isGlobal()) {
@@ -78,13 +78,13 @@ public class ColorButton extends ConfigButton<Color> {
             }
             if (!config.getContainer().getName().equalsIgnoreCase("Colors")) {
                 Animation globalAnimation = colorConfig.getAnimation();
-                if (globalAnimation.getScaledTime() > 0.01) {
-                    fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, Modules.CLICK_GUI.getColor(globalAnimation.getScaledTime()));
+                if (globalAnimation.getFactor() > 0.01) {
+                    fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, Modules.CLICK_GUI.getColor((float) globalAnimation.getFactor()));
                 }
                 RenderManager.renderText(context, "ClientColor", x + 3.0f, y + height + (colorConfig.allowAlpha() ? 31.0f : 21.0f) + width, -1);
             }
-            moduleButton.offset(getPickerHeight() * pickerAnimation.getScaledTime());
-            ((CategoryFrame) frame).offset(getPickerHeight() * pickerAnimation.getScaledTime() * moduleButton.getScaledTime());
+            moduleButton.offset((float) (getPickerHeight() * pickerAnimation.getFactor()));
+            ((CategoryFrame) frame).offset((float) (getPickerHeight() * pickerAnimation.getFactor() * moduleButton.getScaledTime()));
             disableScissor();
         }
     }
@@ -127,6 +127,6 @@ public class ColorButton extends ConfigButton<Color> {
     }
 
     public float getScaledTime() {
-        return pickerAnimation.getScaledTime();
+        return (float) pickerAnimation.getFactor();
     }
 }
