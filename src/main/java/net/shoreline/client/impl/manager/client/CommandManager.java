@@ -5,6 +5,7 @@ import com.mojang.brigadier.RedirectModifier;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.Shoreline;
@@ -13,6 +14,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.command.*;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
+import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 import org.lwjgl.glfw.GLFW;
@@ -82,6 +84,14 @@ public class CommandManager implements Globals {
             } catch (Exception exception) {
                 // exception.printStackTrace();
             }
+        }
+    }
+
+    @EventListener
+    public void onKeyboardInput(KeyboardInputEvent event) {
+        if (event.getAction() == 1 && event.getKeycode() == prefixKey && mc.currentScreen == null) {
+            event.cancel();
+            mc.setScreen(new ChatScreen(""));
         }
     }
 

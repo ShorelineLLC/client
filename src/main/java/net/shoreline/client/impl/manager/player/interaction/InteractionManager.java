@@ -31,11 +31,12 @@ public final class InteractionManager implements Globals
 
     public boolean placeBlock(final BlockPos pos,
                               final int slot,
+                              final boolean grim,
                               final boolean strictDirection,
                               final boolean clientSwing,
                               final RotationCallback rotationCallback)
     {
-        Direction direction = getInteractDirection(pos, strictDirection);
+        Direction direction = getInteractDirection(pos, grim, strictDirection);
         if (Modules.BLOCK_INTERACT.isEnabled() && direction == null && !strictDirection)
         {
             // TODO: this should be not like this
@@ -139,9 +140,10 @@ public final class InteractionManager implements Globals
      * @param strictDirection
      * @return
      */
-    public Direction getInteractDirection(final BlockPos blockPos, final boolean strictDirection)
+    public Direction getInteractDirection(final BlockPos blockPos, final boolean grim, final boolean strictDirection)
     {
-        Set<Direction> ncpDirections = getPlaceDirectionsNCP(mc.player.getEyePos(), blockPos.toCenterPos());
+        Set<Direction> validDirections = grim ? getPlaceDirectionsGrim(mc.player.getEyePos(), blockPos) :
+                getPlaceDirectionsNCP(mc.player.getEyePos(), blockPos.toCenterPos());
         Direction interactDirection = null;
         for (final Direction direction : Direction.values())
         {
@@ -150,7 +152,7 @@ public final class InteractionManager implements Globals
             {
                 continue;
             }
-            if (strictDirection && !ncpDirections.contains(direction.getOpposite()))
+            if (strictDirection && !validDirections.contains(direction.getOpposite()))
             {
                 continue;
             }

@@ -11,6 +11,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
+import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 import org.spongepowered.asm.mixin.Final;
@@ -80,6 +81,11 @@ public class MixinChatHud
             animation.setState(true);
         }
 
+        ChatTextEvent chatTextEvent = new ChatTextEvent(text);
+        Shoreline.EVENT_HANDLER.dispatch(chatTextEvent);
+        if (chatTextEvent.isCanceled()) {
+            return instance.drawTextWithShadow(textRenderer, chatTextEvent.getText(), (int) ((animation != null && Modules.BETTER_CHAT.isEnabled() && Modules.BETTER_CHAT.getAnimationConfig().getValue() ? animation.getCurrent() : 0)), y, color);
+        }
         return instance.drawTextWithShadow(textRenderer, text, (int) ((animation != null && Modules.BETTER_CHAT.isEnabled() && Modules.BETTER_CHAT.getAnimationConfig().getValue() ? animation.getCurrent() : 0)), y, color);
     }
 

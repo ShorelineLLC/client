@@ -84,7 +84,7 @@ public class InventoryManager implements Globals {
     }
 
     /**
-     * Sends a {@link UpdateSelectedSlotC2SPacket} without any slot chekcs
+     * Sends a {@link UpdateSelectedSlotC2SPacket} without any slot checks
      * @param barSlot the player hotbar slot 0-8
      */
     public void setSlotForced(final int barSlot) {
@@ -173,10 +173,6 @@ public class InventoryManager implements Globals {
      */
     public int getServerSlot() {
         return slot;
-    }
-
-    public int getClientSlot() {
-        return mc.player.getInventory().selectedSlot;
     }
 
     /**

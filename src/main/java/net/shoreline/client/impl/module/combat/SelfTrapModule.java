@@ -38,6 +38,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * @author xgraza
@@ -45,17 +46,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class SelfTrapModule extends ObsidianPlacerModule
 {
-    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 5.0f);
+    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 5.0f);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
-    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of surround", true);
+    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true);
     Config<Boolean> centerConfig = new BooleanConfig("Center", "Centers the player before placing blocks", false);
-    Config<Boolean> extendConfig = new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true);
-    Config<Boolean> supportConfig = new BooleanConfig("Support", "Creates a floor for the surround if there is none", false);
-    Config<Boolean> headConfig = new BooleanConfig("Head", "If to place a block at your head", true);
+    Config<Boolean> extendConfig = new BooleanConfig("Extend", "Extends trap  if the player is not in the center of a block", true);
+    Config<Boolean> supportConfig = new BooleanConfig("Support", "Creates a floor for the trap  if there is none", false);
+    Config<Boolean> headConfig = new BooleanConfig("Head", "Place a block at your head", true);
     Config<Integer> shiftTicksConfig = new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5);
     Config<Integer> shiftDelayConfig = new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5);
     Config<Boolean> autoDisableConfig = new BooleanConfig("AutoDisable", "Disables after placing the blocks", true);
-    Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where selftrap is placing blocks", false);
+    Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where trap is placing blocks", false);
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false);
 
     private final Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
@@ -121,13 +122,21 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             return;
         }
         surround = getSelfTrapPositions(pos);
-        placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
+        placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).collect(Collectors.toList());
 
         if (placements.isEmpty())
         {
             return;
         }
-
+        if (supportConfig.getValue()) {
+            for (BlockPos block : new ArrayList<>(placements)) {
+                Direction direction = Managers.INTERACT.getInteractDirection(block, grimConfig.getValue(), strictDirectionConfig.getValue());
+                if (direction == null) {
+                    placements.add(block.down());
+                }
+            }
+        }
+        Collections.reverse(placements);
         final int shiftTicks = shiftTicksConfig.getValue();
         while (blocksPlaced < shiftTicks && !placements.isEmpty())
         {
@@ -165,7 +174,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        Managers.INTERACT.placeBlock(targetPos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
@@ -217,14 +226,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 blocks.add(pos2);
             }
         }
-        if (supportConfig.getValue()) {
-            for (BlockPos block : blocks) {
-                Direction direction = Managers.INTERACT.getInteractDirection(block, strictDirectionConfig.getValue());
-                if (direction == null) {
-                    blocks.add(block.down());
-                }
-            }
-        }
         for (BlockPos entityPos : entities) {
             blocks.add(entityPos.down());
         }
@@ -256,14 +257,12 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             final BlockPos blockPos = PlayerUtil.getRoundedBlockPos(
                     mc.player.getX(), mc.player.getY(), mc.player.getZ()).up(2);
             final Direction direction = Managers.INTERACT.getInteractDirection(
-                    blockPos, strictDirectionConfig.getValue());
+                    blockPos, grimConfig.getValue(), strictDirectionConfig.getValue());
             if (direction != null)
             {
                 blocks.add(blockPos);
             }
         }
-
-        Collections.reverse(blocks);
         return blocks;
     }
 

@@ -111,7 +111,7 @@ public class BlockLagModule extends ObsidianPlacerModule {
             }
         }
 
-        Managers.INTERACT.placeBlock(targetPos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {

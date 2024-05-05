@@ -66,7 +66,7 @@ public final class AutoTotemModule extends ToggleModule
         }
         // Get the item to wield in our offhand, and make sure we are already not holding the item
         final Item itemToWield = getItemToWield();
-        if (PlayerUtil.isHolding(itemToWield))
+        if (!mc.player.getOffHandStack().isEmpty() && mc.player.getOffHandStack().getItem() == itemToWield)
         {
             return;
         }
