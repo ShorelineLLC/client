@@ -250,7 +250,7 @@ public class AutoMineModule extends RotationModule {
     }
 
     private void renderMiningData(MatrixStack matrixStack, MiningData data) {
-        if (data != null && !mc.player.isCreative()) {
+        if (data != null && !mc.player.isCreative() && data.getBlockDamage() > 0.01f) {
             BlockPos mining = data.getPos();
             VoxelShape outlineShape = VoxelShapes.fullCube();
             if (!data.isInstantRemine()) {
