@@ -89,7 +89,7 @@ public class CommandManager implements Globals {
 
     @EventListener
     public void onKeyboardInput(KeyboardInputEvent event) {
-        if (event.getAction() == 1 && event.getKeycode() == prefixKey && !(mc.currentScreen instanceof ChatScreen)) {
+        if (event.getAction() == 1 && event.getKeycode() == prefixKey && mc.currentScreen == null) {
             event.cancel();
             mc.setScreen(new ChatScreen(""));
         }
