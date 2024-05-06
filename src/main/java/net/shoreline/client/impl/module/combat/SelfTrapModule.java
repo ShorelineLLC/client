@@ -252,17 +252,59 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         blocks.sort(Comparator.comparingDouble((blockPos)
                 -> -mc.player.squaredDistanceTo(blockPos.getX(), blockPos.getY(), blockPos.getZ())));
 
-        if (headConfig.getValue())
+        // This should be the absolute LAST thing to do, since placing around is a higher priority
+        final BlockPos headBlockPos = pos.up(2);
+        if (headConfig.getValue() && !blocks.isEmpty() && mc.world.getBlockState(headBlockPos).isAir())
         {
-            final BlockPos blockPos = PlayerUtil.getRoundedBlockPos(
-                    mc.player.getX(), mc.player.getY(), mc.player.getZ()).up(2);
-            final Direction direction = Managers.INTERACT.getInteractDirection(
-                    blockPos, grimConfig.getValue(), strictDirectionConfig.getValue());
-            if (direction != null)
+            searchForSupport:
             {
-                blocks.add(blockPos);
+                if (Modules.BLOCK_INTERACT.isEnabled() && !strictDirectionConfig.getValue())
+                {
+                    blocks.add(headBlockPos);
+                    break searchForSupport;
+                }
+
+                for (final Direction direction : Direction.values())
+                {
+                    final BlockPos neighbor = headBlockPos.offset(direction);
+                    if (entities.contains(neighbor.down()))
+                    {
+                        continue;
+                    }
+
+                    final Direction neighboringDirection = Managers.INTERACT.getInteractDirection(
+                            neighbor, grimConfig.getValue(), strictDirectionConfig.getValue());
+                    if (neighboringDirection != null)
+                    {
+                        // We need to assure that the head block would have a visible side to place on
+                        // with this getInteractionDirection result
+                        // TODO: more elegant way to do this? the code also doesnt look like it'd work, but for whatever reason it does
+                        if (strictDirectionConfig.getValue() && Managers.INTERACT.getPlaceDirectionsNCP(
+                                mc.player.getEyePos(), neighbor.toCenterPos()).contains(direction))
+                        {
+                            continue;
+                        }
+
+                        blocks.add(neighbor);
+                        blocks.add(headBlockPos);
+                        break;
+                    }
+                }
             }
         }
+
+
+//        if (headConfig.getValue())
+//        {
+//            final BlockPos blockPos = PlayerUtil.getRoundedBlockPos(
+//                    mc.player.getX(), mc.player.getY(), mc.player.getZ()).up(2);
+//            final Direction direction = Managers.INTERACT.getInteractDirection(
+//                    blockPos, grimConfig.getValue(), strictDirectionConfig.getValue());
+//            if (direction != null)
+//            {
+//                blocks.add(blockPos);
+//            }
+//        }
         return blocks;
     }
 

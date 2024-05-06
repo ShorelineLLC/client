@@ -377,6 +377,10 @@ public final class MSAAuthenticator
 
         try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpGet))
         {
+            if (response.getStatusLine().getStatusCode() != 200)
+            {
+                throw new MSAAuthException("Failed to fetch MC profile: Status code != 200, sc=" + response.getStatusLine().getStatusCode());
+            }
             final String rawJSON = EntityUtils.toString(response.getEntity());
             final JsonObject object = JsonParser.parseString(rawJSON).getAsJsonObject();
             if (object.has("error"))
