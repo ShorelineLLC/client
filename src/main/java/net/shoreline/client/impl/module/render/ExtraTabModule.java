@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.render;
 
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
@@ -9,15 +8,10 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListColumnsEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListNameEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.mixin.gui.hud.MixinPlayerListHud;
-
-import java.awt.*;
-import java.util.Objects;
 
 /**
  * @author hockeyl8, linus
@@ -37,15 +31,20 @@ public class ExtraTabModule extends ToggleModule {
     @EventListener
     public void onPlayerListName(PlayerListNameEvent event)
     {
-        if (selfConfig.getValue() && event.getPlayerName().getString().equals(mc.getGameProfile().getName()))
+        if (selfConfig.getValue() && event.getPlayerName().getString().contains(mc.getGameProfile().getName()))
         {
             event.cancel();
             event.setPlayerName(Text.of(("§s" + event.getPlayerName().getString())));
         }
-        if (friendsConfig.getValue() && Managers.SOCIAL.isFriend(event.getPlayerName()))
+        else if (friendsConfig.getValue())
         {
-            event.cancel();
-            event.setPlayerName(Text.of(Formatting.AQUA + event.getPlayerName().getString()));
+            for (String s : Managers.SOCIAL.getFriends()) {
+                if (event.getPlayerName().getString().contains(s)) {
+                    event.cancel();
+                    event.setPlayerName(Text.of(Formatting.AQUA + event.getPlayerName().getString()));
+                    break;
+                }
+            }
         }
     }
 
