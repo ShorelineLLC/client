@@ -46,6 +46,8 @@ public class MacroManager implements Globals {
             return;
         }
         for (Macro macro : macros) {
+            // Ignore mouse binds
+            if (macro.getKeycode() >= 1000) continue;
             if ((event.getAction() == GLFW.GLFW_PRESS) && event.getKeycode() != GLFW.GLFW_KEY_UNKNOWN
                     && event.getKeycode() == macro.getKeycode()) {
                 macro.runMacro();
@@ -65,6 +67,8 @@ public class MacroManager implements Globals {
             return;
         }
         for (Macro macro : macros) {
+            // Ignore keyboard binds
+            if (macro.getKeycode() < 1000) continue;
             // Mouse binds start at 1000 here
             if ((event.getAction() == GLFW.GLFW_PRESS) && event.getButton() != GLFW.GLFW_KEY_UNKNOWN
                     && event.getButton() + 1000 == macro.getKeycode()) {

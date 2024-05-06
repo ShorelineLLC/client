@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
  * @since 1.0
  */
 public class KeyboardUtil {
+
     /**
      * @param keycode
      * @return
@@ -28,22 +29,21 @@ public class KeyboardUtil {
             case GLFW.GLFW_KEY_INSERT -> "INSERT";
 
             // Mouse Buttons
-            case 1000 -> "MOUSE0";
-            case 1001 -> "MOUSE1";
-            case 1002 -> "MOUSE2";
-            case 1003 -> "MOUSE3";
-            case 1004 -> "MOUSE4";
-            case 1005 -> "MOUSE5";
-            case 1006 -> "MOUSE6";
-            case 1007 -> "MOUSE7";
-            case 1008 -> "MOUSE8";
-            case 1009 -> "MOUSE9";
+            case 1000 -> "MOUSE0"; // GLFW_MOUSE_BUTTON_1
+            case 1001 -> "MOUSE1"; // GLFW_MOUSE_BUTTON_2
+            case 1002 -> "MOUSE2"; // GLFW_MOUSE_BUTTON_3
+            case 1003 -> "MOUSE3"; // GLFW_MOUSE_BUTTON_4
+            case 1004 -> "MOUSE4"; // GLFW_MOUSE_BUTTON_5
+            case 1005 -> "MOUSE5"; // GLFW_MOUSE_BUTTON_6
+            case 1006 -> "MOUSE6"; // GLFW_MOUSE_BUTTON_7
+            case 1007 -> "MOUSE7"; // GLFW_MOUSE_BUTTON_8
             default -> GLFW.glfwGetKeyName(keycode, scancode);
         };
     }
 
     public static String getKeyName(int keycode) {
-        return getKeyName(keycode, GLFW.glfwGetKeyScancode(keycode));
+
+        return getKeyName(keycode, keycode < 1000 ? GLFW.glfwGetKeyScancode(keycode) : 0);
     }
 
     /**

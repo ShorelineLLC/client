@@ -66,6 +66,15 @@ public class BindButton extends ConfigButton<Macro> {
             } else if (button == GLFW_MOUSE_BUTTON_2 && !listening) {
                 // Reset the bind
                 ((MacroConfig) config).setValue(GLFW_KEY_UNKNOWN);
+            } else {
+                if (listening) {
+                    // Ignore Right click
+                    if (button != GLFW_MOUSE_BUTTON_2) {
+                        // Mouse bind
+                        ((MacroConfig) config).setValue(1000 + button);
+                    }
+                    listening = false;
+                }
             }
         }
     }
