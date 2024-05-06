@@ -26,7 +26,7 @@ public class BetterChatModule extends ToggleModule
 {
     Config<Timestamp> timestampConfig = new EnumConfig<>("Timestamp", "Shows chat timestamps", Timestamp.OFF, Timestamp.values());
     Config<Boolean> animationConfig = new BooleanConfig("Animation", "Animates the chat", false);
-    Config<Integer> timeConfig = new NumberConfig<>("Anim-Time", "Time for the animation", 0, 200, 1000, () -> animationConfig.getValue());
+    Config<Integer> timeConfig = new NumberConfig<>("Anim-Time", "Time for the animation", 0, 200, 1000, () -> false);
 
     public final Map<ChatHudLine, TimeAnimation> animationMap = new HashMap<>();
 
