@@ -74,7 +74,7 @@ public final class AutoTotemModule extends ToggleModule
         final int itemSlot = getSlotFor(itemToWield);
         if (itemSlot != -1)
         {
-            if (itemSlot < 9 && lastHotbarSlot == -1)
+            if (itemSlot < 9)
             {
                 lastHotbarItem = itemToWield;
                 lastHotbarSlot = itemSlot;
