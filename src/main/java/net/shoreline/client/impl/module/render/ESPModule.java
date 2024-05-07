@@ -28,7 +28,8 @@ public class ESPModule extends ToggleModule {
     Config<ESPMode> modeConfig = new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.GLOW, ESPMode.values());
     Config<Float> widthConfig = new NumberConfig<>("Linewidth", "ESP rendering line width", 0.1f, 1.25f, 5.0f);
     Config<Boolean> playersConfig = new BooleanConfig("Players", "Render players through walls", true);
-    Config<Color> playersColorConfig = new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue());
+    Config<Boolean> selfConfig = new BooleanConfig("Self", "Render self through walls", true);
+    Config<Color> playersColorConfig = new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue() || selfConfig.getValue());
     Config<Boolean> monstersConfig = new BooleanConfig("Monsters", "Render monsters through walls", true);
     Config<Color> monstersColorConfig = new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue());
     Config<Boolean> animalsConfig = new BooleanConfig("Animals", "Render animals through walls", true);
@@ -111,7 +112,8 @@ public class ESPModule extends ToggleModule {
     }
 
     public boolean checkESP(Entity entity) {
-        return entity != mc.player && entity instanceof PlayerEntity && playersConfig.getValue()
+        return entity == mc.player && selfConfig.getValue()
+                || entity instanceof PlayerEntity && playersConfig.getValue()
                 || EntityUtil.isMonster(entity) && monstersConfig.getValue()
                 || (EntityUtil.isNeutral(entity)
                 || EntityUtil.isPassive(entity)) && animalsConfig.getValue()
