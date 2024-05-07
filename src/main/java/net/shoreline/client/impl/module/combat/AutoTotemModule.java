@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
+import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -13,13 +14,16 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.world.EndCrystalUtil;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author xgraza
@@ -27,18 +31,15 @@ import java.util.List;
  */
 public final class AutoTotemModule extends ToggleModule
 {
-    // The player inventory sync ID
-    private static final int INVENTORY_SYNC_ID = 0;
-    private static final List<Item> HOTBAR_ITEMS = List.of(Items.TOTEM_OF_UNDYING,
-            Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE);
-
     EnumConfig<OffhandItem> itemConfig = new EnumConfig<>("Item", "The item to wield in your offhand", OffhandItem.TOTEM, OffhandItem.values());
     NumberConfig<Float> healthConfig = new NumberConfig<>("Health", "The health required to fall below before swapping to a totem", 0.0f, 14.0f, 20.0f);
-    BooleanConfig gappleConfig = new BooleanConfig("OffhandGapple", "If to equip a golden apple if holding down the item use button", true);
-    BooleanConfig crappleConfig = new BooleanConfig("Crapple", "If to use a normal golden apple if Absorption is present", true);
+    Config<Boolean> gappleConfig = new BooleanConfig("OffhandGapple", "If to equip a golden apple if holding down the item use button", true);
+    Config<Boolean> crappleConfig = new BooleanConfig("Crapple", "If to use a normal golden apple if Absorption is present", true);
     Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculate lethal damage sources", false);
-    Config<Boolean> fastConfig = new BooleanConfig("FastSwap", "Allows you to swap using faster packets", false);
-    private int lastSlot;
+    Config<Boolean> debugConfig = new BooleanConfig("Debug", "If to debug on death", false);
+
+    private int lastHotbarSlot, lastTotemCount;
+    private Item lastHotbarItem;
 
     public AutoTotemModule()
     {
@@ -52,21 +53,20 @@ public final class AutoTotemModule extends ToggleModule
     }
 
     @Override
-    public void onEnable()
+    public void onDisable()
     {
-        lastSlot = -1;
+        super.onDisable();
+        lastHotbarSlot = -1;
+        lastHotbarItem = null;
+        lastTotemCount = 0;
     }
 
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
-        if (mc.currentScreen != null)
-        {
-            return;
-        }
         // Get the item to wield in our offhand, and make sure we are already not holding the item
         final Item itemToWield = getItemToWield();
-        if (!mc.player.getOffHandStack().isEmpty() && mc.player.getOffHandStack().getItem() == itemToWield)
+        if (mc.player.getOffHandStack().getItem().equals(itemToWield))
         {
             return;
         }
@@ -74,35 +74,68 @@ public final class AutoTotemModule extends ToggleModule
         final int itemSlot = getSlotFor(itemToWield);
         if (itemSlot != -1)
         {
-            if (itemSlot < 9) {
-                lastSlot = itemSlot;
+            if (itemSlot < 9 && lastHotbarSlot == -1)
+            {
+                lastHotbarItem = itemToWield;
+                lastHotbarSlot = itemSlot;
             }
             // Do another quick swap (equivalent to hovering over an item & pressing F)
-            if (fastConfig.getValue()) {
-                mc.interactionManager.clickSlot(INVENTORY_SYNC_ID,
-                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
-            } else {
-                mc.interactionManager.clickSlot(INVENTORY_SYNC_ID, itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
-                mc.interactionManager.clickSlot(INVENTORY_SYNC_ID, 45, 0, SlotActionType.PICKUP, mc.player);
-                if (!mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
-                    mc.interactionManager.clickSlot(INVENTORY_SYNC_ID,
-                            itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
-                }
+            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                    itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
+            // Don't ask about the - 1, I don't want to talk about it
+            lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
+        }
+    }
+
+    @EventListener
+    public void onPacketInbound(final PacketEvent.Inbound event)
+    {
+        if (event.getPacket() instanceof HealthUpdateS2CPacket packet && packet.getHealth() <= 0.0f && debugConfig.getValue())
+        {
+            final Set<String> reasons = new LinkedHashSet<>();
+
+            if (lastTotemCount <= 0)
+            {
+                reasons.add("no_totems");
+            }
+
+            if (mc.player.currentScreenHandler.syncId != 0)
+            {
+                reasons.add("gui_fail(" + mc.player.currentScreenHandler.syncId + ")");
+            }
+
+            if (!mc.player.currentScreenHandler.getCursorStack().isEmpty())
+            {
+                reasons.add("cursor_stack=" + mc.player.currentScreenHandler.getCursorStack().getItem());
+            }
+
+            if (!reasons.isEmpty())
+            {
+                sendModuleMessage("Possible failure reasons: " + String.join(", ", reasons));
+            }
+            else
+            {
+                final int totemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING);
+                sendModuleMessage("Could not figure out possible reasons. meta:{totemCount=" + totemCount + ", matchesCache=" + (totemCount == lastTotemCount) + ", cached=" + lastTotemCount +"}");
             }
         }
     }
 
     private int getSlotFor(final Item item)
     {
-        if (lastSlot != -1 && item.equals(mc.player.getInventory().getStack(lastSlot).getItem())) {
-            int slot = lastSlot;
-            lastSlot = -1;
-            return slot;
+        if (lastHotbarSlot != -1 && lastHotbarItem != null)
+        {
+            final ItemStack stack = mc.player.getInventory().getStack(lastHotbarSlot);
+            if (stack.getItem().equals(item) && lastHotbarItem.equals(mc.player.getOffHandStack().getItem()))
+            {
+                final int tmp = lastHotbarSlot;
+                lastHotbarSlot = -1;
+                lastHotbarItem = null;
+                return tmp;
+            }
         }
-        // Only take totems from the hotbar
-        final int startSlot = HOTBAR_ITEMS.contains(item) ? 0 : 9;
         // Search through our inventory
-        for (int slot = 35; slot >= startSlot; slot--)
+        for (int slot = 36; slot >= 0; slot--)
         {
             final ItemStack itemStack = mc.player.getInventory().getStack(slot);
             if (!itemStack.isEmpty() && itemStack.getItem().equals(item))
