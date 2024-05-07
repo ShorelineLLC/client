@@ -126,6 +126,7 @@ public class Modules {
     public static NoRotateModule NO_ROTATE;
     public static NoWeatherModule NO_WEATHER;
     public static ParticlesModule PARTICLES;
+    public static PhaseESPModule PHASE_ESP;
     public static SkeletonModule SKELETON;
     public static SkyboxModule SKYBOX;
     public static TooltipsModule TOOLTIPS;
@@ -284,6 +285,7 @@ public class Modules {
             NO_ROTATE = (NoRotateModule) getRegisteredModule("norotate-module");
             NO_WEATHER = (NoWeatherModule) getRegisteredModule("noweather-module");
             PARTICLES = (ParticlesModule) getRegisteredModule("particles-module");
+            PHASE_ESP = (PhaseESPModule) getRegisteredModule("phaseesp-module");
             SKELETON = (SkeletonModule) getRegisteredModule("skeleton-module");
             SKYBOX = (SkyboxModule) getRegisteredModule("skybox-module");
             TOOLTIPS = (TooltipsModule) getRegisteredModule("tooltips-module");

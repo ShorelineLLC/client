@@ -133,6 +133,7 @@ public class ModuleManager {
                 new NoRotateModule(),
                 new NoWeatherModule(),
                 new ParticlesModule(),
+                new PhaseESPModule(),
                 new SkeletonModule(),
                 new SkyboxModule(),
                 new TooltipsModule(),
