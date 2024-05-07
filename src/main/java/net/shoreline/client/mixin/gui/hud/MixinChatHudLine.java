@@ -4,18 +4,23 @@ import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
+import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChatHudLine.class)
-public abstract class MixinChatHudLine implements Globals
+public abstract class MixinChatHudLine implements IChatHudLine, Globals
 {
+    @Unique
+    private int id;
+
     /**
      * Change "Modules.BETTER_CHAT.getEasingConfig())" to
      * Modules.BETTER_CHAT.getEasingConfig().getValue())
@@ -37,5 +42,15 @@ public abstract class MixinChatHudLine implements Globals
                         0,
                         Modules.BETTER_CHAT.getTimeConfig().getValue(),
                         Modules.BETTER_CHAT.getEasingConfig()));
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(int id) {
+        this.id = id;
     }
 }

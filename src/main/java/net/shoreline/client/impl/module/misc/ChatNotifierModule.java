@@ -72,7 +72,7 @@ public class ChatNotifierModule extends ToggleModule {
 
     @EventListener
     public void onEntityDeath(EntityDeathEvent event) {
-        if (event.getEntity().getDisplayName() == null) {
+        if (event.getEntity().getDisplayName() == null || !totemPopConfig.getValue()) {
             return;
         }
         int totems = Managers.TOTEM.getTotems(event.getEntity());

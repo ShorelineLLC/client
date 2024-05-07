@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.gui.hud;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -12,6 +13,8 @@ import net.minecraft.text.Text;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
+import net.shoreline.client.impl.imixin.IChatHud;
+import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 import org.spongepowered.asm.mixin.Final;
@@ -29,12 +32,19 @@ import java.util.List;
  * @since 1.0
  */
 @Mixin(ChatHud.class)
-public class MixinChatHud
+public abstract class MixinChatHud implements IChatHud
 {
     @Shadow
     @Final
     private List<ChatHudLine> messages;
+    @Shadow
+    @Final
+    private List<ChatHudLine.Visible> visibleMessages;
+
+    @Shadow public abstract void addMessage(Text message);
+
     private ChatHudLine current = null;
+    private int currentId;
 
     @Inject(
             method = "render",
@@ -89,6 +99,12 @@ public class MixinChatHud
         return instance.drawTextWithShadow(textRenderer, text, (int) ((animation != null && Modules.BETTER_CHAT.isEnabled() && Modules.BETTER_CHAT.getAnimationConfig().getValue() ? animation.getCurrent() : 0)), y, color);
     }
 
+    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/" +
+            "ChatHudLine$Visible;indicator()Lnet/minecraft/client/gui/hud/MessageIndicator;"))
+    private MessageIndicator hookRender(MessageIndicator original) {
+        return Modules.BETTER_CHAT.getNoSignatureConfig().getValue() ? null : original;
+    }
+
     /**
      * @param message
      * @param signature
@@ -105,5 +121,12 @@ public class MixinChatHud
                                 boolean refresh, CallbackInfo ci) {
         ChatMessageEvent chatMessageEvent = new ChatMessageEvent(message);
         Shoreline.EVENT_HANDLER.dispatch(chatMessageEvent);
+    }
+
+    @Override
+    public void addMessage(String message, int id) {
+        currentId = id;
+        addMessage(Text.of(message));
+        currentId = -1;
     }
 }
