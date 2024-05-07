@@ -112,9 +112,10 @@ public class ESPModule extends ToggleModule {
     }
 
     public boolean checkESP(Entity entity) {
-        return entity == mc.player && selfConfig.getValue()
-                || entity instanceof PlayerEntity && playersConfig.getValue()
-                || EntityUtil.isMonster(entity) && monstersConfig.getValue()
+        if (entity instanceof PlayerEntity && playersConfig.getValue()) {
+            return selfConfig.getValue() || entity != mc.player;
+        }
+        return EntityUtil.isMonster(entity) && monstersConfig.getValue()
                 || (EntityUtil.isNeutral(entity)
                 || EntityUtil.isPassive(entity)) && animalsConfig.getValue()
                 || EntityUtil.isVehicle(entity) && vehiclesConfig.getValue()
