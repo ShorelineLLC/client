@@ -48,11 +48,11 @@ public class SpeedmineModule extends RotationModule {
     Config<Swap> swapConfig = new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values(), () -> modeConfig.getValue() == SpeedmineMode.PACKET);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates when mining the block", true, () -> modeConfig.getValue() == SpeedmineMode.PACKET);
     Config<Boolean> grimConfig = new BooleanConfig("Grim", "Uses grim block breaking speeds", false);
-    Config<Boolean> strictConfig = new BooleanConfig("Strict", "Swaps to tool using alternative packets to bypass NCP silent swap", false, () -> swapConfig.getValue() != Swap.OFF && modeConfig.getValue() == SpeedmineMode.PACKET);
     private BlockPos mining;
     private BlockState state;
     private Direction direction;
     private float damage;
+    private boolean switchBack;
 
     public SpeedmineModule() {
         super("Speedmine", "Mines faster", ModuleCategory.WORLD, 900);
@@ -66,6 +66,9 @@ public class SpeedmineModule extends RotationModule {
 
     @Override
     public void onDisable() {
+        if (mining != null) {
+            Managers.INVENTORY.syncToClient();
+        }
         mining = null;
         state = null;
         direction = null;
@@ -89,7 +92,6 @@ public class SpeedmineModule extends RotationModule {
         if (modeConfig.getValue() != SpeedmineMode.PACKET || mc.player.isCreative()) {
             return;
         }
-
         if (mining == null) {
             damage = 0.0f;
             return;
@@ -112,20 +114,9 @@ public class SpeedmineModule extends RotationModule {
                 return;
             }
             if (swapConfig.getValue() != Swap.OFF) {
-                if (strictConfig.getValue()) {
-                    mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        slot + 36, prev, SlotActionType.SWAP, mc.player);
-                } else {
-                    Managers.INVENTORY.setSlot(slot);
-                }
-            }
-            if (swapConfig.getValue() == Swap.SILENT) {
-                if (strictConfig.getValue()) {
-                    mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        slot + 36, prev, SlotActionType.SWAP, mc.player);
-                } else {
-                    // Managers.INVENTORY.syncToClient();
-                }
+                Managers.INVENTORY.setSlot(slot);
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, mining, direction));
+                Managers.INVENTORY.syncToClient();
             }
             damage = 0.0f;
             mining = null;
