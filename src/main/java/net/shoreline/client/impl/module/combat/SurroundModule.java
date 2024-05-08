@@ -100,6 +100,9 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onPlayerTick(PlayerTickEvent event) {
+        if (Modules.SELF_TRAP.isEnabled()) {
+            return;
+        }
         // Do we need this check?? Surround is always highest prio
         blocksPlaced = 0;
         if (jumpDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5) {
@@ -281,7 +284,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onAddEntity(AddEntityEvent event) {
-        if (!(event.getEntity() instanceof EndCrystalEntity crystalEntity) || !attackConfig.getValue()) {
+        if (!(event.getEntity() instanceof EndCrystalEntity crystalEntity) || !attackConfig.getValue() || Modules.SELF_TRAP.isEnabled()) {
             return;
         }
         for (BlockPos blockPos : surround) {
@@ -295,7 +298,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event) {
-        if (mc.player == null) {
+        if (mc.player == null || Modules.SELF_TRAP.isEnabled()) {
             return;
         }
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet) {
@@ -319,6 +322,9 @@ public class SurroundModule extends ObsidianPlacerModule {
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
+        if (Modules.SELF_TRAP.isEnabled()) {
+            return;
+        }
         if (renderConfig.getValue())
         {
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())

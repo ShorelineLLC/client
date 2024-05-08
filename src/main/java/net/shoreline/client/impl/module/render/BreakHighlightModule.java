@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.render;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.BlockBreakingInfo;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
@@ -25,6 +25,8 @@ import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 
+import java.awt.*;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,12 +38,12 @@ public class BreakHighlightModule extends ToggleModule {
 
     Config<HighlightMode> modeConfig = new EnumConfig<>("Mode", "The mode for highlighting blocks", HighlightMode.PACKET, HighlightMode.values());
     Config<Float> rangeConfig = new NumberConfig<>("Range", "The range to render breaking blocks", 5.0f, 10.0f, 50.0f);
+    Config<Color> colorConfig = new ColorConfig("Color", "The break highlight color", new Color(255, 0, 0), false, true);
     //
     private final Map<BlockBreakingProgressS2CPacket, Long> breakingProgress = new ConcurrentHashMap<>();
 
     public BreakHighlightModule() {
-        super("BreakHighlight", "Highlights blocks that are being broken",
-                ModuleCategory.RENDER);
+        super("BreakHighlight", "Highlights blocks that are being broken", ModuleCategory.RENDER);
     }
 
     @EventListener
@@ -91,6 +93,12 @@ public class BreakHighlightModule extends ToggleModule {
             for (Map.Entry<BlockBreakingProgressS2CPacket, Long> mine : breakingProgress.entrySet()) {
                 BlockPos mining = mine.getKey().getPos();
                 long elapsedTime = System.currentTimeMillis() - mine.getValue();
+                long count = breakingProgress.keySet().stream().filter(p -> p.getEntityId() == mine.getKey().getEntityId()).count();
+                while (count > 2) {
+                    breakingProgress.entrySet().stream().filter(p -> p.getKey().getEntityId() == mine.getKey().getEntityId())
+                            .min(Comparator.comparingLong(Map.Entry::getValue)).ifPresent(min -> breakingProgress.remove(min.getKey(), min.getValue()));
+                    count--;
+                }
                 if (mc.world.isAir(mining) || elapsedTime > 2500) {
                     breakingProgress.remove(mine.getKey(), mine.getValue());
                     continue;
@@ -111,8 +119,8 @@ public class BreakHighlightModule extends ToggleModule {
                 double dy = (render1.maxY - render1.minY) / 2.0;
                 double dz = (render1.maxZ - render1.minZ) / 2.0;
                 final Box scaled = new Box(center, center).expand(dx * scale, dy * scale, dz * scale);
-                RenderManager.renderBox(event.getMatrices(), scaled, Modules.COLORS.getRGB(60));
-                RenderManager.renderBoundingBox(event.getMatrices(), scaled, 1.5f, Modules.COLORS.getRGB(125));
+                RenderManager.renderBox(event.getMatrices(), scaled, ((ColorConfig) colorConfig).getValue(60).getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), scaled, 1.5f, ((ColorConfig) colorConfig).getValue(125).getRGB());
             }
         }
     }

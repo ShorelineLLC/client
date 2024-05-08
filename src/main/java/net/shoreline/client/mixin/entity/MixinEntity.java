@@ -194,4 +194,12 @@ public abstract class MixinEntity implements Globals {
         Shoreline.EVENT_HANDLER.dispatch(cameraPositionEvent);
         cir.setReturnValue(cameraPositionEvent.getPosition());
     }
+
+    @Inject(method = "setBoundingBox", at = @At(value = "HEAD"))
+    private void hookSetBoundingBox(Box boundingBox, CallbackInfo ci) {
+        if ((Object) this == mc.player) {
+            SetBBEvent setBBEvent = new SetBBEvent(boundingBox);
+            Shoreline.EVENT_HANDLER.dispatch(setBBEvent);
+        }
+    }
 }
