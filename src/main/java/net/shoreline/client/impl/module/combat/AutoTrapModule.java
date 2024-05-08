@@ -47,7 +47,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public final class AutoTrapModule extends ObsidianPlacerModule
 {
-    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 5.0f);
+    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
     Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of trap", true);
     Config<Boolean> extendConfig = new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true);

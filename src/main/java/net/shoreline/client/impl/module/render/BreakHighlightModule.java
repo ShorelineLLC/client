@@ -23,6 +23,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
+import net.shoreline.client.util.world.BlastResistantBlocks;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,7 +46,8 @@ public class BreakHighlightModule extends ToggleModule {
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event) {
-        if (event.getPacket() instanceof BlockBreakingProgressS2CPacket packet && !contains(packet.getPos())) {
+        if (event.getPacket() instanceof BlockBreakingProgressS2CPacket packet && !contains(packet.getPos())
+                && !BlastResistantBlocks.isUnbreakable(packet.getPos())) {
             breakingProgress.put(packet, System.currentTimeMillis());
         }
     }

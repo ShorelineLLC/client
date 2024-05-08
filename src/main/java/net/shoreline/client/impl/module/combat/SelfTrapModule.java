@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  */
 public final class SelfTrapModule extends ObsidianPlacerModule
 {
-    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 5.0f);
+    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
     Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true);
     Config<Boolean> centerConfig = new BooleanConfig("Center", "Centers the player before placing blocks", false);

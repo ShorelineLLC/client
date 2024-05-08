@@ -90,10 +90,9 @@ public class AutoCrystalModule extends RotationModule {
     Config<Float> breakTimeoutConfig = new NumberConfig<>("BreakTimeout", "Time after waiting for the average break time before considering a crystal attack failed", 0.0f, 3.0f, 10.0f, () -> breakDelayConfig.getValue());
     Config<Float> minTimeoutConfig = new NumberConfig<>("MinTimeout", "Minimum time before considering a crystal break/place failed", 0.0f, 5.0f, 20.0f, () -> breakDelayConfig.getValue());
     Config<Integer> ticksExistedConfig = new NumberConfig<>("TicksExisted", "Minimum ticks alive to consider crystals for attack", 0, 0, 10);
-    Config<Float> breakRangeConfig = new NumberConfig<>("BreakRange", "Range to break crystals", 0.1f, 4.0f, 5.0f);
-    Config<Float> strictBreakRangeConfig = new NumberConfig<>("StrictBreakRange", "NCP range to break crystals", 0.1f, 4.0f, 5.0f);
+    Config<Float> breakRangeConfig = new NumberConfig<>("BreakRange", "Range to break crystals", 0.1f, 4.0f, 6.0f);
     Config<Float> maxYOffsetConfig = new NumberConfig<>("MaxYOffset", "Maximum crystal y-offset difference", 1.0f, 5.0f, 10.0f);
-    Config<Float> breakWallRangeConfig = new NumberConfig<>("BreakWallRange", "Range to break crystals through walls", 0.1f, 4.0f, 5.0f);
+    Config<Float> breakWallRangeConfig = new NumberConfig<>("BreakWallRange", "Range to break crystals through walls", 0.1f, 4.0f, 6.0f);
     Config<Swap> antiWeaknessConfig = new EnumConfig<>("AntiWeakness", "Swap to tools before attacking crystals", Swap.OFF, Swap.values());
     Config<Float> swapDelayConfig = new NumberConfig<>("SwapPenalty", "Delay for attacking after swapping items which prevents NCP flags", 0.0f, 0.0f, 10.0f);
     // fight.speed:
@@ -111,9 +110,8 @@ public class AutoCrystalModule extends RotationModule {
     Config<Boolean> manualConfig = new BooleanConfig("ManualCrystal", "Always breaks manually placed crystals", false);
     Config<Boolean> placeConfig = new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true);
     Config<Float> placeSpeedConfig = new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue());
-    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 5.0f, () -> placeConfig.getValue());
-    Config<Float> strictPlaceRangeConfig = new NumberConfig<>("StrictPlaceRange", "NCP range to place crystals", 0.1f, 4.0f, 5.0f, () -> placeConfig.getValue());
-    Config<Float> placeWallRangeConfig = new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 5.0f, () -> placeConfig.getValue());
+    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue());
+    Config<Float> placeWallRangeConfig = new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue());
     Config<Boolean> placeRangeEyeConfig = new BooleanConfig("PlaceRangeEye", "Calculates place ranges starting from the eye position of the player", false, () -> placeConfig.getValue());
     Config<Boolean> placeRangeCenterConfig = new BooleanConfig("PlaceRangeCenter", "Calculates place ranges to the center of the block", true, () -> placeConfig.getValue());
     Config<Boolean> antiTotemConfig = new BooleanConfig("AntiTotem", "Predicts totems and places crystals to instantly double pop and kill the target", false, () -> placeConfig.getValue());

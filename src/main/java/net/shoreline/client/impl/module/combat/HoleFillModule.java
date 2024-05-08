@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class HoleFillModule extends ObsidianPlacerModule {
     //
-    Config<Float> rangeConfig = new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 5.0f);
+    Config<Float> rangeConfig = new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f);
     Config<Boolean> proximityConfig = new BooleanConfig("ProximityCheck", "Fills holes when enemies are within a certain range", false);
     Config<Float> proximityRangeConfig = new NumberConfig<>("Range", "The range from the target to the hole", 0.5f, 1.0f, 4.0f, () -> proximityConfig.getValue());
     Config<Float> enemyRangeConfig = new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f);

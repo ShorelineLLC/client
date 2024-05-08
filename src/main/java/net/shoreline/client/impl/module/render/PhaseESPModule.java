@@ -29,7 +29,7 @@ public class PhaseESPModule extends ToggleModule {
 
     @EventListener
     public void onRenderWorld(RenderWorldEvent event) {
-        if (mc.player == null || mc.world == null) {
+        if (mc.player == null || mc.world == null || !mc.player.isOnGround()) {
             return;
         }
         BlockPos playerPos = mc.player.getBlockPos();
