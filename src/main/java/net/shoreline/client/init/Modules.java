@@ -39,6 +39,7 @@ public class Modules {
     public static AutoLogModule AUTO_LOG;
     public static AutoTotemModule AUTO_TOTEM;
     public static AutoTrapModule AUTO_TRAP;
+    public static AutoWebModule AUTO_WEB;
     public static AutoXPModule AUTO_XP;
     public static BackTrackModule BACK_TRACK;
     public static BlockLagModule BLOCK_LAG;
@@ -113,6 +114,7 @@ public class Modules {
     public static YawModule YAW;
     // Render
     public static BlockHighlightModule BLOCK_HIGHLIGHT;
+    public static BreadcrumbsModule BREADCRUMBS;
     public static BreakHighlightModule BREAK_HIGHLIGHT;
     public static ChamsModule CHAMS;
     public static ESPModule ESP;
@@ -203,6 +205,7 @@ public class Modules {
             AUTO_LOG = (AutoLogModule) getRegisteredModule("autolog-module");
             AUTO_TOTEM = (AutoTotemModule) getRegisteredModule("autototem-module");
             AUTO_TRAP = (AutoTrapModule) getRegisteredModule("autotrap-module");
+            AUTO_WEB = (AutoWebModule) getRegisteredModule("autoweb-module");
             AUTO_XP = (AutoXPModule) getRegisteredModule("autoxp-module");
             // BACK_TRACK = (BackTrackModule) getRegisteredModule("backtrack-module");
             BLOCK_LAG = (BlockLagModule) getRegisteredModule("blocklag-module");
@@ -272,6 +275,7 @@ public class Modules {
             VELOCITY = (VelocityModule) getRegisteredModule("velocity-module");
             YAW = (YawModule) getRegisteredModule("yaw-module");
             BLOCK_HIGHLIGHT = (BlockHighlightModule) getRegisteredModule("blockhighlight-module");
+            // BREADCRUMBS = (BreadcrumbsModule) getRegisteredModule("breadcrumbs-module");
             BREAK_HIGHLIGHT = (BreakHighlightModule) getRegisteredModule("breakhighlight-module");
             CHAMS = (ChamsModule) getRegisteredModule("chams-module");
             ESP = (ESPModule) getRegisteredModule("esp-module");

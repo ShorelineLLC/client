@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -37,7 +38,9 @@ import java.util.Map;
 public class HoleFillModule extends ObsidianPlacerModule {
     //
     Config<Boolean> obsidianConfig = new BooleanConfig("Obsidian", "Fills obsidian holes", true);
+    Config<Boolean> doublesConfig = new BooleanConfig("Doubles", "Fills double holes", false);
     Config<Float> rangeConfig = new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f);
+    Config<Boolean> websConfig = new BooleanConfig("Webs", "Fills holes with webs", false);
     Config<Boolean> autoConfig = new BooleanConfig("Auto", "Fills holes when enemies are within a certain range", false);
     Config<Float> targetRangeConfig = new NumberConfig<>("TargetRange", "The range from the target to the hole", 0.5f, 3.0f, 5.0f, () -> autoConfig.getValue());
     Config<Float> enemyRangeConfig = new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f, () -> autoConfig.getValue());
@@ -50,13 +53,19 @@ public class HoleFillModule extends ObsidianPlacerModule {
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false);
     private int shiftDelay;
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
-    private List<BlockPos> fills;
+    private List<BlockPos> fills = new ArrayList<>();
 
     /**
      *
      */
     public HoleFillModule() {
         super("HoleFill", "Fills in nearby holes with blocks", ModuleCategory.COMBAT);
+    }
+
+    @Override
+    public void onDisable() {
+        fadeList.clear();
+        fills.clear();
     }
 
     @EventListener
@@ -74,7 +83,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
         }
         List<BlockPos> holes = new ArrayList<>();
         for (Hole hole : Managers.HOLE.getHoles()) {
-            if (hole.isQuad() || hole.getSafety() == HoleType.OBSIDIAN && !obsidianConfig.getValue()) {
+            if (hole.isQuad() || hole.isDouble() && !doublesConfig.getValue() || hole.getSafety() == HoleType.OBSIDIAN && !obsidianConfig.getValue()) {
                 continue;
             }
             if (hole.squaredDistanceTo(mc.player) > ((NumberConfig) rangeConfig).getValueSq()) {
@@ -127,7 +136,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
 
     private void attackPlace(BlockPos targetPos)
     {
-        final int slot = getResistantBlockItem();
+        final int slot = websConfig.getValue() ? getBlockItemSlot(Blocks.COBWEB) : getResistantBlockItem();
         if (slot == -1)
         {
             return;

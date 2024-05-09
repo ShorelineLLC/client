@@ -44,6 +44,7 @@ public class ModuleManager {
                 new AutoLogModule(),
                 new AutoTotemModule(),
                 new AutoTrapModule(),
+                new AutoWebModule(),
                 new AutoXPModule(),
                 // new BackTrackModule(),
                 new BlockLagModule(),
@@ -120,6 +121,7 @@ public class ModuleManager {
                 new YawModule(),
                 // Render
                 new BlockHighlightModule(),
+                // new BreadcrumbsModule(),
                 new BreakHighlightModule(),
                 new ChamsModule(),
                 new ESPModule(),
