@@ -277,7 +277,7 @@ public class SurroundModule extends ObsidianPlacerModule {
         return blocks;
     }
 
-    private boolean isEntityBlockingSurround(Entity entity) {
+    public boolean isEntityBlockingSurround(Entity entity) {
         return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity
                 || (entity instanceof EndCrystalEntity && attackConfig.getValue());
     }
