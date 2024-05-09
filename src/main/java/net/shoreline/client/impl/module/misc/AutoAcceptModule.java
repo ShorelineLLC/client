@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.misc;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;

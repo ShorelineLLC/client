@@ -38,7 +38,7 @@ public class Hole implements Position {
      * @return
      */
     public double squaredDistanceTo(Entity entity) {
-        return entity.squaredDistanceTo(getCenter());
+        return entity.getEyePos().squaredDistanceTo(getCenter());
     }
 
     public boolean isStandard() {
