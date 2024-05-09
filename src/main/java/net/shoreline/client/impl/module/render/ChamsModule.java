@@ -75,7 +75,6 @@ public class ChamsModule extends ToggleModule {
             return;
         }
         RenderSystem.enableBlend();
-        // RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableCull();
         Tessellator tessellator = Tessellator.getInstance();

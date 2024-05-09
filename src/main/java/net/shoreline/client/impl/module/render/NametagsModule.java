@@ -175,11 +175,9 @@ public class NametagsModule extends ToggleModule {
             matrixStack.translate(8.0f, 8.0f, 0.0f);
             matrixStack.scale(16.0f, 16.0f, 0.0f);
             matrixStack.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 0.0f));
-            DiffuseLighting.disableGuiDepthLighting();
-            renderItem(stack, ModelTransformationMode.GUI, 0xff0000, OverlayTexture.DEFAULT_UV,
+            renderItem(stack, ModelTransformationMode.GUI, 0xffffff, OverlayTexture.field_32955,
                     matrixStack, mc.getBufferBuilders().getEntityVertexConsumers(), mc.world, 0);
             mc.getBufferBuilders().getEntityVertexConsumers().draw();
-            DiffuseLighting.enableGuiDepthLighting();
             matrixStack.pop();
             renderItemOverlay(matrixStack, stack, (int) n10, (int) m2);
             // int n4 = (n11 > 4) ? ((n11 - 4) * 8 / 2) : 0;
@@ -227,7 +225,7 @@ public class NametagsModule extends ToggleModule {
                     matrices, vertexConsumers, light, overlay);
         } else {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookRenderBakedItemModel(bakedModel, stack, light,
-                    overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayers.getItemLayer(stack, false), stack.hasGlint()));
+                    overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayersClient.ITEM_ENTITY_TRANSLUCENT_CULL, stack.hasGlint()));
         }
     }
 
