@@ -5,6 +5,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.event.listener.EventListener;
@@ -12,6 +14,8 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.MouseClickEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.init.Modules;
+import net.shoreline.client.util.player.RayCastUtil;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -40,11 +44,13 @@ public class MiddleClickModule extends ToggleModule {
         }
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_MIDDLE
                 && event.getAction() == GLFW.GLFW_PRESS && mc.currentScreen == null) {
-            if (mc.targetedEntity instanceof PlayerEntity target && target.getDisplayName() != null && friendConfig.getValue()) {
-                if (Managers.SOCIAL.isFriend(target.getDisplayName())) {
-                    Managers.SOCIAL.remove(target.getDisplayName());
+            double d = mc.interactionManager.hasExtendedReach() ? 6.0 : mc.interactionManager.getReachDistance();
+            HitResult result = Modules.FREECAM.isEnabled() ? RayCastUtil.raycastEntity(d, Modules.FREECAM.getCameraPosition(), Modules.FREECAM.getCameraRotations()) : RayCastUtil.raycastEntity(d);
+            if (friendConfig.getValue() && result != null && result.getType() == HitResult.Type.ENTITY && ((EntityHitResult) result).getEntity() instanceof PlayerEntity target) {
+                if (Managers.SOCIAL.isFriend(target.getName())) {
+                    Managers.SOCIAL.remove(target.getName());
                 } else {
-                    Managers.SOCIAL.addFriend(target.getDisplayName());
+                    Managers.SOCIAL.addFriend(target.getName());
                 }
             } else {
                 Item item = null;

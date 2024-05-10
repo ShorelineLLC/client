@@ -46,7 +46,7 @@ public class FreecamModule extends ToggleModule {
 
     public Vec3d position, lastPosition;
 
-    private float yaw, pitch;
+    public float yaw, pitch;
 
     private boolean control = false;
 
@@ -234,6 +234,14 @@ public class FreecamModule extends ToggleModule {
         this.pitch += f;
         this.yaw += g;
         this.pitch = MathHelper.clamp(pitch, -90.0F, 90.0F);
+    }
+
+    public Vec3d getCameraPosition() {
+        return position;
+    }
+
+    public float[] getCameraRotations() {
+        return new float[] {yaw, pitch};
     }
 
     public enum Interact {
