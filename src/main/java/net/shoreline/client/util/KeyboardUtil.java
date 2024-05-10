@@ -30,6 +30,12 @@ public class KeyboardUtil {
             case GLFW.GLFW_KEY_CAPS_LOCK -> "CAPS_LOCK";
             case GLFW.GLFW_KEY_PAGE_UP -> "PAGE_UP";
             case GLFW.GLFW_KEY_PAGE_DOWN -> "PAGE_DOWN";
+            case GLFW.GLFW_KEY_HOME -> "HOME";
+            case GLFW.GLFW_KEY_END -> "END";
+            case GLFW.GLFW_KEY_LEFT -> "LEFT";
+            case GLFW.GLFW_KEY_RIGHT -> "RIGHT";
+            case GLFW.GLFW_KEY_UP -> "UP";
+            case GLFW.GLFW_KEY_DOWN -> "DOWN";
 
             // Mouse Buttons
             case 1000 -> "MOUSE0"; // GLFW_MOUSE_BUTTON_1
