@@ -9,15 +9,14 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
@@ -395,7 +394,7 @@ public class AuraModule extends RotationModule {
         for (Entity entity : mc.world.getEntities()) {
             if (entity == null || entity == mc.player
                     || !entity.isAlive() || !isEnemy(entity)
-                    || entity.getDisplayName() != null && Managers.SOCIAL.isFriend(entity.getDisplayName())
+                    || Managers.SOCIAL.isFriend(entity.getName())
                     || entity instanceof EndCrystalEntity
                     || entity instanceof ItemEntity
                     || entity instanceof ArrowEntity
@@ -465,7 +464,6 @@ public class AuraModule extends RotationModule {
     /**
      * @param dist
      * @param pos
-     * @param entity
      * @return
      */
     public boolean isInAttackRange(double dist, Vec3d pos, Vec3d entityPos) {

@@ -42,7 +42,7 @@ public class SocialManager implements Globals {
     }
 
     public boolean isFriend(Text name) {
-        return isRelation(name.getString(), SocialRelation.FRIEND);
+        return name != null && isRelation(name.getString(), SocialRelation.FRIEND);
     }
 
     /**

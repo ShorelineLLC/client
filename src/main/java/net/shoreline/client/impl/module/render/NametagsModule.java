@@ -32,6 +32,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.world.FakePlayerEntity;
@@ -77,7 +78,10 @@ public class NametagsModule extends ToggleModule {
 
         for (Entity entity : mc.world.getEntities()) {
             if (entity instanceof PlayerEntity player) {
-                if (!player.isAlive() || player == mc.player || !invisiblesConfig.getValue() && player.isInvisible()) {
+                if (player == mc.player && !Modules.FREECAM.isEnabled()) {
+                    continue;
+                }
+                if (!player.isAlive() || !invisiblesConfig.getValue() && player.isInvisible()) {
                     continue;
                 }
                 String info = getNametagInfo(player);
@@ -390,7 +394,10 @@ public class NametagsModule extends ToggleModule {
     }
 
     private int getNametagColor(PlayerEntity player) {
-        if (player.getDisplayName() != null && Managers.SOCIAL.isFriend(player.getDisplayName())) {
+        if (player == mc.player) {
+            return Modules.COLORS.getRGB(255);
+        }
+        if (Managers.SOCIAL.isFriend(player.getName())) {
             return 0xff66ffff;
         }
         if (player.isInvisible()) {

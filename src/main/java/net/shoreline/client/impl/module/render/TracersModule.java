@@ -76,7 +76,7 @@ public class TracersModule extends ToggleModule {
         if (entity.isInvisible() && invisiblesConfig.getValue()) {
             return invisiblesColorConfig.getValue();
         } else if (entity instanceof PlayerEntity player && playersConfig.getValue()) {
-            if (player.getDisplayName() != null && Managers.SOCIAL.isFriend(player.getDisplayName())) {
+            if (Managers.SOCIAL.isFriend(player.getName())) {
                 return new Color(85, 200, 200, 255);
             }
             return playersColorConfig.getValue();

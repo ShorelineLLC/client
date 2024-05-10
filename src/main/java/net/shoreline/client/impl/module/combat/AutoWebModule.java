@@ -48,7 +48,7 @@ public class AutoWebModule extends BlockPlacerModule {
         }
         List<BlockPos> webs = new ArrayList<>();
         for (PlayerEntity entity : mc.world.getPlayers()) {
-            if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getGameProfile().getName())) {
+            if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getName())) {
                 continue;
             }
             double d = mc.player.distanceTo(entity);

@@ -86,6 +86,6 @@ public class AutoLogModule extends ToggleModule {
     }
 
     private boolean checkEnemy(AbstractClientPlayerEntity player) {
-        return player.getDisplayName() != null && !Managers.SOCIAL.isFriend(player.getDisplayName()) && !(player instanceof FakePlayerEntity);
+        return !Managers.SOCIAL.isFriend(player.getName()) && !(player instanceof FakePlayerEntity);
     }
 }

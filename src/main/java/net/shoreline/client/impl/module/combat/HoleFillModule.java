@@ -95,7 +95,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
             }
             if (autoConfig.getValue()) {
                 for (PlayerEntity entity : mc.world.getPlayers()) {
-                    if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getGameProfile().getName())) {
+                    if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getName())) {
                         continue;
                     }
                     double dist = mc.player.distanceTo(entity);
