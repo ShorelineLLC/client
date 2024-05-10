@@ -816,12 +816,10 @@ public class AutoCrystalModule extends RotationModule {
     }
 
     private boolean isCrystalLethalTo(DamageData<?> crystal, LivingEntity entity) {
-        if (!isFeetSurrounded(entity)) {
-            return false;
-        }
         if (lethalDamageConfig.getValue()) {
             return lastAttackTimer.passed(500);
         }
+
         float health = entity.getHealth() + entity.getAbsorptionAmount();
         if (crystal.getDamage() * (1.0f + lethalMultiplier.getValue()) >= health + 0.5f) {
             return true;

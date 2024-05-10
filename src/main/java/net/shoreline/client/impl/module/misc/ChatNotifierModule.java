@@ -11,6 +11,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
+import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
@@ -22,6 +23,7 @@ public class ChatNotifierModule extends ToggleModule {
     Config<Boolean> totemPopConfig = new BooleanConfig("TotemPop", "Notifies in chat when a player pops a totem", true);
     Config<Boolean> visualRangeConfig = new BooleanConfig("VisualRange", "Notifies in chat when player enters visual range", false);
     Config<Boolean> friendsConfig = new BooleanConfig("Friends", "Notifies for friends", false);
+    Config<Boolean> grimConfig = new BooleanConfig("Grim", "Notifies you if the server you join is running GrimAC", false);
 
     public ChatNotifierModule() {
         super("ChatNotifier", "Notifies in chat", ModuleCategory.MISCELLANEOUS);
@@ -41,6 +43,22 @@ public class ChatNotifierModule extends ToggleModule {
                 return;
             }
             ChatUtil.clientSendMessage((isFriend ? "§b" : "§s") + playerName + "§f popped §s" + totems + "§f totems");
+        }
+    }
+
+    @EventListener
+    public void onGameJoin(GameJoinEvent event)
+    {
+        if (grimConfig.getValue())
+        {
+            if (Managers.ANTICHEAT.isGrim())
+            {
+                ChatUtil.clientSendMessage("This server is running GrimAC.");
+            }
+            else
+            {
+                ChatUtil.clientSendMessage("This server is not running GrimAC.");
+            }
         }
     }
 
