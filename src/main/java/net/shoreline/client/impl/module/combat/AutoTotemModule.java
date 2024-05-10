@@ -19,7 +19,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
-import net.shoreline.client.util.world.EndCrystalUtil;
+import net.shoreline.client.util.world.ExplosionUtil;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -184,7 +184,7 @@ public final class AutoTotemModule extends ToggleModule
                 {
                     continue;
                 }
-                double potential = EndCrystalUtil.getDamageTo(mc.player, crystal.getPos());
+                double potential = ExplosionUtil.getDamageTo(mc.player, crystal.getPos());
                 if (health + 0.5 > potential)
                 {
                     continue;
