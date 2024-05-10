@@ -36,6 +36,7 @@ public final class AutoTotemModule extends ToggleModule
     Config<Boolean> gappleConfig = new BooleanConfig("OffhandGapple", "If to equip a golden apple if holding down the item use button", true);
     Config<Boolean> crappleConfig = new BooleanConfig("Crapple", "If to use a normal golden apple if Absorption is present", true);
     Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculate lethal damage sources", false);
+    Config<Boolean> fastConfig = new BooleanConfig("FastSwap", "Swaps items to offhand", true);
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "If to debug on death", false);
 
     private int lastHotbarSlot, lastTotemCount;
@@ -80,8 +81,19 @@ public final class AutoTotemModule extends ToggleModule
                 lastHotbarSlot = itemSlot;
             }
             // Do another quick swap (equivalent to hovering over an item & pressing F)
-            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                    itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
+            if (fastConfig.getValue()) {
+                mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
+            } else {
+                mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+                mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                        45, 0, SlotActionType.PICKUP, mc.player);
+                if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
+                    mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                            itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+                }
+            }
             // Don't ask about the - 1, I don't want to talk about it
             lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
         }
