@@ -107,7 +107,6 @@ public class AutoCrystalModule extends RotationModule {
     //        two: 30
     //        four: 60
     //        eight: 100
-    Config<Boolean> manualConfig = new BooleanConfig("ManualCrystal", "Always breaks manually placed crystals", false);
     Config<Boolean> placeConfig = new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true);
     Config<Float> placeSpeedConfig = new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue());
     Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue());
@@ -160,7 +159,6 @@ public class AutoCrystalModule extends RotationModule {
     private final Timer autoSwapTimer = new CacheTimer();
     //
     private final ArrayDeque<Long> attackLatency = new EvictingQueue<>(20);
-    private final List<BlockPos> manualCrystals = new ArrayList<>();
     private final Map<Integer, Long> attackPackets =
             Collections.synchronizedMap(new ConcurrentHashMap<>());
     private final Map<BlockPos, Long> placePackets =
@@ -370,14 +368,13 @@ public class AutoCrystalModule extends RotationModule {
         }
         Vec3d crystalPos = crystalEntity.getPos();
         BlockPos blockPos = BlockPos.ofFloored(crystalPos.add(0.0, -1.0, 0.0));
-        boolean manualPos = manualCrystals.contains(blockPos);
-        if (!instantConfig.getValue() && !(manualPos && manualConfig.getValue())) {
+        if (!instantConfig.getValue()) {
             return;
         }
         renderSpawnPos = blockPos;
         Long time = placePackets.remove(blockPos);
         attackRotate = time != null;
-        if (attackRotate || manualPos) {
+        if (attackRotate) {
             attackInternal(crystalEntity, getCrystalHand());
             setStage("ATTACKING");
             lastAttackTimer.reset();
@@ -429,10 +426,6 @@ public class AutoCrystalModule extends RotationModule {
         }
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket) {
             lastSwapTimer.reset();
-        } else if (event.getPacket() instanceof PlayerInteractBlockC2SPacket packet && !event.isClientPacket()
-                && mc.player.getStackInHand(packet.getHand()).getItem() instanceof EndCrystalItem && manualConfig.getValue()) {
-            BlockHitResult result = packet.getBlockHitResult();
-            manualCrystals.add(result.getBlockPos());
         } else if (event.getPacket() instanceof PlayerActionC2SPacket packet && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
                 && antiSurroundConfig.getValue() && canUseCrystalOnBlock(packet.getPos())) {
 //            Vec3d crystalPos = crystalDamageVec(packet.getPos());

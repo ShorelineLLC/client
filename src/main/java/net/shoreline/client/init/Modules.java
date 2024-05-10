@@ -44,6 +44,7 @@ public class Modules {
     public static BackTrackModule BACK_TRACK;
     public static BlockLagModule BLOCK_LAG;
     public static BowAimModule BOW_AIM;
+    public static ClickCrystalModule CLICK_CRYSTAL;
     public static CriticalsModule CRITICALS;
     public static HoleFillModule HOLE_FILL;
     public static NoHitDelayModule NO_HIT_DELAY;
@@ -210,6 +211,7 @@ public class Modules {
             // BACK_TRACK = (BackTrackModule) getRegisteredModule("backtrack-module");
             BLOCK_LAG = (BlockLagModule) getRegisteredModule("blocklag-module");
             BOW_AIM = (BowAimModule) getRegisteredModule("bowaim-module");
+            CLICK_CRYSTAL = (ClickCrystalModule) getRegisteredModule("clickcrystal-module");
             CRITICALS = (CriticalsModule) getRegisteredModule("criticals-module");
             HOLE_FILL = (HoleFillModule) getRegisteredModule("holefill-module");
             NO_HIT_DELAY = (NoHitDelayModule) getRegisteredModule("nohitdelay-module");
