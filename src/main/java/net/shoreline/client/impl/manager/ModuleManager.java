@@ -38,6 +38,7 @@ public class ModuleManager {
                 new RotationsModule(),
                 // Combat
                 new AuraModule(),
+                // new AutoAnchorModule(),
                 new AutoArmorModule(),
                 new AutoBowReleaseModule(),
                 new AutoCrystalModule(),
@@ -93,6 +94,7 @@ public class ModuleManager {
                 new MiddleClickModule(),
                 new NoPacketKickModule(),
                 new NoSoundLagModule(),
+                new PacketLoggerModule(),
                 new TimerModule(),
                 new TrueDurabilityModule(),
                 new UnfocusedFPSModule(),

@@ -33,6 +33,7 @@ public class Modules {
     public static CapesModule CAPES;
     // Combat
     public static AuraModule AURA;
+    public static AutoAnchorModule AUTO_ANCHOR;
     public static AutoArmorModule AUTO_ARMOR;
     public static AutoBowReleaseModule AUTO_BOW_RELEASE;
     public static AutoCrystalModule AUTO_CRYSTAL;
@@ -86,6 +87,7 @@ public class Modules {
     public static MiddleClickModule MIDDLE_CLICK;
     public static NoPacketKickModule NO_PACKET_KICK;
     public static NoSoundLagModule NO_SOUND_LAG;
+    public static PacketLoggerModule PACKET_LOGGER;
     public static TimerModule TIMER;
     public static TrueDurabilityModule TRUE_DURABILITY;
     public static UnfocusedFPSModule UNFOCUSED_FPS;
@@ -200,6 +202,7 @@ public class Modules {
             }
             CAPES = (CapesModule) getRegisteredModule("capes-module");
             AURA = (AuraModule) getRegisteredModule("aura-module");
+            // AUTO_ANCHOR = (AutoAnchorModule) getRegisteredModule("autoanchor-module");
             AUTO_ARMOR = (AutoArmorModule) getRegisteredModule("autoarmor-module");
             AUTO_BOW_RELEASE = (AutoBowReleaseModule) getRegisteredModule("autobowrelease-module");
             AUTO_CRYSTAL = (AutoCrystalModule) getRegisteredModule("autocrystal-module");
@@ -250,6 +253,7 @@ public class Modules {
             MIDDLE_CLICK = (MiddleClickModule) getRegisteredModule("middleclick-module");
             NO_PACKET_KICK = (NoPacketKickModule) getRegisteredModule("nopacketkick-module");
             NO_SOUND_LAG = (NoSoundLagModule) getRegisteredModule("nosoundlag-module");
+            PACKET_LOGGER = (PacketLoggerModule) getRegisteredModule("packetlogger-module");
             TIMER = (TimerModule) getRegisteredModule("timer-module");
             TRUE_DURABILITY = (TrueDurabilityModule) getRegisteredModule("truedurability-module");
             UNFOCUSED_FPS = (UnfocusedFPSModule) getRegisteredModule("unfocusedfps-module");
