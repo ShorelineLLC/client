@@ -33,7 +33,7 @@ public class Modules {
     public static CapesModule CAPES;
     // Combat
     public static AuraModule AURA;
-    public static AutoAnchorModule AUTO_ANCHOR;
+    // public static AutoAnchorModule AUTO_ANCHOR;
     public static AutoArmorModule AUTO_ARMOR;
     public static AutoBowReleaseModule AUTO_BOW_RELEASE;
     public static AutoCrystalModule AUTO_CRYSTAL;
