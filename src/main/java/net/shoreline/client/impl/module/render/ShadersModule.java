@@ -10,6 +10,6 @@ import net.shoreline.client.api.module.ToggleModule;
 public class ShadersModule extends ToggleModule {
 
     public ShadersModule() {
-        super("Shaders", "Renders shaders in-game", ModuleCategory.RENDER);
+        super("Shaders", "Renders shaders over entities", ModuleCategory.RENDER);
     }
 }

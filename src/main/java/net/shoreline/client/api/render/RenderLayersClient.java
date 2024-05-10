@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderLayersClient implements Globals {
 
-    public static final VertexFormat POSITION_COLOR_TEXTURE_OVERLAY = new VertexFormat((ImmutableMap) ImmutableMap.builder().put("Position", VertexFormats.POSITION_ELEMENT).put("Color", VertexFormats.COLOR_ELEMENT).put("UV0", VertexFormats.TEXTURE_ELEMENT).put("UV1", VertexFormats.OVERLAY_ELEMENT).put("Padding", VertexFormats.PADDING_ELEMENT).put("UV2", VertexFormats.LIGHT_ELEMENT).put("Normal", VertexFormats.NORMAL_ELEMENT).build());
+    public static final VertexFormat POSITION_COLOR_TEXTURE_OVERLAY = new VertexFormat((ImmutableMap) ImmutableMap.builder().put("Position", VertexFormats.POSITION_ELEMENT).put("Color", VertexFormats.COLOR_ELEMENT).put("UV0", VertexFormats.TEXTURE_ELEMENT).put("Padding", VertexFormats.PADDING_ELEMENT).put("UV1", VertexFormats.OVERLAY_ELEMENT).put("UV2", VertexFormats.LIGHT_ELEMENT).build());
     //
     public static final RenderLayer GLINT = RenderLayer.of("glint", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.MultiPhaseParameters.builder()
             .program(RenderPhase.GLINT_PROGRAM).texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, true, false))
@@ -47,7 +47,6 @@ public class RenderLayersClient implements Globals {
             super(false);
             ((AccessorRenderPhase) this).hookSetBeginAction(() -> {
                 mc.gameRenderer.getLightmapTextureManager().enable();
-                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             });
             ((AccessorRenderPhase) this).hookSetEndAction(() -> {
                 mc.gameRenderer.getLightmapTextureManager().disable();

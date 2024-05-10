@@ -45,7 +45,6 @@ public class ParkourModule extends ToggleModule {
                 override = false;
                 mc.options.jumpKey.setPressed(false);
             }
-
         }
     }
 }

@@ -42,7 +42,7 @@ public final class ServerModule extends ConcurrentModule
         }
         if (event.getPacket() instanceof ResourcePackSendS2CPacket && resourcePackConfig.getValue()) {
             event.cancel();
-            Managers.NETWORK.sendPacket(new ResourcePackStatusC2SPacket(mc.player.getUuid(), ResourcePackStatusC2SPacket.Status.ACCEPTED));
+            Managers.NETWORK.sendPacket(new ResourcePackStatusC2SPacket(mc.player.getUuid(), ResourcePackStatusC2SPacket.Status.DECLINED));
         }
     }
 

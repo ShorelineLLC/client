@@ -364,7 +364,7 @@ public class NametagsModule extends ToggleModule {
             info.append(phealth);
             info.append(" ");
         }
-        if (totemsConfig.getValue()) {
+        if (totemsConfig.getValue() && player != mc.player) {
             int totems = Managers.TOTEM.getTotems(player);
             if (totems > 0) {
 
