@@ -23,7 +23,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.player.RotationUtil;
-import net.shoreline.client.util.world.EndCrystalUtil;
+import net.shoreline.client.util.world.ExplosionUtil;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -351,7 +351,7 @@ public class AutoMineModule extends RotationModule {
             if (mc.world.isAir(blockPos) && !autoRemineConfig.getValue()) {
                 continue;
             }
-            double damage = EndCrystalUtil.getDamageTo(entity, blockPos.toCenterPos().subtract(0.0, -0.5, 0.0), true);
+            double damage = ExplosionUtil.getDamageTo(entity, blockPos.toCenterPos().subtract(0.0, -0.5, 0.0), true);
             miningPositions.put(damage, blockPos);
         }
         return miningPositions;

@@ -18,28 +18,42 @@ import java.util.function.BiFunction;
  * @author linus
  * @since 1.0
  */
-public class EndCrystalUtil implements Globals {
+public class ExplosionUtil implements Globals {
     /**
      * @param entity
-     * @param crystal
+     * @param explosion
      * @return
      */
     public static double getDamageTo(final Entity entity,
-                                     final Vec3d crystal) {
-        return getDamageTo(entity, crystal, false);
+                                     final Vec3d explosion) {
+        return getDamageTo(entity, explosion, false);
     }
 
     /**
      * @param entity
-     * @param crystal
+     * @param explosion
      * @param ignoreTerrain
      * @return
      */
     public static double getDamageTo(final Entity entity,
-                                     final Vec3d crystal,
+                                     final Vec3d explosion,
                                      final boolean ignoreTerrain) {
-        double ab = getExposure(crystal, entity, ignoreTerrain);
-        double w = Math.sqrt(entity.squaredDistanceTo(crystal)) / 12.0;
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f);
+    }
+
+    /**
+     * @param pos
+     * @param entity
+     * @param explosion
+     * @return
+     */
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final boolean ignoreTerrain,
+                                     float power) {
+        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity, ignoreTerrain);
+        double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
         dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
@@ -47,27 +61,15 @@ public class EndCrystalUtil implements Globals {
     }
 
     /**
-     * @param pos
-     * @param entity
-     * @param crystal
-     * @return
-     */
-    public static double getDamageToPos(final Vec3d pos,
-                                        final Entity entity,
-                                        final Vec3d crystal) {
-        return getDamageToPos(pos, entity, crystal, false);
-    }
-
-    /**
      * @param pos           The actual position of the damage
      * @param entity
-     * @param crystal
+     * @param explosion
      * @param ignoreTerrain
      * @return
      */
     public static double getDamageToPos(final Vec3d pos,
                                         final Entity entity,
-                                        final Vec3d crystal,
+                                        final Vec3d explosion,
                                         final boolean ignoreTerrain) {
         final Box bb = entity.getBoundingBox();
         double dx = pos.getX() - bb.minX;
@@ -75,8 +77,8 @@ public class EndCrystalUtil implements Globals {
         double dz = pos.getZ() - bb.minZ;
         final Box box = bb.offset(dx, dy, dz);
         //
-        double ab = getExposure(crystal, box, ignoreTerrain);
-        double w = Math.sqrt(pos.squaredDistanceTo(crystal)) / 12.0;
+        double ab = getExposure(explosion, box, ignoreTerrain);
+        double w = Math.sqrt(pos.squaredDistanceTo(explosion)) / 12.0;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
         dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);

@@ -26,7 +26,6 @@ import net.shoreline.client.api.config.NumberDisplay;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
@@ -45,12 +44,10 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.render.animation.TimeAnimation;
-import net.shoreline.client.util.world.EndCrystalUtil;
+import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.client.util.world.EntityUtil;
 
 import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -133,9 +130,7 @@ public class AutoCrystalModule extends RotationModule {
     Config<Boolean> extrapolateRangeConfig = new BooleanConfig("ExtrapolateRange", "Accounts for motion when calculating ranges", false);
     Config<Integer> extrapolateTicksConfig = new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10);
     Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders the current placement", true);
-    Config<Boolean> fadeConfig = new BooleanConfig("Fade", "Fades old renders out", true, () -> renderConfig.getValue());
     Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false);
-    Config<Boolean> damageNametagConfig = new BooleanConfig("Render-Damage", "Renders the current expected damage of a place/attack", false, () -> renderConfig.getValue());
     Config<Boolean> breakDebugConfig = new BooleanConfig("Break-Debug", "Debugs break ms in data", false, () -> renderConfig.getValue());
     //
     Config<Boolean> disableDeathConfig = new BooleanConfig("DisableOnDeath", "Disables during disconnect/death", false);
@@ -297,46 +292,26 @@ public class AutoCrystalModule extends RotationModule {
     {
         if (renderConfig.getValue())
         {
-            if (fadeConfig.getValue())
+            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
-                for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
+                if (set.getKey() == renderPos)
                 {
-                    if (set.getKey() == renderPos)
-                    {
-                        continue;
-                    }
-
-                    set.getValue().setState(false);
-                    int boxAlpha = (int) (80 * set.getValue().getFactor());
-                    int lineAlpha = (int) (145 * set.getValue().getFactor());
-                    Color boxColor = Modules.COLORS.getColor(boxAlpha);
-                    Color lineColor = Modules.COLORS.getColor(lineAlpha);
-                    RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
-                    RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
+                    continue;
                 }
+
+                set.getValue().setState(false);
+                int boxAlpha = (int) (80 * set.getValue().getFactor());
+                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                Color boxColor = Modules.COLORS.getColor(boxAlpha);
+                Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
 
             if (renderPos != null && isHoldingCrystal())
             {
-                if (!fadeConfig.getValue())
-                {
-                    RenderManager.renderBox(event.getMatrices(), renderPos, Modules.COLORS.getRGB(80));
-                    RenderManager.renderBoundingBox(event.getMatrices(), renderPos, 1.5f,
-                            Modules.COLORS.getRGB(145));
-
-                    if (damageNametagConfig.getValue() && placeCrystal != null) {
-                        DecimalFormat format = new DecimalFormat("0.0");
-                        RenderManager.post(() -> {
-                            RenderManager.renderSign(event.getMatrices(),
-                                    format.format(placeCrystal.getDamage()), renderPos.toCenterPos());
-                        });
-                    }
-                }
-                else
-                {
-                    Animation animation = new Animation(true, fadeTimeConfig.getValue());
-                    fadeList.put(renderPos, animation);
-                }
+                Animation animation = new Animation(true, fadeTimeConfig.getValue());
+                fadeList.put(renderPos, animation);
             }
 
             fadeList.entrySet().removeIf(e ->
@@ -382,7 +357,7 @@ public class AutoCrystalModule extends RotationModule {
             if (attackRangeCheck(crystalPos)) {
                 return;
             }
-            double selfDamage = EndCrystalUtil.getDamageTo(mc.player,
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
                     crystalPos, blockDestructionConfig.getValue());
             if (playerDamageCheck(selfDamage)) {
                 return;
@@ -401,7 +376,7 @@ public class AutoCrystalModule extends RotationModule {
                 if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue()) {
                     continue;
                 }
-                double damage = EndCrystalUtil.getDamageTo(entity,
+                double damage = ExplosionUtil.getDamageTo(entity,
                         crystalPos, blockDestructionConfig.getValue());
                 // TODO: Test this
                 DamageData<EndCrystalEntity> data = new DamageData<>(crystalEntity,
@@ -642,7 +617,7 @@ public class AutoCrystalModule extends RotationModule {
             if (attackRangeCheck(crystal1)) {
                 continue;
             }
-            double selfDamage = EndCrystalUtil.getDamageTo(mc.player,
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
                     crystal.getPos(), blockDestructionConfig.getValue());
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer && !safetyOverride.getValue()) {
@@ -662,7 +637,7 @@ public class AutoCrystalModule extends RotationModule {
                 if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue()) {
                     continue;
                 }
-                double damage = EndCrystalUtil.getDamageTo(entity,
+                double damage = ExplosionUtil.getDamageTo(entity,
                         crystal.getPos(), blockDestructionConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity)) {
                     continue;
@@ -690,7 +665,7 @@ public class AutoCrystalModule extends RotationModule {
     private boolean attackRangeCheck(Vec3d entityPos) {
         Vec3d playerPos = mc.player.getEyePos();
         double dist = playerPos.squaredDistanceTo(entityPos);
-        if (dist > breakRangeConfig.getValue() * breakRangeConfig.getValue()) {
+        if (dist > ((NumberConfig) breakRangeConfig).getValueSq()) {
             return true;
         }
         double yOff = Math.abs(entityPos.getY() - mc.player.getY());
@@ -713,7 +688,7 @@ public class AutoCrystalModule extends RotationModule {
             if (!canUseCrystalOnBlock(pos) || placeRangeCheck(pos)) {
                 continue;
             }
-            double selfDamage = EndCrystalUtil.getDamageTo(mc.player,
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
                     crystalDamageVec(pos), blockDestructionConfig.getValue());
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer && !safetyOverride.getValue()) {
@@ -733,7 +708,7 @@ public class AutoCrystalModule extends RotationModule {
                 if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue()) {
                     continue;
                 }
-                double damage = EndCrystalUtil.getDamageTo(entity,
+                double damage = ExplosionUtil.getDamageTo(entity,
                         crystalDamageVec(pos), blockDestructionConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity)) {
                     continue;
@@ -757,7 +732,7 @@ public class AutoCrystalModule extends RotationModule {
         Vec3d player = placeRangeEyeConfig.getValue() ? mc.player.getEyePos() : mc.player.getPos();
         double dist = placeRangeCenterConfig.getValue() ?
                 player.squaredDistanceTo(pos.toCenterPos()) : pos.getSquaredDistance(player.x, player.y, player.z);
-        if (dist > placeRangeConfig.getValue() * placeRangeConfig.getValue()) {
+        if (dist > ((NumberConfig) placeRangeConfig).getValueSq()) {
             return true;
         }
         Vec3d raytrace = Vec3d.of(pos).add(0.0, raytraceConfig.getValue() ? 2.700000047683716 : 1.0, 0.0);
