@@ -27,6 +27,9 @@ public class KeyboardUtil {
             case GLFW.GLFW_KEY_BACKSPACE -> "BACKSPACE";
             case GLFW.GLFW_KEY_DELETE -> "DELETE";
             case GLFW.GLFW_KEY_INSERT -> "INSERT";
+            case GLFW.GLFW_KEY_CAPS_LOCK -> "CAPS_LOCK";
+            case GLFW.GLFW_KEY_PAGE_UP -> "PAGE_UP";
+            case GLFW.GLFW_KEY_PAGE_DOWN -> "PAGE_DOWN";
 
             // Mouse Buttons
             case 1000 -> "MOUSE0"; // GLFW_MOUSE_BUTTON_1
