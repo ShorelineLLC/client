@@ -44,12 +44,12 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.world.ExplosionUtil;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -153,7 +153,7 @@ public class AutoCrystalModule extends RotationModule {
     private final Timer lastSwapTimer = new CacheTimer();
     private final Timer autoSwapTimer = new CacheTimer();
     //
-    private final ArrayDeque<Long> attackLatency = new EvictingQueue<>(20);
+    private final Deque<Long> attackLatency = new EvictingQueue<>(20);
     private final Map<Integer, Long> attackPackets =
             Collections.synchronizedMap(new ConcurrentHashMap<>());
     private final Map<BlockPos, Long> placePackets =

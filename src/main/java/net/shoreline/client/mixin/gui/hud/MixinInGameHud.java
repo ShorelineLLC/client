@@ -45,10 +45,10 @@ public class MixinInGameHud implements Globals {
         Shoreline.EVENT_HANDLER.dispatch(renderOverlayEvent);
     }
 
-    @Redirect(method = "renderHotbar", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerInventory;selectedSlot:I"))
-    private int hookRenderHotbar$selectedSlot(PlayerInventory instance) {
-        return Managers.INVENTORY.getServerSlot();
-    }
+//    @Redirect(method = "renderHotbar", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerInventory;selectedSlot:I"))
+//    private int hookRenderHotbar$selectedSlot(PlayerInventory instance) {
+//        return Managers.INVENTORY.getServerSlot();
+//    }
 
     /**
      * @param context

@@ -9,8 +9,8 @@ import net.shoreline.client.impl.event.render.TickCounterEvent;
 import net.shoreline.client.util.EvictingQueue;
 import net.shoreline.client.util.Globals;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
@@ -20,7 +20,7 @@ import java.util.Queue;
  */
 public class TickManager implements Globals {
 
-    private final ArrayDeque<Float> ticks = new EvictingQueue<>(20);
+    private final Deque<Float> ticks = new EvictingQueue<>(20);
     // The TPS tick handler.
     //
     private long time;
