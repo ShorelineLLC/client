@@ -58,7 +58,7 @@ public class ReplenishModule extends ToggleModule {
             if (total < stack.getMaxCount()) {
                 Managers.INVENTORY.pickupSlot(i);
                 Managers.INVENTORY.pickupSlot(hotbarSlot + 36);
-                if (!mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
+                if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
                     Managers.INVENTORY.pickupSlot(i);
                 }
                 total += stack.getCount();

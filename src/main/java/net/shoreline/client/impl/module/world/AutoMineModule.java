@@ -117,7 +117,7 @@ public class AutoMineModule extends RotationModule {
             }
             if (playerTarget != null) {
                 PriorityQueue<AutoMineCalc> miningPositions = getMiningPosition(playerTarget);
-                PriorityQueue<AutoMineCalc> miningPositionsNoAir = getNoAir(miningPositions);
+                PriorityQueue<AutoMineCalc> miningPositionsNoAir = getNoAir(miningPositions, playerTarget);
                 PriorityQueue<AutoMineCalc> cityPositions = autoRemineConfig.getValue() ? miningPositions : miningPositionsNoAir;
                 if (cityPositions.isEmpty()) {
                     return;
@@ -126,18 +126,18 @@ public class AutoMineModule extends RotationModule {
                     final AutoMineCalc cityPos = cityPositions.poll();
                     if (cityPos != null)
                     {
-                        miningPositionsNoAir.remove(cityPos);
-                        BlockPos cityPos2 = null;
+                        AutoMineCalc cityPos2 = null;
+                        miningPositionsNoAir.removeIf(c -> c.pos().equals(cityPos.pos()));
                         if (!miningPositionsNoAir.isEmpty()) {
-                            cityPos2 = miningPositionsNoAir.poll().pos();
+                            cityPos2 = miningPositionsNoAir.poll();
                         }
                         if (cityPos2 != null)
                         {
                             // If we are re-mining, bypass throttle check below
-                            if (!mc.world.isAir(cityPos.pos()) && !mc.world.isAir(cityPos2) && !isBlockDelayGrim())
+                            if (!mc.world.isAir(cityPos.pos()) && !mc.world.isAir(cityPos2.pos()) && !isBlockDelayGrim())
                             {
-                                MiningData data1 = new AutoMiningData(cityPos2,
-                                        strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityPos2) : Direction.UP);
+                                MiningData data1 = new AutoMiningData(cityPos2.pos(),
+                                        strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityPos2.pos()) : Direction.UP);
                                 MiningData data2 = new AutoMiningData(cityPos.pos(),
                                         strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityPos.pos()) : Direction.UP);
                                 startMining(data1);
@@ -183,7 +183,7 @@ public class AutoMineModule extends RotationModule {
             return;
         }
         for (MiningData data : miningQueue) {
-            if (isDataPacketMine(data) && data.getState().isAir()) {
+            if (isDataPacketMine(data) && (data.getState().isAir() || data.getBlockDamage() >= 1.5f)) {
                 Managers.INVENTORY.syncToClient();
                 miningQueue.remove(data);
                 return;
@@ -350,7 +350,7 @@ public class AutoMineModule extends RotationModule {
     }
 
     // LOL
-    private PriorityQueue<AutoMineCalc> getNoAir(PriorityQueue<AutoMineCalc> calcs) {
+    private PriorityQueue<AutoMineCalc> getNoAir(PriorityQueue<AutoMineCalc> calcs, PlayerEntity player) {
         PriorityQueue<AutoMineCalc> noAir = new PriorityQueue<>();
         for (AutoMineCalc calc : calcs) {
             if (mc.world.isAir(calc.pos())) {
@@ -358,6 +358,7 @@ public class AutoMineModule extends RotationModule {
             }
             noAir.add(calc);
         }
+        noAir.removeIf(c -> c.pos().equals(player.getBlockPos()));
         return noAir;
     }
 

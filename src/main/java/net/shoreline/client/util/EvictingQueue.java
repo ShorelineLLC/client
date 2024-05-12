@@ -6,8 +6,8 @@ import java.util.ArrayDeque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
- * Implementation of https://guava.dev/releases/15.0/api/docs/com/google/common/collect/EvictingQueue.html
- * backed by a first-in last-out {@link ArrayDeque}.
+ * Modified implementation of https://guava.dev/releases/15.0/api/docs/com/google/common/collect/EvictingQueue.html
+ * backed by a {@link ConcurrentLinkedDeque}.
  *
  * @param <E>
  * @author linus
@@ -17,12 +17,18 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class EvictingQueue<E> extends ConcurrentLinkedDeque<E> {
     //
     private final int limit;
+    private final boolean lastOut;
 
     /**
      * @param limit
      */
     public EvictingQueue(int limit) {
+        this(limit, true);
+    }
+
+    public EvictingQueue(int limit, boolean lastOut) {
         this.limit = limit;
+        this.lastOut = lastOut;
     }
 
     /**
@@ -42,9 +48,16 @@ public class EvictingQueue<E> extends ConcurrentLinkedDeque<E> {
      * @param element element whose presence in this collection is to be ensured
      */
     public void addFirst(@NotNull E element) {
-        super.addFirst(element);
-        while (size() > limit) {
-            super.removeLast();
+        if (lastOut) {
+            super.addFirst(element);
+            while (size() > limit) {
+                super.removeLast();
+            }
+        } else {
+            if (size() + 1 > limit) {
+                super.removeFirst();
+            }
+            super.addFirst(element);
         }
     }
 
