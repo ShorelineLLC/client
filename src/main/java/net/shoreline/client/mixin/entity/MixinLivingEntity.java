@@ -1,7 +1,9 @@
 package net.shoreline.client.mixin.entity;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -14,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * @author linus
@@ -104,5 +107,23 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
         if (jumpDelayEvent.isCanceled()) {
             jumpingCooldown = 0;
         }
+    }
+
+    @Inject(method = "onStatusEffectApplied", at = @At(value = "HEAD"))
+    private void hookAddStatusEffect(StatusEffectInstance effect, Entity source, CallbackInfo ci) {
+        if ((Object) this != mc.player) {
+            return;
+        }
+        StatusEffectEvent.Add statusEffectEvent = new StatusEffectEvent.Add(effect);
+        Shoreline.EVENT_HANDLER.dispatch(statusEffectEvent);
+    }
+
+    @Inject(method = "onStatusEffectRemoved", at = @At(value = "HEAD"))
+    private void hookRemoveStatusEffect(StatusEffectInstance effect, CallbackInfo ci) {
+        if ((Object) this != mc.player) {
+            return;
+        }
+        StatusEffectEvent.Remove statusEffectEvent = new StatusEffectEvent.Remove(effect);
+        Shoreline.EVENT_HANDLER.dispatch(statusEffectEvent);
     }
 }

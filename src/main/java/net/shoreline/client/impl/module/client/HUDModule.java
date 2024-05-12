@@ -25,6 +25,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
+import net.shoreline.client.impl.event.entity.StatusEffectEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
@@ -36,7 +37,9 @@ import net.shoreline.client.util.string.EnumFormatter;
 
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -225,7 +228,7 @@ public class HUDModule extends ToggleModule {
                 rainbowOffset++;
             }
             if (pingConfig.getValue() && !mc.isInSingleplayer()) {
-                int latency = Managers.NETWORK.getClientLatency();
+                int latency = Modules.FAST_LATENCY.isEnabled() ? (int) Modules.FAST_LATENCY.getLatency() : Managers.NETWORK.getClientLatency();
                 String text = String.format("Ping §f%dms", latency);
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
