@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -65,6 +66,9 @@ public final class AutoTotemModule extends ToggleModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
+        if (mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen)) {
+            return;
+        }
         // Get the item to wield in our offhand, and make sure we are already not holding the item
         final Item itemToWield = getItemToWield();
         if (mc.player.getOffHandStack().getItem().equals(itemToWield))
