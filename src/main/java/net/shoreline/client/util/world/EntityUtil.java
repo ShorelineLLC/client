@@ -34,7 +34,7 @@ public class EntityUtil {
      * @return
      */
     public static boolean isMonster(Entity e) {
-        return e instanceof Monster;
+        return e instanceof Monster && !isNeutral(e);
     }
 
     /**
