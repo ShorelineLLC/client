@@ -211,49 +211,45 @@ public class RenderManager implements Globals {
     }
 
     /**
-     * @param matrices
      * @param text
      * @param pos
      */
-    public static void renderSign(MatrixStack matrices, String text, Vec3d pos) {
-        renderSign(matrices, text, pos.getX(), pos.getY(), pos.getZ());
+    public static void renderSign(String text, Vec3d pos, int color) {
+        renderSign(text, pos.getX(), pos.getY(), pos.getZ(), color);
     }
 
     /**
-     * @param matrices
      * @param text
-     * @param x1
-     * @param x2
-     * @param x3
+     * @param x
+     * @param y
+     * @param z
      */
-    public static void renderSign(MatrixStack matrices, String text,
-                                  double x1, double x2, double x3) {
-        double dist = Math.sqrt(mc.player.squaredDistanceTo(x1, x2, x3));
+    public static void renderSign(String text, double x, double y, double z, int color) {
+        double dist = Math.sqrt(mc.player.squaredDistanceTo(x, y, z));
         float scaling = 0.0018f + Modules.NAMETAGS.getScaling() * (float) dist;
         if (dist <= 8.0) {
             scaling = 0.0245f;
         }
         Camera camera = mc.gameRenderer.getCamera();
         final Vec3d pos = camera.getPos();
-        MatrixStack matrixStack = new MatrixStack();
-        matrixStack.push();
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));
-        matrixStack.translate(x1 - pos.getX(), x2 - pos.getY(), x3 - pos.getZ());
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        matrixStack.scale(-scaling, -scaling, -1.0f);
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
-        VertexConsumerProvider.Immediate vertexConsumers =
-                VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+        MatrixStack matrices = new MatrixStack();
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));
+        matrices.translate(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.scale(-scaling, -scaling, -1.0f);
         float hwidth = mc.textRenderer.getWidth(text) / 2.0f;
-        Fonts.VANILLA.drawWithShadow(matrixStack, text, -hwidth, 0.0f, -1);
-        vertexConsumers.draw();
-        RenderSystem.disableBlend();
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
-        matrixStack.pop();
+        RenderManager.post(() -> {
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            GL11.glDepthFunc(GL11.GL_ALWAYS);
+
+            Fonts.VANILLA.drawWithShadow(matrices, text, -hwidth, 0.0f, color);
+
+            GL11.glDepthFunc(GL11.GL_LEQUAL);
+            RenderSystem.disableBlend();
+        });
     }
 
     /**

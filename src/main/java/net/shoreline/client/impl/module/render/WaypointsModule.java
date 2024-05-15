@@ -2,12 +2,12 @@ package net.shoreline.client.impl.module.render;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.event.listener.EventListener;
@@ -21,6 +21,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.UUID;
 
@@ -32,6 +33,8 @@ public class WaypointsModule extends ToggleModule {
 
     Config<Boolean> logoutsConfig = new BooleanConfig("LogoutPoints", "Marks the position of player logouts", false);
     Config<Boolean> deathsConfig = new BooleanConfig("DeathPoints", "Marks the position of player deaths", false);
+    Config<Boolean> coordsConfig = new BooleanConfig("Coords", "Shows the coordinates of the waypoint", true);
+    DecimalFormat format = new DecimalFormat("0.0");
 
     public WaypointsModule() {
         super("Waypoints", "Renders a waypoint at marked locations", ModuleCategory.RENDER);
@@ -53,19 +56,18 @@ public class WaypointsModule extends ToggleModule {
                 if (profile == null || profile.getName() == null) {
                     continue;
                 }
-                Managers.WAYPOINT.remove(String.format("%s's Logout", profile.getName()));
+                Managers.WAYPOINT.removeContains(profile.getName());
             }
         } else if (event.getPacket() instanceof PlayerRemoveS2CPacket packet && logoutsConfig.getValue()) {
             for (UUID id : packet.profileIds()) {
                 PlayerEntity player = mc.world.getPlayerByUuid(id);
-                if (player == null) {
+                if (player == null || checkBot(player)) {
                     continue;
                 }
                 String ip = Managers.NETWORK.getServerIp();
                 String serverIp = mc.isInSingleplayer() ? "Singleplayer" : ip;
-                DecimalFormat format = new DecimalFormat("0.0");
-                Managers.WAYPOINT.register(new Waypoint(String.format("%s's Logout XYZ %s %s %s",
-                        player.getName().getString(), format.format(player.prevX), format.format(player.prevY), format.format(player.prevZ)),
+                Managers.WAYPOINT.register(new Waypoint(String.format("%s's Logout" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""),
+                        player.getName().getString(), format.format(player.getX()), format.format(player.getY()), format.format(player.getZ())),
                         serverIp, player.prevX, player.prevY, player.prevZ));
             }
         }
@@ -75,9 +77,9 @@ public class WaypointsModule extends ToggleModule {
     public void onRemoveEntity(ScreenOpenEvent event) {
         if (event.getScreen() instanceof DeathScreen && deathsConfig.getValue()) {
             String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
-            Managers.WAYPOINT.remove("Last Death");
-            Managers.WAYPOINT.register(new Waypoint("Last Death", serverIp,
-                    mc.player.lastX, mc.player.lastBaseY, mc.player.lastZ));
+            Managers.WAYPOINT.removeContains("Last Death");
+            Managers.WAYPOINT.register(new Waypoint(String.format("Last Death" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""), format.format(mc.player.getX()), format.format(mc.player.getY()), format.format(mc.player.getZ())), serverIp,
+                    mc.player.getX(), mc.player.getY(), mc.player.getZ()));
         }
     }
 
@@ -89,9 +91,16 @@ public class WaypointsModule extends ToggleModule {
         for (Waypoint waypoint : Managers.WAYPOINT.getWaypoints()) {
             Box waypointBox = EntityDimensions.fixed(0.6f, 2.2f).getBoxAt(waypoint.getPos());
             double center = (waypointBox.maxX - waypointBox.minX) / 2.0f;
-            RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 2.5f, Modules.COLORS.getRGB(255));
-            RenderManager.renderSign(event.getMatrices(), waypoint.getName(),
-                    new Vec3d(waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center));
+            RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, Modules.COLORS.getRGB(255));
+            RenderManager.renderSign(waypoint.getName(), waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
         }
+    }
+
+    private boolean checkBot(PlayerEntity entity) {
+        return !entity.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + entity.getName().getString()).getBytes(StandardCharsets.UTF_8))) && entity instanceof OtherClientPlayerEntity && !entity.getName().getString().contains("-");
+    }
+
+    public boolean getCoords() {
+        return coordsConfig.getValue();
     }
 }

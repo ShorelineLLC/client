@@ -42,12 +42,20 @@ public class WaypointManager {
      * @param waypoint
      * @return
      */
+    public boolean removeContains(String waypoint) {
+        return waypoints.removeIf(w -> w.getName().contains(waypoint));
+    }
+
+    /**
+     * @param waypoint
+     * @return
+     */
     public boolean remove(String waypoint) {
         return waypoints.removeIf(w -> w.getName().equalsIgnoreCase(waypoint));
     }
 
     public boolean contains(String waypoint) {
-        return waypoints.stream().anyMatch(w -> w.getName().equalsIgnoreCase(waypoint));
+        return waypoints.stream().anyMatch(w -> w.getName().contains(waypoint));
     }
 
     public void clear() {

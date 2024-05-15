@@ -79,8 +79,7 @@ public class WaypointFile extends ConfigFile {
                     JsonElement y = obj.get("y");
                     JsonElement z = obj.get("z");
                     Managers.WAYPOINT.register(new Waypoint(tag.getAsString(),
-                            serverIp, x.getAsDouble(), y.getAsDouble(),
-                            z.getAsDouble()));
+                            serverIp, x.getAsDouble(), y.getAsDouble(), z.getAsDouble()));
                 }
             }
         }

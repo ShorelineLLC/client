@@ -5,9 +5,9 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
-import net.shoreline.client.api.command.PlayerArgumentType;
 import net.shoreline.client.api.waypoint.Waypoint;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.chat.ChatUtil;
 
 public class WaypointCommand extends Command {
@@ -22,7 +22,7 @@ public class WaypointCommand extends Command {
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
         builder.then(argument("add/del", StringArgumentType.string()).suggests(suggest("add", "del", "delete", "remove"))
                 .then(argument("waypoint", StringArgumentType.string())
-                        .then(argument("x", DoubleArgumentType.doubleArg()).then(argument("y", DoubleArgumentType.doubleArg()).then(argument("z", DoubleArgumentType.doubleArg()))
+                        .then(argument("x", DoubleArgumentType.doubleArg()).then(argument("y", DoubleArgumentType.doubleArg()).then(argument("z", DoubleArgumentType.doubleArg())
                                 .executes(c -> {
                                     String waypointName = StringArgumentType.getString(c, "waypoint");
                                     double x = DoubleArgumentType.getDouble(c, "x");
@@ -35,10 +35,11 @@ public class WaypointCommand extends Command {
                                             return 0;
                                         }
                                         ChatUtil.clientSendMessage("Added waypoint with name §s" + waypointName);
+                                        waypointName += (Modules.WAYPOINTS.getCoords() ? String.format(" XYZ %s %s %s", x, y, z) : "");
                                         Managers.WAYPOINT.register(new Waypoint(waypointName, mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp(), x, y, z));
                                     }
                                     return 1;
-                                })))
+                                }))))
                         .executes(c -> {
                             String waypointName = StringArgumentType.getString(c, "waypoint");
                             final String action = StringArgumentType.getString(c, "add/del");
