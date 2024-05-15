@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.shoreline.client.api.config.Config;
@@ -9,6 +10,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 
 import java.util.ArrayList;
@@ -25,8 +27,8 @@ public class ReplenishModule extends ToggleModule {
     }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() != EventStage.PRE) {
+    public void onTick(PlayerTickEvent event) {
+        if (mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen)) {
             return;
         }
         for (int i = 0; i < 9; i++) {

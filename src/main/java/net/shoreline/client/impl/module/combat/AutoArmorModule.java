@@ -18,6 +18,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.EnchantmentUtil;
 
@@ -51,10 +52,7 @@ public class AutoArmorModule extends ToggleModule {
     }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() != EventStage.PRE) {
-            return;
-        }
+    public void onTick(PlayerTickEvent event) {
         if (mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen && inventoryConfig.getValue())) {
             return;
         }
