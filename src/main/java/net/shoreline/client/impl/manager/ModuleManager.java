@@ -146,7 +146,7 @@ public class ModuleManager {
                 new TrueSightModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
-                // new WaypointsModule(),
+                new WaypointsModule(),
                 // World
                 new AntiInteractModule(),
                 new AutoMineModule(),

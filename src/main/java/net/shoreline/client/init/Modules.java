@@ -140,7 +140,7 @@ public class Modules {
     public static TrueSightModule TRUE_SIGHT;
     public static ViewClipModule VIEW_CLIP;
     public static ViewModelModule VIEW_MODEL;
-    // public static WaypointsModule WAYPOINTS;
+    public static WaypointsModule WAYPOINTS;
     // World
     public static AntiInteractModule ANTI_INTERACT;
     public static AutoMineModule AUTO_MINE;
@@ -305,7 +305,7 @@ public class Modules {
             TRUE_SIGHT = (TrueSightModule) getRegisteredModule("truesight-module");
             VIEW_CLIP = (ViewClipModule) getRegisteredModule("viewclip-module");
             VIEW_MODEL = (ViewModelModule) getRegisteredModule("viewmodel-module");
-            // WAYPOINTS = (WaypointsModule) getRegisteredModule("waypoints-module");
+            WAYPOINTS = (WaypointsModule) getRegisteredModule("waypoints-module");
             ANTI_INTERACT = (AntiInteractModule) getRegisteredModule("antiinteract-module");
             AUTO_MINE = (AutoMineModule) getRegisteredModule("automine-module");
             AUTO_TOOL = (AutoToolModule) getRegisteredModule("autotool-module");
