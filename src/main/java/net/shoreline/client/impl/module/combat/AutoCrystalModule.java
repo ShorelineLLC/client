@@ -324,7 +324,8 @@ public class AutoCrystalModule extends RotationModule {
         if (mc.player == null || mc.world == null) {
             return;
         }
-        if (event.getPacket() instanceof PlaySoundS2CPacket packet && packet.getCategory() == SoundCategory.BLOCKS
+        if (event.getPacket() instanceof PlaySoundS2CPacket packet
+                && packet.getCategory() == SoundCategory.BLOCKS
                 && packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE) {
             for (Entity entity : Lists.newArrayList(mc.world.getEntities())) {
                 if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0) {
@@ -481,6 +482,12 @@ public class AutoCrystalModule extends RotationModule {
     }
 
     private void attackInternal(EndCrystalEntity crystalEntity, Hand hand) {
+
+        if (isRotationBlocked() || !rotated && rotateConfig.getValue())
+        {
+            return;
+        }
+
         hand = hand != null ? hand : Hand.MAIN_HAND;
         // ((AccessorPlayerInteractEntityC2SPacket) packet).hookSetEntityId(id);
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
@@ -493,6 +500,11 @@ public class AutoCrystalModule extends RotationModule {
     }
 
     private void placeCrystal(BlockPos blockPos, Hand hand) {
+        if (isRotationBlocked() || !rotated && rotateConfig.getValue())
+        {
+            return;
+        }
+
         if (checkMultitask()) {
             return;
         }

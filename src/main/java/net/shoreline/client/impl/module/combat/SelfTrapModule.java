@@ -128,6 +128,13 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         {
             return;
         }
+
+        final int blockSlot = getResistantBlockItem();
+        if (blockSlot == -1)
+        {
+            return;
+        }
+
         if (supportConfig.getValue()) {
             for (BlockPos block : new ArrayList<>(placements)) {
                 Direction direction = Managers.INTERACT.getInteractDirection(block, grimConfig.getValue(), strictDirectionConfig.getValue());
@@ -136,7 +143,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 }
             }
         }
-        Collections.reverse(placements);
         final int shiftTicks = shiftTicksConfig.getValue();
         while (blocksPlaced < shiftTicks && !placements.isEmpty())
         {
@@ -149,7 +155,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             shiftDelay = 0;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            attackPlace(targetPos);
+            attackPlace(targetPos, blockSlot);
         }
     }
 
@@ -161,7 +167,18 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos)
     {
-        if (attackConfig.getValue()) {
+        final int blockSlot = getResistantBlockItem();
+        if (blockSlot == -1)
+        {
+            return;
+        }
+        attackPlace(targetPos, blockSlot);
+    }
+
+    private void attackPlace(BlockPos targetPos, int blockSlot)
+    {
+        if (attackConfig.getValue())
+        {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities)
             {
@@ -169,22 +186,26 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
         }
 
-        final int slot = getResistantBlockItem();
-        if (slot == -1)
-        {
-            return;
-        }
-        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, blockSlot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
                 if (state)
                 {
-                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
+                    if (grimConfig.getValue())
+                    {
+                        Managers.ROTATION.setRotationSilent(angles[0], angles[1], true);
+                    } else
+                    {
+                        setRotation(angles[0], angles[1]);
+                    }
                 }
                 else
                 {
-                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+                    if (grimConfig.getValue())
+                    {
+                        Managers.ROTATION.setRotationSilentSync(true);
+                    }
                 }
             }
         });
@@ -254,13 +275,54 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
         if (headConfig.getValue())
         {
-            final BlockPos blockPos = PlayerUtil.getRoundedBlockPos(
-                    mc.player.getX(), mc.player.getY(), mc.player.getZ()).up(2);
-            final Direction direction = Managers.INTERACT.getInteractDirection(
-                    blockPos, grimConfig.getValue(), strictDirectionConfig.getValue());
-            if (direction != null)
+            final BlockPos headBlockPos = pos.up(2);
+            if (headConfig.getValue() && !blocks.isEmpty() && mc.world.getBlockState(headBlockPos).isAir())
             {
-                blocks.add(blockPos);
+                searchForSupport:
+                {
+                    // Do not attempt to place head blocks unless every surrounding block
+                    // is placed
+                    for (final BlockPos trapBlockPos : blocks)
+                    {
+                        if (mc.world.getBlockState(trapBlockPos).isReplaceable())
+                        {
+                            break searchForSupport;
+                        }
+                    }
+
+                    if (Modules.BLOCK_INTERACT.isEnabled() && !strictDirectionConfig.getValue())
+                    {
+                        blocks.add(headBlockPos);
+                        break searchForSupport;
+                    }
+
+                    for (final Direction direction : Direction.values())
+                    {
+                        final BlockPos neighbor = headBlockPos.offset(direction);
+                        if (entities.contains(neighbor.down()))
+                        {
+                            continue;
+                        }
+
+                        final Direction neighboringDirection = Managers.INTERACT.getInteractDirection(
+                                neighbor, grimConfig.getValue(), strictDirectionConfig.getValue());
+                        if (neighboringDirection != null)
+                        {
+                            // We need to assure that the head block would have a visible side to place on
+                            // with this getInteractionDirection result
+                            // TODO: more elegant way to do this? the code also doesnt look like it'd work, but for whatever reason it does
+                            if (strictDirectionConfig.getValue() && Managers.INTERACT.getPlaceDirectionsNCP(
+                                    mc.player.getEyePos(), neighbor.toCenterPos()).contains(direction))
+                            {
+                                continue;
+                            }
+
+                            blocks.add(neighbor);
+                            blocks.add(headBlockPos);
+                            break;
+                        }
+                    }
+                }
             }
         }
         return blocks;

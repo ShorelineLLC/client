@@ -161,6 +161,7 @@ public class ModuleManager {
                 new SpeedmineModule()
                 // new WallhackModule()
         );
+        //register(new TestModule());
         if (ShorelineMod.isBaritonePresent()) {
             register(new BaritoneModule());
         }

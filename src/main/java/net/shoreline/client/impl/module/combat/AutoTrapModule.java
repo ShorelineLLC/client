@@ -66,23 +66,10 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     private int blocksPlaced;
     private int shiftDelay;
 
-    private double prevY;
-
     public AutoTrapModule()
     {
         super("AutoTrap", "Automatically traps nearby players in blocks",
                 ModuleCategory.COMBAT, 800);
-    }
-
-    @Override
-    protected void onEnable()
-    {
-        super.onEnable();
-
-        if (mc.player != null)
-        {
-            prevY = mc.player.getY();
-        }
     }
 
     @EventListener
@@ -149,7 +136,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos)
     {
-        if (attackConfig.getValue()) {
+        if (attackConfig.getValue())
+        {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities)
             {

@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.manager.player.interaction;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.ActionResult;
@@ -36,6 +38,12 @@ public final class InteractionManager implements Globals
                               final boolean clientSwing,
                               final RotationCallback rotationCallback)
     {
+        // TODO: should this be a thing
+        if (!mc.world.getBlockState(pos).isReplaceable())
+        {
+            return false;
+        }
+
         Direction direction = getInteractDirection(pos, grim, strictDirection);
         if (Modules.BLOCK_INTERACT.isEnabled() && direction == null && !strictDirection)
         {
