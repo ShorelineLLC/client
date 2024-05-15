@@ -1,11 +1,9 @@
 package net.shoreline.client.impl.manager.world;
 
-import io.netty.util.internal.ConcurrentSet;
 import net.shoreline.client.api.waypoint.Waypoint;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author linus
@@ -14,7 +12,7 @@ import java.util.Set;
  */
 public class WaypointManager {
     //
-    private final Set<Waypoint> waypoints = new ConcurrentSet<>();
+    private final List<Waypoint> waypoints = new CopyOnWriteArrayList<>();
 
     /**
      * @param waypoint
@@ -45,26 +43,29 @@ public class WaypointManager {
      * @return
      */
     public boolean remove(String waypoint) {
-        for (Waypoint w : getWaypoints()) {
-            if (w.getName().equalsIgnoreCase(waypoint)) {
-                return waypoints.remove(w);
-            }
-        }
-        return false;
+        return waypoints.removeIf(w -> w.getName().equalsIgnoreCase(waypoint));
+    }
+
+    public boolean contains(String waypoint) {
+        return waypoints.stream().anyMatch(w -> w.getName().equalsIgnoreCase(waypoint));
+    }
+
+    public void clear() {
+        waypoints.clear();
     }
 
     /**
      * @return
      */
-    public Collection<Waypoint> getWaypoints() {
+    public List<Waypoint> getWaypoints() {
         return waypoints;
     }
 
     /**
      * @return
      */
-    public Collection<String> getIps() {
-        final Set<String> ips = new HashSet<>();
+    public List<String> getIps() {
+        final List<String> ips = new ArrayList<>();
         for (Waypoint waypoint : getWaypoints()) {
             ips.add(waypoint.getIp());
         }

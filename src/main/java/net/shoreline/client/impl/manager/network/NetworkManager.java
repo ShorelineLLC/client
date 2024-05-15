@@ -117,14 +117,18 @@ public class NetworkManager implements Globals {
     }
 
     public boolean isCrystalPvpCC() {
-        if (info != null) {
-            return info.address.equalsIgnoreCase("us.crystalpvp.cc") || info.address.equalsIgnoreCase("crystalpvp.cc");
-        }
-        return false;
+        return getServerIp().equalsIgnoreCase("us.crystalpvp.cc") || getServerIp().equalsIgnoreCase("crystalpvp.cc");
     }
 
     public boolean isGrimCC() {
-        return info != null && info.address.equalsIgnoreCase("grim.crystalpvp.cc");
+        return getServerIp().equalsIgnoreCase("grim.crystalpvp.cc");
+    }
+
+    public String getServerIp() {
+        if (info != null) {
+            return info.address;
+        }
+        return "Singleplayer";
     }
 
     /**

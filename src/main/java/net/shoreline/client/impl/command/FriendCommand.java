@@ -24,7 +24,7 @@ public class FriendCommand extends Command {
 
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.then(argument("add/del", StringArgumentType.string()).suggests(suggest("add", "del", "remove"))
+        builder.then(argument("add/del", StringArgumentType.string()).suggests(suggest("add", "del", "delete", "remove"))
                 .then(argument("friend_name", PlayerArgumentType.player()).executes(c -> {
                     String playerName = PlayerArgumentType.getPlayer(c, "friend_name");
                     final String action = StringArgumentType.getString(c, "add/del");
@@ -35,7 +35,7 @@ public class FriendCommand extends Command {
                         }
                         ChatUtil.clientSendMessage("Added friend with name §s" + playerName);
                         Managers.SOCIAL.addFriend(playerName);
-                    } else if (action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("del")) {
+                    } else if (action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("del") || action.equalsIgnoreCase("delete")) {
                         if (!Managers.SOCIAL.isFriend(playerName)) {
                             ChatUtil.error("Player is not friended!");
                             return 0;

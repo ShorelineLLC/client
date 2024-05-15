@@ -59,7 +59,8 @@ public class CommandManager implements Globals {
                 new ReloadSoundCommand(),
                 new ToggleCommand(),
                 new VanishCommand(),
-                new VClipCommand()
+                new VClipCommand(),
+                new WaypointCommand()
         );
         //
         for (Module module : Managers.MODULE.getModules()) {
