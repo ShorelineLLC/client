@@ -37,11 +37,12 @@ import net.shoreline.client.util.world.FakePlayerEntity;
 public class SpeedModule extends ToggleModule {
     //
     Config<Speed> speedModeConfig = new EnumConfig<>("Mode", "Speed mode", Speed.STRAFE, Speed.values());
+    Config<Float> collisionDistanceConfig = new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE);
     Config<Boolean> vanillaStrafeConfig = new BooleanConfig("Strafe-Vanilla", "Applies strafe speeds to vanilla speed", false, () -> speedModeConfig.getValue() == Speed.VANILLA);
-    Config<Float> speedConfig = new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f);
-    Config<Boolean> timerConfig = new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false);
-    Config<Boolean> strafeBoostConfig = new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false);
-    Config<Integer> boostTicksConfig = new NumberConfig<>("BoostTicks", "The number of ticks to boost strafe", 10, 20, 40, () -> strafeBoostConfig.getValue());
+    Config<Float> speedConfig = new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f, () -> speedModeConfig.getValue() == Speed.VANILLA);
+    Config<Boolean> timerConfig = new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false, () -> isStrafe());
+    Config<Boolean> strafeBoostConfig = new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false, () -> isStrafe());
+    Config<Integer> boostTicksConfig = new NumberConfig<>("BoostTicks", "The number of ticks to boost strafe", 10, 20, 40, () -> isStrafe() && strafeBoostConfig.getValue());
     Config<Boolean> speedWaterConfig = new BooleanConfig("SpeedInWater", "Applies speed even in water and lava", false);
     //
     private int strafe = 4;
@@ -107,7 +108,7 @@ public class SpeedModule extends ToggleModule {
             if (speedModeConfig.getValue() == Speed.GRIM_COLLIDE && MovementUtil.isInputtingMovement()) {
                 int collisions = 0;
                 for (Entity entity : mc.world.getEntities()) {
-                    if (checkIsCollidingEntity(entity) && MathHelper.sqrt((float) mc.player.squaredDistanceTo(entity)) <= 1.5) {
+                    if (checkIsCollidingEntity(entity) && MathHelper.sqrt((float) mc.player.squaredDistanceTo(entity)) <= collisionDistanceConfig.getValue()) {
                         collisions++;
                     }
                 }
