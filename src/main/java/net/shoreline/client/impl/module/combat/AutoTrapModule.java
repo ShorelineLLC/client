@@ -11,6 +11,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -355,15 +357,13 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
         }
-        else if (event.getPacket() instanceof PlaySoundS2CPacket packet
-                && packet.getCategory() == SoundCategory.BLOCKS
-                && packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE)
-        {
-            BlockPos targetPos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
-            if (surround.contains(targetPos))
-            {
-                blocksPlaced++;
-                RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
+        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
+            for (int id : packet.getEntityIds()) {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
+                    blocksPlaced++;
+                    RenderSystem.recordRenderCall(() -> attackPlace(entity.getBlockPos()));
+                }
             }
         }
     }

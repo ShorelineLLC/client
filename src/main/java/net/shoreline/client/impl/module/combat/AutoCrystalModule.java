@@ -12,6 +12,8 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
@@ -316,24 +318,6 @@ public class AutoCrystalModule extends RotationModule {
 
             fadeList.entrySet().removeIf(e ->
                     e.getValue().getFactor() == 0.0);
-        }
-    }
-
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event) {
-        if (mc.player == null || mc.world == null) {
-            return;
-        }
-        if (event.getPacket() instanceof PlaySoundS2CPacket packet
-                && packet.getCategory() == SoundCategory.BLOCKS
-                && packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE) {
-            for (Entity entity : Lists.newArrayList(mc.world.getEntities())) {
-                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0) {
-                    mc.executeSync(() -> {
-                        mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
-                    });
-                }
-            }
         }
     }
 

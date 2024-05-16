@@ -14,10 +14,12 @@ import net.minecraft.util.shape.VoxelShape;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
+import net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.SneakBlocks;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -139,7 +141,8 @@ public final class InteractionManager implements Globals
 
     private ActionResult placeBlockInternally(final BlockHitResult hitResult)
     {
-        return mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
+        Managers.NETWORK.sendSequencedPacket(sequence -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, sequence));
+        return ((AccessorClientPlayerInteractionManager) mc.interactionManager).hookInteractBlockInternal(mc.player, Hand.MAIN_HAND, hitResult);
     }
 
     public ActionResult placeBlockPacket(final BlockHitResult hitResult)
