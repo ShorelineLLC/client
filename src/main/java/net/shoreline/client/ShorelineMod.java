@@ -24,12 +24,8 @@ public class ShorelineMod implements ClientModInitializer {
      */
     @Override
     public void onInitializeClient() {
-        if (isRetardUsingClient())
-        {
-            System.out.println("Retard alert! Aborting!! Error 69god");
-            System.exit(-1);
-        }
         Shoreline.init();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (isRetardUsingClient()) System.exit(-1);
     }
 
     public static boolean isBaritonePresent() {
