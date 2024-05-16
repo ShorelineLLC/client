@@ -3,12 +3,15 @@ package net.shoreline.client.impl.module.client;
 import baritone.api.BaritoneAPI;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.TickEvent;
+
+import java.awt.*;
 
 /**
  * @author Shoreline
@@ -38,6 +41,10 @@ public class BaritoneModule extends ConcurrentModule {
     Config<Boolean> censorCoordsConfig = new BooleanConfig("CensorCoords", "Censors goal coordinates in chat", false);
     Config<Boolean> censorCommandsConfig = new BooleanConfig("CensorCommands", "Censors baritone commands in chat", false);
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "Debugs in the chat", false);
+    Config<Color> goalColor = new ColorConfig("GoalColor", "The color of the goal box", Color.GREEN, false, false);
+    Config<Color> pathColor = new ColorConfig("CurrentPathColor", "The color of the path", Color.RED, false, false);
+    Config<Color> nextPathColor = new ColorConfig("NextPathColor", "The color of the path", Color.MAGENTA, false, false);
+
 
     /**
      *
@@ -73,5 +80,9 @@ public class BaritoneModule extends ConcurrentModule {
         BaritoneAPI.getSettings().censorCoordinates.value = censorCoordsConfig.getValue();
         BaritoneAPI.getSettings().censorRanCommands.value = censorCommandsConfig.getValue();
         BaritoneAPI.getSettings().chatDebug.value = debugConfig.getValue();
+        BaritoneAPI.getSettings().colorGoalBox.value = goalColor.getValue();
+        BaritoneAPI.getSettings().colorCurrentPath.value = pathColor.getValue();
+        BaritoneAPI.getSettings().colorMostRecentConsidered.value = pathColor.getValue();
+        BaritoneAPI.getSettings().colorNextPath.value = nextPathColor.getValue();
     }
 }

@@ -209,7 +209,7 @@ public class AutoCrystalModule extends RotationModule {
         if (placeConfig.getValue()) {
             placeCrystal = calculatePlaceCrystal(blocks, entities);
         }
-        float breakDelay = 1000.0f - breakSpeedConfig.getValue() * 50.0f;
+        float breakDelay = getBreakDelay();
         if (breakDelayConfig.getValue()) {
             breakDelay = Math.max(minTimeoutConfig.getValue() * 50.0f, getBreakMs() + breakTimeoutConfig.getValue() * 50.0f);
         }
@@ -949,6 +949,10 @@ public class AutoCrystalModule extends RotationModule {
             return Hand.MAIN_HAND;
         }
         return null;
+    }
+
+    public float getBreakDelay() {
+        return 1000.0f - breakSpeedConfig.getValue() * 50.0f;
     }
 
     // Debug info

@@ -91,11 +91,6 @@ public class SpeedModule extends ToggleModule {
     }
 
     @EventListener
-    public void onDisconnect(DisconnectEvent event) {
-        disable();
-    }
-
-    @EventListener
     public void onTick(TickEvent event) {
         if (event.getStage() == EventStage.PRE) {
             boostTicks++;

@@ -31,6 +31,8 @@ import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 
@@ -64,6 +66,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private List<BlockPos> surround = new ArrayList<>();
     private List<BlockPos> placements = new ArrayList<>();
+    private final Timer attackTimer = new CacheTimer();
 
     private int blocksPlaced;
     private int shiftDelay;
@@ -177,13 +180,14 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos, int blockSlot)
     {
-        if (attackConfig.getValue())
+        if (attackConfig.getValue() && attackTimer.passed(Modules.AUTO_CRYSTAL.getBreakDelay()))
         {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities)
             {
                 attack(entity);
             }
+            attackTimer.reset();
         }
 
         Managers.INTERACT.placeBlock(targetPos, blockSlot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
