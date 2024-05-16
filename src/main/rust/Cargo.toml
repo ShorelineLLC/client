@@ -1,0 +1,11 @@
+[package]
+name = "shoreline-loader"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+jni = "0.17.0"
+obfstr = "0.3.0"
+
+[lib]
+crate_type = ["cdylib"]
