@@ -287,20 +287,6 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     @EventListener
-    public void onAddEntity(AddEntityEvent event) {
-        if (!(event.getEntity() instanceof EndCrystalEntity crystalEntity) || !attackConfig.getValue() || Modules.SELF_TRAP.isEnabled()) {
-            return;
-        }
-        for (BlockPos blockPos : surround) {
-            if (crystalEntity.getBlockPos() == blockPos) {
-                Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                break;
-            }
-        }
-    }
-
-    @EventListener
     public void onPacketInbound(PacketEvent.Inbound event) {
         if (mc.player == null || Modules.SELF_TRAP.isEnabled()) {
             return;
