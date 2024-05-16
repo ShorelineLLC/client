@@ -1,6 +1,7 @@
 package net.shoreline.client.util.player;
 
 import net.minecraft.client.input.Input;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.util.Globals;
@@ -36,6 +37,14 @@ public class MovementUtil implements Globals {
         double e = mc.player.getY() - mc.player.lastBaseY;
         double f = mc.player.getZ() - mc.player.lastZ;
         return MathHelper.squaredMagnitude(d, e, f) > MathHelper.square(2.0e-4);
+    }
+
+    public static void applySneak()
+    {
+        final float modifier = MathHelper.clamp(0.3F
+                + EnchantmentHelper.getSwiftSneakSpeedBoost(mc.player), 0.0F, 1.0F);
+        mc.player.input.movementForward *= modifier;
+        mc.player.input.movementSideways *= modifier;
     }
 
     public static Vec2f applySafewalk(final double motionX, final double motionZ)

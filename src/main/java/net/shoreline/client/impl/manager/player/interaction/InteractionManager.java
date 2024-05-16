@@ -3,6 +3,7 @@ package net.shoreline.client.impl.manager.player.interaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.ActionResult;
@@ -14,11 +15,15 @@ import net.shoreline.client.Shoreline;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.SneakBlocks;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY;
+import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY;
 
 /**
  * @author xgraza
@@ -110,9 +115,9 @@ public final class InteractionManager implements Globals
         final boolean shouldSneak = SneakBlocks.isSneakBlock(state) && !mc.player.isSneaking();
         if (shouldSneak)
         {
-            
+            Managers.MOVEMENT.setPacketSneaking(true);
+            MovementUtil.applySneak();
         }
-
         final ActionResult actionResult = placeBlockInternally(result);
         if (actionResult.isAccepted() && actionResult.shouldSwingHand())
         {
@@ -127,7 +132,7 @@ public final class InteractionManager implements Globals
         }
         if (shouldSneak)
         {
-
+            Managers.MOVEMENT.setPacketSneaking(false);
         }
         return actionResult.isAccepted();
     }

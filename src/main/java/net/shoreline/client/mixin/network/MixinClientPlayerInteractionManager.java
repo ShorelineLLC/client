@@ -159,6 +159,12 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
         cir.setReturnValue((ActionResult) ((Object) mutableObject.getValue()));
     }
 
+    @Redirect(method = "interactBlockInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;shouldCancelInteraction()Z"))
+    private boolean hookRedirectInteractBlockInternal$shouldCancelInteraction(ClientPlayerEntity player)
+    {
+        return player.isSneaking() || Managers.MOVEMENT.isPacketSneaking();
+    }
+
     @Redirect(
         method = "interactBlockInternal",
         at = @At(

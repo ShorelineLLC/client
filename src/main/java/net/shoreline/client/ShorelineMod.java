@@ -3,6 +3,7 @@ package net.shoreline.client;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 
 /**
  * Fabric {@link ModInitializer}.
@@ -23,10 +24,23 @@ public class ShorelineMod implements ClientModInitializer {
      */
     @Override
     public void onInitializeClient() {
+        if (isRetardUsingClient())
+        {
+            System.out.println("Retard alert! Aborting!! Error 69god");
+            System.exit(-1);
+        }
         Shoreline.init();
     }
 
     public static boolean isBaritonePresent() {
         return FabricLoader.getInstance().getModContainer("baritone").isPresent();
+    }
+
+    public static boolean isRetardUsingClient()
+    {
+        final MinecraftClient mc = MinecraftClient.getInstance();
+        // TODO: add any other retarded usernames
+        return mc.getSession().getUsername().equals("hockeyl8")
+                || mc.getSession().getUsername().toLowerCase().startsWith("niggerzoidfan");
     }
 }

@@ -93,7 +93,7 @@ public final class ScaffoldModule extends RotationModule
             return;
         }
 
-        final boolean result = Managers.INTERACT.placeBlock(data.getHitResult(), blockSlot, false, (state, angles) ->
+        final boolean result = Managers.INTERACT.placeBlock(data.getHitResult(), blockSlot, true, (state, angles) ->
         {
             angles = data.getAngles();
             if (angles == null)
