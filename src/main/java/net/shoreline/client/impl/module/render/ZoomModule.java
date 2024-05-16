@@ -34,7 +34,7 @@ public class ZoomModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() == EventStage.PRE) {
+        if (event.getStage() == EventStage.PRE && mc.currentScreen == null) {
             if (isPressed) {
                 if (flag1) {
                     defaultFov = mc.options.getFov().getValue();

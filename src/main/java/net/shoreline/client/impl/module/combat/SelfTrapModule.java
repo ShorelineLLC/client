@@ -252,6 +252,9 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
         }
         for (BlockPos entityPos : entities) {
+            if (entityPos == pos) {
+                continue;
+            }
             blocks.add(entityPos.down());
         }
         // We now just need to go up one every block pos
