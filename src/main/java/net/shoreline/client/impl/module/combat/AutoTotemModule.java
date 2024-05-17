@@ -102,6 +102,9 @@ public final class AutoTotemModule extends ToggleModule
     @EventListener
     public void onPacketInbound(final PacketEvent.Inbound event)
     {
+        if (mc.player == null) {
+            return;
+        }
         if (event.getPacket() instanceof HealthUpdateS2CPacket packet && packet.getHealth() <= 0.0f && debugConfig.getValue())
         {
             final Set<String> reasons = new LinkedHashSet<>();
