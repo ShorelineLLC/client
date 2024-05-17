@@ -5,8 +5,7 @@ use obfstr::obfstr;
 
 pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
                                name: &str,
-                               jvm_bytes: JObject,
-                               class_loader: JObject)
+                               jvm_bytes: JObject)
 {
     let bytes = env.get_byte_array_elements(
         jvm_bytes.into_inner(),
@@ -23,23 +22,23 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
         vec.push(*bytes.offset(i) as u8);
     }
 
-    // let current_thread = env.call_static_method(
-    //     obfstr!("java/lang/Thread"),
-    //     obfstr!("currentThread"),
-    //     obfstr!("()Ljava/lang/Thread;"),
-    //     &[]
-    // ).unwrap().l().unwrap();
-    //
-    // let context_classloader = env.call_method(
-    //     current_thread,
-    //     obfstr!("getContextClassLoader"),
-    //     obfstr!("()Ljava/lang/ClassLoader;"),
-    //     &[]
-    // ).unwrap().l().unwrap();
+    let current_thread = env.call_static_method(
+        obfstr!("java/lang/Thread"),
+        obfstr!("currentThread"),
+        obfstr!("()Ljava/lang/Thread;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let context_classloader = env.call_method(
+        current_thread,
+        obfstr!("getContextClassLoader"),
+        obfstr!("()Ljava/lang/ClassLoader;"),
+        &[]
+    ).unwrap().l().unwrap();
 
     env.define_class(
         name.replace(obfstr!(".class"), obfstr!("")),
-        class_loader,
+        context_classloader,
         vec.as_ref()
     ).unwrap();
 }

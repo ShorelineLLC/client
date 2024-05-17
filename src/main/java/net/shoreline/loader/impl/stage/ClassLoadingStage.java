@@ -29,10 +29,8 @@ public final class ClassLoadingStage extends LoadingStage
 
         Loader.LOGGER.info("downloading classes...");
 
-        ShorelineClassLoader classLoader = new ShorelineClassLoader();
-
         @SuppressWarnings("unchecked")
-        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.stop_decompiling_3(classLoader);
+        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.stop_decompiling_3(this);
 
         Loader.LOGGER.info("successfully downloaded non-mixin classes");
 
@@ -84,22 +82,6 @@ public final class ClassLoadingStage extends LoadingStage
     public static ClassLoadingStage getInstance()
     {
         return instance;
-    }
-
-    private static class ShorelineClassLoader extends ClassLoader
-    {
-        private ShorelineClassLoader()
-        {
-            super(Thread.currentThread().getContextClassLoader());
-        }
-
-        @Override
-        protected Class<?> findClass(String name) throws ClassNotFoundException
-        {
-            Loader.LOGGER.info("Our custom classloader is trying to find " + name);
-
-            return super.findClass(name);
-        }
     }
 
     private static class CustomMixinService extends MixinServiceKnot

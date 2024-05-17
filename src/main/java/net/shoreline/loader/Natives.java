@@ -38,4 +38,6 @@ public final class Natives
      * @return Null
      */
     public static native Object stop_decompiling_3(Object p0);
+
+    public static native Object stop_decompiling_4(Object p0);
 }

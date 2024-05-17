@@ -12,6 +12,7 @@ use jni::objects::{JObject, JValue, JString, JClass, GlobalRef};
 use std::ffi::CStr;
 use crate::utils::{define_class, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class};
 
+static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
 static mut MIXIN_CONFIG: Option<GlobalRef> = None;
 static mut MIXIN_REFMAP: Option<GlobalRef> = None;
 
@@ -101,6 +102,15 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     // A queue of all classes that need to be defined
     let mut class_queue = VecDeque::new();
 
+    // All mc extending classes that cannot be defined yet
+    let mc_class_dependents = env.new_object(
+        obfstr!("java/util/HashMap"),
+        obfstr!("()V"),
+        &[]
+    ).unwrap();
+
+    LATE_LOADING_CLASSES = env.new_global_ref(mc_class_dependents).ok();
+
     // A map of all classes that need their bytecode parsed by the Java side
     let class_map = env.new_object(
         obfstr!("java/util/HashMap"),
@@ -112,7 +122,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
 
     let url_string = JNIString::from(
-        obfstr!("https://cdn.discordapp.com/attachments/823779797784199169/1240570651337822218/client-1.0.jar?ex=66470af3&is=6645b973&hm=8267ec88ce7736655fe2d3d43e4b8698393a17e0ffbdeabf99c8f6f5db19eee9&")
+        obfstr!("https://cdn.discordapp.com/attachments/823779797784199169/1240857446969380905/client-1.0.jar?ex=6648160d&is=6646c48d&hm=622a2125d4adfbdac9088305b634493d0a54b142be8f7c9719330a0176a4fa56&")
     );
 
     let url = env.new_object(
@@ -200,6 +210,13 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                             obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
                             &[jvm_name.into(), jvm_bytes.into()]
                         ).unwrap().l().unwrap();
+
+                        env.call_method(
+                            mc_class_dependents,
+                            obfstr!("put"),
+                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[jvm_name.into(), jvm_bytes.into()]
+                        ).unwrap();
                     } else if is_mixin_class(&env, jvm_bytes)
                     {
                         env.call_method(
@@ -239,6 +256,8 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                             || name.contains("net/shoreline/client/api/render/RenderManager")
                             || name.contains("net/shoreline/client/util/network/InteractType")
                         {
+                            // NIGGAGAGGAGAGA
+
                             // env.call_method(
                             //     class_map,
                             //     obfstr!("put"),
@@ -256,6 +275,11 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
                         class_queue.push_back((jvm_name, jvm_bytes));
                     }
+                } else
+                {
+                    // It's an asset
+
+
                 }
             }
         }
@@ -293,7 +317,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
             if dependencies.is_empty()
             {
                 let bytes = bytes_map.remove(class_name).unwrap();
-                define_class(&env, class_name, *bytes, class_loader);
+                define_class(&env, class_name, *bytes);
                 defined_this_iteration.push(class_name.clone());
             }
         }
@@ -310,4 +334,69 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     }
 
     return class_map;
+}
+
+#[no_mangle]
+#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_14"]
+pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
+                                                     _caller_class: JClass<'a>,
+                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
+{
+    match LATE_LOADING_CLASSES.as_ref().take()
+    {
+        Some(class_cache) =>
+            {
+                while !env.call_method(
+                    class_cache,
+                    obfstr!("isEmpty"),
+                    obfstr!("()Z"),
+                    &[]
+                ).unwrap().z().unwrap() {
+                    let hashmap_entryset = env.call_method(
+                        class_cache,
+                        obfstr!("entrySet"),
+                        obfstr!("()Ljava/util/Set;"),
+                        &[]
+                    ).unwrap().l().unwrap();
+
+                    let hashmap_iter = env.call_method(
+                        hashmap_entryset,
+                        obfstr!("iterator"),
+                        obfstr!("()Ljava/util/Iterator;"),
+                        &[]
+                    ).unwrap().l().unwrap();
+
+                    let next = env.call_method(
+                        hashmap_iter,
+                        obfstr!("next"),
+                        obfstr!("()Ljava/lang/Object;"),
+                        &[]
+                    ).unwrap().l().unwrap();
+
+                    let key = JString::from(env.call_method(
+                        next,
+                        obfstr!("getKey"),
+                        obfstr!("()Ljava/lang/Object;"),
+                        &[]
+                    ).unwrap().l().unwrap());
+
+                    let value = env.call_method(
+                        class_cache,
+                        obfstr!("remove"),
+                        obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                        &[key.into()]
+                    ).unwrap().l().unwrap();
+
+                    let name_ptr = env.get_string_utf_chars(key).unwrap();
+                    let name = CStr::from_ptr(name_ptr).to_str().unwrap();
+
+                    define_class(&env, name, value);
+
+                    env.release_string_utf_chars(key, name_ptr).unwrap();
+                }
+            },
+        None => panic!("unable to complete native method stop_decompiling_4")
+    }
+
+    return JObject::null();
 }
