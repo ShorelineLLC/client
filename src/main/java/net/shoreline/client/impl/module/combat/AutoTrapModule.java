@@ -109,6 +109,11 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             shiftDelay++;
             return;
         }
+        final int slot = getResistantBlockItem();
+        if (slot == -1)
+        {
+            return;
+        }
         surround = getAutoTrapPositions(pos);
         placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
 

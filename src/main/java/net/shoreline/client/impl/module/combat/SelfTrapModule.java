@@ -126,6 +126,11 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             shiftDelay++;
             return;
         }
+        final int slot = getResistantBlockItem();
+        if (slot == -1)
+        {
+            return;
+        }
         surround = getSelfTrapPositions(pos);
         placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).collect(Collectors.toList());
 
