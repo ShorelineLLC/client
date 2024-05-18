@@ -7,7 +7,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,7 +55,7 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
             return;
         }
         final JumpRotationEvent event = new JumpRotationEvent();
-        Shoreline.EVENT_HANDLER.dispatch(event);
+        EventBus.EVENT_HANDLER.dispatch(event);
         if (event.isCanceled()) {
             ci.cancel();
             Vec3d vec3d = this.getVelocity();
@@ -79,7 +79,7 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
     private boolean hookHasStatusEffect(LivingEntity instance, StatusEffect effect) {
         if (instance.equals(mc.player)) {
             LevitationEvent levitationEvent = new LevitationEvent();
-            Shoreline.EVENT_HANDLER.dispatch(levitationEvent);
+            EventBus.EVENT_HANDLER.dispatch(levitationEvent);
             return !levitationEvent.isCanceled() && hasStatusEffect(effect);
         }
         return hasStatusEffect(effect);
@@ -97,13 +97,13 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
             return;
         }
         ConsumeItemEvent consumeItemEvent = new ConsumeItemEvent(activeItemStack);
-        Shoreline.EVENT_HANDLER.dispatch(consumeItemEvent);
+        EventBus.EVENT_HANDLER.dispatch(consumeItemEvent);
     }
 
     @Inject(method = "tickMovement", at = @At(value = "HEAD"), cancellable = true)
     private void hookTickMovement(CallbackInfo ci) {
         JumpDelayEvent jumpDelayEvent = new JumpDelayEvent();
-        Shoreline.EVENT_HANDLER.dispatch(jumpDelayEvent);
+        EventBus.EVENT_HANDLER.dispatch(jumpDelayEvent);
         if (jumpDelayEvent.isCanceled()) {
             jumpingCooldown = 0;
         }
@@ -115,7 +115,7 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
             return;
         }
         StatusEffectEvent.Add statusEffectEvent = new StatusEffectEvent.Add(effect);
-        Shoreline.EVENT_HANDLER.dispatch(statusEffectEvent);
+        EventBus.EVENT_HANDLER.dispatch(statusEffectEvent);
     }
 
     @Inject(method = "onStatusEffectRemoved", at = @At(value = "HEAD"))
@@ -124,6 +124,6 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
             return;
         }
         StatusEffectEvent.Remove statusEffectEvent = new StatusEffectEvent.Remove(effect);
-        Shoreline.EVENT_HANDLER.dispatch(statusEffectEvent);
+        EventBus.EVENT_HANDLER.dispatch(statusEffectEvent);
     }
 }

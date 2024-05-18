@@ -40,6 +40,7 @@ public class BaritoneModule extends ConcurrentModule {
     Config<Boolean> strictLiquidConfig = new BooleanConfig("Strict-Liquid", "Uses strick liquid checks", false);
     Config<Boolean> censorCoordsConfig = new BooleanConfig("CensorCoords", "Censors goal coordinates in chat", false);
     Config<Boolean> censorCommandsConfig = new BooleanConfig("CensorCommands", "Censors baritone commands in chat", false);
+    Config<Boolean> chatControlConfig = new BooleanConfig("ChatControl", "Allows you to type baritone commands in chat without prefix", true);
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "Debugs in the chat", false);
     Config<Color> goalColor = new ColorConfig("GoalColor", "The color of the goal box", Color.GREEN, false, false);
     Config<Color> pathColor = new ColorConfig("CurrentPathColor", "The color of the path", Color.RED, false, false);
@@ -79,6 +80,7 @@ public class BaritoneModule extends ConcurrentModule {
         BaritoneAPI.getSettings().strictLiquidCheck.value = strictLiquidConfig.getValue();
         BaritoneAPI.getSettings().censorCoordinates.value = censorCoordsConfig.getValue();
         BaritoneAPI.getSettings().censorRanCommands.value = censorCommandsConfig.getValue();
+        BaritoneAPI.getSettings().chatControl.value = chatControlConfig.getValue();
         BaritoneAPI.getSettings().chatDebug.value = debugConfig.getValue();
         BaritoneAPI.getSettings().colorGoalBox.value = goalColor.getValue();
         BaritoneAPI.getSettings().colorCurrentPath.value = pathColor.getValue();

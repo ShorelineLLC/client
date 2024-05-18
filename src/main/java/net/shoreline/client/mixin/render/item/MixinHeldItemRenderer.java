@@ -10,7 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.render.item.RenderArmEvent;
 import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -43,7 +43,7 @@ public class MixinHeldItemRenderer {
     private void hookRenderArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
         PlayerEntityRenderer playerEntityRenderer = (PlayerEntityRenderer) entityRenderDispatcher.getRenderer(client.player);
         RenderArmEvent renderArmEvent = new RenderArmEvent(matrices, vertexConsumers, light, equipProgress, swingProgress, arm, playerEntityRenderer);
-        Shoreline.EVENT_HANDLER.dispatch(renderArmEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderArmEvent);
         if (renderArmEvent.isCanceled()) {
             ci.cancel();
         }
@@ -73,7 +73,7 @@ public class MixinHeldItemRenderer {
                                            ItemStack item, float equipProgress, MatrixStack matrices,
                                            VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         RenderFirstPersonEvent renderFirstPersonEvent = new RenderFirstPersonEvent(hand, item, equipProgress, matrices);
-        Shoreline.EVENT_HANDLER.dispatch(renderFirstPersonEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderFirstPersonEvent);
     }
 
 //    @Inject(method = "applyEatOrDrinkTransformation", at = @At(value = "HEAD"), cancellable = true)

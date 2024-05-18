@@ -2,7 +2,7 @@ package net.shoreline.client.mixin.toast;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.ToastManager;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.toast.RenderToastEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +20,7 @@ public class MixinToastManager {
     @Inject(method = "draw", at = @At(value = "HEAD"), cancellable = true)
     private void hookDraw(DrawContext context, CallbackInfo ci) {
         RenderToastEvent renderToastEvent = new RenderToastEvent();
-        Shoreline.EVENT_HANDLER.dispatch(renderToastEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderToastEvent);
         if (renderToastEvent.isCanceled()) {
             ci.cancel();
         }

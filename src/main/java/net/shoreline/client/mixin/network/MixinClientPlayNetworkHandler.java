@@ -5,7 +5,7 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.network.InventoryEvent;
@@ -35,7 +35,7 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
     private void hookSendChatMessage(String content, CallbackInfo ci) {
         ChatMessageEvent.Server chatInputEvent =
                 new ChatMessageEvent.Server(content);
-        Shoreline.EVENT_HANDLER.dispatch(chatInputEvent);
+        EventBus.EVENT_HANDLER.dispatch(chatInputEvent);
         // prevent chat packet from sending
         if (chatInputEvent.isCanceled()) {
             ci.cancel();
@@ -49,7 +49,7 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
     @Inject(method = "onGameJoin", at = @At(value = "TAIL"))
     private void hookOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
         GameJoinEvent gameJoinEvent = new GameJoinEvent();
-        Shoreline.EVENT_HANDLER.dispatch(gameJoinEvent);
+        EventBus.EVENT_HANDLER.dispatch(gameJoinEvent);
     }
 
     /**
@@ -59,7 +59,7 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
     @Inject(method = "onInventory", at = @At(value = "TAIL"))
     private void hookOnInventory(InventoryS2CPacket packet, CallbackInfo ci) {
         InventoryEvent inventoryEvent = new InventoryEvent(packet);
-        Shoreline.EVENT_HANDLER.dispatch(inventoryEvent);
+        EventBus.EVENT_HANDLER.dispatch(inventoryEvent);
     }
 
     @Override

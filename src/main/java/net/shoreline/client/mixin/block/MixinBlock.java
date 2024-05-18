@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.block;
 
 import net.minecraft.block.Block;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.block.BlockSlipperinessEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ public class MixinBlock {
     private void hookGetSlipperiness(CallbackInfoReturnable<Float> cir) {
         BlockSlipperinessEvent blockSlipperinessEvent =
                 new BlockSlipperinessEvent((Block) (Object) this, cir.getReturnValueF());
-        Shoreline.EVENT_HANDLER.dispatch(blockSlipperinessEvent);
+        EventBus.EVENT_HANDLER.dispatch(blockSlipperinessEvent);
         if (blockSlipperinessEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(blockSlipperinessEvent.getSlipperiness());

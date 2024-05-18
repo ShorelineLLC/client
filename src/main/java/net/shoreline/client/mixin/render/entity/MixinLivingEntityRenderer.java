@@ -8,7 +8,7 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityInvisibleEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -46,7 +46,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
                             MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
         RenderEntityEvent renderEntityEvent = new RenderEntityEvent(livingEntity,
                 f, g, matrixStack, vertexConsumerProvider, i, model, getRenderLayer((T) livingEntity, true, false, false), features);
-        Shoreline.EVENT_HANDLER.dispatch(renderEntityEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderEntityEvent);
         if (renderEntityEvent.isCanceled()) {
             ci.cancel();
         }
@@ -55,7 +55,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     @Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z"))
     private boolean redirectRender$isInvisibleTo(LivingEntity entity, PlayerEntity player) {
         final RenderEntityInvisibleEvent event = new RenderEntityInvisibleEvent(entity);
-        Shoreline.EVENT_HANDLER.dispatch(event);
+        EventBus.EVENT_HANDLER.dispatch(event);
         if (event.isCanceled())
         {
             return false;

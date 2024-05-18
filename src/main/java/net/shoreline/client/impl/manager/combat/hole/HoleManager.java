@@ -4,7 +4,7 @@ import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.impl.event.TickEvent;
@@ -30,7 +30,7 @@ public class HoleManager implements Globals {
     private Set<Hole> holes = new ConcurrentSet<>();
 
     public HoleManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**

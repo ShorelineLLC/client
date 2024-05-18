@@ -4,16 +4,15 @@ import net.minecraft.text.CharacterVisitor;
 import net.minecraft.text.Style;
 import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Formatting;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.buffers.ColorBuffer;
 import net.shoreline.client.impl.event.text.TextVisitEvent;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -45,7 +44,7 @@ public abstract class MixinTextVisitFactory implements Globals {
             return text;
         }
         final TextVisitEvent textVisitEvent = new TextVisitEvent(text);
-        Shoreline.EVENT_HANDLER.dispatch(textVisitEvent);
+        EventBus.EVENT_HANDLER.dispatch(textVisitEvent);
         if (textVisitEvent.isCanceled()) {
             return textVisitEvent.getText();
         }
@@ -69,7 +68,7 @@ public abstract class MixinTextVisitFactory implements Globals {
 
                 d = text.charAt(j + 1);
                 if (d == 's') { // Custom client color
-                    style = style.withColor(Modules.COLORS.getRGB());
+                    style = style.withColor(ColorBuffer.getClientRgb());
                 }
                 else {
                     Formatting formatting = Formatting.byCode(d);

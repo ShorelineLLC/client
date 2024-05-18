@@ -2,7 +2,7 @@ package net.shoreline.client.mixin.biome;
 
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.BiomeParticleConfig;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.biome.BiomeEffectsEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ public class MixinBiomeEffects {
     @Inject(method = "getSkyColor", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetSkyColor(CallbackInfoReturnable<Integer> cir) {
         SkyboxEvent.Sky skyboxEvent = new SkyboxEvent.Sky();
-        Shoreline.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getRGB());
@@ -34,7 +34,7 @@ public class MixinBiomeEffects {
     @Inject(method = "getParticleConfig", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetParticleConfig(CallbackInfoReturnable<Optional<BiomeParticleConfig>> cir) {
         BiomeEffectsEvent biomeEffectsEvent = new BiomeEffectsEvent();
-        Shoreline.EVENT_HANDLER.dispatch(biomeEffectsEvent);
+        EventBus.EVENT_HANDLER.dispatch(biomeEffectsEvent);
         if (biomeEffectsEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(Optional.ofNullable(biomeEffectsEvent.getParticleConfig()));

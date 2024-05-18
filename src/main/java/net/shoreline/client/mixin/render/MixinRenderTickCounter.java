@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.render.RenderTickCounter;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +34,7 @@ public class MixinRenderTickCounter {
     private void hookBeginRenderTick(long timeMillis,
                                      CallbackInfoReturnable<Integer> cir) {
         TickCounterEvent tickCounterEvent = new TickCounterEvent();
-        Shoreline.EVENT_HANDLER.dispatch(tickCounterEvent);
+        EventBus.EVENT_HANDLER.dispatch(tickCounterEvent);
         if (tickCounterEvent.isCanceled()) {
             lastFrameDuration = ((timeMillis - prevTimeMillis) / tickTime) * tickCounterEvent.getTicks();
             prevTimeMillis = timeMillis;

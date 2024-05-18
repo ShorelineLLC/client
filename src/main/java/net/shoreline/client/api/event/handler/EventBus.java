@@ -3,12 +3,10 @@ package net.shoreline.client.api.event.handler;
 import net.shoreline.client.api.event.Event;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.event.listener.Listener;
-import net.shoreline.client.init.Managers;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author linus
@@ -19,6 +17,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 1.0
  */
 public class EventBus implements EventHandler {
+
+    // Client Event handler (aka Event bus) which handles event dispatching
+    // and listening for client events.
+    public static EventHandler EVENT_HANDLER;
     // Active subscriber cache. Used to check if a class is already
     // subscribed to this EventHandler.
     private final Set<Object> subscribers = Collections.synchronizedSet(new HashSet<>());
@@ -95,5 +97,10 @@ public class EventBus implements EventHandler {
             listener.invokeSubscriber(event);
         }
         return event.isCanceled();
+    }
+
+    static {
+        // Create event handler instance
+        EVENT_HANDLER = new EventBus();
     }
 }

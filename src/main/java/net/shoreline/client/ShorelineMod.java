@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.loader.Natives;
 
 /**
  * Fabric {@link ModInitializer}.
@@ -23,7 +24,16 @@ public class ShorelineMod implements ClientModInitializer {
      * Proceed with mild caution.
      */
     @Override
-    public void onInitializeClient() {
+    public void onInitializeClient()
+    {
+        try
+        {
+            Natives.stop_decompiling_4(this);
+        } catch (UnsatisfiedLinkError e)
+        {
+            // Development environment
+        }
+
         Shoreline.init();
     }
 

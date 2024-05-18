@@ -2,7 +2,7 @@ package net.shoreline.client.mixin;
 
 import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.impl.event.keyboard.KeyboardTickEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public class MixinKeyboardInput {
     {
         KeyboardTickEvent event = new KeyboardTickEvent((Input) (Object) this);
         event.setStage(EventStage.PRE);
-        Shoreline.EVENT_HANDLER.dispatch(event);
+        EventBus.EVENT_HANDLER.dispatch(event);
         if (event.isCanceled())
         {
             info.cancel();
@@ -39,7 +39,7 @@ public class MixinKeyboardInput {
     private void hookTick$Post(boolean slowDown, float f, CallbackInfo ci) {
         KeyboardTickEvent keyboardTickEvent = new KeyboardTickEvent((Input) (Object) this);
         keyboardTickEvent.setStage(EventStage.POST);
-        Shoreline.EVENT_HANDLER.dispatch(keyboardTickEvent);
+        EventBus.EVENT_HANDLER.dispatch(keyboardTickEvent);
         if (keyboardTickEvent.isCanceled()) {
             ci.cancel();
         }

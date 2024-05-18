@@ -2,6 +2,7 @@ package net.shoreline.client.mixin.item;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.shoreline.client.impl.event.buffers.ManagersBuffer;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,9 +16,9 @@ public final class MixinItemUsageContext implements Globals
     @Inject(method = "getStack", at = @At("RETURN"), cancellable = true)
     public void hookGetStack(final CallbackInfoReturnable<ItemStack> info)
     {
-        if (mc.player != null && info.getReturnValue().equals(mc.player.getMainHandStack()) && Managers.INVENTORY.isDesynced())
+        if (mc.player != null && info.getReturnValue().equals(mc.player.getMainHandStack()) && ManagersBuffer.getInventoryManager().isDesynced())
         {
-            info.setReturnValue(Managers.INVENTORY.getServerItem());
+            info.setReturnValue(ManagersBuffer.getInventoryManager().getServerItem());
         }
     }
 }

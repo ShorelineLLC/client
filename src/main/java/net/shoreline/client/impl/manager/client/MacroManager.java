@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.manager.client;
 
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.api.macro.Macro;
@@ -28,7 +28,7 @@ public class MacroManager implements Globals {
      *
      */
     public MacroManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**

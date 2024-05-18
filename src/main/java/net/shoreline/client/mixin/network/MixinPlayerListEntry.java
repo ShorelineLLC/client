@@ -4,8 +4,8 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.event.buffers.ManagersBuffer;
+import net.shoreline.client.impl.event.buffers.ModulesBuffer;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -33,7 +33,7 @@ public class MixinPlayerListEntry implements Globals {
         if (capeTextureLoaded) {
             return;
         }
-        Managers.CAPES.loadPlayerCape(profile, identifier -> {
+        ManagersBuffer.getCapesManager().loadPlayerCape(profile, identifier -> {
             capeTexture = identifier;
         });
         capeTextureLoaded = true;
@@ -45,7 +45,7 @@ public class MixinPlayerListEntry implements Globals {
      */
     @Inject(method = "getSkinTextures", at = @At("TAIL"), cancellable = true)
     private void hookGetSkinTextures(CallbackInfoReturnable<SkinTextures> cir) {
-        if (capeTexture != null && (Modules.CAPES.isEnabled() && Modules.CAPES.getOptifineConfig().getValue())) {
+        if (capeTexture != null && (ModulesBuffer.getCapesModule().isEnabled() && ModulesBuffer.getCapesModule().getOptifineConfig().getValue())) {
             SkinTextures t = cir.getReturnValue();
             SkinTextures customCapeTexture = new SkinTextures(t.texture(), t.textureUrl(), capeTexture, capeTexture, t.model(), t.secure());
             cir.setReturnValue(customCapeTexture);

@@ -10,6 +10,7 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.command.*;
@@ -41,7 +42,7 @@ public class CommandManager implements Globals {
      * Registers commands to the CommandManager
      */
     public CommandManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
         register(
                 new BindCommand(),
                 new ConfigCommand(),

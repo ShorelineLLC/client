@@ -3,7 +3,7 @@ package net.shoreline.client.mixin.render;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.render.AmbientColorEvent;
 import net.shoreline.client.impl.event.render.LightmapGammaEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -37,7 +37,7 @@ public class MixinLightmapTextureManager {
     private void hookUpdate(Args args) {
         LightmapGammaEvent lightmapGammaEvent =
                 new LightmapGammaEvent(args.get(2));
-        Shoreline.EVENT_HANDLER.dispatch(lightmapGammaEvent);
+        EventBus.EVENT_HANDLER.dispatch(lightmapGammaEvent);
         if (lightmapGammaEvent.isCanceled()) {
             args.set(2, lightmapGammaEvent.getGamma());
         }
@@ -52,7 +52,7 @@ public class MixinLightmapTextureManager {
             shift = At.Shift.BEFORE))
     private void hookUpdate(float delta, CallbackInfo ci) {
         final AmbientColorEvent ambientColorEvent = new AmbientColorEvent();
-        Shoreline.EVENT_HANDLER.dispatch(ambientColorEvent);
+        EventBus.EVENT_HANDLER.dispatch(ambientColorEvent);
         if (ambientColorEvent.isCanceled()) {
             for (int i = 0; i < 16; ++i) {
                 for (int j = 0; j < 16; ++j) {

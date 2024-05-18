@@ -3,7 +3,7 @@ package net.shoreline.client.impl.manager.player.rotation;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.render.Interpolation;
@@ -42,7 +42,7 @@ public class RotationManager implements Globals {
      *
      */
     public RotationManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     @EventListener

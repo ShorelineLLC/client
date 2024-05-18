@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.chunk.light;
 
 import net.minecraft.world.chunk.light.ChunkSkyLightProvider;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.impl.event.chunk.light.RenderSkylightEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +24,7 @@ public class MixinChunkSkylightProvider {
     @Inject(method = "method_51531", at = @At(value = "HEAD"), cancellable = true)
     private void hookRecalculateLevel(long blockPos, long l, int lightLevel, CallbackInfo ci) {
         RenderSkylightEvent renderSkylightEvent = new RenderSkylightEvent();
-        Shoreline.EVENT_HANDLER.dispatch(renderSkylightEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderSkylightEvent);
         if (renderSkylightEvent.isCanceled()) {
             ci.cancel();
         }

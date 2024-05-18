@@ -60,12 +60,34 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar {
-    from("LICENSE") {
-        rename { "${it}-${project.archives_base_name}" }
-    }
-
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
+
+tasks.register('loaderJar', Jar) {
+    dependsOn remapJar
+    from(zipTree(tasks.remapJar.archivePath))
+
+    exclude 'net/shoreline/client/**'
+    // exclude 'assets/**'
+    exclude 'mixins.shoreline.json'
+    exclude 'shoreline-refmap.json'
+
+    archiveBaseName = "loader"
+}
+
+tasks.register('clientJar', Jar) {
+    dependsOn remapJar
+    from(zipTree(tasks.remapJar.archivePath))
+
+    include 'net/shoreline/client/**'
+    // include 'assets/**'
+    include 'mixins.shoreline.json'
+    include 'shoreline-refmap.json'
+
+    archiveBaseName = "client"
+}
+
+build.dependsOn(loaderJar, clientJar)
 
 def execute(String cmd) {
     try {
