@@ -3,12 +3,10 @@ package net.shoreline.client.api.event.handler;
 import net.shoreline.client.api.event.Event;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.event.listener.Listener;
-import net.shoreline.client.init.Managers;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author linus
