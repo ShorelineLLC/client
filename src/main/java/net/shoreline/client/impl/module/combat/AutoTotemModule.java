@@ -1,10 +1,13 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.config.Config;
@@ -65,6 +68,9 @@ public final class AutoTotemModule extends ToggleModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
+        if (mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen)) {
+            return;
+        }
         // Get the item to wield in our offhand, and make sure we are already not holding the item
         final Item itemToWield = getItemToWield();
         if (mc.player.getOffHandStack().getItem().equals(itemToWield))
@@ -132,6 +138,34 @@ public final class AutoTotemModule extends ToggleModule
             {
                 final int totemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING);
                 sendModuleMessage("Could not figure out possible reasons. meta:{totemCount=" + totemCount + ", matchesCache=" + (totemCount == lastTotemCount) + ", cached=" + lastTotemCount +"}");
+            }
+        }
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet
+                && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING && packet.getEntity(mc.world) == mc.player) {
+            final int itemSlot = getSlotFor(Items.TOTEM_OF_UNDYING);
+            if (itemSlot != -1)
+            {
+                if (itemSlot < 9)
+                {
+                    lastHotbarItem = Items.TOTEM_OF_UNDYING;
+                    lastHotbarSlot = itemSlot;
+                }
+                // Do another quick swap (equivalent to hovering over an item & pressing F)
+                if (fastConfig.getValue()) {
+                    mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                            itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
+                } else {
+                    mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                            itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                            45, 0, SlotActionType.PICKUP, mc.player);
+                    if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
+                        mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                                itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+                    }
+                }
+                // Don't ask about the - 1, I don't want to talk about it
+                lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
             }
         }
     }

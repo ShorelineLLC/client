@@ -6,7 +6,7 @@ import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
-import net.shoreline.client.util.collection.EvictingQueue;
+import net.shoreline.client.util.EvictingQueue;
 import net.shoreline.client.util.Globals;
 
 import java.util.ArrayList;
