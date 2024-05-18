@@ -35,7 +35,7 @@ public final class InteractionManager implements Globals
 {
     public InteractionManager()
     {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     public boolean placeBlock(final BlockPos pos,

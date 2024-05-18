@@ -37,7 +37,7 @@ public abstract class MixinTridentItem implements Globals {
     @Inject(method = "use", at = @At(value = "HEAD"), cancellable = true)
     private void hookUse(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
         TridentWaterEvent tridentWaterEvent = new TridentWaterEvent();
-        Shoreline.EVENT_HANDLER.dispatch(tridentWaterEvent);
+        EventBus.EVENT_HANDLER.dispatch(tridentWaterEvent);
         if (tridentWaterEvent.isCanceled()) {
             cir.cancel();
             ItemStack itemStack = user.getStackInHand(hand);
@@ -57,12 +57,12 @@ public abstract class MixinTridentItem implements Globals {
         }
         int i = getMaxUseTime(stack) - remainingUseTicks;
         TridentPullbackEvent tridentPullbackEvent = new TridentPullbackEvent();
-        Shoreline.EVENT_HANDLER.dispatch(tridentPullbackEvent);
+        EventBus.EVENT_HANDLER.dispatch(tridentPullbackEvent);
         if (!tridentPullbackEvent.isCanceled() && i < 10) {
             return;
         }
         TridentWaterEvent tridentWaterEvent = new TridentWaterEvent();
-        Shoreline.EVENT_HANDLER.dispatch(tridentWaterEvent);
+        EventBus.EVENT_HANDLER.dispatch(tridentWaterEvent);
         if (tridentWaterEvent.isCanceled()) {
             ci.cancel();
             PlayerEntity playerEntity = (PlayerEntity) user;

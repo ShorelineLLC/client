@@ -35,7 +35,7 @@ public class MixinItemEntityRenderer {
                             VertexConsumerProvider vertexConsumerProvider,
                             int i, CallbackInfo ci) {
         RenderItemEvent renderItemEvent = new RenderItemEvent(itemEntity);
-        Shoreline.EVENT_HANDLER.dispatch(renderItemEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderItemEvent);
         if (renderItemEvent.isCanceled()) {
             ci.cancel();
         }

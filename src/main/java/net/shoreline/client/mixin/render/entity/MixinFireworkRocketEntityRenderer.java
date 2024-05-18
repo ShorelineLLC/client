@@ -37,7 +37,7 @@ public class MixinFireworkRocketEntityRenderer {
                             int i, CallbackInfo ci) {
         RenderFireworkRocketEvent renderFireworkRocketEvent =
                 new RenderFireworkRocketEvent();
-        Shoreline.EVENT_HANDLER.dispatch(renderFireworkRocketEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderFireworkRocketEvent);
         if (renderFireworkRocketEvent.isCanceled()) {
             ci.cancel();
         }

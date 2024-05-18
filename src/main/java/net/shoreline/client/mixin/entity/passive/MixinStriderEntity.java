@@ -16,7 +16,7 @@ public class MixinStriderEntity {
     @Inject(method = "isSaddled", at = @At(value = "HEAD"), cancellable = true)
     private void hookIsSaddled(CallbackInfoReturnable<Boolean> cir) {
         EntitySteerEvent entitySteerEvent = new EntitySteerEvent();
-        Shoreline.EVENT_HANDLER.dispatch(entitySteerEvent);
+        EventBus.EVENT_HANDLER.dispatch(entitySteerEvent);
         if (entitySteerEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(true);

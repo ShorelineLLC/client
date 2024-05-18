@@ -26,6 +26,6 @@ public class MixinFireworkRocketItem {
     private void hookUse(World world, PlayerEntity user, Hand hand,
                          CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
         FireworkUseEvent fireworkUseEvent = new FireworkUseEvent();
-        Shoreline.EVENT_HANDLER.dispatch(fireworkUseEvent);
+        EventBus.EVENT_HANDLER.dispatch(fireworkUseEvent);
     }
 }

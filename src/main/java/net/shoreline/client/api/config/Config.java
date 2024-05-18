@@ -174,11 +174,11 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
         final ConfigUpdateEvent event = new ConfigUpdateEvent(this);
         // PRE
         event.setStage(EventStage.PRE);
-        Shoreline.EVENT_HANDLER.dispatch(event);
+        EventBus.EVENT_HANDLER.dispatch(event);
         value = val;
         // POST
         event.setStage(EventStage.POST);
-        Shoreline.EVENT_HANDLER.dispatch(event);
+        EventBus.EVENT_HANDLER.dispatch(event);
     }
 
     /**

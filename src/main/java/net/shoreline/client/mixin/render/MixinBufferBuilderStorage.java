@@ -6,6 +6,7 @@ import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.util.Util;
 import net.shoreline.client.api.render.RenderLayersClient;
+import net.shoreline.client.impl.event.buffers.RenderLayersBuffer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -53,7 +54,7 @@ public class MixinBufferBuilderStorage {
             map.put(RenderLayer.getEntityGlint(), new BufferBuilder(RenderLayer.getEntityGlint().getExpectedBufferSize()));
             map.put(RenderLayer.getDirectEntityGlint(), new BufferBuilder(RenderLayer.getDirectEntityGlint().getExpectedBufferSize()));
             map.put(RenderLayer.getWaterMask(), new BufferBuilder(RenderLayer.getWaterMask().getExpectedBufferSize()));
-            map.put(RenderLayersClient.GLINT, new BufferBuilder(RenderLayersClient.GLINT.getExpectedBufferSize()));
+            map.put(RenderLayersClient.GLINT, new BufferBuilder(RenderLayersBuffer.getGlint().getExpectedBufferSize()));
             ModelLoader.BLOCK_DESTRUCTION_RENDER_LAYERS.forEach(renderLayer -> map.put(renderLayer, new BufferBuilder(renderLayer.getExpectedBufferSize())));
         });
         entityVertexConsumers = VertexConsumerProvider.immediate(sortedMap, new BufferBuilder(786432));

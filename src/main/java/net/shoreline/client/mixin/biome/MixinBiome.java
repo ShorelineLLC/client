@@ -14,7 +14,7 @@ public class MixinBiome {
     @Inject(method = "getFogColor", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetFogColor(CallbackInfoReturnable<Integer> cir) {
         SkyboxEvent.Fog skyboxEvent = new SkyboxEvent.Fog(0.0f);
-        Shoreline.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getRGB());

@@ -43,7 +43,7 @@ public class MixinEndCrystalEntityRenderer {
         RenderCrystalEvent renderCrystalEvent = new RenderCrystalEvent(endCrystalEntity,
                 f, g, matrixStack, i, core, frame);
         // Does it matter if render comes before cancelling?
-        Shoreline.EVENT_HANDLER.dispatch(renderCrystalEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderCrystalEvent);
         if (renderCrystalEvent.isCanceled()) {
             ci.cancel();
         }

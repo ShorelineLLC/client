@@ -30,7 +30,7 @@ public class HoleManager implements Globals {
     private Set<Hole> holes = new ConcurrentSet<>();
 
     public HoleManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**

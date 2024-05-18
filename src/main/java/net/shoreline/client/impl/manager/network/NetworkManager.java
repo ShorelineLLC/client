@@ -29,7 +29,7 @@ public class NetworkManager implements Globals {
      *
      */
     public NetworkManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**

@@ -32,7 +32,7 @@ public abstract class MixinEntityRenderer {
     public void hookRenderLabelIfPresent(Entity entity, Text text, MatrixStack matrices,
                                          VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         RenderLabelEvent renderLabelEvent = new RenderLabelEvent(entity);
-        Shoreline.EVENT_HANDLER.dispatch(renderLabelEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderLabelEvent);
         if (renderLabelEvent.isCanceled()) {
             ci.cancel();
         }

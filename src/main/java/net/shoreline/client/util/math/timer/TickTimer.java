@@ -21,7 +21,7 @@ public class TickTimer implements Timer {
      */
     public TickTimer() {
         ticks = 0;
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**

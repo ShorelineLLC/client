@@ -36,7 +36,7 @@ public class MixinKeyboard {
                            int modifiers, CallbackInfo ci) {
         if (client.getWindow().getHandle() == window) {
             KeyboardInputEvent keyboardInputEvent = new KeyboardInputEvent(key, action);
-            Shoreline.EVENT_HANDLER.dispatch(keyboardInputEvent);
+            EventBus.EVENT_HANDLER.dispatch(keyboardInputEvent);
             // prevent keyboard input
             if (keyboardInputEvent.isCanceled()) {
                 ci.cancel();

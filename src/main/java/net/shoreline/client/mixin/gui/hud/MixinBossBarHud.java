@@ -23,7 +23,7 @@ public class MixinBossBarHud {
     private void hookRender(DrawContext context, CallbackInfo ci) {
         RenderOverlayEvent.BossBar renderOverlayEvent =
                 new RenderOverlayEvent.BossBar(context);
-        Shoreline.EVENT_HANDLER.dispatch(renderOverlayEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled()) {
             ci.cancel();
         }

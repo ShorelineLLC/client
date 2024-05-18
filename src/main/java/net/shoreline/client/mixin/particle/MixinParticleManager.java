@@ -36,7 +36,7 @@ public class MixinParticleManager {
                                  double velocityY, double velocityZ,
                                  CallbackInfoReturnable<Particle> cir) {
         ParticleEvent particleEvent = new ParticleEvent(parameters);
-        Shoreline.EVENT_HANDLER.dispatch(particleEvent);
+        EventBus.EVENT_HANDLER.dispatch(particleEvent);
         if (particleEvent.isCanceled()) {
             cir.setReturnValue(null);
             cir.cancel();
@@ -55,7 +55,7 @@ public class MixinParticleManager {
                                 int maxAge, CallbackInfo ci) {
         ParticleEvent.Emitter particleEvent =
                 new ParticleEvent.Emitter(parameters);
-        Shoreline.EVENT_HANDLER.dispatch(particleEvent);
+        EventBus.EVENT_HANDLER.dispatch(particleEvent);
         if (particleEvent.isCanceled()) {
             ci.cancel();
         }

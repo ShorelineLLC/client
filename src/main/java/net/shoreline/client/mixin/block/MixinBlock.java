@@ -22,7 +22,7 @@ public class MixinBlock {
     private void hookGetSlipperiness(CallbackInfoReturnable<Float> cir) {
         BlockSlipperinessEvent blockSlipperinessEvent =
                 new BlockSlipperinessEvent((Block) (Object) this, cir.getReturnValueF());
-        Shoreline.EVENT_HANDLER.dispatch(blockSlipperinessEvent);
+        EventBus.EVENT_HANDLER.dispatch(blockSlipperinessEvent);
         if (blockSlipperinessEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(blockSlipperinessEvent.getSlipperiness());

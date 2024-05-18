@@ -31,7 +31,7 @@ public class MixinFireworkRocketEntity implements Globals {
     private void hookTickPre(CallbackInfo ci) {
         FireworkRocketEntity rocketEntity = ((FireworkRocketEntity) (Object) this);
         RemoveFireworkEvent removeFireworkEvent = new RemoveFireworkEvent(rocketEntity);
-        Shoreline.EVENT_HANDLER.dispatch(removeFireworkEvent);
+        EventBus.EVENT_HANDLER.dispatch(removeFireworkEvent);
         if (removeFireworkEvent.isCanceled()) {
             ci.cancel();
             if (life == 0 && !rocketEntity.isSilent()) {

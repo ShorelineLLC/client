@@ -20,7 +20,7 @@ public class MixinToastManager {
     @Inject(method = "draw", at = @At(value = "HEAD"), cancellable = true)
     private void hookDraw(DrawContext context, CallbackInfo ci) {
         RenderToastEvent renderToastEvent = new RenderToastEvent();
-        Shoreline.EVENT_HANDLER.dispatch(renderToastEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderToastEvent);
         if (renderToastEvent.isCanceled()) {
             ci.cancel();
         }

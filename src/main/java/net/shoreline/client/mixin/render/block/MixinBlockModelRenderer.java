@@ -48,7 +48,7 @@ public class MixinBlockModelRenderer {
                             CallbackInfo ci) {
         RenderBlockEvent renderBlockEvent =
                 new RenderBlockEvent(state, pos);
-        Shoreline.EVENT_HANDLER.dispatch(renderBlockEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderBlockEvent);
         if (renderBlockEvent.isCanceled()) {
             ci.cancel();
         }

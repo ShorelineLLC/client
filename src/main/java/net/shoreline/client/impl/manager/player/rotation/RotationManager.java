@@ -42,7 +42,7 @@ public class RotationManager implements Globals {
      *
      */
     public RotationManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     @EventListener

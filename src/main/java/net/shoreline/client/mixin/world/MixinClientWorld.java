@@ -33,7 +33,7 @@ public abstract class MixinClientWorld {
     @Inject(method = "addEntity", at = @At(value = "HEAD"))
     private void hookAddEntity(Entity entity, CallbackInfo ci) {
         AddEntityEvent addEntityEvent = new AddEntityEvent(entity);
-        Shoreline.EVENT_HANDLER.dispatch(addEntityEvent);
+        EventBus.EVENT_HANDLER.dispatch(addEntityEvent);
     }
 
     /**
@@ -49,7 +49,7 @@ public abstract class MixinClientWorld {
             return;
         }
         RemoveEntityEvent addEntityEvent = new RemoveEntityEvent(entity, removalReason);
-        Shoreline.EVENT_HANDLER.dispatch(addEntityEvent);
+        EventBus.EVENT_HANDLER.dispatch(addEntityEvent);
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class MixinClientWorld {
     private void hookGetSkyColor(Vec3d cameraPos, float tickDelta,
                                  CallbackInfoReturnable<Vec3d> cir) {
         SkyboxEvent.Sky skyboxEvent = new SkyboxEvent.Sky();
-        Shoreline.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getColorVec());
@@ -76,7 +76,7 @@ public abstract class MixinClientWorld {
     private void hookGetCloudsColor(float tickDelta,
                                     CallbackInfoReturnable<Vec3d> cir) {
         SkyboxEvent.Cloud skyboxEvent = new SkyboxEvent.Cloud();
-        Shoreline.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getColorVec());

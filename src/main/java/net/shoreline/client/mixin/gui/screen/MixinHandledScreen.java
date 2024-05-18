@@ -26,7 +26,7 @@ public class MixinHandledScreen {
         }
         RenderTooltipEvent renderTooltipEvent =
                 new RenderTooltipEvent(context, focusedSlot.getStack(), x, y);
-        Shoreline.EVENT_HANDLER.dispatch(renderTooltipEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderTooltipEvent);
         if (renderTooltipEvent.isCanceled()) {
             ci.cancel();
         }

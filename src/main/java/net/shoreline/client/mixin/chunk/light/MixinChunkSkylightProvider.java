@@ -24,7 +24,7 @@ public class MixinChunkSkylightProvider {
     @Inject(method = "method_51531", at = @At(value = "HEAD"), cancellable = true)
     private void hookRecalculateLevel(long blockPos, long l, int lightLevel, CallbackInfo ci) {
         RenderSkylightEvent renderSkylightEvent = new RenderSkylightEvent();
-        Shoreline.EVENT_HANDLER.dispatch(renderSkylightEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderSkylightEvent);
         if (renderSkylightEvent.isCanceled()) {
             ci.cancel();
         }

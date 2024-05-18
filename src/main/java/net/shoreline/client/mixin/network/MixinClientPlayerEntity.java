@@ -14,6 +14,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.event.EventStage;
+import net.shoreline.client.impl.event.buffers.ManagersBuffer;
 import net.shoreline.client.impl.event.entity.SwingEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.*;
@@ -110,11 +111,11 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void hookSendMovementPackets(CallbackInfo ci) {
         PlayerUpdateEvent playerUpdateEvent = new PlayerUpdateEvent();
         playerUpdateEvent.setStage(EventStage.PRE);
-        Shoreline.EVENT_HANDLER.dispatch(playerUpdateEvent);
+        EventBus.EVENT_HANDLER.dispatch(playerUpdateEvent);
         // Rotation spoof
         MovementPacketsEvent movementPacketsEvent = new MovementPacketsEvent(mc.player.getX(), mc.player.getY(),
                 mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround());
-        Shoreline.EVENT_HANDLER.dispatch(movementPacketsEvent);
+        EventBus.EVENT_HANDLER.dispatch(movementPacketsEvent);
         double x = movementPacketsEvent.getX();
         double y = movementPacketsEvent.getY();
         double z = movementPacketsEvent.getZ();
@@ -168,7 +169,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             }
         }
         playerUpdateEvent.setStage(EventStage.POST);
-        Shoreline.EVENT_HANDLER.dispatch(playerUpdateEvent);
+        EventBus.EVENT_HANDLER.dispatch(playerUpdateEvent);
     }
 
     /**
@@ -179,8 +180,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             shift = At.Shift.BEFORE, ordinal = 0))
     private void hookTickPre(CallbackInfo ci) {
         PlayerTickEvent playerTickEvent = new PlayerTickEvent();
-        Shoreline.EVENT_HANDLER.dispatch(playerTickEvent);
-        Managers.ROTATION.onUpdate();
+        EventBus.EVENT_HANDLER.dispatch(playerTickEvent);
+        ManagersBuffer.getRotationManager().onUpdate();
     }
 
     /**
@@ -194,7 +195,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             return;
         }
         TickMovementEvent tickMovementEvent = new TickMovementEvent();
-        Shoreline.EVENT_HANDLER.dispatch(tickMovementEvent);
+        EventBus.EVENT_HANDLER.dispatch(tickMovementEvent);
         if (tickMovementEvent.isCanceled()) {
             for (int i = 0; i < tickMovementEvent.getIterations(); i++) {
                 ticking = true;
@@ -214,7 +215,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void hookTickMovementPost(CallbackInfo ci) {
         MovementSlowdownEvent movementUpdateEvent =
                 new MovementSlowdownEvent(input);
-        Shoreline.EVENT_HANDLER.dispatch(movementUpdateEvent);
+        EventBus.EVENT_HANDLER.dispatch(movementUpdateEvent);
     }
 
     /**
@@ -227,7 +228,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
                           CallbackInfo ci) {
         final PlayerMoveEvent playerMoveEvent =
                 new PlayerMoveEvent(movementType, movement);
-        Shoreline.EVENT_HANDLER.dispatch(playerMoveEvent);
+        EventBus.EVENT_HANDLER.dispatch(playerMoveEvent);
         if (playerMoveEvent.isCanceled()) {
             ci.cancel();
             double d = getX();
@@ -246,7 +247,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             cancellable = true)
     private void onPushOutOfBlocks(double x, double z, CallbackInfo ci) {
         PushOutOfBlocksEvent pushOutOfBlocksEvent = new PushOutOfBlocksEvent();
-        Shoreline.EVENT_HANDLER.dispatch(pushOutOfBlocksEvent);
+        EventBus.EVENT_HANDLER.dispatch(pushOutOfBlocksEvent);
         if (pushOutOfBlocksEvent.isCanceled()) {
             ci.cancel();
         }
@@ -259,7 +260,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "setCurrentHand", at = @At(value = "HEAD"))
     private void hookSetCurrentHand(Hand hand, CallbackInfo ci) {
         SetCurrentHandEvent setCurrentHandEvent = new SetCurrentHandEvent(hand);
-        Shoreline.EVENT_HANDLER.dispatch(setCurrentHandEvent);
+        EventBus.EVENT_HANDLER.dispatch(setCurrentHandEvent);
     }
 
     /**
@@ -271,7 +272,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             ordinal = 3))
     private void hookSetSprinting(ClientPlayerEntity instance, boolean b) {
         final SprintCancelEvent sprintEvent = new SprintCancelEvent();
-        Shoreline.EVENT_HANDLER.dispatch(sprintEvent);
+        EventBus.EVENT_HANDLER.dispatch(sprintEvent);
         if (sprintEvent.isCanceled()) {
             instance.setSprinting(true);
         } else {
@@ -299,7 +300,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void hookGetMountJumpStrength(CallbackInfoReturnable<Float> cir) {
         MountJumpStrengthEvent mountJumpStrengthEvent =
                 new MountJumpStrengthEvent();
-        Shoreline.EVENT_HANDLER.dispatch(mountJumpStrengthEvent);
+        EventBus.EVENT_HANDLER.dispatch(mountJumpStrengthEvent);
         if (mountJumpStrengthEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(mountJumpStrengthEvent.getJumpStrength());
@@ -313,7 +314,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "swingHand", at = @At(value = "RETURN"))
     private void hookSwingHand(Hand hand, CallbackInfo ci) {
         SwingEvent swingEvent = new SwingEvent(hand);
-        Shoreline.EVENT_HANDLER.dispatch(swingEvent);
+        EventBus.EVENT_HANDLER.dispatch(swingEvent);
     }
 
     @Override

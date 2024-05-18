@@ -27,7 +27,7 @@ public class MixinDecoderHandler {
             "network/NetworkState;getId()Ljava/lang/String;", shift = At.Shift.AFTER), cancellable = true)
     private void hookDecode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> objects, CallbackInfo ci) {
         DecodePacketEvent decodePacketEvent = new DecodePacketEvent();
-        Shoreline.EVENT_HANDLER.dispatch(decodePacketEvent);
+        EventBus.EVENT_HANDLER.dispatch(decodePacketEvent);
         if (decodePacketEvent.isCanceled()) {
             ci.cancel();
         }

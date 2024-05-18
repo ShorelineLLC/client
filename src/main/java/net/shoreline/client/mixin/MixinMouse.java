@@ -24,7 +24,7 @@ public class MixinMouse {
     private void onMouseButton(long window, int button, int action, int mods,
                                CallbackInfo ci) {
         MouseClickEvent mouseClickEvent = new MouseClickEvent(button, action);
-        Shoreline.EVENT_HANDLER.dispatch(mouseClickEvent);
+        EventBus.EVENT_HANDLER.dispatch(mouseClickEvent);
         if (mouseClickEvent.isCanceled()) {
             ci.cancel();
         }
@@ -33,7 +33,7 @@ public class MixinMouse {
     @Redirect(method = "updateMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;changeLookDirection(DD)V"))
     public void onUpdate(ClientPlayerEntity instance, double cursorDeltaX, double cursorDeltaY) {
         MouseUpdateEvent mouseUpdateEvent = new MouseUpdateEvent(cursorDeltaX, cursorDeltaY);
-        Shoreline.EVENT_HANDLER.dispatch(mouseUpdateEvent);
+        EventBus.EVENT_HANDLER.dispatch(mouseUpdateEvent);
 
         if (!mouseUpdateEvent.isCanceled()) {
             instance.changeLookDirection(cursorDeltaX, cursorDeltaY);

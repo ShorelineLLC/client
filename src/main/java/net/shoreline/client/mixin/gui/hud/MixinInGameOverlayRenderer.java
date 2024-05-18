@@ -27,7 +27,7 @@ public class MixinInGameOverlayRenderer {
     private static void hookRenderFireOverlay(MinecraftClient client, MatrixStack matrices, CallbackInfo ci) {
         RenderOverlayEvent.Fire renderOverlayEvent =
                 new RenderOverlayEvent.Fire(null);
-        Shoreline.EVENT_HANDLER.dispatch(renderOverlayEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled()) {
             ci.cancel();
         }
@@ -44,7 +44,7 @@ public class MixinInGameOverlayRenderer {
                                                     CallbackInfo ci) {
         RenderOverlayEvent.Water renderOverlayEvent =
                 new RenderOverlayEvent.Water(null);
-        Shoreline.EVENT_HANDLER.dispatch(renderOverlayEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled()) {
             ci.cancel();
         }
@@ -60,7 +60,7 @@ public class MixinInGameOverlayRenderer {
     private static void hookRenderFireOverlay(Sprite sprite, MatrixStack matrices, CallbackInfo ci) {
         RenderOverlayEvent.Block renderOverlayEvent =
                 new RenderOverlayEvent.Block(null);
-        Shoreline.EVENT_HANDLER.dispatch(renderOverlayEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled()) {
             ci.cancel();
         }

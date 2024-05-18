@@ -37,7 +37,7 @@ public class MixinBlockCollisionSpliterator implements Globals {
         }
         BlockCollisionEvent blockCollisionEvent =
                 new BlockCollisionEvent(voxelShape, blockPos, instance);
-        Shoreline.EVENT_HANDLER.dispatch(blockCollisionEvent);
+        EventBus.EVENT_HANDLER.dispatch(blockCollisionEvent);
         if (blockCollisionEvent.isCanceled()) {
             return blockCollisionEvent.getVoxelShape();
         }

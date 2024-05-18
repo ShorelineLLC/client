@@ -48,7 +48,7 @@ public class MixinClientConnection {
                                      boolean flush, CallbackInfo ci) {
         PacketEvent.Outbound packetOutboundEvent =
                 new PacketEvent.Outbound(packet);
-        Shoreline.EVENT_HANDLER.dispatch(packetOutboundEvent);
+        EventBus.EVENT_HANDLER.dispatch(packetOutboundEvent);
         if (packetOutboundEvent.isCanceled()) {
             ci.cancel();
         }
@@ -66,7 +66,7 @@ public class MixinClientConnection {
                                   Packet<?> packet, CallbackInfo ci) {
         PacketEvent.Inbound packetInboundEvent =
                 new PacketEvent.Inbound(packetListener, packet);
-        Shoreline.EVENT_HANDLER.dispatch(packetInboundEvent);
+        EventBus.EVENT_HANDLER.dispatch(packetInboundEvent);
         // prevent client from receiving packet from server
         if (packetInboundEvent.isCanceled()) {
             ci.cancel();
@@ -80,6 +80,6 @@ public class MixinClientConnection {
     @Inject(method = "disconnect", at = @At(value = "HEAD"))
     private void hookDisconnect(Text disconnectReason, CallbackInfo ci) {
         DisconnectEvent disconnectEvent = new DisconnectEvent();
-        Shoreline.EVENT_HANDLER.dispatch(disconnectEvent);
+        EventBus.EVENT_HANDLER.dispatch(disconnectEvent);
     }
 }

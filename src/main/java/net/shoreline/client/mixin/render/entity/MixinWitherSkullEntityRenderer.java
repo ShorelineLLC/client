@@ -35,7 +35,7 @@ public class MixinWitherSkullEntityRenderer {
                             int i, CallbackInfo ci) {
         RenderWitherSkullEvent renderWitherSkullEvent =
                 new RenderWitherSkullEvent();
-        Shoreline.EVENT_HANDLER.dispatch(renderWitherSkullEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderWitherSkullEvent);
         if (renderWitherSkullEvent.isCanceled()) {
             ci.cancel();
         }

@@ -31,7 +31,7 @@ public abstract class MixinTotemParticle extends MixinParticle {
     private void hookInit(ClientWorld world, double x, double y, double z, double velocityX,
                           double velocityY, double velocityZ, SpriteProvider spriteProvider, CallbackInfo ci) {
         TotemParticleEvent totemParticleEvent = new TotemParticleEvent();
-        Shoreline.EVENT_HANDLER.dispatch(totemParticleEvent);
+        EventBus.EVENT_HANDLER.dispatch(totemParticleEvent);
         if (totemParticleEvent.isCanceled()) {
             Color color = totemParticleEvent.getColor();
             setColor(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);

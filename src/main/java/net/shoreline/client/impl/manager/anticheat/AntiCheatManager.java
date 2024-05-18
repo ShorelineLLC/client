@@ -25,7 +25,7 @@ public final class AntiCheatManager implements Globals
 
     public AntiCheatManager()
     {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
         Arrays.fill(transactions, -1);
     }
 

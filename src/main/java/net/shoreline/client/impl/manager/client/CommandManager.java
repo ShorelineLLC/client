@@ -41,7 +41,7 @@ public class CommandManager implements Globals {
      * Registers commands to the CommandManager
      */
     public CommandManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
         register(
                 new BindCommand(),
                 new ConfigCommand(),

@@ -18,6 +18,6 @@ public class ConcurrentModule extends Module {
      */
     public ConcurrentModule(String name, String desc, ModuleCategory category) {
         super(name, desc, category);
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 }

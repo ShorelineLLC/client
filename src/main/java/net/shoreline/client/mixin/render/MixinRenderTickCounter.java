@@ -34,7 +34,7 @@ public class MixinRenderTickCounter {
     private void hookBeginRenderTick(long timeMillis,
                                      CallbackInfoReturnable<Integer> cir) {
         TickCounterEvent tickCounterEvent = new TickCounterEvent();
-        Shoreline.EVENT_HANDLER.dispatch(tickCounterEvent);
+        EventBus.EVENT_HANDLER.dispatch(tickCounterEvent);
         if (tickCounterEvent.isCanceled()) {
             lastFrameDuration = ((timeMillis - prevTimeMillis) / tickTime) * tickCounterEvent.getTicks();
             prevTimeMillis = timeMillis;

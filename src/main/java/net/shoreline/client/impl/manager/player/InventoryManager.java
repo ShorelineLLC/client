@@ -34,7 +34,7 @@ public class InventoryManager implements Globals {
      *
      */
     public InventoryManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     @EventListener

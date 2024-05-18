@@ -27,7 +27,7 @@ public class TotemManager implements Globals {
      *
      */
     public TotemManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     @EventListener

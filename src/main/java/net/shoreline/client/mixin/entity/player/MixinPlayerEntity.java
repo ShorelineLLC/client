@@ -44,7 +44,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
     private void hookTravelHead(Vec3d movementInput, CallbackInfo ci) {
         TravelEvent travelEvent = new TravelEvent(movementInput);
         travelEvent.setStage(EventStage.PRE);
-        Shoreline.EVENT_HANDLER.dispatch(travelEvent);
+        EventBus.EVENT_HANDLER.dispatch(travelEvent);
         if (travelEvent.isCanceled()) {
             move(MovementType.SELF, getVelocity());
             ci.cancel();
@@ -60,7 +60,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
     private void hookTravelTail(Vec3d movementInput, CallbackInfo ci) {
         TravelEvent travelEvent = new TravelEvent(movementInput);
         travelEvent.setStage(EventStage.POST);
-        Shoreline.EVENT_HANDLER.dispatch(travelEvent);
+        EventBus.EVENT_HANDLER.dispatch(travelEvent);
     }
 
     /**
@@ -73,7 +73,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
             return;
         }
         PushFluidsEvent pushFluidsEvent = new PushFluidsEvent();
-        Shoreline.EVENT_HANDLER.dispatch(pushFluidsEvent);
+        EventBus.EVENT_HANDLER.dispatch(pushFluidsEvent);
         if (pushFluidsEvent.isCanceled()) {
             cir.setReturnValue(false);
             cir.cancel();
@@ -90,7 +90,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
         }
         PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent();
         playerJumpEvent.setStage(EventStage.PRE);
-        Shoreline.EVENT_HANDLER.dispatch(playerJumpEvent);
+        EventBus.EVENT_HANDLER.dispatch(playerJumpEvent);
         if (playerJumpEvent.isCanceled()) {
             ci.cancel();
         }
@@ -106,6 +106,6 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
         }
         PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent();
         playerJumpEvent.setStage(EventStage.POST);
-        Shoreline.EVENT_HANDLER.dispatch(playerJumpEvent);
+        EventBus.EVENT_HANDLER.dispatch(playerJumpEvent);
     }
 }

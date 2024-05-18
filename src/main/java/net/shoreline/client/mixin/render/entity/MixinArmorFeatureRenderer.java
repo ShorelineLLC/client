@@ -35,10 +35,9 @@ public class MixinArmorFeatureRenderer {
                                  LivingEntity entity, EquipmentSlot armorSlot,
                                  int light, BipedEntityModel<?> model, CallbackInfo ci) {
         RenderArmorEvent renderArmorEvent = new RenderArmorEvent(entity);
-        Shoreline.EVENT_HANDLER.dispatch(renderArmorEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderArmorEvent);
         if (renderArmorEvent.isCanceled()) {
             ci.cancel();
         }
-        ;
     }
 }

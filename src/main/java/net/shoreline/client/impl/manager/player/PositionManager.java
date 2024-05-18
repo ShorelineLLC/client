@@ -29,7 +29,7 @@ public class PositionManager implements Globals {
      *
      */
     public PositionManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**

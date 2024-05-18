@@ -44,7 +44,7 @@ public class MixinPlayerEntityRenderer {
                               int i, CallbackInfo ci) {
         final RenderPlayerEvent renderPlayerEvent =
                 new RenderPlayerEvent(abstractClientPlayerEntity);
-        Shoreline.EVENT_HANDLER.dispatch(renderPlayerEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderPlayerEvent);
         yaw = abstractClientPlayerEntity.getYaw();
         prevYaw = abstractClientPlayerEntity.prevYaw;
         bodyYaw = abstractClientPlayerEntity.bodyYaw;

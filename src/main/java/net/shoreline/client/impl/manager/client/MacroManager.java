@@ -28,7 +28,7 @@ public class MacroManager implements Globals {
      *
      */
     public MacroManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**

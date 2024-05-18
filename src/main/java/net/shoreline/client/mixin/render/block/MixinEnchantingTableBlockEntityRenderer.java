@@ -40,7 +40,7 @@ public class MixinEnchantingTableBlockEntityRenderer {
                             int i, int j, CallbackInfo ci) {
         RenderTileEntityEvent.EnchantingTableBook renderTileEntityEvent =
                 new RenderTileEntityEvent.EnchantingTableBook();
-        Shoreline.EVENT_HANDLER.dispatch(renderTileEntityEvent);
+        EventBus.EVENT_HANDLER.dispatch(renderTileEntityEvent);
         if (renderTileEntityEvent.isCanceled()) {
             ci.cancel();
             matrixStack.pop();

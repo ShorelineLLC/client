@@ -26,9 +26,9 @@ public class ToggleConfig extends BooleanConfig {
             Animation anim = toggle.getAnimation();
             anim.setState(val);
             if (val) {
-                Shoreline.EVENT_HANDLER.subscribe(toggle);
+                EventBus.EVENT_HANDLER.subscribe(toggle);
             } else {
-                Shoreline.EVENT_HANDLER.unsubscribe(toggle);
+                EventBus.EVENT_HANDLER.unsubscribe(toggle);
             }
         }
     }

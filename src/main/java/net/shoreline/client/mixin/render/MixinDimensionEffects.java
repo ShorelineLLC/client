@@ -22,7 +22,7 @@ public class MixinDimensionEffects {
     private void hookGetFogColorOverride(float skyAngle, float tickDelta,
                                          CallbackInfoReturnable<float[]> cir) {
         SkyboxEvent.Fog skyboxEvent = new SkyboxEvent.Fog(tickDelta);
-        Shoreline.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             Color color = skyboxEvent.getColor();
             cir.cancel();

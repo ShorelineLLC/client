@@ -12,7 +12,6 @@ import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.impl.event.*;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.imixin.IMinecraftClient;
-import net.shoreline.client.util.chat.ChatUtil;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -87,7 +86,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
             "/minecraft/client/MinecraftClient;render(Z)V", shift = At.Shift.BEFORE))
     private void hookRun(CallbackInfo ci) {
         final RunTickEvent runTickEvent = new RunTickEvent();
-        Shoreline.EVENT_HANDLER.dispatch(runTickEvent);
+        EventBus.EVENT_HANDLER.dispatch(runTickEvent);
     }
 
     /**
@@ -97,7 +96,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "onInitFinished", at = @At(value = "RETURN"))
     private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext, CallbackInfoReturnable<Runnable> cir) {
         FinishLoadingEvent finishLoadingEvent = new FinishLoadingEvent();
-        Shoreline.EVENT_HANDLER.dispatch(finishLoadingEvent);
+        EventBus.EVENT_HANDLER.dispatch(finishLoadingEvent);
         // Managers.CAPES.init();
     }
 
@@ -111,7 +110,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
         if (player != null && world != null) {
             TickEvent tickPreEvent = new TickEvent();
             tickPreEvent.setStage(EventStage.PRE);
-            Shoreline.EVENT_HANDLER.dispatch(tickPreEvent);
+            EventBus.EVENT_HANDLER.dispatch(tickPreEvent);
         }
         if (interactionManager == null) {
             return;
@@ -134,11 +133,11 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
         if (player != null && world != null) {
             TickEvent tickPostEvent = new TickEvent();
             tickPostEvent.setStage(EventStage.POST);
-            Shoreline.EVENT_HANDLER.dispatch(tickPostEvent);
+            EventBus.EVENT_HANDLER.dispatch(tickPostEvent);
             world.getEntities().forEach(entity -> {
                 if (entity instanceof LivingEntity e && e.isDead()) {
                     EntityDeathEvent entityDeathEvent = new EntityDeathEvent(e);
-                    Shoreline.EVENT_HANDLER.dispatch(entityDeathEvent);
+                    EventBus.EVENT_HANDLER.dispatch(entityDeathEvent);
                 }
             });
         }
@@ -151,7 +150,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "setScreen", at = @At(value = "TAIL"))
     private void hookSetScreen(Screen screen, CallbackInfo ci) {
         ScreenOpenEvent screenOpenEvent = new ScreenOpenEvent(screen);
-        Shoreline.EVENT_HANDLER.dispatch(screenOpenEvent);
+        EventBus.EVENT_HANDLER.dispatch(screenOpenEvent);
     }
 
     /**
@@ -169,7 +168,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     private void hookDoAttack(CallbackInfoReturnable<Boolean> cir) {
         doAttackCalled = true;
         AttackCooldownEvent attackCooldownEvent = new AttackCooldownEvent();
-        Shoreline.EVENT_HANDLER.dispatch(attackCooldownEvent);
+        EventBus.EVENT_HANDLER.dispatch(attackCooldownEvent);
         if (attackCooldownEvent.isCanceled()) {
             attackCooldown = 0;
         }
@@ -183,7 +182,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
             target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
     private boolean hookIsUsingItem(ClientPlayerEntity instance) {
         ItemMultitaskEvent itemMultitaskEvent = new ItemMultitaskEvent();
-        Shoreline.EVENT_HANDLER.dispatch(itemMultitaskEvent);
+        EventBus.EVENT_HANDLER.dispatch(itemMultitaskEvent);
         return !itemMultitaskEvent.isCanceled() && instance.isUsingItem();
     }
 
@@ -195,7 +194,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
             "/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
     private boolean hookIsBreakingBlock(ClientPlayerInteractionManager instance) {
         ItemMultitaskEvent itemMultitaskEvent = new ItemMultitaskEvent();
-        Shoreline.EVENT_HANDLER.dispatch(itemMultitaskEvent);
+        EventBus.EVENT_HANDLER.dispatch(itemMultitaskEvent);
         return !itemMultitaskEvent.isCanceled() && instance.isBreakingBlock();
     }
 
@@ -205,7 +204,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "getFramerateLimit", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetFramerateLimit(CallbackInfoReturnable<Integer> cir) {
         FramerateLimitEvent framerateLimitEvent = new FramerateLimitEvent();
-        Shoreline.EVENT_HANDLER.dispatch(framerateLimitEvent);
+        EventBus.EVENT_HANDLER.dispatch(framerateLimitEvent);
         if (framerateLimitEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(framerateLimitEvent.getFramerateLimit());
@@ -219,7 +218,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "hasOutline", at = @At(value = "HEAD"), cancellable = true)
     private void hookHasOutline(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         EntityOutlineEvent entityOutlineEvent = new EntityOutlineEvent(entity);
-        Shoreline.EVENT_HANDLER.dispatch(entityOutlineEvent);
+        EventBus.EVENT_HANDLER.dispatch(entityOutlineEvent);
         if (entityOutlineEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(true);

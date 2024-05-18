@@ -33,7 +33,7 @@ public class MixinSlimeBlock implements Globals {
                                  Entity entity, CallbackInfo ci) {
         SteppedOnSlimeBlockEvent steppedOnSlimeBlockEvent =
                 new SteppedOnSlimeBlockEvent();
-        Shoreline.EVENT_HANDLER.dispatch(steppedOnSlimeBlockEvent);
+        EventBus.EVENT_HANDLER.dispatch(steppedOnSlimeBlockEvent);
         if (steppedOnSlimeBlockEvent.isCanceled() && entity == mc.player) {
             ci.cancel();
         }
