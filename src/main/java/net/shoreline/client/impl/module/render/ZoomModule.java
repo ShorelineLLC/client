@@ -41,10 +41,12 @@ public class ZoomModule extends ToggleModule {
                     flag1 = false;
                 }
                 mc.options.smoothCameraEnabled = true;
+                mc.options.hudHidden = true;
                 mc.options.getFov().setValue(targetFov);
                 flag = true;
             } else if (flag) {
                 mc.options.smoothCameraEnabled = false;
+                mc.options.hudHidden = false;
                 mc.options.getFov().setValue(defaultFov);
                 flag = false;
                 flag1 = true;
