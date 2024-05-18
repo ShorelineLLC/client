@@ -1,12 +1,12 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -38,10 +38,13 @@ public final class AutoTotemModule extends ToggleModule
     Config<Boolean> crappleConfig = new BooleanConfig("Crapple", "If to use a normal golden apple if Absorption is present", true);
     Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculate lethal damage sources", false);
     Config<Boolean> fastConfig = new BooleanConfig("FastSwap", "Swaps items to offhand", true);
+    Config<Boolean> waitConfig = new BooleanConfig("Wait", "If to wait for the previous inventory action to complete", true);
+    Config<Boolean> inventoryCheckConfig = new BooleanConfig("InventoryCheck", "", true);
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "If to debug on death", false);
 
     private int lastHotbarSlot, lastTotemCount;
     private Item lastHotbarItem;
+    private boolean replacing;
 
     public AutoTotemModule()
     {
@@ -61,24 +64,35 @@ public final class AutoTotemModule extends ToggleModule
         lastHotbarSlot = -1;
         lastHotbarItem = null;
         lastTotemCount = 0;
+        replacing = false;
     }
 
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
-        if (mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen)) {
+        // Do not attempt to replace totems inside another container GUI
+        if (!(mc.player.currentScreenHandler instanceof PlayerScreenHandler) && inventoryCheckConfig.getValue())
+        {
             return;
         }
         // Get the item to wield in our offhand, and make sure we are already not holding the item
         final Item itemToWield = getItemToWield();
         if (mc.player.getOffHandStack().getItem().equals(itemToWield))
         {
+            replacing = false;
             return;
         }
+
+        if (replacing && waitConfig.getValue())
+        {
+            return;
+        }
+
         // Find the item in our inventory
         final int itemSlot = getSlotFor(itemToWield);
         if (itemSlot != -1)
         {
+            replacing = true;
             if (itemSlot < 9)
             {
                 lastHotbarItem = itemToWield;
@@ -123,6 +137,11 @@ public final class AutoTotemModule extends ToggleModule
             if (!mc.player.currentScreenHandler.getCursorStack().isEmpty())
             {
                 reasons.add("cursor_stack=" + mc.player.currentScreenHandler.getCursorStack().getItem());
+            }
+
+            if (replacing)
+            {
+                reasons.add("replacing(stuck?)");
             }
 
             if (!reasons.isEmpty())
