@@ -2,11 +2,11 @@ package net.shoreline.client.impl.manager.world.tick;
 
 import com.google.common.collect.Lists;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
-import net.shoreline.client.util.EvictingQueue;
+import net.shoreline.client.util.collection.EvictingQueue;
 import net.shoreline.client.util.Globals;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class TickManager implements Globals {
      *
      */
     public TickManager() {
-        Shoreline.EVENT_HANDLER.subscribe(this);
+        EventBus.EVENT_HANDLER.subscribe(this);
     }
 
     /**
