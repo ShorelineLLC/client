@@ -68,11 +68,14 @@ public final class AutoTotemModule extends ToggleModule
         if (itemConfig.getValue() == OffhandItem.TOTEM)
         {
             Item offhandItem = Items.TOTEM_OF_UNDYING;
-            // If offhand gap is enabled & the use key is pressed down, equip a golden apple.
-            if (gappleConfig.getValue() && mc.options.useKey.isPressed() && (mc.player.getMainHandStack().getItem() instanceof SwordItem
-                    || mc.player.getMainHandStack().getItem() instanceof TridentItem || mc.player.getMainHandStack().getItem() instanceof AxeItem))
+            if (!checkLethal())
             {
-                offhandItem = getGoldenAppleType();
+                // If offhand gap is enabled & the use key is pressed down, equip a golden apple.
+                if (gappleConfig.getValue() && mc.options.useKey.isPressed() && (mc.player.getMainHandStack().getItem() instanceof SwordItem
+                        || mc.player.getMainHandStack().getItem() instanceof TridentItem || mc.player.getMainHandStack().getItem() instanceof AxeItem))
+                {
+                    offhandItem = getGoldenAppleType();
+                }
             }
             if (mc.player.getOffHandStack().getItem() == offhandItem)
             {
