@@ -64,6 +64,7 @@ public class Modules {
     public static FakeLatencyModule FAKE_LATENCY;
     public static FastLatencyModule FAST_LATENCY;
     public static FastProjectileModule FAST_PROJECTILE;
+    public static InventorySyncModule INVENTORY_SYNC;
     public static PacketCancelerModule PACKET_CANCELER;
     public static PacketFlyModule PACKET_FLY;
     public static PhaseModule PHASE;
@@ -89,6 +90,7 @@ public class Modules {
     public static NoPacketKickModule NO_PACKET_KICK;
     public static NoSoundLagModule NO_SOUND_LAG;
     public static PacketLoggerModule PACKET_LOGGER;
+    public static TestModule TEST;
     public static TimerModule TIMER;
     public static TrueDurabilityModule TRUE_DURABILITY;
     public static UnfocusedFPSModule UNFOCUSED_FPS;
@@ -234,6 +236,7 @@ public class Modules {
             FAKE_LATENCY = (FakeLatencyModule) getRegisteredModule("fakelatency-module");
             FAST_LATENCY = (FastLatencyModule) getRegisteredModule("fastlatency-module");
             FAST_PROJECTILE = (FastProjectileModule) getRegisteredModule("fastprojectile-module");
+            INVENTORY_SYNC = (InventorySyncModule) getRegisteredModule("inventorysync-module");
             PACKET_CANCELER = (PacketCancelerModule) getRegisteredModule("packetcanceler-module");
             PACKET_FLY = (PacketFlyModule) getRegisteredModule("packetfly-module");
             PHASE = (PhaseModule) getRegisteredModule("phase-module");
@@ -257,6 +260,7 @@ public class Modules {
             NO_PACKET_KICK = (NoPacketKickModule) getRegisteredModule("nopacketkick-module");
             NO_SOUND_LAG = (NoSoundLagModule) getRegisteredModule("nosoundlag-module");
             PACKET_LOGGER = (PacketLoggerModule) getRegisteredModule("packetlogger-module");
+            TEST = (TestModule) getRegisteredModule("test-module");
             TIMER = (TimerModule) getRegisteredModule("timer-module");
             TRUE_DURABILITY = (TrueDurabilityModule) getRegisteredModule("truedurability-module");
             UNFOCUSED_FPS = (UnfocusedFPSModule) getRegisteredModule("unfocusedfps-module");

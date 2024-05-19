@@ -69,6 +69,7 @@ public class ModuleManager {
                 new FakeLatencyModule(),
                 new FastLatencyModule(),
                 new FastProjectileModule(),
+                new InventorySyncModule(),
                 new PacketCancelerModule(),
                 new PacketFlyModule(),
                 new PhaseModule(),
@@ -162,7 +163,7 @@ public class ModuleManager {
                 new SpeedmineModule()
                 // new WallhackModule()
         );
-        //register(new TestModule());
+        register(new TestModule());
         if (ShorelineMod.isBaritonePresent()) {
             register(new BaritoneModule());
         }

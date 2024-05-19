@@ -32,6 +32,7 @@
     "accessor.AccessorPlayerPositionLookS2CPacket",
     "accessor.AccessorPlayerSkinProvider",
     "accessor.AccessorRenderPhase",
+    "accessor.AccessorScreenHandler",
     "accessor.AccessorTextFieldWidget",
     "accessor.AccessorTextRenderer",
     "accessor.AccessorWorldRenderer",
