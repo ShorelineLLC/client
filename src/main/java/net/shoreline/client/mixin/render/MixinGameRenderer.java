@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.buffers.ProgramsBuffer;
 import net.shoreline.client.impl.event.network.ReachEvent;
 import net.shoreline.client.impl.event.render.*;

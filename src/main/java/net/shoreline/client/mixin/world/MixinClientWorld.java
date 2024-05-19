@@ -3,7 +3,7 @@ package net.shoreline.client.mixin.world;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;

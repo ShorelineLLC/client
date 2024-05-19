@@ -7,7 +7,7 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.impl.event.*;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;

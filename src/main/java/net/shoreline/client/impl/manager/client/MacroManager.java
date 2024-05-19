@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.manager.client;
 
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.api.macro.Macro;

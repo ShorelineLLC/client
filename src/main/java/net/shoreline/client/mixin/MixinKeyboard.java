@@ -2,7 +2,7 @@ package net.shoreline.client.mixin;
 
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

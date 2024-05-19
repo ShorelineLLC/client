@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.render.DimensionEffects;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

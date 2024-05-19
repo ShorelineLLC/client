@@ -3,7 +3,7 @@ package net.shoreline.client.mixin.render;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.render.AmbientColorEvent;
 import net.shoreline.client.impl.event.render.LightmapGammaEvent;
 import org.spongepowered.asm.mixin.Final;

@@ -1,8 +1,6 @@
 package net.shoreline.client;
 
 import net.shoreline.client.api.Identifiable;
-import net.shoreline.client.api.event.handler.EventBus;
-import net.shoreline.client.api.event.handler.EventHandler;
 import net.shoreline.client.api.file.ClientConfiguration;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.init.Modules;

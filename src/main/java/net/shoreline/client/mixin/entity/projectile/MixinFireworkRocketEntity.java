@@ -4,7 +4,7 @@ import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.entity.projectile.RemoveFireworkEvent;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;

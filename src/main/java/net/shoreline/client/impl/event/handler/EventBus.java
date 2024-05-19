@@ -1,6 +1,7 @@
-package net.shoreline.client.api.event.handler;
+package net.shoreline.client.impl.event.handler;
 
 import net.shoreline.client.api.event.Event;
+import net.shoreline.client.api.event.handler.EventHandler;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.event.listener.Listener;
 

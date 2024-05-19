@@ -1,6 +1,6 @@
 package net.shoreline.client.api.config.setting;
 
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.config.ConfigContainer;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.util.render.animation.Animation;

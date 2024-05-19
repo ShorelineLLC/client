@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.handler.EventBus;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;

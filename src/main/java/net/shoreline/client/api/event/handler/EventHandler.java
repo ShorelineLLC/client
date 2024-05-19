@@ -2,6 +2,7 @@ package net.shoreline.client.api.event.handler;
 
 import net.shoreline.client.api.event.Event;
 import net.shoreline.client.api.event.listener.Listener;
+import net.shoreline.client.impl.event.handler.EventBus;
 
 /**
  * @author linus
