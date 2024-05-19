@@ -36,7 +36,7 @@ public final class AutoTotemModule extends ToggleModule
     Config<Boolean> gappleConfig = new BooleanConfig("OffhandGapple", "Equips a golden apple if holding down the item use button", true);
     Config<Boolean> crappleConfig = new BooleanConfig("Crapple", "Uses a normal golden apple if Absorption is present", true);
     Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculates lethal damage sources", false, () -> itemConfig.getValue() != OffhandItem.TOTEM);
-    Config<Boolean> noRubberConfig = new BooleanConfig("NoRubber", "", true, () -> false);
+    Config<Boolean> noRubberConfig = new BooleanConfig("NoRubber", "Better wear that latex cause You dont want that late text that say Im late text", false, () -> false);
     Config<Boolean> fastConfig = new BooleanConfig("FastSwap", "Swaps items to offhand", true);
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "Debug on death", false);
 
