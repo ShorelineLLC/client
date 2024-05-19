@@ -24,8 +24,8 @@ public class Managers {
     // Manager instances. Managers can be statically referenced after
     // initialized. Managers will be initialized in this order.
     public static NetworkManager NETWORK;
-    public static ModuleManager MODULE;
     public static MacroManager MACRO;
+    public static ModuleManager MODULE;
     public static CommandManager COMMAND;
     public static SocialManager SOCIAL;
     public static WaypointManager WAYPOINT;
@@ -56,8 +56,8 @@ public class Managers {
     public static void init() {
         if (!isInitialized()) {
             NETWORK = new NetworkManager();
-            MODULE = new ModuleManager();
             MACRO = new MacroManager();
+            MODULE = new ModuleManager();
             SOCIAL = new SocialManager();
             WAYPOINT = new WaypointManager();
             ACCOUNT = new AccountManager();
@@ -85,7 +85,6 @@ public class Managers {
      */
     public static void postInit() {
         if (isInitialized()) {
-            MODULE.postInit();
             MACRO.postInit();
             ACCOUNT.postInit();
             CAPES = new CapeManager();

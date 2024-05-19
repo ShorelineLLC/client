@@ -9,8 +9,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.client.impl.module.world.BlockInteractModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.player.MovementUtil;
@@ -45,7 +45,7 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, grim, strictDirection);
-        if (Modules.BLOCK_INTERACT.isEnabled() && direction == null && !strictDirection)
+        if (BlockInteractModule.INSTANCE.isEnabled() && direction == null && !strictDirection)
         {
             // TODO: this should be not like this
             direction = Direction.UP;

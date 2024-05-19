@@ -9,7 +9,7 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -83,7 +83,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
         // slider fill
         float fill = (config.getValue().floatValue() - min.floatValue())
                 / (max.floatValue() - min.floatValue());
-        fillGradient(context, ix, iy, ix + (fill * width), iy + height, Modules.CLICK_GUI.getColor(), Modules.CLICK_GUI.getColor1());
+        fillGradient(context, ix, iy, ix + (fill * width), iy + height, ClickGuiModule.INSTANCE.getColor(), ClickGuiModule.INSTANCE.getColor1());
         RenderManager.renderText(context, config.getName() + Formatting.GRAY
                 + " " + config.getValue(), ix + 2.0f, iy + 4.0f, -1);
     }

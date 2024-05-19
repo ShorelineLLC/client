@@ -13,8 +13,8 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.MouseClickEvent;
+import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.player.RayCastUtil;
 import org.lwjgl.glfw.GLFW;
 
@@ -45,7 +45,7 @@ public class MiddleClickModule extends ToggleModule {
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_MIDDLE
                 && event.getAction() == GLFW.GLFW_PRESS && mc.currentScreen == null) {
             double d = mc.interactionManager.hasExtendedReach() ? 6.0 : mc.interactionManager.getReachDistance();
-            HitResult result = Modules.FREECAM.isEnabled() ? RayCastUtil.raycastEntity(d, Modules.FREECAM.getCameraPosition(), Modules.FREECAM.getCameraRotations()) : RayCastUtil.raycastEntity(d);
+            HitResult result = FreecamModule.INSTANCE.isEnabled() ? RayCastUtil.raycastEntity(d, FreecamModule.INSTANCE.getCameraPosition(), FreecamModule.INSTANCE.getCameraRotations()) : RayCastUtil.raycastEntity(d);
             if (friendConfig.getValue() && result != null && result.getType() == HitResult.Type.ENTITY && ((EntityHitResult) result).getEntity() instanceof PlayerEntity target) {
                 if (Managers.SOCIAL.isFriend(target.getName())) {
                     Managers.SOCIAL.remove(target.getName());

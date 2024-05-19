@@ -5,14 +5,17 @@ public final class UserContext
     private String hwid;
     private String username;
     private String uid;
+    private UserType userType;
 
     public UserContext(String hwid,
                        String username,
-                       String uid)
+                       String uid,
+                       UserType userType)
     {
         this.hwid = hwid;
         this.username = username;
         this.uid = uid;
+        this.userType = userType;
     }
 
     public String hwid()
@@ -28,6 +31,11 @@ public final class UserContext
     public String uid()
     {
         return this.uid;
+    }
+
+    public UserType userType()
+    {
+        return userType;
     }
 
     public UserContext hwid(String hwid)
@@ -66,13 +74,25 @@ public final class UserContext
         return this;
     }
 
+    public UserContext userType(UserType userType)
+    {
+        if (this.userType != null)
+        {
+            throw new IllegalStateException("Field already set");
+        }
+
+        this.userType = userType;
+
+        return this;
+    }
+
     public boolean isNone()
     {
-        return this.hwid == null && this.username == null && this.uid == null;
+        return this.hwid == null && this.username == null && this.uid == null && this.username == null;
     }
 
     public static UserContext none()
     {
-        return new UserContext(null, null, null);
+        return new UserContext(null, null, null, UserType.USER);
     }
 }

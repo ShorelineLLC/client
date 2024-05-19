@@ -37,6 +37,7 @@ import org.lwjgl.glfw.GLFW;
  * @since 1.0
  */
 public class FreecamModule extends ToggleModule {
+    public static FreecamModule INSTANCE;
 
     Config<Float> speedConfig = new NumberConfig<>("Speed", "The move speed of the camera", 0.1f, 4.0f, 10.0f);
     Config<Macro> controlConfig = new MacroConfig("ControlKey", "", new Macro(getId() + "-control", GLFW.GLFW_KEY_LEFT_ALT, () -> {}));

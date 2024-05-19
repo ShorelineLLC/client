@@ -18,8 +18,8 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 
@@ -28,6 +28,8 @@ import net.shoreline.client.util.string.EnumFormatter;
  * @since 1.0
  */
 public class LongJumpModule extends ToggleModule {
+    public static LongJumpModule INSTANCE;
+
     //
     Config<JumpMode> modeConfig = new EnumConfig<>("Mode", "The mode for long jump", JumpMode.NORMAL, JumpMode.values());
     Config<Float> boostConfig = new NumberConfig<>("Boost", "The jump boost speed", 0.1f, 4.5f, 10.0f, () -> modeConfig.getValue() == JumpMode.NORMAL);
@@ -78,8 +80,8 @@ public class LongJumpModule extends ToggleModule {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (modeConfig.getValue() == JumpMode.NORMAL) {
             if (mc.player == null || mc.world == null
-                    || Modules.FLIGHT.isEnabled()
-                    || Modules.PACKET_FLY.isEnabled()
+                    || FlightModule.INSTANCE.isEnabled()
+                    || PacketFlyModule.INSTANCE.isEnabled()
                     || !MovementUtil.isInputtingMovement()) {
                 return;
             }
@@ -116,7 +118,7 @@ public class LongJumpModule extends ToggleModule {
             }
             speed = Math.max(speed, base);
             event.cancel();
-            Vec2f motion = Modules.SPEED.handleStrafeMotion((float) speed);
+            Vec2f motion = SpeedModule.INSTANCE.handleStrafeMotion((float) speed);
             event.setX(motion.x);
             event.setZ(motion.y);
         }
@@ -127,7 +129,7 @@ public class LongJumpModule extends ToggleModule {
         // Direkt LongJump
         if (event.getStage() == EventStage.PRE
                 && modeConfig.getValue() == JumpMode.GLIDE) {
-            if (Modules.FLIGHT.isEnabled() || mc.player.isFallFlying()
+            if (FlightModule.INSTANCE.isEnabled() || mc.player.isFallFlying()
                     || mc.player.isHoldingOntoLadder()
                     || mc.player.isTouchingWater()) {
                 return;

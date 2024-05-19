@@ -21,7 +21,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 
@@ -85,9 +85,9 @@ public class BreakHighlightModule extends ToggleModule {
                 double sizeY = damage * ((bb.maxY - y) / 9.0);
                 double sizeZ = damage * ((bb.maxZ - z) / 9.0);
                 RenderManager.renderBox(event.getMatrices(), new Box(x - sizeX,
-                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), Modules.COLORS.getRGB(60));
+                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), ColorsModule.INSTANCE.getRGB(60));
                 RenderManager.renderBoundingBox(event.getMatrices(), new Box(x - sizeX,
-                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), 1.5f, Modules.COLORS.getRGB(125));
+                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), 1.5f, ColorsModule.INSTANCE.getRGB(125));
             }
         } else {
             for (Map.Entry<BlockBreakingProgressS2CPacket, Long> mine : breakingProgress.entrySet()) {

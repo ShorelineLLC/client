@@ -8,7 +8,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.Button;
 import net.shoreline.client.impl.gui.click.impl.config.setting.*;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
@@ -104,7 +104,7 @@ public class ModuleButton extends Button {
         if (module.getName().equalsIgnoreCase("ClickGui")) {
             scaledTime = 1.7f;
         }
-        rectGradient(context, fill ? Modules.CLICK_GUI.getColor(scaledTime) : 0x555555, fill ? Modules.CLICK_GUI.getColor1(scaledTime) : 0x555555);
+        rectGradient(context, fill ? ClickGuiModule.INSTANCE.getColor(scaledTime) : 0x555555, fill ? ClickGuiModule.INSTANCE.getColor1(scaledTime) : 0x555555);
         RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? -1 : 0xaaaaaa);
         if (settingsAnimation.getFactor() > 0.01f) {
             off = y + height + 1.0f;
@@ -129,9 +129,9 @@ public class ModuleButton extends Button {
                 off += configButton.getHeight();
             }
             if (fill) {
-                fill(context, ix, y + height, 1.0f, off - (y + height) + 1.0f, Modules.CLICK_GUI.getColor1(scaledTime));
-                fill(context, ix + width - 1.0f, y + height, 1.0f, off - (y + height) + 1.0f, Modules.CLICK_GUI.getColor(scaledTime));
-                fillGradient(context, ix, off + 1.0f, ix + width, off + 2.0f, Modules.CLICK_GUI.getColor(scaledTime),  Modules.CLICK_GUI.getColor1(scaledTime));
+                fill(context, ix, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.INSTANCE.getColor1(scaledTime));
+                fill(context, ix + width - 1.0f, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.INSTANCE.getColor(scaledTime));
+                fillGradient(context, ix, off + 1.0f, ix + width, off + 2.0f, ClickGuiModule.INSTANCE.getColor(scaledTime), ClickGuiModule.INSTANCE.getColor1(scaledTime));
             }
             disableScissor();
             ((CategoryFrame) frame).offset((float) (3.0f * settingsAnimation.getFactor()));

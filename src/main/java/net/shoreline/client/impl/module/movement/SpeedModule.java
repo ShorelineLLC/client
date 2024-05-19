@@ -21,10 +21,9 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
-import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.MathUtil;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
@@ -35,6 +34,8 @@ import net.shoreline.client.util.world.FakePlayerEntity;
  * @since 1.0
  */
 public class SpeedModule extends ToggleModule {
+    public static SpeedModule INSTANCE;
+
     //
     Config<Speed> speedModeConfig = new EnumConfig<>("Mode", "Speed mode", Speed.STRAFE, Speed.values());
     Config<Float> collisionDistanceConfig = new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE);
@@ -73,19 +74,19 @@ public class SpeedModule extends ToggleModule {
 
     @Override
     public void onEnable() {
-        prevTimer = Modules.TIMER.isEnabled();
+        prevTimer = TimerModule.INSTANCE.isEnabled();
         if (timerConfig.getValue() && !prevTimer && isStrafe()) {
-            Modules.TIMER.enable();
+            TimerModule.INSTANCE.enable();
         }
     }
 
     @Override
     public void onDisable() {
         resetStrafe();
-        if (Modules.TIMER.isEnabled()) {
-            Modules.TIMER.resetTimer();
+        if (TimerModule.INSTANCE.isEnabled()) {
+            TimerModule.INSTANCE.resetTimer();
             if (!prevTimer) {
-                Modules.TIMER.disable();
+                TimerModule.INSTANCE.disable();
             }
         }
     }
@@ -122,8 +123,8 @@ public class SpeedModule extends ToggleModule {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (mc.player != null && mc.world != null) {
             if (!MovementUtil.isInputtingMovement()
-                    || Modules.FLIGHT.isEnabled()
-                    || Modules.LONG_JUMP.isEnabled()
+                    || FlightModule.INSTANCE.isEnabled()
+                    || LongJumpModule.INSTANCE.isEnabled()
             //      || Modules.ELYTRA_FLY.isEnabled()
                     || mc.player.isRiding()
                     || mc.player.isFallFlying()
@@ -132,7 +133,7 @@ public class SpeedModule extends ToggleModule {
                     || (mc.player.isInLava() || mc.player.isTouchingWater())
                     && !speedWaterConfig.getValue()) {
                 resetStrafe();
-                Modules.TIMER.setTimer(1.0f);
+                TimerModule.INSTANCE.setTimer(1.0f);
                 return;
             }
             event.cancel();
@@ -158,7 +159,7 @@ public class SpeedModule extends ToggleModule {
                     return;
                 }
                 if (timerConfig.getValue()) {
-                    Modules.TIMER.setTimer(1.0888f);
+                    TimerModule.INSTANCE.setTimer(1.0888f);
                 }
                 if (strafe == 1) {
                     speed = 1.35f * base - 0.01f;
@@ -219,7 +220,7 @@ public class SpeedModule extends ToggleModule {
                 speed = Math.max(speed, base);
                 //
                 if (timerConfig.getValue()) {
-                    Modules.TIMER.setTimer(1.0888f);
+                    TimerModule.INSTANCE.setTimer(1.0888f);
                 }
                 double baseMax = 0.465 * speedEffect / slowEffect;
                 double baseMin = 0.44 * speedEffect / slowEffect;
@@ -239,7 +240,7 @@ public class SpeedModule extends ToggleModule {
                     return;
                 }
                 if (timerConfig.getValue()) {
-                    Modules.TIMER.setTimer(1.0888f);
+                    TimerModule.INSTANCE.setTimer(1.0888f);
                 }
                 if (MathUtil.round(mc.player.getY() - (double) (int) mc.player.getY(), 3) == MathUtil.round(0.4, 3)) {
                     Managers.MOVEMENT.setMotionY(0.31 + jumpEffect);
@@ -477,15 +478,15 @@ public class SpeedModule extends ToggleModule {
     public void onConfigUpdate(ConfigUpdateEvent event) {
         if (event.getConfig() == timerConfig && event.getStage() == EventStage.POST && isStrafe()) {
             if (timerConfig.getValue()) {
-                prevTimer = Modules.TIMER.isEnabled();
+                prevTimer = TimerModule.INSTANCE.isEnabled();
                 if (!prevTimer) {
-                    Modules.TIMER.enable();
+                    TimerModule.INSTANCE.enable();
                     // Modules.TIMER.setTimer(1.0888f);
                 }
-            } else if (Modules.TIMER.isEnabled()) {
-                Modules.TIMER.resetTimer();
+            } else if (TimerModule.INSTANCE.isEnabled()) {
+                TimerModule.INSTANCE.resetTimer();
                 if (!prevTimer) {
-                    Modules.TIMER.disable();
+                    TimerModule.INSTANCE.disable();
                 }
             }
         }

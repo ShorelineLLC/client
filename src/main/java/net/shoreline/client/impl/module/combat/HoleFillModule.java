@@ -21,8 +21,8 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.manager.combat.hole.Hole;
 import net.shoreline.client.impl.manager.combat.hole.HoleType;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.animation.Animation;
@@ -93,7 +93,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
                 continue;
             }
             if (mc.world.getOtherEntities(null, new Box(hole.getPos()))
-                    .stream().anyMatch(e -> !Modules.SURROUND.isEntityBlockingSurround(e))) {
+                    .stream().anyMatch(e -> !SurroundModule.INSTANCE.isEntityBlockingSurround(e))) {
                 continue;
             }
             if (autoConfig.getValue()) {
@@ -152,7 +152,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
     }
 
     private void attackPlace(BlockPos targetPos, int slot) {
-        if (attackConfig.getValue() && attackTimer.passed(Modules.AUTO_CRYSTAL.getBreakDelay())) {
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay())) {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities) {
                 attack(entity);
@@ -186,8 +186,8 @@ public class HoleFillModule extends ObsidianPlacerModule {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = Modules.COLORS.getColor(boxAlpha);
-                Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
+                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }

@@ -3,7 +3,7 @@ package net.shoreline.client.api.config.setting;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ColorsModule;
 
 import java.awt.*;
 import java.util.function.Supplier;
@@ -52,15 +52,15 @@ public class ColorConfig extends Config<Color> {
 
     @Override
     public Color getValue() {
-        if (Modules.COLORS != null && global) {
-            return Modules.COLORS.getColor(getAlpha());
+        if (ColorsModule.INSTANCE != null && global) {
+            return ColorsModule.INSTANCE.getColor(getAlpha());
         }
         return new Color(value.getRed(), value.getGreen(), value.getBlue(), allowAlpha ? value.getAlpha() : 255);
     }
 
     public Color getValue(int alpha) {
-        if (Modules.COLORS != null && global) {
-            return Modules.COLORS.getColor(alpha);
+        if (ColorsModule.INSTANCE != null && global) {
+            return ColorsModule.INSTANCE.getColor(alpha);
         }
         return new Color(value.getRed(), value.getGreen(), value.getBlue(), alpha);
     }
@@ -117,8 +117,8 @@ public class ColorConfig extends Config<Color> {
     public void setGlobal(boolean global) {
         this.global = global;
         configAnimation.setState(global);
-        if (Modules.COLORS != null && global) {
-            setValue(Modules.COLORS.getColor(getAlpha()));
+        if (ColorsModule.INSTANCE != null && global) {
+            setValue(ColorsModule.INSTANCE.getColor(getAlpha()));
         }
     }
 

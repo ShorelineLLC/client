@@ -8,8 +8,8 @@ import net.shoreline.client.api.module.file.ModuleFile;
 import net.shoreline.client.api.social.SocialFile;
 import net.shoreline.client.api.social.SocialRelation;
 import net.shoreline.client.api.waypoint.WaypointFile;
+import net.shoreline.client.impl.module.misc.InvCleanerModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.Globals;
 
 import java.io.File;
@@ -82,7 +82,7 @@ public class ClientConfiguration implements Globals {
             // files.add(new ModulePreset(clientDir.resolve("Defaults"), module));
             files.add(new ModuleFile(clientDir.resolve("Modules"), module));
         }
-        files.add(Modules.INV_CLEANER.getBlacklistFile(clientDir));
+        files.add(InvCleanerModule.INSTANCE.getBlacklistFile(clientDir));
         for (SocialRelation relation : SocialRelation.values()) {
             files.add(new SocialFile(clientDir, relation));
         }

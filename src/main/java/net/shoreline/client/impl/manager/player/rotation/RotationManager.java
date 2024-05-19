@@ -15,8 +15,8 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.RenderPlayerEvent;
 import net.shoreline.client.impl.imixin.IClientPlayerEntity;
+import net.shoreline.client.impl.module.client.RotationsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.Globals;
 
 import java.util.ArrayList;
@@ -121,7 +121,7 @@ public class RotationManager implements Globals {
     @EventListener
     public void onKeyboardTick(KeyboardTickEvent event) {
         if (rotation != null && mc.player != null
-                && Modules.ROTATIONS.getMovementFix()) {
+                && RotationsModule.INSTANCE.getMovementFix()) {
             float forward = mc.player.input.movementForward;
             float sideways = mc.player.input.movementSideways;
             float delta = (mc.player.getYaw() - rotation.getYaw()) * MathHelper.RADIANS_PER_DEGREE;
@@ -134,7 +134,7 @@ public class RotationManager implements Globals {
 
     @EventListener
     public void onUpdateVelocity(UpdateVelocityEvent event) {
-        if (rotation != null && Modules.ROTATIONS.getMovementFix()) {
+        if (rotation != null && RotationsModule.INSTANCE.getMovementFix()) {
             event.cancel();
             event.setVelocity(movementInputToVelocity(rotation.getYaw(), event.getMovementInput(), event.getSpeed()));
         }
@@ -142,7 +142,7 @@ public class RotationManager implements Globals {
 
     @EventListener
     public void onPlayerJump(PlayerJumpEvent event) {
-        if (rotation != null && Modules.ROTATIONS.getMovementFix()) {
+        if (rotation != null && RotationsModule.INSTANCE.getMovementFix()) {
             if (event.getStage() == EventStage.PRE) {
                 prevJumpYaw = mc.player.getYaw();
                 mc.player.setYaw(rotation.getYaw());
@@ -242,7 +242,7 @@ public class RotationManager implements Globals {
      * @return
      */
     public boolean isDoneRotating() {
-        return rotateTicks > Modules.ROTATIONS.getPreserveTicks();
+        return rotateTicks > RotationsModule.INSTANCE.getPreserveTicks();
     }
 
     public boolean isRotating() {

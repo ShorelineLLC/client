@@ -5,8 +5,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.*;
+import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.init.Fonts;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
 import net.shoreline.client.util.Globals;
 import org.joml.Matrix4f;
@@ -226,7 +226,7 @@ public class RenderManager implements Globals {
      */
     public static void renderSign(String text, double x, double y, double z, int color) {
         double dist = Math.sqrt(mc.player.squaredDistanceTo(x, y, z));
-        float scaling = 0.0018f + Modules.NAMETAGS.getScaling() * (float) dist;
+        float scaling = 0.0018f + NametagsModule.INSTANCE.getScaling() * (float) dist;
         if (dist <= 8.0) {
             scaling = 0.0245f;
         }

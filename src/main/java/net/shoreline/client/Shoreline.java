@@ -3,7 +3,6 @@ package net.shoreline.client;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.file.ClientConfiguration;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,7 +42,6 @@ public class Shoreline {
         EXECUTOR = Executors.newFixedThreadPool(1);
         info("Starting init ...");
         Managers.init();
-        Modules.init();
         // Commands.init();
         info("Starting postInit ...");
         CONFIG = new ClientConfiguration();

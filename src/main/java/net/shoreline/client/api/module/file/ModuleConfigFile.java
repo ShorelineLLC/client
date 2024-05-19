@@ -57,7 +57,7 @@ public class ModuleConfigFile extends ConfigFile {
                 for (JsonElement element : array.asList()) {
                     JsonObject object = element.getAsJsonObject();
                     if (object.has("id")) {
-                        Module module = Managers.MODULE.getModule(object.get("id").getAsString());
+                        Module module = Managers.MODULE.getModuleById(object.get("id").getAsString());
                         if (module == null) {
                             return;
                         }

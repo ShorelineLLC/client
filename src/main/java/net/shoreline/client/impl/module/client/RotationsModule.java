@@ -11,6 +11,8 @@ import net.shoreline.client.api.module.ModuleCategory;
  * @since 1.0
  */
 public class RotationsModule extends ConcurrentModule {
+    public static RotationsModule INSTANCE;
+
     //
     Config<Float> preserveTicksConfig = new NumberConfig<>("PreserveTicks", "Time to preserve rotations after reaching the target rotations", 0.0f, 10.0f, 20.0f);
     Config<Boolean> movementFixConfig = new BooleanConfig("MovementFix", "Fixes movement on Grim when rotating", false);

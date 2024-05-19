@@ -13,6 +13,8 @@ import java.awt.*;
  * @since 1.0
  */
 public class ColorsModule extends ConcurrentModule {
+    public static ColorsModule INSTANCE;
+
     //
     Config<Color> colorConfig = new ColorConfig("Color", "The primary client color", new Color(255, 0, 0), false, false);
     // Config<Color> color1Config = new ColorConfig("Accent-Color", "The accent client color", new Color());

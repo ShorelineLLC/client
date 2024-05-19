@@ -21,6 +21,7 @@ import net.shoreline.client.util.string.EnumFormatter;
  * @since 1.0
  */
 public class FlightModule extends ToggleModule {
+    public static FlightModule INSTANCE;
 
     Config<FlightMode> modeConfig = new EnumConfig<>("Mode", "The mode for vanilla flight", FlightMode.NORMAL, FlightMode.values());
     Config<Float> speedConfig = new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f);

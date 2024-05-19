@@ -7,6 +7,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.module.SkipRegister;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author linus
  * @since 1.0
  */
+@SkipRegister
 public class BreadcrumbsModule extends ToggleModule {
 
     private final Map<Vec3d, Long> positions = new ConcurrentHashMap<>();

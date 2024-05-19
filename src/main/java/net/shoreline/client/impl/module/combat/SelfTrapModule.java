@@ -10,10 +10,6 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -29,10 +25,10 @@ import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.BlockInteractModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
@@ -50,6 +46,8 @@ import java.util.stream.Collectors;
  */
 public final class SelfTrapModule extends ObsidianPlacerModule
 {
+    public static SelfTrapModule INSTANCE;
+
     Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
     Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true);
@@ -187,7 +185,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos, int blockSlot)
     {
-        if (attackConfig.getValue() && attackTimer.passed(Modules.AUTO_CRYSTAL.getBreakDelay()))
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay()))
         {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities)
@@ -304,7 +302,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                         }
                     }
 
-                    if (Modules.BLOCK_INTERACT.isEnabled() && !strictDirectionConfig.getValue())
+                    if (BlockInteractModule.INSTANCE.isEnabled() && !strictDirectionConfig.getValue())
                     {
                         blocks.add(headBlockPos);
                         break searchForSupport;
@@ -407,7 +405,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 set.getValue().setState(false);
                 set.getValue().setState(false);
                 int alpha = (int) set.getValue().getCurrent();
-                Color color = Modules.COLORS.getColor(alpha);
+                Color color = ColorsModule.INSTANCE.getColor(alpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
             }
 
@@ -415,7 +413,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 set.getValue().setState(false);
                 int alpha = (int) set.getValue().getCurrent();
-                Color color = Modules.COLORS.getColor(alpha);
+                Color color = ColorsModule.INSTANCE.getColor(alpha);
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
             }
 

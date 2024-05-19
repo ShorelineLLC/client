@@ -33,8 +33,8 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.collection.EvictingQueue;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -54,6 +54,7 @@ import java.util.concurrent.*;
  * @since 1.0
  */
 public class AutoCrystalModule extends RotationModule {
+    public static AutoCrystalModule INSTANCE;
 
     Config<Boolean> multitaskConfig = new BooleanConfig("Multitask", "Allows attacking while using items", false);
     Config<Boolean> whileMiningConfig = new BooleanConfig("WhileMining", "Allows attacking while mining blocks", false);
@@ -299,8 +300,8 @@ public class AutoCrystalModule extends RotationModule {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = Modules.COLORS.getColor(boxAlpha);
-                Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
+                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }

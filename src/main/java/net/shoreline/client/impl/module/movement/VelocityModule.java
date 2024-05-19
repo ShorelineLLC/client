@@ -39,6 +39,8 @@ import java.text.DecimalFormat;
  * @since 1.0
  */
 public class VelocityModule extends ToggleModule {
+    public static VelocityModule INSTANCE;
+
     Config<Boolean> knockbackConfig = new BooleanConfig("Knockback", "Removes player knockback velocity", true);
     Config<Boolean> explosionConfig = new BooleanConfig("Explosion", "Removes player explosion velocity", true);
     Config<VelocityMode> modeConfig = new EnumConfig<>("Mode", "The mode for velocity", VelocityMode.NORMAL, VelocityMode.values());

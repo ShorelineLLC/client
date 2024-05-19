@@ -16,6 +16,8 @@ import net.shoreline.client.impl.event.network.AttackBlockEvent;
  */
 public final class AutoToolModule extends ToggleModule
 {
+    public static AutoToolModule INSTANCE;
+
     public AutoToolModule()
     {
         super("AutoTool", "Automatically switches to a tool before mining", ModuleCategory.WORLD);

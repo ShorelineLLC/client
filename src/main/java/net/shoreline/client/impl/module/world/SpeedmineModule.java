@@ -5,12 +5,9 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -28,8 +25,8 @@ import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager;
 import net.shoreline.client.util.player.RotationUtil;
 
@@ -40,6 +37,7 @@ import java.text.DecimalFormat;
  * @since 1.0
  */
 public class SpeedmineModule extends RotationModule {
+    public static SpeedmineModule INSTANCE;
 
     Config<SpeedmineMode> modeConfig = new EnumConfig<>("Mode", "The mining mode for speedmine", SpeedmineMode.PACKET, SpeedmineMode.values());
     Config<Float> mineSpeedConfig = new NumberConfig<>("Speed", "The speed to mine blocks", 0.0f, 0.7f, 0.9f, () -> modeConfig.getValue() == SpeedmineMode.DAMAGE);
@@ -98,7 +96,7 @@ public class SpeedmineModule extends RotationModule {
         }
         state = mc.world.getBlockState(mining);
         int prev = mc.player.getInventory().selectedSlot;
-        int slot = Modules.AUTO_TOOL.getBestTool(state);
+        int slot = AutoToolModule.INSTANCE.getBestTool(state);
         double dist = mc.player.squaredDistanceTo(mining.toCenterPos());
         if (dist > ((NumberConfig<?>) rangeConfig).getValueSq()
             || state.isAir() || damage > 3.0f) {
@@ -108,8 +106,8 @@ public class SpeedmineModule extends RotationModule {
             state = null;
             direction = null;
             damage = 0.0f;
-        } else if (damage > 1.0f && !Modules.AUTO_CRYSTAL.isAttacking()
-            && !Modules.AUTO_CRYSTAL.isPlacing() && !mc.player.isUsingItem()) {
+        } else if (damage > 1.0f && !AutoCrystalModule.INSTANCE.isAttacking()
+            && !AutoCrystalModule.INSTANCE.isPlacing() && !mc.player.isUsingItem()) {
             if (isRotationBlocked()) {
                 return;
             }
@@ -126,8 +124,8 @@ public class SpeedmineModule extends RotationModule {
             float delta = calcBlockBreakingDelta(state, mc.world, mining);
             damage += delta;
             if (delta + damage > 1.0f && rotateConfig.getValue()
-                && !Modules.AUTO_CRYSTAL.isAttacking()
-                && !Modules.AUTO_CRYSTAL.isPlacing()) {
+                && !AutoCrystalModule.INSTANCE.isAttacking()
+                && !AutoCrystalModule.INSTANCE.isPlacing()) {
                 float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), mining.toCenterPos());
                 setRotation(rotations[0], rotations[1]);
             }
@@ -170,7 +168,7 @@ public class SpeedmineModule extends RotationModule {
         direction = event.getDirection();
         damage = 0.0f;
         if (mining != null && direction != null) {
-            int slot = Modules.AUTO_TOOL.getBestTool(event.getState());
+            int slot = AutoToolModule.INSTANCE.getBestTool(event.getState());
             if (grimConfig.getValue()) {
                 Managers.INVENTORY.setSlot(slot);
             }
@@ -208,7 +206,7 @@ public class SpeedmineModule extends RotationModule {
     }
 
     private float getBlockBreakingSpeed(BlockState block) {
-        int tool = Modules.AUTO_TOOL.getBestTool(block);
+        int tool = AutoToolModule.INSTANCE.getBestTool(block);
         float f = mc.player.getInventory().getStack(tool).getMiningSpeedMultiplier(block);
         if (f > 1.0F) {
             ItemStack stack = mc.player.getInventory().getStack(tool);
@@ -241,7 +239,7 @@ public class SpeedmineModule extends RotationModule {
 
     private boolean canHarvest(BlockState state) {
         if (state.isToolRequired()) {
-            int tool = Modules.AUTO_TOOL.getBestTool(state);
+            int tool = AutoToolModule.INSTANCE.getBestTool(state);
             return mc.player.getInventory().getStack(tool).isSuitableFor(state);
         }
         return true;

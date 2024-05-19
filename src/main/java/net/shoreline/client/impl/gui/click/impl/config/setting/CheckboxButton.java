@@ -5,7 +5,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.render.animation.Animation;
 
 /**
@@ -38,8 +38,8 @@ public class CheckboxButton extends ConfigButton<Boolean> {
         x = ix;
         y = iy;
         Animation checkboxAnimation = config.getAnimation();
-        rectGradient(context, checkboxAnimation.getFactor() > 0.01f ?  Modules.CLICK_GUI.getColor((float) checkboxAnimation.getFactor()) : 0x00000000,
-                checkboxAnimation.getFactor() > 0.01f ?  Modules.CLICK_GUI.getColor1((float) checkboxAnimation.getFactor()) : 0x00000000);
+        rectGradient(context, checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.INSTANCE.getColor((float) checkboxAnimation.getFactor()) : 0x00000000,
+                checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.INSTANCE.getColor1((float) checkboxAnimation.getFactor()) : 0x00000000);
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, -1);
     }
 

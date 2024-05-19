@@ -6,7 +6,6 @@ import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.event.buffers.ModulesBuffer;
 import net.shoreline.client.impl.imixin.IChatHudLine;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 import org.spongepowered.asm.mixin.Mixin;

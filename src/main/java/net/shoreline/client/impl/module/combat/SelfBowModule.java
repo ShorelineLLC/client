@@ -26,6 +26,7 @@ import java.util.Set;
  * @since 1.0
  */
 public class SelfBowModule extends RotationModule {
+    public static SelfBowModule INSTANCE;
 
     //
     private final Set<StatusEffectInstance> arrows = new HashSet<>();

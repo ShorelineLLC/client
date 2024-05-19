@@ -30,9 +30,9 @@ import net.shoreline.client.api.render.RenderLayersClient;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.world.FakePlayerEntity;
@@ -49,6 +49,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 1.0
  */
 public class NametagsModule extends ToggleModule {
+    public static NametagsModule INSTANCE;
+
     Config<Boolean> armorConfig = new BooleanConfig("Armor", "Displays the player's armor", true);
     Config<Boolean> enchantmentsConfig = new BooleanConfig("Enchantments", "Displays a list of the item's enchantments", true);
     Config<Boolean> durabilityConfig = new BooleanConfig("Durability", "Displays item durability", true);
@@ -78,7 +80,7 @@ public class NametagsModule extends ToggleModule {
 
         for (Entity entity : mc.world.getEntities()) {
             if (entity instanceof PlayerEntity player) {
-                if (player == mc.player && !Modules.FREECAM.isEnabled()) {
+                if (player == mc.player && !FreecamModule.INSTANCE.isEnabled()) {
                     continue;
                 }
                 if (!player.isAlive() || !invisiblesConfig.getValue() && player.isInvisible()) {
@@ -395,7 +397,7 @@ public class NametagsModule extends ToggleModule {
 
     private int getNametagColor(PlayerEntity player) {
         if (player == mc.player) {
-            return Modules.COLORS.getRGB(255);
+            return ColorsModule.INSTANCE.getRGB(255);
         }
         if (Managers.SOCIAL.isFriend(player.getName())) {
             return 0xff66ffff;

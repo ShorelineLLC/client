@@ -33,6 +33,7 @@ import java.util.List;
  * @since 1.0
  */
 public class InvCleanerModule extends ToggleModule {
+    public static InvCleanerModule INSTANCE;
 
     //
     Config<List<Item>> blacklistConfig = new ItemListConfig<>("Blacklist", "The items to throw");

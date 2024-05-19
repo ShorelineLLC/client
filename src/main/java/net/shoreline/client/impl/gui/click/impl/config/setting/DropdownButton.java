@@ -6,7 +6,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.string.EnumFormatter;
 import org.lwjgl.glfw.GLFW;
 
@@ -42,7 +42,7 @@ public class DropdownButton extends ConfigButton<Enum<?>> {
         x = ix;
         y = iy;
         String val = EnumFormatter.formatEnum(config.getValue());
-        rectGradient(context, Modules.CLICK_GUI.getColor(), Modules.CLICK_GUI.getColor1());
+        rectGradient(context, ClickGuiModule.INSTANCE.getColor(), ClickGuiModule.INSTANCE.getColor1());
         RenderManager.renderText(context, config.getName() + Formatting.GRAY + " " + val, ix + 2.0f, iy + 4.0f, -1);
     }
 

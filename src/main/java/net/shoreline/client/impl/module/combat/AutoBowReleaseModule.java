@@ -16,7 +16,6 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 
 /**
  * @author linus
@@ -38,7 +37,7 @@ public class AutoBowReleaseModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (Modules.SELF_BOW.isEnabled()) {
+        if (SelfBowModule.INSTANCE.isEnabled()) {
             return;
         }
         if (event.getStage() == EventStage.POST) {

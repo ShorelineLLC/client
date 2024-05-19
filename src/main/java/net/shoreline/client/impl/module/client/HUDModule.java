@@ -25,10 +25,10 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
-import net.shoreline.client.impl.event.entity.StatusEffectEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
+import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.StreamUtils;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -37,9 +37,7 @@ import net.shoreline.client.util.string.EnumFormatter;
 
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -47,6 +45,7 @@ import java.util.stream.Stream;
  * @since 1.0
  */
 public class HUDModule extends ToggleModule {
+    public static HUDModule INSTANCE;
 
     //
     // private static final HudScreen HUD_SCREEN = new HudScreen();
@@ -191,7 +190,7 @@ public class HUDModule extends ToggleModule {
                 double z = mc.player.getZ() - mc.player.prevZ;
                 double dist = Math.sqrt(x * x + z * z) / 1000.0;
                 double div = 0.05 / 3600.0;
-                float timer = Modules.TIMER.isEnabled() ? Modules.TIMER.getTimer() : 1.0f;
+                float timer = TimerModule.INSTANCE.isEnabled() ? TimerModule.INSTANCE.getTimer() : 1.0f;
                 final double speed = dist / div * timer;
                 String text = String.format("Speed §f%skm/h",
                         decimal.format(speed));
@@ -228,7 +227,7 @@ public class HUDModule extends ToggleModule {
                 rainbowOffset++;
             }
             if (pingConfig.getValue() && !mc.isInSingleplayer()) {
-                int latency = Modules.FAST_LATENCY.isEnabled() ? (int) Modules.FAST_LATENCY.getLatency() : Managers.NETWORK.getClientLatency();
+                int latency = FastLatencyModule.INSTANCE.isEnabled() ? (int) FastLatencyModule.INSTANCE.getLatency() : Managers.NETWORK.getClientLatency();
                 String text = String.format("Ping §f%dms", latency);
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
@@ -362,7 +361,7 @@ public class HUDModule extends ToggleModule {
 
     private int getHudColor(int rainbowOffset) {
         return switch (rainbowModeConfig.getValue()) {
-            case OFF -> Modules.COLORS.getRGB();
+            case OFF -> ColorsModule.INSTANCE.getRGB();
             case STATIC -> rainbow(1L);
             case GRADIENT -> rainbow(rainbowOffset);
             // case ALPHA -> alpha(rainbowOffset);
@@ -389,7 +388,7 @@ public class HUDModule extends ToggleModule {
     public static int alpha(long offset) {
         offset = (offset * 2) + 10;
         float[] hsb = new float[3];
-        Color color = Modules.COLORS.getColor();
+        Color color = ColorsModule.INSTANCE.getColor();
         Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
         float brightness = Math.abs(((float) (System.currentTimeMillis() % 2000L) / 1000 + 50.0f / (float) offset * 2) % 2 - 1);
         brightness = 0.5f + 0.5f * brightness;

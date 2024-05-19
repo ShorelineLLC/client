@@ -13,7 +13,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.gui.RenderTooltipEvent;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ColorsModule;
 
 /**
  * @author linus
@@ -45,7 +45,7 @@ public class TooltipsModule extends ToggleModule {
             DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(27, ItemStack.EMPTY);
             Inventories.readNbt(nbtCompound, defaultedList);
             RenderManager.rect(event.context.getMatrices(), event.getX() + 8.0,
-                    event.getY() - 21.0, 150.0, 13.0, Modules.COLORS.getRGB(170));
+                    event.getY() - 21.0, 150.0, 13.0, ColorsModule.INSTANCE.getRGB(170));
             RenderManager.renderText(event.getContext(), stack.getName().getString(),
                     event.getX() + 11.0f, event.getY() - 18.0f, -1);
             RenderManager.rect(event.context.getMatrices(), event.getX() + 8.0,

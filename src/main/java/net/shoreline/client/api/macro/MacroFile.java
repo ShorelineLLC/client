@@ -58,7 +58,7 @@ public class MacroFile extends ConfigFile {
                         Macro macro = Managers.MACRO.getMacro(m -> m.getId().equals(id));
                         if (macro != null) {
                             macro.fromJson(jsonObject);
-                            Module module = Managers.MODULE.getModule(id.substring(0, id.length() - 6));
+                            Module module = Managers.MODULE.getModuleById(id.substring(0, id.length() - 6));
                             if (module instanceof ToggleModule t) {
                                 t.keybind(jsonObject.get("value").getAsInt());
                             }

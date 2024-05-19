@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.client;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
@@ -14,6 +13,8 @@ import org.lwjgl.glfw.GLFW;
  * @since 1.0
  */
 public class ClickGuiModule extends ToggleModule {
+
+    public static ClickGuiModule INSTANCE;
 
 //    Config<Integer> hueConfig = new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
 //    Config<Integer> saturationConfig = new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
@@ -62,22 +63,22 @@ public class ClickGuiModule extends ToggleModule {
     }
 
     public int getColor() {
-        return Modules.COLORS.getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.INSTANCE.getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hueConfig.getValue(), saturationConfig.getValue(), brightnessConfig.getValue(), alphaConfig.getValue() / 100.0f).getRGB();
     }
 
     public int getColor1() {
-        return Modules.COLORS.getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.INSTANCE.getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hue1Config.getValue(), saturation1Config.getValue(), brightness1Config.getValue(), alphaConfig.getValue() / 100.0f).getRGB();
     }
 
     public int getColor(float alpha) {
-        return Modules.COLORS.getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.INSTANCE.getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hueConfig.getValue(), saturationConfig.getValue(), brightnessConfig.getValue(), MathHelper.clamp(alphaConfig.getValue() * alpha / 100.0f, 0.0f, 1.0f)).getRGB();
     }
 
     public int getColor1(float alpha) {
-        return Modules.COLORS.getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.INSTANCE.getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hue1Config.getValue(), saturation1Config.getValue(), brightness1Config.getValue(), MathHelper.clamp(alphaConfig.getValue() * alpha / 100.0f, 0.0f, 1.0f)).getRGB();
     }
 

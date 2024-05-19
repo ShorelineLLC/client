@@ -23,8 +23,8 @@ import net.shoreline.client.impl.event.entity.player.PlayerJumpEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.world.BlockCollisionEvent;
+import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
 import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 import net.shoreline.client.util.string.EnumFormatter;
@@ -66,7 +66,7 @@ public class JesusModule extends ToggleModule {
     @EventListener
     public void onBlockCollision(BlockCollisionEvent event) {
         BlockState state = event.getState();
-        if (Modules.FLIGHT.isEnabled() || Modules.PACKET_FLY.isEnabled()
+        if (FlightModule.INSTANCE.isEnabled() || PacketFlyModule.INSTANCE.isEnabled()
                 || mc.player.isSpectator() || mc.player.isOnFire()
                 || state.getFluidState().isEmpty()) {
             return;
@@ -96,7 +96,7 @@ public class JesusModule extends ToggleModule {
     @EventListener
     public void onTick(TickEvent event) {
         if (event.getStage() == EventStage.PRE) {
-            if (Modules.FLIGHT.isEnabled() || Modules.PACKET_FLY.isEnabled()) {
+            if (FlightModule.INSTANCE.isEnabled() || PacketFlyModule.INSTANCE.isEnabled()) {
                 return;
             }
             if (modeConfig.getValue() == JesusMode.SOLID) {
@@ -126,7 +126,7 @@ public class JesusModule extends ToggleModule {
 
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent event) {
-        if (Modules.FLIGHT.isEnabled() || Modules.PACKET_FLY.isEnabled()) {
+        if (FlightModule.INSTANCE.isEnabled() || PacketFlyModule.INSTANCE.isEnabled()) {
             return;
         }
         if (event.getStage() == EventStage.PRE
@@ -163,8 +163,8 @@ public class JesusModule extends ToggleModule {
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event) {
         if (event.isClientPacket() || mc.player == null || mc.getNetworkHandler() == null
-                || mc.player.age <= 20 || Modules.FLIGHT.isEnabled()
-                || Modules.PACKET_FLY.isEnabled()) {
+                || mc.player.age <= 20 || FlightModule.INSTANCE.isEnabled()
+                || PacketFlyModule.INSTANCE.isEnabled()) {
             return;
         }
         if (event.getPacket() instanceof PlayerMoveC2SPacket packet

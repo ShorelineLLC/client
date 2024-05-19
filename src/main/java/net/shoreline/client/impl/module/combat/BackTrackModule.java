@@ -12,13 +12,15 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.module.SkipRegister;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.timer.TickTimer;
 import net.shoreline.client.util.math.timer.Timer;
 
@@ -29,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author xgraza
  * @since 1.0
  */
+@SkipRegister
 public final class BackTrackModule extends ToggleModule
 {
     Config<Integer> delayConfig = new NumberConfig<>("Delay", "The delay before throttling packets again", 0, 100, 1000);
@@ -101,7 +104,7 @@ public final class BackTrackModule extends ToggleModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
-        final AuraModule auraModule = Modules.AURA;
+        final AuraModule auraModule = AuraModule.INSTANCE;
         if (!auraModule.isEnabled() || !(auraModule.getEntityTarget() instanceof LivingEntity auraTarget))
         {
             attackingEntity = null;
@@ -152,8 +155,8 @@ public final class BackTrackModule extends ToggleModule
 
         if (hitBox != null)
         {
-            RenderManager.renderBox(event.getMatrices(), hitBox, Modules.COLORS.getRGB(120));
-            RenderManager.renderBoundingBox(event.getMatrices(), hitBox, 1.5f, Modules.COLORS.getRGB());
+            RenderManager.renderBox(event.getMatrices(), hitBox, ColorsModule.INSTANCE.getRGB(120));
+            RenderManager.renderBoundingBox(event.getMatrices(), hitBox, 1.5f, ColorsModule.INSTANCE.getRGB());
         }
     }
 
@@ -173,7 +176,7 @@ public final class BackTrackModule extends ToggleModule
 
     private boolean shouldCancelPacket(final Packet<?> packet)
     {
-        if (Modules.VELOCITY.isEnabled())
+        if (VelocityModule.INSTANCE.isEnabled())
         {
             return !(packet instanceof EntityVelocityUpdateS2CPacket || packet instanceof ExplosionS2CPacket);
         }

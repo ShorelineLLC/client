@@ -28,8 +28,9 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.BlockInteractModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
@@ -141,7 +142,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos)
     {
-        if (attackConfig.getValue() && attackTimer.passed(Modules.AUTO_CRYSTAL.getBreakDelay()))
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay()))
         {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities)
@@ -250,7 +251,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 continue;
             }
             // Insane!? (probably should rewrite this part, kinda autistic)
-            if (cityConfig.getValue() && Modules.AUTO_CRYSTAL.isEnabled() && !mc.world.getBlockState(trapBlockPos).isAir())
+            if (cityConfig.getValue() && AutoCrystalModule.INSTANCE.isEnabled() && !mc.world.getBlockState(trapBlockPos).isAir())
             {
                 blocks.remove(blockPos);
                 continue;
@@ -268,7 +269,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             searchForSupport:
             {
-                if (Modules.BLOCK_INTERACT.isEnabled() && !strictDirectionConfig.getValue())
+                if (BlockInteractModule.INSTANCE.isEnabled() && !strictDirectionConfig.getValue())
                 {
                     blocks.add(headBlockPos);
                     break searchForSupport;
@@ -378,8 +379,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = Modules.COLORS.getColor(boxAlpha);
-                Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
+                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }

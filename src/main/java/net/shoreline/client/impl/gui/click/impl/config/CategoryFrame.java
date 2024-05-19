@@ -9,8 +9,8 @@ import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.component.Frame;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ColorButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.string.EnumFormatter;
@@ -113,7 +113,7 @@ public class CategoryFrame extends Frame {
         if (y > mc.getWindow().getHeight() - 10) {
             y = mc.getWindow().getHeight() - 10;
         }
-        rect(context, Modules.CLICK_GUI.getColor(1.7f));
+        rect(context, ClickGuiModule.INSTANCE.getColor(1.7f));
         RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, -1);
         if (categoryAnimation.getFactor() > 0.01f) {
             enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));

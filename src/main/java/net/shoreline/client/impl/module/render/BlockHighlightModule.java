@@ -19,8 +19,8 @@ import net.shoreline.client.api.render.BoxRender;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderBlockOutlineEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 
 import java.text.DecimalFormat;
 
@@ -76,12 +76,12 @@ public class BlockHighlightModule extends ToggleModule {
             switch (boxModeConfig.getValue()) {
                 case FILL -> {
                     RenderManager.renderBox(event.getMatrices(), render,
-                            Modules.COLORS.getRGB(60));
+                            ColorsModule.INSTANCE.getRGB(60));
                     RenderManager.renderBoundingBox(event.getMatrices(),
-                            render, 2.5f, Modules.COLORS.getRGB(145));
+                            render, 2.5f, ColorsModule.INSTANCE.getRGB(145));
                 }
                 case OUTLINE -> RenderManager.renderBoundingBox(event.getMatrices(),
-                        render, 2.5f, Modules.COLORS.getRGB(145));
+                        render, 2.5f, ColorsModule.INSTANCE.getRGB(145));
             }
         }
     }

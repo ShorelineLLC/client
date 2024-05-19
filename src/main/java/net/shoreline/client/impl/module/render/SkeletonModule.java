@@ -18,7 +18,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
@@ -93,7 +93,7 @@ public class SkeletonModule extends ToggleModule {
                 bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
                 // RenderSystem.lineWidth(2.0f);
                 Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
-                Color skeletonColor = Modules.COLORS.getColor();
+                Color skeletonColor = ColorsModule.INSTANCE.getColor();
                 bufferBuilder.vertex(matrix4f, 0, sneaking ? 0.6f : 0.7f,
                         sneaking ? 0.23f : 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
                 bufferBuilder.vertex(matrix4f, 0, sneaking ? 1.05f : 1.4f,

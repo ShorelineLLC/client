@@ -38,6 +38,8 @@ import java.util.List;
  * @since 1.0
  */
 public class NoSlowModule extends ToggleModule {
+    public static NoSlowModule INSTANCE;
+
     //
     Config<Boolean> strictConfig = new BooleanConfig("Strict", "Strict NCP bypass for ground slowdowns", false);
     Config<Boolean> airStrictConfig = new BooleanConfig("AirStrict", "Strict NCP bypass for air slowdowns", false);

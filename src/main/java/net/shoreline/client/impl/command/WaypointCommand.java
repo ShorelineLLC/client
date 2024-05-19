@@ -6,8 +6,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.waypoint.Waypoint;
+import net.shoreline.client.impl.module.render.WaypointsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.chat.ChatUtil;
 
 public class WaypointCommand extends Command {
@@ -35,7 +35,7 @@ public class WaypointCommand extends Command {
                                             return 0;
                                         }
                                         ChatUtil.clientSendMessage("Added waypoint with name §s" + waypointName);
-                                        waypointName += (Modules.WAYPOINTS.getCoords() ? String.format(" XYZ %s %s %s", x, y, z) : "");
+                                        waypointName += (WaypointsModule.INSTANCE.getCoords() ? String.format(" XYZ %s %s %s", x, y, z) : "");
                                         Managers.WAYPOINT.register(new Waypoint(waypointName, mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp(), x, y, z));
                                     }
                                     return 1;

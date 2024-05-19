@@ -10,10 +10,6 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -29,10 +25,9 @@ import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -50,6 +45,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 public class SurroundModule extends ObsidianPlacerModule {
+    public static SurroundModule INSTANCE;
 
     Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
@@ -105,7 +101,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onPlayerTick(PlayerTickEvent event) {
-        if (Modules.SELF_TRAP.isEnabled()) {
+        if (SelfTrapModule.INSTANCE.isEnabled()) {
             return;
         }
         // Do we need this check?? Surround is always highest prio
@@ -173,7 +169,7 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     private void attackPlace(BlockPos targetPos, int slot) {
-        if (attackConfig.getValue() && attackTimer.passed(Modules.AUTO_CRYSTAL.getBreakDelay())) {
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay())) {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities) {
                 attack(entity);
@@ -290,7 +286,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event) {
-        if (mc.player == null || Modules.SELF_TRAP.isEnabled()) {
+        if (mc.player == null || SelfTrapModule.INSTANCE.isEnabled()) {
             return;
         }
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet) {
@@ -314,7 +310,7 @@ public class SurroundModule extends ObsidianPlacerModule {
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
-        if (Modules.SELF_TRAP.isEnabled()) {
+        if (SelfTrapModule.INSTANCE.isEnabled()) {
             return;
         }
         if (renderConfig.getValue())
@@ -324,8 +320,8 @@ public class SurroundModule extends ObsidianPlacerModule {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = Modules.COLORS.getColor(boxAlpha);
-                Color lineColor = Modules.COLORS.getColor(lineAlpha);
+                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
+                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }

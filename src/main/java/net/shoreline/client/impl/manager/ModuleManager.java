@@ -3,208 +3,113 @@ package net.shoreline.client.impl.manager;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.module.Module;
-import net.shoreline.client.impl.module.client.*;
-import net.shoreline.client.impl.module.combat.*;
-import net.shoreline.client.impl.module.exploit.*;
-import net.shoreline.client.impl.module.misc.*;
-import net.shoreline.client.impl.module.movement.*;
-import net.shoreline.client.impl.module.render.*;
-import net.shoreline.client.impl.module.world.*;
+import net.shoreline.client.api.module.SkipRegister;
+import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.module.client.BaritoneModule;
+import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.ReflectionUtil;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
- * @author linus
- * @since 1.0
+ * @author xgraza
+ * @since 05/19/24
  */
-public class ModuleManager {
-    // The client module register. Keeps a list of modules and their ids for
-    // easy retrieval by id.
-    private final Map<String, Module> modules =
-            Collections.synchronizedMap(new LinkedHashMap<>());
+@SuppressWarnings("unchecked")
+public final class ModuleManager
+{
+    private static final String MODULE_IMPL = "net.shoreline.client.impl.module";
 
-    /**
-     * Initializes the module register.
-     */
-    public ModuleManager() {
-        // MAINTAIN ALPHABETICAL ORDER
-        register(
-                // Client
-                new ServerModule(),
-                new CapesModule(),
-                new ClickGuiModule(),
-                new ColorsModule(),
-                new HUDModule(),
-                new RotationsModule(),
-                // Combat
-                new AuraModule(),
-                // new AutoAnchorModule(),
-                new AutoArmorModule(),
-                new AutoBowReleaseModule(),
-                new AutoCrystalModule(),
-                new AutoLogModule(),
-                new AutoTotemModule(),
-                new AutoTrapModule(),
-                new AutoWebModule(),
-                new AutoXPModule(),
-                // new BacktrackModule(),
-                new BlockLagModule(),
-                new BowAimModule(),
-                new ClickCrystalModule(),
-                new CriticalsModule(),
-                new HoleFillModule(),
-                new NoHitDelayModule(),
-                new ReplenishModule(),
-                new SelfBowModule(),
-                new SelfTrapModule(),
-                new SurroundModule(),
-                new TriggerModule(),
-                // Exploit
-                new AntiHungerModule(),
-                new ChorusControlModule(),
-                new ClientSpoofModule(),
-                new CrasherModule(),
-                new DisablerModule(),
-                new ExtendedFireworkModule(),
-                new FakeLatencyModule(),
-                new FastLatencyModule(),
-                new FastProjectileModule(),
-                new InventorySyncModule(),
-                new PacketCancelerModule(),
-                new PacketFlyModule(),
-                new PhaseModule(),
-                new PortalGodModeModule(),
-                new ReachModule(),
-                // Misc
-                // new AntiAFKModule(),
-                new AntiAimModule(),
-                // new AntiBookBanModule(),
-                new AntiSpamModule(),
-                new AutoAcceptModule(),
-                new AutoEatModule(),
-                new AutoFishModule(),
-                new AutoReconnectModule(),
-                new AutoRespawnModule(),
-                new BeaconSelectorModule(),
-                new BetterChatModule(),
-                new ChatNotifierModule(),
-                new ChestSwapModule(),
-                // new ChestStealerModule(),
-                new FakePlayerModule(),
-                new InvCleanerModule(),
-                new MiddleClickModule(),
-                new NoPacketKickModule(),
-                new NoSoundLagModule(),
-                new PacketLoggerModule(),
-                new TimerModule(),
-                new TrueDurabilityModule(),
-                new UnfocusedFPSModule(),
-                new XCarryModule(),
-                // Movement
-                new AntiLevitationModule(),
-                new AutoWalkModule(),
-                new ElytraFlyModule(),
-                new EntityControlModule(),
-                new EntitySpeedModule(),
-                new FakeLagModule(),
-                new FastFallModule(),
-                new FlightModule(),
-                new IceSpeedModule(),
-                new JesusModule(),
-                new LongJumpModule(),
-                new NoFallModule(),
-                new NoJumpDelayModule(),
-                new NoSlowModule(),
-                new ParkourModule(),
-                new SpeedModule(),
-                new SprintModule(),
-                new StepModule(),
-                new TickShiftModule(),
-                new TridentFlyModule(),
-                new VelocityModule(),
-                new YawModule(),
-                // Render
-                new BlockHighlightModule(),
-                // new BreadcrumbsModule(),
-                new BreakHighlightModule(),
-                new ChamsModule(),
-                new ESPModule(),
-                new ExtraTabModule(),
-                new FreecamModule(),
-                new FullbrightModule(),
-                new HoleESPModule(),
-                new NameProtectModule(),
-                new NametagsModule(),
-                new NoRenderModule(),
-                new NoRotateModule(),
-                new NoWeatherModule(),
-                new ParticlesModule(),
-                new PhaseESPModule(),
-                new SkeletonModule(),
-                new SkyboxModule(),
-                new TooltipsModule(),
-                new TracersModule(),
-                new TrueSightModule(),
-                new ViewClipModule(),
-                new ViewModelModule(),
-                new WaypointsModule(),
-                new ZoomModule(),
-                // World
-                new AntiInteractModule(),
-                new AutoMineModule(),
-                new AutoToolModule(),
-                new AvoidModule(),
-                new BlockInteractModule(),
-                new FastDropModule(),
-                new FastPlaceModule(),
-                new MultitaskModule(),
-                new NoGlitchBlocksModule(),
-                new ScaffoldModule(),
-                new SpeedmineModule()
-                // new WallhackModule()
-        );
-        if (ShorelineMod.isBaritonePresent()) {
-            register(new BaritoneModule());
+    private final Map<Class<? extends Module>, Module> moduleInstanceMap = new LinkedHashMap<>();
+    private final Map<String, Module> moduleIdInstanceMap = new HashMap<>();
+    private final List<Module> moduleList = new LinkedList<>();
+
+    public ModuleManager()
+    {
+        try
+        {
+            ReflectionUtil.reflectInPackage(MODULE_IMPL).forEach((moduleClass) ->
+            {
+                // Make sure the class we're reflecting is a module class
+                if (!Module.class.isAssignableFrom(moduleClass))
+                {
+                    return;
+                }
+
+                // Some modules may be completely broken or not finished or are inside jokes
+                // Do not register these.
+                if (moduleClass.isAnnotationPresent(SkipRegister.class))
+                {
+                    Shoreline.LOGGER.debug("@SkipRegister on {}, skipping", moduleClass);
+                    return;
+                }
+
+                if (BaritoneModule.class.isAssignableFrom(moduleClass) && !ShorelineMod.isBaritonePresent())
+                {
+                    Shoreline.info("Baritone module not supported - Baritone not in mod path!");
+                    return;
+                }
+
+                try
+                {
+                    // Invoke constructor & register instance created
+                    register((Module) moduleClass.getConstructors()[0].newInstance());
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e)
+                {
+                    Shoreline.error("Failed to register class {}", moduleClass);
+                    e.printStackTrace();
+                }
+            });
+        } catch (final IOException | ClassNotFoundException e)
+        {
+            Shoreline.error("Failed to reflect module classes.");
+            // Throwing here is intentional, we want this to fail
+            throw new RuntimeException(e);
         }
-        Shoreline.info("Registered {} modules!", modules.size());
+        Shoreline.info("Reflected {} modules", moduleList.size());
     }
 
-    /**
-     *
-     */
-    public void postInit() {
-        // TODO
+    public void register(final Module module)
+    {
+        // Cache module instance
+        moduleInstanceMap.put(module.getClass(), module);
+        moduleIdInstanceMap.put(module.getId(), module);
+        moduleList.add(module);
+
+        // Automatically register settings & macro
+        module.reflectConfigs();
+        if (module instanceof ToggleModule toggleModule) {
+            Managers.MACRO.register(toggleModule.getKeybinding());
+        }
+
+        // Automatically reflect the INSTANCE variable if it exists
+        try
+        {
+            // Set the static INSTANCE variable to the local instance we created
+            module.getClass().getDeclaredField("INSTANCE").set(module, module);
+        } catch (final NoSuchFieldException | IllegalAccessException e)
+        {
+            // No .INSTANCE found
+        }
     }
 
-    /**
-     * @param modules
-     * @see #register(Module)
-     */
-    private void register(Module... modules) {
-        for (Module module : modules) {
+    public void register(final Module... modules)
+    {
+        for (final Module module : modules)
+        {
             register(module);
         }
     }
 
-    /**
-     * @param module
-     */
-    private void register(Module module) {
-        modules.put(module.getId(), module);
+    public <T extends Module> T getModuleById(final String id)
+    {
+        return (T) moduleIdInstanceMap.get(id);
     }
 
-    /**
-     * @param id
-     * @return
-     */
-    public Module getModule(String id) {
-        return modules.get(id);
-    }
-
-    /**
-     * @return
-     */
-    public List<Module> getModules() {
-        return new ArrayList<>(modules.values());
+    public List<Module> getModules()
+    {
+        return moduleList;
     }
 }

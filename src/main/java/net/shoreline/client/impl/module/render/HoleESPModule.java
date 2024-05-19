@@ -22,6 +22,8 @@ import java.awt.*;
  * @since 1.0
  */
 public class HoleESPModule extends ToggleModule {
+    public static HoleESPModule INSTANCE;
+
     //
     Config<Float> rangeConfig = new NumberConfig<>("Range", "Range to display holes", 3.0f, 5.0f, 25.0f);
     Config<Float> heightConfig = new NumberConfig<>("Size", "Render height of holes", -1.0f, 1.00f, 1.0f);

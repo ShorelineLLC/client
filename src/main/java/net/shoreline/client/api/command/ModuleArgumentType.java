@@ -27,7 +27,7 @@ public class ModuleArgumentType implements ArgumentType<Module> {
     public Module parse(StringReader reader) throws CommandSyntaxException {
         String string = reader.readString();
         String id = String.format(Module.MODULE_ID_FORMAT, string.toLowerCase());
-        Module module = Managers.MODULE.getModule(id);
+        Module module = Managers.MODULE.getModuleById(id);
         if (module == null) {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException().createWithContext(reader, null);
         }

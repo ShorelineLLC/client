@@ -8,7 +8,7 @@ import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.render.HoleESPModule;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.client.util.world.BlockUtil;
@@ -47,7 +47,7 @@ public class HoleManager implements Globals {
 
     public List<BlockPos> getSphere(Vec3d start) {
         List<BlockPos> sphere = new ArrayList<>();
-        double rad = Math.ceil(Math.max(5.0, Modules.HOLE_ESP.getRange()));
+        double rad = Math.ceil(Math.max(5.0, HoleESPModule.INSTANCE.getRange()));
         for (double x = -rad; x <= rad; ++x) {
             for (double y = -rad; y <= rad; ++y) {
                 for (double z = -rad; z <= rad; ++z) {

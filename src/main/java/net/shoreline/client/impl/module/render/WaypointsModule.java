@@ -18,8 +18,8 @@ import net.shoreline.client.api.waypoint.Waypoint;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -30,6 +30,7 @@ import java.util.UUID;
  * @since 1.0
  */
 public class WaypointsModule extends ToggleModule {
+    public static WaypointsModule INSTANCE;
 
     Config<Boolean> logoutsConfig = new BooleanConfig("LogoutPoints", "Marks the position of player logouts", false);
     Config<Boolean> deathsConfig = new BooleanConfig("DeathPoints", "Marks the position of player deaths", false);
@@ -91,7 +92,7 @@ public class WaypointsModule extends ToggleModule {
         for (Waypoint waypoint : Managers.WAYPOINT.getWaypoints()) {
             Box waypointBox = EntityDimensions.fixed(0.6f, 2.2f).getBoxAt(waypoint.getPos());
             double center = (waypointBox.maxX - waypointBox.minX) / 2.0f;
-            RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, Modules.COLORS.getRGB(255));
+            RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, ColorsModule.INSTANCE.getRGB(255));
             RenderManager.renderSign(waypoint.getName(), waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
         }
     }

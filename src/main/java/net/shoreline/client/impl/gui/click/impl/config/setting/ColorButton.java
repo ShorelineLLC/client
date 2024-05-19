@@ -8,7 +8,7 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
-import net.shoreline.client.init.Modules;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 
@@ -79,7 +79,7 @@ public class ColorButton extends ConfigButton<Color> {
             if (!config.getContainer().getName().equalsIgnoreCase("Colors")) {
                 Animation globalAnimation = colorConfig.getAnimation();
                 if (globalAnimation.getFactor() > 0.01) {
-                    fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, Modules.CLICK_GUI.getColor((float) globalAnimation.getFactor()));
+                    fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, ClickGuiModule.INSTANCE.getColor((float) globalAnimation.getFactor()));
                 }
                 RenderManager.renderText(context, "ClientColor", x + 3.0f, y + height + (colorConfig.allowAlpha() ? 31.0f : 21.0f) + width, -1);
             }

@@ -20,6 +20,8 @@ import static net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket.DEM
  */
 public final class ServerModule extends ConcurrentModule
 {
+    public static ServerModule INSTANCE;
+
     Config<Boolean> packetKickConfig = new BooleanConfig("NoPacketKick", "Prevents thrown exceptions from kicking you", true);
     Config<Boolean> demoConfig = new BooleanConfig("NoDemo", "Prevents servers from forcing you to a demo screen", true);
     Config<Boolean> resourcePackConfig = new BooleanConfig("NoResourcePack", "Prevents server from forcing resource pack", false);

@@ -18,7 +18,6 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.network.InteractType;
@@ -31,6 +30,7 @@ import net.shoreline.client.util.world.EntityUtil;
  * @since 1.0
  */
 public class CriticalsModule extends ToggleModule {
+    public static CriticalsModule INSTANCE;
 
     //
     Config<CritMode> modeConfig = new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values());
@@ -77,7 +77,7 @@ public class CriticalsModule extends ToggleModule {
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event) {
         // Custom aura crit handling
-        if (Modules.AURA.isEnabled()) {
+        if (AuraModule.INSTANCE.isEnabled()) {
             return;
         }
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet

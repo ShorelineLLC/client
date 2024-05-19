@@ -10,8 +10,8 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 import net.shoreline.client.util.string.EnumFormatter;
 
@@ -73,7 +73,7 @@ public class NoFallModule extends ToggleModule {
 
     private boolean checkFalling() {
         return mc.player.fallDistance > mc.player.getSafeFallDistance() && !mc.player.isOnGround()
-                && !mc.player.isFallFlying() && !Modules.FLIGHT.isEnabled() && !Modules.PACKET_FLY.isEnabled();
+                && !mc.player.isFallFlying() && !FlightModule.INSTANCE.isEnabled() && !PacketFlyModule.INSTANCE.isEnabled();
     }
 
     public enum NoFallMode {

@@ -11,8 +11,8 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.TickMovementEvent;
+import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.init.Modules;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 
@@ -60,8 +60,8 @@ public class FastFallModule extends ToggleModule {
                         || mc.player.input.sneaking) {
                     return;
                 }
-                if (Modules.SPEED.isEnabled() || Modules.LONG_JUMP.isEnabled()
-                        || Modules.FLIGHT.isEnabled() || Modules.PACKET_FLY.isEnabled()) {
+                if (SpeedModule.INSTANCE.isEnabled() || LongJumpModule.INSTANCE.isEnabled()
+                        || FlightModule.INSTANCE.isEnabled() || PacketFlyModule.INSTANCE.isEnabled()) {
                     return;
                 }
                 if (mc.player.isOnGround() && isNearestBlockWithinHeight(heightConfig.getValue())) {
@@ -85,10 +85,10 @@ public class FastFallModule extends ToggleModule {
                 return;
             }
             if (!Managers.ANTICHEAT.hasPassed(1000) || !fallTimer.passed(1000)
-                    || Modules.SPEED.isEnabled()
-                    || Modules.LONG_JUMP.isEnabled()
-                    || Modules.FLIGHT.isEnabled()
-                    || Modules.PACKET_FLY.isEnabled()) {
+                    || SpeedModule.INSTANCE.isEnabled()
+                    || LongJumpModule.INSTANCE.isEnabled()
+                    || FlightModule.INSTANCE.isEnabled()
+                    || PacketFlyModule.INSTANCE.isEnabled()) {
                 return;
             }
             if (mc.player.getVelocity().y < 0 && prevOnGround && !mc.player.isOnGround()
@@ -104,7 +104,7 @@ public class FastFallModule extends ToggleModule {
 
     @EventListener
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (Modules.FLIGHT.isEnabled() || Modules.PACKET_FLY.isEnabled()) {
+        if (FlightModule.INSTANCE.isEnabled() || PacketFlyModule.INSTANCE.isEnabled()) {
             return;
         }
         if (cancelFallMovement && fallModeConfig.getValue() == FallMode.SHIFT) {
