@@ -36,6 +36,7 @@ public final class AutoTotemModule extends ToggleModule
     Config<Boolean> gappleConfig = new BooleanConfig("OffhandGapple", "Equips a golden apple if holding down the item use button", true);
     Config<Boolean> crappleConfig = new BooleanConfig("Crapple", "Uses a normal golden apple if Absorption is present", true);
     Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculates lethal damage sources", false, () -> itemConfig.getValue() != OffhandItem.TOTEM);
+    Config<Boolean> noRubberConfig = new BooleanConfig("NoRubber", "", true, () -> false);
     Config<Boolean> fastConfig = new BooleanConfig("FastSwap", "Swaps items to offhand", true);
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "Debug on death", false);
 
@@ -75,8 +76,10 @@ public final class AutoTotemModule extends ToggleModule
             if (gappleConfig.getValue() && mc.options.useKey.isPressed()
                     && (mainHandItem instanceof SwordItem
                         || mainHandItem instanceof TridentItem
-                        || mainHandItem instanceof AxeItem))
+                        || mainHandItem instanceof AxeItem)
+                    && (noRubberConfig.getValue() || mc.player.getHealth() > healthConfig.getValue()))
             {
+
                 offhandItem = getGoldenAppleType();
             }
         }
