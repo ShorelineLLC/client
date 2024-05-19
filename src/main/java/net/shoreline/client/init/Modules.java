@@ -90,7 +90,6 @@ public class Modules {
     public static NoPacketKickModule NO_PACKET_KICK;
     public static NoSoundLagModule NO_SOUND_LAG;
     public static PacketLoggerModule PACKET_LOGGER;
-    public static TestModule TEST;
     public static TimerModule TIMER;
     public static TrueDurabilityModule TRUE_DURABILITY;
     public static UnfocusedFPSModule UNFOCUSED_FPS;
@@ -260,7 +259,6 @@ public class Modules {
             NO_PACKET_KICK = (NoPacketKickModule) getRegisteredModule("nopacketkick-module");
             NO_SOUND_LAG = (NoSoundLagModule) getRegisteredModule("nosoundlag-module");
             PACKET_LOGGER = (PacketLoggerModule) getRegisteredModule("packetlogger-module");
-            TEST = (TestModule) getRegisteredModule("test-module");
             TIMER = (TimerModule) getRegisteredModule("timer-module");
             TRUE_DURABILITY = (TrueDurabilityModule) getRegisteredModule("truedurability-module");
             UNFOCUSED_FPS = (UnfocusedFPSModule) getRegisteredModule("unfocusedfps-module");

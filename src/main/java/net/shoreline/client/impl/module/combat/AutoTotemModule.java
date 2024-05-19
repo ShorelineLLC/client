@@ -15,6 +15,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
@@ -27,24 +28,20 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author xgraza
+ * @author xgraza, Shoreline
  * @since 1.0
  */
 public final class AutoTotemModule extends ToggleModule
 {
     EnumConfig<OffhandItem> itemConfig = new EnumConfig<>("Item", "The item to wield in your offhand", OffhandItem.TOTEM, OffhandItem.values());
     NumberConfig<Float> healthConfig = new NumberConfig<>("Health", "The health required to fall below before swapping to a totem", 0.0f, 14.0f, 20.0f);
-    Config<Boolean> gappleConfig = new BooleanConfig("OffhandGapple", "If to equip a golden apple if holding down the item use button", true);
-    Config<Boolean> crappleConfig = new BooleanConfig("Crapple", "If to use a normal golden apple if Absorption is present", true);
-    Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculate lethal damage sources", false);
+    Config<Boolean> gappleConfig = new BooleanConfig("OffhandGapple", "Equips a golden apple if holding down the item use button", true);
+    Config<Boolean> crappleConfig = new BooleanConfig("Crapple", "Uses a normal golden apple if Absorption is present", true);
+    Config<Boolean> lethalConfig = new BooleanConfig("Lethal", "Calculates lethal damage sources", false, () -> itemConfig.getValue() != OffhandItem.TOTEM);
     Config<Boolean> fastConfig = new BooleanConfig("FastSwap", "Swaps items to offhand", true);
-    Config<Boolean> waitConfig = new BooleanConfig("Wait", "If to wait for the previous inventory action to complete", true);
-    Config<Boolean> inventoryCheckConfig = new BooleanConfig("InventoryCheck", "", true);
-    Config<Boolean> debugConfig = new BooleanConfig("Debug", "If to debug on death", false);
-
+    Config<Boolean> debugConfig = new BooleanConfig("Debug", "Debug on death", false);
     private int lastHotbarSlot, lastTotemCount;
     private Item lastHotbarItem;
-    private boolean replacing;
 
     public AutoTotemModule()
     {
@@ -63,58 +60,64 @@ public final class AutoTotemModule extends ToggleModule
         super.onDisable();
         lastHotbarSlot = -1;
         lastHotbarItem = null;
-        lastTotemCount = 0;
-        replacing = false;
     }
 
     @EventListener
-    public void onPlayerTick(final PlayerTickEvent event)
+    public void onPlayerTick(final TickEvent event)
     {
-        // Do not attempt to replace totems inside another container GUI
-        if (!(mc.player.currentScreenHandler instanceof PlayerScreenHandler) && inventoryCheckConfig.getValue())
+        if (itemConfig.getValue() == OffhandItem.TOTEM)
         {
-            return;
-        }
-        // Get the item to wield in our offhand, and make sure we are already not holding the item
-        final Item itemToWield = getItemToWield();
-        if (mc.player.getOffHandStack().getItem().equals(itemToWield))
-        {
-            replacing = false;
-            return;
-        }
-
-        if (replacing && waitConfig.getValue())
-        {
-            return;
-        }
-
-        // Find the item in our inventory
-        final int itemSlot = getSlotFor(itemToWield);
-        if (itemSlot != -1)
-        {
-            replacing = true;
+            Item offhandItem = Items.TOTEM_OF_UNDYING;
+            // If offhand gap is enabled & the use key is pressed down, equip a golden apple.
+            if (gappleConfig.getValue() && mc.options.useKey.isPressed() && (mc.player.getMainHandStack().getItem() instanceof SwordItem
+                    || mc.player.getMainHandStack().getItem() instanceof TridentItem || mc.player.getMainHandStack().getItem() instanceof AxeItem))
+            {
+                offhandItem = getGoldenAppleType();
+            }
+            if (mc.player.getOffHandStack().getItem() == offhandItem)
+            {
+                return;
+            }
+            int itemSlot = getSlotFor(offhandItem);
+            if (itemSlot == -1)
+            {
+                return;
+            }
             if (itemSlot < 9)
             {
-                lastHotbarItem = itemToWield;
+                lastHotbarItem = offhandItem;
                 lastHotbarSlot = itemSlot;
             }
-            // Do another quick swap (equivalent to hovering over an item & pressing F)
-            if (fastConfig.getValue()) {
-                mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
-            } else {
-                mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
-                mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        45, 0, SlotActionType.PICKUP, mc.player);
-                if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
-                    mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                            itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
-                }
+            swapToOffhand(itemSlot);
+        }
+        else
+        {
+            Item offhandItem = itemConfig.getValue().getItem();
+            // If offhand gap is enabled & the use key is pressed down, equip a golden apple.
+            if (gappleConfig.getValue() && mc.options.useKey.isPressed() && (mc.player.getMainHandStack().getItem() instanceof SwordItem
+                    || mc.player.getMainHandStack().getItem() instanceof TridentItem || mc.player.getMainHandStack().getItem() instanceof AxeItem))
+            {
+                offhandItem = getGoldenAppleType();
             }
-            // Don't ask about the - 1, I don't want to talk about it
-            lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
-            //replacing = false;
+            if (checkLethal())
+            {
+                offhandItem = Items.TOTEM_OF_UNDYING;
+            }
+            if (mc.player.getOffHandStack().getItem() == offhandItem)
+            {
+                return;
+            }
+            int itemSlot = getSlotFor(offhandItem);
+            if (itemSlot == -1)
+            {
+                return;
+            }
+            if (itemSlot < 9)
+            {
+                lastHotbarItem = offhandItem;
+                lastHotbarSlot = itemSlot;
+            }
+            swapToOffhand(itemSlot);
         }
     }
 
@@ -127,40 +130,36 @@ public final class AutoTotemModule extends ToggleModule
         }
         if (event.getPacket() instanceof HealthUpdateS2CPacket packet && packet.getHealth() <= 0.0f && debugConfig.getValue())
         {
-            final Set<String> reasons = new LinkedHashSet<>();
-
             if (lastTotemCount <= 0)
             {
-                reasons.add("no_totems");
+                return;
             }
-
-            if (mc.player.currentScreenHandler.syncId != 0)
-            {
-                reasons.add("gui_fail(" + mc.player.currentScreenHandler.syncId + ")");
-            }
-
-            if (!mc.player.currentScreenHandler.getCursorStack().isEmpty())
-            {
-                reasons.add("cursor_stack=" + mc.player.currentScreenHandler.getCursorStack().getItem());
-            }
-
-            if (replacing)
-            {
-                reasons.add("replacing(stuck?)");
-            }
-
-            if (!reasons.isEmpty())
-            {
-                sendModuleMessage("Possible failure reasons: " + String.join(", ", reasons));
-            }
-            else
-            {
-                sendModuleMessage("Possible reasons could not be calculated. Probably a client issue, please reproduce & report to a developer.");
-            }
+            sendModuleMessage("Failed to replace totem!");
         }
     }
 
-    private int getSlotFor(final Item item)
+    private void swapToOffhand(final int itemSlot)
+    {
+        if (fastConfig.getValue())
+        {
+            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                    itemSlot < 9 ? itemSlot + 36 : itemSlot, 40, SlotActionType.SWAP, mc.player);
+        }
+        else
+        {
+            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                    itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                    45, 0, SlotActionType.PICKUP, mc.player);
+            if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
+                mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+            }
+        }
+        lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
+    }
+
+    private int getSlotFor(Item item)
     {
         if (lastHotbarSlot != -1 && lastHotbarItem != null)
         {
@@ -185,18 +184,18 @@ public final class AutoTotemModule extends ToggleModule
         return -1;
     }
 
-    private Item getItemToWield()
+    private boolean checkLethal()
     {
         // If the player's health (+absorption) falls below the "safe" amount, equip a totem
         final float health = PlayerUtil.getLocalPlayerHealth();
         if (health <= healthConfig.getValue())
         {
-            return Items.TOTEM_OF_UNDYING;
+            return true;
         }
         // Check fall damage
         if (PlayerUtil.computeFallDamage(mc.player.fallDistance, 1.0f) + 0.5f > mc.player.getHealth())
         {
-            return Items.TOTEM_OF_UNDYING;
+            return true;
         }
         if (lethalConfig.getValue())
         {
@@ -216,16 +215,10 @@ public final class AutoTotemModule extends ToggleModule
                 {
                     continue;
                 }
-                return Items.TOTEM_OF_UNDYING;
+                return true;
             }
         }
-        // If offhand gap is enabled & the use key is pressed down, equip a golden apple.
-        if (gappleConfig.getValue() && mc.options.useKey.isPressed() && (mc.player.getMainHandStack().getItem() instanceof SwordItem
-                || mc.player.getMainHandStack().getItem() instanceof TridentItem || mc.player.getMainHandStack().getItem() instanceof AxeItem))
-        {
-            return getGoldenAppleType();
-        }
-        return itemConfig.getValue().getItem();
+        return false;
     }
 
     private Item getGoldenAppleType()
