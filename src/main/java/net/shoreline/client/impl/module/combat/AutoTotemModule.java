@@ -57,6 +57,7 @@ public final class AutoTotemModule extends ToggleModule
     @Override
     public void onDisable()
     {
+        // This comment is funny, check the commit
         super.onDisable();
         lastHotbarSlot = -1;
         lastHotbarItem = null;
