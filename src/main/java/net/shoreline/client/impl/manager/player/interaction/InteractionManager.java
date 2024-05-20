@@ -134,8 +134,9 @@ public final class InteractionManager implements Globals
 
     private ActionResult placeBlockInternally(final BlockHitResult hitResult)
     {
-        Managers.NETWORK.sendSequencedPacket(sequence -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, sequence));
-        return ((AccessorClientPlayerInteractionManager) mc.interactionManager).hookInteractBlockInternal(mc.player, Hand.MAIN_HAND, hitResult);
+        return mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
+        // Managers.NETWORK.sendSequencedPacket(sequence -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, sequence));
+        // return ((AccessorClientPlayerInteractionManager) mc.interactionManager).hookInteractBlockInternal(mc.player, Hand.MAIN_HAND, hitResult);
     }
 
     public ActionResult placeBlockPacket(final BlockHitResult hitResult)
