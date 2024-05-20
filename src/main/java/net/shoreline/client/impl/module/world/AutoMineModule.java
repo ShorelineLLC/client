@@ -180,7 +180,7 @@ public class AutoMineModule extends RotationModule {
             return;
         }
         for (MiningData data : miningQueue) {
-            if (isDataPacketMine(data) && (data.getState().isAir() || data.getTries() > 5)) {
+            if (isDataPacketMine(data) && (data.getState().isAir() || data.getBlockDamage() > 1.5f)) {
                 Managers.INVENTORY.syncToClient();
                 miningQueue.remove(data);
                 continue;
@@ -194,13 +194,12 @@ public class AutoMineModule extends RotationModule {
                 }
                 if (data.getSlot() != -1) {
                     Managers.INVENTORY.setSlot(data.getSlot());
-                    data.triedBreak();
                 }
             }
         }
         MiningData miningData2 = miningQueue.getFirst();
         final double distance = mc.player.getEyePos().squaredDistanceTo(miningData2.getPos().toCenterPos());
-        if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq() || miningData2.getTries() > 5)
+        if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq())
         {
 //          abortMining(miningData);
             miningQueue.remove(miningData2);
@@ -459,7 +458,6 @@ public class AutoMineModule extends RotationModule {
         }
         Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
-        data.triedBreak();
         lastBreak = System.currentTimeMillis();
         if (canSwap) {
             Managers.INVENTORY.syncToClient();
@@ -493,7 +491,6 @@ public class AutoMineModule extends RotationModule {
         private float blockDamage;
         private boolean instantRemine;
         private boolean started;
-        private int tries;
 
         public MiningData(BlockPos pos, Direction direction) {
             this.pos = pos;
@@ -554,14 +551,6 @@ public class AutoMineModule extends RotationModule {
 
         public float getLastDamage() {
             return lastDamage;
-        }
-
-        public void triedBreak() {
-            tries++;
-        }
-
-        public int getTries() {
-            return tries;
         }
     }
 }
