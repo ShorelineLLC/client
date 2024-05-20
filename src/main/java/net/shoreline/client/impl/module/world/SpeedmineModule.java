@@ -50,6 +50,7 @@ public class SpeedmineModule extends RotationModule {
     private BlockState state;
     private Direction direction;
     private float damage;
+    private float lastDamage;
     private boolean switchBack;
 
     public SpeedmineModule() {
@@ -95,19 +96,18 @@ public class SpeedmineModule extends RotationModule {
             return;
         }
         state = mc.world.getBlockState(mining);
-        int prev = mc.player.getInventory().selectedSlot;
         int slot = AutoToolModule.INSTANCE.getBestTool(state);
         double dist = mc.player.squaredDistanceTo(mining.toCenterPos());
         if (dist > ((NumberConfig<?>) rangeConfig).getValueSq()
-            || state.isAir() || damage > 3.0f) {
+                || state.isAir() || damage > 3.0f) {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, mining, Direction.DOWN));
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, mining, Direction.DOWN));
             mining = null;
             state = null;
             direction = null;
             damage = 0.0f;
-        } else if (damage > 1.0f && !AutoCrystalModule.INSTANCE.isAttacking()
-            && !AutoCrystalModule.INSTANCE.isPlacing() && !mc.player.isUsingItem()) {
+        } else if (damage >= 1.0f && !AutoCrystalModule.INSTANCE.isAttacking()
+                && !AutoCrystalModule.INSTANCE.isPlacing() && !mc.player.isUsingItem()) {
             if (isRotationBlocked()) {
                 return;
             }
@@ -122,10 +122,11 @@ public class SpeedmineModule extends RotationModule {
             direction = null;
         } else {
             float delta = calcBlockBreakingDelta(state, mc.world, mining);
+            lastDamage = damage;
             damage += delta;
-            if (delta + damage > 1.0f && rotateConfig.getValue()
-                && !AutoCrystalModule.INSTANCE.isAttacking()
-                && !AutoCrystalModule.INSTANCE.isPlacing()) {
+            if (delta + damage >= 1.0f && rotateConfig.getValue()
+                    && !AutoCrystalModule.INSTANCE.isAttacking()
+                    && !AutoCrystalModule.INSTANCE.isPlacing()) {
                 float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), mining.toCenterPos());
                 setRotation(rotations[0], rotations[1]);
             }
@@ -192,7 +193,7 @@ public class SpeedmineModule extends RotationModule {
     }
 
     float calcBlockBreakingDelta(BlockState state, BlockView world,
-                                         BlockPos pos) {
+                                 BlockPos pos) {
         if (swapConfig.getValue() == Swap.OFF) {
             return state.calcBlockBreakingDelta(mc.player, mc.world, pos);
         }
@@ -260,10 +261,7 @@ public class SpeedmineModule extends RotationModule {
                 mining.getZ() + render1.minZ, mining.getX() + render1.maxX,
                 mining.getY() + render1.maxY, mining.getZ() + render1.maxZ);
         Vec3d center = render.getCenter();
-        float scale = MathHelper.clamp(damage, 0.0f, 1.0f);
-        if (scale > 1.0f) {
-            scale = 1.0f;
-        }
+        float scale = MathHelper.clamp(damage + (damage - lastDamage) * event.getTickDelta(), 0.0f, 1.0f);
         double dx = (render1.maxX - render1.minX) / 2.0;
         double dy = (render1.maxY - render1.minY) / 2.0;
         double dz = (render1.maxZ - render1.minZ) / 2.0;

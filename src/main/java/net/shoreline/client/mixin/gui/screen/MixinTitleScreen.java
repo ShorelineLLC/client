@@ -76,7 +76,7 @@ public abstract class MixinTitleScreen extends Screen {
             return;
         }
         context.drawTextWithShadow(client.textRenderer,
-                "Shoreline " + ModBuffer.getShorelineModName()
+                ModBuffer.getShorelineModName()
                         + " (" + ModBuffer.getShorelineModBuildNumber()
                         + "-" + BuildConfig.HASH + ")",
                 2, height - (client.textRenderer.fontHeight * 2) - 2, 0xffffff | i);
