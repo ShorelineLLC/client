@@ -54,4 +54,32 @@ public final class Natives
      * @return String value of the username and UID of the user, seperated by ":"
      */
     public static native Object stop_decompiling_5(Object p0);
+
+    /**
+     * Checks with the server to ensure the loader is on its most recent version
+     * Will crash if not
+     *
+     * @param p0 The current loader version
+     * @return Null
+     */
+    public static native Object stop_decompiling_6(Object p0);
+
+    /**
+     * Alerts the webhook with the loaded user context, then crashes the client
+     *
+     * @param p0 A String array of:
+     *           [0] = The message to send (or the reason why we are alerting)
+     *           [1] = The HWID of the user
+     *           [2] = The username of the user
+     * @return Null
+     */
+    public static native Object stop_decompiling_7(Object p0);
+
+    /**
+     * Adds the given set of classes to jdk/internal/reflect/Reflection field & method filter map
+     *
+     * @param p0 A set of classes
+     * @return Null
+     */
+    public static native Object stop_decompiling_8(Object p0);
 }

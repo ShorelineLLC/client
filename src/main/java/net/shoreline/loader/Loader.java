@@ -7,10 +7,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
-import java.util.Map;
 
 public final class Loader implements ClientModInitializer
 {
+    public static final String VERSION = "b0.0.1";
     public static final Logger LOGGER = LogManager.getLogger("Shoreline [Loader]");
 
     private static final UserContext context = UserContext.none();

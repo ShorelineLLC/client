@@ -1,9 +1,10 @@
-package net.shoreline.loader.impl.stage;
+package net.shoreline.loader.impl.stage.classloading;
 
 import net.fabricmc.loader.impl.launch.knot.MixinServiceKnot;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.context.UserContext;
+import net.shoreline.loader.impl.stage.LoadingStage;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.transformer.Config;
 import org.spongepowered.asm.service.MixinService;
@@ -70,7 +71,8 @@ public final class ClassLoadingStage extends LoadingStage
     public void error(UserContext context,
                       Throwable throwable)
     {
-        throw new RuntimeException(throwable);
+        throwable.printStackTrace();
+        context.alert(throwable.getMessage());
     }
 
     @Override

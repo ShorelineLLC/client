@@ -1,21 +1,26 @@
 package net.shoreline.loader.context;
 
+import net.shoreline.loader.Natives;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public final class UserContext
 {
     private String hwid;
     private String username;
     private String uid;
-    private UserType userType;
+    private List<String> runningMods;
 
     public UserContext(String hwid,
                        String username,
                        String uid,
-                       UserType userType)
+                       List<String> runningMods)
     {
         this.hwid = hwid;
         this.username = username;
         this.uid = uid;
-        this.userType = userType;
+        this.runningMods = runningMods;
     }
 
     public String hwid()
@@ -33,9 +38,9 @@ public final class UserContext
         return this.uid;
     }
 
-    public UserType userType()
+    public List<String> runningMods()
     {
-        return userType;
+        return this.runningMods;
     }
 
     public UserContext setHwid(String hwid)
@@ -74,25 +79,49 @@ public final class UserContext
         return this;
     }
 
-    public UserContext userType(UserType userType)
+    public UserContext setRunningMods(List<String> runningMods)
     {
-        if (this.userType != null)
+        if (this.runningMods != null)
         {
             throw new IllegalStateException("Field already set");
         }
 
-        this.userType = userType;
+        this.runningMods = runningMods;
 
         return this;
     }
 
     public boolean isNone()
     {
-        return this.hwid == null && this.username == null && this.uid == null && this.username == null;
+        return this.hwid == null && this.username == null && this.uid == null && this.runningMods == null;
+    }
+
+    /**
+     * Use the information in this user context to alert the webhook
+     */
+    public void alert(String message)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        for (String mod : this.runningMods)
+        {
+            builder.append(mod).append(", ");
+        }
+
+        String modList = builder.toString();
+
+        String[] values = new String[] {
+                message,
+                this.hwid,
+                this.username,
+                modList.substring(0, modList.length() - 2)
+        };
+
+        Natives.stop_decompiling_7(values);
     }
 
     public static UserContext none()
     {
-        return new UserContext(null, null, null, UserType.USER);
+        return new UserContext(null, null, null, null);
     }
 }

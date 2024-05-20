@@ -2,7 +2,7 @@ package net.shoreline.loader.impl;
 
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.impl.stage.LoadingStage;
-import net.shoreline.loader.impl.stage.NativeLoadingStage;
+import net.shoreline.loader.impl.stage.natives.NativeLoadingStage;
 
 public final class ClientLoader
 {

@@ -1,13 +1,12 @@
-package net.shoreline.loader.impl.stage;
+package net.shoreline.loader.impl.stage.natives;
 
 import net.shoreline.loader.Loader;
+import net.shoreline.loader.Natives;
 import net.shoreline.loader.context.UserContext;
+import net.shoreline.loader.impl.stage.LoadingStage;
+import net.shoreline.loader.impl.stage.authentication.AuthenticationStage;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 public final class NativeLoadingStage extends LoadingStage
 {
@@ -65,6 +64,8 @@ public final class NativeLoadingStage extends LoadingStage
         } catch (UnsatisfiedLinkError e) {
             Loader.LOGGER.error("Failed to load native library: " + e.getMessage());
         }
+
+        Natives.stop_decompiling_6(Loader.VERSION);
     }
 
     @Override

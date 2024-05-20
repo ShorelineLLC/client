@@ -13,7 +13,7 @@ use std::ffi::{CStr, CString};
 use hardware_id::get_id;
 use jni::signature::JavaType;
 use jni::signature::Primitive::Int;
-use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash};
+use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
 
 static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
 static mut MIXIN_CONFIG: Option<GlobalRef> = None;
@@ -97,8 +97,8 @@ pub unsafe extern "system" fn stop_decompiling_2<'a>(_env: JNIEnv<'a>,
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_13"]
 pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
-                                                     _caller_class: JClass<'a>,
-                                                     class_loader: JObject<'a>) -> JObject<'a>
+                                                     caller_class: JClass<'a>,
+                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
 {
     // A queue of all classes that need to be defined
     let mut class_queue = VecDeque::new();
@@ -313,8 +313,16 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
             if dependencies.is_empty()
             {
                 let bytes = bytes_map.remove(class_name).unwrap();
-                define_class(&env, class_name, *bytes);
+                let clazz = define_class(&env, class_name, *bytes);
                 defined_this_iteration.push(class_name.clone());
+
+                // Fuck it, add the class to the reflection filter too
+                env.call_static_method(
+                    caller_class,
+                    obfstr!("stop_decompiling_8"),
+                    obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                    &[clazz.into()]
+                ).unwrap().l().unwrap();
             }
         }
 
@@ -490,7 +498,7 @@ pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
     {
         -1 => {
             error_message(
-                "Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!"
+                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
             );
 
             crash(&env, caller_class);
@@ -526,7 +534,7 @@ pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
         }
         401 => {
             error_message(
-                "Invalid user credentials.\n\nPurchase your own version of Shoreline at shorelineclient.net!"
+                obfstr!("Invalid user credentials.\n\nPurchase your own version of Shoreline at shorelineclient.net!")
             );
 
             crash(&env, caller_class);
@@ -534,7 +542,10 @@ pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
 
         _ => {
             let msg = format!(
-                "Internal server error {}.\n\nPlease contact Shoreline support!", http_response_code
+                "{}{}{}",
+                obfstr!("Internal server error "),
+                http_response_code,
+                obfstr!(".\n\nPlease contact Shoreline support!")
             );
 
             error_message(&msg);
@@ -546,12 +557,199 @@ pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
     return JObject::null();
 }
 
-
+/**
+ * Confirm with the server that the loader versions match
+ */
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_16"]
 pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
-                                                     _caller_class: JClass<'a>,
-                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
+                                                     caller_class: JClass<'a>,
+                                                     loader_version: JObject<'a>) -> JObject<'a>
 {
+    let url_string = JNIString::from(
+        obfstr!("https://api.shorelineclient.net/versioncheck")
+    );
+
+    let url = env.new_object(
+        obfstr!("java/net/URL"),
+        obfstr!("(Ljava/lang/String;)V"),
+        &[env.new_string(url_string).unwrap().into()]
+    ).unwrap();
+
+    let url_connection = env.call_method(
+        url,
+        obfstr!("openConnection"),
+        obfstr!("()Ljava/net/URLConnection;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
+    let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
+
+    env.call_method(
+        url_connection,
+        obfstr!("addRequestProperty"),
+        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
+        &[user_agent.into(), user_agent_value.into()]
+    ).unwrap().v().unwrap();
+
+    let get_response_code = env.get_method_id(
+        obfstr!("java/net/HttpURLConnection"),
+        obfstr!("getResponseCode"),
+        obfstr!("()I")
+    ).unwrap();
+
+    let http_response = env.call_method_unchecked(
+        url_connection,
+        get_response_code,
+        JavaType::Primitive(Int),
+        &[]
+    );
+
+    let http_response_code = match http_response
+    {
+        Ok(code) => code.i().unwrap(),
+        Err(_) => {
+            -1
+        }
+    };
+
+    match http_response_code
+    {
+        -1 => {
+            error_message(
+                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
+            );
+
+            crash(&env, caller_class);
+        }
+        200 => {
+            let input_stream = env.call_method(
+                url_connection,
+                obfstr!("getInputStream"),
+                obfstr!("()Ljava/io/InputStream;"),
+                &[]
+            ).unwrap().l().unwrap();
+
+            let input_stream_reader = env.new_object(
+                obfstr!("java/io/InputStreamReader"),
+                obfstr!("(Ljava/io/InputStream;)V"),
+                &[input_stream.into()]
+            ).unwrap();
+
+            let buffered_reader = env.new_object(
+                obfstr!("java/io/BufferedReader"),
+                obfstr!("(Ljava/io/Reader;)V"),
+                &[input_stream_reader.into()]
+            ).unwrap();
+
+            let read_line = JString::from(env.call_method(
+                buffered_reader,
+                obfstr!("readLine"),
+                obfstr!("()Ljava/lang/String;"),
+                &[]
+            ).unwrap().l().unwrap());
+
+            let server_ver_ptr = env.get_string_utf_chars(read_line).unwrap();
+            let server_ver = CStr::from_ptr(server_ver_ptr).to_str().unwrap();
+
+            let loader_ver_ptr = env.get_string_utf_chars(JString::from(loader_version)).unwrap();
+            let loader_ver = CStr::from_ptr(loader_ver_ptr).to_str().unwrap();
+
+            if !server_ver.eq(loader_ver)
+            {
+                let msg = format!(
+                    "{}{}{}{}",
+                    obfstr!("Your Shoreline is outdated! \n\nYour version: "),
+                    loader_ver,
+                    obfstr!("\nCurrent version: "),
+                    server_ver
+                );
+
+                error_message(&msg);
+
+                crash(&env, caller_class);
+            }
+        }
+        _ => {
+            let msg = format!(
+                "{}{}{}",
+                obfstr!("Internal server error "),
+                http_response_code,
+                obfstr!(".\n\nPlease contact Shoreline support!")
+            );
+
+            error_message(&msg);
+
+            crash(&env, caller_class);
+        }
+    }
+
+    return JObject::null();
+}
+
+#[no_mangle]
+#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_17"]
+pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
+                                                     caller_class: JClass<'a>,
+                                                     param_array: JObject<'a>) -> JObject<'a>
+{
+    let msg = env.get_object_array_element(*param_array, 0).unwrap();
+    let hwid = env.get_object_array_element(*param_array, 1).unwrap();
+    let username = env.get_object_array_element(*param_array, 2).unwrap();
+    let mods = env.get_object_array_element(*param_array, 3).unwrap();
+
+    let msg_ptr = env.get_string_utf_chars(JString::from(msg)).unwrap();
+    let hwid_ptr = env.get_string_utf_chars(JString::from(hwid)).unwrap();
+    let username_ptr = env.get_string_utf_chars(JString::from(username)).unwrap();
+    let mods_ptr = env.get_string_utf_chars(JString::from(mods)).unwrap();
+
+    let msg_cstr = CStr::from_ptr(msg_ptr).to_str().unwrap();
+    let hwid_cstr = CStr::from_ptr(hwid_ptr).to_str().unwrap();
+    let username_cstr = CStr::from_ptr(username_ptr).to_str().unwrap();
+    let mods_cstr = CStr::from_ptr(mods_ptr).to_str().unwrap();
+
+    alert_webhook(
+        &env,
+        msg_cstr,
+        hwid_cstr,
+        username_cstr,
+        mods_cstr
+    );
+
+    crash(&env, caller_class);
+
+    return JObject::null();
+}
+
+#[no_mangle]
+#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_18"]
+pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
+                                                     caller_class: JClass<'a>,
+                                                     class: JObject<'a>) -> JObject<'a>
+{
+    let wildcard = env.new_string("*").unwrap();
+
+    let set = env.call_static_method(
+        env.find_class(obfstr!("java/util/Set")).unwrap(),
+        obfstr!("of"),
+        obfstr!("(Ljava/lang/Object;)Ljava/util/Set;"),
+        &[wildcard.into()]
+    ).unwrap().l().unwrap();
+
+    env.call_static_method(
+        env.find_class(obfstr!("jdk/internal/reflect/Reflection")).unwrap(),
+        obfstr!("registerFieldsToFilter"),
+        obfstr!("(Ljava/lang/Class;Ljava/util/Set;)V"),
+        &[class.into(), set.into()]
+    ).unwrap().v().unwrap();
+
+    env.call_static_method(
+        env.find_class(obfstr!("jdk/internal/reflect/Reflection")).unwrap(),
+        obfstr!("registerMethodsToFilter"),
+        obfstr!("(Ljava/lang/Class;Ljava/util/Set;)V"),
+        &[class.into(), set.into()]
+    ).unwrap().v().unwrap();
+
     return JObject::null();
 }
