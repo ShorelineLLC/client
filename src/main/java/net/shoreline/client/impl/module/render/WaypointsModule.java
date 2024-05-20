@@ -62,14 +62,12 @@ public class WaypointsModule extends ToggleModule {
         } else if (event.getPacket() instanceof PlayerRemoveS2CPacket packet && logoutsConfig.getValue()) {
             for (UUID id : packet.profileIds()) {
                 PlayerEntity player = mc.world.getPlayerByUuid(id);
-                if (player == null || checkBot(player)) {
+                if (player == null) {
                     continue;
                 }
-                String ip = Managers.NETWORK.getServerIp();
-                String serverIp = mc.isInSingleplayer() ? "Singleplayer" : ip;
-                Managers.WAYPOINT.register(new Waypoint(String.format("%s's Logout" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""),
-                        player.getName().getString(), format.format(player.getX()), format.format(player.getY()), format.format(player.getZ())),
-                        serverIp, player.getX(), player.getY(), player.getZ()));
+                String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
+                String nametag = String.format("%s Logout" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""), player.getName().getString(), format.format(mc.player.getX()), format.format(mc.player.getY()), format.format(mc.player.getZ()));
+                Managers.WAYPOINT.register(new Waypoint(nametag, serverIp, player.getX(), player.getY(), player.getZ()));
             }
         }
     }
@@ -98,10 +96,6 @@ public class WaypointsModule extends ToggleModule {
             RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, ColorsModule.INSTANCE.getRGB(255));
             RenderManager.renderSign(waypoint.getName(), waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
         }
-    }
-
-    private boolean checkBot(PlayerEntity entity) {
-        return !entity.getUuid().equals(UUID.nameUUIDFromBytes(("OfflinePlayer:" + entity.getName().getString()).getBytes(StandardCharsets.UTF_8))) && entity instanceof OtherClientPlayerEntity && !entity.getName().getString().contains("-");
     }
 
     public boolean getCoords() {
