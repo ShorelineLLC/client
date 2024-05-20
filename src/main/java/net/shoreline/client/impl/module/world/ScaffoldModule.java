@@ -105,7 +105,7 @@ public final class ScaffoldModule extends RotationModule
         {
             Managers.INVENTORY.setSlot(slot);
         }
-        Managers.INTERACT.placeBlock(blockData.getHitResult(), slot, false, (state, angles) ->
+        Managers.INTERACT.placeBlock(blockData.getHitResult(), slot, false, false, (state, angles) ->
         {
             final float[] rotations = blockData.getAngles();
             if (rotations == null)
