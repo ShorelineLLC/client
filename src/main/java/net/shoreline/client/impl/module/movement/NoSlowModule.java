@@ -94,14 +94,17 @@ public class NoSlowModule extends ToggleModule {
     public void onPlayerUpdate(PlayerUpdateEvent event) {
         if (event.getStage() == EventStage.PRE && grimConfig.getValue()
                 && mc.player.isUsingItem() && !mc.player.isSneaking() && itemsConfig.getValue()) {
-            ItemStack offHandStack = mc.player.getOffHandStack();
-            if (mc.player.getActiveHand() == Hand.OFF_HAND) {
-                Managers.INVENTORY.setSlotForced(mc.player.getInventory().selectedSlot % 8 + 1);
-                Managers.INVENTORY.syncToClient();
-            } else if (!offHandStack.isFood() && offHandStack.getItem() != Items.BOW && offHandStack.getItem() != Items.CROSSBOW && offHandStack.getItem() != Items.SHIELD) {
+            // Grim focuses on other hand noslow checks
+            if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack())) {
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+            } else if (checkStack(mc.player.getOffHandStack())) {
                 Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
             }
         }
+    }
+
+    private boolean checkStack(ItemStack stack) {
+        return !stack.isFood() && stack.getItem() != Items.BOW && stack.getItem() != Items.CROSSBOW && stack.getItem() != Items.SHIELD;
     }
 
     @EventListener

@@ -128,12 +128,25 @@ public class InventoryManager implements Globals {
         click(slot, 0, SlotActionType.THROW);
     }
 
+    public int findEmptySlot() {
+        for (int i = 9; i < 36; i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (stack.isEmpty()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     /**
      * @param slot
      * @param button
      * @param type
      */
     private void click(int slot, int button, SlotActionType type) {
+        if (slot < 0) {
+            return;
+        }
         ScreenHandler screenHandler = mc.player.currentScreenHandler;
         DefaultedList<Slot> defaultedList = screenHandler.slots;
         int i = defaultedList.size();

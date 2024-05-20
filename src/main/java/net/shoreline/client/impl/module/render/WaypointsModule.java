@@ -69,7 +69,7 @@ public class WaypointsModule extends ToggleModule {
                 String serverIp = mc.isInSingleplayer() ? "Singleplayer" : ip;
                 Managers.WAYPOINT.register(new Waypoint(String.format("%s's Logout" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""),
                         player.getName().getString(), format.format(player.getX()), format.format(player.getY()), format.format(player.getZ())),
-                        serverIp, player.prevX, player.prevY, player.prevZ));
+                        serverIp, player.getX(), player.getY(), player.getZ()));
             }
         }
     }
@@ -90,6 +90,9 @@ public class WaypointsModule extends ToggleModule {
             return;
         }
         for (Waypoint waypoint : Managers.WAYPOINT.getWaypoints()) {
+            if (!waypoint.getIp().equalsIgnoreCase(Managers.NETWORK.getServerIp())) {
+                continue;
+            }
             Box waypointBox = EntityDimensions.fixed(0.6f, 2.2f).getBoxAt(waypoint.getPos());
             double center = (waypointBox.maxX - waypointBox.minX) / 2.0f;
             RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, ColorsModule.INSTANCE.getRGB(255));

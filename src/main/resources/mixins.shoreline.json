@@ -47,6 +47,7 @@
     "entity.passive.MixinPigEntity",
     "entity.passive.MixinStriderEntity",
     "entity.player.MixinPlayerEntity",
+    "entity.player.MixinPlayerInventory",
     "entity.projectile.MixinFireworkRocketEntity",
     "gui.hud.MixinBossBarHud",
     "gui.hud.MixinChatHud",
