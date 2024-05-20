@@ -8,10 +8,12 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.module.client.BaritoneModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.ReflectionUtil;
+import net.shoreline.client.util.StreamUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author xgraza
@@ -24,7 +26,7 @@ public final class ModuleManager
 
     private final Map<Class<? extends Module>, Module> moduleInstanceMap = new LinkedHashMap<>();
     private final Map<String, Module> moduleIdInstanceMap = new HashMap<>();
-    private final List<Module> moduleList = new LinkedList<>();
+    private List<Module> moduleList = new LinkedList<>();
 
     public ModuleManager()
     {
@@ -69,6 +71,7 @@ public final class ModuleManager
             throw new RuntimeException(e);
         }
         Shoreline.info("Reflected {} modules", moduleList.size());
+        moduleList = StreamUtils.sortCached(moduleList.stream(), Module::getName).collect(Collectors.toList());
     }
 
     public void register(final Module module)
