@@ -10,13 +10,16 @@ import net.shoreline.client.api.command.ConfigArgumentType;
 import net.shoreline.client.api.command.ItemArgumentType;
 import net.shoreline.client.api.command.PlayerArgumentType;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.ItemListConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.util.KeyboardUtil;
 import net.shoreline.client.util.chat.ChatUtil;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -113,14 +116,38 @@ public class ModuleCommand extends Command {
         try {
             if (config.getValue() instanceof Integer) {
                 Integer val = Integer.parseInt(value);
+                if (val.doubleValue() < ((NumberConfig) config).getMin().doubleValue()) {
+                    ChatUtil.error("Value less than min!");
+                    return 0;
+                }
+                if (val.doubleValue() > ((NumberConfig) config).getMax().doubleValue()) {
+                    ChatUtil.error("Value greater than max!");
+                    return 0;
+                }
                 ((Config<Integer>) config).setValue(val);
                 ChatUtil.clientSendMessage("§7%s§f was set to §s%s", config.getName(), val.toString());
             } else if (config.getValue() instanceof Float) {
                 Float val = Float.parseFloat(value);
+                if (val.doubleValue() < ((NumberConfig) config).getMin().doubleValue()) {
+                    ChatUtil.error("Value less than min!");
+                    return 0;
+                }
+                if (val.doubleValue() > ((NumberConfig) config).getMax().doubleValue()) {
+                    ChatUtil.error("Value greater than max!");
+                    return 0;
+                }
                 ((Config<Float>) config).setValue(val);
                 ChatUtil.clientSendMessage("§7%s§f was set to §s%s", config.getName(), val.toString());
             } else if (config.getValue() instanceof Double) {
                 Double val = Double.parseDouble(value);
+                if (val.doubleValue() < ((NumberConfig) config).getMin().doubleValue()) {
+                    ChatUtil.error("Value less than min!");
+                    return 0;
+                }
+                if (val.doubleValue() > ((NumberConfig) config).getMax().doubleValue()) {
+                    ChatUtil.error("Value greater than max!");
+                    return 0;
+                }
                 ((Config<Double>) config).setValue(val);
                 ChatUtil.clientSendMessage("§7%s§f was set to §s%s", config.getName(), val.toString());
             }
@@ -129,6 +156,10 @@ public class ModuleCommand extends Command {
             // e.printStackTrace();
         }
         if (config.getValue() instanceof Boolean) {
+            if (!value.equalsIgnoreCase("True") && !value.equalsIgnoreCase("False")) {
+                ChatUtil.error("Invalid value!");
+                return 0;
+            }
             Boolean val = Boolean.parseBoolean(value);
             ((Config<Boolean>) config).setValue(val);
             ChatUtil.clientSendMessage("§7%s§f was set to §s%s", config.getName(), val ? "True" : "False");
@@ -159,6 +190,17 @@ public class ModuleCommand extends Command {
             ChatUtil.clientSendMessage("§7%s§f was set to key §s%s", config.getName(), value);
         } else if (config.getValue() instanceof String) {
             ((Config<String>) config).setValue(value);
+        }
+        else if (config.getValue() instanceof Color)
+        {
+            try {
+                Color color = ((ColorConfig) config).parseColor(value);
+                ((Config<Color>) config).setValue(color);
+                ChatUtil.clientSendMessage("§7%s§f was set to §s%s", config.getName(), value);
+            }
+            catch (IllegalArgumentException e) {
+                ChatUtil.error("Invalid color!");
+            }
         }
         return 1;
     }

@@ -159,7 +159,7 @@ public class ColorConfig extends Config<Color> {
      * @return
      * @throws IllegalArgumentException
      */
-    private Color parseColor(String colorString) {
+    public Color parseColor(String colorString) {
         if (colorString.startsWith("0x")) {
             colorString = colorString.substring(2);
             return new Color((int) Long.parseLong(colorString, 16), true);
