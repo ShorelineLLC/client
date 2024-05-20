@@ -65,7 +65,7 @@ public final class ReflectionUtil
                                                           final String packageName)
             throws ClassNotFoundException
     {
-        final List<Class<?>> classes = new ArrayList<>();
+        final List<Class<?>> classes = new LinkedList<>();
         if (!directory.exists())
         {
             return classes;
