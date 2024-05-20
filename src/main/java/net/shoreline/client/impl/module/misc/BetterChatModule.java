@@ -1,9 +1,7 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -12,6 +10,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
+import net.shoreline.client.util.FormattingUtils;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 
@@ -47,12 +46,8 @@ public class BetterChatModule extends ToggleModule
                 case OFF -> "";
             };
             event.cancel();
-            event.setText(Text.of(text + event.getText().getString()));
+            event.setText(Text.of(text + FormattingUtils.toString(event.getText())));
         }
-    }
-
-    private OrderedText fromString(String string, Style style) {
-        return OrderedText.styledForwardsVisitedString(string, style);
     }
 
     public Config<Boolean> getAnimationConfig()

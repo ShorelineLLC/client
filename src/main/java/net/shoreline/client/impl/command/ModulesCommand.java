@@ -26,7 +26,7 @@ public class ModulesCommand extends Command {
                 modulesList.append(module.getName());
                 modulesList.append(Formatting.RESET);
                 // LOL
-                if (!module.getName().equalsIgnoreCase(ShorelineMod.isBaritonePresent() ? "Baritone" : "Speedmine")) {
+                if (!module.getName().equalsIgnoreCase("Zoom")) {
                     modulesList.append(", ");
                 }
             }
