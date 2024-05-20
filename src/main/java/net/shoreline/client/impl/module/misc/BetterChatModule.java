@@ -3,7 +3,7 @@ package net.shoreline.client.impl.module.misc;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
-import net.minecraft.util.Formatting;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -11,8 +11,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
-import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 
@@ -39,16 +38,16 @@ public class BetterChatModule extends ToggleModule
     }
 
     @EventListener
-    public void onChatText(ChatTextEvent event) {
+    public void onChatText(ChatMessageEvent event) {
         if (timestampConfig.getValue() != Timestamp.OFF) {
             String time = new SimpleDateFormat("k:mm").format(new Date());
-            OrderedText text = switch (timestampConfig.getValue()) {
-                case NORMAL -> OrderedText.concat(fromString("<", Style.EMPTY.withColor(Formatting.DARK_GRAY)), fromString(time, Style.EMPTY.withColor(Formatting.GRAY)), fromString("> ", Style.EMPTY.withColor(Formatting.DARK_GRAY)));
-                case COLOR -> OrderedText.concat(fromString("<" + time + "> ", Style.EMPTY.withColor(ColorsModule.INSTANCE.getRGB())));
-                case OFF -> OrderedText.EMPTY;
+            String text = switch (timestampConfig.getValue()) {
+                case NORMAL -> "§8<§7" + time + "§8>§r ";
+                case COLOR -> "§s<" + time + ">§r ";
+                case OFF -> "";
             };
             event.cancel();
-            event.setText(OrderedText.concat(text, event.getText()));
+            event.setText(Text.of(text + event.getText().getString()));
         }
     }
 

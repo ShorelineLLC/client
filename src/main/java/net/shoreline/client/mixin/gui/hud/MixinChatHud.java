@@ -2,14 +2,17 @@ package net.shoreline.client.mixin.gui.hud;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
+import net.minecraft.client.util.ChatMessages;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.buffers.ModulesBuffer;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
@@ -41,6 +44,19 @@ public abstract class MixinChatHud implements IChatHud
     private List<ChatHudLine.Visible> visibleMessages;
 
     @Shadow public abstract void addMessage(Text message);
+
+    @Shadow public abstract double getChatScale();
+
+    @Shadow public abstract int getWidth();
+
+    @Shadow @Final private MinecraftClient client;
+    @Shadow private boolean hasUnreadNewMessages;
+
+    @Shadow public abstract void scroll(int scroll);
+
+    @Shadow private int scrolledLines;
+
+    @Shadow protected abstract boolean isChatFocused();
 
     private ChatHudLine current = null;
     private int currentId;
@@ -89,12 +105,6 @@ public abstract class MixinChatHud implements IChatHud
         {
             animation.setState(true);
         }
-
-        ChatTextEvent chatTextEvent = new ChatTextEvent(text);
-        EventBus.EVENT_HANDLER.dispatch(chatTextEvent);
-        if (chatTextEvent.isCanceled()) {
-            return instance.drawTextWithShadow(textRenderer, chatTextEvent.getText(), (int) ((animation != null && ModulesBuffer.getBetterChatModule().isEnabled() && ModulesBuffer.getBetterChatModule().getAnimationConfig().getValue() ? animation.getCurrent() : 0)), y, color);
-        }
         return instance.drawTextWithShadow(textRenderer, text, (int) ((animation != null && ModulesBuffer.getBetterChatModule().isEnabled() && ModulesBuffer.getBetterChatModule().getAnimationConfig().getValue() ? animation.getCurrent() : 0)), y, color);
     }
 
@@ -112,14 +122,39 @@ public abstract class MixinChatHud implements IChatHud
      * @param refresh
      * @param ci
      */
-    @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/" +
-            "network/message/MessageSignatureData;ILnet/minecraft/client/" +
-            "gui/hud/MessageIndicator;Z)V", at = @At(value = "HEAD"))
+    @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void hookAddMessage(Text message, MessageSignatureData signature,
                                 int ticks, MessageIndicator indicator,
                                 boolean refresh, CallbackInfo ci) {
-        ChatMessageEvent chatMessageEvent = new ChatMessageEvent(message);
-        EventBus.EVENT_HANDLER.dispatch(chatMessageEvent);
+        ci.cancel();
+        ChatMessageEvent chatTextEvent = new ChatMessageEvent(message);
+        EventBus.EVENT_HANDLER.dispatch(chatTextEvent);
+        int i = MathHelper.floor((double)this.getWidth() / this.getChatScale());
+        if (indicator != null && indicator.icon() != null) {
+            i -= indicator.icon().width + 4 + 2;
+        }
+        List<OrderedText> list = ChatMessages.breakRenderedChatMessageLines(chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, i, this.client.textRenderer);
+        boolean bl = this.isChatFocused();
+        for (int j = 0; j < list.size(); ++j) {
+            OrderedText orderedText = list.get(j);
+            if (bl && this.scrolledLines > 0) {
+                this.hasUnreadNewMessages = true;
+                this.scroll(1);
+            }
+            ChatTextEvent chatMessageEvent = new ChatTextEvent(orderedText);
+            EventBus.EVENT_HANDLER.dispatch(chatMessageEvent);
+            boolean bl2 = j == list.size() - 1;
+            this.visibleMessages.add(0, new ChatHudLine.Visible(ticks, chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2));
+        }
+        while (this.visibleMessages.size() > 100) {
+            this.visibleMessages.remove(this.visibleMessages.size() - 1);
+        }
+        if (!refresh) {
+            this.messages.add(0, new ChatHudLine(ticks, chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, signature, indicator));
+            while (this.messages.size() > 100) {
+                this.messages.remove(this.messages.size() - 1);
+            }
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.client;
 
 import baritone.api.BaritoneAPI;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -10,6 +11,8 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
+import net.shoreline.client.util.chat.ChatUtil;
 
 import java.awt.*;
 
@@ -86,5 +89,12 @@ public class BaritoneModule extends ConcurrentModule {
         BaritoneAPI.getSettings().colorCurrentPath.value = pathColor.getValue();
         BaritoneAPI.getSettings().colorMostRecentConsidered.value = pathColor.getValue();
         BaritoneAPI.getSettings().colorNextPath.value = nextPathColor.getValue();
+    }
+
+    @EventListener
+    public void onChatText(ChatMessageEvent event) {
+        if (event.getText().getString().startsWith("[Baritone]")) {
+            event.setText(Text.of(ChatUtil.PREFIX + event.getText().getString()));
+        }
     }
 }
