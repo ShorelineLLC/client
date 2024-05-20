@@ -1,7 +1,54 @@
 use std::ffi::CStr;
+use fltk::app::App;
+use fltk::dialog::alert_default;
+use fltk::window::Window;
 use jni::JNIEnv;
-use jni::objects::{JObject, JString, JValue};
+use jni::objects::{JClass, JObject, JString, JValue};
 use obfstr::obfstr;
+use sha2::{Digest, Sha256};
+use sha2::digest::DynDigest;
+
+pub unsafe fn crash<'a>(env: &JNIEnv<'a>,
+                        class_to_rape: JClass)
+{
+    let the_unsafe = env.get_static_field(
+        env.find_class(obfstr!("sun/misc/Unsafe")).unwrap(),
+        obfstr!("theUnsafe"),
+        obfstr!("Lsun/misc/Unsafe;")
+    ).unwrap().l().unwrap();
+
+    let jvm_obj_ptr = env.call_method(
+        class_to_rape,
+        obfstr!("hashCode"),
+        obfstr!("()I"),
+        &[]
+    ).unwrap().i().unwrap();
+
+    env.call_method(
+        the_unsafe,
+        obfstr!("freeMemory"),
+        obfstr!("(J)V"),
+        &[jvm_obj_ptr.into()]
+    ).unwrap().v().unwrap();
+
+    // Shouldn't ever reach beyond this point
+
+    env.throw_new(
+        obfstr!("java/lang/Throwable"),
+        obfstr!("")
+    ).unwrap();
+
+    std::process::exit(0);
+}
+
+pub fn error_message(msg: &str)
+{
+    let app = App::default();
+
+    alert_default(msg);
+
+    app.run().unwrap();
+}
 
 pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
                                name: &str,
@@ -41,6 +88,35 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
         context_classloader,
         vec.as_ref()
     ).unwrap();
+}
+
+pub unsafe fn add_to_resource_path<'a>(env: &JNIEnv<'a>,
+                                       resource_name: &str,
+                                       jvm_bytes: JObject)
+{
+    let current_thread = env.call_static_method(
+        obfstr!("java/lang/Thread"),
+        obfstr!("currentThread"),
+        obfstr!("()Ljava/lang/Thread;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let context_classloader = env.call_method(
+        current_thread,
+        obfstr!("getContextClassLoader"),
+        obfstr!("()Ljava/lang/ClassLoader;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    println!("trying to get urlclassloader");
+    let url_classloader = env.get_field(
+        context_classloader,
+        obfstr!("urlLoader"),
+        obfstr!("net/fabricmc/loader/impl/launch/knot/KnotClassLoader$DynamicURLClassLoader")
+    ).unwrap().l().unwrap();
+    println!("got urlclassloader");
+
+
 }
 
 pub unsafe fn is_mixin_class<'a>(env: &JNIEnv<'a>,
@@ -238,7 +314,7 @@ pub fn get_immediate_dependents<'a>(env: &JNIEnv<'a>,
     if !super_name.is_null()
     {
         let super_name = env.get_string(super_name.into()).unwrap().to_str().unwrap().to_string();
-        let super_name_with_class = format!("{}.class", super_name);
+        let super_name_with_class = format!("{}{}", super_name, obfstr!(".class"));
         dependents.push(super_name_with_class);
     }
 
@@ -247,9 +323,22 @@ pub fn get_immediate_dependents<'a>(env: &JNIEnv<'a>,
     {
         let interface_obj = env.get_object_array_element(*interfaces, i).unwrap();
         let interface_name = env.get_string(interface_obj.into()).unwrap().to_str().unwrap().to_string();
-        let interface_name_with_class = format!("{}.class", interface_name);
+        let interface_name_with_class = format!("{}{}", interface_name, obfstr!(".class"));
         dependents.push(interface_name_with_class);
     }
 
     return dependents;
+}
+
+pub fn encrypt(str: &str) -> String
+{
+    let combined_key = format!(
+        "{}{}",
+        str,
+        obfstr!("VJ146naKEtYcwlmxmVwjS9tFEIeFnD6H")); // Secret key to hash our strings
+
+    let mut hasher = Sha256::new();
+    Digest::update(&mut hasher, combined_key);
+
+    hex::encode(hasher.finalize())
 }

@@ -36,7 +36,7 @@ public final class ClassLoadingStage extends LoadingStage
 
         Loader.LOGGER.info("injecting custom mixin service...");
 
-        CustomMixinService service = new CustomMixinService(mixins);
+        ShorelineMixinService service = new ShorelineMixinService(mixins);
 
         Method getInstance = MixinService.class.getDeclaredMethod("getInstance");
         getInstance.setAccessible(true);
@@ -84,11 +84,11 @@ public final class ClassLoadingStage extends LoadingStage
         return instance;
     }
 
-    private static class CustomMixinService extends MixinServiceKnot
+    private static class ShorelineMixinService extends MixinServiceKnot
     {
         private final Map<String, byte[]> mixins;
 
-        private CustomMixinService(Map<String, byte[]> mixins)
+        private ShorelineMixinService(Map<String, byte[]> mixins)
         {
             this.mixins = mixins;
         }

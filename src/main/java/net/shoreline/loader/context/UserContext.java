@@ -38,7 +38,7 @@ public final class UserContext
         return userType;
     }
 
-    public UserContext hwid(String hwid)
+    public UserContext setHwid(String hwid)
     {
         if (this.hwid != null)
         {
@@ -50,7 +50,7 @@ public final class UserContext
         return this;
     }
 
-    public UserContext username(String username)
+    public UserContext setUsername(String username)
     {
         if (this.username != null)
         {
@@ -62,7 +62,7 @@ public final class UserContext
         return this;
     }
 
-    public UserContext uid(String uid)
+    public UserContext setUid(String uid)
     {
         if (this.uid != null)
         {

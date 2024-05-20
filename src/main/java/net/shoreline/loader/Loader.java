@@ -11,7 +11,7 @@ import java.util.Map;
 
 public final class Loader implements ClientModInitializer
 {
-    public static final Logger LOGGER = LogManager.getLogger("Shoreline (Loader)");
+    public static final Logger LOGGER = LogManager.getLogger("Shoreline [Loader]");
 
     private static final UserContext context = UserContext.none();
 

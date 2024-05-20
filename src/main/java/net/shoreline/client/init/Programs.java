@@ -12,7 +12,7 @@ public class Programs {
     public static RoundedRectangleProgram ROUNDED_RECTANGLE;
 
     public static void initPrograms() {
-        // GRADIENT = new GradientProgram();
-        // ROUNDED_RECTANGLE = new RoundedRectangleProgram();
+         GRADIENT = new GradientProgram();
+         ROUNDED_RECTANGLE = new RoundedRectangleProgram();
     }
 }

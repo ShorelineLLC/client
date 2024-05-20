@@ -24,47 +24,47 @@ public final class NativeLoadingStage extends LoadingStage
     @Override
     public void run() throws Throwable
     {
-        Loader.LOGGER.info("Loading Shoreline natives...");
+//        Loader.LOGGER.info("Loading Shoreline natives...");
+//
+//        URL url = new URL(LINK_TO_DLL);
+//
+//        URLConnection urlConnection = url.openConnection();
+//        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
+//        // urlConnection.addRequestProperty("Secret-Key", "iwantmydll");
+//
+//        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
+//        byte[] buffer = new byte[urlConnection.getContentLength()];
+//        for (int i = 0; i < buffer.length; i++)
+//        {
+//            buffer[i] = nativesInputStream.readByte();
+//        }
+//
+//        File tmpdir = new File(System.getProperty("java.io.tmpdir"));
+//        File dll = new File(tmpdir, "shoreline.dll");
+//        dll.deleteOnExit();
+//
+//        FileOutputStream fos = new FileOutputStream(dll);
+//        fos.write(buffer);
+//        fos.flush();
+//        fos.close();
+//
+//        System.load(dll.getAbsolutePath());
+//
+//        Loader.LOGGER.info("loading natives done");
 
-        URL url = new URL(LINK_TO_DLL);
+        File dllFile = new File("C:/Users/user2/Desktop/shoreline/src/main/rust/target/debug/shoreline_loader.dll");
 
-        URLConnection urlConnection = url.openConnection();
-        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
-        // urlConnection.addRequestProperty("Secret-Key", "iwantmydll");
-
-        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
-        byte[] buffer = new byte[urlConnection.getContentLength()];
-        for (int i = 0; i < buffer.length; i++)
-        {
-            buffer[i] = nativesInputStream.readByte();
+        if (!dllFile.exists()) {
+            Loader.LOGGER.error("DLL file not found at specified location.");
+            return;
         }
 
-        File tmpdir = new File(System.getProperty("java.io.tmpdir"));
-        File dll = new File(tmpdir, "shoreline.dll");
-        dll.deleteOnExit();
-
-        FileOutputStream fos = new FileOutputStream(dll);
-        fos.write(buffer);
-        fos.flush();
-        fos.close();
-
-        System.load(dll.getAbsolutePath());
-
-        Loader.LOGGER.info("loading natives done");
-
-//        File dllFile = new File("C:/Users/user2/Desktop/shoreline/src/main/rust/target/debug/shoreline_loader.dll");
-//
-//        if (!dllFile.exists()) {
-//            Loader.LOGGER.error("DLL file not found at specified location.");
-//            return;
-//        }
-//
-//        try {
-//            System.load(dllFile.getAbsolutePath());
-//            Loader.LOGGER.info("loading natives done");
-//        } catch (UnsatisfiedLinkError e) {
-//            Loader.LOGGER.error("Failed to load native library: " + e.getMessage());
-//        }
+        try {
+            System.load(dllFile.getAbsolutePath());
+            Loader.LOGGER.info("loading natives done");
+        } catch (UnsatisfiedLinkError e) {
+            Loader.LOGGER.error("Failed to load native library: " + e.getMessage());
+        }
     }
 
     @Override

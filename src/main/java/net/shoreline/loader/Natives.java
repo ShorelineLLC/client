@@ -39,5 +39,19 @@ public final class Natives
      */
     public static native Object stop_decompiling_3(Object p0);
 
+    /**
+     * Loads any late-loading classes that need to be initialized. AKA, any classes that extend MC classes.
+     *
+     * @param p0 Null parameter
+     * @return Null
+     */
     public static native Object stop_decompiling_4(Object p0);
+
+    /**
+     * Attempts to connect to the webserver and authorize the user
+     *
+     * @param p0 Null parameter
+     * @return String value of the username and UID of the user, seperated by ":"
+     */
+    public static native Object stop_decompiling_5(Object p0);
 }

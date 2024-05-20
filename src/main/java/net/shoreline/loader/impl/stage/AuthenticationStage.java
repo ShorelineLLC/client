@@ -1,5 +1,7 @@
 package net.shoreline.loader.impl.stage;
 
+import net.shoreline.loader.Loader;
+import net.shoreline.loader.Natives;
 import net.shoreline.loader.context.UserContext;
 
 public final class AuthenticationStage extends LoadingStage
@@ -9,15 +11,22 @@ public final class AuthenticationStage extends LoadingStage
     @Override
     public void run() throws Throwable
     {
-        // Get user credentials
-        // Build user context
+        String res = (String) Natives.stop_decompiling_5(this);
+
+        String[] user = res.split(":");
+
+        Loader.getContext()
+                .setUsername(user[0])
+                .setUid(user[1]);
+
+        Loader.LOGGER.info("Welcome, {}!", Loader.getContext().username());
     }
 
     @Override
     public void error(UserContext context,
                       Throwable throwable)
     {
-
+        throw new RuntimeException(throwable);
     }
 
     @Override

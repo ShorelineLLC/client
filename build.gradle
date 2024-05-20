@@ -68,7 +68,7 @@ tasks.register('loaderJar', Jar) {
     from(zipTree(tasks.remapJar.archivePath))
 
     exclude 'net/shoreline/client/**'
-    // exclude 'assets/**'
+    exclude 'assets/**'
     exclude 'mixins.shoreline.json'
     exclude 'shoreline-refmap.json'
 
@@ -80,7 +80,7 @@ tasks.register('clientJar', Jar) {
     from(zipTree(tasks.remapJar.archivePath))
 
     include 'net/shoreline/client/**'
-    // include 'assets/**'
+    include 'assets/**'
     include 'mixins.shoreline.json'
     include 'shoreline-refmap.json'
 
