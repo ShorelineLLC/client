@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -67,6 +68,9 @@ public class WaypointsModule extends ToggleModule {
                 }
                 String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
                 String nametag = String.format("%s Logout" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""), player.getName().getString(), format.format(mc.player.getX()), format.format(mc.player.getY()), format.format(mc.player.getZ()));
+                if (Managers.SOCIAL.isFriend(player.getName().getString())) {
+                    nametag = Formatting.AQUA + nametag;
+                }
                 Managers.WAYPOINT.register(new Waypoint(nametag, serverIp, player.getX(), player.getY(), player.getZ()));
             }
         }
