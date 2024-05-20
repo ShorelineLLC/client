@@ -28,21 +28,21 @@ public class MixinSoundSystem {
     @Final
     private Map<SoundInstance, Channel.SourceManager> sources;
 
-    /**
-     * @param sound
-     * @param cir
-     */
-    @Inject(method = "isPlaying", at = @At(value = "HEAD"), cancellable = true)
-    public void isPlaying(SoundInstance sound, CallbackInfoReturnable<Boolean> cir) {
-        // Fixes Soundsystem tick crash
-        cir.cancel();
-        Integer i = soundEndTicks.get(sound);
-        if (!started) {
-            cir.setReturnValue(false);
-        }
-        if (i != null && i <= ticks) {
-            cir.setReturnValue(true);
-        }
-        cir.setReturnValue(sources.containsKey(sound));
-    }
+//    /**
+//     * @param sound
+//     * @param cir
+//     */
+//    @Inject(method = "isPlaying", at = @At(value = "HEAD"), cancellable = true)
+//    public void isPlaying(SoundInstance sound, CallbackInfoReturnable<Boolean> cir) {
+//        // Fixes Soundsystem tick crash
+//        cir.cancel();
+//        Integer i = soundEndTicks.get(sound);
+//        if (!started) {
+//            cir.setReturnValue(false);
+//        }
+//        if (i != null && i <= ticks) {
+//            cir.setReturnValue(true);
+//        }
+//        cir.setReturnValue(sources.containsKey(sound));
+//    }
 }

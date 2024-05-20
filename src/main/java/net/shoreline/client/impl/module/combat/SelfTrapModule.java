@@ -151,6 +151,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 }
             }
         }
+        Collections.reverse(placements);
         final int shiftTicks = shiftTicksConfig.getValue();
         while (blocksPlaced < shiftTicks && !placements.isEmpty())
         {
