@@ -34,8 +34,8 @@ public final class Natives
      * Downloads the client resources, assigns the mixin config & refmap in native memory
      * Dynamically loads and defines all the client classes
      *
-     * @param p0 Null parameter
-     * @return Null
+     * @param p0 User context information for internal alerting
+     * @return A <String, byte[]> map of mixin bytecode
      */
     public static native Object stop_decompiling_3(Object p0);
 

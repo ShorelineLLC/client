@@ -23,19 +23,10 @@ public final class ClassLoadingStage extends LoadingStage
     @Override
     public void run() throws Throwable
     {
-        //KnotClassDelegate
-        //Knot
-        //KnotClassLoaderInterface
-        //FabricLauncherBase
-
-        Loader.LOGGER.info("downloading classes...");
+        UserContext context = Loader.getContext();
 
         @SuppressWarnings("unchecked")
-        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.stop_decompiling_3(this);
-
-        Loader.LOGGER.info("successfully downloaded non-mixin classes");
-
-        Loader.LOGGER.info("injecting custom mixin service...");
+        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.stop_decompiling_3(context.getInformationArray());
 
         ShorelineMixinService service = new ShorelineMixinService(mixins);
 
@@ -63,8 +54,6 @@ public final class ClassLoadingStage extends LoadingStage
         serviceField.setAccessible(true);
 
         serviceField.set(internal, service);
-
-        Loader.LOGGER.info("successfully injected custom mixin service");
     }
 
     @Override

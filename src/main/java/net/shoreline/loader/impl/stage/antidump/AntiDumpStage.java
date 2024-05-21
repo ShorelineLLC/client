@@ -11,7 +11,7 @@ public final class AntiDumpStage extends LoadingStage
     @Override
     public void run() throws Throwable
     {
-        Measure.runAllMeasures();
+        //Measure.runAllMeasures();
     }
 
     @Override

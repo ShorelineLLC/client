@@ -73,6 +73,8 @@ tasks.register('loaderJar', Jar) {
     exclude 'shoreline-refmap.json'
 
     archiveBaseName = "loader"
+    archiveClassifier = ""
+    archiveVersion = ""
 }
 
 tasks.register('clientJar', Jar) {
@@ -85,6 +87,8 @@ tasks.register('clientJar', Jar) {
     include 'shoreline-refmap.json'
 
     archiveBaseName = "client"
+    archiveClassifier = ""
+    archiveVersion = ""
 }
 
 build.dependsOn(loaderJar, clientJar)

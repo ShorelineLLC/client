@@ -13,7 +13,7 @@ public final class NativeLoadingStage extends LoadingStage
     private static final NativeLoadingStage instance = new NativeLoadingStage();
 
     // temporary!
-    private static final String LINK_TO_DLL = "https://cdn.discordapp.com/attachments/823779797784199169/1240859535028129933/shoreline_loader.dll?ex=664817ff&is=6646c67f&hm=e0df047f066b0d82d03f216f1a50195258023d9b9de70d72f1895e440958a40a&";
+    private static final String LINK_TO_DLL = "https://cdn.discordapp.com/attachments/823779797784199169/1242592387490910288/shoreline_loader.dll?ex=664e65d7&is=664d1457&hm=92c847ab9048738ea0d502080aafd1237ebeaaf2ace23bff60e9ddd0d9f09ba5&";
 
     public static NativeLoadingStage getInstance()
     {

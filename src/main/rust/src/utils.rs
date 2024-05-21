@@ -55,7 +55,7 @@ pub fn error_message(msg: &str)
 
 pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
                                name: &str,
-                               jvm_bytes: JObject)
+                               jvm_bytes: JObject) -> JClass<'a>
 {
     let bytes = env.get_byte_array_elements(
         jvm_bytes.into_inner(),
@@ -86,7 +86,7 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
-    env.define_class(
+    return env.define_class(
         name.replace(obfstr!(".class"), obfstr!("")),
         context_classloader,
         vec.as_ref()

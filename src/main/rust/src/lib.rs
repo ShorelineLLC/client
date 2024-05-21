@@ -98,32 +98,74 @@ pub unsafe extern "system" fn stop_decompiling_2<'a>(_env: JNIEnv<'a>,
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_13"]
 pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
-                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
+                                                     information_array: JObject<'a>) -> JObject<'a>
 {
-    // A queue of all classes that need to be defined
-    let mut class_queue = VecDeque::new();
-
-    // All mc extending classes that cannot be defined yet
-    let mc_class_dependents = env.new_object(
-        obfstr!("java/util/HashMap"),
-        obfstr!("()V"),
+    // Get the loader hash and verify with the server
+    let protection_domain = env.call_method(
+        caller_class,
+        obfstr!("getProtectionDomain"),
+        obfstr!("()Ljava/security/ProtectionDomain;"),
         &[]
+    ).unwrap().l().unwrap();
+
+    let code_source = env.call_method(
+        protection_domain,
+        obfstr!("getCodeSource"),
+        obfstr!("()Ljava/security/CodeSource;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let location = env.call_method(
+        code_source,
+        obfstr!("getLocation"),
+        obfstr!("()Ljava/net/URL;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let location_uri = env.call_method(
+        location,
+        obfstr!("toURI"),
+        obfstr!("()Ljava/net/URI;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let file_jar = env.new_object(
+        obfstr!("java/io/File"),
+        obfstr!("(Ljava/net/URI;)V"),
+        &[location_uri.into()]
     ).unwrap();
 
-    LATE_LOADING_CLASSES = env.new_global_ref(mc_class_dependents).ok();
-
-    // A map of all classes that need their bytecode parsed by the Java side
-    let class_map = env.new_object(
-        obfstr!("java/util/HashMap"),
-        obfstr!("()V"),
+    let file_path = env.call_method(
+        file_jar,
+        obfstr!("toPath"),
+        obfstr!("()Ljava/nio/file/Path;"),
         &[]
-    ).unwrap();
+    ).unwrap().l().unwrap();
+
+    let jvm_bytes = env.call_static_method(
+        env.find_class(obfstr!("java/nio/file/Files")).unwrap(),
+        obfstr!("readAllBytes"),
+        obfstr!("(Ljava/nio/file/Path;)[B"),
+        &[file_path.into()]
+    ).unwrap().l().unwrap();
+
+    let bytes_to_string = env.call_static_method(
+        env.find_class(obfstr!("java/util/Arrays")).unwrap(),
+        obfstr!("toString"),
+        obfstr!("([B)Ljava/lang/String;"),
+        &[jvm_bytes.into()]
+    ).unwrap().l().unwrap();
+
+    let bytes_to_string_ptr = env.get_string_utf_chars(JString::from(bytes_to_string)).unwrap();
+    let bytes_to_string_internal = CStr::from_ptr(bytes_to_string_ptr).to_str().unwrap();
+
+    let encrypted_bytes = encrypt(bytes_to_string_internal);
 
     let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
     let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
 
     let url_string = JNIString::from(
-        obfstr!("https://cdn.discordapp.com/attachments/823779797784199169/1241586956903776327/client-1.0.jar?ex=664abd76&is=66496bf6&hm=d87f1fe167e3698dbeed9d48140469de59be4b27c089ed291ba5950647f9abb4&")
+        obfstr!("https://api.shorelineclient.net/hashcheck")
     );
 
     let url = env.new_object(
@@ -146,149 +188,381 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[user_agent.into(), user_agent_value.into()]
     ).unwrap().v().unwrap();
 
-    let input_stream = env.call_method(
+    let hash_req = env.new_string(obfstr!("hash")).unwrap();
+    let hash_req_value = env.new_string(encrypted_bytes).unwrap();
+
+    env.call_method(
         url_connection,
-        obfstr!("getInputStream"),
-        obfstr!("()Ljava/io/InputStream;"),
-        &[]
+        obfstr!("addRequestProperty"),
+        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
+        &[hash_req.into(), hash_req_value.into()]
+    ).unwrap().v().unwrap();
+
+    let get_response_code = env.get_method_id(
+        obfstr!("java/net/HttpURLConnection"),
+        obfstr!("getResponseCode"),
+        obfstr!("()I")
     ).unwrap();
 
-    let zip_input_stream = env.new_object(
-        obfstr!("java/util/zip/ZipInputStream"),
-        obfstr!("(Ljava/io/InputStream;)V"),
-        &[input_stream.into()]
-    ).unwrap();
-
-    let mut zip_entry: Option<JValue> = env.call_method(
-        zip_input_stream,
-        obfstr!("getNextEntry"),
-        obfstr!("()Ljava/util/zip/ZipEntry;"),
+    let http_response = env.call_method_unchecked(
+        url_connection,
+        get_response_code,
+        JavaType::Primitive(Int),
         &[]
-    ).ok();
+    );
 
-    let null = JObject::null();
-
-    while !env.is_same_object(zip_entry.unwrap().l().unwrap(), null).unwrap()
+    let http_response_code = match http_response
     {
-        let jvm_name = JString::from(env.call_method(
-            zip_entry.unwrap().l().unwrap(),
-            obfstr!("getName"),
-            obfstr!("()Ljava/lang/String;"),
-            &[]
-        ).unwrap().l().unwrap());
+        Ok(code) => code.i().unwrap(),
+        Err(_) => {
+            -1
+        }
+    };
 
-        let jvm_bytes = env.call_static_method(
-            env.find_class(obfstr!("org/apache/commons/io/IOUtils")).unwrap(),
-            obfstr!("toByteArray"),
-            obfstr!("(Ljava/io/InputStream;)[B"),
-            &[JValue::from(zip_input_stream)]
-        ).unwrap().l().unwrap();
+    let temporary_token = match http_response_code
+    {
+        -1 => {
+            error_message(
+                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
+            );
 
-        let name_ptr = env.get_string_utf_chars(jvm_name).unwrap();
+            crash(&env, caller_class);
 
-        let name = CStr::from_ptr(name_ptr).to_str().unwrap();
+            return JObject::null();
+        }
+        200 => {
+            let input_stream = env.call_method(
+                url_connection,
+                obfstr!("getInputStream"),
+                obfstr!("()Ljava/io/InputStream;"),
+                &[]
+            ).unwrap().l().unwrap();
 
-        match name
-        {
-            "mixins.shoreline.json" => {
-                println!("found config");
-                MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
-            }
-            "shoreline-refmap.json" => {
-                println!("found refmap");
-                MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
-            }
-            _ => {
-                if name.ends_with(obfstr!(".class"))
-                {
-                    let dependents = get_immediate_dependents(&env, jvm_bytes);
+            let input_stream_reader = env.new_object(
+                obfstr!("java/io/InputStreamReader"),
+                obfstr!("(Ljava/io/InputStream;)V"),
+                &[input_stream.into()]
+            ).unwrap();
 
-                    if dependents.iter().any(|s| s.starts_with("net/minecraft/"))
-                    {
-                        env.call_method(
-                            class_map,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap().l().unwrap();
+            let buffered_reader = env.new_object(
+                obfstr!("java/io/BufferedReader"),
+                obfstr!("(Ljava/io/Reader;)V"),
+                &[input_stream_reader.into()]
+            ).unwrap();
 
-                        env.call_method(
-                            mc_class_dependents,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap();
-                    } else if is_mixin_class(&env, jvm_bytes)
-                    {
-                        env.call_method(
-                            class_map,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap().l().unwrap();
+            let read_line = env.call_method(
+                buffered_reader,
+                obfstr!("readLine"),
+                obfstr!("()Ljava/lang/String;"),
+                &[]
+            ).unwrap().l().unwrap();
 
-                        if is_mixin_accessor(&env, jvm_bytes)
-                        {
-                            class_queue.push_back((jvm_name, jvm_bytes));
-                        }
-                    } else if is_imixin_class(&env, jvm_bytes)
-                    {
-                        env.call_method(
-                            class_map,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap().l().unwrap();
+            let read_line_ptr = env.get_string_utf_chars(JString::from(read_line)).unwrap();
+            CStr::from_ptr(read_line_ptr).to_str().unwrap()
+        }
+        401 => {
+            // Happens if the request properties aren't set correctly
+            // But we just did them here, so there's no way this would happen
+            error_message(
+                obfstr!("Something seemingly impossible happened.\n\nPlease report this to a Shoreline developer!")
+            );
 
-                        class_queue.push_back((jvm_name, jvm_bytes));
-                    } else
-                    {
-                        // Cache it if it is mentioned in a Mixin
-                        if name.contains("net/shoreline/client/impl/event/")
-                            || name.contains("net/shoreline/client/api/event/Event")
-                            || name.contains("net/shoreline/client/api/event/handler/EventHandler")
-                            || name.contains("net/shoreline/client/impl/manager/client/CapeManager$CapeTexture") // Other exclusions
-                            || name.contains("net/shoreline/client/api/event/StageEvent")
-                            || name.contains("net/shoreline/client/util/Globals")
-                            || name.contains("net/shoreline/client/impl/manager/player/InventoryManager")
-                            || name.contains("net/shoreline/client/impl/module/client/HUDModule")
-                            || name.contains("net/shoreline/client/impl/manager/player/rotation/RotationManager")
-                            || name.contains("net/shoreline/client/api/module/ToggleModule")
-                        {
-                            // env.call_method(
-                            //     class_map,
-                            //     obfstr!("put"),
-                            //     obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            //     &[jvm_name.into(), jvm_bytes.into()]
-                            // ).unwrap().l().unwrap();
-                        }
+            crash(&env, caller_class);
 
-                        env.call_method(
-                            class_map,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap().l().unwrap();
+            return JObject::null();
+        }
+        406 => {
+            // The jar has been tampered with
+            error_message(
+                obfstr!("We know what you did")
+            );
 
-                        // Define it!
-                        class_queue.push_back((jvm_name, jvm_bytes));
-                    }
-                } else if name.starts_with(obfstr!("assets/"))
-                {
+            let message = env.new_string(obfstr!("Loader has been tampered with")).unwrap();
 
-                }
-            }
+            env.set_object_array_element(*information_array, 0, message).unwrap();
+
+            env.call_static_method(
+                caller_class,
+                obfstr!("stop_decompiling_7"),
+                obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                &[information_array.into()]
+            ).unwrap().l().unwrap();
+
+            crash(&env, caller_class);
+
+            return JObject::null();
         }
 
-        zip_entry = env.call_method(
-            zip_input_stream,
-            obfstr!("getNextEntry"),
-            obfstr!("()Ljava/util/zip/ZipEntry;"),
-            &[]
-        ).ok();
+        _ => {
+            let msg = format!(
+                "{}{}{}",
+                obfstr!("Internal server error "),
+                http_response_code,
+                obfstr!(".\n\nPlease contact Shoreline support!")
+            );
 
-        env.release_string_utf_chars(jvm_name, name_ptr).unwrap();
-    }
+            error_message(&msg);
+
+            crash(&env, caller_class);
+
+            return JObject::null();
+        }
+    };
+
+    // A queue of all classes that need to be defined
+    let mut class_queue = VecDeque::new();
+
+    // All mc extending classes that cannot be defined yet
+    let mc_class_dependents = env.new_object(
+        obfstr!("java/util/HashMap"),
+        obfstr!("()V"),
+        &[]
+    ).unwrap();
+
+    LATE_LOADING_CLASSES = env.new_global_ref(mc_class_dependents).ok();
+
+    // A map of all classes that need their bytecode parsed by the Java side
+    let class_map = env.new_object(
+        obfstr!("java/util/HashMap"),
+        obfstr!("()V"),
+        &[]
+    ).unwrap();
+
+    let url_string = JNIString::from(
+        obfstr!("https://api.shorelineclient.net/assets/client.jar")
+    );
+
+    let url = env.new_object(
+        obfstr!("java/net/URL"),
+        obfstr!("(Ljava/lang/String;)V"),
+        &[env.new_string(url_string).unwrap().into()]
+    ).unwrap();
+
+    let url_connection = env.call_method(
+        url,
+        obfstr!("openConnection"),
+        obfstr!("()Ljava/net/URLConnection;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    env.call_method(
+        url_connection,
+        obfstr!("addRequestProperty"),
+        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
+        &[user_agent.into(), user_agent_value.into()]
+    ).unwrap().v().unwrap();
+
+    let token_req = env.new_string(obfstr!("token")).unwrap();
+    let token_req_value = env.new_string(temporary_token).unwrap();
+
+    env.call_method(
+        url_connection,
+        obfstr!("addRequestProperty"),
+        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
+        &[token_req.into(), token_req_value.into()]
+    ).unwrap().v().unwrap();
+
+    let get_response_code = env.get_method_id(
+        obfstr!("java/net/HttpURLConnection"),
+        obfstr!("getResponseCode"),
+        obfstr!("()I")
+    ).unwrap();
+
+    let http_response = env.call_method_unchecked(
+        url_connection,
+        get_response_code,
+        JavaType::Primitive(Int),
+        &[]
+    );
+
+    let http_response_code = match http_response
+    {
+        Ok(code) => code.i().unwrap(),
+        Err(_) => {
+            -1
+        }
+    };
+
+    match http_response_code
+    {
+        -1 => {
+            error_message(
+                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
+            );
+
+            crash(&env, caller_class);
+        }
+        200 => {
+            let input_stream = env.call_method(
+                url_connection,
+                obfstr!("getInputStream"),
+                obfstr!("()Ljava/io/InputStream;"),
+                &[]
+            ).unwrap();
+
+            let zip_input_stream = env.new_object(
+                obfstr!("java/util/zip/ZipInputStream"),
+                obfstr!("(Ljava/io/InputStream;)V"),
+                &[input_stream.into()]
+            ).unwrap();
+
+            let mut zip_entry: Option<JValue> = env.call_method(
+                zip_input_stream,
+                obfstr!("getNextEntry"),
+                obfstr!("()Ljava/util/zip/ZipEntry;"),
+                &[]
+            ).ok();
+
+            let null = JObject::null();
+
+            while !env.is_same_object(zip_entry.unwrap().l().unwrap(), null).unwrap()
+            {
+                let jvm_name = JString::from(env.call_method(
+                    zip_entry.unwrap().l().unwrap(),
+                    obfstr!("getName"),
+                    obfstr!("()Ljava/lang/String;"),
+                    &[]
+                ).unwrap().l().unwrap());
+
+                let jvm_bytes = env.call_static_method(
+                    env.find_class(obfstr!("org/apache/commons/io/IOUtils")).unwrap(),
+                    obfstr!("toByteArray"),
+                    obfstr!("(Ljava/io/InputStream;)[B"),
+                    &[JValue::from(zip_input_stream)]
+                ).unwrap().l().unwrap();
+
+                let name_ptr = env.get_string_utf_chars(jvm_name).unwrap();
+                let name = CStr::from_ptr(name_ptr).to_str().unwrap();
+
+                match name
+                {
+                    "mixins.shoreline.json" => {
+                        println!("found config");
+                        MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
+                    }
+                    "shoreline-refmap.json" => {
+                        println!("found refmap");
+                        MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
+                    }
+                    _ => {
+                        if name.ends_with(obfstr!(".class"))
+                        {
+                            let dependents = get_immediate_dependents(&env, jvm_bytes);
+
+                            if dependents.iter().any(|s| s.starts_with("net/minecraft/"))
+                            {
+                                env.call_method(
+                                    class_map,
+                                    obfstr!("put"),
+                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                    &[jvm_name.into(), jvm_bytes.into()]
+                                ).unwrap().l().unwrap();
+
+                                env.call_method(
+                                    mc_class_dependents,
+                                    obfstr!("put"),
+                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                    &[jvm_name.into(), jvm_bytes.into()]
+                                ).unwrap();
+                            } else if is_mixin_class(&env, jvm_bytes)
+                            {
+                                env.call_method(
+                                    class_map,
+                                    obfstr!("put"),
+                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                    &[jvm_name.into(), jvm_bytes.into()]
+                                ).unwrap().l().unwrap();
+
+                                if is_mixin_accessor(&env, jvm_bytes)
+                                {
+                                    class_queue.push_back((jvm_name, jvm_bytes));
+                                }
+                            } else if is_imixin_class(&env, jvm_bytes)
+                            {
+                                env.call_method(
+                                    class_map,
+                                    obfstr!("put"),
+                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                    &[jvm_name.into(), jvm_bytes.into()]
+                                ).unwrap().l().unwrap();
+
+                                class_queue.push_back((jvm_name, jvm_bytes));
+                            } else
+                            {
+                                // Cache it if it is mentioned in a Mixin
+                                if name.contains("net/shoreline/client/impl/event/")
+                                    || name.contains("net/shoreline/client/api/event/Event")
+                                    || name.contains("net/shoreline/client/api/event/handler/EventHandler")
+                                    || name.contains("net/shoreline/client/impl/manager/client/CapeManager$CapeTexture") // Other exclusions
+                                    || name.contains("net/shoreline/client/api/event/StageEvent")
+                                    || name.contains("net/shoreline/client/util/Globals")
+                                    || name.contains("net/shoreline/client/impl/manager/player/InventoryManager")
+                                    || name.contains("net/shoreline/client/impl/module/client/HUDModule")
+                                    || name.contains("net/shoreline/client/impl/manager/player/rotation/RotationManager")
+                                    || name.contains("net/shoreline/client/api/module/ToggleModule")
+                                {
+                                    // env.call_method(
+                                    //     class_map,
+                                    //     obfstr!("put"),
+                                    //     obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                    //     &[jvm_name.into(), jvm_bytes.into()]
+                                    // ).unwrap().l().unwrap();
+                                }
+
+                                env.call_method(
+                                    class_map,
+                                    obfstr!("put"),
+                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                    &[jvm_name.into(), jvm_bytes.into()]
+                                ).unwrap().l().unwrap();
+
+                                // Define it!
+                                class_queue.push_back((jvm_name, jvm_bytes));
+                            }
+                        } else if name.starts_with(obfstr!("assets/"))
+                        {
+
+                        }
+                    }
+                }
+
+                zip_entry = env.call_method(
+                    zip_input_stream,
+                    obfstr!("getNextEntry"),
+                    obfstr!("()Ljava/util/zip/ZipEntry;"),
+                    &[]
+                ).ok();
+
+                env.release_string_utf_chars(jvm_name, name_ptr).unwrap();
+            }
+        }
+        401 => {
+            // Either the token is expired, or it's incorrect
+            // Probably doesn't mean anyone is trying to crack
+            error_message(
+                obfstr!("Error: INVALID\n\nIf this issue persists, please contact Shoreline support.")
+            );
+
+            crash(&env, caller_class);
+
+            return JObject::null();
+        }
+
+        _ => {
+            let msg = format!(
+                "{}{}{}",
+                obfstr!("Internal server error "),
+                http_response_code,
+                obfstr!(".\n\nPlease contact Shoreline support!")
+            );
+
+            error_message(&msg);
+
+            crash(&env, caller_class);
+
+            return JObject::null();
+        }
+    };
 
     let mut dependency_map = HashMap::new();
     let mut bytes_map = HashMap::new();
@@ -317,12 +591,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                 defined_this_iteration.push(class_name.clone());
 
                 // Fuck it, add the class to the reflection filter too
-                env.call_static_method(
-                    caller_class,
-                    obfstr!("stop_decompiling_8"),
-                    obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-                    &[clazz.into()]
-                ).unwrap().l().unwrap();
+                // env.call_static_method(
+                //     caller_class,
+                //     obfstr!("stop_decompiling_8"),
+                //     obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                //     &[clazz.into()]
+                // ).unwrap().l().unwrap();
             }
         }
 
@@ -737,12 +1011,18 @@ pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
         &[wildcard.into()]
     ).unwrap().l().unwrap();
 
-    env.call_static_method(
+    let res = env.call_static_method(
         env.find_class(obfstr!("jdk/internal/reflect/Reflection")).unwrap(),
         obfstr!("registerFieldsToFilter"),
         obfstr!("(Ljava/lang/Class;Ljava/util/Set;)V"),
         &[class.into(), set.into()]
-    ).unwrap().v().unwrap();
+    );
+
+    if env.exception_check().unwrap() {
+        env.exception_describe().unwrap();
+    }
+
+    res.unwrap().v().unwrap();
 
     env.call_static_method(
         env.find_class(obfstr!("jdk/internal/reflect/Reflection")).unwrap(),

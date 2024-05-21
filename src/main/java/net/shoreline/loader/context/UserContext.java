@@ -2,7 +2,6 @@ package net.shoreline.loader.context;
 
 import net.shoreline.loader.Natives;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class UserContext
@@ -101,6 +100,13 @@ public final class UserContext
      */
     public void alert(String message)
     {
+        String[] information = getInformationArray();
+        information[0] = message;
+        Natives.stop_decompiling_7(information);
+    }
+
+    public String[] getInformationArray()
+    {
         StringBuilder builder = new StringBuilder();
 
         for (String mod : this.runningMods)
@@ -110,14 +116,12 @@ public final class UserContext
 
         String modList = builder.toString();
 
-        String[] values = new String[] {
-                message,
+        return new String[] {
+                null, // Message
                 this.hwid,
                 this.username,
                 modList.substring(0, modList.length() - 2)
         };
-
-        Natives.stop_decompiling_7(values);
     }
 
     public static UserContext none()

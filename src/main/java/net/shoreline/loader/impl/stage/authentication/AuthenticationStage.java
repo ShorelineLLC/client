@@ -32,7 +32,6 @@ public final class AuthenticationStage extends LoadingStage
                 .setUid(user[2])
                 .setRunningMods(collectMods());
 
-
         Loader.LOGGER.info("Welcome, {}!", Loader.getContext().username());
     }
 
