@@ -142,14 +142,15 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos)
     {
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay()))
+        List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay()) && !entities.isEmpty())
         {
-            List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities)
             {
                 attack(entity);
             }
             attackTimer.reset();
+            return;
         }
 
         final int slot = getResistantBlockItem();
