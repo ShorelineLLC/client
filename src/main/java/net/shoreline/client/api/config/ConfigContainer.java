@@ -10,7 +10,6 @@ import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.util.Globals;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;

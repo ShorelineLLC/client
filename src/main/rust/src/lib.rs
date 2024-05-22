@@ -600,12 +600,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                 defined_this_iteration.push(class_name.clone());
 
                 // Fuck it, add the class to the reflection filter too
-                env.call_static_method(
-                    caller_class,
-                    obfstr!("stop_decompiling_8"),
-                    obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-                    &[clazz.into()]
-                ).unwrap().l().unwrap();
+                // env.call_static_method(
+                //     caller_class,
+                //     obfstr!("stop_decompiling_8"),
+                //     obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                //     &[clazz.into()]
+                // ).unwrap().l().unwrap();
             }
         }
 
