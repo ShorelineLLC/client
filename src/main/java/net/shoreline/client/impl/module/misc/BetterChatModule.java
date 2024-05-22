@@ -42,7 +42,8 @@ public class BetterChatModule extends ToggleModule
         if (timestampConfig.getValue() != Timestamp.OFF) {
             String time = new SimpleDateFormat("k:mm").format(new Date());
             String text = switch (timestampConfig.getValue()) {
-                case NORMAL -> "§8<§7" + time + "§8>§r ";
+                case NORMAL -> "<" + time + ">§r ";
+                case GRAY -> "§8<§7" + time + "§8>§r ";
                 case COLOR -> "§s<" + time + ">§r ";
                 case OFF -> "";
             };
@@ -59,7 +60,6 @@ public class BetterChatModule extends ToggleModule
 
     @EventListener
     public void onChatLineRender(RenderChatHudEvent event) {
-
         if (animationConfig.getValue()) {
             TimeAnimation animation = null;
             if (event.getChatHudLine() != null)
@@ -87,6 +87,7 @@ public class BetterChatModule extends ToggleModule
 
     public enum Timestamp {
         NORMAL,
+        GRAY,
         COLOR,
         OFF
     }

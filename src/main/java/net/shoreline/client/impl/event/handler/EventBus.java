@@ -58,7 +58,6 @@ public class EventBus implements EventHandler {
         }
     }
 
-
     /**
      * Unsubscribes the subscriber {@link Class} and all associated
      * {@link EventListener} from the listener map.

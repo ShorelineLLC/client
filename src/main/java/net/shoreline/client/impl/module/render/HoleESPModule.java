@@ -42,12 +42,10 @@ public class HoleESPModule extends ToggleModule {
 
     public HoleESPModule() {
         super("HoleESP", "Displays nearby blast resistant holes", ModuleCategory.RENDER);
+        INSTANCE = this;
     }
 
     public static HoleESPModule getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new HoleESPModule();
-        }
         return INSTANCE;
     }
 
