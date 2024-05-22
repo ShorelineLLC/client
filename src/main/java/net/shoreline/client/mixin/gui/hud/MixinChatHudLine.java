@@ -8,7 +8,6 @@ import net.shoreline.client.impl.event.gui.hud.ChatLineEvent;
 import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.util.Globals;
-import net.shoreline.client.util.render.animation.TimeAnimation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

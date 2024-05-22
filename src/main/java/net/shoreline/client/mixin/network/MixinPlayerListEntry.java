@@ -7,11 +7,8 @@ import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.network.CapesEvent;
 import net.shoreline.client.impl.event.network.LoadCapeEvent;
-import net.shoreline.client.impl.manager.client.cape.CapeType;
 import net.shoreline.client.util.Globals;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerListEntry.class)
 public class MixinPlayerListEntry implements Globals {
 
-    @Shadow @Final private GameProfile profile;
     @Unique
     private Identifier capeTexture;
     @Unique
@@ -54,7 +50,7 @@ public class MixinPlayerListEntry implements Globals {
         if (capeTexture != null) {
             CapesEvent capesEvent = new CapesEvent();
             EventBus.EVENT_HANDLER.dispatch(capesEvent);
-            if (!capesEvent.isCanceled() || capesEvent.getCapeType() != CapeType.OPTIFINE) {
+            if (!capesEvent.isCanceled()) {
                 return;
             }
             SkinTextures t = cir.getReturnValue();
