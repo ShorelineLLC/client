@@ -23,6 +23,7 @@ public final class ClassLoadingStage extends LoadingStage
     @Override
     public void run() throws Throwable
     {
+        Loader.LOGGER.info("about to enter stop_decompiling_3");
         UserContext context = Loader.getContext();
 
         @SuppressWarnings("unchecked")

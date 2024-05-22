@@ -91,6 +91,24 @@ pub unsafe extern "system" fn stop_decompiling_2<'a>(_env: JNIEnv<'a>,
     }
 }
 
+pub fn log(env: &JNIEnv, msg: &str)
+{
+    let logger = env.get_static_field(
+        env.find_class("net/shoreline/loader/Loader").unwrap(),
+        "LOGGER",
+        "Lorg/apache/logging/log4j/Logger;"
+    ).unwrap().l().unwrap();
+
+    let msg_str = env.new_string(msg).unwrap();
+
+    env.call_method(
+        logger,
+        "info",
+        "(Ljava/lang/String;)V",
+        &[msg_str.into()]
+    ).unwrap().v().unwrap();
+}
+
 /**
  * Download and store all client classes & resources
  */
@@ -100,6 +118,8 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      information_array: JObject<'a>) -> JObject<'a>
 {
+    log(&env, "entered stop_decompiling_3");
+
     // Get the loader hash and verify with the server
     let protection_domain = env.call_method(
         caller_class,
@@ -108,12 +128,16 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
+    log(&env, "got protection domain");
+
     let code_source = env.call_method(
         protection_domain,
         obfstr!("getCodeSource"),
         obfstr!("()Ljava/security/CodeSource;"),
         &[]
     ).unwrap().l().unwrap();
+
+    log(&env, "got code source");
 
     let location = env.call_method(
         code_source,
@@ -122,6 +146,8 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
+    log(&env, "got location");
+
     let location_uri = env.call_method(
         location,
         obfstr!("toURI"),
@@ -129,11 +155,15 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
+    log(&env, "got as URI");
+
     let file_jar = env.new_object(
         obfstr!("java/io/File"),
         obfstr!("(Ljava/net/URI;)V"),
         &[location_uri.into()]
     ).unwrap();
+
+    log(&env, "got location jar");
 
     let file_path = env.call_method(
         file_jar,
@@ -142,6 +172,8 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
+    log(&env, "got file path");
+
     let jvm_bytes = env.call_static_method(
         env.find_class(obfstr!("java/nio/file/Files")).unwrap(),
         obfstr!("readAllBytes"),
@@ -149,12 +181,16 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[file_path.into()]
     ).unwrap().l().unwrap();
 
+    log(&env, "read bytes");
+
     let bytes_to_string = env.call_static_method(
         env.find_class(obfstr!("java/util/Arrays")).unwrap(),
         obfstr!("toString"),
         obfstr!("([B)Ljava/lang/String;"),
         &[jvm_bytes.into()]
     ).unwrap().l().unwrap();
+
+    log(&env, "turned to string");
 
     let bytes_to_string_ptr = env.get_string_utf_chars(JString::from(bytes_to_string)).unwrap();
     let bytes_to_string_internal = CStr::from_ptr(bytes_to_string_ptr).to_str().unwrap();
@@ -167,6 +203,8 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     let url_string = JNIString::from(
         obfstr!("https://api.shorelineclient.net/hashcheck")
     );
+
+    log(&env, "made url");
 
     let url = env.new_object(
         obfstr!("java/net/URL"),

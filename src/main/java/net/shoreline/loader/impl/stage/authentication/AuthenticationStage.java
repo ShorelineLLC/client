@@ -1,5 +1,6 @@
 package net.shoreline.loader.impl.stage.authentication;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.context.UserContext;
@@ -7,11 +8,8 @@ import net.shoreline.loader.impl.stage.LoadingStage;
 import net.shoreline.loader.impl.stage.antidump.AntiDumpStage;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class AuthenticationStage extends LoadingStage
 {
@@ -53,22 +51,10 @@ public final class AuthenticationStage extends LoadingStage
 
     private List<String> collectMods()
     {
-        List<String> modList = new ArrayList<>();
-        String minecraftPath = getMinecraftModsPath();
-
-        if (minecraftPath != null)
-        {
-            try
-            {
-                Files.walk(Paths.get(minecraftPath), 1)
-                        .filter(it -> !it.toFile().isDirectory() && it.toFile().getName().endsWith(".jar"))
-                        .forEach(jar -> modList.add(jar.toFile().getName()));
-            } catch (IOException ignored) // it didn't work, whatever
-            {
-            }
-        }
-
-        return modList;
+        return FabricLoader.getInstance().getAllMods()
+                .stream()
+                .map(mod -> mod.getMetadata().getName())
+                .collect(Collectors.toList());
     }
 
     private static String getMinecraftModsPath()
