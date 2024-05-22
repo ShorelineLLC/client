@@ -31,8 +31,8 @@ import java.text.DecimalFormat;
  */
 public class BlockHighlightModule extends ToggleModule {
 
-    Config<BoxRender> boxModeConfig = new EnumConfig<>("BoxMode", "Box rendering mode", BoxRender.OUTLINE, BoxRender.values());
-    Config<Boolean> entitiesConfig = new BooleanConfig("Debug-Entities", "Highlights entity bounding boxes for debug purposes", false);
+    Config<BoxRender> boxModeConfig = register(new EnumConfig<>("BoxMode", "Box rendering mode", BoxRender.OUTLINE, BoxRender.values()));
+    Config<Boolean> entitiesConfig = register(new BooleanConfig("Debug-Entities", "Highlights entity bounding boxes for debug purposes", false));
     private double distance;
 
     public BlockHighlightModule() {

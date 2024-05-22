@@ -30,8 +30,8 @@ import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.
  */
 public final class ScaffoldModule extends RotationModule
 {
-    Config<Mode> modeConfig = new EnumConfig<>("Mode", "", Mode.VANILLA, Mode.values());
-    Config<Boolean> keepYConfig = new BooleanConfig("KeepY", "", false);
+    Config<Mode> modeConfig = register(new EnumConfig<>("Mode", "", Mode.VANILLA, Mode.values()));
+    Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "", false));
 
     private boolean stoppedServerSprint;
     private float[] lastAngles;

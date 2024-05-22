@@ -14,7 +14,7 @@ import net.shoreline.client.impl.event.render.entity.RenderEntityInvisibleEvent;
  */
 public final class TrueSightModule extends ToggleModule
 {
-    Config<Boolean> onlyPlayersConfig = new BooleanConfig("OnlyPlayers", "If to only reveal invisible players", true);
+    Config<Boolean> onlyPlayersConfig = register(new BooleanConfig("OnlyPlayers", "If to only reveal invisible players", true));
 
     public TrueSightModule()
     {

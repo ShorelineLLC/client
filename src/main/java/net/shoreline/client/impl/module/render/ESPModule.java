@@ -25,31 +25,31 @@ import java.awt.*;
  */
 public class ESPModule extends ToggleModule {
     //
-    Config<ESPMode> modeConfig = new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.GLOW, ESPMode.values());
-    Config<Float> widthConfig = new NumberConfig<>("Linewidth", "ESP rendering line width", 0.1f, 1.25f, 5.0f);
-    Config<Boolean> playersConfig = new BooleanConfig("Players", "Render players through walls", true);
-    Config<Boolean> selfConfig = new BooleanConfig("Self", "Render self through walls", true);
-    Config<Color> playersColorConfig = new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue() || selfConfig.getValue());
-    Config<Boolean> monstersConfig = new BooleanConfig("Monsters", "Render monsters through walls", true);
-    Config<Color> monstersColorConfig = new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue());
-    Config<Boolean> animalsConfig = new BooleanConfig("Animals", "Render animals through walls", true);
-    Config<Color> animalsColorConfig = new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue());
-    Config<Boolean> vehiclesConfig = new BooleanConfig("Vehicles", "Render vehicles through walls", false);
-    Config<Color> vehiclesColorConfig = new ColorConfig("VehiclesColor", "The render color for vehicles", new Color(200, 100, 0), false, () -> vehiclesConfig.getValue());
-    Config<Boolean> itemsConfig = new BooleanConfig("Items", "Render dropped items through walls", false);
-    Config<Color> itemsColorConfig = new ColorConfig("ItemsColor", "The render color for items", new Color(200, 100, 0), false, () -> itemsConfig.getValue());
-    Config<Boolean> crystalsConfig = new BooleanConfig("EndCrystals", "Render end crystals through walls", false);
-    Config<Color> crystalsColorConfig = new ColorConfig("EndCrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> crystalsConfig.getValue());
-    Config<Boolean> chestsConfig = new BooleanConfig("Chests", "Render players through walls", true);
-    Config<Color> chestsColorConfig = new ColorConfig("ChestsColor", "The render color for chests", new Color(200, 200, 101), false, () -> chestsConfig.getValue());
-    Config<Boolean> echestsConfig = new BooleanConfig("EnderChests", "Render players through walls", true);
-    Config<Color> echestsColorConfig = new ColorConfig("EnderChestsColor", "The render color for ender chests", new Color(155, 0, 200), false, () -> echestsConfig.getValue());
-    Config<Boolean> shulkersConfig = new BooleanConfig("Shulkers", "Render players through walls", true);
-    Config<Color> shulkersColorConfig = new ColorConfig("ShulkersColor", "The render color for shulkers", new Color(200, 0, 106), false, () -> shulkersConfig.getValue());
-    Config<Boolean> hoppersConfig = new BooleanConfig("Hoppers", "Render players through walls", false);
-    Config<Color> hoppersColorConfig = new ColorConfig("HoppersColor", "The render color for hoppers", new Color(100, 100, 100), false, () -> hoppersConfig.getValue());
-    Config<Boolean> furnacesConfig = new BooleanConfig("Furnaces", "Render players through walls", false);
-    Config<Color> furnacesColorConfig = new ColorConfig("FurnacesColor", "The render color for furnaces", new Color(100, 100, 100), () -> furnacesConfig.getValue());
+    Config<ESPMode> modeConfig = register(new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.GLOW, ESPMode.values()));
+    Config<Float> widthConfig = register(new NumberConfig<>("Linewidth", "ESP rendering line width", 0.1f, 1.25f, 5.0f));
+    Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render players through walls", true));
+    Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render self through walls", true));
+    Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue() || selfConfig.getValue()));
+    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render monsters through walls", true));
+    Config<Color> monstersColorConfig = register(new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue()));
+    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render animals through walls", true));
+    Config<Color> animalsColorConfig = register(new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue()));
+    Config<Boolean> vehiclesConfig = register(new BooleanConfig("Vehicles", "Render vehicles through walls", false));
+    Config<Color> vehiclesColorConfig = register(new ColorConfig("VehiclesColor", "The render color for vehicles", new Color(200, 100, 0), false, () -> vehiclesConfig.getValue()));
+    Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render dropped items through walls", false));
+    Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(200, 100, 0), false, () -> itemsConfig.getValue()));
+    Config<Boolean> crystalsConfig = register(new BooleanConfig("EndCrystals", "Render end crystals through walls", false));
+    Config<Color> crystalsColorConfig = register(new ColorConfig("EndCrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> crystalsConfig.getValue()));
+    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", true));
+    Config<Color> chestsColorConfig = register(new ColorConfig("ChestsColor", "The render color for chests", new Color(200, 200, 101), false, () -> chestsConfig.getValue()));
+    Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", true));
+    Config<Color> echestsColorConfig = register(new ColorConfig("EnderChestsColor", "The render color for ender chests", new Color(155, 0, 200), false, () -> echestsConfig.getValue()));
+    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", true));
+    Config<Color> shulkersColorConfig = register(new ColorConfig("ShulkersColor", "The render color for shulkers", new Color(200, 0, 106), false, () -> shulkersConfig.getValue()));
+    Config<Boolean> hoppersConfig = register(new BooleanConfig("Hoppers", "Render players through walls", false));
+    Config<Color> hoppersColorConfig = register(new ColorConfig("HoppersColor", "The render color for hoppers", new Color(100, 100, 100), false, () -> hoppersConfig.getValue()));
+    Config<Boolean> furnacesConfig = register(new BooleanConfig("Furnaces", "Render players through walls", false));
+    Config<Color> furnacesColorConfig = register(new ColorConfig("FurnacesColor", "The render color for furnaces", new Color(100, 100, 100), () -> furnacesConfig.getValue()));
 
     public ESPModule() {
         super("ESP", "See entities and objects through walls", ModuleCategory.RENDER);

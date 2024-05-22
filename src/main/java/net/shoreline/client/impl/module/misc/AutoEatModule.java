@@ -20,7 +20,7 @@ import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
  */
 public class AutoEatModule extends ToggleModule {
     //
-    Config<Float> hungerConfig = new NumberConfig<>("Hunger", "The minimum hunger level before eating", 1.0f, 19.0f, 20.0f);
+    Config<Float> hungerConfig = register(new NumberConfig<>("Hunger", "The minimum hunger level before eating", 1.0f, 19.0f, 20.0f));
     //
     private int prevSlot;
 

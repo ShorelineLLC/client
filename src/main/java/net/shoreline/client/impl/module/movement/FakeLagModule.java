@@ -37,10 +37,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class FakeLagModule extends ToggleModule {
 
     //
-    Config<LagMode> modeConfig = new EnumConfig<>("Mode", "The mode for caching packets", LagMode.BLINK, LagMode.values());
-    Config<Boolean> pulseConfig = new BooleanConfig("Pulse", "Releases packets at intervals", false);
-    Config<Float> factorConfig = new NumberConfig<>("Factor", "The factor for packet intervals", 0.0f, 1.0f, 10.0f, () -> pulseConfig.getValue());
-    Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders the serverside player position", true);
+    Config<LagMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for caching packets", LagMode.BLINK, LagMode.values()));
+    Config<Boolean> pulseConfig = register(new BooleanConfig("Pulse", "Releases packets at intervals", false));
+    Config<Float> factorConfig = register(new NumberConfig<>("Factor", "The factor for packet intervals", 0.0f, 1.0f, 10.0f, () -> pulseConfig.getValue()));
+    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the serverside player position", true));
     //
     private FakePlayerEntity serverModel;
     //

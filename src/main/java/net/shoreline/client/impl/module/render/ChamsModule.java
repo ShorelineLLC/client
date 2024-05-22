@@ -35,15 +35,15 @@ import java.awt.*;
  */
 public class ChamsModule extends ToggleModule {
 
-    Config<ChamsMode> modeConfig = new EnumConfig<>("Mode", "The rendering mode for the chams", ChamsMode.NORMAL, ChamsMode.values());
-    Config<Boolean> handsConfig = new BooleanConfig("Hands", "Render chams on first-person hands", true);
-    Config<Boolean> selfConfig = new BooleanConfig("Self", "Render chams on the player", true);
-    Config<Boolean> playersConfig = new BooleanConfig("Players", "Render chams on other players", true);
-    Config<Boolean> monstersConfig = new BooleanConfig("Monsters", "Render chams on monsters", true);
-    Config<Boolean> animalsConfig = new BooleanConfig("Animals", "Render chams on animals", true);
-    Config<Boolean> otherConfig = new BooleanConfig("Others", "Render chams on crystals", true);
-    Config<Boolean> invisiblesConfig = new BooleanConfig("Invisibles", "Render chams on invisible entities", true);
-    Config<Color> colorConfig = new ColorConfig("Color", "The color of the chams", new Color(255, 0, 0, 60));
+    Config<ChamsMode> modeConfig = register(new EnumConfig<>("Mode", "The rendering mode for the chams", ChamsMode.NORMAL, ChamsMode.values()));
+    Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render chams on first-person hands", true));
+    Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render chams on the player", true));
+    Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render chams on other players", true));
+    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render chams on monsters", true));
+    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render chams on animals", true));
+    Config<Boolean> otherConfig = register(new BooleanConfig("Others", "Render chams on crystals", true));
+    Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render chams on invisible entities", true));
+    Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the chams", new Color(255, 0, 0, 60)));
 
     private static final float SINE_45_DEGREES = (float) Math.sin(0.7853981633974483);
 

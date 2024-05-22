@@ -169,9 +169,8 @@ public final class ModuleManager
         if (ShorelineMod.isBaritonePresent()) {
             register(new BaritoneModule());
         }
-        // Reflected configs
+        // Register keybinds
         for (Module module : getModules()) {
-            module.reflectConfigs();
             if (module instanceof ToggleModule t) {
                 Managers.MACRO.register(t.getKeybinding());
             }

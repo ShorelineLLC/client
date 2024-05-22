@@ -21,13 +21,13 @@ import java.awt.*;
  */
 public class SkyboxModule extends ToggleModule {
 
-    Config<Integer> dayTimeConfig = new NumberConfig<>("WorldTime", "The world time of day", 0, 6000, 24000);
-    Config<Boolean> skyConfig = new BooleanConfig("Sky", "Changes the world skybox color", true);
-    Config<Color> skyColorConfig = new ColorConfig("SkyColor", "The color for the world skybox", new Color(255, 0, 0), false, true, () -> skyConfig.getValue());
-    Config<Boolean> cloudConfig = new BooleanConfig("Cloud", "Changes the world cloud color", false);
-    Config<Color> cloudColorConfig = new ColorConfig("CloudColor", "The color for the world clouds", new Color(255, 0, 0), false, true, () -> cloudConfig.getValue());
-    Config<Boolean> fogConfig = new BooleanConfig("Fog", "Changes the world fog color", false);
-    Config<Color> fogColorConfig = new ColorConfig("FogColor", "The color for the world fog", new Color(255, 0, 0), false, true, () -> fogConfig.getValue());
+    Config<Integer> dayTimeConfig = register(new NumberConfig<>("WorldTime", "The world time of day", 0, 6000, 24000));
+    Config<Boolean> skyConfig = register(new BooleanConfig("Sky", "Changes the world skybox color", true));
+    Config<Color> skyColorConfig = register(new ColorConfig("SkyColor", "The color for the world skybox", new Color(255, 0, 0), false, true, () -> skyConfig.getValue()));
+    Config<Boolean> cloudConfig = register(new BooleanConfig("Cloud", "Changes the world cloud color", false));
+    Config<Color> cloudColorConfig = register(new ColorConfig("CloudColor", "The color for the world clouds", new Color(255, 0, 0), false, true, () -> cloudConfig.getValue()));
+    Config<Boolean> fogConfig = register(new BooleanConfig("Fog", "Changes the world fog color", false));
+    Config<Color> fogColorConfig = register(new ColorConfig("FogColor", "The color for the world fog", new Color(255, 0, 0), false, true, () -> fogConfig.getValue()));
 
     public SkyboxModule() {
         super("Skybox", "Changes the rendering of the world skybox", ModuleCategory.RENDER);

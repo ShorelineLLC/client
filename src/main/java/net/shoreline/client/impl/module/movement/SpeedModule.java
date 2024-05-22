@@ -38,14 +38,14 @@ public class SpeedModule extends ToggleModule {
     private static SpeedModule INSTANCE;
 
     //
-    Config<Speed> speedModeConfig = new EnumConfig<>("Mode", "Speed mode", Speed.STRAFE, Speed.values());
-    Config<Float> collisionDistanceConfig = new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE);
-    Config<Boolean> vanillaStrafeConfig = new BooleanConfig("Strafe-Vanilla", "Applies strafe speeds to vanilla speed", false, () -> speedModeConfig.getValue() == Speed.VANILLA);
-    Config<Float> speedConfig = new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f, () -> speedModeConfig.getValue() == Speed.VANILLA);
-    Config<Boolean> timerConfig = new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false, () -> isStrafe());
-    Config<Boolean> strafeBoostConfig = new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false, () -> isStrafe());
-    Config<Integer> boostTicksConfig = new NumberConfig<>("BoostTicks", "The number of ticks to boost strafe", 10, 20, 40, () -> isStrafe() && strafeBoostConfig.getValue());
-    Config<Boolean> speedWaterConfig = new BooleanConfig("SpeedInWater", "Applies speed even in water and lava", false);
+    Config<Speed> speedModeConfig = register(new EnumConfig<>("Mode", "Speed mode", Speed.STRAFE, Speed.values()));
+    Config<Float> collisionDistanceConfig = register(new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE));
+    Config<Boolean> vanillaStrafeConfig = register(new BooleanConfig("Strafe-Vanilla", "Applies strafe speeds to vanilla speed", false, () -> speedModeConfig.getValue() == Speed.VANILLA));
+    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f, () -> speedModeConfig.getValue() == Speed.VANILLA));
+    Config<Boolean> timerConfig = register(new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false, () -> isStrafe()));
+    Config<Boolean> strafeBoostConfig = register(new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false, () -> isStrafe()));
+    Config<Integer> boostTicksConfig = register(new NumberConfig<>("BoostTicks", "The number of ticks to boost strafe", 10, 20, 40, () -> isStrafe() && strafeBoostConfig.getValue()));
+    Config<Boolean> speedWaterConfig = register(new BooleanConfig("SpeedInWater", "Applies speed even in water and lava", false));
     //
     private int strafe = 4;
     private boolean accel;

@@ -14,7 +14,7 @@ import net.shoreline.client.impl.manager.client.cape.CapeType;
  */
 public final class CapesModule extends ToggleModule
 {
-    Config<Boolean> optifineConfig = new BooleanConfig("Optifine", "If to show optifine capes", true);
+    Config<Boolean> optifineConfig = register(new BooleanConfig("Optifine", "If to show optifine capes", true));
 
     public CapesModule()
     {

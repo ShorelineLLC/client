@@ -28,20 +28,20 @@ import java.awt.*;
  */
 public class TracersModule extends ToggleModule {
 
-    Config<Boolean> playersConfig = new BooleanConfig("Players", "Render tracers to player", true);
-    Config<Color> playersColorConfig = new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue());
-    Config<Boolean> invisiblesConfig = new BooleanConfig("Invisibles", "Render tracers to invisible entities", true);
-    Config<Color> invisiblesColorConfig = new ColorConfig("InvisiblesColor", "The render color for invisibles", new Color(200, 100, 0), false, () -> invisiblesConfig.getValue());
-    Config<Boolean> monstersConfig = new BooleanConfig("Monsters", "Render tracers to monsters", true);
-    Config<Color> monstersColorConfig = new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue());
-    Config<Boolean> animalsConfig = new BooleanConfig("Animals", "Render tracers to animals", true);
-    Config<Color> animalsColorConfig = new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue());
-    Config<Boolean> vehiclesConfig = new BooleanConfig("Vehicles", "Render tracers to vehicles", false);
-    Config<Color> vehiclesColorConfig = new ColorConfig("VehiclesColor", "The render color for vehicles", new Color(200, 100, 0), false, () -> vehiclesConfig.getValue());
-    Config<Boolean> itemsConfig = new BooleanConfig("Items", "Render tracers to items", false);
-    Config<Color> itemsColorConfig = new ColorConfig("ItemsColor", "The render color for items", new Color(255, 255, 255), false, () -> itemsConfig.getValue());
-    Config<Target> targetConfig = new EnumConfig<>("Target", "The body part of the entity to target", Target.FEET, Target.values());
-    Config<Float> widthConfig = new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.5f, 10.0f);
+    Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render tracers to player", true));
+    Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue()));
+    Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render tracers to invisible entities", true));
+    Config<Color> invisiblesColorConfig = register(new ColorConfig("InvisiblesColor", "The render color for invisibles", new Color(200, 100, 0), false, () -> invisiblesConfig.getValue()));
+    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render tracers to monsters", true));
+    Config<Color> monstersColorConfig = register(new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue()));
+    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render tracers to animals", true));
+    Config<Color> animalsColorConfig = register(new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue()));
+    Config<Boolean> vehiclesConfig = register(new BooleanConfig("Vehicles", "Render tracers to vehicles", false));
+    Config<Color> vehiclesColorConfig = register(new ColorConfig("VehiclesColor", "The render color for vehicles", new Color(200, 100, 0), false, () -> vehiclesConfig.getValue()));
+    Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render tracers to items", false));
+    Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(255, 255, 255), false, () -> itemsConfig.getValue()));
+    Config<Target> targetConfig = register(new EnumConfig<>("Target", "The body part of the entity to target", Target.FEET, Target.values()));
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.5f, 10.0f));
 
     public TracersModule() {
         super("Tracers", "Draws a tracer to all entities in render distance",

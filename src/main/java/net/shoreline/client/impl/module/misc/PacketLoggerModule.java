@@ -13,25 +13,25 @@ import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
 
 public class PacketLoggerModule extends ToggleModule {
 
-    Config<Boolean> chatConfig = new BooleanConfig("LogChat", "Logs packets in the chats", false);
-    Config<Boolean> moveFullConfig = new BooleanConfig("PlayerMoveFull", "Logs PlayerMoveC2SPacket", false);
-    Config<Boolean> moveLookConfig = new BooleanConfig("PlayerMoveLook", "Logs PlayerMoveC2SPacket", false);
-    Config<Boolean> movePosConfig = new BooleanConfig("PlayerMovePosition", "Logs PlayerMoveC2SPacket", false);
-    Config<Boolean> moveGroundConfig = new BooleanConfig("PlayerMoveGround", "Logs PlayerMoveC2SPacket", false);
-    Config<Boolean> vehicleMoveConfig = new BooleanConfig("VehicleMove", "Logs VehicleMoveC2SPacket", false);
-    Config<Boolean> playerActionConfig = new BooleanConfig("PlayerAction", "Logs PlayerActionC2SPacket", false);
-    Config<Boolean> updateSlotConfig = new BooleanConfig("UpdateSelectedSlot", "Logs UpdateSelectedSlotC2SPacket", false);
-    Config<Boolean> clickSlotConfig = new BooleanConfig("ClickSlot", "Logs ClickSlotC2SPacket", false);
-    Config<Boolean> pickInventoryConfig = new BooleanConfig("PickInventory", "Logs PickFromInventoryC2SPacket", false);
-    Config<Boolean> handSwingConfig = new BooleanConfig("HandSwing", "Logs HandSwingC2SPacket", false);
-    Config<Boolean> interactEntityConfig = new BooleanConfig("InteractEntity", "Logs PlayerInteractEntityC2SPacket", false);
-    Config<Boolean> interactBlockConfig = new BooleanConfig("InteractBlock", "Logs PlayerInteractBlockC2SPacket", false);
-    Config<Boolean> interactItemConfig = new BooleanConfig("InteractItem", "Logs PlayerInteractItemC2SPacket", false);
-    Config<Boolean> commandConfig = new BooleanConfig("ClientCommand", "Logs ClientCommandC2SPacket", false);
-    Config<Boolean> statusConfig = new BooleanConfig("ClientStatus", "Logs ClientStatusC2SPacket", false);
-    Config<Boolean> closeScreenConfig = new BooleanConfig("CloseScreen", "Logs CloseHandledScreenC2SPacket", false);
-    Config<Boolean> teleportConfirmConfig = new BooleanConfig("TeleportConfirm", "Logs TeleportConfirmC2SPacket", false);
-    Config<Boolean> pongConfig = new BooleanConfig("Pong", "Logs CommonPongC2SPacket", false);
+    Config<Boolean> chatConfig = register(new BooleanConfig("LogChat", "Logs packets in the chats", false));
+    Config<Boolean> moveFullConfig = register(new BooleanConfig("PlayerMoveFull", "Logs PlayerMoveC2SPacket", false));
+    Config<Boolean> moveLookConfig = register(new BooleanConfig("PlayerMoveLook", "Logs PlayerMoveC2SPacket", false));
+    Config<Boolean> movePosConfig = register(new BooleanConfig("PlayerMovePosition", "Logs PlayerMoveC2SPacket", false));
+    Config<Boolean> moveGroundConfig = register(new BooleanConfig("PlayerMoveGround", "Logs PlayerMoveC2SPacket", false));
+    Config<Boolean> vehicleMoveConfig = register(new BooleanConfig("VehicleMove", "Logs VehicleMoveC2SPacket", false));
+    Config<Boolean> playerActionConfig = register(new BooleanConfig("PlayerAction", "Logs PlayerActionC2SPacket", false));
+    Config<Boolean> updateSlotConfig = register(new BooleanConfig("UpdateSelectedSlot", "Logs UpdateSelectedSlotC2SPacket", false));
+    Config<Boolean> clickSlotConfig = register(new BooleanConfig("ClickSlot", "Logs ClickSlotC2SPacket", false));
+    Config<Boolean> pickInventoryConfig = register(new BooleanConfig("PickInventory", "Logs PickFromInventoryC2SPacket", false));
+    Config<Boolean> handSwingConfig = register(new BooleanConfig("HandSwing", "Logs HandSwingC2SPacket", false));
+    Config<Boolean> interactEntityConfig = register(new BooleanConfig("InteractEntity", "Logs PlayerInteractEntityC2SPacket", false));
+    Config<Boolean> interactBlockConfig = register(new BooleanConfig("InteractBlock", "Logs PlayerInteractBlockC2SPacket", false));
+    Config<Boolean> interactItemConfig = register(new BooleanConfig("InteractItem", "Logs PlayerInteractItemC2SPacket", false));
+    Config<Boolean> commandConfig = register(new BooleanConfig("ClientCommand", "Logs ClientCommandC2SPacket", false));
+    Config<Boolean> statusConfig = register(new BooleanConfig("ClientStatus", "Logs ClientStatusC2SPacket", false));
+    Config<Boolean> closeScreenConfig = register(new BooleanConfig("CloseScreen", "Logs CloseHandledScreenC2SPacket", false));
+    Config<Boolean> teleportConfirmConfig = register(new BooleanConfig("TeleportConfirm", "Logs TeleportConfirmC2SPacket", false));
+    Config<Boolean> pongConfig = register(new BooleanConfig("Pong", "Logs CommonPongC2SPacket", false));
 
     public PacketLoggerModule() {
         super("PacketLogger", "Logs client packets", ModuleCategory.MISCELLANEOUS);

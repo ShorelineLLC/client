@@ -32,12 +32,12 @@ import java.util.concurrent.TimeUnit;
 public class FastPlaceModule extends ToggleModule {
 
     //
-    Config<Selection> selectionConfig = new EnumConfig<>("Selection", "The selection of items to apply fast placements", Selection.WHITELIST, Selection.values());
-    Config<Integer> delayConfig = new NumberConfig<>("Delay", "Fast place click delay", 0, 1, 4);
-    Config<Float> startDelayConfig = new NumberConfig<>("StartDelay", "Fast place start delay", 0.0f, 0.0f, 1.0f);
-    Config<Boolean> ghostFixConfig = new BooleanConfig("GhostFix", "Fixes item ghosting issue on some servers", false);
-    Config<List<Item>> whitelistConfig = new ItemListConfig<>("Whitelist", "Valid item whitelist", Items.EXPERIENCE_BOTTLE, Items.SNOWBALL, Items.EGG);
-    Config<List<Item>> blacklistConfig = new ItemListConfig<>("Blacklist", "Valid item blacklist", Items.ENDER_PEARL, Items.ENDER_EYE);
+    Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of items to apply fast placements", Selection.WHITELIST, Selection.values()));
+    Config<Integer> delayConfig = register(new NumberConfig<>("Delay", "Fast place click delay", 0, 1, 4));
+    Config<Float> startDelayConfig = register(new NumberConfig<>("StartDelay", "Fast place start delay", 0.0f, 0.0f, 1.0f));
+    Config<Boolean> ghostFixConfig = register(new BooleanConfig("GhostFix", "Fixes item ghosting issue on some servers", false));
+    Config<List<Item>> whitelistConfig = register(new ItemListConfig<>("Whitelist", "Valid item whitelist", Items.EXPERIENCE_BOTTLE, Items.SNOWBALL, Items.EGG));
+    Config<List<Item>> blacklistConfig = register(new ItemListConfig<>("Blacklist", "Valid item blacklist", Items.ENDER_PEARL, Items.ENDER_EYE));
     //
     private final CacheTimer startTimer = new CacheTimer();
 

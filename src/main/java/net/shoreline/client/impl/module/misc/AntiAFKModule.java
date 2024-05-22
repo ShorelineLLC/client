@@ -17,12 +17,12 @@ import net.shoreline.client.util.chat.ChatUtil;
  */
 public class AntiAFKModule extends ToggleModule {
     //
-    Config<Boolean> messageConfig = new BooleanConfig("Message", "Messages in chat to prevent AFK kick", true);
-    Config<Boolean> tabCompleteConfig = new BooleanConfig("TabComplete", "Uses tab complete in chat to prevent AFK kick", true);
-    Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates the player to prevent AFK kick", true);
-    Config<Boolean> autoReplyConfig = new BooleanConfig("AutoReply", "Replies to players messaging you in chat", true);
-    Config<String> replyConfig = new StringConfig("Reply", "The reply message for AutoReply", "[Shoreline] I am currently AFK.");
-    Config<Float> delayConfig = new NumberConfig<>("Delay", "The delay between actions", 5.0f, 60.0f, 270.0f);
+    Config<Boolean> messageConfig = register(new BooleanConfig("Message", "Messages in chat to prevent AFK kick", true));
+    Config<Boolean> tabCompleteConfig = register(new BooleanConfig("TabComplete", "Uses tab complete in chat to prevent AFK kick", true));
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates the player to prevent AFK kick", true));
+    Config<Boolean> autoReplyConfig = register(new BooleanConfig("AutoReply", "Replies to players messaging you in chat", true));
+    Config<String> replyConfig = register(new StringConfig("Reply", "The reply message for AutoReply", "[Shoreline] I am currently AFK."));
+    Config<Float> delayConfig = register(new NumberConfig<>("Delay", "The delay between actions", 5.0f, 60.0f, 270.0f));
 
     /**
      *

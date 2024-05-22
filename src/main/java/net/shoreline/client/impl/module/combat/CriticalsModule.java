@@ -33,8 +33,8 @@ public class CriticalsModule extends ToggleModule {
     private static CriticalsModule INSTANCE;
 
     //
-    Config<CritMode> modeConfig = new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values());
-    Config<Boolean> packetSyncConfig = new BooleanConfig("Tick-Sync", "Syncs the cached packet interaction to the next tick", false);
+    Config<CritMode> modeConfig = register(new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values()));
+    Config<Boolean> packetSyncConfig = register(new BooleanConfig("Tick-Sync", "Syncs the cached packet interaction to the next tick", false));
     // The cached attack packets that will be resent after manipulating
     // player position packets
     private PlayerInteractEntityC2SPacket attackPacket;

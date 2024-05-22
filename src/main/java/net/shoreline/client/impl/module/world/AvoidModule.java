@@ -19,11 +19,11 @@ import net.shoreline.client.util.world.BlockUtil;
  * @since 1.0
  */
 public class AvoidModule extends ToggleModule {
-    Config<Boolean> voidConfig = new BooleanConfig("Void", "Prevents player from falling into the void", true);
-    Config<Boolean> fireConfig = new BooleanConfig("Fire", "Prevents player from walking into fire", false);
-    Config<Boolean> berryBushConfig = new BooleanConfig("BerryBush", "Prevents player from walking into sweet berry bushes", false);
-    Config<Boolean> cactiConfig = new BooleanConfig("Cactus", "Prevents player from walking into cacti", false);
-    Config<Boolean> unloadedConfig = new BooleanConfig("Unloaded", "Prevents player from entering chunks that haven't been loaded", false);
+    Config<Boolean> voidConfig = register(new BooleanConfig("Void", "Prevents player from falling into the void", true));
+    Config<Boolean> fireConfig = register(new BooleanConfig("Fire", "Prevents player from walking into fire", false));
+    Config<Boolean> berryBushConfig = register(new BooleanConfig("BerryBush", "Prevents player from walking into sweet berry bushes", false));
+    Config<Boolean> cactiConfig = register(new BooleanConfig("Cactus", "Prevents player from walking into cacti", false));
+    Config<Boolean> unloadedConfig = register(new BooleanConfig("Unloaded", "Prevents player from entering chunks that haven't been loaded", false));
 
     public AvoidModule() {
         super("Avoid", "Prevents player from entering harmful areas",

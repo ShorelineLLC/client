@@ -18,7 +18,7 @@ import net.shoreline.client.mixin.accessor.AccessorPlayerPositionLookS2CPacket;
  * @since 1.0
  */
 public class NoRotateModule extends ToggleModule {
-    Config<Boolean> positionAdjustConfig = new BooleanConfig("PositionAdjust", "Adjusts outgoing rotation packets", false);
+    Config<Boolean> positionAdjustConfig = register(new BooleanConfig("PositionAdjust", "Adjusts outgoing rotation packets", false));
     private float yaw, pitch;
     private boolean cancelRotate;
     public NoRotateModule() {

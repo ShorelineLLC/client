@@ -28,9 +28,9 @@ import java.text.DecimalFormat;
 public class EntitySpeedModule extends ToggleModule {
 
     //
-    Config<Float> speedConfig = new NumberConfig<>("Speed", "The speed of the entity while moving", 0.1f, 0.5f, 4.0f);
-    Config<Boolean> antiStuckConfig = new BooleanConfig("AntiStuck", "Prevents entities from getting stuck when moving up", false);
-    Config<Boolean> strictConfig = new BooleanConfig("Strict", "The NCP-Updated bypass for speeding up entity movement", false);
+    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed of the entity while moving", 0.1f, 0.5f, 4.0f));
+    Config<Boolean> antiStuckConfig = register(new BooleanConfig("AntiStuck", "Prevents entities from getting stuck when moving up", false));
+    Config<Boolean> strictConfig = register(new BooleanConfig("Strict", "The NCP-Updated bypass for speeding up entity movement", false));
     //
     private final Timer entityJumpTimer = new CacheTimer();
 

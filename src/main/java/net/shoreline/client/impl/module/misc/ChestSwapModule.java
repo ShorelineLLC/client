@@ -17,7 +17,7 @@ import net.shoreline.client.init.Managers;
  */
 public class ChestSwapModule extends ToggleModule {
 
-    Config<Priority> priorityConfig = new EnumConfig<>("Priority", "The chestplate material to prioritize", Priority.NETHERITE, Priority.values());
+    Config<Priority> priorityConfig = register(new EnumConfig<>("Priority", "The chestplate material to prioritize", Priority.NETHERITE, Priority.values()));
 
     public ChestSwapModule() {
         super("ChestSwap", "Automatically swaps chestplate", ModuleCategory.MISCELLANEOUS);

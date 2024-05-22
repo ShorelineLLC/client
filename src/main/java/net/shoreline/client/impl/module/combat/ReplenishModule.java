@@ -23,7 +23,7 @@ import java.util.ArrayList;
  */
 public class ReplenishModule extends ToggleModule {
 
-    Config<Integer> percentConfig = new NumberConfig<>("Percent", "The minimum percent of total stack before replenishing", 0, 25, 80);
+    Config<Integer> percentConfig = register(new NumberConfig<>("Percent", "The minimum percent of total stack before replenishing", 0, 25, 80));
 
     private ItemStack[] hotbar = new ItemStack[9];
 

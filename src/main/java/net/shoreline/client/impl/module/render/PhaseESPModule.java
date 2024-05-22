@@ -19,10 +19,10 @@ import java.awt.*;
 
 public class PhaseESPModule extends ToggleModule {
 
-    Config<Boolean> safeConfig = new BooleanConfig("Safe", "Highlights safe phase blocks", false);
-    Config<Color> unsafeConfig = new ColorConfig("UnsafeColor", "The color for rendering unsafe phase blocks", new Color(255, 0, 0), false, false);
-    Config<Color> obsidianConfig = new ColorConfig("ObsidianColor", "The color for rendering obsidian phase blocks", new Color(255, 255, 0), false, false, () -> safeConfig.getValue());
-    Config<Color> bedrockConfig = new ColorConfig("BedrockColor", "The color for rendering bedrock phase blocks", new Color(0, 255, 0), false, false, () -> safeConfig.getValue());
+    Config<Boolean> safeConfig = register(new BooleanConfig("Safe", "Highlights safe phase blocks", false));
+    Config<Color> unsafeConfig = register(new ColorConfig("UnsafeColor", "The color for rendering unsafe phase blocks", new Color(255, 0, 0), false, false));
+    Config<Color> obsidianConfig = register(new ColorConfig("ObsidianColor", "The color for rendering obsidian phase blocks", new Color(255, 255, 0), false, false, () -> safeConfig.getValue()));
+    Config<Color> bedrockConfig = register(new ColorConfig("BedrockColor", "The color for rendering bedrock phase blocks", new Color(0, 255, 0), false, false, () -> safeConfig.getValue()));
 
     public PhaseESPModule() {
         super("PhaseESP", "Displays safe phase blocks", ModuleCategory.RENDER);

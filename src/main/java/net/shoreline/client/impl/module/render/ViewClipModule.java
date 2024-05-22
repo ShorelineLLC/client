@@ -13,7 +13,7 @@ import net.shoreline.client.impl.event.render.CameraClipEvent;
  */
 public class ViewClipModule extends ToggleModule {
 
-    Config<Float> distanceConfig = new NumberConfig<>("Distance", "The third-person camera clip distance", 1.0f, 3.5f, 20.0f);
+    Config<Float> distanceConfig = register(new NumberConfig<>("Distance", "The third-person camera clip distance", 1.0f, 3.5f, 20.0f));
 
     public ViewClipModule() {
         super("ViewClip", "Clips your third-person camera through blocks", ModuleCategory.RENDER);

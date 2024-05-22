@@ -34,9 +34,9 @@ import java.util.UUID;
 public class WaypointsModule extends ToggleModule {
     private static WaypointsModule INSTANCE;
 
-    Config<Boolean> logoutsConfig = new BooleanConfig("LogoutPoints", "Marks the position of player logouts", false);
-    Config<Boolean> deathsConfig = new BooleanConfig("DeathPoints", "Marks the position of player deaths", false);
-    Config<Boolean> coordsConfig = new BooleanConfig("Coords", "Shows the coordinates of the waypoint", true);
+    Config<Boolean> logoutsConfig = register(new BooleanConfig("LogoutPoints", "Marks the position of player logouts", false));
+    Config<Boolean> deathsConfig = register(new BooleanConfig("DeathPoints", "Marks the position of player deaths", false));
+    Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Shows the coordinates of the waypoint", true));
     DecimalFormat format = new DecimalFormat("0.0");
 
     public WaypointsModule() {

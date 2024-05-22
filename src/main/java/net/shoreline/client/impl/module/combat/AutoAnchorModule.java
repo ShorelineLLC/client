@@ -32,22 +32,22 @@ import java.util.List;
 
 public class AutoAnchorModule extends BlockPlacerModule {
 
-    Config<Float> targetRangeConfig = new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f);
-    Config<Boolean> swingConfig = new BooleanConfig("Swing", "Swing hand when exploding anchors", true);
-    Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotate before exploding", false);
-    Config<Boolean> playersConfig = new BooleanConfig("Players", "Target players", true);
-    Config<Boolean> monstersConfig = new BooleanConfig("Monsters", "Target monsters", false);
-    Config<Boolean> neutralsConfig = new BooleanConfig("Neutrals", "Target neutrals", false);
-    Config<Boolean> animalsConfig = new BooleanConfig("Animals", "Target animals", false);
-    Config<Float> rangeConfig = new NumberConfig<>("Range", "Range to explode anchors", 0.1f, 4.0f, 6.0f);
-    Config<Boolean> placeConfig = new BooleanConfig("Place", "Places anchors to damage enemies", true);
-    Config<Float> explodeSpeedConfig = new NumberConfig<>("ExplodeSpeed", "Speed to place anchors", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue());
-    Config<Boolean> strictDirectionConfig = new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue());
-    Config<Boolean> grimConfig = new BooleanConfig("Grim", "Places using grim instant rotations", false, () -> rotateConfig.getValue() && placeConfig.getValue());
-    Config<Float> minDamageConfig = new NumberConfig<>("MinDamage", "Minimum damage required to consider exploding anchors", 1.0f, 4.0f, 10.0f);
-    Config<Boolean> safetyConfig = new BooleanConfig("Safety", "Accounts for total player safety when exploding anchors", true);
-    Config<Float> maxLocalDamageConfig = new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f);
-    Config<Boolean> blockDestructionConfig = new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false);
+    Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
+    Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when exploding anchors", true));
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate before exploding", false));
+    Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Target players", true));
+    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Target monsters", false));
+    Config<Boolean> neutralsConfig = register(new BooleanConfig("Neutrals", "Target neutrals", false));
+    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Target animals", false));
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Range to explode anchors", 0.1f, 4.0f, 6.0f));
+    Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places anchors to damage enemies", true));
+    Config<Float> explodeSpeedConfig = register(new NumberConfig<>("ExplodeSpeed", "Speed to place anchors", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
+    Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false, () -> rotateConfig.getValue() && placeConfig.getValue()));
+    Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider exploding anchors", 1.0f, 4.0f, 10.0f));
+    Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when exploding anchors", true));
+    Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
+    Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
     //
     private BlockPos anchorPos;
     private final Timer explodeTimer = new CacheTimer();

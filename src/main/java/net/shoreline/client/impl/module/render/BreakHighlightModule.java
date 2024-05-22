@@ -37,9 +37,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BreakHighlightModule extends ToggleModule {
 
-    Config<HighlightMode> modeConfig = new EnumConfig<>("Mode", "The mode for highlighting blocks", HighlightMode.PACKET, HighlightMode.values());
-    Config<Float> rangeConfig = new NumberConfig<>("Range", "The range to render breaking blocks", 5.0f, 10.0f, 50.0f);
-    Config<Color> colorConfig = new ColorConfig("Color", "The break highlight color", new Color(255, 0, 0), false, true);
+    Config<HighlightMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for highlighting blocks", HighlightMode.PACKET, HighlightMode.values()));
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to render breaking blocks", 5.0f, 10.0f, 50.0f));
+    Config<Color> colorConfig = register(new ColorConfig("Color", "The break highlight color", new Color(255, 0, 0), false, true));
     //
     private final Map<BlockBreakingProgressS2CPacket, Long> breakingProgress = new ConcurrentHashMap<>();
 

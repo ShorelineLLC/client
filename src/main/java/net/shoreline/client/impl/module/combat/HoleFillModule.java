@@ -40,20 +40,20 @@ import java.util.Map;
  */
 public class HoleFillModule extends ObsidianPlacerModule {
     //
-    Config<Boolean> obsidianConfig = new BooleanConfig("Obsidian", "Fills obsidian holes", true);
-    Config<Boolean> doublesConfig = new BooleanConfig("Doubles", "Fills double holes", false);
-    Config<Float> rangeConfig = new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f);
-    Config<Boolean> websConfig = new BooleanConfig("Webs", "Fills holes with webs", false);
-    Config<Boolean> autoConfig = new BooleanConfig("Auto", "Fills holes when enemies are within a certain range", false);
-    Config<Float> targetRangeConfig = new NumberConfig<>("TargetRange", "The range from the target to the hole", 0.5f, 3.0f, 5.0f, () -> autoConfig.getValue());
-    Config<Float> enemyRangeConfig = new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f, () -> autoConfig.getValue());
-    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of hole fill", true);
-    Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
-    Config<Integer> shiftTicksConfig = new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5);
-    Config<Integer> shiftDelayConfig = new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5);
-    Config<Boolean> autoDisableConfig = new BooleanConfig("AutoDisable", "Disables after filling all holes", false);
-    Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where scaffold is placing blocks", false);
-    Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false);
+    Config<Boolean> obsidianConfig = register(new BooleanConfig("Obsidian", "Fills obsidian holes", true));
+    Config<Boolean> doublesConfig = register(new BooleanConfig("Doubles", "Fills double holes", false));
+    Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f));
+    Config<Boolean> websConfig = register(new BooleanConfig("Webs", "Fills holes with webs", false));
+    Config<Boolean> autoConfig = register(new BooleanConfig("Auto", "Fills holes when enemies are within a certain range", false));
+    Config<Float> targetRangeConfig = register(new NumberConfig<>("TargetRange", "The range from the target to the hole", 0.5f, 3.0f, 5.0f, () -> autoConfig.getValue()));
+    Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f, () -> autoConfig.getValue()));
+    Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of hole fill", true));
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
+    Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5));
+    Config<Integer> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5));
+    Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after filling all holes", false));
+    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
     private int shiftDelay;
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
     private List<BlockPos> fills = new ArrayList<>();

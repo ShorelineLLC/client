@@ -25,9 +25,9 @@ import org.lwjgl.glfw.GLFW;
 public class MiddleClickModule extends ToggleModule {
 
     //
-    Config<Boolean> friendConfig = new BooleanConfig("Friend", "Friends players when middle click", true);
-    Config<Boolean> pearlConfig = new BooleanConfig("Pearl", "Throws a pearl when middle click", true);
-    Config<Boolean> fireworkConfig = new BooleanConfig("Firework", "Uses firework to boost elytra when middle click", false);
+    Config<Boolean> friendConfig = register(new BooleanConfig("Friend", "Friends players when middle click", true));
+    Config<Boolean> pearlConfig = register(new BooleanConfig("Pearl", "Throws a pearl when middle click", true));
+    Config<Boolean> fireworkConfig = register(new BooleanConfig("Firework", "Uses firework to boost elytra when middle click", false));
 
     /**
      *

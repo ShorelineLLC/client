@@ -37,30 +37,30 @@ import net.shoreline.client.impl.event.world.BlindnessEvent;
  * @since 1.0
  */
 public class NoRenderModule extends ToggleModule {
-    Config<Boolean> hurtCamConfig = new BooleanConfig("NoHurtCam", "Prevents the hurt camera shake effect from rendering", true);
-    Config<Boolean> antiCrashConfig = new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false);
-    Config<Boolean> armorConfig = new BooleanConfig("Armor", "Prevents armor pieces from rendering", false);
-    Config<Boolean> fireOverlayConfig = new BooleanConfig("Overlay-Fire", "Prevents the fire Hud overlay from rendering", true);
-    Config<Boolean> waterOverlayConfig = new BooleanConfig("Overlay-Water", "Prevents the water Hud overlay from rendering", true);
-    Config<Boolean> blockOverlayConfig = new BooleanConfig("Overlay-Block", "Prevents the block Hud overlay from rendering", true);
-    Config<Boolean> spyglassOverlayConfig = new BooleanConfig("Overlay-Spyglass", "Prevents the spyglass Hud overlay from rendering", false);
-    Config<Boolean> pumpkinOverlayConfig = new BooleanConfig("Overlay-Pumpkin", "Prevents the pumpkin Hud overlay from rendering", true);
-    Config<Boolean> bossOverlayConfig = new BooleanConfig("Overlay-BossBar", "Prevents the boss bar Hud overlay from rendering", true);
-    Config<Boolean> nauseaConfig = new BooleanConfig("Nausea", "Prevents nausea effect from rendering (includes portal effect)", false);
-    Config<Boolean> blindnessConfig = new BooleanConfig("Blindness", "Prevents blindness effect from rendering", false);
-    Config<Boolean> frostbiteConfig = new BooleanConfig("Frostbite", "Prevents frostbite effect from rendering", false);
-    Config<Boolean> skylightConfig = new BooleanConfig("Skylight", "Prevents skylight from rendering", true);
-    Config<Boolean> witherSkullsConfig = new BooleanConfig("WitherSkulls", "Prevents flying wither skulls from rendering", false);
-    Config<Boolean> tileEntitiesConfig = new BooleanConfig("TileEntities", "Prevents special tile entity properties from rendering (i.e. enchantment table books or cutting table saws)", false);
-    Config<Boolean> fireworksConfig = new BooleanConfig("Fireworks", "Prevents firework particles from rendering", true);
-    Config<Boolean> explosionsConfig = new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true);
-    Config<Boolean> campfiresConfig = new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false);
-    Config<Boolean> totemConfig = new BooleanConfig("Totems", "Prevents totem particles from rendering", false);
-    Config<Boolean> worldBorderConfig = new BooleanConfig("WorldBorder", "Prevents world border from rendering", false);
-    Config<Boolean> interpolationConfig = new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false);
-    Config<FogRender> fogConfig = new EnumConfig<>("Fog", "Prevents fog from rendering in the world", FogRender.OFF, FogRender.values());
-    Config<ItemRender> itemsConfig = new EnumConfig<>("Items", "Prevents dropped items from rendering", ItemRender.OFF, ItemRender.values());
-    Config<Boolean> guiToastConfig = new BooleanConfig("GuiToast", "Prevents advancements from rendering", true);
+    Config<Boolean> hurtCamConfig = register(new BooleanConfig("NoHurtCam", "Prevents the hurt camera shake effect from rendering", true));
+    Config<Boolean> antiCrashConfig = register(new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false));
+    Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Prevents armor pieces from rendering", false));
+    Config<Boolean> fireOverlayConfig = register(new BooleanConfig("Overlay-Fire", "Prevents the fire Hud overlay from rendering", true));
+    Config<Boolean> waterOverlayConfig = register(new BooleanConfig("Overlay-Water", "Prevents the water Hud overlay from rendering", true));
+    Config<Boolean> blockOverlayConfig = register(new BooleanConfig("Overlay-Block", "Prevents the block Hud overlay from rendering", true));
+    Config<Boolean> spyglassOverlayConfig = register(new BooleanConfig("Overlay-Spyglass", "Prevents the spyglass Hud overlay from rendering", false));
+    Config<Boolean> pumpkinOverlayConfig = register(new BooleanConfig("Overlay-Pumpkin", "Prevents the pumpkin Hud overlay from rendering", true));
+    Config<Boolean> bossOverlayConfig = register(new BooleanConfig("Overlay-BossBar", "Prevents the boss bar Hud overlay from rendering", true));
+    Config<Boolean> nauseaConfig = register(new BooleanConfig("Nausea", "Prevents nausea effect from rendering (includes portal effect)", false));
+    Config<Boolean> blindnessConfig = register(new BooleanConfig("Blindness", "Prevents blindness effect from rendering", false));
+    Config<Boolean> frostbiteConfig = register(new BooleanConfig("Frostbite", "Prevents frostbite effect from rendering", false));
+    Config<Boolean> skylightConfig = register(new BooleanConfig("Skylight", "Prevents skylight from rendering", true));
+    Config<Boolean> witherSkullsConfig = register(new BooleanConfig("WitherSkulls", "Prevents flying wither skulls from rendering", false));
+    Config<Boolean> tileEntitiesConfig = register(new BooleanConfig("TileEntities", "Prevents special tile entity properties from rendering (i.e. enchantment table books or cutting table saws)", false));
+    Config<Boolean> fireworksConfig = register(new BooleanConfig("Fireworks", "Prevents firework particles from rendering", true));
+    Config<Boolean> explosionsConfig = register(new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true));
+    Config<Boolean> campfiresConfig = register(new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false));
+    Config<Boolean> totemConfig = register(new BooleanConfig("Totems", "Prevents totem particles from rendering", false));
+    Config<Boolean> worldBorderConfig = register(new BooleanConfig("WorldBorder", "Prevents world border from rendering", false));
+    Config<Boolean> interpolationConfig = register(new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false));
+    Config<FogRender> fogConfig = register(new EnumConfig<>("Fog", "Prevents fog from rendering in the world", FogRender.OFF, FogRender.values()));
+    Config<ItemRender> itemsConfig = register(new EnumConfig<>("Items", "Prevents dropped items from rendering", ItemRender.OFF, ItemRender.values()));
+    Config<Boolean> guiToastConfig = register(new BooleanConfig("GuiToast", "Prevents advancements from rendering", true));
 
     public NoRenderModule() {
         super("NoRender", "Prevents certain game elements from rendering",

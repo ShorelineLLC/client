@@ -11,7 +11,7 @@ import net.shoreline.client.api.module.ToggleModule;
  */
 public class FontModule extends ToggleModule {
     //
-    Config<Boolean> shadowConfig = new BooleanConfig("Shadow", "Renders text with a shadow background", true);
+    Config<Boolean> shadowConfig = register(new BooleanConfig("Shadow", "Renders text with a shadow background", true));
 
     /**
      *

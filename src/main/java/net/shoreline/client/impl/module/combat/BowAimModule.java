@@ -21,11 +21,11 @@ import net.shoreline.client.util.world.EntityUtil;
  */
 public class BowAimModule extends RotationModule {
     //
-    Config<Boolean> playersConfig = new BooleanConfig("Players", "Aims bow at players", true);
-    Config<Boolean> monstersConfig = new BooleanConfig("Monsters", "Aims bow at monsters", false);
-    Config<Boolean> neutralsConfig = new BooleanConfig("Neutrals", "Aims bow at neutrals", false);
-    Config<Boolean> animalsConfig = new BooleanConfig("Animals", "Aims bow at animals", false);
-    Config<Boolean> invisiblesConfig = new BooleanConfig("Invisibles", "Aims bow at invisible entities", false);
+    Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Aims bow at players", true));
+    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Aims bow at monsters", false));
+    Config<Boolean> neutralsConfig = register(new BooleanConfig("Neutrals", "Aims bow at neutrals", false));
+    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Aims bow at animals", false));
+    Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Aims bow at invisible entities", false));
     //
     private Entity aimTarget;
 

@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class ChatModule extends ConcurrentModule {
     //
-    Config<Boolean> debugConfig = new BooleanConfig("ChatDebug", "Allows client debug messages to be printed in the chat", false);
+    Config<Boolean> debugConfig = register(new BooleanConfig("ChatDebug", "Allows client debug messages to be printed in the chat", false));
 
     /**
      *

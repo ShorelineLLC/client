@@ -28,11 +28,11 @@ import net.shoreline.client.util.string.EnumFormatter;
  */
 public class ElytraFlyModule extends ToggleModule {
 
-    Config<FlyMode> modeConfig = new EnumConfig<>("Mode", "The mode for elytra flight", FlyMode.CONTROL, FlyMode.values());
-    Config<Float> speedConfig = new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f);
-    Config<Float> vspeedConfig = new NumberConfig<>("VerticalSpeed", "The vertical flight speed", 0.1f, 1.0f, 5.0f);
-    Config<Boolean> instantFlyConfig = new BooleanConfig("InstantFly", "Automatically activates elytra from the ground", false);
-    Config<Boolean> fireworkConfig = new BooleanConfig("Fireworks", "Uses fireworks when flying", false, () -> modeConfig.getValue() != FlyMode.PACKET);
+    Config<FlyMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for elytra flight", FlyMode.CONTROL, FlyMode.values()));
+    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f));
+    Config<Float> vspeedConfig = register(new NumberConfig<>("VerticalSpeed", "The vertical flight speed", 0.1f, 1.0f, 5.0f));
+    Config<Boolean> instantFlyConfig = register(new BooleanConfig("InstantFly", "Automatically activates elytra from the ground", false));
+    Config<Boolean> fireworkConfig = register(new BooleanConfig("Fireworks", "Uses fireworks when flying", false, () -> modeConfig.getValue() != FlyMode.PACKET));
 
     private float pitch;
     private FireworkRocketEntity fireworkRocketEntity;

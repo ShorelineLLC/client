@@ -20,8 +20,8 @@ public class AutoAcceptModule extends ToggleModule {
     //
     private final Timer acceptTimer = new CacheTimer();
     //
-    Config<Float> delayConfig = new NumberConfig<>("Delay", "The delay before" +
-            " accepting teleport requests", 0.0f, 3.0f, 10.0f);
+    Config<Float> delayConfig = register(new NumberConfig<>("Delay", "The delay before" +
+            " accepting teleport requests", 0.0f, 3.0f, 10.0f));
 
     /**
      *

@@ -19,7 +19,7 @@ import net.shoreline.client.impl.event.render.LightmapGammaEvent;
  */
 public class FullbrightModule extends ToggleModule {
 
-    Config<Brightness> brightnessConfig = new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values());
+    Config<Brightness> brightnessConfig = register(new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values()));
 
     public FullbrightModule() {
         super("Fullbright", "Brightens the world", ModuleCategory.RENDER);

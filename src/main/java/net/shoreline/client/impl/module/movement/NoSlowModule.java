@@ -41,21 +41,21 @@ public class NoSlowModule extends ToggleModule {
     public static NoSlowModule INSTANCE;
 
     //
-    Config<Boolean> strictConfig = new BooleanConfig("Strict", "Strict NCP bypass for ground slowdowns", false);
-    Config<Boolean> airStrictConfig = new BooleanConfig("AirStrict", "Strict NCP bypass for air slowdowns", false);
-    Config<Boolean> grimConfig = new BooleanConfig("Grim", "Strict Grim bypass for slowdown", false);
-    Config<Boolean> grimNewConfig = new BooleanConfig("GrimV3", "Strict GrimV3 bypass for slowdown", false);
-    Config<Boolean> strafeFixConfig = new BooleanConfig("StrafeFix", "Old NCP bypass for strafe", false);
-    Config<Boolean> inventoryMoveConfig = new BooleanConfig("InventoryMove", "Allows the player to move while in inventories or screens", true);
-    Config<Boolean> arrowMoveConfig = new BooleanConfig("ArrowMove", "Allows the player to look while in inventories or screens by using the arrow keys", false);
-    Config<Boolean> itemsConfig = new BooleanConfig("Items", "Removes the slowdown effect caused by using items", true);
-    Config<Boolean> shieldsConfig = new BooleanConfig("Shields", "Removes the slowdown effect caused by shields", true);
-    Config<Boolean> websConfig = new BooleanConfig("Webs", "Removes the slowdown caused when moving through webs", false);
-    Config<Boolean> berryBushConfig = new BooleanConfig("BerryBush", "Removes the slowdown caused when moving through webs", false);
-    Config<Float> webSpeedConfig = new NumberConfig<>("WebSpeed", "Speed to fall through webs", 0.0f, 3.5f, 20.0f, () -> websConfig.getValue());
-    Config<Boolean> soulsandConfig = new BooleanConfig("SoulSand", "Removes the slowdown effect caused by walking over SoulSand blocks", false);
-    Config<Boolean> honeyblockConfig = new BooleanConfig("HoneyBlock", "Removes the slowdown effect caused by walking over Honey blocks", false);
-    Config<Boolean> slimeblockConfig = new BooleanConfig("SlimeBlock", "Removes the slowdown effect caused by walking over Slime blocks", false);
+    Config<Boolean> strictConfig = register(new BooleanConfig("Strict", "Strict NCP bypass for ground slowdowns", false));
+    Config<Boolean> airStrictConfig = register(new BooleanConfig("AirStrict", "Strict NCP bypass for air slowdowns", false));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Strict Grim bypass for slowdown", false));
+    Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Strict GrimV3 bypass for slowdown", false));
+    Config<Boolean> strafeFixConfig = register(new BooleanConfig("StrafeFix", "Old NCP bypass for strafe", false));
+    Config<Boolean> inventoryMoveConfig = register(new BooleanConfig("InventoryMove", "Allows the player to move while in inventories or screens", true));
+    Config<Boolean> arrowMoveConfig = register(new BooleanConfig("ArrowMove", "Allows the player to look while in inventories or screens by using the arrow keys", false));
+    Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Removes the slowdown effect caused by using items", true));
+    Config<Boolean> shieldsConfig = register(new BooleanConfig("Shields", "Removes the slowdown effect caused by shields", true));
+    Config<Boolean> websConfig = register(new BooleanConfig("Webs", "Removes the slowdown caused when moving through webs", false));
+    Config<Boolean> berryBushConfig = register(new BooleanConfig("BerryBush", "Removes the slowdown caused when moving through webs", false));
+    Config<Float> webSpeedConfig = register(new NumberConfig<>("WebSpeed", "Speed to fall through webs", 0.0f, 3.5f, 20.0f, () -> websConfig.getValue()));
+    Config<Boolean> soulsandConfig = register(new BooleanConfig("SoulSand", "Removes the slowdown effect caused by walking over SoulSand blocks", false));
+    Config<Boolean> honeyblockConfig = register(new BooleanConfig("HoneyBlock", "Removes the slowdown effect caused by walking over Honey blocks", false));
+    Config<Boolean> slimeblockConfig = register(new BooleanConfig("SlimeBlock", "Removes the slowdown effect caused by walking over Slime blocks", false));
     //
     private boolean sneaking;
     //

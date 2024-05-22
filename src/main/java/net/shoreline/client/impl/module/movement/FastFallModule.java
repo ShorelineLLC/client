@@ -23,9 +23,9 @@ import net.shoreline.client.util.math.timer.Timer;
 public class FastFallModule extends ToggleModule {
 
     //
-    Config<Float> heightConfig = new NumberConfig<>("Height", "The maximum fall height", 1.0f, 3.0f, 10.0f);
-    Config<FallMode> fallModeConfig = new EnumConfig<>("Mode", "The mode for falling down blocks", FallMode.STEP, FallMode.values());
-    Config<Integer> shiftTicksConfig = new NumberConfig<>("ShiftTicks", "Number of ticks to shift ahead", 1, 3, 5, () -> fallModeConfig.getValue() == FallMode.SHIFT);
+    Config<Float> heightConfig = register(new NumberConfig<>("Height", "The maximum fall height", 1.0f, 3.0f, 10.0f));
+    Config<FallMode> fallModeConfig = register(new EnumConfig<>("Mode", "The mode for falling down blocks", FallMode.STEP, FallMode.values()));
+    Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "Number of ticks to shift ahead", 1, 3, 5, () -> fallModeConfig.getValue() == FallMode.SHIFT));
     //
     private boolean prevOnGround;
     //

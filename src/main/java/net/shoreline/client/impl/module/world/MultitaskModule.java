@@ -25,7 +25,7 @@ import net.shoreline.client.init.Managers;
  */
 public class MultitaskModule extends ToggleModule {
 
-    Config<Boolean> grimConfig = new BooleanConfig("Grim", "Allows you to eat while placing on grim", false);
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Allows you to eat while placing on grim", false));
 
     public MultitaskModule() {
         super("MultiTask", "Allows you to mine and use items simultaneously", ModuleCategory.WORLD);

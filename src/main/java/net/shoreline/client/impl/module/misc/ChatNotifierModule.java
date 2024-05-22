@@ -20,10 +20,10 @@ import net.shoreline.client.util.chat.ChatUtil;
 
 public class ChatNotifierModule extends ToggleModule {
 
-    Config<Boolean> totemPopConfig = new BooleanConfig("TotemPop", "Notifies in chat when a player pops a totem", true);
-    Config<Boolean> visualRangeConfig = new BooleanConfig("VisualRange", "Notifies in chat when player enters visual range", false);
-    Config<Boolean> friendsConfig = new BooleanConfig("Friends", "Notifies for friends", false);
-    Config<Boolean> grimConfig = new BooleanConfig("Grim", "Notifies you if the server you join is running GrimAC", false);
+    Config<Boolean> totemPopConfig = register(new BooleanConfig("TotemPop", "Notifies in chat when a player pops a totem", true));
+    Config<Boolean> visualRangeConfig = register(new BooleanConfig("VisualRange", "Notifies in chat when player enters visual range", false));
+    Config<Boolean> friendsConfig = register(new BooleanConfig("Friends", "Notifies for friends", false));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Notifies you if the server you join is running Grim", false));
 
     public ChatNotifierModule() {
         super("ChatNotifier", "Notifies in chat", ModuleCategory.MISCELLANEOUS);

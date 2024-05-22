@@ -24,9 +24,9 @@ import net.shoreline.client.util.math.timer.Timer;
 public class TriggerModule extends ToggleModule {
 
     //
-    Config<TriggerMode> modeConfig = new EnumConfig<>("Mode", "The mode for activating the trigger bot", TriggerMode.MOUSE_BUTTON, TriggerMode.values());
-    Config<Float> attackSpeedConfig = new NumberConfig<>("AttackSpeed", "The speed to attack entities", 0.1f, 8.0f, 20.0f);
-    Config<Float> randomSpeedConfig = new NumberConfig<>("RandomSpeed", "The speed randomizer for attacks", 0.1f, 2.0f, 10.0f);
+    Config<TriggerMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for activating the trigger bot", TriggerMode.MOUSE_BUTTON, TriggerMode.values()));
+    Config<Float> attackSpeedConfig = register(new NumberConfig<>("AttackSpeed", "The speed to attack entities", 0.1f, 8.0f, 20.0f));
+    Config<Float> randomSpeedConfig = register(new NumberConfig<>("RandomSpeed", "The speed randomizer for attacks", 0.1f, 2.0f, 10.0f));
     //
     private final Timer triggerTimer = new CacheTimer();
 

@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BreadcrumbsModule extends ToggleModule {
 
     private final Map<Vec3d, Long> positions = new ConcurrentHashMap<>();
-    Config<Boolean> infiniteConfig = new BooleanConfig("Infinite", "Renders breadcrumbs for all positions since toggle", true);
-    Config<Float> maxTimeConfig = new NumberConfig<>("MaxPosition", "The maximum time for a given position", 1.0f, 2.0f, 20.0f);
+    Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Renders breadcrumbs for all positions since toggle", true));
+    Config<Float> maxTimeConfig = register(new NumberConfig<>("MaxPosition", "The maximum time for a given position", 1.0f, 2.0f, 20.0f));
 
     public BreadcrumbsModule() {
         super("Breadcrumbs", "Renders a line connecting all previous positions", ModuleCategory.RENDER);

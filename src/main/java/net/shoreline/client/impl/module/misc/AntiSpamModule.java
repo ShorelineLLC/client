@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class AntiSpamModule extends ToggleModule {
 
     // TODO: ADD MORE SPAM CHECKS
-    Config<Boolean> unicodeConfig = new BooleanConfig("Unicode", "Prevents unicode characters from being rendered in chat", false);
+    Config<Boolean> unicodeConfig = register(new BooleanConfig("Unicode", "Prevents unicode characters from being rendered in chat", false));
     //
     private final Map<UUID, String> messages = new HashMap<>();
 

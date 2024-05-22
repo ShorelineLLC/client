@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class ZoomModule extends ToggleModule {
 
-    Config<Macro> zoomKeyConfig = new MacroConfig("ZoomKey", "The zoom key bind", new Macro(getId(), GLFW.GLFW_KEY_C, null));
+    Config<Macro> zoomKeyConfig = register(new MacroConfig("ZoomKey", "The zoom key bind", new Macro(getId(), GLFW.GLFW_KEY_C, null)));
 
     private boolean flag;
     private boolean flag1 = true;

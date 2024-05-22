@@ -22,8 +22,8 @@ import net.shoreline.client.util.string.EnumFormatter;
  */
 public final class FastEatModule extends ToggleModule
 {
-    Config<Mode> modeConfig = new EnumConfig<>("Mode", "The bypass mode", Mode.VANILLA, Mode.values());
-    Config<Integer> ticksConfig = new NumberConfig<>("Ticks", "The amount of ticks to have 'consumed' an item before fast eating", 0, 10, 30);
+    Config<Mode> modeConfig = register(new EnumConfig<>("Mode", "The bypass mode", Mode.VANILLA, Mode.values()));
+    Config<Integer> ticksConfig = register(new NumberConfig<>("Ticks", "The amount of ticks to have 'consumed' an item before fast eating", 0, 10, 30));
     private int packets;
 
     public FastEatModule()

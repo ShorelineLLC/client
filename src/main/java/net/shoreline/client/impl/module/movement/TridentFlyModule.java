@@ -22,10 +22,10 @@ import net.shoreline.client.init.Managers;
  */
 public class TridentFlyModule extends ToggleModule {
 
-    Config<Boolean> allowNoWaterConfig = new BooleanConfig("AllowNoWater", "Allows you to fly using tridents even without water", true);
-    Config<Boolean> instantConfig = new BooleanConfig("Instant", "Removes the pullback of the trident", true);
-    Config<Boolean> flyConfig = new BooleanConfig("Spam", "Automatically uses riptide", false);
-    Config<Integer> ticksConfig = new NumberConfig<>("Ticks", "The ticks between riptide boost", 0, 3, 20, () -> flyConfig.getValue());
+    Config<Boolean> allowNoWaterConfig = register(new BooleanConfig("AllowNoWater", "Allows you to fly using tridents even without water", true));
+    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Removes the pullback of the trident", true));
+    Config<Boolean> flyConfig = register(new BooleanConfig("Spam", "Automatically uses riptide", false));
+    Config<Integer> ticksConfig = register(new NumberConfig<>("Ticks", "The ticks between riptide boost", 0, 3, 20, () -> flyConfig.getValue()));
 
     public TridentFlyModule() {
         super("TridentFly", "Allows you to fly using tridents", ModuleCategory.MOVEMENT);

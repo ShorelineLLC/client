@@ -14,7 +14,7 @@ import net.shoreline.client.impl.event.TickEvent;
  */
 public class AutoWalkModule extends ToggleModule {
     //
-    Config<Boolean> lockConfig = new BooleanConfig("Lock", "Stops movement when sneaking or jumping", false);
+    Config<Boolean> lockConfig = register(new BooleanConfig("Lock", "Stops movement when sneaking or jumping", false));
 
     /**
      *

@@ -15,18 +15,18 @@ import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
  */
 public class ViewModelModule extends ToggleModule {
 
-    // Config<Boolean> eatingConfig = new BooleanConfig("Eating", "Modifies eating transformations", true);
-    // Config<Boolean> customFovConfig = new BooleanConfig("CustomFov", "Change field of view", false);
-    // Config<Float> fovConfig = new NumberConfig<>("FOV", "Field of view", 10.0f, 120.0f, 180.0f);
-    Config<Float> positionXConfig = new NumberConfig<>("X", "Translation in x-direction", -3.0f, 0.0f, 3.0f);
-    Config<Float> positionYConfig = new NumberConfig<>("Y", "Translation in y-direction", -3.0f, 0.0f, 3.0f);
-    Config<Float> positionZConfig = new NumberConfig<>("Z", "Translation in z-direction", -3.0f, 0.0f, 3.0f);
-    Config<Float> scaleXConfig = new NumberConfig<>("ScaleX", "Scaling in x-direction", 0.1f, 1.0f, 2.0f);
-    Config<Float> scaleYConfig = new NumberConfig<>("ScaleY", "Scaling in y-direction", 0.1f, 1.0f, 2.0f);
-    Config<Float> scaleZConfig = new NumberConfig<>("ScaleZ", "Scaling in z-direction", 0.1f, 1.0f, 2.0f);
-    Config<Float> rotateXConfig = new NumberConfig<>("RotateX", "Rotation in x-direction", -180.0f, 0.0f, 180.0f);
-    Config<Float> rotateYConfig = new NumberConfig<>("RotateY", "Rotation in y-direction", -180.0f, 0.0f, 180.0f);
-    Config<Float> rotateZConfig = new NumberConfig<>("RotateZ", "Rotation in z-direction", -180.0f, 0.0f, 180.0f);
+    // Config<Boolean> eatingConfig = register(new BooleanConfig("Eating", "Modifies eating transformations", true);
+    // Config<Boolean> customFovConfig = register(new BooleanConfig("CustomFov", "Change field of view", false);
+    // Config<Float> fovConfig = register(new NumberConfig<>("FOV", "Field of view", 10.0f, 120.0f, 180.0f);
+    Config<Float> positionXConfig = register(new NumberConfig<>("X", "Translation in x-direction", -3.0f, 0.0f, 3.0f));
+    Config<Float> positionYConfig = register(new NumberConfig<>("Y", "Translation in y-direction", -3.0f, 0.0f, 3.0f));
+    Config<Float> positionZConfig = register(new NumberConfig<>("Z", "Translation in z-direction", -3.0f, 0.0f, 3.0f));
+    Config<Float> scaleXConfig = register(new NumberConfig<>("ScaleX", "Scaling in x-direction", 0.1f, 1.0f, 2.0f));
+    Config<Float> scaleYConfig = register(new NumberConfig<>("ScaleY", "Scaling in y-direction", 0.1f, 1.0f, 2.0f));
+    Config<Float> scaleZConfig = register(new NumberConfig<>("ScaleZ", "Scaling in z-direction", 0.1f, 1.0f, 2.0f));
+    Config<Float> rotateXConfig = register(new NumberConfig<>("RotateX", "Rotation in x-direction", -180.0f, 0.0f, 180.0f));
+    Config<Float> rotateYConfig = register(new NumberConfig<>("RotateY", "Rotation in y-direction", -180.0f, 0.0f, 180.0f));
+    Config<Float> rotateZConfig = register(new NumberConfig<>("RotateZ", "Rotation in z-direction", -180.0f, 0.0f, 180.0f));
 
     public ViewModelModule() {
         super("ViewModel", "Changes the first-person viewmodel", ModuleCategory.RENDER);

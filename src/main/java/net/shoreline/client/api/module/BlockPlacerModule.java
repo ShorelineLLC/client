@@ -10,8 +10,8 @@ import java.util.function.Predicate;
 
 public class BlockPlacerModule extends RotationModule {
 
-    protected Config<Boolean> strictDirectionConfig = new BooleanConfig("StrictDirection", "Places on visible sides only", false);
-    protected Config<Boolean> grimConfig = new BooleanConfig("Grim", "Places using grim instant rotations", false);
+    protected Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Places on visible sides only", false));
+    protected Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false));
 
     public BlockPlacerModule(String name, String desc, ModuleCategory category) {
         super(name, desc, category);

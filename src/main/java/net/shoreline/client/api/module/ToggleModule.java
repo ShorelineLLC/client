@@ -31,17 +31,17 @@ public class ToggleModule extends Module implements Hideable {
     private final Animation animation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
     // Config representing the module enabled state. Cannot interact with
     // this configuration unless using #toggle() #enable() or #disable().
-    Config<Boolean> enabledConfig = new ToggleConfig("Enabled", "The module" +
-            " enabled state. This state is true when the module is running.", false);
+    Config<Boolean> enabledConfig = register(new ToggleConfig("Enabled", "The module" +
+            " enabled state. This state is true when the module is running.", false));
     // Config for keybinding implementation. Module keybind is used to
     // interact with the #enabledConfig.
-    Config<Macro> keybindingConfig = new MacroConfig("Keybind", "The module " +
+    Config<Macro> keybindingConfig = register(new MacroConfig("Keybind", "The module " +
             "keybinding. Pressing this key will toggle the module enabled " +
             "state. Press [BACKSPACE] to delete the keybind.",
-            new Macro(getId(), GLFW.GLFW_KEY_UNKNOWN, () -> toggle()));
+            new Macro(getId(), GLFW.GLFW_KEY_UNKNOWN, () -> toggle())));
     // Arraylist rendering info
-    Config<Boolean> hiddenConfig = new BooleanConfig("Hidden", "The hidden " +
-            "state of the module in the Arraylist", false);
+    Config<Boolean> hiddenConfig = register(new BooleanConfig("Hidden", "The hidden " +
+            "state of the module in the Arraylist", false));
 
     /**
      * @param name     The module unique identifier

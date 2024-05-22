@@ -35,8 +35,8 @@ import net.shoreline.client.util.string.EnumFormatter;
  */
 public class JesusModule extends ToggleModule {
     //
-    Config<JesusMode> modeConfig = new EnumConfig<>("Mode", "The mode for walking on water", JesusMode.SOLID, JesusMode.values());
-    Config<Boolean> strictConfig = new BooleanConfig("Strict", "NCP Updated bypass for floating offsets", false, () -> modeConfig.getValue() == JesusMode.SOLID);
+    Config<JesusMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for walking on water", JesusMode.SOLID, JesusMode.values()));
+    Config<Boolean> strictConfig = register(new BooleanConfig("Strict", "NCP Updated bypass for floating offsets", false, () -> modeConfig.getValue() == JesusMode.SOLID));
     //
     private int floatTimer = 1000;
     private boolean fluidState;

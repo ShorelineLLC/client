@@ -24,8 +24,8 @@ public final class BlockInteractModule extends ToggleModule
 {
     public static BlockInteractModule INSTANCE;
 
-    Config<Float> range = new NumberConfig<>("Range", "", 1.0f, 4.0f, 10.0f, NumberDisplay.DEFAULT);
-    Config<Boolean> fluids = new BooleanConfig("Fluids", "", false);
+    Config<Float> range = register(new NumberConfig<>("Range", "", 1.0f, 4.0f, 10.0f, NumberDisplay.DEFAULT));
+    Config<Boolean> fluids = register(new BooleanConfig("Fluids", "", false));
 
     public BlockInteractModule()
     {

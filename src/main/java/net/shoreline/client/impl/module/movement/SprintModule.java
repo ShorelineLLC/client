@@ -18,7 +18,7 @@ import net.shoreline.client.util.string.EnumFormatter;
  */
 public class SprintModule extends ToggleModule {
     //
-    Config<SprintMode> modeConfig = new EnumConfig<>("Mode", "Sprinting mode. Rage allows for multi-directional sprinting.", SprintMode.LEGIT, SprintMode.values());
+    Config<SprintMode> modeConfig = register(new EnumConfig<>("Mode", "Sprinting mode. Rage allows for multi-directional sprinting.", SprintMode.LEGIT, SprintMode.values()));
 
     /**
      *

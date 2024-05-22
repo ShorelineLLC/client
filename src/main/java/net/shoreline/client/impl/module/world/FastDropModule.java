@@ -18,7 +18,7 @@ import net.shoreline.client.init.Managers;
  */
 public class FastDropModule extends ToggleModule {
 
-    Config<Integer> delayConfig = new NumberConfig<>("Delay", "The delay for dropping items", 0, 0, 4);
+    Config<Integer> delayConfig = register(new NumberConfig<>("Delay", "The delay for dropping items", 0, 0, 4));
 
     private int dropTicks;
 

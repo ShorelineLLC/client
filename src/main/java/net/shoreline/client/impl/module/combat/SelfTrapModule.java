@@ -49,18 +49,18 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 {
     public static SelfTrapModule INSTANCE;
 
-    Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f);
-    Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
-    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true);
-    Config<Boolean> centerConfig = new BooleanConfig("Center", "Centers the player before placing blocks", false);
-    Config<Boolean> extendConfig = new BooleanConfig("Extend", "Extends trap  if the player is not in the center of a block", true);
-    Config<Boolean> supportConfig = new BooleanConfig("Support", "Creates a floor for the trap  if there is none", false);
-    Config<Boolean> headConfig = new BooleanConfig("Head", "Place a block at your head", true);
-    Config<Integer> shiftTicksConfig = new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5);
-    Config<Integer> shiftDelayConfig = new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5);
-    Config<Boolean> autoDisableConfig = new BooleanConfig("AutoDisable", "Disables after placing the blocks", true);
-    Config<Boolean> renderConfig = new BooleanConfig("Render", "Renders where trap is placing blocks", false);
-    Config<Integer> fadeTimeConfig = new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false);
+    Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f));
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
+    Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
+    Config<Boolean> centerConfig = register(new BooleanConfig("Center", "Centers the player before placing blocks", false));
+    Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap  if the player is not in the center of a block", true));
+    Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap  if there is none", false));
+    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
+    Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5));
+    Config<Integer> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5));
+    Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after placing the blocks", true));
+    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where trap is placing blocks", false));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
 
     private final Map<BlockPos, TimeAnimation> fadeBoxes = new HashMap<>();
     private final Map<BlockPos, TimeAnimation> fadeLines = new HashMap<>();

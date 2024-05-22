@@ -17,13 +17,13 @@ public class ClickGuiModule extends ToggleModule {
 
     private static ClickGuiModule INSTANCE;
 
-//    Config<Integer> hueConfig = new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
-//    Config<Integer> saturationConfig = new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
-//    Config<Integer> brightnessConfig = new NumberConfig<>("Brightness", "The brightness of colors", 0, 50, 100);
-//    Config<Integer> hue1Config = new NumberConfig<>("Hue1", "The saturation of colors", 0, 0, 360);
-//    Config<Integer> saturation1Config = new NumberConfig<>("Saturation1", "The saturation of colors", 0, 50, 100);
-//    Config<Integer> brightness1Config = new NumberConfig<>("Brightness1", "The brightness of colors", 0, 50, 100);
-//    Config<Integer> alphaConfig = new NumberConfig<>("Alpha", "The alpha of colors", 0, 100, 100);
+//    Config<Integer> hueConfig = register(new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
+//    Config<Integer> saturationConfig = register(new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
+//    Config<Integer> brightnessConfig = register(new NumberConfig<>("Brightness", "The brightness of colors", 0, 50, 100);
+//    Config<Integer> hue1Config = register(new NumberConfig<>("Hue1", "The saturation of colors", 0, 0, 360);
+//    Config<Integer> saturation1Config = register(new NumberConfig<>("Saturation1", "The saturation of colors", 0, 50, 100);
+//    Config<Integer> brightness1Config = register(new NumberConfig<>("Brightness1", "The brightness of colors", 0, 50, 100);
+//    Config<Integer> alphaConfig = register(new NumberConfig<>("Alpha", "The alpha of colors", 0, 100, 100);
     //
     public static ClickGuiScreen CLICK_GUI_SCREEN;
     private final Animation openCloseAnimation = new Animation(false, 300, Easing.CUBIC_IN_OUT);

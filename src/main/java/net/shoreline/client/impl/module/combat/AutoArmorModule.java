@@ -32,12 +32,12 @@ import java.util.Queue;
 public class AutoArmorModule extends ToggleModule {
 
     //
-    Config<Priority> priorityConfig = new EnumConfig<>("Priority", "Armor enchantment priority", Priority.BLAST_PROTECTION, Priority.values());
-    Config<Float> minDurabilityConfig = new NumberConfig<>("MinDurability", "Durability percent to replace armor", 0.0f, 0.0f, 20.0f, NumberDisplay.PERCENT);
-    Config<Boolean> elytraPriorityConfig = new BooleanConfig("ElytraPriority", "Prioritizes existing elytras in the chestplate armor slot", true);
-    Config<Boolean> blastLeggingsConfig = new BooleanConfig("Leggings-BlastPriority", "Prioritizes Blast Protection leggings", true);
-    Config<Boolean> noBindingConfig = new BooleanConfig("NoBinding", "Avoids armor with the Curse of Binding enchantment", true);
-    Config<Boolean> inventoryConfig = new BooleanConfig("AllowInventory", "Allows armor to be swapped while in the inventory menu", false);
+    Config<Priority> priorityConfig = register(new EnumConfig<>("Priority", "Armor enchantment priority", Priority.BLAST_PROTECTION, Priority.values()));
+    Config<Float> minDurabilityConfig = register(new NumberConfig<>("MinDurability", "Durability percent to replace armor", 0.0f, 0.0f, 20.0f, NumberDisplay.PERCENT));
+    Config<Boolean> elytraPriorityConfig = register(new BooleanConfig("ElytraPriority", "Prioritizes existing elytras in the chestplate armor slot", true));
+    Config<Boolean> blastLeggingsConfig = register(new BooleanConfig("Leggings-BlastPriority", "Prioritizes Blast Protection leggings", true));
+    Config<Boolean> noBindingConfig = register(new BooleanConfig("NoBinding", "Avoids armor with the Curse of Binding enchantment", true));
+    Config<Boolean> inventoryConfig = register(new BooleanConfig("AllowInventory", "Allows armor to be swapped while in the inventory menu", false));
     //
     private final Queue<ArmorSlot> helmet = new PriorityQueue<>();
     private final Queue<ArmorSlot> chestplate = new PriorityQueue<>();

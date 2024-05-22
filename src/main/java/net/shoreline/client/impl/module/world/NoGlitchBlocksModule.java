@@ -17,8 +17,8 @@ import net.shoreline.client.init.Managers;
  */
 public class NoGlitchBlocksModule extends ToggleModule {
 
-    Config<Boolean> placeConfig = new BooleanConfig("Place", "Places blocks only after the server confirms", true);
-    Config<Boolean> destroyConfig = new BooleanConfig("Destroy", "Destroys blocks only after the server confirms", true);
+    Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places blocks only after the server confirms", true));
+    Config<Boolean> destroyConfig = register(new BooleanConfig("Destroy", "Destroys blocks only after the server confirms", true));
 
     public NoGlitchBlocksModule() {
         super("NoGlitchBlocks", "Prevents blocks from being glitched in the world",

@@ -20,7 +20,7 @@ import net.shoreline.client.util.string.EnumFormatter;
  */
 public class NoWeatherModule extends ToggleModule {
 
-    Config<Weather> weatherConfig = new EnumConfig<>("Weather", "The world weather", Weather.CLEAR, Weather.values());
+    Config<Weather> weatherConfig = register(new EnumConfig<>("Weather", "The world weather", Weather.CLEAR, Weather.values()));
     // The current weather mode
     private Weather weather;
 

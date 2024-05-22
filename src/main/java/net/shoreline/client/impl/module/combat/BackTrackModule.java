@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public final class BackTrackModule extends ToggleModule
 {
-    Config<Integer> delayConfig = new NumberConfig<>("Delay", "The delay before throttling packets again", 0, 100, 1000);
+    Config<Integer> delayConfig = register(new NumberConfig<>("Delay", "The delay before throttling packets again", 0, 100, 1000));
 
     private final Queue<Packet<?>> packetQueue = new ConcurrentLinkedQueue<>();
     private boolean blockingPackets;

@@ -21,12 +21,12 @@ import net.shoreline.client.util.world.FakePlayerEntity;
  */
 public class AutoLogModule extends ToggleModule {
     //
-    Config<Float> healthConfig = new NumberConfig<>("Health", "Disconnects when player reaches this health", 0.1f, 5.0f, 19.0f);
-    Config<Boolean> healthTotemConfig = new BooleanConfig("HealthTotems", "Totem check for health config", true);
-    Config<Boolean> onRenderConfig = new BooleanConfig("OnRender", "Disconnects when a player enters render distance", false);
-    Config<Boolean> noTotemConfig = new BooleanConfig("NoTotems", "Disconnects when player has no totems in the inventory", false);
-    Config<Integer> totemsConfig = new NumberConfig<>("Totems", "The number of totems before disconnecting", 0, 1, 5);
-    Config<Boolean> illegalDisconnectConfig = new BooleanConfig("IllegalDisconnect", "Disconnects from the server using invalid packets", false);
+    Config<Float> healthConfig = register(new NumberConfig<>("Health", "Disconnects when player reaches this health", 0.1f, 5.0f, 19.0f));
+    Config<Boolean> healthTotemConfig = register(new BooleanConfig("HealthTotems", "Totem check for health config", true));
+    Config<Boolean> onRenderConfig = register(new BooleanConfig("OnRender", "Disconnects when a player enters render distance", false));
+    Config<Boolean> noTotemConfig = register(new BooleanConfig("NoTotems", "Disconnects when player has no totems in the inventory", false));
+    Config<Integer> totemsConfig = register(new NumberConfig<>("Totems", "The number of totems before disconnecting", 0, 1, 5));
+    Config<Boolean> illegalDisconnectConfig = register(new BooleanConfig("IllegalDisconnect", "Disconnects from the server using invalid packets", false));
 
     /**
      *

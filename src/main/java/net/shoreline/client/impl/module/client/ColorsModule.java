@@ -18,9 +18,9 @@ public class ColorsModule extends ConcurrentModule {
     private static ColorsModule INSTANCE;
 
     //
-    Config<Color> colorConfig = new ColorConfig("Color", "The primary client color", new Color(255, 0, 0), false, false);
-    // Config<Color> color1Config = new ColorConfig("Accent-Color", "The accent client color", new Color());
-    Config<Boolean> rainbowConfig = new BooleanConfig("Rainbow", "Renders rainbow colors for modules", false);
+    Config<Color> colorConfig = register(new ColorConfig("Color", "The primary client color", new Color(255, 0, 0), false, false));
+    // Config<Color> color1Config = register(new ColorConfig("Accent-Color", "The accent client color", new Color());
+    Config<Boolean> rainbowConfig = register(new BooleanConfig("Rainbow", "Renders rainbow colors for modules", false));
 
     /**
      *

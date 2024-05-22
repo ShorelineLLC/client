@@ -20,12 +20,12 @@ import java.awt.*;
  */
 public class ParticlesModule extends ToggleModule {
 
-    Config<TotemParticle> totemConfig = new EnumConfig<>("Totem", "Renders totem particles", TotemParticle.OFF, TotemParticle.values());
-    Config<Color> totemColorConfig = new ColorConfig("TotemColor", "Color of the totem particles", new Color(25, 120, 0), false, false, () -> totemConfig.getValue() == TotemParticle.COLOR);
-    Config<Boolean> fireworkConfig = new BooleanConfig("Firework", "Renders firework particles", false);
-    Config<Boolean> potionConfig = new BooleanConfig("Effects", "Renders potion effect particles", true);
-    Config<Boolean> bottleConfig = new BooleanConfig("BottleSplash", "Render bottle splash particles", true);
-    Config<Boolean> portalConfig = new BooleanConfig("Portal", "Render portal particles", true);
+    Config<TotemParticle> totemConfig = register(new EnumConfig<>("Totem", "Renders totem particles", TotemParticle.OFF, TotemParticle.values()));
+    Config<Color> totemColorConfig = register(new ColorConfig("TotemColor", "Color of the totem particles", new Color(25, 120, 0), false, false, () -> totemConfig.getValue() == TotemParticle.COLOR));
+    Config<Boolean> fireworkConfig = register(new BooleanConfig("Firework", "Renders firework particles", false));
+    Config<Boolean> potionConfig = register(new BooleanConfig("Effects", "Renders potion effect particles", true));
+    Config<Boolean> bottleConfig = register(new BooleanConfig("BottleSplash", "Render bottle splash particles", true));
+    Config<Boolean> portalConfig = register(new BooleanConfig("Portal", "Render portal particles", true));
 
     public ParticlesModule() {
         super("Particles", "Change the rendering of particles", ModuleCategory.RENDER);

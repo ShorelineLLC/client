@@ -29,10 +29,10 @@ import java.util.Set;
 
 public class ClickCrystalModule extends RotationModule {
 
-    Config<Float> breakDelayConfig = new NumberConfig<>("SpawnDelay", "Speed to break crystals after spawning", 0.0f, 0.0f, 20.0f);
-    Config<Float> randomDelayConfig = new NumberConfig<>("RandomDelay", "Randomized break delay", 0.0f, 0.0f, 5.0f);
-    Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotate before breaking", false);
-    Config<Boolean> randomRotateConfig = new BooleanConfig("Rotate-Random", "Slightly randomizes rotations", false, () -> rotateConfig.getValue());
+    Config<Float> breakDelayConfig = register(new NumberConfig<>("SpawnDelay", "Speed to break crystals after spawning", 0.0f, 0.0f, 20.0f));
+    Config<Float> randomDelayConfig = register(new NumberConfig<>("RandomDelay", "Randomized break delay", 0.0f, 0.0f, 5.0f));
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate before breaking", false));
+    Config<Boolean> randomRotateConfig = register(new BooleanConfig("Rotate-Random", "Slightly randomizes rotations", false, () -> rotateConfig.getValue()));
     private final Set<BlockPos> placedCrystals = new HashSet<>();
     private final Map<EndCrystalEntity, Long> spawnedCrystals = new LinkedHashMap<>();
     private float randomDelay = -1;

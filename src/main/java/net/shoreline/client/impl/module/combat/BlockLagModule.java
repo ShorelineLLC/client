@@ -27,10 +27,10 @@ import java.util.List;
  */
 public class BlockLagModule extends ObsidianPlacerModule {
     //
-    Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates before placing the block", false);
-    // Config<Boolean> strictConfig = new BooleanConfig("Strict", "Allows you to fake lag on strict servers", false);
-    Config<Boolean> attackConfig = new BooleanConfig("Attack", "Attacks crystals in the way of block", true);
-    Config<Boolean> autoDisableConfig = new BooleanConfig("AutoDisable", "Automatically disables after placing block", false);
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates before placing the block", false));
+    // Config<Boolean> strictConfig = register(new BooleanConfig("Strict", "Allows you to fake lag on strict servers", false);
+    Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of block", true));
+    Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Automatically disables after placing block", false));
     //
     private double prevY;
 

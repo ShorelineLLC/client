@@ -32,9 +32,9 @@ public class LongJumpModule extends ToggleModule {
     private static LongJumpModule INSTANCE;
 
     //
-    Config<JumpMode> modeConfig = new EnumConfig<>("Mode", "The mode for long jump", JumpMode.NORMAL, JumpMode.values());
-    Config<Float> boostConfig = new NumberConfig<>("Boost", "The jump boost speed", 0.1f, 4.5f, 10.0f, () -> modeConfig.getValue() == JumpMode.NORMAL);
-    Config<Boolean> autoDisableConfig = new BooleanConfig("AutoDisable", "Automatically disables when rubberband is detected", true);
+    Config<JumpMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for long jump", JumpMode.NORMAL, JumpMode.values()));
+    Config<Float> boostConfig = register(new NumberConfig<>("Boost", "The jump boost speed", 0.1f, 4.5f, 10.0f, () -> modeConfig.getValue() == JumpMode.NORMAL));
+    Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Automatically disables when rubberband is detected", true));
     //
     private int stage;
     private double distance;

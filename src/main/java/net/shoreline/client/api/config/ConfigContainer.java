@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author linus
  * @see Config
- * @see ConfigFactory
  * @since 1.0
  */
 public class ConfigContainer implements Identifiable, Serializable<Config<?>>, Globals {
@@ -33,12 +32,9 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
             Collections.synchronizedMap(new LinkedHashMap<>());
 
     /**
-     * Uses the reflection {@link ConfigFactory} to add all declared configurations
-     * to the config {@link ConcurrentMap}. Declared {@link Config}s will not
-     * be registered if this process does not complete.
+     * Declared {@link Config}s will not be registered if this process does not complete.
      *
      * @param name The container name
-     * @see ConfigFactory
      */
     public ConfigContainer(String name) {
         // set name of this container early
@@ -49,9 +45,10 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
     /**
      * @param config
      */
-    protected void register(Config<?> config) {
+    protected <T> Config<T> register(Config<T> config) {
         config.setContainer(this);
         configurations.put(config.getId(), config);
+        return config;
     }
 
     /**
@@ -76,21 +73,21 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
     /**
      * Reflect configuration fields
      */
-    public void reflectConfigs() {
-        final ConfigFactory factory = new ConfigFactory(this);
-        // populate container using reflection
-        for (Field field : getClass().getDeclaredFields()) {
-            if (Config.class.isAssignableFrom(field.getType())) {
-                Config<?> config = factory.build(field);
-                if (config == null) {
-                    // failsafe for debugging purposes
-                    Shoreline.error("Value for field {} is null!", field);
-                    continue;
-                }
-                register(config);
-            }
-        }
-    }
+//    public void reflectConfigs() {
+//        final ConfigFactory factory = new ConfigFactory(this);
+//        // populate container using reflection
+//        for (Field field : getClass().getDeclaredFields()) {
+//            if (Config.class.isAssignableFrom(field.getType())) {
+//                Config<?> config = factory.build(field);
+//                if (config == null) {
+//                    // failsafe for debugging purposes
+//                    Shoreline.error("Value for field {} is null!", field);
+//                    continue;
+//                }
+//                register(config);
+//            }
+//        }
+//    }
 
     /**
      * Returns the container as a {@link JsonObject} containing a list of the

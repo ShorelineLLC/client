@@ -37,9 +37,9 @@ public class InvCleanerModule extends ToggleModule {
     private static InvCleanerModule INSTANCE;
 
     //
-    Config<List<Item>> blacklistConfig = new ItemListConfig<>("Blacklist", "The items to throw");
-    Config<Float> delayConfig = new NumberConfig<>("Delay", "The delay between removing items from the inventory", 0.05f, 0.0f, 1.0f);
-    Config<Boolean> hotbarConfig = new BooleanConfig("Hotbar", "Cleans the hotbar inventory slots", true);
+    Config<List<Item>> blacklistConfig = register(new ItemListConfig<>("Blacklist", "The items to throw"));
+    Config<Float> delayConfig = register(new NumberConfig<>("Delay", "The delay between removing items from the inventory", 0.05f, 0.0f, 1.0f));
+    Config<Boolean> hotbarConfig = register(new BooleanConfig("Hotbar", "Cleans the hotbar inventory slots", true));
     //
     private final Timer invCleanTimer = new CacheTimer();
 

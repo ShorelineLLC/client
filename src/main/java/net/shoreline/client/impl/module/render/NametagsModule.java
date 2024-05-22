@@ -53,18 +53,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class NametagsModule extends ToggleModule {
     private static NametagsModule INSTANCE;
 
-    Config<Boolean> armorConfig = new BooleanConfig("Armor", "Displays the player's armor", true);
-    Config<Boolean> enchantmentsConfig = new BooleanConfig("Enchantments", "Displays a list of the item's enchantments", true);
-    Config<Boolean> durabilityConfig = new BooleanConfig("Durability", "Displays item durability", true);
-    Config<Boolean> itemNameConfig = new BooleanConfig("ItemName", "Displays the player's current held item name", false);
-    Config<Boolean> entityIdConfig = new BooleanConfig("EntityId", "Displays the player's entity id", false);
-    Config<Boolean> gamemodeConfig = new BooleanConfig("Gamemode", "Displays the player's gamemode", false);
-    Config<Boolean> pingConfig = new BooleanConfig("Ping", "Displays the player's server connection ping", true);
-    Config<Boolean> healthConfig = new BooleanConfig("Health", "Displays the player's current health", true);
-    Config<Boolean> totemsConfig = new BooleanConfig("Totems", "Displays the player's popped totem count", false);
-    Config<Float> scalingConfig = new NumberConfig<>("Scaling", "The nametag label scale", 0.001f, 0.003f, 0.01f);
-    Config<Boolean> invisiblesConfig = new BooleanConfig("Invisibles", "Renders nametags on invisible players", true);
-    Config<Boolean> borderedConfig = new BooleanConfig("TextBorder", "Renders a border behind the nametag", true);
+    Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays the player's armor", true));
+    Config<Boolean> enchantmentsConfig = register(new BooleanConfig("Enchantments", "Displays a list of the item's enchantments", true));
+    Config<Boolean> durabilityConfig = register(new BooleanConfig("Durability", "Displays item durability", true));
+    Config<Boolean> itemNameConfig = register(new BooleanConfig("ItemName", "Displays the player's current held item name", false));
+    Config<Boolean> entityIdConfig = register(new BooleanConfig("EntityId", "Displays the player's entity id", false));
+    Config<Boolean> gamemodeConfig = register(new BooleanConfig("Gamemode", "Displays the player's gamemode", false));
+    Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Displays the player's server connection ping", true));
+    Config<Boolean> healthConfig = register(new BooleanConfig("Health", "Displays the player's current health", true));
+    Config<Boolean> totemsConfig = register(new BooleanConfig("Totems", "Displays the player's popped totem count", false));
+    Config<Float> scalingConfig = register(new NumberConfig<>("Scaling", "The nametag label scale", 0.001f, 0.003f, 0.01f));
+    Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Renders nametags on invisible players", true));
+    Config<Boolean> borderedConfig = register(new BooleanConfig("TextBorder", "Renders a border behind the nametag", true));
 
     public NametagsModule() {
         super("Nametags", "Renders info on player nametags", ModuleCategory.RENDER);

@@ -22,12 +22,12 @@ import java.util.List;
  */
 public class AutoWebModule extends BlockPlacerModule {
 
-    Config<Float> rangeConfig = new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f);
-    Config<Float> enemyRangeConfig = new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f);
-    Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
-    Config<Boolean> coverHeadConfig = new BooleanConfig("CoverHead", "Places webs on the targets head", false);
-    Config<Integer> shiftTicksConfig = new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5);
-    Config<Integer> shiftDelayConfig = new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5);
+    Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f));
+    Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
+    Config<Boolean> coverHeadConfig = register(new BooleanConfig("CoverHead", "Places webs on the targets head", false));
+    Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5));
+    Config<Integer> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5));
     private int shiftDelay;
 
     public AutoWebModule() {
