@@ -26,6 +26,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.RunTickEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
@@ -54,7 +55,7 @@ import java.util.concurrent.*;
  * @since 1.0
  */
 public class AutoCrystalModule extends RotationModule {
-    public static AutoCrystalModule INSTANCE;
+    private static AutoCrystalModule INSTANCE;
 
     Config<Boolean> multitaskConfig = new BooleanConfig("Multitask", "Allows attacking while using items", false);
     Config<Boolean> whileMiningConfig = new BooleanConfig("WhileMining", "Allows attacking while mining blocks", false);
@@ -164,6 +165,11 @@ public class AutoCrystalModule extends RotationModule {
     public AutoCrystalModule() {
         super("AutoCrystal", "Attacks entities with end crystals",
                 ModuleCategory.COMBAT, 750);
+        INSTANCE = this;
+    }
+
+    public static AutoCrystalModule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -290,6 +296,7 @@ public class AutoCrystalModule extends RotationModule {
     {
         if (renderConfig.getValue())
         {
+            RenderBuffers.preRender();
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 if (set.getKey() == renderPos)
@@ -300,11 +307,12 @@ public class AutoCrystalModule extends RotationModule {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
-                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
+                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
+                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
+            RenderBuffers.postRender();
 
             if (renderPos != null && isHoldingCrystal())
             {

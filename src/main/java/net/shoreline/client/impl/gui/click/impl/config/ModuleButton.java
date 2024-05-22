@@ -104,7 +104,7 @@ public class ModuleButton extends Button {
         if (module.getName().equalsIgnoreCase("ClickGui")) {
             scaledTime = 1.7f;
         }
-        rectGradient(context, fill ? ClickGuiModule.INSTANCE.getColor(scaledTime) : 0x555555, fill ? ClickGuiModule.INSTANCE.getColor1(scaledTime) : 0x555555);
+        rectGradient(context, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : 0x555555, fill ? ClickGuiModule.getInstance().getColor1(scaledTime) : 0x555555);
         RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? -1 : 0xaaaaaa);
         if (settingsAnimation.getFactor() > 0.01f) {
             off = y + height + 1.0f;
@@ -129,9 +129,9 @@ public class ModuleButton extends Button {
                 off += configButton.getHeight();
             }
             if (fill) {
-                fill(context, ix, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.INSTANCE.getColor1(scaledTime));
-                fill(context, ix + width - 1.0f, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.INSTANCE.getColor(scaledTime));
-                fillGradient(context, ix, off + 1.0f, ix + width, off + 2.0f, ClickGuiModule.INSTANCE.getColor(scaledTime), ClickGuiModule.INSTANCE.getColor1(scaledTime));
+                fill(context, ix, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.getInstance().getColor1(scaledTime));
+                fill(context, ix + width - 1.0f, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.getInstance().getColor(scaledTime));
+                fillGradient(context, ix, off + 1.0f, ix + width, off + 2.0f, ClickGuiModule.getInstance().getColor(scaledTime), ClickGuiModule.getInstance().getColor1(scaledTime));
             }
             disableScissor();
             ((CategoryFrame) frame).offset((float) (3.0f * settingsAnimation.getFactor()));

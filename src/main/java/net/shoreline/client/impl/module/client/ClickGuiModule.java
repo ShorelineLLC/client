@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.client;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
+import net.shoreline.client.impl.module.combat.AuraModule;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
@@ -14,7 +15,7 @@ import org.lwjgl.glfw.GLFW;
  */
 public class ClickGuiModule extends ToggleModule {
 
-    public static ClickGuiModule INSTANCE;
+    private static ClickGuiModule INSTANCE;
 
 //    Config<Integer> hueConfig = new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
 //    Config<Integer> saturationConfig = new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
@@ -36,6 +37,11 @@ public class ClickGuiModule extends ToggleModule {
     public ClickGuiModule() {
         super("ClickGui", "Opens the clickgui screen", ModuleCategory.CLIENT,
                 GLFW.GLFW_KEY_RIGHT_SHIFT);
+        INSTANCE = this;
+    }
+
+    public static ClickGuiModule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -63,22 +69,22 @@ public class ClickGuiModule extends ToggleModule {
     }
 
     public int getColor() {
-        return ColorsModule.INSTANCE.getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.getInstance().getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hueConfig.getValue(), saturationConfig.getValue(), brightnessConfig.getValue(), alphaConfig.getValue() / 100.0f).getRGB();
     }
 
     public int getColor1() {
-        return ColorsModule.INSTANCE.getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.getInstance().getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hue1Config.getValue(), saturation1Config.getValue(), brightness1Config.getValue(), alphaConfig.getValue() / 100.0f).getRGB();
     }
 
     public int getColor(float alpha) {
-        return ColorsModule.INSTANCE.getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.getInstance().getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hueConfig.getValue(), saturationConfig.getValue(), brightnessConfig.getValue(), MathHelper.clamp(alphaConfig.getValue() * alpha / 100.0f, 0.0f, 1.0f)).getRGB();
     }
 
     public int getColor1(float alpha) {
-        return ColorsModule.INSTANCE.getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
+        return ColorsModule.getInstance().getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
         // return ColorUtil.hslToColor(hue1Config.getValue(), saturation1Config.getValue(), brightness1Config.getValue(), MathHelper.clamp(alphaConfig.getValue() * alpha / 100.0f, 0.0f, 1.0f)).getRGB();
     }
 

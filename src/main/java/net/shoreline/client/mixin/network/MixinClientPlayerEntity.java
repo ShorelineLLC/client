@@ -14,7 +14,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.impl.event.buffers.ManagersBuffer;
 import net.shoreline.client.impl.event.entity.SwingEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.*;
@@ -180,7 +179,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void hookTickPre(CallbackInfo ci) {
         PlayerTickEvent playerTickEvent = new PlayerTickEvent();
         EventBus.EVENT_HANDLER.dispatch(playerTickEvent);
-        ManagersBuffer.getRotationManager().onUpdate();
     }
 
     /**

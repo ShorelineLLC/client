@@ -17,12 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.impl.event.buffers.ManagersBuffer;
-import net.shoreline.client.impl.event.buffers.ModulesBuffer;
-import net.shoreline.client.impl.event.network.AttackBlockEvent;
-import net.shoreline.client.impl.event.network.BreakBlockEvent;
-import net.shoreline.client.impl.event.network.InteractBlockEvent;
-import net.shoreline.client.impl.event.network.ReachEvent;
+import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.util.Globals;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Mixin;
@@ -122,47 +117,41 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
      */
     @Inject(method = "interactItem", at = @At(value = "HEAD"), cancellable = true)
     public void hookInteractItem(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        cir.cancel();
-        if (this.gameMode == GameMode.SPECTATOR) {
-            cir.setReturnValue(ActionResult.PASS);
-        }
-        syncSelectedSlot();
+        StrafeFixEvent strafeFixEvent = new StrafeFixEvent();
+        EventBus.EVENT_HANDLER.dispatch(strafeFixEvent);
         // Strafe fix cuz goofy 1.19 sends move packet when using items
-        float yaw = mc.player.getYaw();
-        float pitch = mc.player.getPitch();
-        if (ManagersBuffer.getRotationManager().isRotating())
-        {
-            yaw = ManagersBuffer.getRotationManager().getRotationYaw();
-            pitch = ManagersBuffer.getRotationManager().getRotationPitch();
-        }
-        if (!ModulesBuffer.getNoSlowModule().isEnabled() || !ModulesBuffer.getNoSlowModule().getStrafeFix())
-        {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(player.getX(), player.getY(), player.getZ(),
-                    yaw, pitch, player.isOnGround()));
-        }
-        MutableObject mutableObject = new MutableObject();
-        sendSequencedPacket(mc.world, sequence -> {
-            PlayerInteractItemC2SPacket playerInteractItemC2SPacket = new PlayerInteractItemC2SPacket(hand, sequence);
-            ItemStack itemStack = player.getStackInHand(hand);
-            if (player.getItemCooldownManager().isCoolingDown(itemStack.getItem())) {
-                mutableObject.setValue(ActionResult.PASS);
+        if (strafeFixEvent.isCanceled()) {
+            cir.cancel();
+            if (this.gameMode == GameMode.SPECTATOR) {
+                cir.setReturnValue(ActionResult.PASS);
+            }
+            syncSelectedSlot();
+            MutableObject mutableObject = new MutableObject();
+            sendSequencedPacket(mc.world, sequence -> {
+                PlayerInteractItemC2SPacket playerInteractItemC2SPacket = new PlayerInteractItemC2SPacket(hand, sequence);
+                ItemStack itemStack = player.getStackInHand(hand);
+                if (player.getItemCooldownManager().isCoolingDown(itemStack.getItem())) {
+                    mutableObject.setValue(ActionResult.PASS);
+                    return playerInteractItemC2SPacket;
+                }
+                TypedActionResult<ItemStack> typedActionResult = itemStack.use(mc.world, player, hand);
+                ItemStack itemStack2 = typedActionResult.getValue();
+                if (itemStack2 != itemStack) {
+                    player.setStackInHand(hand, itemStack2);
+                }
+                mutableObject.setValue(typedActionResult.getResult());
                 return playerInteractItemC2SPacket;
-            }
-            TypedActionResult<ItemStack> typedActionResult = itemStack.use(mc.world, player, hand);
-            ItemStack itemStack2 = typedActionResult.getValue();
-            if (itemStack2 != itemStack) {
-                player.setStackInHand(hand, itemStack2);
-            }
-            mutableObject.setValue(typedActionResult.getResult());
-            return playerInteractItemC2SPacket;
-        });
-        cir.setReturnValue((ActionResult) ((Object) mutableObject.getValue()));
+            });
+            cir.setReturnValue((ActionResult) ((Object) mutableObject.getValue()));
+        }
     }
 
     @Redirect(method = "interactBlockInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;shouldCancelInteraction()Z"))
     private boolean hookRedirectInteractBlockInternal$shouldCancelInteraction(ClientPlayerEntity player)
     {
-        return player.isSneaking() || ManagersBuffer.getMovementManger().isPacketSneaking();
+        PacketSneakingEvent packetSneakingEvent = new PacketSneakingEvent();
+        EventBus.EVENT_HANDLER.dispatch(packetSneakingEvent);
+        return player.isSneaking() || packetSneakingEvent.isCanceled();
     }
 
     @Redirect(
@@ -175,7 +164,9 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
         {
             return entity.getStackInHand(hand);
         }
-        return ManagersBuffer.getInventoryManager().isDesynced() ? ManagersBuffer.getInventoryManager().getServerItem() : entity.getStackInHand(Hand.MAIN_HAND);
+        ItemDesyncEvent itemDesyncEvent = new ItemDesyncEvent();
+        EventBus.EVENT_HANDLER.dispatch(itemDesyncEvent);
+        return itemDesyncEvent.isCanceled() ? itemDesyncEvent.getServerItem() : entity.getStackInHand(Hand.MAIN_HAND);
     }
 
     @Redirect(
@@ -185,6 +176,8 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
             target = "Lnet/minecraft/item/ItemStack;isEmpty()Z",
             ordinal = 0))
     private boolean hookRedirectInteractBlockInternal$getMainHandStack(ItemStack instance) {
-        return ManagersBuffer.getInventoryManager().isDesynced() ? ManagersBuffer.getInventoryManager().getServerItem().isEmpty() : instance.isEmpty();
+        ItemDesyncEvent itemDesyncEvent = new ItemDesyncEvent();
+        EventBus.EVENT_HANDLER.dispatch(itemDesyncEvent);
+        return itemDesyncEvent.isCanceled() ? itemDesyncEvent.getServerItem().isEmpty() : instance.isEmpty();
     }
 }

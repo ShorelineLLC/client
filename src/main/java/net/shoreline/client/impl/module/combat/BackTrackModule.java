@@ -12,8 +12,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.SkipRegister;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
@@ -31,7 +31,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author xgraza
  * @since 1.0
  */
-@SkipRegister
 public final class BackTrackModule extends ToggleModule
 {
     Config<Integer> delayConfig = new NumberConfig<>("Delay", "The delay before throttling packets again", 0, 100, 1000);
@@ -104,7 +103,7 @@ public final class BackTrackModule extends ToggleModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
-        final AuraModule auraModule = AuraModule.INSTANCE;
+        final AuraModule auraModule = AuraModule.getInstance();
         if (!auraModule.isEnabled() || !(auraModule.getEntityTarget() instanceof LivingEntity auraTarget))
         {
             attackingEntity = null;
@@ -155,8 +154,10 @@ public final class BackTrackModule extends ToggleModule
 
         if (hitBox != null)
         {
-            RenderManager.renderBox(event.getMatrices(), hitBox, ColorsModule.INSTANCE.getRGB(120));
-            RenderManager.renderBoundingBox(event.getMatrices(), hitBox, 1.5f, ColorsModule.INSTANCE.getRGB());
+            RenderBuffers.preRender();
+            RenderManager.renderBox(event.getMatrices(), hitBox, ColorsModule.getInstance().getRGB(120));
+            RenderManager.renderBoundingBox(event.getMatrices(), hitBox, 1.5f, ColorsModule.getInstance().getRGB());
+            RenderBuffers.postRender();
         }
     }
 
@@ -176,7 +177,7 @@ public final class BackTrackModule extends ToggleModule
 
     private boolean shouldCancelPacket(final Packet<?> packet)
     {
-        if (VelocityModule.INSTANCE.isEnabled())
+        if (VelocityModule.getInstance().isEnabled())
         {
             return !(packet instanceof EntityVelocityUpdateS2CPacket || packet instanceof ExplosionS2CPacket);
         }

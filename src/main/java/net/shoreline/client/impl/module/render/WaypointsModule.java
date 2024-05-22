@@ -20,6 +20,7 @@ import net.shoreline.client.impl.event.ScreenOpenEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 
 import java.nio.charset.StandardCharsets;
@@ -31,7 +32,7 @@ import java.util.UUID;
  * @since 1.0
  */
 public class WaypointsModule extends ToggleModule {
-    public static WaypointsModule INSTANCE;
+    private static WaypointsModule INSTANCE;
 
     Config<Boolean> logoutsConfig = new BooleanConfig("LogoutPoints", "Marks the position of player logouts", false);
     Config<Boolean> deathsConfig = new BooleanConfig("DeathPoints", "Marks the position of player deaths", false);
@@ -40,6 +41,11 @@ public class WaypointsModule extends ToggleModule {
 
     public WaypointsModule() {
         super("Waypoints", "Renders a waypoint at marked locations", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static WaypointsModule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -68,9 +74,7 @@ public class WaypointsModule extends ToggleModule {
                 }
                 String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
                 String nametag = String.format("%s Logout" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""), player.getName().getString(), format.format(mc.player.getX()), format.format(mc.player.getY()), format.format(mc.player.getZ()));
-                if (Managers.SOCIAL.isFriend(player.getName().getString())) {
-                    nametag = Formatting.AQUA + nametag;
-                }
+                nametag = (Managers.SOCIAL.isFriend(player.getName().getString()) ? "§b" : "§7") + nametag;
                 Managers.WAYPOINT.register(new Waypoint(nametag, serverIp, player.getX(), player.getY(), player.getZ()));
             }
         }
@@ -81,7 +85,7 @@ public class WaypointsModule extends ToggleModule {
         if (event.getScreen() instanceof DeathScreen && deathsConfig.getValue()) {
             String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
             Managers.WAYPOINT.removeContains("Last Death");
-            Managers.WAYPOINT.register(new Waypoint(String.format("Last Death" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""), format.format(mc.player.getX()), format.format(mc.player.getY()), format.format(mc.player.getZ())), serverIp,
+            Managers.WAYPOINT.register(new Waypoint(String.format("§7Last Death" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""), format.format(mc.player.getX()), format.format(mc.player.getY()), format.format(mc.player.getZ())), serverIp,
                     mc.player.getX(), mc.player.getY(), mc.player.getZ()));
         }
     }
@@ -97,7 +101,7 @@ public class WaypointsModule extends ToggleModule {
             }
             Box waypointBox = EntityDimensions.fixed(0.6f, 2.2f).getBoxAt(waypoint.getPos());
             double center = (waypointBox.maxX - waypointBox.minX) / 2.0f;
-            RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, ColorsModule.INSTANCE.getRGB(255));
+            RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, ColorsModule.getInstance().getRGB(255));
             RenderManager.renderSign(waypoint.getName(), waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
         }
     }

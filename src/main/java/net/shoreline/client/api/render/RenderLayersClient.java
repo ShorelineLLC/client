@@ -4,6 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.client.impl.event.render.StoreBufferEvent;
 import net.shoreline.client.mixin.accessor.AccessorRenderPhase;
 import net.shoreline.client.util.Globals;
 import org.lwjgl.opengl.GL11;
@@ -20,6 +23,15 @@ public class RenderLayersClient implements Globals {
             RenderLayer.MultiPhaseParameters.builder().program(RenderPhase.ITEM_ENTITY_TRANSLUCENT_CULL_PROGRAM).texture(RenderPhase.BLOCK_ATLAS_TEXTURE).lightmap(new Lightmap())
                     .target(RenderPhase.ITEM_ENTITY_TARGET).writeMaskState(RenderPhase.ALL_MASK).build(true));
 
+    public RenderLayersClient() {
+        EventBus.EVENT_HANDLER.subscribe(this);
+    }
+
+    @EventListener
+    public void onStoreBuffer(StoreBufferEvent event) {
+        // initialize client layers here
+        event.getMap().put(GLINT, GLINT.getExpectedBufferSize());
+    }
 
     protected static class DepthTest extends RenderPhase.DepthTest {
         public DepthTest() {

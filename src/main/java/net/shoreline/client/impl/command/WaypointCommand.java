@@ -35,8 +35,8 @@ public class WaypointCommand extends Command {
                                             return 0;
                                         }
                                         ChatUtil.clientSendMessage("Added waypoint with name §s" + waypointName);
-                                        waypointName += (WaypointsModule.INSTANCE.getCoords() ? String.format(" XYZ %s %s %s", x, y, z) : "");
-                                        Managers.WAYPOINT.register(new Waypoint(waypointName, mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp(), x, y, z));
+                                        waypointName += (WaypointsModule.getInstance().getCoords() ? String.format(" XYZ %s %s %s", x, y, z) : "");
+                                        Managers.WAYPOINT.register(new Waypoint("§7" + waypointName, mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp(), x, y, z));
                                     }
                                     return 1;
                                 }))))

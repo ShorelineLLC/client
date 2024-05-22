@@ -113,7 +113,7 @@ public class CategoryFrame extends Frame {
         if (y > mc.getWindow().getHeight() - 10) {
             y = mc.getWindow().getHeight() - 10;
         }
-        rect(context, ClickGuiModule.INSTANCE.getColor(1.7f));
+        rect(context, ClickGuiModule.getInstance().getColor(1.7f));
         RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, -1);
         if (categoryAnimation.getFactor() > 0.01f) {
             enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));

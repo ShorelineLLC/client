@@ -4,6 +4,8 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.client.impl.event.network.PacketSneakingEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -14,6 +16,10 @@ import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.
 public class MovementManager implements Globals {
 
     private boolean packetSneaking;
+
+    public MovementManager() {
+        EventBus.EVENT_HANDLER.subscribe(this);
+    }
 
     /**
      * @param y
@@ -43,7 +49,8 @@ public class MovementManager implements Globals {
         }
     }
 
-    public boolean isPacketSneaking() {
-        return packetSneaking;
+    @EventListener
+    public void onPacketSneak(PacketSneakingEvent event) {
+        event.setCanceled(packetSneaking);
     }
 }

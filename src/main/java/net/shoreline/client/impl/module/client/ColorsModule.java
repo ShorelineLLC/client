@@ -3,8 +3,10 @@ package net.shoreline.client.impl.module.client;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
+import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.impl.event.ClientColorEvent;
 
 import java.awt.*;
 
@@ -13,7 +15,7 @@ import java.awt.*;
  * @since 1.0
  */
 public class ColorsModule extends ConcurrentModule {
-    public static ColorsModule INSTANCE;
+    private static ColorsModule INSTANCE;
 
     //
     Config<Color> colorConfig = new ColorConfig("Color", "The primary client color", new Color(255, 0, 0), false, false);
@@ -25,6 +27,16 @@ public class ColorsModule extends ConcurrentModule {
      */
     public ColorsModule() {
         super("Colors", "Client color scheme", ModuleCategory.CLIENT);
+        INSTANCE = this;
+    }
+
+    public static ColorsModule getInstance() {
+        return INSTANCE;
+    }
+
+    @EventListener
+    public void onClientColor(ClientColorEvent event) {
+        event.setRgb(getRGB());
     }
 
     public Color getColor() {

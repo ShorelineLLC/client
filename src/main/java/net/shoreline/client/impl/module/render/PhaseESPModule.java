@@ -10,6 +10,7 @@ import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.util.world.BlastResistantBlocks;
@@ -32,6 +33,7 @@ public class PhaseESPModule extends ToggleModule {
         if (mc.player == null || mc.world == null || !mc.player.isOnGround()) {
             return;
         }
+        RenderBuffers.preRender();
         BlockPos playerPos = mc.player.getBlockPos();
         for (Direction direction : Direction.values()) {
             if (!direction.getAxis().isHorizontal()) {
@@ -71,5 +73,6 @@ public class PhaseESPModule extends ToggleModule {
                 RenderManager.drawLine(event.getMatrices(), x, y, z + 1.0, x + 1.0, y, z + 1.0, color.getRGB());
             }
         }
+        RenderBuffers.postRender();
     }
 }

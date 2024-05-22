@@ -6,9 +6,8 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.shoreline.client.impl.event.gui.screen.RenderOpenChatEvent;
 import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.impl.event.buffers.ManagersBuffer;
-import net.shoreline.client.impl.event.buffers.ModulesBuffer;
 import net.shoreline.client.impl.event.gui.chat.ChatInputEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatKeyInputEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
@@ -98,8 +97,10 @@ public class MixinChatScreen extends MixinScreen {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
     private void hookFill(DrawContext instance, int x1, int y1, int x2, int y2, int color) {
-        float openAnimation = ModulesBuffer.getHudModule().isEnabled() ? 12.0f * ModulesBuffer.getHudModule().getChatAnimation() : 12.0f;
-        ManagersBuffer.getRenderManagerRect(instance.getMatrices(), 2, this.height - 2.0f , this.width - 4, -openAnimation, client.options.getTextBackgroundColor(Integer.MIN_VALUE));
+        RenderOpenChatEvent renderOpenChatEvent = new RenderOpenChatEvent();
+        EventBus.EVENT_HANDLER.dispatch(renderOpenChatEvent);
+        float openAnimation = renderOpenChatEvent.isCanceled() ? 12.0f * renderOpenChatEvent.getAnimation() : 12.0f;
+        instance.fill(2, (int) (this.height - 2.0f), this.width - 2, (int) ((this.height - 2.0f) - openAnimation), client.options.getTextBackgroundColor(Integer.MIN_VALUE));
     }
 
     @Override

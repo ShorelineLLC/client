@@ -18,6 +18,7 @@ import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -33,7 +34,7 @@ import java.util.List;
  * @since 1.0
  */
 public class InvCleanerModule extends ToggleModule {
-    public static InvCleanerModule INSTANCE;
+    private static InvCleanerModule INSTANCE;
 
     //
     Config<List<Item>> blacklistConfig = new ItemListConfig<>("Blacklist", "The items to throw");
@@ -48,6 +49,13 @@ public class InvCleanerModule extends ToggleModule {
     public InvCleanerModule() {
         super("InvCleaner", "Automatically cleans the player inventory",
                 ModuleCategory.MISCELLANEOUS);
+    }
+
+    public static InvCleanerModule getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new InvCleanerModule();
+        }
+        return INSTANCE;
     }
 
     @EventListener

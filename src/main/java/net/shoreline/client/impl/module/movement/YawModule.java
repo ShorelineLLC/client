@@ -19,12 +19,8 @@ public class YawModule extends ToggleModule {
 
     Config<Boolean> lockConfig = new BooleanConfig("Lock", "Locks the yaw in cardinal direction", false);
 
-    /**
-     *
-     */
     public YawModule() {
-        super("Yaw", "Locks player yaw to a cardinal axis",
-                ModuleCategory.MOVEMENT);
+        super("Yaw", "Locks player yaw to a cardinal axis", ModuleCategory.MOVEMENT);
     }
 
     @EventListener

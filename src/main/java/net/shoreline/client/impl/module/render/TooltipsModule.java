@@ -45,7 +45,7 @@ public class TooltipsModule extends ToggleModule {
             DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(27, ItemStack.EMPTY);
             Inventories.readNbt(nbtCompound, defaultedList);
             RenderManager.rect(event.context.getMatrices(), event.getX() + 8.0,
-                    event.getY() - 21.0, 150.0, 13.0, ColorsModule.INSTANCE.getRGB(170));
+                    event.getY() - 21.0, 150.0, 13.0, ColorsModule.getInstance().getRGB(170));
             RenderManager.renderText(event.getContext(), stack.getName().getString(),
                     event.getX() + 11.0f, event.getY() - 18.0f, -1);
             RenderManager.rect(event.context.getMatrices(), event.getX() + 8.0,

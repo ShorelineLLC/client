@@ -73,7 +73,7 @@ public class NoFallModule extends ToggleModule {
 
     private boolean checkFalling() {
         return mc.player.fallDistance > mc.player.getSafeFallDistance() && !mc.player.isOnGround()
-                && !mc.player.isFallFlying() && !FlightModule.INSTANCE.isEnabled() && !PacketFlyModule.INSTANCE.isEnabled();
+                && !mc.player.isFallFlying() && !FlightModule.getInstance().isEnabled() && !PacketFlyModule.getInstance().isEnabled();
     }
 
     public enum NoFallMode {

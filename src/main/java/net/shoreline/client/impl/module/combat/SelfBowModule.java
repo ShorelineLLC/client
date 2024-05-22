@@ -26,7 +26,7 @@ import java.util.Set;
  * @since 1.0
  */
 public class SelfBowModule extends RotationModule {
-    public static SelfBowModule INSTANCE;
+    private static SelfBowModule INSTANCE;
 
     //
     private final Set<StatusEffectInstance> arrows = new HashSet<>();
@@ -36,6 +36,11 @@ public class SelfBowModule extends RotationModule {
      */
     public SelfBowModule() {
         super("SelfBow", "Shoots player with beneficial tipped arrows", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static SelfBowModule getInstance() {
+        return INSTANCE;
     }
 
     @Override

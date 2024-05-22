@@ -14,6 +14,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 
 /**
  * @author xgraza
@@ -29,6 +30,11 @@ public final class BlockInteractModule extends ToggleModule
     public BlockInteractModule()
     {
         super("BlockInteract", "Allows you to place blocks in the air", ModuleCategory.WORLD);
+        INSTANCE = this;
+    }
+
+    public static BlockInteractModule getInstance() {
+        return INSTANCE;
     }
 
     @EventListener

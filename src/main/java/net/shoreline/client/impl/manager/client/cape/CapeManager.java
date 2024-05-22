@@ -1,10 +1,12 @@
-package net.shoreline.client.impl.manager.client;
+package net.shoreline.client.impl.manager.client.cape;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.client.impl.event.network.LoadCapeEvent;
 import net.shoreline.client.util.Globals;
 
 import java.io.InputStream;
@@ -19,6 +21,11 @@ public class CapeManager implements Globals {
     // TODO: this is a workaround to a rare crash, possibly save to FS like real Optifine?
     // im open to better solutions because this could get pretty bad pretty quick
     private static final Map<UUID, Identifier> CAPE_TEXTURE_CACHE = new HashMap<>();
+
+    @EventListener
+    public void onLoadCape(LoadCapeEvent event) {
+        loadPlayerCape(event.getGameProfile(), event.getTexture());
+    }
 
     /**
      * @param profile

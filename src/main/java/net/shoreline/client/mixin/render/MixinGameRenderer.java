@@ -10,7 +10,6 @@ import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.impl.event.buffers.ProgramsBuffer;
 import net.shoreline.client.impl.event.network.ReachEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.world.UpdateCrosshairTargetEvent;
@@ -187,6 +186,7 @@ public class MixinGameRenderer implements Globals {
             target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
             ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     private void initPrograms(ResourceFactory factory, CallbackInfo ci) {
-        ProgramsBuffer.hookLoadPrograms();
+        LoadProgramsEvent loadProgramsEvent = new LoadProgramsEvent();
+        EventBus.EVENT_HANDLER.dispatch(loadProgramsEvent);
     }
 }

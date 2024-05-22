@@ -13,12 +13,12 @@ import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
+import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
 import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.impl.event.buffers.ModulesBuffer;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
 import net.shoreline.client.impl.imixin.IChatHud;
-import net.shoreline.client.util.render.animation.TimeAnimation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -92,26 +92,17 @@ public abstract class MixinChatHud implements IChatHud
                                        int y,
                                        int color)
     {
-        TimeAnimation animation = null;
-        if (current != null)
-        {
-            if (ModulesBuffer.getBetterChatModule().animationMap.containsKey(current))
-            {
-                animation = ModulesBuffer.getBetterChatModule().animationMap.get(current);
-            }
-        }
-
-        if (animation != null)
-        {
-            animation.setState(true);
-        }
-        return instance.drawTextWithShadow(textRenderer, text, (int) ((animation != null && ModulesBuffer.getBetterChatModule().isEnabled() && ModulesBuffer.getBetterChatModule().getAnimationConfig().getValue() ? animation.getCurrent() : 0)), y, color);
+        RenderChatHudEvent renderChatHudEvent = new RenderChatHudEvent(current);
+        EventBus.EVENT_HANDLER.dispatch(renderChatHudEvent);
+        return instance.drawTextWithShadow(textRenderer, text, (int) ((renderChatHudEvent.getAnimation() != null && renderChatHudEvent.isCanceled() ? renderChatHudEvent.getAnimation().getCurrent() : 0)), y, color);
     }
 
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/" +
             "ChatHudLine$Visible;indicator()Lnet/minecraft/client/gui/hud/MessageIndicator;"))
     private MessageIndicator hookRender(MessageIndicator original) {
-        return ModulesBuffer.getBetterChatModule().getNoSignatureConfig().getValue() ? null : original;
+        SignatureIndicatorEvent signatureIndicatorEvent = new SignatureIndicatorEvent();
+        EventBus.EVENT_HANDLER.dispatch(signatureIndicatorEvent);
+        return signatureIndicatorEvent.isCanceled() ? null : original;
     }
 
     /**

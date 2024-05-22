@@ -9,8 +9,11 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.gui.hud.ChatLineEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
-import net.shoreline.client.util.FormattingUtils;
+import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
+import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
+import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 
@@ -22,8 +25,6 @@ import java.util.Map;
 //TODO: add easing when linus fixes enumconfig...
 public class BetterChatModule extends ToggleModule
 {
-    public static BetterChatModule INSTANCE;
-
     Config<Timestamp> timestampConfig = new EnumConfig<>("Timestamp", "Shows chat timestamps", Timestamp.OFF, Timestamp.values());
     Config<Boolean> animationConfig = new BooleanConfig("Animation", "Animates the chat", false);
     Config<Integer> timeConfig = new NumberConfig<>("Anim-Time", "Time for the animation", 0, 200, 1000, () -> false);
@@ -46,34 +47,42 @@ public class BetterChatModule extends ToggleModule
                 case OFF -> "";
             };
             event.cancel();
-            event.setText(Text.of(text + FormattingUtils.toString(event.getText())));
+            event.setText(Text.of(text + FormattingUtil.toString(event.getText())));
         }
     }
 
-    public Config<Boolean> getAnimationConfig()
-    {
-        return animationConfig;
+    @EventListener
+    public void onChatLine(ChatLineEvent event) {
+        animationMap.put(event.getChatHudLine(), new TimeAnimation(false, event.getWidth(), 0,
+                timeConfig.getValue(), Easing.LINEAR));
     }
 
-    public Config<Integer> getTimeConfig()
-    {
-        return timeConfig;
+    @EventListener
+    public void onChatLineRender(RenderChatHudEvent event) {
+
+        if (animationConfig.getValue()) {
+            TimeAnimation animation = null;
+            if (event.getChatHudLine() != null)
+            {
+                if (animationMap.containsKey(event.getChatHudLine()))
+                {
+                    animation = animationMap.get(event.getChatHudLine());
+                }
+            }
+            if (animation != null)
+            {
+                animation.setState(true);
+            }
+            event.cancel();
+            event.setAnimation(animation);
+        }
     }
 
-    /*
-    public Config<Easing> getEasingConfig()
-    {
-        return easing;
-    }
-    */
-
-    public Easing getEasingConfig()
-    {
-        return Easing.LINEAR;
-    }
-
-    public Config<Boolean> getNoSignatureConfig() {
-        return noSignatureConfig;
+    @EventListener
+    public void onSignatureIndicator(SignatureIndicatorEvent event) {
+        if (noSignatureConfig.getValue()) {
+            event.cancel();
+        }
     }
 
     public enum Timestamp {

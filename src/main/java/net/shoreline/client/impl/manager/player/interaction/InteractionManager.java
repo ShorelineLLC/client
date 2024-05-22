@@ -45,7 +45,7 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, grim, strictDirection);
-        if (BlockInteractModule.INSTANCE.isEnabled() && direction == null && !strictDirection)
+        if (BlockInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
         {
             // TODO: this should be not like this
             direction = Direction.UP;
@@ -73,7 +73,7 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, grim, strictDirection);
-        if (BlockInteractModule.INSTANCE.isEnabled() && direction == null && !strictDirection)
+        if (BlockInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
         {
             // TODO: this should be not like this
             direction = Direction.UP;

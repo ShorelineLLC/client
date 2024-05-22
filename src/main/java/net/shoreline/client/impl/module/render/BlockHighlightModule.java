@@ -16,6 +16,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.BoxRender;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderBlockOutlineEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
@@ -72,18 +73,20 @@ public class BlockHighlightModule extends ToggleModule {
                 distance = pos.distanceTo(hpos.toCenterPos());
             }
         }
+        RenderBuffers.preRender();
         if (render != null) {
             switch (boxModeConfig.getValue()) {
                 case FILL -> {
                     RenderManager.renderBox(event.getMatrices(), render,
-                            ColorsModule.INSTANCE.getRGB(60));
+                            ColorsModule.getInstance().getRGB(60));
                     RenderManager.renderBoundingBox(event.getMatrices(),
-                            render, 2.5f, ColorsModule.INSTANCE.getRGB(145));
+                            render, 2.5f, ColorsModule.getInstance().getRGB(145));
                 }
                 case OUTLINE -> RenderManager.renderBoundingBox(event.getMatrices(),
-                        render, 2.5f, ColorsModule.INSTANCE.getRGB(145));
+                        render, 2.5f, ColorsModule.getInstance().getRGB(145));
             }
         }
+        RenderBuffers.postRender();
     }
 
     @EventListener

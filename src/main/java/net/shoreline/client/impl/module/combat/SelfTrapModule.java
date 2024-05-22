@@ -20,6 +20,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -187,7 +188,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     private void attackPlace(BlockPos targetPos, int blockSlot)
     {
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay()) && !entities.isEmpty())
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()) && !entities.isEmpty())
         {
             for (Entity entity : entities)
             {
@@ -304,7 +305,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                         }
                     }
 
-                    if (BlockInteractModule.INSTANCE.isEnabled() && !strictDirectionConfig.getValue())
+                    if (BlockInteractModule.getInstance().isEnabled() && !strictDirectionConfig.getValue())
                     {
                         blocks.add(headBlockPos);
                         break searchForSupport;
@@ -402,12 +403,13 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     {
         if (renderConfig.getValue())
         {
+            RenderBuffers.preRender();
             for (Map.Entry<BlockPos, TimeAnimation> set : fadeBoxes.entrySet())
             {
                 set.getValue().setState(false);
                 set.getValue().setState(false);
                 int alpha = (int) set.getValue().getCurrent();
-                Color color = ColorsModule.INSTANCE.getColor(alpha);
+                Color color = ColorsModule.getInstance().getColor(alpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), color.getRGB());
             }
 
@@ -415,9 +417,10 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 set.getValue().setState(false);
                 int alpha = (int) set.getValue().getCurrent();
-                Color color = ColorsModule.INSTANCE.getColor(alpha);
+                Color color = ColorsModule.getInstance().getColor(alpha);
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, color.getRGB());
             }
+            RenderBuffers.postRender();
 
             if (placements.isEmpty())
             {

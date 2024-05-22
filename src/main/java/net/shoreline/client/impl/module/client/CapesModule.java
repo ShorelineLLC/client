@@ -2,8 +2,11 @@ package net.shoreline.client.impl.module.client;
 
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.network.CapesEvent;
+import net.shoreline.client.impl.manager.client.cape.CapeType;
 
 /**
  * @author xgraza
@@ -11,8 +14,6 @@ import net.shoreline.client.api.module.ToggleModule;
  */
 public final class CapesModule extends ToggleModule
 {
-    public static CapesModule INSTANCE;
-
     Config<Boolean> optifineConfig = new BooleanConfig("Optifine", "If to show optifine capes", true);
 
     public CapesModule()
@@ -21,8 +22,11 @@ public final class CapesModule extends ToggleModule
         enable();
     }
 
-    public Config<Boolean> getOptifineConfig()
-    {
-        return optifineConfig;
+    @EventListener
+    public void onCapes(CapesEvent event) {
+        event.cancel();
+        if (optifineConfig.getValue()) {
+            event.setCapeType(CapeType.OPTIFINE);
+        }
     }
 }

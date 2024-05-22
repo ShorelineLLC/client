@@ -12,6 +12,7 @@ import net.shoreline.client.impl.event.entity.player.PlayerJumpEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardTickEvent;
 import net.shoreline.client.impl.event.network.MovementPacketsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.RenderPlayerEvent;
 import net.shoreline.client.impl.imixin.IClientPlayerEntity;
@@ -58,7 +59,8 @@ public class RotationManager implements Globals {
         }
     }
 
-    public void onUpdate() {
+    @EventListener(priority = Integer.MIN_VALUE)
+    public void onUpdate(PlayerTickEvent event) {
         if (requests.isEmpty()) {
             rotation = null;
             return;
@@ -121,7 +123,7 @@ public class RotationManager implements Globals {
     @EventListener
     public void onKeyboardTick(KeyboardTickEvent event) {
         if (rotation != null && mc.player != null
-                && RotationsModule.INSTANCE.getMovementFix()) {
+                && RotationsModule.getInstance().getMovementFix()) {
             float forward = mc.player.input.movementForward;
             float sideways = mc.player.input.movementSideways;
             float delta = (mc.player.getYaw() - rotation.getYaw()) * MathHelper.RADIANS_PER_DEGREE;
@@ -134,7 +136,7 @@ public class RotationManager implements Globals {
 
     @EventListener
     public void onUpdateVelocity(UpdateVelocityEvent event) {
-        if (rotation != null && RotationsModule.INSTANCE.getMovementFix()) {
+        if (rotation != null && RotationsModule.getInstance().getMovementFix()) {
             event.cancel();
             event.setVelocity(movementInputToVelocity(rotation.getYaw(), event.getMovementInput(), event.getSpeed()));
         }
@@ -142,7 +144,7 @@ public class RotationManager implements Globals {
 
     @EventListener
     public void onPlayerJump(PlayerJumpEvent event) {
-        if (rotation != null && RotationsModule.INSTANCE.getMovementFix()) {
+        if (rotation != null && RotationsModule.getInstance().getMovementFix()) {
             if (event.getStage() == EventStage.PRE) {
                 prevJumpYaw = mc.player.getYaw();
                 mc.player.setYaw(rotation.getYaw());
@@ -242,7 +244,7 @@ public class RotationManager implements Globals {
      * @return
      */
     public boolean isDoneRotating() {
-        return rotateTicks > RotationsModule.INSTANCE.getPreserveTicks();
+        return rotateTicks > RotationsModule.getInstance().getPreserveTicks();
     }
 
     public boolean isRotating() {

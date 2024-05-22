@@ -16,6 +16,7 @@ import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
@@ -185,7 +186,7 @@ public class AutoMineModule extends RotationModule {
                 miningQueue.remove(data);
                 continue;
             }
-            final float damageDelta = SpeedmineModule.INSTANCE.calcBlockBreakingDelta(
+            final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
             if (data.getBlockDamage() >= 1.0f && isDataPacketMine(data)) {
@@ -312,6 +313,7 @@ public class AutoMineModule extends RotationModule {
         if (mc.player.isCreative()) {
             return;
         }
+        RenderBuffers.preRender();
         for (Map.Entry<MiningData, Animation> set : fadeList.entrySet())
         {
             MiningData data = set.getKey();
@@ -346,6 +348,7 @@ public class AutoMineModule extends RotationModule {
         }
         fadeList.entrySet().removeIf(e ->
                 e.getValue().getFactor() == 0.0);
+        RenderBuffers.postRender();
     }
 
     private void startManualMine(BlockPos pos, Direction direction) {
@@ -372,7 +375,7 @@ public class AutoMineModule extends RotationModule {
 
     private PriorityQueue<AutoMineCalc> getMiningPosition(PlayerEntity entity) {
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
-        List<BlockPos> entityIntersections = SurroundModule.INSTANCE.getSurroundEntities(entity);
+        List<BlockPos> entityIntersections = SurroundModule.getInstance().getSurroundEntities(entity);
         for (BlockPos blockPos : entityIntersections) {
             double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
             if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq()) {
@@ -382,7 +385,7 @@ public class AutoMineModule extends RotationModule {
                 miningPositions.add(new AutoMineCalc(blockPos, Double.MAX_VALUE - 1.0));
             }
         }
-        List<BlockPos> surroundBlocks = SurroundModule.INSTANCE.getEntitySurroundNoSupport(entity);
+        List<BlockPos> surroundBlocks = SurroundModule.getInstance().getEntitySurroundNoSupport(entity);
         for (BlockPos blockPos : surroundBlocks) {
             double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
             if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq()) {
@@ -530,7 +533,7 @@ public class AutoMineModule extends RotationModule {
         }
 
         public int getSlot() {
-            return AutoToolModule.INSTANCE.getBestToolNoFallback(getState());
+            return AutoToolModule.getInstance().getBestToolNoFallback(getState());
         }
 
         public BlockState getState() {

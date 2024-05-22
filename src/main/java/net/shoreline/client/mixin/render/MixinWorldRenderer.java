@@ -6,9 +6,8 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.PerspectiveEvent;
-import net.shoreline.client.impl.event.buffers.RenderEventBuffer;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.render.RenderWorldBorderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.util.Globals;
@@ -46,13 +45,9 @@ public class MixinWorldRenderer implements Globals {
         Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
         matrices.translate(-pos.x, -pos.y, -pos.z);
 
-        RenderEventBuffer.hookRenderBufferPre();
-
         final RenderWorldEvent renderWorldEvent =
                 new RenderWorldEvent(matrices, tickDelta);
         EventBus.EVENT_HANDLER.dispatch(renderWorldEvent);
-
-        RenderEventBuffer.hookRenderBufferPost();
     }
 
     /**

@@ -15,6 +15,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
@@ -93,7 +94,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
                 continue;
             }
             if (mc.world.getOtherEntities(null, new Box(hole.getPos()))
-                    .stream().anyMatch(e -> !SurroundModule.INSTANCE.isEntityBlockingSurround(e))) {
+                    .stream().anyMatch(e -> !SurroundModule.getInstance().isEntityBlockingSurround(e))) {
                 continue;
             }
             if (autoConfig.getValue()) {
@@ -152,7 +153,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
     }
 
     private void attackPlace(BlockPos targetPos, int slot) {
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay())) {
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay())) {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities) {
                 attack(entity);
@@ -181,17 +182,18 @@ public class HoleFillModule extends ObsidianPlacerModule {
     {
         if (renderConfig.getValue())
         {
+            RenderBuffers.preRender();
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
-                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
+                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
+                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
-
+            RenderBuffers.postRender();
 
             if (fills.isEmpty())
             {

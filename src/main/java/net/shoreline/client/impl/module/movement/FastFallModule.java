@@ -60,8 +60,8 @@ public class FastFallModule extends ToggleModule {
                         || mc.player.input.sneaking) {
                     return;
                 }
-                if (SpeedModule.INSTANCE.isEnabled() || LongJumpModule.INSTANCE.isEnabled()
-                        || FlightModule.INSTANCE.isEnabled() || PacketFlyModule.INSTANCE.isEnabled()) {
+                if (SpeedModule.getInstance().isEnabled() || LongJumpModule.getInstance().isEnabled()
+                        || FlightModule.getInstance().isEnabled() || PacketFlyModule.getInstance().isEnabled()) {
                     return;
                 }
                 if (mc.player.isOnGround() && isNearestBlockWithinHeight(heightConfig.getValue())) {
@@ -85,10 +85,8 @@ public class FastFallModule extends ToggleModule {
                 return;
             }
             if (!Managers.ANTICHEAT.hasPassed(1000) || !fallTimer.passed(1000)
-                    || SpeedModule.INSTANCE.isEnabled()
-                    || LongJumpModule.INSTANCE.isEnabled()
-                    || FlightModule.INSTANCE.isEnabled()
-                    || PacketFlyModule.INSTANCE.isEnabled()) {
+                    || SpeedModule.getInstance().isEnabled() || LongJumpModule.getInstance().isEnabled()
+                    || FlightModule.getInstance().isEnabled() || PacketFlyModule.getInstance().isEnabled()) {
                 return;
             }
             if (mc.player.getVelocity().y < 0 && prevOnGround && !mc.player.isOnGround()
@@ -104,7 +102,7 @@ public class FastFallModule extends ToggleModule {
 
     @EventListener
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (FlightModule.INSTANCE.isEnabled() || PacketFlyModule.INSTANCE.isEnabled()) {
+        if (FlightModule.getInstance().isEnabled() || PacketFlyModule.getInstance().isEnabled()) {
             return;
         }
         if (cancelFallMovement && fallModeConfig.getValue() == FallMode.SHIFT) {

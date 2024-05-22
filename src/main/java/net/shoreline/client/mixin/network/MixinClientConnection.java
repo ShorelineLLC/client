@@ -7,6 +7,7 @@ import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.client.impl.event.network.DecodePacketEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.client.ServerModule;
@@ -31,7 +32,9 @@ public class MixinClientConnection {
 
     @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
     private void hookExceptionCaught(ChannelHandlerContext context, Throwable ex, CallbackInfo ci) {
-        if (ServerModule.INSTANCE.isPacketKick()) {
+        DecodePacketEvent decodePacketEvent = new DecodePacketEvent();
+        EventBus.EVENT_HANDLER.dispatch(decodePacketEvent);
+        if (decodePacketEvent.isCanceled()) {
             LOGGER.error("Exception caught on network thread:", ex);
             ci.cancel();
         }

@@ -26,11 +26,13 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderLayersClient;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
@@ -49,7 +51,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 1.0
  */
 public class NametagsModule extends ToggleModule {
-    public static NametagsModule INSTANCE;
+    private static NametagsModule INSTANCE;
 
     Config<Boolean> armorConfig = new BooleanConfig("Armor", "Displays the player's armor", true);
     Config<Boolean> enchantmentsConfig = new BooleanConfig("Enchantments", "Displays a list of the item's enchantments", true);
@@ -66,6 +68,11 @@ public class NametagsModule extends ToggleModule {
 
     public NametagsModule() {
         super("Nametags", "Renders info on player nametags", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static NametagsModule getInstance() {
+        return INSTANCE;
     }
 
     @EventListener
@@ -73,14 +80,14 @@ public class NametagsModule extends ToggleModule {
         if (mc.gameRenderer == null || mc.getCameraEntity() == null) {
             return;
         }
-
+        RenderBuffers.preRender();
         Vec3d interpolate = Interpolation.getRenderPosition(mc.getCameraEntity(), mc.getTickDelta());
         Camera camera = mc.gameRenderer.getCamera();
         Vec3d pos = camera.getPos();
 
         for (Entity entity : mc.world.getEntities()) {
             if (entity instanceof PlayerEntity player) {
-                if (player == mc.player && !FreecamModule.INSTANCE.isEnabled()) {
+                if (player == mc.player && !FreecamModule.getInstance().isEnabled()) {
                     continue;
                 }
                 if (!player.isAlive() || !invisiblesConfig.getValue() && player.isInvisible()) {
@@ -109,6 +116,7 @@ public class NametagsModule extends ToggleModule {
         }
 
         RenderSystem.enableBlend();
+        RenderBuffers.postRender();
     }
 
     @EventListener
@@ -397,7 +405,7 @@ public class NametagsModule extends ToggleModule {
 
     private int getNametagColor(PlayerEntity player) {
         if (player == mc.player) {
-            return ColorsModule.INSTANCE.getRGB(255);
+            return ColorsModule.getInstance().getRGB(255);
         }
         if (Managers.SOCIAL.isFriend(player.getName())) {
             return 0xff66ffff;

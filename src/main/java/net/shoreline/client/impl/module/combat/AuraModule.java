@@ -27,6 +27,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.api.render.Interpolation;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -51,7 +52,7 @@ import java.util.stream.Stream;
  * @since 1.0
  */
 public class AuraModule extends RotationModule {
-    public static AuraModule INSTANCE;
+    private static AuraModule INSTANCE;
 
     Config<Boolean> swingConfig = new BooleanConfig("Swing", "Swings the hand after attacking", true);
     Config<TargetMode> modeConfig = new EnumConfig<>("Mode", "The mode for targeting entities to attack", TargetMode.SWITCH, TargetMode.values());
@@ -109,6 +110,11 @@ public class AuraModule extends RotationModule {
 
     public AuraModule() {
         super("Aura", "Attacks nearby entities", ModuleCategory.COMBAT, 700);
+        INSTANCE = this;
+    }
+
+    public static AuraModule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -138,8 +144,8 @@ public class AuraModule extends RotationModule {
 
     @EventListener
     public void onPlayerUpdate(PlayerTickEvent event) {
-        if (AutoCrystalModule.INSTANCE.isAttacking()
-                || AutoCrystalModule.INSTANCE.isPlacing()) {
+        if (AutoCrystalModule.getInstance().isAttacking()
+                || AutoCrystalModule.getInstance().isPlacing()) {
             return;
         }
         final Vec3d eyepos = Managers.POSITION.getEyePos();
@@ -250,10 +256,12 @@ public class AuraModule extends RotationModule {
                 float animFactor = 1.0f - MathHelper.clamp(attackTimer.getElapsedTime() / (1000f - delay), 0.0f, 1.0f);
                 attackDelay = (int) (100.0 * animFactor);
             }
+            RenderBuffers.preRender();
             RenderManager.renderBox(event.getMatrices(),
-                    Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.INSTANCE.getRGB(60 + attackDelay));
+                    Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.getInstance().getRGB(60 + attackDelay));
             RenderManager.renderBoundingBox(event.getMatrices(),
-                    Interpolation.getInterpolatedEntityBox(entityTarget), 1.5f, ColorsModule.INSTANCE.getRGB(145));
+                    Interpolation.getInterpolatedEntityBox(entityTarget), 1.5f, ColorsModule.getInstance().getRGB(145));
+            RenderBuffers.postRender();
         }
     }
 
@@ -374,7 +382,7 @@ public class AuraModule extends RotationModule {
             Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player,
                     ClientCommandC2SPacket.Mode.START_SPRINTING));
         }
-        if (CriticalsModule.INSTANCE.isEnabled() && critTimer.passed(500)) {
+        if (CriticalsModule.getInstance().isEnabled() && critTimer.passed(500)) {
             if (!mc.player.isOnGround()
                     || mc.player.isRiding()
                     || mc.player.isSubmergedInWater()
@@ -384,7 +392,7 @@ public class AuraModule extends RotationModule {
                     || mc.player.input.jumping) {
                 return;
             }
-            CriticalsModule.INSTANCE.preAttackPacket();
+            CriticalsModule.getInstance().preAttackPacket();
             critTimer.reset();
             mc.player.addCritParticles(entity);
         }

@@ -10,8 +10,10 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.player.SetStackEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.chat.ChatUtil;
 
 import java.util.ArrayList;
 
@@ -22,8 +24,16 @@ import java.util.ArrayList;
 public class ReplenishModule extends ToggleModule {
 
     Config<Integer> percentConfig = new NumberConfig<>("Percent", "The minimum percent of total stack before replenishing", 0, 25, 80);
+
+    private ItemStack[] hotbar = new ItemStack[9];
+
     public ReplenishModule() {
         super("Replenish", "Automatically replaces items in your hotbar", ModuleCategory.COMBAT);
+    }
+
+    @Override
+    public void onEnable() {
+        hotbar = new ItemStack[9];
     }
 
     @EventListener
@@ -32,8 +42,8 @@ public class ReplenishModule extends ToggleModule {
             return;
         }
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.isEmpty() || !stack.isStackable()) {
+            ItemStack stack = hotbar[i];
+            if (stack == null || stack.isEmpty() || !stack.isStackable()) {
                 continue;
             }
             double stackPercent = ((float) stack.getCount() / stack.getMaxCount()) * 100.0f;
@@ -43,7 +53,19 @@ public class ReplenishModule extends ToggleModule {
         }
     }
 
+    @EventListener
+    public void onSetStack(SetStackEvent event) {
+        if (event.getSlot() < 9 && !event.getStack().isEmpty() && event.getStack().isStackable()) {
+            hotbar[event.getSlot()] = event.getStack();
+        }
+    }
+
     private void replenishStack(ItemStack item, int hotbarSlot) {
+        ItemStack cursorStack = mc.player.currentScreenHandler.getCursorStack();
+        if (!cursorStack.isEmpty() && cursorStack.getItem() == item.getItem()) {
+            Managers.INVENTORY.pickupSlot(hotbarSlot + 36);
+            return;
+        }
         int total = item.getCount();
         for (int i = 9; i < 36; i++) {
             ItemStack stack = mc.player.getInventory().getStack(i);
@@ -60,7 +82,7 @@ public class ReplenishModule extends ToggleModule {
             if (total < stack.getMaxCount()) {
                 Managers.INVENTORY.pickupSlot(i);
                 Managers.INVENTORY.pickupSlot(hotbarSlot + 36);
-                if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
+                if (!mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
                     Managers.INVENTORY.pickupSlot(i);
                 }
                 total += stack.getCount();

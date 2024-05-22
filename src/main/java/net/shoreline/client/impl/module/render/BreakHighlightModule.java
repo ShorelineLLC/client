@@ -18,6 +18,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
@@ -59,6 +60,7 @@ public class BreakHighlightModule extends ToggleModule {
         if (mc.player == null || mc.world == null) {
             return;
         }
+        RenderBuffers.preRender();
         if (modeConfig.getValue() == HighlightMode.NORMAL) {
             Int2ObjectMap<BlockBreakingInfo> blockBreakProgressions =
                     ((AccessorWorldRenderer) mc.worldRenderer).getBlockBreakingProgressions();
@@ -85,9 +87,9 @@ public class BreakHighlightModule extends ToggleModule {
                 double sizeY = damage * ((bb.maxY - y) / 9.0);
                 double sizeZ = damage * ((bb.maxZ - z) / 9.0);
                 RenderManager.renderBox(event.getMatrices(), new Box(x - sizeX,
-                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), ColorsModule.INSTANCE.getRGB(60));
+                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), ColorsModule.getInstance().getRGB(60));
                 RenderManager.renderBoundingBox(event.getMatrices(), new Box(x - sizeX,
-                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), 1.5f, ColorsModule.INSTANCE.getRGB(125));
+                        y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), 1.5f, ColorsModule.getInstance().getRGB(125));
             }
         } else {
             for (Map.Entry<BlockBreakingProgressS2CPacket, Long> mine : breakingProgress.entrySet()) {
@@ -122,6 +124,7 @@ public class BreakHighlightModule extends ToggleModule {
                 RenderManager.renderBox(event.getMatrices(), scaled, ((ColorConfig) colorConfig).getValue(60).getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), scaled, 1.5f, ((ColorConfig) colorConfig).getValue(125).getRGB());
             }
+            RenderBuffers.postRender();
         }
     }
 

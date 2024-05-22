@@ -26,6 +26,7 @@ import net.shoreline.client.impl.event.entity.player.PushFluidsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
@@ -39,7 +40,7 @@ import java.text.DecimalFormat;
  * @since 1.0
  */
 public class VelocityModule extends ToggleModule {
-    public static VelocityModule INSTANCE;
+    private static VelocityModule INSTANCE;
 
     Config<Boolean> knockbackConfig = new BooleanConfig("Knockback", "Removes player knockback velocity", true);
     Config<Boolean> explosionConfig = new BooleanConfig("Explosion", "Removes player explosion velocity", true);
@@ -57,8 +58,12 @@ public class VelocityModule extends ToggleModule {
      *
      */
     public VelocityModule() {
-        super("Velocity", "Reduces the amount of player knockback velocity",
-                ModuleCategory.MOVEMENT);
+        super("Velocity", "Reduces the amount of player knockback velocity", ModuleCategory.MOVEMENT);
+        INSTANCE = this;
+    }
+
+    public static VelocityModule getInstance() {
+        return INSTANCE;
     }
 
     @Override

@@ -82,7 +82,7 @@ public class ClientConfiguration implements Globals {
             // files.add(new ModulePreset(clientDir.resolve("Defaults"), module));
             files.add(new ModuleFile(clientDir.resolve("Modules"), module));
         }
-        files.add(InvCleanerModule.INSTANCE.getBlacklistFile(clientDir));
+        files.add(InvCleanerModule.getInstance().getBlacklistFile(clientDir));
         for (SocialRelation relation : SocialRelation.values()) {
             files.add(new SocialFile(clientDir, relation));
         }

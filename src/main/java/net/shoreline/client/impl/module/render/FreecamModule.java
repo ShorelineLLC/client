@@ -27,6 +27,7 @@ import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.render.BobViewEvent;
 import net.shoreline.client.impl.manager.player.rotation.Rotation;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.RayCastUtil;
 import net.shoreline.client.util.player.RotationUtil;
@@ -37,7 +38,7 @@ import org.lwjgl.glfw.GLFW;
  * @since 1.0
  */
 public class FreecamModule extends ToggleModule {
-    public static FreecamModule INSTANCE;
+    private static FreecamModule INSTANCE;
 
     Config<Float> speedConfig = new NumberConfig<>("Speed", "The move speed of the camera", 0.1f, 4.0f, 10.0f);
     Config<Macro> controlConfig = new MacroConfig("ControlKey", "", new Macro(getId() + "-control", GLFW.GLFW_KEY_LEFT_ALT, () -> {}));
@@ -52,8 +53,12 @@ public class FreecamModule extends ToggleModule {
     private boolean control = false;
 
     public FreecamModule() {
-        super("Freecam", "Allows you to control the camera separately from the player",
-                ModuleCategory.RENDER);
+        super("Freecam", "Allows you to control the camera separately from the player", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static FreecamModule getInstance() {
+        return INSTANCE;
     }
 
     @Override

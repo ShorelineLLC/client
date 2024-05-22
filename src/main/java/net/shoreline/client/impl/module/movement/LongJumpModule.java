@@ -18,6 +18,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.MovementUtil;
@@ -28,7 +29,7 @@ import net.shoreline.client.util.string.EnumFormatter;
  * @since 1.0
  */
 public class LongJumpModule extends ToggleModule {
-    public static LongJumpModule INSTANCE;
+    private static LongJumpModule INSTANCE;
 
     //
     Config<JumpMode> modeConfig = new EnumConfig<>("Mode", "The mode for long jump", JumpMode.NORMAL, JumpMode.values());
@@ -46,8 +47,12 @@ public class LongJumpModule extends ToggleModule {
      *
      */
     public LongJumpModule() {
-        super("LongJump", "Allows the player to jump farther",
-                ModuleCategory.MOVEMENT);
+        super("LongJump", "Allows the player to jump farther", ModuleCategory.MOVEMENT);
+        INSTANCE = this;
+    }
+
+    public static LongJumpModule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -79,10 +84,8 @@ public class LongJumpModule extends ToggleModule {
     @EventListener
     public void onPlayerMove(PlayerMoveEvent event) {
         if (modeConfig.getValue() == JumpMode.NORMAL) {
-            if (mc.player == null || mc.world == null
-                    || FlightModule.INSTANCE.isEnabled()
-                    || PacketFlyModule.INSTANCE.isEnabled()
-                    || !MovementUtil.isInputtingMovement()) {
+            if (mc.player == null || mc.world == null || FlightModule.getInstance().isEnabled()
+                    || PacketFlyModule.getInstance().isEnabled() || !MovementUtil.isInputtingMovement()) {
                 return;
             }
             //
@@ -118,7 +121,7 @@ public class LongJumpModule extends ToggleModule {
             }
             speed = Math.max(speed, base);
             event.cancel();
-            Vec2f motion = SpeedModule.INSTANCE.handleStrafeMotion((float) speed);
+            Vec2f motion = SpeedModule.getInstance().handleStrafeMotion((float) speed);
             event.setX(motion.x);
             event.setZ(motion.y);
         }
@@ -129,7 +132,7 @@ public class LongJumpModule extends ToggleModule {
         // Direkt LongJump
         if (event.getStage() == EventStage.PRE
                 && modeConfig.getValue() == JumpMode.GLIDE) {
-            if (FlightModule.INSTANCE.isEnabled() || mc.player.isFallFlying()
+            if (FlightModule.getInstance().isEnabled() || mc.player.isFallFlying()
                     || mc.player.isHoldingOntoLadder()
                     || mc.player.isTouchingWater()) {
                 return;

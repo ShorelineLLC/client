@@ -30,7 +30,7 @@ import net.shoreline.client.util.world.EntityUtil;
  * @since 1.0
  */
 public class CriticalsModule extends ToggleModule {
-    public static CriticalsModule INSTANCE;
+    private static CriticalsModule INSTANCE;
 
     //
     Config<CritMode> modeConfig = new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values());
@@ -48,6 +48,11 @@ public class CriticalsModule extends ToggleModule {
     public CriticalsModule() {
         super("Criticals", "Modifies attacks to always land critical hits",
                 ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static CriticalsModule getInstance() {
+        return INSTANCE;
     }
 
     /**
@@ -77,7 +82,7 @@ public class CriticalsModule extends ToggleModule {
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event) {
         // Custom aura crit handling
-        if (AuraModule.INSTANCE.isEnabled()) {
+        if (mc.player == null || mc.world == null || AuraModule.getInstance().isEnabled()) {
             return;
         }
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet

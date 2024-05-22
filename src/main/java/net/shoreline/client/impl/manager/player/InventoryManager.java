@@ -15,6 +15,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.collection.DefaultedList;
 import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -54,6 +55,12 @@ public class InventoryManager implements Globals {
         if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket packet) {
             slot = packet.getSlot();
         }
+    }
+
+    @EventListener
+    public void onItemDesync(ItemDesyncEvent event) {
+        event.setCanceled(isDesynced());
+        event.setStack(getServerItem());
     }
 
     /**

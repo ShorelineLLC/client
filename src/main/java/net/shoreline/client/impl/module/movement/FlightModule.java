@@ -10,6 +10,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -21,7 +22,7 @@ import net.shoreline.client.util.string.EnumFormatter;
  * @since 1.0
  */
 public class FlightModule extends ToggleModule {
-    public static FlightModule INSTANCE;
+    private static FlightModule INSTANCE;
 
     Config<FlightMode> modeConfig = new EnumConfig<>("Mode", "The mode for vanilla flight", FlightMode.NORMAL, FlightMode.values());
     Config<Float> speedConfig = new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f);
@@ -37,6 +38,11 @@ public class FlightModule extends ToggleModule {
 
     public FlightModule() {
         super("Flight", "Allows the player to fly in survival", ModuleCategory.MOVEMENT);
+        INSTANCE = this;
+    }
+
+    public static FlightModule getInstance() {
+        return INSTANCE;
     }
 
     @Override

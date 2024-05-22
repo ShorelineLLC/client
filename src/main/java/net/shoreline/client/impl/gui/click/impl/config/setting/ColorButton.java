@@ -79,7 +79,7 @@ public class ColorButton extends ConfigButton<Color> {
             if (!config.getContainer().getName().equalsIgnoreCase("Colors")) {
                 Animation globalAnimation = colorConfig.getAnimation();
                 if (globalAnimation.getFactor() > 0.01) {
-                    fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, ClickGuiModule.INSTANCE.getColor((float) globalAnimation.getFactor()));
+                    fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, ClickGuiModule.getInstance().getColor((float) globalAnimation.getFactor()));
                 }
                 RenderManager.renderText(context, "ClientColor", x + 3.0f, y + height + (colorConfig.allowAlpha() ? 31.0f : 21.0f) + width, -1);
             }

@@ -19,6 +19,7 @@ import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
@@ -26,6 +27,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager;
 import net.shoreline.client.util.player.RotationUtil;
@@ -55,6 +57,11 @@ public class SpeedmineModule extends RotationModule {
 
     public SpeedmineModule() {
         super("Speedmine", "Mines faster", ModuleCategory.WORLD, 900);
+        INSTANCE = this;
+    }
+
+    public static SpeedmineModule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -96,7 +103,7 @@ public class SpeedmineModule extends RotationModule {
             return;
         }
         state = mc.world.getBlockState(mining);
-        int slot = AutoToolModule.INSTANCE.getBestTool(state);
+        int slot = AutoToolModule.getInstance().getBestTool(state);
         double dist = mc.player.squaredDistanceTo(mining.toCenterPos());
         if (dist > ((NumberConfig<?>) rangeConfig).getValueSq()
                 || state.isAir() || damage > 3.0f) {
@@ -106,8 +113,8 @@ public class SpeedmineModule extends RotationModule {
             state = null;
             direction = null;
             damage = 0.0f;
-        } else if (damage >= 1.0f && !AutoCrystalModule.INSTANCE.isAttacking()
-                && !AutoCrystalModule.INSTANCE.isPlacing() && !mc.player.isUsingItem()) {
+        } else if (damage >= 1.0f && !AutoCrystalModule.getInstance().isAttacking()
+                && !AutoCrystalModule.getInstance().isPlacing() && !mc.player.isUsingItem()) {
             if (isRotationBlocked()) {
                 return;
             }
@@ -125,8 +132,8 @@ public class SpeedmineModule extends RotationModule {
             lastDamage = damage;
             damage += delta;
             if (delta + damage >= 1.0f && rotateConfig.getValue()
-                    && !AutoCrystalModule.INSTANCE.isAttacking()
-                    && !AutoCrystalModule.INSTANCE.isPlacing()) {
+                    && !AutoCrystalModule.getInstance().isAttacking()
+                    && !AutoCrystalModule.getInstance().isPlacing()) {
                 float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), mining.toCenterPos());
                 setRotation(rotations[0], rotations[1]);
             }
@@ -169,7 +176,7 @@ public class SpeedmineModule extends RotationModule {
         direction = event.getDirection();
         damage = 0.0f;
         if (mining != null && direction != null) {
-            int slot = AutoToolModule.INSTANCE.getBestTool(event.getState());
+            int slot = AutoToolModule.getInstance().getBestTool(event.getState());
             if (grimConfig.getValue()) {
                 Managers.INVENTORY.setSlot(slot);
             }
@@ -207,7 +214,7 @@ public class SpeedmineModule extends RotationModule {
     }
 
     private float getBlockBreakingSpeed(BlockState block) {
-        int tool = AutoToolModule.INSTANCE.getBestTool(block);
+        int tool = AutoToolModule.getInstance().getBestTool(block);
         float f = mc.player.getInventory().getStack(tool).getMiningSpeedMultiplier(block);
         if (f > 1.0F) {
             ItemStack stack = mc.player.getInventory().getStack(tool);
@@ -240,7 +247,7 @@ public class SpeedmineModule extends RotationModule {
 
     private boolean canHarvest(BlockState state) {
         if (state.isToolRequired()) {
-            int tool = AutoToolModule.INSTANCE.getBestTool(state);
+            int tool = AutoToolModule.getInstance().getBestTool(state);
             return mc.player.getInventory().getStack(tool).isSuitableFor(state);
         }
         return true;
@@ -256,6 +263,7 @@ public class SpeedmineModule extends RotationModule {
         if (outlineShape.isEmpty()) {
             return;
         }
+        RenderBuffers.preRender();
         Box render1 = outlineShape.getBoundingBox();
         Box render = new Box(mining.getX() + render1.minX, mining.getY() + render1.minY,
                 mining.getZ() + render1.minZ, mining.getX() + render1.maxX,
@@ -270,6 +278,7 @@ public class SpeedmineModule extends RotationModule {
                 damage > 0.95f ? 0x6000ff00 : 0x60ff0000);
         RenderManager.renderBoundingBox(event.getMatrices(), scaled,
                 2.5f, damage > 0.95f ? 0x6000ff00 : 0x60ff0000);
+        RenderBuffers.postRender();
     }
 
     public enum SpeedmineMode {

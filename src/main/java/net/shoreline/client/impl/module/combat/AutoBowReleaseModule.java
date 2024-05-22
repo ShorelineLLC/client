@@ -37,7 +37,7 @@ public class AutoBowReleaseModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (SelfBowModule.INSTANCE.isEnabled()) {
+        if (SelfBowModule.getInstance().isEnabled()) {
             return;
         }
         if (event.getStage() == EventStage.POST) {

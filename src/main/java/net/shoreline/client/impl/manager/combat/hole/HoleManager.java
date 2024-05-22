@@ -47,7 +47,7 @@ public class HoleManager implements Globals {
 
     public List<BlockPos> getSphere(Vec3d start) {
         List<BlockPos> sphere = new ArrayList<>();
-        double rad = Math.ceil(Math.max(5.0, HoleESPModule.INSTANCE.getRange()));
+        double rad = Math.ceil(Math.max(5.0, HoleESPModule.getInstance().getRange()));
         for (double x = -rad; x <= rad; ++x) {
             for (double y = -rad; y <= rad; ++y) {
                 for (double z = -rad; z <= rad; ++z) {

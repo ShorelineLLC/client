@@ -4,7 +4,8 @@ import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
-import net.shoreline.client.impl.event.buffers.ModulesBuffer;
+import net.shoreline.client.impl.event.gui.hud.ChatLineEvent;
+import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.render.animation.TimeAnimation;
@@ -34,13 +35,8 @@ public abstract class MixinChatHudLine implements IChatHudLine, Globals
                          MessageIndicator messageIndicator,
                          CallbackInfo info)
     {
-        ModulesBuffer.getBetterChatModule().animationMap.put(
-                ChatHudLine.class.cast(this),
-                new TimeAnimation(false,
-                        -mc.textRenderer.getWidth(text.getString()),
-                        0,
-                        ModulesBuffer.getBetterChatModule().getTimeConfig().getValue(),
-                        ModulesBuffer.getBetterChatModule().getEasingConfig()));
+        ChatLineEvent chatLineEvent = new ChatLineEvent(ChatHudLine.class.cast(this), -mc.textRenderer.getWidth(text.getString()));
+        EventBus.EVENT_HANDLER.dispatch(chatLineEvent);
     }
 
     @Override

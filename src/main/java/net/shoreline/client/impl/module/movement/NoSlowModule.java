@@ -44,6 +44,7 @@ public class NoSlowModule extends ToggleModule {
     Config<Boolean> strictConfig = new BooleanConfig("Strict", "Strict NCP bypass for ground slowdowns", false);
     Config<Boolean> airStrictConfig = new BooleanConfig("AirStrict", "Strict NCP bypass for air slowdowns", false);
     Config<Boolean> grimConfig = new BooleanConfig("Grim", "Strict Grim bypass for slowdown", false);
+    Config<Boolean> grimNewConfig = new BooleanConfig("GrimV3", "Strict GrimV3 bypass for slowdown", false);
     Config<Boolean> strafeFixConfig = new BooleanConfig("StrafeFix", "Old NCP bypass for strafe", false);
     Config<Boolean> inventoryMoveConfig = new BooleanConfig("InventoryMove", "Allows the player to move while in inventories or screens", true);
     Config<Boolean> arrowMoveConfig = new BooleanConfig("ArrowMove", "Allows the player to look while in inventories or screens by using the arrow keys", false);
@@ -63,9 +64,14 @@ public class NoSlowModule extends ToggleModule {
      *
      */
     public NoSlowModule() {
-        super("NoSlow", "Prevents items from slowing down player",
-                ModuleCategory.MOVEMENT);
+        super("NoSlow", "Prevents items from slowing down player", ModuleCategory.MOVEMENT);
+        INSTANCE = this;
     }
+
+    public static NoSlowModule getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public void onDisable() {
         if (airStrictConfig.getValue() && sneaking) {
@@ -118,9 +124,9 @@ public class NoSlowModule extends ToggleModule {
             }
             if (strafeFixConfig.getValue() && checkSlowed()) {
                 // Old NCP
-                // Managers.NETWORK.sendSequencedPacket(id ->
-                //        new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND,
-                //                new BlockHitResult(mc.player.getPos(), Direction.UP, BlockPos.ORIGIN, false), id));
+//              Managers.NETWORK.sendSequencedPacket(id ->
+//                      new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND,
+//                              new BlockHitResult(mc.player.getPos(), Direction.UP, mc.player.getBlockPos(), false), id));
             }
             if (inventoryMoveConfig.getValue() && checkScreen()) {
                 final long handle = mc.getWindow().getHandle();
@@ -152,6 +158,22 @@ public class NoSlowModule extends ToggleModule {
                             PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.DOWN));
                 }
             }
+        }
+    }
+
+    @EventListener
+    public void onStrafeFix(StrafeFixEvent event) {
+        if (strafeFixConfig.getValue()) {
+            float yaw = mc.player.getYaw();
+            float pitch = mc.player.getPitch();
+            if (Managers.ROTATION.isRotating())
+            {
+                yaw = Managers.ROTATION.getRotationYaw();
+                pitch = Managers.ROTATION.getRotationPitch();
+            }
+            event.cancel();
+            event.setYaw(yaw);
+            event.setPitch(pitch);
         }
     }
 
@@ -224,6 +246,9 @@ public class NoSlowModule extends ToggleModule {
                 Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player,
                         ClientCommandC2SPacket.Mode.STOP_SPRINTING));
             }
+        } else if (event.getPacket() instanceof PlayerInteractItemC2SPacket && grimNewConfig.getValue()) {
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN, id));
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN, id));
         }
     }
 

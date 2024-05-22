@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class FormattingUtils {
+public class FormattingUtil {
 
     private static final Map<Integer, Formatting> COLOR_TO_FORMATTING = Stream.of(Formatting.values()).filter(Formatting::isColor).collect(ImmutableMap.toImmutableMap(formatting -> formatting.getColorValue(), Function.identity()));
 

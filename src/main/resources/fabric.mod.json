@@ -15,12 +15,12 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "net.shoreline.loader.Loader"
+      "net.shoreline.client.ShorelineMod"
     ]
   },
   "accessWidener": "shoreline.accesswidener",
   "mixins": [
-    "mixins.shoreline.plugin.json"
+    "mixins.shoreline.json"
   ],
   "depends": {
     "java": ">=17",

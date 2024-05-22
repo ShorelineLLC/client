@@ -9,10 +9,12 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.manager.combat.hole.Hole;
 import net.shoreline.client.impl.manager.combat.hole.HoleType;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 
 import java.awt.*;
@@ -22,7 +24,7 @@ import java.awt.*;
  * @since 1.0
  */
 public class HoleESPModule extends ToggleModule {
-    public static HoleESPModule INSTANCE;
+    private static HoleESPModule INSTANCE;
 
     //
     Config<Float> rangeConfig = new NumberConfig<>("Range", "Range to display holes", 3.0f, 5.0f, 25.0f);
@@ -42,11 +44,19 @@ public class HoleESPModule extends ToggleModule {
         super("HoleESP", "Displays nearby blast resistant holes", ModuleCategory.RENDER);
     }
 
+    public static HoleESPModule getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new HoleESPModule();
+        }
+        return INSTANCE;
+    }
+
     @EventListener
     public void onRenderWorld(RenderWorldEvent event) {
         if (mc.player == null) {
             return;
         }
+        RenderBuffers.preRender();
         for (Hole hole : Managers.HOLE.getHoles()) {
             if ((hole.isDoubleX() || hole.isDoubleZ()) && !doubleConfig.getValue()
                     || hole.isQuad() && !quadConfig.getValue()
@@ -92,6 +102,7 @@ public class HoleESPModule extends ToggleModule {
             RenderManager.renderBox(event.getMatrices(), render, getHoleColor(hole.getSafety(), alpha));
             RenderManager.renderBoundingBox(event.getMatrices(), render, 1.5f, getHoleColor(hole.getSafety(), (int) (alpha * 145.0f)));
         }
+        RenderBuffers.postRender();
     }
 
     private int getHoleColor(HoleType holeType, double alpha) {

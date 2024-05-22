@@ -52,15 +52,15 @@ public class ColorConfig extends Config<Color> {
 
     @Override
     public Color getValue() {
-        if (ColorsModule.INSTANCE != null && global) {
-            return ColorsModule.INSTANCE.getColor(getAlpha());
+        if (ColorsModule.getInstance() != null && global) {
+            return ColorsModule.getInstance().getColor(getAlpha());
         }
         return new Color(value.getRed(), value.getGreen(), value.getBlue(), allowAlpha ? value.getAlpha() : 255);
     }
 
     public Color getValue(int alpha) {
-        if (ColorsModule.INSTANCE != null && global) {
-            return ColorsModule.INSTANCE.getColor(alpha);
+        if (ColorsModule.getInstance() != null && global) {
+            return ColorsModule.getInstance().getColor(alpha);
         }
         return new Color(value.getRed(), value.getGreen(), value.getBlue(), alpha);
     }
@@ -117,8 +117,8 @@ public class ColorConfig extends Config<Color> {
     public void setGlobal(boolean global) {
         this.global = global;
         configAnimation.setState(global);
-        if (ColorsModule.INSTANCE != null && global) {
-            setValue(ColorsModule.INSTANCE.getColor(getAlpha()));
+        if (ColorsModule.getInstance() != null && global) {
+            setValue(ColorsModule.getInstance().getColor(getAlpha()));
         }
     }
 

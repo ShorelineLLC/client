@@ -83,7 +83,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
         // slider fill
         float fill = (config.getValue().floatValue() - min.floatValue())
                 / (max.floatValue() - min.floatValue());
-        fillGradient(context, ix, iy, ix + (fill * width), iy + height, ClickGuiModule.INSTANCE.getColor(), ClickGuiModule.INSTANCE.getColor1());
+        fillGradient(context, ix, iy, ix + (fill * width), iy + height, ClickGuiModule.getInstance().getColor(), ClickGuiModule.getInstance().getColor1());
         RenderManager.renderText(context, config.getName() + Formatting.GRAY
                 + " " + config.getValue(), ix + 2.0f, iy + 4.0f, -1);
     }

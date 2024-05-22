@@ -20,6 +20,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 public class SurroundModule extends ObsidianPlacerModule {
-    public static SurroundModule INSTANCE;
+    private static SurroundModule INSTANCE;
 
     Config<Float> placeRangeConfig = new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f);
     Config<Boolean> rotateConfig = new BooleanConfig("Rotate", "Rotates to block before placing", false);
@@ -72,6 +73,11 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     public SurroundModule() {
         super("Surround", "Surrounds feet with obsidian", ModuleCategory.COMBAT, 950);
+        INSTANCE = this;
+    }
+
+    public static SurroundModule getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -170,7 +176,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     private void attackPlace(BlockPos targetPos, int slot) {
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay()) && !entities.isEmpty())
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()) && !entities.isEmpty())
         {
             for (Entity entity : entities)
             {
@@ -289,7 +295,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event) {
-        if (mc.player == null || SelfTrapModule.INSTANCE.isEnabled()) {
+        if (mc.player == null || mc.world == null || SelfTrapModule.INSTANCE.isEnabled()) {
             return;
         }
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet) {
@@ -318,17 +324,18 @@ public class SurroundModule extends ObsidianPlacerModule {
         }
         if (renderConfig.getValue())
         {
+            RenderBuffers.preRender();
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
-                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
+                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
+                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
-
+            RenderBuffers.postRender();
 
             if (placements.isEmpty())
             {

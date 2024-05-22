@@ -9,6 +9,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 
 /**
  * @author xgraza
@@ -16,11 +17,16 @@ import net.shoreline.client.impl.event.network.AttackBlockEvent;
  */
 public final class AutoToolModule extends ToggleModule
 {
-    public static AutoToolModule INSTANCE;
+    private static AutoToolModule INSTANCE;
 
     public AutoToolModule()
     {
         super("AutoTool", "Automatically switches to a tool before mining", ModuleCategory.WORLD);
+        INSTANCE = this;
+    }
+
+    public static AutoToolModule getInstance() {
+        return INSTANCE;
     }
 
     @EventListener

@@ -9,6 +9,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.init.Managers;
 
@@ -19,7 +20,7 @@ import java.text.DecimalFormat;
  * @since 1.0
  */
 public class TimerModule extends ToggleModule {
-    public static TimerModule INSTANCE;
+    private static TimerModule INSTANCE;
 
     //
     Config<Float> ticksConfig = new NumberConfig<>("Ticks", "The game tick speed", 0.1f, 2.0f, 50.0f);
@@ -35,6 +36,13 @@ public class TimerModule extends ToggleModule {
         super("Timer", "Changes the client tick speed", ModuleCategory.MISCELLANEOUS);
     }
 
+    public static TimerModule getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new TimerModule();
+        }
+        return INSTANCE;
+    }
+
     @Override
     public String getModuleData() {
         DecimalFormat decimal = new DecimalFormat("0.0#");
@@ -43,8 +51,8 @@ public class TimerModule extends ToggleModule {
 
     @Override
     public void toggle() {
-        SpeedModule.INSTANCE.setPrevTimer();
-        if (SpeedModule.INSTANCE.isUsingTimer()) {
+        SpeedModule.getInstance().setPrevTimer();
+        if (SpeedModule.getInstance().isUsingTimer()) {
             return;
         }
         super.toggle();
@@ -53,7 +61,7 @@ public class TimerModule extends ToggleModule {
     @EventListener
     public void onTick(TickEvent event) {
         if (event.getStage() == EventStage.PRE) {
-            if (SpeedModule.INSTANCE.isUsingTimer()) {
+            if (SpeedModule.getInstance().isUsingTimer()) {
                 return;
             }
             if (tpsSyncConfig.getValue()) {

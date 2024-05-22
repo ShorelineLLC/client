@@ -19,7 +19,6 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.BlockPlacerModule;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.SkipRegister;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -31,7 +30,6 @@ import net.shoreline.client.util.world.ExplosionUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-@SkipRegister
 public class AutoAnchorModule extends BlockPlacerModule {
 
     Config<Float> targetRangeConfig = new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f);

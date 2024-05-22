@@ -10,6 +10,7 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
+import net.shoreline.client.impl.event.gui.screen.SuggestChatEvent;
 import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.Module;
@@ -95,6 +96,13 @@ public class CommandManager implements Globals {
             event.cancel();
             mc.setScreen(new ChatScreen(""));
         }
+    }
+
+    @EventListener
+    public void onChatSuggest(SuggestChatEvent event) {
+        event.setPrefix(prefix);
+        event.setDispatcher(dispatcher);
+        event.setSource(source);
     }
 
     @SuppressWarnings("unchecked")

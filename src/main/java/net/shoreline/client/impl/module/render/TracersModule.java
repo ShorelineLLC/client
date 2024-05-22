@@ -14,6 +14,7 @@ import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
@@ -52,6 +53,7 @@ public class TracersModule extends ToggleModule {
         if (mc.player == null) {
             return;
         }
+        RenderBuffers.preRender();
         boolean prevBobView = mc.options.getBobView().getValue();
         mc.options.getBobView().setValue(false);
         Camera cameraPos = mc.gameRenderer.getCamera();
@@ -70,6 +72,7 @@ public class TracersModule extends ToggleModule {
             }
         }
         mc.options.getBobView().setValue(prevBobView);
+        RenderBuffers.postRender();
     }
 
     private Color getTracerColor(Entity entity) {

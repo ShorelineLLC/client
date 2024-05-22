@@ -11,7 +11,7 @@ import net.shoreline.client.api.module.ModuleCategory;
  * @since 1.0
  */
 public class RotationsModule extends ConcurrentModule {
-    public static RotationsModule INSTANCE;
+    private static RotationsModule INSTANCE;
 
     //
     Config<Float> preserveTicksConfig = new NumberConfig<>("PreserveTicks", "Time to preserve rotations after reaching the target rotations", 0.0f, 10.0f, 20.0f);
@@ -23,8 +23,12 @@ public class RotationsModule extends ConcurrentModule {
      *
      */
     public RotationsModule() {
-        super("Rotations", "Manages client rotations",
-                ModuleCategory.CLIENT);
+        super("Rotations", "Manages client rotations", ModuleCategory.CLIENT);
+        INSTANCE = this;
+    }
+
+    public static RotationsModule getInstance() {
+        return INSTANCE;
     }
 
     public boolean getMovementFix() {

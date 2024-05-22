@@ -22,6 +22,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -143,7 +144,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     private void attackPlace(BlockPos targetPos)
     {
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.INSTANCE.getBreakDelay()) && !entities.isEmpty())
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()) && !entities.isEmpty())
         {
             for (Entity entity : entities)
             {
@@ -252,7 +253,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 continue;
             }
             // Insane!? (probably should rewrite this part, kinda autistic)
-            if (cityConfig.getValue() && AutoCrystalModule.INSTANCE.isEnabled() && !mc.world.getBlockState(trapBlockPos).isAir())
+            if (cityConfig.getValue() && AutoCrystalModule.getInstance().isEnabled() && !mc.world.getBlockState(trapBlockPos).isAir())
             {
                 blocks.remove(blockPos);
                 continue;
@@ -270,7 +271,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             searchForSupport:
             {
-                if (BlockInteractModule.INSTANCE.isEnabled() && !strictDirectionConfig.getValue())
+                if (BlockInteractModule.getInstance().isEnabled() && !strictDirectionConfig.getValue())
                 {
                     blocks.add(headBlockPos);
                     break searchForSupport;
@@ -344,7 +345,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (mc.player == null)
+        if (mc.player == null || mc.world == null)
         {
             return;
         }
@@ -374,17 +375,18 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     {
         if (renderConfig.getValue())
         {
-
+            RenderBuffers.preRender();
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (80 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.INSTANCE.getColor(boxAlpha);
-                Color lineColor = ColorsModule.INSTANCE.getColor(lineAlpha);
+                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
+                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
+            RenderBuffers.postRender();
 
 
             if (placements.isEmpty())

@@ -1,10 +1,7 @@
 package net.shoreline.client.impl.module.client;
 
 import baritone.api.BaritoneAPI;
-import net.minecraft.client.util.ChatMessages;
-import net.minecraft.client.util.TextCollector;
 import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -15,11 +12,10 @@ import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
-import net.shoreline.client.util.FormattingUtils;
+import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.chat.ChatUtil;
 
 import java.awt.*;
-import java.util.Optional;
 
 /**
  * @author Shoreline
@@ -100,7 +96,7 @@ public class BaritoneModule extends ConcurrentModule {
     public void onChatText(ChatMessageEvent event) {
         if (event.getText().getString().startsWith("[Baritone]")) {
             event.cancel();
-            event.setText(Text.of(ChatUtil.PREFIX + FormattingUtils.toString(event.getText())));
+            event.setText(Text.of(ChatUtil.PREFIX + FormattingUtil.toString(event.getText())));
         }
     }
 }
