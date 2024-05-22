@@ -118,8 +118,6 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      information_array: JObject<'a>) -> JObject<'a>
 {
-    log(&env, "entered stop_decompiling_3");
-
     // Get the loader hash and verify with the server
     let protection_domain = env.call_method(
         caller_class,
@@ -128,16 +126,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
-    log(&env, "got protection domain");
-
     let code_source = env.call_method(
         protection_domain,
         obfstr!("getCodeSource"),
         obfstr!("()Ljava/security/CodeSource;"),
         &[]
     ).unwrap().l().unwrap();
-
-    log(&env, "got code source");
 
     let location = env.call_method(
         code_source,
@@ -146,8 +140,6 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
-    log(&env, "got location");
-
     let location_uri = env.call_method(
         location,
         obfstr!("toURI"),
@@ -155,15 +147,11 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
-    log(&env, "got as URI");
-
     let file_jar = env.new_object(
         obfstr!("java/io/File"),
         obfstr!("(Ljava/net/URI;)V"),
         &[location_uri.into()]
     ).unwrap();
-
-    log(&env, "got location jar");
 
     let file_path = env.call_method(
         file_jar,
@@ -172,8 +160,6 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
-    log(&env, "got file path");
-
     let jvm_bytes = env.call_static_method(
         env.find_class(obfstr!("java/nio/file/Files")).unwrap(),
         obfstr!("readAllBytes"),
@@ -181,16 +167,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[file_path.into()]
     ).unwrap().l().unwrap();
 
-    log(&env, "read bytes");
-
     let bytes_to_string = env.call_static_method(
         env.find_class(obfstr!("java/util/Arrays")).unwrap(),
         obfstr!("toString"),
         obfstr!("([B)Ljava/lang/String;"),
         &[jvm_bytes.into()]
     ).unwrap().l().unwrap();
-
-    log(&env, "turned to string");
 
     let bytes_to_string_ptr = env.get_string_utf_chars(JString::from(bytes_to_string)).unwrap();
     let bytes_to_string_internal = CStr::from_ptr(bytes_to_string_ptr).to_str().unwrap();
@@ -203,8 +185,6 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     let url_string = JNIString::from(
         obfstr!("https://api.shorelineclient.net/hashcheck")
     );
-
-    log(&env, "made url");
 
     let url = env.new_object(
         obfstr!("java/net/URL"),
@@ -531,28 +511,19 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                 if name.contains("net/shoreline/client/impl/event/")
                                     || name.contains("net/shoreline/client/api/event/Event")
                                     || name.contains("net/shoreline/client/api/event/handler/EventHandler")
-                                    || name.contains("net/shoreline/client/impl/manager/client/CapeManager$CapeTexture") // Other exclusions
                                     || name.contains("net/shoreline/client/api/event/StageEvent")
+                                    // Other exclusions
                                     || name.contains("net/shoreline/client/util/Globals")
-                                    || name.contains("net/shoreline/client/impl/manager/player/InventoryManager")
-                                    || name.contains("net/shoreline/client/impl/module/client/HUDModule")
-                                    || name.contains("net/shoreline/client/impl/manager/player/rotation/RotationManager")
-                                    || name.contains("net/shoreline/client/api/module/ToggleModule")
+                                    || name.contains("net/shoreline/client/util/network/InteractType")
+                                    || name.contains("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture")
                                 {
-                                    // env.call_method(
-                                    //     class_map,
-                                    //     obfstr!("put"),
-                                    //     obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                    //     &[jvm_name.into(), jvm_bytes.into()]
-                                    // ).unwrap().l().unwrap();
+                                    env.call_method(
+                                        class_map,
+                                        obfstr!("put"),
+                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                        &[jvm_name.into(), jvm_bytes.into()]
+                                    ).unwrap().l().unwrap();
                                 }
-
-                                env.call_method(
-                                    class_map,
-                                    obfstr!("put"),
-                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                    &[jvm_name.into(), jvm_bytes.into()]
-                                ).unwrap().l().unwrap();
 
                                 // Define it!
                                 class_queue.push_back((jvm_name, jvm_bytes));
@@ -629,12 +600,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                 defined_this_iteration.push(class_name.clone());
 
                 // Fuck it, add the class to the reflection filter too
-                // env.call_static_method(
-                //     caller_class,
-                //     obfstr!("stop_decompiling_8"),
-                //     obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-                //     &[clazz.into()]
-                // ).unwrap().l().unwrap();
+                env.call_static_method(
+                    caller_class,
+                    obfstr!("stop_decompiling_8"),
+                    obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                    &[clazz.into()]
+                ).unwrap().l().unwrap();
             }
         }
 
@@ -970,15 +941,9 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
 
             if !server_ver.eq(loader_ver)
             {
-                let msg = format!(
-                    "{}{}{}{}",
-                    obfstr!("Your Shoreline is outdated! \n\nYour version: "),
-                    loader_ver,
-                    obfstr!("\nCurrent version: "),
-                    server_ver
+                error_message(
+                    obfstr!("Your Shoreline loader is out of date!\n\n Please install the latest version via the installer.")
                 );
-
-                error_message(&msg);
 
                 crash(&env, caller_class);
             }
