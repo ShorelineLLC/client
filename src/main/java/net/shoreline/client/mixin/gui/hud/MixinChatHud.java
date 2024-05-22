@@ -94,7 +94,7 @@ public abstract class MixinChatHud implements IChatHud
     {
         RenderChatHudEvent renderChatHudEvent = new RenderChatHudEvent(current);
         EventBus.EVENT_HANDLER.dispatch(renderChatHudEvent);
-        return instance.drawTextWithShadow(textRenderer, text, (int) ((renderChatHudEvent.getAnimation() != null && renderChatHudEvent.isCanceled() ? renderChatHudEvent.getAnimation().getCurrent() : 0)), y, color);
+        return instance.drawTextWithShadow(textRenderer, text, (int) ((renderChatHudEvent.isCanceled() ? renderChatHudEvent.getAnimation() : 0)), y, color);
     }
 
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/" +

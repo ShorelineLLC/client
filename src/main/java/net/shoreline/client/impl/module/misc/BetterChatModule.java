@@ -72,9 +72,9 @@ public class BetterChatModule extends ToggleModule
             if (animation != null)
             {
                 animation.setState(true);
+                event.cancel();
+                event.setAnimation(animation.getCurrent());
             }
-            event.cancel();
-            event.setAnimation(animation);
         }
     }
 

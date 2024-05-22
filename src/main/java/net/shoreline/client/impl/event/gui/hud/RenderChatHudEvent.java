@@ -9,17 +9,17 @@ import net.shoreline.client.util.render.animation.TimeAnimation;
 public class RenderChatHudEvent extends Event
 {
     private final ChatHudLine chatHudLine;
-    private TimeAnimation animation;
+    private double animation;
 
     public RenderChatHudEvent(ChatHudLine chatHudLine) {
         this.chatHudLine = chatHudLine;
     }
 
-    public TimeAnimation getAnimation() {
+    public double getAnimation() {
         return animation;
     }
 
-    public void setAnimation(TimeAnimation animation) {
+    public void setAnimation(double animation) {
         this.animation = animation;
     }
 
