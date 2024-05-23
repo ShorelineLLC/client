@@ -1,13 +1,11 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
@@ -63,7 +61,7 @@ public class ReplenishModule extends ToggleModule {
     public void onSetStack(SetStackEvent event) {
         if (event.getSlot() < 9)
         {
-            if (event.getStack().isEmpty() && !(mc.currentScreen instanceof InventoryScreen)) {
+            if (event.getStack().isEmpty() && !(mc.currentScreen instanceof GenericContainerScreen)) {
                 return;
             }
             hotbar[event.getSlot()] = event.getStack().getItem();
