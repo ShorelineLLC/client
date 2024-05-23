@@ -59,7 +59,7 @@ public class RotationManager implements Globals {
         }
     }
 
-    @EventListener(priority = Integer.MIN_VALUE)
+    @EventListener(priority = MAX_VALUE)
     public void onUpdate(PlayerTickEvent event) {
         if (requests.isEmpty()) {
             rotation = null;
