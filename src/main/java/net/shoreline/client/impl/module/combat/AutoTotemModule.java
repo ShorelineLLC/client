@@ -146,13 +146,15 @@ public final class AutoTotemModule extends ToggleModule
         }
         else
         {
+            boolean holdingCursor = !mc.player.currentScreenHandler.getCursorStack().isEmpty();
             mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
                     itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+            boolean replace = !mc.player.getInventory().getStack(45).isEmpty();
             mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
                     45, 0, SlotActionType.PICKUP, mc.player);
-            if (!mc.player.playerScreenHandler.getCursorStack().isEmpty()) {
+            if (replace) {
                 mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
+                        holdingCursor ? Managers.INVENTORY.findEmptySlot() : itemSlot < 9 ? itemSlot + 36 : itemSlot, 0, SlotActionType.PICKUP, mc.player);
             }
         }
         // Subtracting 1 from this number accounts for this totem that we are replacing

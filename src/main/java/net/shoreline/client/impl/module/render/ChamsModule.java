@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -9,11 +10,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Arm;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -121,8 +124,12 @@ public class ChamsModule extends ToggleModule {
             n = ((Entity) event.entity).getEyeHeight(EntityPose.STANDING) - 0.1f;
             event.matrixStack.translate((float) (-direction.getOffsetX()) * n, 0.0f, (float) (-direction.getOffsetZ()) * n);
         }
-        float l = event.entity.age + event.g;
-        setupTransforms(event.entity, event.matrixStack, l, h, event.g);
+        float l = event.entity instanceof WolfEntity wolf ? wolf.getTailAngle() : event.entity.age + event.g;
+        if (event.entity instanceof PlayerEntity) {
+            setupPlayerTransforms((AbstractClientPlayerEntity) event.entity, event.matrixStack, l, h, event.g);
+        } else {
+            setupTransforms(event.entity, event.matrixStack, l, h, event.g);
+        }
         event.matrixStack.scale(-1.0f, -1.0f, 1.0f);
         event.matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
         event.matrixStack.translate(0.0f, -1.501f, 0.0f);
@@ -156,6 +163,38 @@ public class ChamsModule extends ToggleModule {
         }
         event.matrixStack.pop();
         event.cancel();
+    }
+
+    protected void setupPlayerTransforms(AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h) {
+        float i = abstractClientPlayerEntity.getLeaningPitch(h);
+        float j = abstractClientPlayerEntity.getPitch(h);
+        if (abstractClientPlayerEntity.isFallFlying()) {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+            float k = (float)abstractClientPlayerEntity.getRoll() + h;
+            float l = MathHelper.clamp(k * k / 100.0f, 0.0f, 1.0f);
+            if (!abstractClientPlayerEntity.isUsingRiptide()) {
+                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(l * (-90.0f - j)));
+            }
+            Vec3d vec3d = abstractClientPlayerEntity.getRotationVec(h);
+            Vec3d vec3d2 = abstractClientPlayerEntity.lerpVelocity(h);
+            double d = vec3d2.horizontalLengthSquared();
+            double e = vec3d.horizontalLengthSquared();
+            if (d > 0.0 && e > 0.0) {
+                double m = (vec3d2.x * vec3d.x + vec3d2.z * vec3d.z) / Math.sqrt(d * e);
+                double n = vec3d2.x * vec3d.z - vec3d2.z * vec3d.x;
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation((float)(Math.signum(n) * Math.acos(m))));
+            }
+        } else if (i > 0.0f) {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+            float k = abstractClientPlayerEntity.isTouchingWater() ? -90.0f - j : -90.0f;
+            float l = MathHelper.lerp(i, 0.0f, k);
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(l));
+            if (abstractClientPlayerEntity.isInSwimmingPose()) {
+                matrixStack.translate(0.0f, -1.0f, 0.3f);
+            }
+        } else {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+        }
     }
 
     protected void setupTransforms(LivingEntity entity, MatrixStack matrices, float animationProgress,
