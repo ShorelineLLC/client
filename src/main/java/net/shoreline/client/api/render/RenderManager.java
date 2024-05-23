@@ -220,6 +220,14 @@ public class RenderManager implements Globals {
 
     /**
      * @param text
+     * @param pos
+     */
+    public static void renderSign(String text, Vec3d pos, float scaling, int color) {
+        renderSign(text, pos.getX(), pos.getY(), pos.getZ(), scaling, color);
+    }
+
+    /**
+     * @param text
      * @param x
      * @param y
      * @param z
@@ -232,6 +240,12 @@ public class RenderManager implements Globals {
         if (dist <= 8.0) {
             scaling = 0.0245f;
         }
+        renderSign(text, x, y, z, scaling, color);
+    }
+
+    public static void renderSign(String text, double x, double y, double z, float scaling, int color) {
+        Camera camera = mc.gameRenderer.getCamera();
+        final Vec3d pos = camera.getPos();
         MatrixStack matrices = new MatrixStack();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));

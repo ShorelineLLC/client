@@ -14,6 +14,5 @@ public class NoBobModule extends ToggleModule {
     @EventListener
     public void onTick(TickEvent event) {
         mc.player.horizontalSpeed = 4.0f;
-        mc.options.getBobView().setValue(true);
     }
 }

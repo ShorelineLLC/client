@@ -110,7 +110,7 @@ public class ReplenishModule extends ToggleModule {
         for (int i = 9; i < 36; i++) {
             ItemStack stack1 = mc.player.getInventory().getStack(i);
             // We cannot merge stacks if they don't have the same name
-            if (!stack.getName().equals(stack1.getName())) {
+            if (!stack.getName().getString().equals(stack1.getName().getString())) {
                 continue;
             }
             if (stack.getItem() instanceof BlockItem blockItem && (!(stack1.getItem() instanceof BlockItem blockItem1) || blockItem.getBlock() != blockItem1.getBlock())) {

@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.ItemStack;
@@ -65,6 +66,7 @@ public class NametagsModule extends ToggleModule {
     Config<Float> scalingConfig = register(new NumberConfig<>("Scaling", "The nametag label scale", 0.001f, 0.003f, 0.01f));
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Renders nametags on invisible players", true));
     Config<Boolean> borderedConfig = register(new BooleanConfig("TextBorder", "Renders a border behind the nametag", true));
+    Config<Boolean> itemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
 
     public NametagsModule() {
         super("Nametags", "Renders info on player nametags", ModuleCategory.RENDER);
@@ -112,6 +114,15 @@ public class NametagsModule extends ToggleModule {
                     scaling = 0.0245f;
                 }
                 renderInfo(info, hwidth, player, rx, ry, rz, camera, scaling);
+            }
+            if (entity instanceof ItemEntity itemEntity && itemsConfig.getValue()) {
+                Vec3d itemPos = Interpolation.getRenderPosition(itemEntity, mc.getTickDelta());
+                double rx = itemEntity.getX() - itemPos.getX();
+                double ry = itemEntity.getY() - itemPos.getY();
+                double rz = itemEntity.getZ() - itemPos.getZ();
+                ItemStack stack = itemEntity.getStack();
+                String stackNametag = stack.getName().getString() + (stack.getCount() > 1 ? " x" + stack.getCount() : "");
+                RenderManager.renderSign(stackNametag, rx, ry, rz, -1);
             }
         }
 
