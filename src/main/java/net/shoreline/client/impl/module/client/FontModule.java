@@ -10,6 +10,8 @@ import net.shoreline.client.api.module.ToggleModule;
  * @since 1.0
  */
 public class FontModule extends ToggleModule {
+    private static FontModule INSTANCE;
+
     //
     Config<Boolean> shadowConfig = register(new BooleanConfig("Shadow", "Renders text with a shadow background", true));
 
@@ -17,8 +19,12 @@ public class FontModule extends ToggleModule {
      *
      */
     public FontModule() {
-        super("Font", "Changes the client text to custom font rendering",
-                ModuleCategory.CLIENT);
+        super("Font", "Changes the client text to custom font rendering", ModuleCategory.CLIENT);
+        INSTANCE = this;
+    }
+
+    public static FontModule getInstance() {
+        return INSTANCE;
     }
 
     /**

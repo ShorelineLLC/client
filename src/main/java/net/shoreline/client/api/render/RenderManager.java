@@ -1,10 +1,12 @@
 package net.shoreline.client.api.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.*;
+import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
@@ -259,7 +261,12 @@ public class RenderManager implements Globals {
             RenderSystem.defaultBlendFunc();
             GL11.glDepthFunc(GL11.GL_ALWAYS);
 
-            Fonts.VANILLA.drawWithShadow(matrices, text, -hwidth, 0.0f, color);
+            if (FontModule.getInstance().isEnabled()) {
+                Fonts.draw(matrices, text, -hwidth, 0.0f, color, false);
+            }
+            else {
+                Fonts.VANILLA.drawWithShadow(matrices, text, -hwidth, 0.0f, color);
+            }
 
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             RenderSystem.disableBlend();
@@ -340,6 +347,10 @@ public class RenderManager implements Globals {
      * @param color
      */
     public static void renderText(DrawContext context, String text, float x, float y, int color) {
+        if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null) {
+            context.drawText(Fonts.CLIENT, text, (int) x, (int) y, color, FontModule.getInstance().getShadow());
+            return;
+        }
         context.drawText(mc.textRenderer, text, (int) x, (int) y, color, true);
     }
 
@@ -348,6 +359,9 @@ public class RenderManager implements Globals {
      * @return
      */
     public static int textWidth(String text) {
+        if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null) {
+            return Fonts.CLIENT.getWidth(text);
+        }
         return mc.textRenderer.getWidth(text);
     }
 }

@@ -12,6 +12,7 @@ import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.impl.event.*;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.imixin.IMinecraftClient;
+import net.shoreline.client.init.Fonts;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -97,6 +98,9 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext, CallbackInfoReturnable<Runnable> cir) {
         FinishLoadingEvent finishLoadingEvent = new FinishLoadingEvent();
         EventBus.EVENT_HANDLER.dispatch(finishLoadingEvent);
+        if (!Fonts.isInitialized()) {
+            Fonts.init();
+        }
         // Managers.CAPES.init();
     }
 

@@ -1,0 +1,11 @@
+{
+  "providers" : [
+    {
+      "type" : "ttf",
+      "file" : "shoreline:verdana.ttf",
+      "shift":[0,0],
+      "size":16,
+      "oversample":20
+    }
+  ]
+}

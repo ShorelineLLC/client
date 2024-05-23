@@ -37,6 +37,7 @@ public final class ModuleManager
                 new CapesModule(),
                 new ClickGuiModule(),
                 new ColorsModule(),
+                new FontModule(),
                 new HUDModule(),
                 new RotationsModule(),
                 // Combat
