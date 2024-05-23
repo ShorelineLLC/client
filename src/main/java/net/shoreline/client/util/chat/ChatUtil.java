@@ -3,6 +3,7 @@ package net.shoreline.client.util.chat;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.shoreline.client.mixin.accessor.AccessorChatHud;
 import net.shoreline.client.util.Globals;
 
 /**
@@ -20,7 +21,7 @@ public class ChatUtil implements Globals {
      * @param message The message
      */
     public static void clientSendMessage(String message) {
-        mc.inGameHud.getChatHud().addMessage(Text.of(PREFIX + message), null, null);
+        ((AccessorChatHud) mc.inGameHud.getChatHud()).hookAddMessage(Text.of(PREFIX + message), null, mc.inGameHud.getTicks(), null, true);
     }
 
     /**
@@ -35,7 +36,7 @@ public class ChatUtil implements Globals {
      * @param message
      */
     public static void clientSendMessageRaw(String message) {
-        mc.inGameHud.getChatHud().addMessage(Text.of(message), null, null);
+        ((AccessorChatHud) mc.inGameHud.getChatHud()).hookAddMessage(Text.of(message), null, mc.inGameHud.getTicks(), null, true);
     }
 
     /**

@@ -152,12 +152,12 @@ public class MixinGameRenderer implements Globals {
      * @param ci
      */
     @Inject(method = "bobView", at = @At(value = "HEAD"), cancellable = true)
-    private void hookBobView(MatrixStack matrices, float tickDelta,
-                             CallbackInfo ci) {
-        BobViewEvent bobViewEvent = new BobViewEvent();
+    private void hookBobView(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        BobViewEvent bobViewEvent = new BobViewEvent(matrices, tickDelta);
         EventBus.EVENT_HANDLER.dispatch(bobViewEvent);
         if (bobViewEvent.isCanceled()) {
             ci.cancel();
+            matrices.translate(0.0f, bobViewEvent.getY(), 0.0f);
         }
     }
 

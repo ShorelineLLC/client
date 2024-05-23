@@ -11,6 +11,7 @@
     "MixinMouse",
     "accessor.AccessorAbstractBlock",
     "accessor.AccessorBufferBuilderStorage",
+    "accessor.AccessorChatHud",
     "accessor.AccessorChatScreen",
     "accessor.AccessorClickableWidget",
     "accessor.AccessorClientConnection",

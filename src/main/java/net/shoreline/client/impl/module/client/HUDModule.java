@@ -159,12 +159,12 @@ public class HUDModule extends ToggleModule {
                     if (effect == StatusEffects.NIGHT_VISION) {
                         continue;
                     }
-                    boolean amplifier = e.getAmplifier() > 1 && !e.isInfinite();
+                    boolean amplifier = e.getAmplifier() + 1 > 1 && !e.isInfinite();
                     Text duration = StatusEffectUtil.getDurationText(e, 1.0f, mc.world.getTickManager().getTickRate());
                     String text = String.format("%s %s§f%s",
                             effect.getName().getString(),
-                            amplifier ? e.getAmplifier() + " " : "",
-                            e.isInfinite() ? "" : duration.getString());
+                            amplifier ? e.getAmplifier() + 1 + " " : "",
+                            e.isInfinite() ? "Inf" : duration.getString());
                     int width = RenderManager.textWidth(text);
                     RenderManager.renderText(event.getContext(), text,
                             res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
