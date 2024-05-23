@@ -382,19 +382,19 @@ public class AuraModule extends RotationModule {
             Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player,
                     ClientCommandC2SPacket.Mode.START_SPRINTING));
         }
-        if (CriticalsModule.getInstance().isEnabled() && critTimer.passed(500)) {
-            if (!mc.player.isOnGround()
-                    || mc.player.isRiding()
-                    || mc.player.isSubmergedInWater()
-                    || mc.player.isInLava()
-                    || mc.player.isHoldingOntoLadder()
-                    || mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                    || mc.player.input.jumping) {
-                return;
-            }
-            CriticalsModule.getInstance().preAttackPacket(entity);
-            critTimer.reset();
-        }
+//        if (CriticalsModule.getInstance().isEnabled() && critTimer.passed(500)) {
+//            if (!mc.player.isOnGround()
+//                    || mc.player.isRiding()
+//                    || mc.player.isSubmergedInWater()
+//                    || mc.player.isInLava()
+//                    || mc.player.isHoldingOntoLadder()
+//                    || mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
+//                    || mc.player.input.jumping) {
+//                return;
+//            }
+//            CriticalsModule.getInstance().preAttackPacket(entity);
+//            critTimer.reset();
+//        }
     }
 
     private Entity getAttackTarget(Vec3d pos) {

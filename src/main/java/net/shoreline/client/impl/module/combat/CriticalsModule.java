@@ -60,7 +60,7 @@ public class CriticalsModule extends ToggleModule {
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event) {
         // Custom aura crit handling
-        if (mc.player == null || mc.world == null || AuraModule.getInstance().isEnabled()) {
+        if (mc.player == null || mc.world == null) {
             return;
         }
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet
