@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -76,7 +77,7 @@ public class CriticalsModule extends ToggleModule {
             }
             // Attacked entity
             final Entity e = packet.getEntity();
-            if (e == null || !e.isAlive() || e instanceof EndCrystalEntity) {
+            if (e == null || !e.isAlive() || !(e instanceof LivingEntity)) {
                 return;
             }
             if (EntityUtil.isVehicle(e)) {

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
 
 /**
  * @author linus, bon55
@@ -59,8 +60,7 @@ public class RotationManager implements Globals {
         }
     }
 
-    @EventListener(priority = MAX_VALUE)
-    public void onUpdate(PlayerTickEvent event) {
+    public void onUpdate() {
         if (requests.isEmpty()) {
             rotation = null;
             return;
