@@ -410,16 +410,15 @@ public class AutoMineModule extends RotationModule {
             return;
         }
         if (doubleBreakConfig.getValue()) {
-            if (grimConfig.getValue()) {
-                stopMiningInternal(data);
-            }
             Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
-            stopMiningInternal(data);
-        } else {
             if (grimConfig.getValue()) {
-                stopMiningInternal(data);
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
             }
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+        } else {
             Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
         }
