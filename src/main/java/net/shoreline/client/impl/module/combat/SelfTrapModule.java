@@ -77,6 +77,11 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     public SelfTrapModule()
     {
         super("SelfTrap", "Fully surrounds the player with blocks", ModuleCategory.COMBAT, 900);
+        INSTANCE = this;
+    }
+
+    public static SelfTrapModule getInstance() {
+        return INSTANCE;
     }
 
     @Override

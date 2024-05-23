@@ -107,7 +107,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onPlayerTick(PlayerTickEvent event) {
-        if (SelfTrapModule.INSTANCE.isEnabled()) {
+        if (SelfTrapModule.getInstance().isEnabled()) {
             return;
         }
         // Do we need this check?? Surround is always highest prio
@@ -295,7 +295,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event) {
-        if (mc.player == null || mc.world == null || SelfTrapModule.INSTANCE.isEnabled()) {
+        if (mc.player == null || mc.world == null || SelfTrapModule.getInstance().isEnabled()) {
             return;
         }
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet) {
@@ -319,7 +319,7 @@ public class SurroundModule extends ObsidianPlacerModule {
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
-        if (SelfTrapModule.INSTANCE.isEnabled()) {
+        if (SelfTrapModule.getInstance().isEnabled()) {
             return;
         }
         if (renderConfig.getValue())
