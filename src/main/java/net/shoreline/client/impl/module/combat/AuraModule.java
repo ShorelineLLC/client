@@ -392,9 +392,8 @@ public class AuraModule extends RotationModule {
                     || mc.player.input.jumping) {
                 return;
             }
-            CriticalsModule.getInstance().preAttackPacket();
+            CriticalsModule.getInstance().preAttackPacket(entity);
             critTimer.reset();
-            mc.player.addCritParticles(entity);
         }
     }
 

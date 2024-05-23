@@ -8,13 +8,10 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
 import net.shoreline.client.init.Managers;
@@ -34,11 +31,6 @@ public class CriticalsModule extends ToggleModule {
 
     //
     Config<CritMode> modeConfig = register(new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values()));
-    Config<Boolean> packetSyncConfig = register(new BooleanConfig("Tick-Sync", "Syncs the cached packet interaction to the next tick", false));
-    // The cached attack packets that will be resent after manipulating
-    // player position packets
-    private PlayerInteractEntityC2SPacket attackPacket;
-    private HandSwingC2SPacket swingPacket;
     //
     private final Timer attackTimer = new CacheTimer();
 
@@ -46,8 +38,7 @@ public class CriticalsModule extends ToggleModule {
      *
      */
     public CriticalsModule() {
-        super("Criticals", "Modifies attacks to always land critical hits",
-                ModuleCategory.COMBAT);
+        super("Criticals", "Modifies attacks to always land critical hits", ModuleCategory.COMBAT);
         INSTANCE = this;
     }
 
@@ -63,19 +54,6 @@ public class CriticalsModule extends ToggleModule {
         return EnumFormatter.formatEnum(modeConfig.getValue());
     }
 
-    @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() != EventStage.POST) {
-            return;
-        }
-        if (packetSyncConfig.getValue() && attackPacket != null && swingPacket != null) {
-            Managers.NETWORK.sendPacket(attackPacket);
-            Managers.NETWORK.sendPacket(swingPacket);
-            attackPacket = null;
-            swingPacket = null;
-        }
-    }
-
     /**
      * @param event
      */
@@ -86,25 +64,13 @@ public class CriticalsModule extends ToggleModule {
             return;
         }
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet
-                && packet.getType() == InteractType.ATTACK && !event.isClientPacket()) {
-            if (isGrim()) {
-                if (!mc.player.isOnGround()) {
-                    double x = mc.player.getX();
-                    double y = mc.player.getY();
-                    double z = mc.player.getZ();
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y - 0.000001, z, false));
-                }
-                return;
-            }
-            if (!Managers.POSITION.isOnGround()
-                    || mc.player.isRiding()
+                && packet.getType() == InteractType.ATTACK) {
+            if (mc.player.isRiding()
                     || mc.player.isFallFlying()
                     || mc.player.isTouchingWater()
                     || mc.player.isInLava()
                     || mc.player.isHoldingOntoLadder()
                     || mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                    || mc.player.input.jumping
                     || InventoryUtil.isHolding32k()) {
                 return;
             }
@@ -113,31 +79,17 @@ public class CriticalsModule extends ToggleModule {
             if (e == null || !e.isAlive() || e instanceof EndCrystalEntity) {
                 return;
             }
-            if (attackTimer.passed(500)) {
-                event.cancel();
-                if (EntityUtil.isVehicle(e)) {
-                    if (modeConfig.getValue() == CritMode.PACKET) {
-                        for (int i = 0; i < 5; ++i) {
-                            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(e,
-                                    Managers.POSITION.isSneaking()));
-                            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                        }
+            if (EntityUtil.isVehicle(e)) {
+                if (modeConfig.getValue() == CritMode.PACKET) {
+                    for (int i = 0; i < 5; ++i) {
+                        Managers.NETWORK.sendQuietPacket(PlayerInteractEntityC2SPacket.attack(e,
+                                Managers.POSITION.isSneaking()));
+                        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     }
-                    return;
                 }
-                attackPacket = PlayerInteractEntityC2SPacket.attack(e, Managers.POSITION.isSneaking());
-                if (!packetSyncConfig.getValue()) {
-                    Managers.NETWORK.sendPacket(attackPacket);
-                }
-                preAttackPacket();
-                mc.player.addCritParticles(e);
-                attackTimer.reset();
+                return;
             }
-        } else if (event.getPacket() instanceof HandSwingC2SPacket packet) {
-            if (packetSyncConfig.getValue() && attackPacket != null) {
-                event.cancel();
-                swingPacket = packet;
-            }
+            preAttackPacket(e);
         }
     }
 
@@ -147,37 +99,66 @@ public class CriticalsModule extends ToggleModule {
      *
      * @see AuraModule#postAttackTarget(Entity)
      */
-    public void preAttackPacket() {
+    public void preAttackPacket(Entity e) {
         double x = Managers.POSITION.getX();
         double y = Managers.POSITION.getY();
         double z = Managers.POSITION.getZ();
+        float yaw = mc.player.getYaw();
+        float pitch = mc.player.getPitch();
+        if (Managers.ROTATION.isRotating())
+        {
+            yaw = Managers.ROTATION.getRotationYaw();
+            pitch = Managers.ROTATION.getRotationPitch();
+        }
         switch (modeConfig.getValue()) {
             case VANILLA -> {
-                double d = 1.0e-7 + 1.0e-7 * (1.0 + RANDOM.nextInt(RANDOM.nextBoolean() ? 34 : 43));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 0.1016f + d * 3.0f, z, false));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 0.0202f + d * 2.0f, z, false));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 3.239e-4 + d, z, false));
+                if (mc.player.isOnGround() && !mc.player.input.jumping) {
+                    double d = 1.0e-7 + 1.0e-7 * (1.0 + RANDOM.nextInt(RANDOM.nextBoolean() ? 34 : 43));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.1016f + d * 3.0f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.0202f + d * 2.0f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 3.239e-4 + d, z, false));
+                    mc.player.addCritParticles(e);
+                }
             }
             case PACKET -> {
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 0.05f, z, false));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y, z, false));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 0.03f, z, false));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y, z, false));
+                if (mc.player.isOnGround() && !mc.player.input.jumping) {
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.05f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.03f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y, z, false));
+                    mc.player.addCritParticles(e);
+                }
             }
             case PACKET_STRICT -> {
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 0.11f, z, false));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 0.1100013579f, z, false));
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                        x, y + 0.0000013579f, z, false));
+                if (attackTimer.passed(500) && mc.player.isOnGround() && !mc.player.input.jumping) {
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.11f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.1100013579f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.0000013579f, z, false));
+                    attackTimer.reset();
+                    mc.player.addCritParticles(e);
+                }
+            }
+            case GRIM -> {
+                if (!mc.player.isOnGround()) {
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y - 0.000001, z, yaw, pitch, false));
+                }
+//                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+//                        x, y + 0.00150000001304f, z, mc.player.getYaw(), mc.player.getPitch(), false));
+//                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+//                        x, y + 0.014400000001304f, z, mc.player.getYaw(), mc.player.getPitch(), false));
+//                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+//                        x, y + 0.001150000001304f, z, mc.player.getYaw(), mc.player.getPitch(), false));
             }
             case LOW_HOP -> {
                 // mc.player.jump();
