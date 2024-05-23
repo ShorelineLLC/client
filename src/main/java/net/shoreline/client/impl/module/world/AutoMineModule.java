@@ -411,17 +411,14 @@ public class AutoMineModule extends RotationModule {
         }
         if (doubleBreakConfig.getValue()) {
             if (grimConfig.getValue()) {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+                stopMiningInternal(data);
             }
             Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+            stopMiningInternal(data);
         } else {
             if (grimConfig.getValue()) {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+                stopMiningInternal(data);
             }
             Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
@@ -459,14 +456,22 @@ public class AutoMineModule extends RotationModule {
         if (canSwap) {
             Managers.INVENTORY.setSlot(data.getSlot());
         }
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+        stopMiningInternal(data);
         lastBreak = System.currentTimeMillis();
         if (canSwap) {
             Managers.INVENTORY.syncToClient();
         }
         if (rotateConfig.getValue()) {
             Managers.ROTATION.setRotationSilentSync(true);
+        }
+    }
+
+    private void stopMiningInternal(MiningData data) {
+        Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+        if (grimConfig.getValue()) {
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos().up(500), data.getDirection(), id));
         }
     }
 

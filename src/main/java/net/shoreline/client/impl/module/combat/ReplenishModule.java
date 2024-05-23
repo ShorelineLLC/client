@@ -1,14 +1,20 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.player.SetStackEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 
@@ -45,7 +51,7 @@ public class ReplenishModule extends ToggleModule {
             double stackPercent = ((float) stack.getCount() / stack.getMaxCount()) * 100.0f;
             if (stack.getCount() <= 1 || stackPercent <= percentConfig.getValue()) {
                 Item item = hotbar[i];
-                if (item == null) {
+                if (item == null || item == Items.AIR) {
                     return;
                 }
                 replenishStack(item, stack, i);
@@ -55,9 +61,24 @@ public class ReplenishModule extends ToggleModule {
 
     @EventListener
     public void onSetStack(SetStackEvent event) {
-        if (event.getSlot() < 9 && !event.getStack().isEmpty())
+        if (event.getSlot() < 9)
         {
+            if (event.getStack().isEmpty() && !(mc.currentScreen instanceof InventoryScreen)) {
+                return;
+            }
             hotbar[event.getSlot()] = event.getStack().getItem();
+        }
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event) {
+        if (event.getPacket() instanceof PlayerActionC2SPacket packet && (packet.getAction() == PlayerActionC2SPacket.Action.DROP_ITEM
+                || packet.getAction() == PlayerActionC2SPacket.Action.DROP_ITEM)) {
+            int slot = mc.player.getInventory().selectedSlot;
+            ItemStack stack = mc.player.getInventory().getStack(slot);
+            if (stack.isEmpty()) {
+                hotbar[slot] = null;
+            }
         }
     }
 
