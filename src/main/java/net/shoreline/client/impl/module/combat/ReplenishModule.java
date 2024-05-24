@@ -1,5 +1,8 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -59,11 +62,15 @@ public class ReplenishModule extends ToggleModule {
     public void onSetStack(SetStackEvent event) {
         if (event.getSlot() < 9)
         {
-            if (event.getStack().isEmpty() && mc.currentScreen == null) {
+            if (event.getStack().isEmpty() && !isInInventory()) {
                 return;
             }
             hotbar[event.getSlot()] = event.getStack().getItem();
         }
+    }
+
+    private boolean isInInventory() {
+        return mc.currentScreen instanceof GenericContainerScreen || mc.currentScreen instanceof ShulkerBoxScreen || mc.currentScreen instanceof InventoryScreen;
     }
 
     private void replenishItem(Item item, int hotbarSlot) {
