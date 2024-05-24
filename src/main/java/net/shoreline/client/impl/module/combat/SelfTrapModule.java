@@ -10,6 +10,8 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -26,6 +28,7 @@ import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.BlockInteractModule;
@@ -53,7 +56,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
     Config<Boolean> centerConfig = register(new BooleanConfig("Center", "Centers the player before placing blocks", false));
-    Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap  if the player is not in the center of a block", true));
+    Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap  if there is none", false));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5));
@@ -192,14 +195,18 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos, int blockSlot)
     {
-        List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()) && !entities.isEmpty())
+        List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
         {
-            for (Entity entity : entities)
+            List<Entity> crystalEntities = entities.stream().filter(e -> e instanceof EndCrystalEntity).toList();
+            for (Entity entity : crystalEntities)
             {
                 attack(entity);
             }
             attackTimer.reset();
+            return;
+        }
+        if (!entities.isEmpty()) {
             return;
         }
 
@@ -289,61 +296,9 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             blocks.add(trapBlockPos);
         }
 
-        // Sort from furthest from the player first
-        blocks.sort(Comparator.comparingDouble((blockPos)
-                -> -mc.player.squaredDistanceTo(blockPos.getX(), blockPos.getY(), blockPos.getZ())));
-
         if (headConfig.getValue())
         {
-            final BlockPos headBlockPos = pos.up(2);
-            if (headConfig.getValue() && !blocks.isEmpty() && mc.world.getBlockState(headBlockPos).isAir())
-            {
-                searchForSupport:
-                {
-                    // Do not attempt to place head blocks unless every surrounding block
-                    // is placed
-                    for (final BlockPos trapBlockPos : blocks)
-                    {
-                        if (mc.world.getBlockState(trapBlockPos).isReplaceable())
-                        {
-                            break searchForSupport;
-                        }
-                    }
-
-                    if (BlockInteractModule.getInstance().isEnabled() && !strictDirectionConfig.getValue())
-                    {
-                        blocks.add(headBlockPos);
-                        break searchForSupport;
-                    }
-
-                    for (final Direction direction : Direction.values())
-                    {
-                        final BlockPos neighbor = headBlockPos.offset(direction);
-                        if (entities.contains(neighbor.down()))
-                        {
-                            continue;
-                        }
-
-                        final Direction neighboringDirection = Managers.INTERACT.getInteractDirection(
-                                neighbor, grimConfig.getValue(), strictDirectionConfig.getValue());
-                        if (neighboringDirection != null)
-                        {
-                            // We need to assure that the head block would have a visible side to place on
-                            // with this getInteractionDirection result
-                            // TODO: more elegant way to do this? the code also doesnt look like it'd work, but for whatever reason it does
-                            if (strictDirectionConfig.getValue() && Managers.INTERACT.getPlaceDirectionsNCP(
-                                    mc.player.getEyePos(), neighbor.toCenterPos()).contains(direction))
-                            {
-                                continue;
-                            }
-
-                            blocks.add(neighbor);
-                            blocks.add(headBlockPos);
-                            break;
-                        }
-                    }
-                }
-            }
+            // Need better strict direction checks before we can implement this
         }
         return blocks;
     }
@@ -392,13 +347,16 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
         }
-        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            for (int id : packet.getEntityIds()) {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
-                    blocksPlaced++;
-                    RenderSystem.recordRenderCall(() -> attackPlace(entity.getBlockPos()));
-                }
+    }
+
+    @EventListener
+    public void onPlaySound(PlaySoundEvent event) {
+        if (event.getSoundEvent() == SoundEvents.ENTITY_GENERIC_EXPLODE && event.getCategory() == SoundCategory.BLOCKS) {
+            BlockPos targetPos = BlockPos.ofFloored(event.getPos());
+            if (surround.contains(targetPos)) {
+                blocksPlaced++;
+                RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
+                sendModuleMessage("l");
             }
         }
     }

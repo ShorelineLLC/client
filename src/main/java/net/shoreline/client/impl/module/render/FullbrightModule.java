@@ -27,11 +27,11 @@ public class FullbrightModule extends ToggleModule {
 
     Config<Brightness> brightnessConfig = register(new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values()));
     Config<Boolean> biomeConfig = register(new BooleanConfig("Biome", "Colors the light of the biome", false));
-    Config<Color> biomeColorConfig = register(new ColorConfig("BiomeColor", "The color of the biome", Color.RED, false, true));
+    Config<Color> biomeColorConfig = register(new ColorConfig("BiomeColor", "The color of the biome", Color.RED, false, true, () -> biomeConfig.getValue()));
     Config<Boolean> waterConfig = register(new BooleanConfig("Water", "Colors the water", false));
-    Config<Color> waterColorConfig = register(new ColorConfig("WaterColor", "The color of the water", Color.RED, false, true));
+    Config<Color> waterColorConfig = register(new ColorConfig("WaterColor", "The color of the water", Color.RED, false, true, () -> waterConfig.getValue()));
     Config<Boolean> grassConfig = register(new BooleanConfig("Grass", "Colors the grass", false));
-    Config<Color> grassColorConfig = register(new ColorConfig("GrassColor", "The color of the grass", Color.RED, false, true));
+    Config<Color> grassColorConfig = register(new ColorConfig("GrassColor", "The color of the grass", Color.RED, false, true, () -> grassConfig.getValue()));
 
     public FullbrightModule() {
         super("Fullbright", "Brightens the world", ModuleCategory.RENDER);
@@ -86,14 +86,16 @@ public class FullbrightModule extends ToggleModule {
 
     @EventListener
     public void onBiomeColor(BiomeColorEvent event) {
-        event.cancel();
         if (biomeConfig.getValue() && event.getColorResolver() == BiomeColors.FOLIAGE_COLOR) {
+            event.cancel();
             event.setColor(biomeColorConfig.getValue());
         }
         else if (waterConfig.getValue() && event.getColorResolver() == BiomeColors.WATER_COLOR) {
+            event.cancel();
             event.setColor(waterColorConfig.getValue());
         }
         else if (grassConfig.getValue() && event.getColorResolver() == BiomeColors.GRASS_COLOR) {
+            event.cancel();
             event.setColor(grassColorConfig.getValue());
         }
     }

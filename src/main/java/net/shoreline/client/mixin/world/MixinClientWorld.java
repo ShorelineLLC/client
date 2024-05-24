@@ -2,9 +2,12 @@ package net.shoreline.client.mixin.world;
 
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
+import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
 import org.jetbrains.annotations.Nullable;
@@ -80,6 +83,16 @@ public abstract class MixinClientWorld {
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getColorVec());
+        }
+    }
+
+    @Inject(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V", at = @At(value = "HEAD"), cancellable = true)
+    private void hookPlaySound(double x, double y, double z, SoundEvent event, SoundCategory category,
+                               float volume, float pitch, boolean useDistance, long seed, CallbackInfo ci) {
+        PlaySoundEvent playSoundEvent = new PlaySoundEvent(new Vec3d(x, y, z), event, category);
+        EventBus.EVENT_HANDLER.dispatch(playSoundEvent);
+        if (playSoundEvent.isCanceled()) {
+            ci.cancel();
         }
     }
 }

@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -10,6 +11,8 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -26,6 +29,7 @@ import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
@@ -175,14 +179,18 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     private void attackPlace(BlockPos targetPos, int slot) {
-        List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()) && !entities.isEmpty())
+        List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
         {
-            for (Entity entity : entities)
+            List<Entity> crystalEntities = entities.stream().filter(e -> e instanceof EndCrystalEntity).toList();
+            for (Entity entity : crystalEntities)
             {
                 attack(entity);
             }
             attackTimer.reset();
+            return;
+        }
+        if (!entities.isEmpty()) {
             return;
         }
 
@@ -305,13 +313,16 @@ public class SurroundModule extends ObsidianPlacerModule {
                 blocksPlaced++;
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
-        } else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            for (int id : packet.getEntityIds()) {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
-                    blocksPlaced++;
-                    RenderSystem.recordRenderCall(() -> attackPlace(entity.getBlockPos()));
-                }
+        }
+    }
+
+    @EventListener
+    public void onPlaySound(PlaySoundEvent event) {
+        if (event.getSoundEvent() == SoundEvents.ENTITY_GENERIC_EXPLODE && event.getCategory() == SoundCategory.BLOCKS) {
+            BlockPos targetPos = BlockPos.ofFloored(event.getPos());
+            if (surround.contains(targetPos)) {
+                blocksPlaced++;
+                RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
         }
     }

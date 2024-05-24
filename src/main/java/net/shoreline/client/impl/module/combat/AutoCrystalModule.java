@@ -13,6 +13,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -34,6 +36,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
+import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.EvictingQueue;
@@ -378,6 +381,19 @@ public class AutoCrystalModule extends RotationModule {
                     setStage("ATTACKING");
                     lastAttackTimer.reset();
                     break;
+                }
+            }
+        }
+    }
+
+    @EventListener
+    public void onPlaySound(PlaySoundEvent event) {
+        if (event.getSoundEvent() == SoundEvents.ENTITY_GENERIC_EXPLODE && event.getCategory() == SoundCategory.BLOCKS) {
+            for (Entity entity : Lists.newArrayList(mc.world.getEntities())) {
+                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getPos()) < 144.0) {
+                    mc.executeSync(() -> {
+                        mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
+                    });
                 }
             }
         }
