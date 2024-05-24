@@ -85,6 +85,12 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     @Override
+    public void onDisable() {
+        surround.clear();
+        placements.clear();
+    }
+
+    @Override
     public void onEnable() {
         if (mc.player == null) {
             return;
@@ -103,8 +109,10 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     @EventListener
-    public void onRemoveEntity(RemoveEntityEvent event) {
-        if (event.getEntity() == mc.player) {
+    public void onRemoveEntity(RemoveEntityEvent event)
+    {
+        if (mc.player != null && event.getEntity() == mc.player)
+        {
             disable();
         }
     }
@@ -159,7 +167,7 @@ public class SurroundModule extends ObsidianPlacerModule {
             shiftDelay = 0;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            attackPlace(targetPos, slot);
+            attackPlace(targetPos);
         }
     }
 
@@ -168,17 +176,8 @@ public class SurroundModule extends ObsidianPlacerModule {
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
 
-    private void attackPlace(BlockPos targetPos)
-    {
-        final int slot = getResistantBlockItem();
-        if (slot == -1)
-        {
-            return;
-        }
-        attackPlace(targetPos, slot);
-    }
 
-    private void attackPlace(BlockPos targetPos, int slot) {
+    private void attackPlace(BlockPos targetPos) {
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
         if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
         {
@@ -188,12 +187,20 @@ public class SurroundModule extends ObsidianPlacerModule {
                 attack(entity);
             }
             attackTimer.reset();
-            return;
         }
         if (!entities.isEmpty()) {
             return;
         }
 
+        place(targetPos);
+    }
+
+    private void place(BlockPos targetPos) {
+        final int slot = getResistantBlockItem();
+        if (slot == -1)
+        {
+            return;
+        }
         Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
@@ -314,15 +321,13 @@ public class SurroundModule extends ObsidianPlacerModule {
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
         }
-    }
-
-    @EventListener
-    public void onPlaySound(PlaySoundEvent event) {
-        if (event.getSoundEvent() == SoundEvents.ENTITY_GENERIC_EXPLODE && event.getCategory() == SoundCategory.BLOCKS) {
-            BlockPos targetPos = BlockPos.ofFloored(event.getPos());
-            if (surround.contains(targetPos)) {
-                blocksPlaced++;
-                RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
+        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
+            for (int id : packet.getEntityIds()) {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
+                    blocksPlaced++;
+                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
+                }
             }
         }
     }

@@ -33,7 +33,6 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.world.BlockInteractModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -75,6 +74,12 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     {
         super("AutoTrap", "Automatically traps nearby players in blocks",
                 ModuleCategory.COMBAT, 800);
+    }
+
+    @Override
+    public void onDisable() {
+        surround.clear();
+        placements.clear();
     }
 
     @EventListener
@@ -144,6 +149,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
 
+
+
     private void attackPlace(BlockPos targetPos)
     {
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
@@ -155,12 +162,15 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 attack(entity);
             }
             attackTimer.reset();
-            return;
         }
         if (!entities.isEmpty()) {
             return;
         }
 
+        place(targetPos);
+    }
+
+    private void place(BlockPos targetPos) {
         final int slot = getResistantBlockItem();
         if (slot == -1)
         {
@@ -328,15 +338,13 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
         }
-    }
-
-    @EventListener
-    public void onPlaySound(PlaySoundEvent event) {
-        if (event.getSoundEvent() == SoundEvents.ENTITY_GENERIC_EXPLODE && event.getCategory() == SoundCategory.BLOCKS) {
-            BlockPos targetPos = BlockPos.ofFloored(event.getPos());
-            if (surround.contains(targetPos)) {
-                blocksPlaced++;
-                RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
+        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
+            for (int id : packet.getEntityIds()) {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
+                    blocksPlaced++;
+                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
+                }
             }
         }
     }

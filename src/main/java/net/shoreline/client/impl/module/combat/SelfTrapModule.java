@@ -103,6 +103,12 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         prevY = mc.player.getY();
     }
 
+    @Override
+    public void onDisable() {
+        surround.clear();
+        placements.clear();
+    }
+
     @EventListener
     public void onDisconnect(DisconnectEvent event)
     {
@@ -204,32 +210,31 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 attack(entity);
             }
             attackTimer.reset();
-            return;
         }
         if (!entities.isEmpty()) {
             return;
         }
 
-        Managers.INTERACT.placeBlock(targetPos, blockSlot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+        place(targetPos);
+    }
+
+    private void place(BlockPos targetPos) {
+        final int slot = getResistantBlockItem();
+        if (slot == -1)
+        {
+            return;
+        }
+        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
                 if (state)
                 {
-                    if (grimConfig.getValue())
-                    {
-                        Managers.ROTATION.setRotationSilent(angles[0], angles[1], true);
-                    } else
-                    {
-                        setRotation(angles[0], angles[1]);
-                    }
+                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
                 }
                 else
                 {
-                    if (grimConfig.getValue())
-                    {
-                        Managers.ROTATION.setRotationSilentSync(true);
-                    }
+                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
                 }
             }
         });
@@ -347,16 +352,13 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
         }
-    }
-
-    @EventListener
-    public void onPlaySound(PlaySoundEvent event) {
-        if (event.getSoundEvent() == SoundEvents.ENTITY_GENERIC_EXPLODE && event.getCategory() == SoundCategory.BLOCKS) {
-            BlockPos targetPos = BlockPos.ofFloored(event.getPos());
-            if (surround.contains(targetPos)) {
-                blocksPlaced++;
-                RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
-                sendModuleMessage("l");
+        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
+            for (int id : packet.getEntityIds()) {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
+                    blocksPlaced++;
+                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
+                }
             }
         }
     }

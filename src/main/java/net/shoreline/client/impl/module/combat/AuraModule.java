@@ -70,7 +70,6 @@ public class AuraModule extends RotationModule {
     // Config<Integer> packetsConfig = register(new NumberConfig<>("Packets", "Maximum attack packets to send in a single tick", 0, 1, 20);
     Config<Float> swapDelayConfig = register(new NumberConfig<>("SwapPenalty", "Delay for attacking after swapping items which prevents NCP flags", 0.0f,0.0f, 10.0f));
     Config<TickSync> tpsSyncConfig = register(new EnumConfig<>("TPS-Sync", "Syncs the attacks with the server TPS", TickSync.NONE, TickSync.values()));
-    Config<Boolean> awaitCritsConfig = register(new BooleanConfig("AwaitCriticals", "Aura will wait for a critical hit when falling", false));
     Config<Boolean> autoSwapConfig = register(new BooleanConfig("AutoSwap","Automatically swaps to a weapon before attacking", true));
     Config<Boolean> swordCheckConfig = register(new BooleanConfig("Sword-Check", "Checks if a weapon is in the hand before attacking", true));
     // ROTATE
@@ -212,7 +211,7 @@ public class AuraModule extends RotationModule {
                 setRotation(rotation[0], rotation[1]);
             }
         }
-        if (isRotationBlocked() || !shouldWaitCrit() || !rotated && rotateConfig.getValue() || !isInAttackRange(eyepos, entityTarget)) {
+        if (isRotationBlocked() || !rotated && rotateConfig.getValue() || !isInAttackRange(eyepos, entityTarget)) {
             return;
         }
         if (attackDelayConfig.getValue()) {
@@ -502,17 +501,6 @@ public class AuraModule extends RotationModule {
         return !swordCheckConfig.getValue() || mc.player.getMainHandStack().getItem() instanceof SwordItem
                 || mc.player.getMainHandStack().getItem() instanceof AxeItem
                 || mc.player.getMainHandStack().getItem() instanceof TridentItem;
-    }
-
-    public boolean shouldWaitCrit() {
-        return !mc.player.isOnGround()
-                && mc.player.fallDistance > 0
-                && mc.player.fallDistance < 1
-                && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                && !mc.player.isClimbing()
-                && !mc.player.isTouchingWater()
-                || !awaitCritsConfig.getValue()
-                || !mc.options.jumpKey.isPressed();
     }
 
     private Vec3d getAttackRotateVec(Entity entity) {

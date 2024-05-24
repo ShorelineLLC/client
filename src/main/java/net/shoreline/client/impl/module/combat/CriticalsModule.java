@@ -2,7 +2,6 @@ package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
@@ -90,17 +89,11 @@ public class CriticalsModule extends ToggleModule {
                 }
                 return;
             }
-            preAttackPacket(e);
+            attackSpoofJump(e);
         }
     }
 
-    /**
-     * Callback method for pre attack stage, must be called before the attack
-     * packet or else the movements will not be registered
-     *
-     * @see AuraModule#postAttackTarget(Entity)
-     */
-    public void preAttackPacket(Entity e) {
+    public void attackSpoofJump(Entity e) {
         double x = Managers.POSITION.getX();
         double y = Managers.POSITION.getY();
         double z = Managers.POSITION.getZ();
