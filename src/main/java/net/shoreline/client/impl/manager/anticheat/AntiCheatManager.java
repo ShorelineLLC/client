@@ -4,8 +4,8 @@ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.Shoreline;
-import net.shoreline.client.api.event.listener.EventListener;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.util.Globals;
@@ -26,7 +26,7 @@ public final class AntiCheatManager implements Globals
 
     public AntiCheatManager()
     {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
         Arrays.fill(transactions, -1);
     }
 

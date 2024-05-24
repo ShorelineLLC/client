@@ -1,4 +1,4 @@
-package net.shoreline.client.api.event.listener;
+package net.shoreline.eventbus.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

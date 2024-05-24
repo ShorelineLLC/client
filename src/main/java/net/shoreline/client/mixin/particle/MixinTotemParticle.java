@@ -3,7 +3,7 @@ package net.shoreline.client.mixin.particle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.particle.TotemParticle;
 import net.minecraft.client.world.ClientWorld;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.particle.TotemParticleEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +31,7 @@ public abstract class MixinTotemParticle extends MixinParticle {
     private void hookInit(ClientWorld world, double x, double y, double z, double velocityX,
                           double velocityY, double velocityZ, SpriteProvider spriteProvider, CallbackInfo ci) {
         TotemParticleEvent totemParticleEvent = new TotemParticleEvent();
-        EventBus.EVENT_HANDLER.dispatch(totemParticleEvent);
+        EventBus.INSTANCE.dispatch(totemParticleEvent);
         if (totemParticleEvent.isCanceled()) {
             Color color = totemParticleEvent.getColor();
             setColor(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);

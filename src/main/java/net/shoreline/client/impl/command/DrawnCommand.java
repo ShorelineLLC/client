@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.Hideable;

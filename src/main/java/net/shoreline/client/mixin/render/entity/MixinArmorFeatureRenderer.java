@@ -6,7 +6,7 @@ import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderArmorEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,7 +35,7 @@ public class MixinArmorFeatureRenderer {
                                  LivingEntity entity, EquipmentSlot armorSlot,
                                  int light, BipedEntityModel<?> model, CallbackInfo ci) {
         RenderArmorEvent renderArmorEvent = new RenderArmorEvent(entity);
-        EventBus.EVENT_HANDLER.dispatch(renderArmorEvent);
+        EventBus.INSTANCE.dispatch(renderArmorEvent);
         if (renderArmorEvent.isCanceled()) {
             ci.cancel();
         }

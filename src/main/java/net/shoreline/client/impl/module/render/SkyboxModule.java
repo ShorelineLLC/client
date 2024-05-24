@@ -5,8 +5,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
@@ -63,7 +63,7 @@ public class SkyboxModule extends ToggleModule {
 //    @EventListener
 //    public void onConfigUpdate(ConfigUpdateEvent event)
 //    {
-//        if (event.getStage() != EventStage.POST || mc.player == null
+//        if (event.getStage() != StageEvent.EventStage.POST || mc.player == null
 //                || mc.worldRenderer == null)
 //        {
 //            return;
@@ -88,7 +88,7 @@ public class SkyboxModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() == EventStage.POST) {
+        if (event.getStage() == StageEvent.EventStage.POST) {
             mc.world.setTimeOfDay(dayTimeConfig.getValue());
         }
     }

@@ -10,8 +10,8 @@ import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
@@ -40,7 +40,7 @@ public class AutoBowReleaseModule extends ToggleModule {
         if (SelfBowModule.getInstance().isEnabled()) {
             return;
         }
-        if (event.getStage() == EventStage.POST) {
+        if (event.getStage() == StageEvent.EventStage.POST) {
             ItemStack mainhand = mc.player.getMainHandStack();
             if (mainhand.getItem() == Items.BOW) {
                 float off = tpsSyncConfig.getValue() ? 20.0f - Managers.TICK.getTpsAverage() : 0.0f;

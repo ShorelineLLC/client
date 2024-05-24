@@ -5,7 +5,7 @@ import net.minecraft.block.SlimeBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.block.SteppedOnSlimeBlockEvent;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,7 +33,7 @@ public class MixinSlimeBlock implements Globals {
                                  Entity entity, CallbackInfo ci) {
         SteppedOnSlimeBlockEvent steppedOnSlimeBlockEvent =
                 new SteppedOnSlimeBlockEvent();
-        EventBus.EVENT_HANDLER.dispatch(steppedOnSlimeBlockEvent);
+        EventBus.INSTANCE.dispatch(steppedOnSlimeBlockEvent);
         if (steppedOnSlimeBlockEvent.isCanceled() && entity == mc.player) {
             ci.cancel();
         }

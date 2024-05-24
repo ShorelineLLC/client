@@ -3,9 +3,9 @@ package net.shoreline.client.impl.manager.network;
 import net.minecraft.client.network.*;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.screen.ConnectScreenEvent;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
@@ -29,7 +29,7 @@ public class NetworkManager implements Globals {
      *
      */
     public NetworkManager() {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener

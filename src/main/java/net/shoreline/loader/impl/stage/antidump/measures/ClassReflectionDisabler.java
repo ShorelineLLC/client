@@ -6,12 +6,12 @@ import net.shoreline.loader.asm.ClassScanner;
 import net.shoreline.loader.context.UserContext;
 import net.shoreline.loader.context.UserType;
 import net.shoreline.loader.impl.ClientLoader;
+import net.shoreline.loader.impl.natives.NativeLoader;
 import net.shoreline.loader.impl.stage.LoadingStage;
 import net.shoreline.loader.impl.stage.antidump.AntiDumpStage;
 import net.shoreline.loader.impl.stage.antidump.Measure;
 import net.shoreline.loader.impl.stage.authentication.AuthenticationStage;
 import net.shoreline.loader.impl.stage.classloading.ClassLoadingStage;
-import net.shoreline.loader.impl.stage.natives.NativeLoadingStage;
 import net.shoreline.loader.plugin.ConfigPlugin;
 
 import java.util.Set;
@@ -27,6 +27,8 @@ public final class ClassReflectionDisabler extends Measure
                 UserContext.class,
                 UserType.class,
 
+                NativeLoader.class,
+
                 ClassReflectionDisabler.class,
 
                 AntiDumpStage.class,
@@ -35,8 +37,6 @@ public final class ClassReflectionDisabler extends Measure
                 AuthenticationStage.class,
 
                 ClassLoadingStage.class,
-
-                NativeLoadingStage.class,
 
                 LoadingStage.class,
 

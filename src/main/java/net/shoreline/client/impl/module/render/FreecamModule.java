@@ -11,15 +11,15 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.MacroConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.MouseUpdateEvent;
+import net.shoreline.client.impl.event.PerspectiveEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.camera.CameraPositionEvent;
-import net.shoreline.client.impl.event.PerspectiveEvent;
 import net.shoreline.client.impl.event.camera.CameraRotationEvent;
 import net.shoreline.client.impl.event.camera.EntityCameraPositionEvent;
 import net.shoreline.client.impl.event.entity.EntityRotationVectorEvent;
@@ -27,7 +27,6 @@ import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.render.BobViewEvent;
 import net.shoreline.client.impl.manager.player.rotation.Rotation;
-import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.RayCastUtil;
 import net.shoreline.client.util.player.RotationUtil;
@@ -136,7 +135,7 @@ public class FreecamModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() != EventStage.PRE) return;
+        if (event.getStage() != StageEvent.EventStage.PRE) return;
         if (!control && rotateConfig.getValue()) {
             float[] currentAngles = {yaw, pitch};
             Vec3d eyePos = position;

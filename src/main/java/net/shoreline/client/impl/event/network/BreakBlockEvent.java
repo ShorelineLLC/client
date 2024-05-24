@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.network;
 
 import net.minecraft.util.math.BlockPos;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 @Cancelable
 public class BreakBlockEvent extends Event {

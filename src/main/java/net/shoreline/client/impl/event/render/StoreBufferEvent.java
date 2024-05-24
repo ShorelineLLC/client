@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.render;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class StoreBufferEvent extends Event {
 

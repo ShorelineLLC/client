@@ -4,7 +4,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderPlayerEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -44,7 +44,7 @@ public class MixinPlayerEntityRenderer {
                               int i, CallbackInfo ci) {
         final RenderPlayerEvent renderPlayerEvent =
                 new RenderPlayerEvent(abstractClientPlayerEntity);
-        EventBus.EVENT_HANDLER.dispatch(renderPlayerEvent);
+        EventBus.INSTANCE.dispatch(renderPlayerEvent);
         yaw = abstractClientPlayerEntity.getYaw();
         prevYaw = abstractClientPlayerEntity.prevYaw;
         bodyYaw = abstractClientPlayerEntity.bodyYaw;

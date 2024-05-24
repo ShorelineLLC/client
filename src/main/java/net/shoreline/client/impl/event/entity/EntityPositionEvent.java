@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.entity;
 
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class EntityPositionEvent extends Event {
     private final Vec3d updatePos;

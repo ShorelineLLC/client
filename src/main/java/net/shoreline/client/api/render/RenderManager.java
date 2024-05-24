@@ -1,7 +1,6 @@
 package net.shoreline.client.api.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -14,7 +13,8 @@ import net.shoreline.client.util.Globals;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import static net.shoreline.client.api.render.RenderBuffers.*;
+import static net.shoreline.client.api.render.RenderBuffers.LINES;
+import static net.shoreline.client.api.render.RenderBuffers.QUADS;
 
 /**
  * @author linus

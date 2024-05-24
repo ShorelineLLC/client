@@ -1,9 +1,8 @@
 package net.shoreline.client.impl.event.gui.hud;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
-import net.shoreline.client.util.render.animation.TimeAnimation;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 @Cancelable
 public class RenderChatHudEvent extends Event

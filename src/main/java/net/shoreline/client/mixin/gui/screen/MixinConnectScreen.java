@@ -4,8 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.screen.ConnectScreenEvent;
-import net.shoreline.client.impl.event.handler.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,6 +29,6 @@ public class MixinConnectScreen {
     private void onConnect(MinecraftClient client, ServerAddress address,
                            ServerInfo info, CallbackInfo ci) {
         ConnectScreenEvent connectScreenEvent = new ConnectScreenEvent(address, info);
-        EventBus.EVENT_HANDLER.dispatch(connectScreenEvent);
+        EventBus.INSTANCE.dispatch(connectScreenEvent);
     }
 }

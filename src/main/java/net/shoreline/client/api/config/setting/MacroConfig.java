@@ -1,7 +1,5 @@
 package net.shoreline.client.api.config.setting;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.init.Managers;

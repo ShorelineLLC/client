@@ -1,8 +1,8 @@
 package net.shoreline.client.util.math.timer;
 
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.TickEvent;
 
 /**
@@ -21,7 +21,7 @@ public class TickTimer implements Timer {
      */
     public TickTimer() {
         ticks = 0;
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 
     /**
@@ -29,7 +29,7 @@ public class TickTimer implements Timer {
      */
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() == EventStage.PRE) {
+        if (event.getStage() == StageEvent.EventStage.PRE) {
             ++ticks;
         }
     }

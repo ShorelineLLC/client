@@ -1,12 +1,12 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.*;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.gui.hud.ChatLineEvent;

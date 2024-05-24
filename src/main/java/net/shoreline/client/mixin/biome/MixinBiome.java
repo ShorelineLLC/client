@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.biome;
 
 import net.minecraft.world.biome.Biome;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,7 +14,7 @@ public class MixinBiome {
     @Inject(method = "getFogColor", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetFogColor(CallbackInfoReturnable<Integer> cir) {
         SkyboxEvent.Fog skyboxEvent = new SkyboxEvent.Fog(0.0f);
-        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.INSTANCE.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getRGB());

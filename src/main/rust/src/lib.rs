@@ -1,28 +1,63 @@
 mod utils;
+mod eventbus;
 
 extern crate jni;
 
 use std::collections::{HashMap, VecDeque};
 use jni::{JNIEnv, JavaVM};
 use obfstr::obfstr;
-use jni::sys::{JNI_VERSION_1_8};
+use jni::sys::{JNI_GetCreatedJavaVMs, JNI_VERSION_1_8};
 use std::os::raw::{c_void, c_int};
 use jni::strings::{JNIString};
 use jni::objects::{JObject, JValue, JString, JClass, GlobalRef};
 use std::ffi::{CStr, CString};
+use std::fmt::format;
+use std::ptr::null_mut;
 use hardware_id::get_id;
 use jni::signature::JavaType;
 use jni::signature::Primitive::Int;
+use crate::eventbus::INVOKE;
 use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
 
 static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
+
 static mut MIXIN_CONFIG: Option<GlobalRef> = None;
 static mut MIXIN_REFMAP: Option<GlobalRef> = None;
 
 #[no_mangle]
-pub extern "system" fn JNI_OnLoad(_vm: *mut JavaVM,
-                                  _reserved: &mut c_void) -> c_int
+pub unsafe extern "system" fn JNI_OnLoad(vm: *mut JavaVM,
+                                         _reserved: &mut c_void) -> c_int
 {
+    // Make our event bus
+
+    // let jvm_ptr = Vec::with_capacity(1).as_mut_ptr();
+    // let count = null_mut();
+    //
+    // JNI_GetCreatedJavaVMs(jvm_ptr, 1, count);
+    //
+    // let mut env_ptr: *mut c_void = null_mut();
+    //
+    // // Call GetEnv to obtain the JNIEnv pointer
+    // let result = (*jvm_ptr).GetEnv.unwrap()(jvm_ptr, &mut env_ptr, JNI_VERSION_1_8);
+    //
+    // let env = vm.get_env().unwrap();
+    //
+    // let event_bus = env.new_object(
+    //     obfstr!("net/shoreline/client/api/event/EventBus"),
+    //     obfstr!("()V"),
+    //     &[]
+    // ).unwrap();
+    //
+    //
+    // let event_bus_class = env.get_object_class(event_bus).unwrap();
+    //
+    // env.set_field(
+    //     event_bus_class,
+    //     obfstr!("INSTANCE"),
+    //     obfstr!("Lnet/shoreline/client/api/event/EventBus;"),
+    //     event_bus.into()
+    // ).unwrap();
+
     return JNI_VERSION_1_8
 }
 
@@ -509,13 +544,14 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                             {
                                 // Cache it if it is mentioned in a Mixin
                                 if name.contains("net/shoreline/client/impl/event/")
-                                    || name.contains("net/shoreline/client/api/event/Event")
-                                    || name.contains("net/shoreline/client/api/event/handler/EventHandler")
-                                    || name.contains("net/shoreline/client/api/event/StageEvent")
                                     // Other exclusions
                                     || name.contains("net/shoreline/client/util/Globals")
                                     || name.contains("net/shoreline/client/util/network/InteractType")
                                     || name.contains("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture")
+
+                                    || name.contains("net/shoreline/client/init/Fonts")
+                                    || name.contains("net/shoreline/client/init/Managers")
+                                    || name.contains("net/shoreline/client/impl/manager/player/rotation/RotationManager")
                                 {
                                     env.call_method(
                                         class_map,
@@ -599,13 +635,13 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                 let clazz = define_class(&env, class_name, *bytes);
                 defined_this_iteration.push(class_name.clone());
 
-                // Fuck it, add the class to the reflection filter too
-                // env.call_static_method(
-                //     caller_class,
-                //     obfstr!("stop_decompiling_8"),
-                //     obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-                //     &[clazz.into()]
-                // ).unwrap().l().unwrap();
+                // Add it to the reflection filter map
+                env.call_static_method(
+                    caller_class,
+                    obfstr!("stop_decompiling_8"),
+                    obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                    &[clazz.into()]
+                ).unwrap().l().unwrap();
             }
         }
 
@@ -965,6 +1001,10 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
     return JObject::null();
 }
 
+/**
+ * Alerts the webhook and crashes
+ */
+
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_17"]
 pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
@@ -999,10 +1039,14 @@ pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
     return JObject::null();
 }
 
+/**
+ * Adds the class to the reflection filter map
+ */
+
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_18"]
 pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
+                                                     _caller_class: JClass<'a>,
                                                      class: JObject<'a>) -> JObject<'a>
 {
     let wildcard = env.new_string("*").unwrap();
@@ -1035,4 +1079,28 @@ pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
     ).unwrap().v().unwrap();
 
     return JObject::null();
+}
+
+/**
+ * Returns an array of all methods in the class
+ */
+
+#[no_mangle]
+#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_19"]
+pub unsafe extern "system" fn stop_decompiling_9<'a>(env: JNIEnv<'a>,
+                                                     caller_class: JClass<'a>,
+                                                     class: JObject<'a>) -> JObject<'a>
+{
+    let get_declared_methods = env.get_method_id(
+        env.find_class(obfstr!("java/lang/Class")).unwrap(),
+        obfstr!("getDeclaredMethods0"),
+        obfstr!("(Z)[Ljava/lang/reflect/Method;")
+    ).unwrap();
+
+    return env.call_method_unchecked(
+        class,
+        get_declared_methods,
+        JavaType::Array(Box::from(JavaType::Object(String::from(obfstr!("Ljava/lang/reflect/Method;"))))),
+        &[JValue::Bool(0)]
+    ).unwrap().l().unwrap();
 }

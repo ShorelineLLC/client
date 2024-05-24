@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.gui.hud;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class ChatLineEvent extends Event {
 

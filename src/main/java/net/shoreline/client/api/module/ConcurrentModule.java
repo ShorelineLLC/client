@@ -1,6 +1,6 @@
 package net.shoreline.client.api.module;
 
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 
 /**
  * {@link Module} implementation that runs concurrently and cannot be disabled
@@ -18,6 +18,6 @@ public class ConcurrentModule extends Module {
      */
     public ConcurrentModule(String name, String desc, ModuleCategory category) {
         super(name, desc, category);
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 }

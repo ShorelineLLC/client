@@ -5,7 +5,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +32,7 @@ public abstract class MixinEntityRenderer {
     public void hookRenderLabelIfPresent(Entity entity, Text text, MatrixStack matrices,
                                          VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         RenderLabelEvent renderLabelEvent = new RenderLabelEvent(entity);
-        EventBus.EVENT_HANDLER.dispatch(renderLabelEvent);
+        EventBus.INSTANCE.dispatch(renderLabelEvent);
         if (renderLabelEvent.isCanceled()) {
             ci.cancel();
         }

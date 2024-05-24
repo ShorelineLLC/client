@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.entity;
 
 import net.minecraft.entity.LivingEntity;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class EntityDeathEvent extends Event {
 

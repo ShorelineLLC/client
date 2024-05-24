@@ -6,7 +6,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.RenderFogEvent;
 import net.shoreline.client.impl.event.world.BlindnessEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
@@ -48,7 +48,7 @@ public class MixinBackgroundRenderer {
             return;
         }
         RenderFogEvent renderFogEvent = new RenderFogEvent();
-        EventBus.EVENT_HANDLER.dispatch(renderFogEvent);
+        EventBus.INSTANCE.dispatch(renderFogEvent);
         if (renderFogEvent.isCanceled()) {
             RenderSystem.setShaderFogStart(viewDistance * 4.0f);
             RenderSystem.setShaderFogEnd(viewDistance * 4.25f);
@@ -58,7 +58,7 @@ public class MixinBackgroundRenderer {
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     private static void hookRender(Camera camera, float tickDelta, ClientWorld world, int viewDistance, float skyDarkness, CallbackInfo ci) {
         SkyboxEvent.Fog skyboxEvent = new SkyboxEvent.Fog(tickDelta);
-        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.INSTANCE.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             ci.cancel();
             Vec3d vec3d = skyboxEvent.getColorVec();
@@ -73,7 +73,7 @@ public class MixinBackgroundRenderer {
             "BackgroundRenderer$StatusEffectFogModifier;", at = @At("HEAD"), cancellable = true)
     private static void onGetFogModifier(Entity entity, float tickDelta, CallbackInfoReturnable<BackgroundRenderer.StatusEffectFogModifier> cir) {
         BlindnessEvent blindnessEvent = new BlindnessEvent();
-        EventBus.EVENT_HANDLER.dispatch(blindnessEvent);
+        EventBus.INSTANCE.dispatch(blindnessEvent);
         if (blindnessEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(null);

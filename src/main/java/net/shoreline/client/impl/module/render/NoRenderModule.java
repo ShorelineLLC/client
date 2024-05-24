@@ -14,8 +14,8 @@ import net.minecraft.registry.tag.FluidTags;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
@@ -69,7 +69,7 @@ public class NoRenderModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (itemsConfig.getValue() == ItemRender.REMOVE && event.getStage() == EventStage.PRE) {
+        if (itemsConfig.getValue() == ItemRender.REMOVE && event.getStage() == StageEvent.EventStage.PRE) {
             for (Entity entity : Lists.newArrayList(mc.world.getEntities())) {
                 if (entity instanceof ItemEntity) {
                     mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);

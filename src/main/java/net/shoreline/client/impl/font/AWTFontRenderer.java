@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.font;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.shoreline.client.api.font.FontRenderer;
 import net.shoreline.client.api.font.Glyph;

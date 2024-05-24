@@ -2,8 +2,8 @@ package net.shoreline.client.impl.event.gui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.StageEvent;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.StageEvent;
 
 /**
  * @author linus

@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.render.DimensionEffects;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ public class MixinDimensionEffects {
     private void hookGetFogColorOverride(float skyAngle, float tickDelta,
                                          CallbackInfoReturnable<float[]> cir) {
         SkyboxEvent.Fog skyboxEvent = new SkyboxEvent.Fog(tickDelta);
-        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.INSTANCE.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             Color color = skyboxEvent.getColor();
             cir.cancel();

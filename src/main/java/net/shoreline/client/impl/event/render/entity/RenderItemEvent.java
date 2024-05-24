@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.render.entity;
 
 import net.minecraft.entity.ItemEntity;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 /**
  * @author linus

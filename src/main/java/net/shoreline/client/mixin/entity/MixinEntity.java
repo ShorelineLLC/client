@@ -7,7 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.event.GameEvent;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.camera.EntityCameraPositionEvent;
 import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.client.impl.event.entity.decoration.TeamColorEvent;
@@ -65,7 +65,7 @@ public abstract class MixinEntity implements Globals {
     public void hookGetCameraPosVec(final float tickDelta, final CallbackInfoReturnable<Vec3d> info) {
         final EntityRotationVectorEvent event = new EntityRotationVectorEvent(
                 tickDelta, (Entity) (Object) this, info.getReturnValue());
-        EventBus.EVENT_HANDLER.dispatch(event);
+        EventBus.INSTANCE.dispatch(event);
         info.setReturnValue(event.getPosition());
     }
 
@@ -79,7 +79,7 @@ public abstract class MixinEntity implements Globals {
             return;
         }
         // StepEvent stepEvent = new StepEvent(cir.getReturnValue().y - movement.y);
-        // EventBus.EVENT_HANDLER.dispatch(stepEvent);
+        // EventBus.INSTANCE.dispatch(stepEvent);
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class MixinEntity implements Globals {
             return;
         }
         SlowMovementEvent slowMovementEvent = new SlowMovementEvent(state);
-        EventBus.EVENT_HANDLER.dispatch(slowMovementEvent);
+        EventBus.INSTANCE.dispatch(slowMovementEvent);
         if (slowMovementEvent.isCanceled()) {
             ci.cancel();
         }
@@ -112,7 +112,7 @@ public abstract class MixinEntity implements Globals {
         }
         VelocityMultiplierEvent velocityMultiplierEvent =
                 new VelocityMultiplierEvent(instance);
-        EventBus.EVENT_HANDLER.dispatch(velocityMultiplierEvent);
+        EventBus.INSTANCE.dispatch(velocityMultiplierEvent);
         if (velocityMultiplierEvent.isCanceled()) {
             return Blocks.DIRT;
         }
@@ -128,7 +128,7 @@ public abstract class MixinEntity implements Globals {
     private void hookUpdateVelocity(float speed, Vec3d movementInput, CallbackInfo ci) {
         if ((Object) this == mc.player) {
             UpdateVelocityEvent updateVelocityEvent = new UpdateVelocityEvent(movementInput, speed, mc.player.getYaw(), movementInputToVelocity(movementInput, speed, mc.player.getYaw()));
-            EventBus.EVENT_HANDLER.dispatch(updateVelocityEvent);
+            EventBus.INSTANCE.dispatch(updateVelocityEvent);
             if (updateVelocityEvent.isCanceled()) {
                 ci.cancel();
                 mc.player.setVelocity(mc.player.getVelocity().add(updateVelocityEvent.getVelocity()));
@@ -143,7 +143,7 @@ public abstract class MixinEntity implements Globals {
     @Inject(method = "pushAwayFrom", at = @At(value = "HEAD"), cancellable = true)
     private void hookPushAwayFrom(Entity entity, CallbackInfo ci) {
         PushEntityEvent pushEntityEvent = new PushEntityEvent((Entity) (Object) this, entity);
-        EventBus.EVENT_HANDLER.dispatch(pushEntityEvent);
+        EventBus.INSTANCE.dispatch(pushEntityEvent);
         if (pushEntityEvent.isCanceled()) {
             ci.cancel();
         }
@@ -157,7 +157,7 @@ public abstract class MixinEntity implements Globals {
     private void hookGetTeamColorValue(CallbackInfoReturnable<Integer> cir) {
         TeamColorEvent teamColorEvent =
                 new TeamColorEvent((Entity) (Object) this);
-        EventBus.EVENT_HANDLER.dispatch(teamColorEvent);
+        EventBus.INSTANCE.dispatch(teamColorEvent);
         if (teamColorEvent.isCanceled()) {
             cir.setReturnValue(teamColorEvent.getColor());
             cir.cancel();
@@ -175,7 +175,7 @@ public abstract class MixinEntity implements Globals {
         if ((Object) this == mc.player) {
             LookDirectionEvent lookDirectionEvent = new LookDirectionEvent(
                     (Entity) (Object) this, cursorDeltaX, cursorDeltaY);
-            EventBus.EVENT_HANDLER.dispatch(lookDirectionEvent);
+            EventBus.INSTANCE.dispatch(lookDirectionEvent);
             if (lookDirectionEvent.isCanceled()) {
                 ci.cancel();
             }
@@ -185,13 +185,13 @@ public abstract class MixinEntity implements Globals {
     @Inject(method = "emitGameEvent(Lnet/minecraft/world/event/GameEvent;Lnet/minecraft/entity/Entity;)V", at = @At(value = "HEAD"))
     private void hookEmitGameEvent(GameEvent event, Entity entity, CallbackInfo ci) {
         EntityGameEvent entityGameEvent = new EntityGameEvent(event, entity);
-        EventBus.EVENT_HANDLER.dispatch(entityGameEvent);
+        EventBus.INSTANCE.dispatch(entityGameEvent);
     }
 
     @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
     public void hookCameraPositionVec(float tickDelta, CallbackInfoReturnable<Vec3d> cir) {
         EntityCameraPositionEvent cameraPositionEvent = new EntityCameraPositionEvent(cir.getReturnValue(), (Entity) (Object) this, tickDelta);
-        EventBus.EVENT_HANDLER.dispatch(cameraPositionEvent);
+        EventBus.INSTANCE.dispatch(cameraPositionEvent);
         cir.setReturnValue(cameraPositionEvent.getPosition());
     }
 
@@ -199,7 +199,7 @@ public abstract class MixinEntity implements Globals {
     private void hookSetBoundingBox(Box boundingBox, CallbackInfo ci) {
         if ((Object) this == mc.player) {
             SetBBEvent setBBEvent = new SetBBEvent(boundingBox);
-            EventBus.EVENT_HANDLER.dispatch(setBBEvent);
+            EventBus.INSTANCE.dispatch(setBBEvent);
         }
     }
 }

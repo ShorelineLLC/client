@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.world.event.GameEvent;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class EntityGameEvent extends Event {
     private final GameEvent gameEvent;

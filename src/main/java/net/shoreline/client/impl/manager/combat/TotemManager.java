@@ -4,8 +4,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -27,7 +27,7 @@ public class TotemManager implements Globals {
      *
      */
     public TotemManager() {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener

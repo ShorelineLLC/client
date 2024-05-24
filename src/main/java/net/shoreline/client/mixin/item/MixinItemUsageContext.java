@@ -2,7 +2,7 @@ package net.shoreline.client.mixin.item;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,7 @@ public final class MixinItemUsageContext implements Globals
     public void hookGetStack(final CallbackInfoReturnable<ItemStack> info)
     {
         ItemDesyncEvent itemDesyncEvent = new ItemDesyncEvent();
-        EventBus.EVENT_HANDLER.dispatch(itemDesyncEvent);
+        EventBus.INSTANCE.dispatch(itemDesyncEvent);
         if (mc.player != null && info.getReturnValue().equals(mc.player.getMainHandStack()) && itemDesyncEvent.isCanceled())
         {
             info.setReturnValue(itemDesyncEvent.getServerItem());

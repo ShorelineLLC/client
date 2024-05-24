@@ -1,8 +1,7 @@
 package net.shoreline.client.impl.event.entity;
 
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class StatusEffectEvent extends Event {
 

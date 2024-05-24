@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.entity;
 
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.StageEvent;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.StageEvent;
 
 @Cancelable
 public class UpdateVelocityEvent extends StageEvent {

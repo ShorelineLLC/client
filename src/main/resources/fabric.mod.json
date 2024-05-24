@@ -15,7 +15,10 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "net.shoreline.client.ShorelineMod"
+      "net.shoreline.loader.Loader"
+    ],
+    "preLaunch": [
+      "net.shoreline.loader.Loader"
     ]
   },
   "accessWidener": "shoreline.accesswidener",

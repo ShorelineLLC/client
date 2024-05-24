@@ -6,8 +6,8 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.EventStage;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.entity.player.PlayerJumpEvent;
 import net.shoreline.client.impl.event.entity.player.PushFluidsEvent;
 import net.shoreline.client.impl.event.entity.player.TravelEvent;
@@ -43,8 +43,8 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
     @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
     private void hookTravelHead(Vec3d movementInput, CallbackInfo ci) {
         TravelEvent travelEvent = new TravelEvent(movementInput);
-        travelEvent.setStage(EventStage.PRE);
-        EventBus.EVENT_HANDLER.dispatch(travelEvent);
+        travelEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(travelEvent);
         if (travelEvent.isCanceled()) {
             move(MovementType.SELF, getVelocity());
             ci.cancel();
@@ -59,8 +59,8 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
     @Inject(method = "travel", at = @At(value = "RETURN"), cancellable = true)
     private void hookTravelTail(Vec3d movementInput, CallbackInfo ci) {
         TravelEvent travelEvent = new TravelEvent(movementInput);
-        travelEvent.setStage(EventStage.POST);
-        EventBus.EVENT_HANDLER.dispatch(travelEvent);
+        travelEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(travelEvent);
     }
 
     /**
@@ -73,7 +73,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
             return;
         }
         PushFluidsEvent pushFluidsEvent = new PushFluidsEvent();
-        EventBus.EVENT_HANDLER.dispatch(pushFluidsEvent);
+        EventBus.INSTANCE.dispatch(pushFluidsEvent);
         if (pushFluidsEvent.isCanceled()) {
             cir.setReturnValue(false);
             cir.cancel();
@@ -89,8 +89,8 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
             return;
         }
         PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent();
-        playerJumpEvent.setStage(EventStage.PRE);
-        EventBus.EVENT_HANDLER.dispatch(playerJumpEvent);
+        playerJumpEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(playerJumpEvent);
         if (playerJumpEvent.isCanceled()) {
             ci.cancel();
         }
@@ -105,7 +105,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
             return;
         }
         PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent();
-        playerJumpEvent.setStage(EventStage.POST);
-        EventBus.EVENT_HANDLER.dispatch(playerJumpEvent);
+        playerJumpEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(playerJumpEvent);
     }
 }

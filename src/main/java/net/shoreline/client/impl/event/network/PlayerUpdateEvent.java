@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.event.network;
 
-import net.shoreline.client.api.event.StageEvent;
+import net.shoreline.eventbus.StageEvent;
 
 public class PlayerUpdateEvent extends StageEvent {
     private float yaw;

@@ -3,8 +3,8 @@ package net.shoreline.client.impl.event.world;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 @Cancelable
 public class PlaySoundEvent extends Event {

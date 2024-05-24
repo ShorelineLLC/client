@@ -1,13 +1,13 @@
 package net.shoreline.client.impl.module.client;
 
 import baritone.api.BaritoneAPI;
-import net.minecraft.text.*;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.TickEvent;
@@ -59,7 +59,7 @@ public class BaritoneModule extends ConcurrentModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() != EventStage.POST) {
+        if (event.getStage() != StageEvent.EventStage.POST) {
             return;
         }
         BaritoneAPI.getSettings().blockReachDistance.value = rangeConfig.getValue();

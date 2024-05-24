@@ -7,10 +7,10 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.EventStage;
+import net.shoreline.eventbus.StageEvent;
 import net.shoreline.client.impl.event.*;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.imixin.IMinecraftClient;
 import net.shoreline.client.init.Fonts;
 import org.jetbrains.annotations.Nullable;
@@ -87,7 +87,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
             "/minecraft/client/MinecraftClient;render(Z)V", shift = At.Shift.BEFORE))
     private void hookRun(CallbackInfo ci) {
         final RunTickEvent runTickEvent = new RunTickEvent();
-        EventBus.EVENT_HANDLER.dispatch(runTickEvent);
+        EventBus.INSTANCE.dispatch(runTickEvent);
     }
 
     /**
@@ -97,7 +97,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "onInitFinished", at = @At(value = "RETURN"))
     private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext, CallbackInfoReturnable<Runnable> cir) {
         FinishLoadingEvent finishLoadingEvent = new FinishLoadingEvent();
-        EventBus.EVENT_HANDLER.dispatch(finishLoadingEvent);
+        EventBus.INSTANCE.dispatch(finishLoadingEvent);
         if (!Fonts.isInitialized()) {
             Fonts.init();
         }
@@ -113,8 +113,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
         doItemUseCalled = false;
         if (player != null && world != null) {
             TickEvent tickPreEvent = new TickEvent();
-            tickPreEvent.setStage(EventStage.PRE);
-            EventBus.EVENT_HANDLER.dispatch(tickPreEvent);
+            tickPreEvent.setStage(StageEvent.EventStage.PRE);
+            EventBus.INSTANCE.dispatch(tickPreEvent);
         }
         if (interactionManager == null) {
             return;
@@ -136,12 +136,12 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     private void hookTickPost(CallbackInfo ci) {
         if (player != null && world != null) {
             TickEvent tickPostEvent = new TickEvent();
-            tickPostEvent.setStage(EventStage.POST);
-            EventBus.EVENT_HANDLER.dispatch(tickPostEvent);
+            tickPostEvent.setStage(StageEvent.EventStage.POST);
+            EventBus.INSTANCE.dispatch(tickPostEvent);
             world.getEntities().forEach(entity -> {
                 if (entity instanceof LivingEntity e && e.isDead()) {
                     EntityDeathEvent entityDeathEvent = new EntityDeathEvent(e);
-                    EventBus.EVENT_HANDLER.dispatch(entityDeathEvent);
+                    EventBus.INSTANCE.dispatch(entityDeathEvent);
                 }
             });
         }
@@ -154,7 +154,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "setScreen", at = @At(value = "TAIL"))
     private void hookSetScreen(Screen screen, CallbackInfo ci) {
         ScreenOpenEvent screenOpenEvent = new ScreenOpenEvent(screen);
-        EventBus.EVENT_HANDLER.dispatch(screenOpenEvent);
+        EventBus.INSTANCE.dispatch(screenOpenEvent);
     }
 
     /**
@@ -172,7 +172,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     private void hookDoAttack(CallbackInfoReturnable<Boolean> cir) {
         doAttackCalled = true;
         AttackCooldownEvent attackCooldownEvent = new AttackCooldownEvent();
-        EventBus.EVENT_HANDLER.dispatch(attackCooldownEvent);
+        EventBus.INSTANCE.dispatch(attackCooldownEvent);
         if (attackCooldownEvent.isCanceled()) {
             attackCooldown = 0;
         }
@@ -186,7 +186,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
             target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
     private boolean hookIsUsingItem(ClientPlayerEntity instance) {
         ItemMultitaskEvent itemMultitaskEvent = new ItemMultitaskEvent();
-        EventBus.EVENT_HANDLER.dispatch(itemMultitaskEvent);
+        EventBus.INSTANCE.dispatch(itemMultitaskEvent);
         return !itemMultitaskEvent.isCanceled() && instance.isUsingItem();
     }
 
@@ -198,7 +198,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
             "/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
     private boolean hookIsBreakingBlock(ClientPlayerInteractionManager instance) {
         ItemMultitaskEvent itemMultitaskEvent = new ItemMultitaskEvent();
-        EventBus.EVENT_HANDLER.dispatch(itemMultitaskEvent);
+        EventBus.INSTANCE.dispatch(itemMultitaskEvent);
         return !itemMultitaskEvent.isCanceled() && instance.isBreakingBlock();
     }
 
@@ -208,7 +208,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "getFramerateLimit", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetFramerateLimit(CallbackInfoReturnable<Integer> cir) {
         FramerateLimitEvent framerateLimitEvent = new FramerateLimitEvent();
-        EventBus.EVENT_HANDLER.dispatch(framerateLimitEvent);
+        EventBus.INSTANCE.dispatch(framerateLimitEvent);
         if (framerateLimitEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(framerateLimitEvent.getFramerateLimit());
@@ -222,7 +222,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     @Inject(method = "hasOutline", at = @At(value = "HEAD"), cancellable = true)
     private void hookHasOutline(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         EntityOutlineEvent entityOutlineEvent = new EntityOutlineEvent(entity);
-        EventBus.EVENT_HANDLER.dispatch(entityOutlineEvent);
+        EventBus.INSTANCE.dispatch(entityOutlineEvent);
         if (entityOutlineEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(true);

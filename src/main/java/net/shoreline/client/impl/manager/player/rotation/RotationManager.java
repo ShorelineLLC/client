@@ -3,16 +3,15 @@ package net.shoreline.client.impl.manager.player.rotation;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.impl.event.entity.UpdateVelocityEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerJumpEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardTickEvent;
 import net.shoreline.client.impl.event.network.MovementPacketsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.RenderPlayerEvent;
 import net.shoreline.client.impl.imixin.IClientPlayerEntity;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.MIN_VALUE;
 
 /**
  * @author linus, bon55
@@ -44,7 +42,7 @@ public class RotationManager implements Globals {
      *
      */
     public RotationManager() {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener
@@ -114,7 +112,7 @@ public class RotationManager implements Globals {
 
     @EventListener
     public void onPlayerUpdate(final PlayerUpdateEvent event) {
-        if (event.getStage() == EventStage.POST) {
+        if (event.getStage() == StageEvent.EventStage.POST) {
             lastServerYaw = ((IClientPlayerEntity) mc.player).getLastSpoofedYaw();
             lastServerPitch = ((IClientPlayerEntity) mc.player).getLastSpoofedPitch();
         }
@@ -145,7 +143,7 @@ public class RotationManager implements Globals {
     @EventListener
     public void onPlayerJump(PlayerJumpEvent event) {
         if (rotation != null && RotationsModule.getInstance().getMovementFix()) {
-            if (event.getStage() == EventStage.PRE) {
+            if (event.getStage() == StageEvent.EventStage.PRE) {
                 prevJumpYaw = mc.player.getYaw();
                 mc.player.setYaw(rotation.getYaw());
             } else {

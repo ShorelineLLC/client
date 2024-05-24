@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.color.world;
 
 import net.minecraft.world.biome.ColorResolver;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 import java.awt.*;
 

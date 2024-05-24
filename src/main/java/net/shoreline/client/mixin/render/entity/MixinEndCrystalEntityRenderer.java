@@ -5,7 +5,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,7 +43,7 @@ public class MixinEndCrystalEntityRenderer {
         RenderCrystalEvent renderCrystalEvent = new RenderCrystalEvent(endCrystalEntity,
                 f, g, matrixStack, i, core, frame);
         // Does it matter if render comes before cancelling?
-        EventBus.EVENT_HANDLER.dispatch(renderCrystalEvent);
+        EventBus.INSTANCE.dispatch(renderCrystalEvent);
         if (renderCrystalEvent.isCanceled()) {
             ci.cancel();
         }

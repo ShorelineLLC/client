@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.event;
 
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class FinishLoadingEvent extends Event {
 }

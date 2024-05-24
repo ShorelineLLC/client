@@ -4,7 +4,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,7 +36,7 @@ public class MixinParticleManager {
                                  double velocityY, double velocityZ,
                                  CallbackInfoReturnable<Particle> cir) {
         ParticleEvent particleEvent = new ParticleEvent(parameters);
-        EventBus.EVENT_HANDLER.dispatch(particleEvent);
+        EventBus.INSTANCE.dispatch(particleEvent);
         if (particleEvent.isCanceled()) {
             cir.setReturnValue(null);
             cir.cancel();
@@ -55,7 +55,7 @@ public class MixinParticleManager {
                                 int maxAge, CallbackInfo ci) {
         ParticleEvent.Emitter particleEvent =
                 new ParticleEvent.Emitter(parameters);
-        EventBus.EVENT_HANDLER.dispatch(particleEvent);
+        EventBus.INSTANCE.dispatch(particleEvent);
         if (particleEvent.isCanceled()) {
             ci.cancel();
         }

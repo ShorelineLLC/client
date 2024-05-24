@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.client;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
-import net.shoreline.client.impl.module.combat.AuraModule;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;

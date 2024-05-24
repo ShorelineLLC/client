@@ -2,7 +2,6 @@ package net.shoreline.client.impl.gui.click;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.gui.click.component.ScissorStack;

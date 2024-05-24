@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.gui.hud;
 
 import net.minecraft.client.gui.DrawContext;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 import net.shoreline.client.mixin.gui.hud.MixinInGameHud;
 
 /**

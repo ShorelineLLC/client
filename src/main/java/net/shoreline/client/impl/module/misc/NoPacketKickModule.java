@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.module.misc;
 
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.DecodePacketEvent;

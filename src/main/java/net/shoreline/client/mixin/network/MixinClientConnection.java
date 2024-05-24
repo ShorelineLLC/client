@@ -6,11 +6,10 @@ import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.network.DecodePacketEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.module.client.ServerModule;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
@@ -33,7 +32,7 @@ public class MixinClientConnection {
     @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
     private void hookExceptionCaught(ChannelHandlerContext context, Throwable ex, CallbackInfo ci) {
         DecodePacketEvent decodePacketEvent = new DecodePacketEvent();
-        EventBus.EVENT_HANDLER.dispatch(decodePacketEvent);
+        EventBus.INSTANCE.dispatch(decodePacketEvent);
         if (decodePacketEvent.isCanceled()) {
             LOGGER.error("Exception caught on network thread:", ex);
             ci.cancel();
@@ -51,7 +50,7 @@ public class MixinClientConnection {
                                      boolean flush, CallbackInfo ci) {
         PacketEvent.Outbound packetOutboundEvent =
                 new PacketEvent.Outbound(packet);
-        EventBus.EVENT_HANDLER.dispatch(packetOutboundEvent);
+        EventBus.INSTANCE.dispatch(packetOutboundEvent);
         if (packetOutboundEvent.isCanceled()) {
             ci.cancel();
         }
@@ -69,7 +68,7 @@ public class MixinClientConnection {
                                   Packet<?> packet, CallbackInfo ci) {
         PacketEvent.Inbound packetInboundEvent =
                 new PacketEvent.Inbound(packetListener, packet);
-        EventBus.EVENT_HANDLER.dispatch(packetInboundEvent);
+        EventBus.INSTANCE.dispatch(packetInboundEvent);
         // prevent client from receiving packet from server
         if (packetInboundEvent.isCanceled()) {
             ci.cancel();
@@ -83,6 +82,6 @@ public class MixinClientConnection {
     @Inject(method = "disconnect", at = @At(value = "HEAD"))
     private void hookDisconnect(Text disconnectReason, CallbackInfo ci) {
         DisconnectEvent disconnectEvent = new DisconnectEvent();
-        EventBus.EVENT_HANDLER.dispatch(disconnectEvent);
+        EventBus.INSTANCE.dispatch(disconnectEvent);
     }
 }

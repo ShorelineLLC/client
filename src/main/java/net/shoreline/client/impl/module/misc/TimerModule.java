@@ -3,13 +3,12 @@ package net.shoreline.client.impl.module.misc;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
-import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.init.Managers;
 
@@ -60,7 +59,7 @@ public class TimerModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() == EventStage.PRE) {
+        if (event.getStage() == StageEvent.EventStage.PRE) {
             if (SpeedModule.getInstance().isUsingTimer()) {
                 return;
             }

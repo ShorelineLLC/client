@@ -2,8 +2,8 @@ package net.shoreline.client.impl.event.network;
 
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 import net.shoreline.client.init.Managers;
 
 /**

@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.gui.screen;
 
 import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class ConnectScreenEvent extends Event {
 

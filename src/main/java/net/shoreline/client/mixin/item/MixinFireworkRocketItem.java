@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.item.FireworkUseEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,6 +26,6 @@ public class MixinFireworkRocketItem {
     private void hookUse(World world, PlayerEntity user, Hand hand,
                          CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
         FireworkUseEvent fireworkUseEvent = new FireworkUseEvent();
-        EventBus.EVENT_HANDLER.dispatch(fireworkUseEvent);
+        EventBus.INSTANCE.dispatch(fireworkUseEvent);
     }
 }

@@ -8,7 +8,7 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.hud.PlayerListColumnsEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListNameEvent;
@@ -53,7 +53,7 @@ public abstract class MixinPlayerListHud {
             text = applyGameModeFormatting(entry, Team.decorateName(entry.getScoreboardTeam(), Text.literal(entry.getProfile().getName())));
         }
         PlayerListNameEvent playerListNameEvent = new PlayerListNameEvent(text, entry.getProfile().getId());
-        EventBus.EVENT_HANDLER.dispatch(playerListNameEvent);
+        EventBus.INSTANCE.dispatch(playerListNameEvent);
         if (playerListNameEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(playerListNameEvent.getPlayerName());
@@ -66,7 +66,7 @@ public abstract class MixinPlayerListHud {
     @Inject(method = "collectPlayerEntries", at = @At(value = "HEAD"), cancellable = true)
     private void hookCollectPlayerEntries(CallbackInfoReturnable<List<PlayerListEntry>> cir) {
         PlayerListEvent playerListEvent = new PlayerListEvent();
-        EventBus.EVENT_HANDLER.dispatch(playerListEvent);
+        EventBus.INSTANCE.dispatch(playerListEvent);
         if (playerListEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(client.player.networkHandler.getListedPlayerListEntries()
@@ -81,7 +81,7 @@ public abstract class MixinPlayerListHud {
         int totalPlayers = newO = this.collectPlayerEntries().size();
 
         PlayerListColumnsEvent playerListColumsEvent = new PlayerListColumnsEvent();
-        EventBus.EVENT_HANDLER.dispatch(playerListColumsEvent);
+        EventBus.INSTANCE.dispatch(playerListColumsEvent);
         if (playerListColumsEvent.isCanceled())
         {
             while (newO > playerListColumsEvent.getTabHeight())

@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.world;
 
 import net.minecraft.entity.Entity;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class AddEntityEvent extends Event {
     private final Entity entity;

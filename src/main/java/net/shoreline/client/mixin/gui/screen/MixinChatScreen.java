@@ -6,12 +6,12 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.shoreline.client.impl.event.gui.screen.RenderOpenChatEvent;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.chat.ChatInputEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatKeyInputEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatRenderEvent;
+import net.shoreline.client.impl.event.gui.screen.RenderOpenChatEvent;
 import net.shoreline.client.mixin.accessor.AccessorTextFieldWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,7 +37,7 @@ public class MixinChatScreen extends MixinScreen {
     @Inject(method = "onChatFieldUpdate", at = @At(value = "TAIL"))
     private void hookOnChatFieldUpdate(String chatText, CallbackInfo ci) {
         ChatInputEvent chatInputEvent = new ChatInputEvent(chatText);
-        EventBus.EVENT_HANDLER.dispatch(chatInputEvent);
+        EventBus.INSTANCE.dispatch(chatInputEvent);
     }
 
     /**
@@ -51,7 +51,7 @@ public class MixinChatScreen extends MixinScreen {
                                 CallbackInfoReturnable<Boolean> cir) {
         ChatKeyInputEvent keyInputEvent = new ChatKeyInputEvent(keyCode,
                 chatField.getText());
-        EventBus.EVENT_HANDLER.dispatch(keyInputEvent);
+        EventBus.INSTANCE.dispatch(keyInputEvent);
         if (keyInputEvent.isCanceled()) {
             cir.cancel();
             chatField.setText(keyInputEvent.getChatText());
@@ -68,7 +68,7 @@ public class MixinChatScreen extends MixinScreen {
                                  CallbackInfoReturnable<Boolean> cir) {
         ChatMessageEvent.Client chatMessageEvent =
                 new ChatMessageEvent.Client(chatText);
-        EventBus.EVENT_HANDLER.dispatch(chatMessageEvent);
+        EventBus.INSTANCE.dispatch(chatMessageEvent);
         if (chatMessageEvent.isCanceled()) {
             cir.setReturnValue(true);
             cir.cancel();
@@ -92,13 +92,13 @@ public class MixinChatScreen extends MixinScreen {
                 chatField.getY() + (chatField.getHeight() - 8) / 2.0f :
                 chatField.getY();
         ChatRenderEvent chatTextRenderEvent = new ChatRenderEvent(context, x, y);
-        EventBus.EVENT_HANDLER.dispatch(chatTextRenderEvent);
+        EventBus.INSTANCE.dispatch(chatTextRenderEvent);
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(IIIII)V"))
     private void hookFill(DrawContext instance, int x1, int y1, int x2, int y2, int color) {
         RenderOpenChatEvent renderOpenChatEvent = new RenderOpenChatEvent();
-        EventBus.EVENT_HANDLER.dispatch(renderOpenChatEvent);
+        EventBus.INSTANCE.dispatch(renderOpenChatEvent);
         float openAnimation = renderOpenChatEvent.isCanceled() ? 12.0f * renderOpenChatEvent.getAnimation() : 12.0f;
         instance.fill(2, (int) (this.height - 2.0f), this.width - 2, (int) ((this.height - 2.0f) - openAnimation), client.options.getTextBackgroundColor(Integer.MIN_VALUE));
     }

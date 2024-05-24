@@ -12,8 +12,8 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.EventStage;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.entity.SwingEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.*;
@@ -109,12 +109,12 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "sendMovementPackets", at = @At(value = "HEAD"), cancellable = true)
     private void hookSendMovementPackets(CallbackInfo ci) {
         PlayerUpdateEvent playerUpdateEvent = new PlayerUpdateEvent();
-        playerUpdateEvent.setStage(EventStage.PRE);
-        EventBus.EVENT_HANDLER.dispatch(playerUpdateEvent);
+        playerUpdateEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(playerUpdateEvent);
         // Rotation spoof
         MovementPacketsEvent movementPacketsEvent = new MovementPacketsEvent(mc.player.getX(), mc.player.getY(),
                 mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround());
-        EventBus.EVENT_HANDLER.dispatch(movementPacketsEvent);
+        EventBus.INSTANCE.dispatch(movementPacketsEvent);
         double x = movementPacketsEvent.getX();
         double y = movementPacketsEvent.getY();
         double z = movementPacketsEvent.getZ();
@@ -167,8 +167,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
                 autoJumpEnabled = client.options.getAutoJump().getValue();
             }
         }
-        playerUpdateEvent.setStage(EventStage.POST);
-        EventBus.EVENT_HANDLER.dispatch(playerUpdateEvent);
+        playerUpdateEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(playerUpdateEvent);
     }
 
     /**
@@ -179,7 +179,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             shift = At.Shift.BEFORE, ordinal = 0))
     private void hookTickPre(CallbackInfo ci) {
         PlayerTickEvent playerTickEvent = new PlayerTickEvent();
-        EventBus.EVENT_HANDLER.dispatch(playerTickEvent);
+        EventBus.INSTANCE.dispatch(playerTickEvent);
         Managers.ROTATION.onUpdate();
     }
 
@@ -194,7 +194,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             return;
         }
         TickMovementEvent tickMovementEvent = new TickMovementEvent();
-        EventBus.EVENT_HANDLER.dispatch(tickMovementEvent);
+        EventBus.INSTANCE.dispatch(tickMovementEvent);
         if (tickMovementEvent.isCanceled()) {
             for (int i = 0; i < tickMovementEvent.getIterations(); i++) {
                 ticking = true;
@@ -214,7 +214,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void hookTickMovementPost(CallbackInfo ci) {
         MovementSlowdownEvent movementUpdateEvent =
                 new MovementSlowdownEvent(input);
-        EventBus.EVENT_HANDLER.dispatch(movementUpdateEvent);
+        EventBus.INSTANCE.dispatch(movementUpdateEvent);
     }
 
     /**
@@ -227,7 +227,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
                           CallbackInfo ci) {
         final PlayerMoveEvent playerMoveEvent =
                 new PlayerMoveEvent(movementType, movement);
-        EventBus.EVENT_HANDLER.dispatch(playerMoveEvent);
+        EventBus.INSTANCE.dispatch(playerMoveEvent);
         if (playerMoveEvent.isCanceled()) {
             ci.cancel();
             double d = getX();
@@ -246,7 +246,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             cancellable = true)
     private void onPushOutOfBlocks(double x, double z, CallbackInfo ci) {
         PushOutOfBlocksEvent pushOutOfBlocksEvent = new PushOutOfBlocksEvent();
-        EventBus.EVENT_HANDLER.dispatch(pushOutOfBlocksEvent);
+        EventBus.INSTANCE.dispatch(pushOutOfBlocksEvent);
         if (pushOutOfBlocksEvent.isCanceled()) {
             ci.cancel();
         }
@@ -259,7 +259,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "setCurrentHand", at = @At(value = "HEAD"))
     private void hookSetCurrentHand(Hand hand, CallbackInfo ci) {
         SetCurrentHandEvent setCurrentHandEvent = new SetCurrentHandEvent(hand);
-        EventBus.EVENT_HANDLER.dispatch(setCurrentHandEvent);
+        EventBus.INSTANCE.dispatch(setCurrentHandEvent);
     }
 
     /**
@@ -271,7 +271,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
             ordinal = 3))
     private void hookSetSprinting(ClientPlayerEntity instance, boolean b) {
         final SprintCancelEvent sprintEvent = new SprintCancelEvent();
-        EventBus.EVENT_HANDLER.dispatch(sprintEvent);
+        EventBus.INSTANCE.dispatch(sprintEvent);
         if (sprintEvent.isCanceled()) {
             instance.setSprinting(true);
         } else {
@@ -299,7 +299,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void hookGetMountJumpStrength(CallbackInfoReturnable<Float> cir) {
         MountJumpStrengthEvent mountJumpStrengthEvent =
                 new MountJumpStrengthEvent();
-        EventBus.EVENT_HANDLER.dispatch(mountJumpStrengthEvent);
+        EventBus.INSTANCE.dispatch(mountJumpStrengthEvent);
         if (mountJumpStrengthEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(mountJumpStrengthEvent.getJumpStrength());
@@ -313,7 +313,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Inject(method = "swingHand", at = @At(value = "RETURN"))
     private void hookSwingHand(Hand hand, CallbackInfo ci) {
         SwingEvent swingEvent = new SwingEvent(hand);
-        EventBus.EVENT_HANDLER.dispatch(swingEvent);
+        EventBus.INSTANCE.dispatch(swingEvent);
     }
 
     @Override

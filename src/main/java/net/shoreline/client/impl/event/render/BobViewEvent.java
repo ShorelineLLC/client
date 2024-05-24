@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.render;
 
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 @Cancelable
 public class BobViewEvent extends Event {

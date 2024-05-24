@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.event;
 
-import net.shoreline.client.api.event.Event;
-import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.eventbus.Event;
 
 public class ClientColorEvent extends Event {
 

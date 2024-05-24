@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.network;
 
 import net.minecraft.client.input.Input;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 /**
  * @author linus

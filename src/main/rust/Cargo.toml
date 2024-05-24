@@ -11,6 +11,8 @@ sha2 = "0.10.8"
 hex = "0.4.3"
 fltk = { version = "1.1", features = ["fltk-bundled"] }
 serde_json = "1.0.117"
+priority-queue = "2.0.2"
+log = "0.4.21"
 
 [lib]
 crate_type = ["cdylib"]

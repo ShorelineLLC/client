@@ -4,7 +4,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,7 +35,7 @@ public class MixinItemEntityRenderer {
                             VertexConsumerProvider vertexConsumerProvider,
                             int i, CallbackInfo ci) {
         RenderItemEvent renderItemEvent = new RenderItemEvent(itemEntity);
-        EventBus.EVENT_HANDLER.dispatch(renderItemEvent);
+        EventBus.INSTANCE.dispatch(renderItemEvent);
         if (renderItemEvent.isCanceled()) {
             ci.cancel();
         }

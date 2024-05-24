@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.network;
 
 import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class InventoryEvent extends Event {
     private final InventoryS2CPacket packet;

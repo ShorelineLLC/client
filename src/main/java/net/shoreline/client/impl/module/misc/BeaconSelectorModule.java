@@ -3,7 +3,7 @@ package net.shoreline.client.impl.module.misc;
 import net.minecraft.client.gui.screen.ingame.BeaconScreen;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.network.packet.c2s.play.UpdateBeaconC2SPacket;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.ScreenOpenEvent;

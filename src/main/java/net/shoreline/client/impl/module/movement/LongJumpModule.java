@@ -10,15 +10,14 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
-import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.MovementUtil;
@@ -73,7 +72,7 @@ public class LongJumpModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() != EventStage.PRE) {
+        if (event.getStage() != StageEvent.EventStage.PRE) {
             return;
         }
         double dx = mc.player.getX() - mc.player.prevX;
@@ -130,7 +129,7 @@ public class LongJumpModule extends ToggleModule {
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent event) {
         // Direkt LongJump
-        if (event.getStage() == EventStage.PRE
+        if (event.getStage() == StageEvent.EventStage.PRE
                 && modeConfig.getValue() == JumpMode.GLIDE) {
             if (FlightModule.getInstance().isEnabled() || mc.player.isFallFlying()
                     || mc.player.isHoldingOntoLadder()

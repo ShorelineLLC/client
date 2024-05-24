@@ -8,7 +8,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -16,7 +15,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.util.Globals;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -55,7 +54,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
         BlockState state = mc.world.getBlockState(pos);
         final AttackBlockEvent attackBlockEvent = new AttackBlockEvent(
                 pos, state, direction);
-        EventBus.EVENT_HANDLER.dispatch(attackBlockEvent);
+        EventBus.INSTANCE.dispatch(attackBlockEvent);
         if (attackBlockEvent.isCanceled()) {
             cir.cancel();
             // cir.setReturnValue(false);
@@ -69,7 +68,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
             cancellable = true)
     private void hookGetReachDistance(CallbackInfoReturnable<Float> cir) {
         final ReachEvent reachEvent = new ReachEvent();
-        EventBus.EVENT_HANDLER.dispatch(reachEvent);
+        EventBus.INSTANCE.dispatch(reachEvent);
         if (reachEvent.isCanceled()) {
             cir.cancel();
             float reach = gameMode.isCreative() ? 5.0f : 4.5f;
@@ -89,7 +88,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
                                    CallbackInfoReturnable<ActionResult> cir) {
         InteractBlockEvent interactBlockEvent = new InteractBlockEvent(
                 player, hand, hitResult);
-        EventBus.EVENT_HANDLER.dispatch(interactBlockEvent);
+        EventBus.INSTANCE.dispatch(interactBlockEvent);
         if (interactBlockEvent.isCanceled()) {
             cir.setReturnValue(ActionResult.SUCCESS);
             cir.cancel();
@@ -103,7 +102,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
     @Inject(method = "breakBlock", at = @At(value = "HEAD"), cancellable = true)
     private void hookBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         BreakBlockEvent breakBlockEvent = new BreakBlockEvent(pos);
-        EventBus.EVENT_HANDLER.dispatch(breakBlockEvent);
+        EventBus.INSTANCE.dispatch(breakBlockEvent);
         if (breakBlockEvent.isCanceled()) {
             cir.setReturnValue(false);
             cir.cancel();
@@ -118,7 +117,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
     @Inject(method = "interactItem", at = @At(value = "HEAD"), cancellable = true)
     public void hookInteractItem(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         StrafeFixEvent strafeFixEvent = new StrafeFixEvent();
-        EventBus.EVENT_HANDLER.dispatch(strafeFixEvent);
+        EventBus.INSTANCE.dispatch(strafeFixEvent);
         // Strafe fix cuz goofy 1.19 sends move packet when using items
         if (strafeFixEvent.isCanceled()) {
             cir.cancel();
@@ -150,7 +149,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
     private boolean hookRedirectInteractBlockInternal$shouldCancelInteraction(ClientPlayerEntity player)
     {
         PacketSneakingEvent packetSneakingEvent = new PacketSneakingEvent();
-        EventBus.EVENT_HANDLER.dispatch(packetSneakingEvent);
+        EventBus.INSTANCE.dispatch(packetSneakingEvent);
         return player.isSneaking() || packetSneakingEvent.isCanceled();
     }
 
@@ -165,7 +164,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
             return entity.getStackInHand(hand);
         }
         ItemDesyncEvent itemDesyncEvent = new ItemDesyncEvent();
-        EventBus.EVENT_HANDLER.dispatch(itemDesyncEvent);
+        EventBus.INSTANCE.dispatch(itemDesyncEvent);
         return itemDesyncEvent.isCanceled() ? itemDesyncEvent.getServerItem() : entity.getStackInHand(Hand.MAIN_HAND);
     }
 
@@ -177,7 +176,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals {
             ordinal = 0))
     private boolean hookRedirectInteractBlockInternal$getMainHandStack(ItemStack instance) {
         ItemDesyncEvent itemDesyncEvent = new ItemDesyncEvent();
-        EventBus.EVENT_HANDLER.dispatch(itemDesyncEvent);
+        EventBus.INSTANCE.dispatch(itemDesyncEvent);
         return itemDesyncEvent.isCanceled() ? itemDesyncEvent.getServerItem().isEmpty() : instance.isEmpty();
     }
 }

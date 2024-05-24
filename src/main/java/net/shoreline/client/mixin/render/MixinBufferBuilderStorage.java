@@ -3,11 +3,7 @@ package net.shoreline.client.mixin.render;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
-import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.util.Util;
-import net.shoreline.client.api.render.RenderLayersClient;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.impl.event.render.StoreBufferEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -57,7 +53,7 @@ public class MixinBufferBuilderStorage {
             map.put(RenderLayer.getWaterMask(), new BufferBuilder(RenderLayer.getWaterMask().getExpectedBufferSize()));
             // Liquidbounce b8
 //            StoreBufferEvent storeBufferEvent = new StoreBufferEvent(map);
-//            EventBus.EVENT_HANDLER.dispatch(storeBufferEvent);
+//            EventBus.INSTANCE.dispatch(storeBufferEvent);
 //            ModelLoader.BLOCK_DESTRUCTION_RENDER_LAYERS.forEach(renderLayer -> map.put(renderLayer, new BufferBuilder(renderLayer.getExpectedBufferSize())));
         });
         entityVertexConsumers = VertexConsumerProvider.immediate(sortedMap, new BufferBuilder(786432));

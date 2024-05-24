@@ -2,8 +2,8 @@ package net.shoreline.client.impl.event.entity.player;
 
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 /**
  * @author linus

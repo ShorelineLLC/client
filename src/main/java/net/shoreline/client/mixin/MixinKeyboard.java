@@ -2,7 +2,7 @@ package net.shoreline.client.mixin;
 
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +36,7 @@ public class MixinKeyboard {
                            int modifiers, CallbackInfo ci) {
         if (client.getWindow().getHandle() == window) {
             KeyboardInputEvent keyboardInputEvent = new KeyboardInputEvent(key, action);
-            EventBus.EVENT_HANDLER.dispatch(keyboardInputEvent);
+            EventBus.INSTANCE.dispatch(keyboardInputEvent);
             // prevent keyboard input
             if (keyboardInputEvent.isCanceled()) {
                 ci.cancel();

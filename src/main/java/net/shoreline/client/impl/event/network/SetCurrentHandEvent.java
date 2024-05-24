@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.network;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 import net.shoreline.client.mixin.network.MixinClientPlayerEntity;
 import net.shoreline.client.util.Globals;
 

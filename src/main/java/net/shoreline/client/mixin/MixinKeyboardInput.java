@@ -2,8 +2,8 @@ package net.shoreline.client.mixin;
 
 import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.EventStage;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.keyboard.KeyboardTickEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,8 +21,8 @@ public class MixinKeyboardInput {
     private void hookTick$Pre(boolean slowDown, float slowDownFactor, CallbackInfo info)
     {
         KeyboardTickEvent event = new KeyboardTickEvent((Input) (Object) this);
-        event.setStage(EventStage.PRE);
-        EventBus.EVENT_HANDLER.dispatch(event);
+        event.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {
             info.cancel();
@@ -38,8 +38,8 @@ public class MixinKeyboardInput {
             "client/input/KeyboardInput;sneaking:Z", shift = At.Shift.BEFORE), cancellable = true)
     private void hookTick$Post(boolean slowDown, float f, CallbackInfo ci) {
         KeyboardTickEvent keyboardTickEvent = new KeyboardTickEvent((Input) (Object) this);
-        keyboardTickEvent.setStage(EventStage.POST);
-        EventBus.EVENT_HANDLER.dispatch(keyboardTickEvent);
+        keyboardTickEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(keyboardTickEvent);
         if (keyboardTickEvent.isCanceled()) {
             ci.cancel();
         }

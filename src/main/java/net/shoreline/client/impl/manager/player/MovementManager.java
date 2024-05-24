@@ -2,11 +2,9 @@ package net.shoreline.client.impl.manager.player;
 
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.Shoreline;
-import net.shoreline.client.api.event.listener.EventListener;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.network.PacketSneakingEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 
@@ -18,7 +16,7 @@ public class MovementManager implements Globals {
     private boolean packetSneaking;
 
     public MovementManager() {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 
     /**

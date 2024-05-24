@@ -4,9 +4,9 @@ import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.render.HoleESPModule;
 import net.shoreline.client.util.Globals;
@@ -30,7 +30,7 @@ public class HoleManager implements Globals {
     private Set<Hole> holes = new ConcurrentSet<>();
 
     public HoleManager() {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 
     /**
@@ -38,7 +38,7 @@ public class HoleManager implements Globals {
      */
     @EventListener
     public void onTickEvent(TickEvent event) {
-        if (event.getStage() != EventStage.PRE) {
+        if (event.getStage() != StageEvent.EventStage.PRE) {
             return;
         }
         HoleTask runnable = new HoleTask(getSphere(mc.player.getPos()));

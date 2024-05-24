@@ -4,8 +4,8 @@ import net.minecraft.text.CharacterVisitor;
 import net.minecraft.text.Style;
 import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Formatting;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.ClientColorEvent;
-import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.impl.event.text.TextVisitEvent;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,7 +44,7 @@ public abstract class MixinTextVisitFactory implements Globals {
             return text;
         }
         final TextVisitEvent textVisitEvent = new TextVisitEvent(text);
-        EventBus.EVENT_HANDLER.dispatch(textVisitEvent);
+        EventBus.INSTANCE.dispatch(textVisitEvent);
         if (textVisitEvent.isCanceled()) {
             return textVisitEvent.getText();
         }
@@ -69,7 +69,7 @@ public abstract class MixinTextVisitFactory implements Globals {
                 d = text.charAt(j + 1);
                 if (d == 's') { // Custom client color
                     ClientColorEvent clientColorEvent = new ClientColorEvent();
-                    EventBus.EVENT_HANDLER.dispatch(clientColorEvent);
+                    EventBus.INSTANCE.dispatch(clientColorEvent);
                     style = style.withColor(clientColorEvent.getClientRgb());
                 }
                 else {

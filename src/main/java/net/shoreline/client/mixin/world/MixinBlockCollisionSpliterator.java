@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockCollisionSpliterator;
 import net.minecraft.world.BlockView;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.world.BlockCollisionEvent;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,7 +37,7 @@ public class MixinBlockCollisionSpliterator implements Globals {
         }
         BlockCollisionEvent blockCollisionEvent =
                 new BlockCollisionEvent(voxelShape, blockPos, instance);
-        EventBus.EVENT_HANDLER.dispatch(blockCollisionEvent);
+        EventBus.INSTANCE.dispatch(blockCollisionEvent);
         if (blockCollisionEvent.isCanceled()) {
             return blockCollisionEvent.getVoxelShape();
         }

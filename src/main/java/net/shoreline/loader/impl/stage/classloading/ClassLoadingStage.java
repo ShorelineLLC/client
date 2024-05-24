@@ -1,6 +1,7 @@
 package net.shoreline.loader.impl.stage.classloading;
 
 import net.fabricmc.loader.impl.launch.knot.MixinServiceKnot;
+import net.minecraft.world.BlockView;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.context.UserContext;

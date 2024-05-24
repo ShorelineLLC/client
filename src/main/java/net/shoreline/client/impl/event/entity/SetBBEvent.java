@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.entity;
 
 import net.minecraft.util.math.Box;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class SetBBEvent extends Event {
 

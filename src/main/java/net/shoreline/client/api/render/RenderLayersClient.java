@@ -1,11 +1,13 @@
 package net.shoreline.client.api.render;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.shoreline.client.api.event.listener.EventListener;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.StoreBufferEvent;
 import net.shoreline.client.mixin.accessor.AccessorRenderPhase;
 import net.shoreline.client.util.Globals;
@@ -24,7 +26,7 @@ public class RenderLayersClient implements Globals {
                     .target(RenderPhase.ITEM_ENTITY_TARGET).writeMaskState(RenderPhase.ALL_MASK).build(true));
 
     public RenderLayersClient() {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener

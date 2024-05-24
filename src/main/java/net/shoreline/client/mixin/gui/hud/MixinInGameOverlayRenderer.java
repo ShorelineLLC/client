@@ -4,7 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +27,7 @@ public class MixinInGameOverlayRenderer {
     private static void hookRenderFireOverlay(MinecraftClient client, MatrixStack matrices, CallbackInfo ci) {
         RenderOverlayEvent.Fire renderOverlayEvent =
                 new RenderOverlayEvent.Fire(null);
-        EventBus.EVENT_HANDLER.dispatch(renderOverlayEvent);
+        EventBus.INSTANCE.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled()) {
             ci.cancel();
         }
@@ -44,7 +44,7 @@ public class MixinInGameOverlayRenderer {
                                                     CallbackInfo ci) {
         RenderOverlayEvent.Water renderOverlayEvent =
                 new RenderOverlayEvent.Water(null);
-        EventBus.EVENT_HANDLER.dispatch(renderOverlayEvent);
+        EventBus.INSTANCE.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled()) {
             ci.cancel();
         }
@@ -60,7 +60,7 @@ public class MixinInGameOverlayRenderer {
     private static void hookRenderFireOverlay(Sprite sprite, MatrixStack matrices, CallbackInfo ci) {
         RenderOverlayEvent.Block renderOverlayEvent =
                 new RenderOverlayEvent.Block(null);
-        EventBus.EVENT_HANDLER.dispatch(renderOverlayEvent);
+        EventBus.INSTANCE.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled()) {
             ci.cancel();
         }

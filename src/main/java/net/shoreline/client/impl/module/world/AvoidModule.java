@@ -5,8 +5,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
@@ -32,7 +32,7 @@ public class AvoidModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() == EventStage.PRE && voidConfig.getValue()
+        if (event.getStage() == StageEvent.EventStage.PRE && voidConfig.getValue()
                 && !mc.player.isSpectator()
                 && mc.player.getY() < mc.world.getBottomY()) {
             // sendModuleMessage(Formatting.RED + "Prevented player from " +

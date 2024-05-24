@@ -2,7 +2,8 @@ package net.shoreline.client.impl.manager.world;
 
 import net.shoreline.client.api.waypoint.Waypoint;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**

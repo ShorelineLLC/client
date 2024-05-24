@@ -1,7 +1,7 @@
 package net.shoreline.client.api.config.setting;
 
-import net.shoreline.client.impl.event.handler.EventBus;
 import net.shoreline.client.api.config.ConfigContainer;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.util.render.animation.Animation;
 
@@ -26,9 +26,9 @@ public class ToggleConfig extends BooleanConfig {
             Animation anim = toggle.getAnimation();
             anim.setState(val);
             if (val) {
-                EventBus.EVENT_HANDLER.subscribe(toggle);
+                EventBus.INSTANCE.subscribe(toggle);
             } else {
-                EventBus.EVENT_HANDLER.unsubscribe(toggle);
+                EventBus.INSTANCE.unsubscribe(toggle);
             }
         }
     }

@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.block;
 
 import net.minecraft.block.Block;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 /**
  * @author linus

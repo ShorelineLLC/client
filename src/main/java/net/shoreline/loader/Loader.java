@@ -1,14 +1,17 @@
 package net.shoreline.loader;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.shoreline.client.ShorelineMod;
 import net.shoreline.loader.context.UserContext;
+import net.shoreline.loader.impl.natives.NativeLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 
-public final class Loader implements ClientModInitializer
+public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 {
     public static final String VERSION = "b0.0.1";
     public static final Logger LOGGER = LogManager.getLogger("Shoreline [Loader]");
@@ -45,11 +48,31 @@ public final class Loader implements ClientModInitializer
             ((ShorelineMod) Natives.stop_decompiling_0(constructor)).onInitializeClient();
         } catch (Throwable ignored)
         {
+            ignored.printStackTrace();
         }
     }
 
     public static UserContext getContext()
     {
         return context;
+    }
+
+    @Override
+    public void onPreLaunch()
+    {
+        if (FabricLoader.getInstance().isDevelopmentEnvironment())
+        {
+            Loader.LOGGER.info("Dev workspace detected, loading natives...");
+
+            try
+            {
+                NativeLoader.load();
+            } catch (Throwable t)
+            {
+                Loader.LOGGER.error("Failed to load native libraries", t);
+            }
+
+            Loader.LOGGER.info("Native library successfully loaded, starting Shoreline...");
+        }
     }
 }

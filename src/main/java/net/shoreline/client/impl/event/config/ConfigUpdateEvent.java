@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.config;
 
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.event.StageEvent;
+import net.shoreline.eventbus.StageEvent;
 
 /**
  * @author linus

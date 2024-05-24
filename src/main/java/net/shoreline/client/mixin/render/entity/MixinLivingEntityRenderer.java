@@ -8,13 +8,15 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityInvisibleEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
@@ -46,7 +48,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
                             MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
         RenderEntityEvent renderEntityEvent = new RenderEntityEvent(livingEntity,
                 f, g, matrixStack, vertexConsumerProvider, i, model, getRenderLayer((T) livingEntity, true, false, false), features);
-        EventBus.EVENT_HANDLER.dispatch(renderEntityEvent);
+        EventBus.INSTANCE.dispatch(renderEntityEvent);
         if (renderEntityEvent.isCanceled()) {
             ci.cancel();
         }
@@ -55,7 +57,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     @Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z"))
     private boolean redirectRender$isInvisibleTo(LivingEntity entity, PlayerEntity player) {
         final RenderEntityInvisibleEvent event = new RenderEntityInvisibleEvent(entity);
-        EventBus.EVENT_HANDLER.dispatch(event);
+        EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {
             return false;

@@ -3,7 +3,6 @@ package net.shoreline.client.impl.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
-import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.PlayerArgumentType;
 import net.shoreline.client.init.Managers;

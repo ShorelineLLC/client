@@ -5,7 +5,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.EnchantingTableBlockEntityRenderer;
 import net.minecraft.client.render.entity.model.BookModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.render.block.RenderTileEntityEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +40,7 @@ public class MixinEnchantingTableBlockEntityRenderer {
                             int i, int j, CallbackInfo ci) {
         RenderTileEntityEvent.EnchantingTableBook renderTileEntityEvent =
                 new RenderTileEntityEvent.EnchantingTableBook();
-        EventBus.EVENT_HANDLER.dispatch(renderTileEntityEvent);
+        EventBus.INSTANCE.dispatch(renderTileEntityEvent);
         if (renderTileEntityEvent.isCanceled()) {
             ci.cancel();
             matrixStack.pop();

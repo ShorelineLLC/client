@@ -1,10 +1,4 @@
-package net.shoreline.loader.impl.stage.natives;
-
-import net.shoreline.loader.Loader;
-import net.shoreline.loader.Natives;
-import net.shoreline.loader.context.UserContext;
-import net.shoreline.loader.impl.stage.LoadingStage;
-import net.shoreline.loader.impl.stage.authentication.AuthenticationStage;
+package net.shoreline.loader.impl.natives;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -12,20 +6,10 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-public final class NativeLoadingStage extends LoadingStage
+public final class NativeLoader
 {
-    private static final NativeLoadingStage instance = new NativeLoadingStage();
-
-    public static NativeLoadingStage getInstance()
+    public static void load() throws Throwable
     {
-        return instance;
-    }
-
-    @Override
-    public void run() throws Throwable
-    {
-        Loader.LOGGER.info("Loading Shoreline natives...");
-
         OSType type = getOS();
         URL url = new URL("https://api.shorelineclient.net/assets/" + type.getExt());
 
@@ -50,41 +34,9 @@ public final class NativeLoadingStage extends LoadingStage
         fos.close();
 
         System.load(natives.getAbsolutePath());
-
-        Loader.LOGGER.info("loading natives done");
-
-//        File dllFile = new File("C:/Users/user2/Desktop/shoreline/src/main/rust/target/debug/shoreline_loader.dll");
-//
-//        if (!dllFile.exists()) {
-//            Loader.LOGGER.error("DLL file not found at specified location.");
-//            return;
-//        }
-//
-//        try {
-//            System.load(dllFile.getAbsolutePath());
-//            Loader.LOGGER.info("loading natives done");
-//        } catch (UnsatisfiedLinkError e) {
-//            Loader.LOGGER.error("Failed to load native library: " + e.getMessage());
-//        }
-
-        Natives.stop_decompiling_6(Loader.VERSION);
     }
 
-    @Override
-    public void error(UserContext context,
-                      Throwable throwable)
-    {
-        Loader.LOGGER.info("Failed to load natives: " + throwable);
-        throw new RuntimeException(throwable);
-    }
-
-    @Override
-    public LoadingStage next()
-    {
-        return AuthenticationStage.getInstance();
-    }
-
-    private OSType getOS()
+    private static OSType getOS()
     {
         String osName = System.getProperty("os.name");
 
@@ -109,7 +61,7 @@ public final class NativeLoadingStage extends LoadingStage
         return OSType.OTHER;
     }
 
-    public enum OSType
+    private enum OSType
     {
         WINDOWS("dll"),
         MAC("dylib"),

@@ -7,8 +7,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
@@ -70,7 +70,7 @@ public class FullbrightModule extends ToggleModule {
     @EventListener
     public void onConfigUpdate(ConfigUpdateEvent event) {
         if (mc.player != null && brightnessConfig == event.getConfig()
-                && event.getStage() == EventStage.POST
+                && event.getStage() == StageEvent.EventStage.POST
                 && brightnessConfig.getValue() != Brightness.POTION) {
             mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
         }

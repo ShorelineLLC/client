@@ -14,15 +14,14 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.MathUtil;
@@ -99,7 +98,7 @@ public class SpeedModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() == EventStage.PRE) {
+        if (event.getStage() == StageEvent.EventStage.PRE) {
             boostTicks++;
             if (boostTicks > boostTicksConfig.getValue()) {
                 boostSpeed = 0.0;
@@ -482,7 +481,7 @@ public class SpeedModule extends ToggleModule {
 
     @EventListener
     public void onConfigUpdate(ConfigUpdateEvent event) {
-        if (event.getConfig() == timerConfig && event.getStage() == EventStage.POST && isStrafe()) {
+        if (event.getConfig() == timerConfig && event.getStage() == StageEvent.EventStage.POST && isStrafe()) {
             if (timerConfig.getValue()) {
                 prevTimer = TimerModule.getInstance().isEnabled();
                 if (!prevTimer) {

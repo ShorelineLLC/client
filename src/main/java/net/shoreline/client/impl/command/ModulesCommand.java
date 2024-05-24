@@ -3,8 +3,6 @@ package net.shoreline.client.impl.command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
-import net.shoreline.client.Shoreline;
-import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ToggleModule;

@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.network.CapesEvent;
 import net.shoreline.client.impl.event.network.LoadCapeEvent;
 import net.shoreline.client.util.Globals;
@@ -37,7 +37,7 @@ public class MixinPlayerListEntry implements Globals {
         LoadCapeEvent loadCapeEvent = new LoadCapeEvent(profile, identifier -> {
             capeTexture = identifier;
         });
-        EventBus.EVENT_HANDLER.dispatch(loadCapeEvent);
+        EventBus.INSTANCE.dispatch(loadCapeEvent);
         capeTextureLoaded = true;
     }
 
@@ -49,7 +49,7 @@ public class MixinPlayerListEntry implements Globals {
     private void hookGetSkinTextures(CallbackInfoReturnable<SkinTextures> cir) {
         if (capeTexture != null) {
             CapesEvent capesEvent = new CapesEvent();
-            EventBus.EVENT_HANDLER.dispatch(capesEvent);
+            EventBus.INSTANCE.dispatch(capesEvent);
             if (!capesEvent.isCanceled()) {
                 return;
             }

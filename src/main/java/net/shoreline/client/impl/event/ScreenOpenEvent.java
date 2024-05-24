@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 /**
  * @author linus

@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
@@ -36,7 +36,7 @@ public abstract class MixinClientWorld {
     @Inject(method = "addEntity", at = @At(value = "HEAD"))
     private void hookAddEntity(Entity entity, CallbackInfo ci) {
         AddEntityEvent addEntityEvent = new AddEntityEvent(entity);
-        EventBus.EVENT_HANDLER.dispatch(addEntityEvent);
+        EventBus.INSTANCE.dispatch(addEntityEvent);
     }
 
     /**
@@ -52,7 +52,7 @@ public abstract class MixinClientWorld {
             return;
         }
         RemoveEntityEvent addEntityEvent = new RemoveEntityEvent(entity, removalReason);
-        EventBus.EVENT_HANDLER.dispatch(addEntityEvent);
+        EventBus.INSTANCE.dispatch(addEntityEvent);
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class MixinClientWorld {
     private void hookGetSkyColor(Vec3d cameraPos, float tickDelta,
                                  CallbackInfoReturnable<Vec3d> cir) {
         SkyboxEvent.Sky skyboxEvent = new SkyboxEvent.Sky();
-        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.INSTANCE.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getColorVec());
@@ -79,7 +79,7 @@ public abstract class MixinClientWorld {
     private void hookGetCloudsColor(float tickDelta,
                                     CallbackInfoReturnable<Vec3d> cir) {
         SkyboxEvent.Cloud skyboxEvent = new SkyboxEvent.Cloud();
-        EventBus.EVENT_HANDLER.dispatch(skyboxEvent);
+        EventBus.INSTANCE.dispatch(skyboxEvent);
         if (skyboxEvent.isCanceled()) {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getColorVec());
@@ -90,7 +90,7 @@ public abstract class MixinClientWorld {
     private void hookPlaySound(double x, double y, double z, SoundEvent event, SoundCategory category,
                                float volume, float pitch, boolean useDistance, long seed, CallbackInfo ci) {
         PlaySoundEvent playSoundEvent = new PlaySoundEvent(new Vec3d(x, y, z), event, category);
-        EventBus.EVENT_HANDLER.dispatch(playSoundEvent);
+        EventBus.INSTANCE.dispatch(playSoundEvent);
         if (playSoundEvent.isCanceled()) {
             ci.cancel();
         }

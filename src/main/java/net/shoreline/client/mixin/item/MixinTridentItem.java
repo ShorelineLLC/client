@@ -17,7 +17,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.item.TridentPullbackEvent;
 import net.shoreline.client.impl.event.item.TridentWaterEvent;
 import net.shoreline.client.util.Globals;
@@ -37,7 +37,7 @@ public abstract class MixinTridentItem implements Globals {
     @Inject(method = "use", at = @At(value = "HEAD"), cancellable = true)
     private void hookUse(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
         TridentWaterEvent tridentWaterEvent = new TridentWaterEvent();
-        EventBus.EVENT_HANDLER.dispatch(tridentWaterEvent);
+        EventBus.INSTANCE.dispatch(tridentWaterEvent);
         if (tridentWaterEvent.isCanceled()) {
             cir.cancel();
             ItemStack itemStack = user.getStackInHand(hand);
@@ -57,12 +57,12 @@ public abstract class MixinTridentItem implements Globals {
         }
         int i = getMaxUseTime(stack) - remainingUseTicks;
         TridentPullbackEvent tridentPullbackEvent = new TridentPullbackEvent();
-        EventBus.EVENT_HANDLER.dispatch(tridentPullbackEvent);
+        EventBus.INSTANCE.dispatch(tridentPullbackEvent);
         if (!tridentPullbackEvent.isCanceled() && i < 10) {
             return;
         }
         TridentWaterEvent tridentWaterEvent = new TridentWaterEvent();
-        EventBus.EVENT_HANDLER.dispatch(tridentWaterEvent);
+        EventBus.INSTANCE.dispatch(tridentWaterEvent);
         if (tridentWaterEvent.isCanceled()) {
             ci.cancel();
             PlayerEntity playerEntity = (PlayerEntity) user;

@@ -82,4 +82,9 @@ public final class Natives
      * @return Null
      */
     public static native Object stop_decompiling_8(Object p0);
+
+    /**
+     *
+     */
+    public static native Object stop_decompiling_9(Object p0);
 }

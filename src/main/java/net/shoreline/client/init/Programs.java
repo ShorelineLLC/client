@@ -1,8 +1,5 @@
 package net.shoreline.client.init;
 
-import net.shoreline.client.api.event.listener.EventListener;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.impl.event.render.LoadProgramsEvent;
 import net.shoreline.client.impl.shaders.GradientProgram;
 import net.shoreline.client.impl.shaders.RoundedRectangleProgram;
 

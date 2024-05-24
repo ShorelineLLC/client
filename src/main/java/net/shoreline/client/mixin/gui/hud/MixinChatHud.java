@@ -13,11 +13,11 @@ import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
-import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
+import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
 import net.shoreline.client.impl.imixin.IChatHud;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -93,7 +93,7 @@ public abstract class MixinChatHud implements IChatHud
                                        int color)
     {
         RenderChatHudEvent renderChatHudEvent = new RenderChatHudEvent(current);
-        EventBus.EVENT_HANDLER.dispatch(renderChatHudEvent);
+        EventBus.INSTANCE.dispatch(renderChatHudEvent);
         return instance.drawTextWithShadow(textRenderer, text, (int) ((renderChatHudEvent.isCanceled() ? renderChatHudEvent.getAnimation() : 0)), y, color);
     }
 
@@ -101,7 +101,7 @@ public abstract class MixinChatHud implements IChatHud
             "ChatHudLine$Visible;indicator()Lnet/minecraft/client/gui/hud/MessageIndicator;"))
     private MessageIndicator hookRender(MessageIndicator original) {
         SignatureIndicatorEvent signatureIndicatorEvent = new SignatureIndicatorEvent();
-        EventBus.EVENT_HANDLER.dispatch(signatureIndicatorEvent);
+        EventBus.INSTANCE.dispatch(signatureIndicatorEvent);
         return signatureIndicatorEvent.isCanceled() ? null : original;
     }
 
@@ -119,7 +119,7 @@ public abstract class MixinChatHud implements IChatHud
                                 boolean refresh, CallbackInfo ci) {
         ci.cancel();
         ChatMessageEvent chatTextEvent = new ChatMessageEvent(message);
-        EventBus.EVENT_HANDLER.dispatch(chatTextEvent);
+        EventBus.INSTANCE.dispatch(chatTextEvent);
         int i = MathHelper.floor((double)this.getWidth() / this.getChatScale());
         if (indicator != null && indicator.icon() != null) {
             i -= indicator.icon().width + 4 + 2;
@@ -133,7 +133,7 @@ public abstract class MixinChatHud implements IChatHud
                 this.scroll(1);
             }
             ChatTextEvent chatMessageEvent = new ChatTextEvent(orderedText);
-            EventBus.EVENT_HANDLER.dispatch(chatMessageEvent);
+            EventBus.INSTANCE.dispatch(chatMessageEvent);
             boolean bl2 = j == list.size() - 1;
             this.visibleMessages.add(0, new ChatHudLine.Visible(ticks, chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2));
         }

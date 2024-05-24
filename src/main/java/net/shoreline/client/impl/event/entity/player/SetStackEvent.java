@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.entity.player;
 
 import net.minecraft.item.ItemStack;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class SetStackEvent extends Event {
 

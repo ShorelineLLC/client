@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.client.gui.screen.DeathScreen;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
@@ -26,7 +26,7 @@ public class AutoRespawnModule extends ToggleModule {
 
     @EventListener
     public void onTick(TickEvent event) {
-        if (event.getStage() == EventStage.PRE && respawn && mc.player.isDead()) {
+        if (event.getStage() == StageEvent.EventStage.PRE && respawn && mc.player.isDead()) {
             mc.player.requestRespawn();
             respawn = false;
         }

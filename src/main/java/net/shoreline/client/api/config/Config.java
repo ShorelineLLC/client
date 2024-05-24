@@ -4,8 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.config.setting.*;
-import net.shoreline.client.api.event.EventStage;
-import net.shoreline.client.impl.event.handler.EventBus;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
@@ -173,12 +173,12 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
         }
         final ConfigUpdateEvent event = new ConfigUpdateEvent(this);
         // PRE
-        event.setStage(EventStage.PRE);
-        EventBus.EVENT_HANDLER.dispatch(event);
+        event.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(event);
         value = val;
         // POST
-        event.setStage(EventStage.POST);
-        EventBus.EVENT_HANDLER.dispatch(event);
+        event.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(event);
     }
 
     /**

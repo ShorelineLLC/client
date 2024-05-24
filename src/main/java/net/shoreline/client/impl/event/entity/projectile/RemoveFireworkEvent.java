@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.entity.projectile;
 
 import net.minecraft.entity.projectile.FireworkRocketEntity;
-import net.shoreline.client.api.event.Cancelable;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Cancelable;
+import net.shoreline.eventbus.Event;
 
 @Cancelable
 public class RemoveFireworkEvent extends Event {

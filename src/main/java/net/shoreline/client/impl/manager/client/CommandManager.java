@@ -10,12 +10,12 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
-import net.shoreline.client.impl.event.gui.screen.SuggestChatEvent;
-import net.shoreline.client.impl.event.handler.EventBus;
-import net.shoreline.client.api.event.listener.EventListener;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.command.*;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
+import net.shoreline.client.impl.event.gui.screen.SuggestChatEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -43,7 +43,7 @@ public class CommandManager implements Globals {
      * Registers commands to the CommandManager
      */
     public CommandManager() {
-        EventBus.EVENT_HANDLER.subscribe(this);
+        EventBus.INSTANCE.subscribe(this);
         register(
                 new BindCommand(),
                 new ConfigCommand(),

@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.camera;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class EntityCameraPositionEvent extends Event {
 
