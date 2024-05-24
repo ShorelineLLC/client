@@ -1,18 +1,15 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.player.SetStackEvent;
-import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 
@@ -43,16 +40,17 @@ public class ReplenishModule extends ToggleModule {
         }
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack == null) {
-                continue;
-            }
-            double stackPercent = ((float) stack.getCount() / stack.getMaxCount()) * 100.0f;
-            if (stack.getCount() <= 1 || stackPercent <= percentConfig.getValue()) {
+            if (stack == null || stack.isEmpty()) {
                 Item item = hotbar[i];
-                if (item == null || item == Items.AIR) {
-                    return;
+                if (item != null && item != Items.AIR) {
+                    replenishItem(item, i);
                 }
-                replenishStack(item, stack, i);
+            }
+            else {
+                double stackPercent = ((float) stack.getCount() / stack.getMaxCount()) * 100.0f;
+                if (stackPercent <= percentConfig.getValue()) {
+                    replenishStack(stack, i);
+                }
             }
         }
     }
@@ -61,53 +59,38 @@ public class ReplenishModule extends ToggleModule {
     public void onSetStack(SetStackEvent event) {
         if (event.getSlot() < 9)
         {
-            if (event.getStack().isEmpty() && !(mc.currentScreen instanceof GenericContainerScreen)) {
+            if (event.getStack().isEmpty() && mc.currentScreen == null) {
                 return;
             }
             hotbar[event.getSlot()] = event.getStack().getItem();
         }
     }
 
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event) {
-        if (event.getPacket() instanceof PlayerActionC2SPacket packet && (packet.getAction() == PlayerActionC2SPacket.Action.DROP_ITEM
-                || packet.getAction() == PlayerActionC2SPacket.Action.DROP_ITEM)) {
-            int slot = mc.player.getInventory().selectedSlot;
-            ItemStack stack = mc.player.getInventory().getStack(slot);
-            if (stack.isEmpty()) {
-                hotbar[slot] = null;
+    private void replenishItem(Item item, int hotbarSlot) {
+        int total = 0;
+        while (total < item.getMaxCount())
+        {
+            ReplenishData i = searchReplenishItem(item);
+            if (i == null)
+            {
+                break;
             }
+            replenishInternal(i.slot(), hotbarSlot);
+            total += i.count();
         }
     }
 
-    private void replenishStack(Item item, ItemStack stack, int hotbarSlot) {
-        if (stack.isEmpty())
+    private void replenishStack(ItemStack stack, int hotbarSlot) {
+        int total = stack.getCount();
+        while (total < stack.getMaxCount())
         {
-            int total = 0;
-            while (total < item.getMaxCount())
+            ReplenishData i = searchReplenishStack(stack);
+            if (i == null)
             {
-                ReplenishData i = searchReplenishItem(item);
-                if (i == null)
-                {
-                    break;
-                }
-                replenishInternal(i.slot(), hotbarSlot);
-                total += i.count();
+                break;
             }
-        }
-        else
-        {
-            int total = stack.getCount();
-            while (total < stack.getMaxCount())
-            {
-                ReplenishData i = searchReplenishStack(stack);
-                if (i == null)
-                {
-                    break;
-                }
-                replenishInternal(i.slot(), hotbarSlot);
-                total += i.count();
-            }
+            replenishInternal(i.slot(), hotbarSlot);
+            total += i.count();
         }
     }
 
@@ -144,12 +127,12 @@ public class ReplenishModule extends ToggleModule {
     }
 
     private void replenishInternal(int i, int hotbarSlot) {
-        boolean holdingCursor = !mc.player.currentScreenHandler.getCursorStack().isEmpty();
         Managers.INVENTORY.pickupSlot(i);
         boolean replace = !mc.player.getInventory().getStack(hotbarSlot + 36).isEmpty();
         Managers.INVENTORY.pickupSlot(hotbarSlot + 36);
         if (replace) {
-            Managers.INVENTORY.pickupSlot(holdingCursor ? Managers.INVENTORY.findEmptySlot() : i);
+            boolean prevStack = !mc.player.getInventory().getStack(i).isEmpty();
+            Managers.INVENTORY.pickupSlot(prevStack ? Managers.INVENTORY.findEmptySlot() : i);
         }
     }
 

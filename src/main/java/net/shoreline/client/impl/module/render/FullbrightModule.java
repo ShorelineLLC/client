@@ -1,17 +1,23 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.event.EventStage;
 import net.shoreline.client.api.event.listener.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.color.world.BiomeColorEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.render.LightmapGammaEvent;
+
+import java.awt.*;
 
 /**
  * @author linus
@@ -20,6 +26,12 @@ import net.shoreline.client.impl.event.render.LightmapGammaEvent;
 public class FullbrightModule extends ToggleModule {
 
     Config<Brightness> brightnessConfig = register(new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values()));
+    Config<Boolean> biomeConfig = register(new BooleanConfig("Biome", "Colors the light of the biome", false));
+    Config<Color> biomeColorConfig = register(new ColorConfig("BiomeColor", "The color of the biome", Color.RED, false, true));
+    Config<Boolean> waterConfig = register(new BooleanConfig("Water", "Colors the water", false));
+    Config<Color> waterColorConfig = register(new ColorConfig("WaterColor", "The color of the water", Color.RED, false, true));
+    Config<Boolean> grassConfig = register(new BooleanConfig("Grass", "Colors the grass", false));
+    Config<Color> grassColorConfig = register(new ColorConfig("GrassColor", "The color of the grass", Color.RED, false, true));
 
     public FullbrightModule() {
         super("Fullbright", "Brightens the world", ModuleCategory.RENDER);
@@ -69,6 +81,20 @@ public class FullbrightModule extends ToggleModule {
         if (brightnessConfig.getValue() == Brightness.POTION
                 && !mc.player.hasStatusEffect(StatusEffects.NIGHT_VISION)) {
             mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, -1, 0));
+        }
+    }
+
+    @EventListener
+    public void onBiomeColor(BiomeColorEvent event) {
+        event.cancel();
+        if (biomeConfig.getValue() && event.getColorResolver() == BiomeColors.FOLIAGE_COLOR) {
+            event.setColor(biomeColorConfig.getValue());
+        }
+        else if (waterConfig.getValue() && event.getColorResolver() == BiomeColors.WATER_COLOR) {
+            event.setColor(waterColorConfig.getValue());
+        }
+        else if (grassConfig.getValue() && event.getColorResolver() == BiomeColors.GRASS_COLOR) {
+            event.setColor(grassColorConfig.getValue());
         }
     }
 

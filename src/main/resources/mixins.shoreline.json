@@ -41,6 +41,7 @@
     "biome.MixinBiomeEffects",
     "block.MixinBlock",
     "block.MixinSlimeBlock",
+    "color.world.MixinBiomeColors",
     "chunk.light.MixinChunkSkylightProvider",
     "entity.MixinEntity",
     "entity.MixinLivingEntity",
