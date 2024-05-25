@@ -229,12 +229,20 @@ pub unsafe extern "system" fn dispatch_internal(env: JNIEnv<'static>,
     match INVOKE.as_ref()
     {
         Some(invoke) => {
-            env.call_method_unchecked(
+            let invoked = env.call_method_unchecked(
                 method,
                 *invoke,
                 JavaType::Object(String::from(obfstr!("Ljava/lang/Object;"))),
                 &[instance.into(), event.into()]
-            ).unwrap();
+            );
+
+            if env.exception_check().unwrap()
+            {
+                env.exception_describe().unwrap();
+                env.exception_clear().unwrap();
+            }
+
+            invoked.unwrap().l().unwrap();
         }
         None => panic!("unable to complete native method dispatch_internal")
     }
