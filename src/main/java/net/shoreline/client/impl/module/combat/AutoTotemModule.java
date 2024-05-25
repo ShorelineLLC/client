@@ -147,7 +147,6 @@ public final class AutoTotemModule extends ToggleModule
                     return;
                 }
                 swapToOffhand(Items.TOTEM_OF_UNDYING, slot);
-                sendModuleMessage("attempt instant replace!");
             }
         }
     }
