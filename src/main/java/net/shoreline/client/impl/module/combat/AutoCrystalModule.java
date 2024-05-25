@@ -751,7 +751,7 @@ public class AutoCrystalModule extends RotationModule {
         if (dist > ((NumberConfig) placeRangeConfig).getValueSq()) {
             return true;
         }
-        Vec3d raytrace = Vec3d.of(pos).add(0.0, raytraceConfig.getValue() ? 2.700000047683716 : 1.0, 0.0);
+        Vec3d raytrace = Vec3d.of(pos).add(0.0, raytraceConfig.getValue() ? 2.70000004768372 : 1.0, 0.0);
         BlockHitResult result = mc.world.raycast(new RaycastContext(
                 mc.player.getEyePos(), raytrace,
                 RaycastContext.ShapeType.COLLIDER,

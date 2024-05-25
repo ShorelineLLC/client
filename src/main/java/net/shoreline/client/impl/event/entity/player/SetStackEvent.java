@@ -5,8 +5,8 @@ import net.shoreline.eventbus.Event;
 
 public class SetStackEvent extends Event {
 
-    private int slot;
-    private ItemStack stack;
+    private final int slot;
+    private final ItemStack stack;
 
     public SetStackEvent(int slot, ItemStack stack) {
         this.slot = slot;

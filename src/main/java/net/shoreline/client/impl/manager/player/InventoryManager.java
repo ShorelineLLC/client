@@ -142,7 +142,7 @@ public class InventoryManager implements Globals {
                 return i;
             }
         }
-        return -1;
+        return -999; // throw
     }
 
     /**

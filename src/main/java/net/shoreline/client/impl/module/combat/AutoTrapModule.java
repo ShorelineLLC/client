@@ -19,7 +19,6 @@ import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -35,10 +34,11 @@ import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -64,6 +64,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     private List<BlockPos> placements = new ArrayList<>();
     private final Timer attackTimer = new CacheTimer();
 
+    private int inhibitEntity;
     private int blocksPlaced;
     private int shiftDelay;
 
@@ -140,13 +141,13 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         }
     }
 
-    private void attack(Entity entity)
+    private boolean attack(Entity entity)
     {
+        inhibitEntity = entity.getId();
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        return true;
     }
-
-
 
     private void attackPlace(BlockPos targetPos)
     {
@@ -156,7 +157,9 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             List<Entity> crystalEntities = entities.stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : crystalEntities)
             {
-                attack(entity);
+                if (attack(entity)) {
+                    entities.remove(entity);
+                }
             }
             attackTimer.reset();
         }
@@ -340,7 +343,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 Entity entity = mc.world.getEntityById(id);
                 if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
                     blocksPlaced++;
-                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
+                    RenderSystem.recordRenderCall(() -> attackPlace(entity.getBlockPos()));
                 }
             }
         }
@@ -363,7 +366,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
             RenderBuffers.postRender();
-
 
             if (placements.isEmpty())
             {

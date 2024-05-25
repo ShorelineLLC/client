@@ -70,7 +70,7 @@ public class AutoXPModule extends RotationModule {
         delayTimer.reset();
     }
 
-    public static boolean areItemsFullDura(PlayerEntity player) {
+    private boolean areItemsFullDura(PlayerEntity player) {
         if (!isItemFullDura(player.getMainHandStack()) || !isItemFullDura(player.getOffHandStack())) {
             return false;
         }
@@ -84,7 +84,7 @@ public class AutoXPModule extends RotationModule {
         return true;
     }
 
-    private static boolean isItemFullDura(ItemStack stack) {
+    private boolean isItemFullDura(ItemStack stack) {
         if (stack.isEmpty()) {
             return true;
         }

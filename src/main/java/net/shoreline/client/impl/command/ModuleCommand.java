@@ -154,11 +154,11 @@ public class ModuleCommand extends Command {
             // e.printStackTrace();
         }
         if (config.getValue() instanceof Boolean) {
-            if (!value.equalsIgnoreCase("True") && !value.equalsIgnoreCase("False")) {
+            Boolean val = parseBoolean(value);
+            if (val == null) {
                 ChatUtil.error("Invalid value!");
                 return 0;
             }
-            Boolean val = Boolean.parseBoolean(value);
             ((Config<Boolean>) config).setValue(val);
             ChatUtil.clientSendMessage("§7%s§f was set to §s%s", config.getName(), val ? "True" : "False");
         } else if (config.getValue() instanceof Enum<?>) {
@@ -201,5 +201,15 @@ public class ModuleCommand extends Command {
             }
         }
         return 1;
+    }
+
+    private Boolean parseBoolean(String string) {
+        if (string.equalsIgnoreCase("True") || string.equalsIgnoreCase("On")) {
+            return true;
+        }
+        else if (string.equalsIgnoreCase("False") || string.equalsIgnoreCase("Off")) {
+            return false;
+        }
+        return null;
     }
 }
