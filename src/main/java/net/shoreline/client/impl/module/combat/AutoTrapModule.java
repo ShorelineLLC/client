@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -19,7 +18,6 @@ import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -35,10 +33,11 @@ import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -64,6 +63,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     private List<BlockPos> placements = new ArrayList<>();
     private final Timer attackTimer = new CacheTimer();
 
+    private int inhibitEntity;
     private int blocksPlaced;
     private int shiftDelay;
 
@@ -140,13 +140,16 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         }
     }
 
-    private void attack(Entity entity)
+    private boolean attack(Entity entity)
     {
+        if (entity.getId() <= inhibitEntity) {
+            return false;
+        }
+        inhibitEntity = entity.getId();
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        return true;
     }
-
-
 
     private void attackPlace(BlockPos targetPos)
     {
@@ -156,7 +159,9 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             List<Entity> crystalEntities = entities.stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : crystalEntities)
             {
-                attack(entity);
+                if (attack(entity)) {
+                    entities.remove(entity);
+                }
             }
             attackTimer.reset();
         }
@@ -335,15 +340,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
             }
         }
-        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            for (int id : packet.getEntityIds()) {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
-                    blocksPlaced++;
-                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
-                }
-            }
-        }
     }
 
     @EventListener
@@ -363,7 +359,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
             RenderBuffers.postRender();
-
 
             if (placements.isEmpty())
             {

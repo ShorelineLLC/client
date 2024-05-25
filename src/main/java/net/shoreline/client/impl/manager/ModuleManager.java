@@ -61,6 +61,7 @@ public final class ModuleManager
                 new ReplenishModule(),
                 new SelfBowModule(),
                 new SelfTrapModule(),
+                new SelfWebModule(),
                 new SurroundModule(),
                 new TriggerModule(),
                 // Exploit

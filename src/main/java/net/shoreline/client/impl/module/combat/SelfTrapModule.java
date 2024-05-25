@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  */
 public final class SelfTrapModule extends ObsidianPlacerModule
 {
-    public static SelfTrapModule INSTANCE;
+    private static SelfTrapModule INSTANCE;
 
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
@@ -66,6 +66,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private List<BlockPos> surround = new ArrayList<>();
     private List<BlockPos> placements = new ArrayList<>();
+    private int inhibitEntity;
     private final Timer attackTimer = new CacheTimer();
 
     private int blocksPlaced;
@@ -175,27 +176,22 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             shiftDelay = 0;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            attackPlace(targetPos, blockSlot);
+            attackPlace(targetPos);
         }
     }
 
-    private void attack(Entity entity)
+    private boolean attack(Entity entity)
     {
+        if (entity.getId() <= inhibitEntity) {
+            return false;
+        }
+        inhibitEntity = entity.getId();
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        return true;
     }
 
     private void attackPlace(BlockPos targetPos)
-    {
-        final int blockSlot = getResistantBlockItem();
-        if (blockSlot == -1)
-        {
-            return;
-        }
-        attackPlace(targetPos, blockSlot);
-    }
-
-    private void attackPlace(BlockPos targetPos, int blockSlot)
     {
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
         if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
@@ -203,7 +199,9 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             List<Entity> crystalEntities = entities.stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : crystalEntities)
             {
-                attack(entity);
+                if (attack(entity)) {
+                    entities.remove(entity);
+                }
             }
             attackTimer.reset();
         }
@@ -346,15 +344,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 blocksPlaced++;
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
-            }
-        }
-        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            for (int id : packet.getEntityIds()) {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
-                    blocksPlaced++;
-                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
-                }
             }
         }
     }

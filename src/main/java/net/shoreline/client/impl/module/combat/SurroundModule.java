@@ -65,6 +65,7 @@ public class SurroundModule extends ObsidianPlacerModule {
     private List<BlockPos> surround = new ArrayList<>();
     private List<BlockPos> placements = new ArrayList<>();
     private final Timer attackTimer = new CacheTimer();
+    private int inhibitEntity;
 
     private int blocksPlaced;
     private int shiftDelay;
@@ -167,11 +168,16 @@ public class SurroundModule extends ObsidianPlacerModule {
         }
     }
 
-    private void attack(Entity entity) {
+    private boolean attack(Entity entity)
+    {
+        if (entity.getId() <= inhibitEntity) {
+            return false;
+        }
+        inhibitEntity = entity.getId();
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        return true;
     }
-
 
     private void attackPlace(BlockPos targetPos) {
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
@@ -180,7 +186,9 @@ public class SurroundModule extends ObsidianPlacerModule {
             List<Entity> crystalEntities = entities.stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : crystalEntities)
             {
-                attack(entity);
+                if (attack(entity)) {
+                    entities.remove(entity);
+                }
             }
             attackTimer.reset();
         }
@@ -315,15 +323,6 @@ public class SurroundModule extends ObsidianPlacerModule {
             if (surround.contains(targetPos) && state.isReplaceable()) {
                 blocksPlaced++;
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
-            }
-        }
-        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            for (int id : packet.getEntityIds()) {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
-                    blocksPlaced++;
-                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
-                }
             }
         }
     }

@@ -5,13 +5,16 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.SquidEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.SquidEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.Arm;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -124,7 +127,7 @@ public class ChamsModule extends ToggleModule {
             n = ((Entity) event.entity).getEyeHeight(EntityPose.STANDING) - 0.1f;
             event.matrixStack.translate((float) (-direction.getOffsetX()) * n, 0.0f, (float) (-direction.getOffsetZ()) * n);
         }
-        float l = event.entity instanceof WolfEntity wolf ? wolf.getTailAngle() : event.entity.age + event.g;
+        float l = getAnimationProgress(event.entity, event.g);
         if (event.entity instanceof PlayerEntity) {
             setupPlayerTransforms((AbstractClientPlayerEntity) event.entity, event.matrixStack, l, h, event.g);
         } else {
@@ -224,6 +227,13 @@ public class ChamsModule extends ToggleModule {
             matrices.translate(0.0f, ((Entity) entity).getHeight() + 0.1f, 0.0f);
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
         }
+    }
+
+    private float getAnimationProgress(LivingEntity entity, float f) {
+        if (entity instanceof SquidEntity) {
+            return MathHelper.lerp(f, ((SquidEntity)entity).prevTentacleAngle, ((SquidEntity)entity).tentacleAngle);
+        }
+        return entity instanceof WolfEntity wolf ? wolf.getTailAngle() : entity.age + f;
     }
 
     @EventListener
