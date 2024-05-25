@@ -9,6 +9,9 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ModulesCommand extends Command {
     public ModulesCommand() {
         super("Modules", "Displays all client modules", literal("modules"));
@@ -17,18 +20,12 @@ public class ModulesCommand extends Command {
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(c -> {
-            StringBuilder modulesList = new StringBuilder();
+            List<String> modulesList = new ArrayList<>();
             for (Module module : Managers.MODULE.getModules()) {
                 String formatting = module instanceof ToggleModule t && t.isEnabled() ? "§s" : "§f";
-                modulesList.append(formatting);
-                modulesList.append(module.getName());
-                modulesList.append(Formatting.RESET);
-                // LOL
-                if (!module.getName().equalsIgnoreCase("Zoom")) {
-                    modulesList.append(", ");
-                }
+                modulesList.add(formatting + module.getName());
             }
-            ChatUtil.clientSendMessageRaw(" §7Modules:§f " + modulesList);
+            ChatUtil.clientSendMessageRaw(" §7Modules:§f " + String.join(", ", modulesList));
             return 1;
         });
     }

@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage;
 import net.minecraft.util.Util;
+import net.shoreline.client.api.render.RenderLayersClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -51,6 +52,7 @@ public class MixinBufferBuilderStorage {
             map.put(RenderLayer.getEntityGlint(), new BufferBuilder(RenderLayer.getEntityGlint().getExpectedBufferSize()));
             map.put(RenderLayer.getDirectEntityGlint(), new BufferBuilder(RenderLayer.getDirectEntityGlint().getExpectedBufferSize()));
             map.put(RenderLayer.getWaterMask(), new BufferBuilder(RenderLayer.getWaterMask().getExpectedBufferSize()));
+            map.put(RenderLayersClient.GLINT, new BufferBuilder(RenderLayersClient.GLINT.getExpectedBufferSize()));
             // Liquidbounce b8
 //            StoreBufferEvent storeBufferEvent = new StoreBufferEvent(map);
 //            EventBus.INSTANCE.dispatch(storeBufferEvent);
