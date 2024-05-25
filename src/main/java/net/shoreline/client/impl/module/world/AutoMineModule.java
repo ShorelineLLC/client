@@ -189,7 +189,7 @@ public class AutoMineModule extends RotationModule {
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (data.getBlockDamage() >= 1.0f && isDataPacketMine(data)) {
+            if (data.getBlockDamage() >= 0.9f && isDataPacketMine(data)) {
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue()) {
                     return;
                 }
@@ -206,7 +206,7 @@ public class AutoMineModule extends RotationModule {
             miningQueue.remove(miningData2);
             return;
         }
-        if (miningData2.getState().isAir())
+        if (miningData2.getState().isReplaceable())
         {
             // Once we broke the block that overrode that the auto city, we can allow the module
             // to auto mine "city" blocks
@@ -275,7 +275,7 @@ public class AutoMineModule extends RotationModule {
 //              abortMining(miningData);
                 return;
             }
-            if (data1 instanceof AutoMiningData) {
+            if (data1 instanceof AutoMiningData && data2 instanceof AutoMiningData) {
                 manualOverride = true;
             }
             startManualMine(event.getPos(), event.getDirection());

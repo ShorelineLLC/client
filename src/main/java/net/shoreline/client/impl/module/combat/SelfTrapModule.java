@@ -182,9 +182,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private boolean attack(Entity entity)
     {
-        if (entity.getId() <= inhibitEntity) {
-            return false;
-        }
         inhibitEntity = entity.getId();
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -344,6 +341,15 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 blocksPlaced++;
                 RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
+            }
+        }
+        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
+            for (int id : packet.getEntityIds()) {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
+                    blocksPlaced++;
+                    RenderSystem.recordRenderCall(() -> attackPlace(entity.getBlockPos()));
+                }
             }
         }
     }

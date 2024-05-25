@@ -12,6 +12,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
+import net.shoreline.client.impl.event.RunTickEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
@@ -66,8 +67,11 @@ public final class AutoTotemModule extends ToggleModule
     }
 
     @EventListener
-    public void onTick(final TickEvent event)
+    public void onRunTick(final RunTickEvent event)
     {
+        if (mc.player == null) {
+            return;
+        }
         Item offhandItem = itemConfig.getValue().getItem();
         if (offhandItem != Items.TOTEM_OF_UNDYING && checkLethal())
         {
@@ -143,6 +147,7 @@ public final class AutoTotemModule extends ToggleModule
                     return;
                 }
                 swapToOffhand(Items.TOTEM_OF_UNDYING, slot);
+                sendModuleMessage("attempt instant replace!");
             }
         }
     }
