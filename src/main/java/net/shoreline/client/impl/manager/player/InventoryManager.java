@@ -120,8 +120,8 @@ public class InventoryManager implements Globals {
     /**
      * @param slot
      */
-    public void pickupSlot(final int slot) {
-        click(slot, 0, SlotActionType.PICKUP);
+    public int pickupSlot(final int slot) {
+        return click(slot, 0, SlotActionType.PICKUP);
     }
 
     public void quickMove(final int slot) {
@@ -150,9 +150,9 @@ public class InventoryManager implements Globals {
      * @param button
      * @param type
      */
-    private void click(int slot, int button, SlotActionType type) {
+    private int click(int slot, int button, SlotActionType type) {
         if (slot < 0) {
-            return;
+            return -1;
         }
         ScreenHandler screenHandler = mc.player.currentScreenHandler;
         DefaultedList<Slot> defaultedList = screenHandler.slots;
@@ -170,6 +170,7 @@ public class InventoryManager implements Globals {
             int2ObjectMap.put(j, itemStack2.copy());
         }
         mc.player.networkHandler.sendPacket(new ClickSlotC2SPacket(screenHandler.syncId, screenHandler.getRevision(), slot, button, type, screenHandler.getCursorStack().copy(), int2ObjectMap));
+        return screenHandler.getRevision();
     }
 
     /**

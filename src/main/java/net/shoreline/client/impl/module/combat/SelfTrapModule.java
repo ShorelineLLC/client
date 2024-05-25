@@ -215,7 +215,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
