@@ -12,7 +12,7 @@ public interface AccessorFireworkRocketEntity {
      * @return
      */
     @Accessor("shooter")
-    LivingEntity getShooter();
+    LivingEntity hookGetShooter();
 
     /**
      * @return

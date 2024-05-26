@@ -85,7 +85,7 @@ public final class AutoTotemModule extends ToggleModule
                     && (mainHandItem instanceof SwordItem
                     || mainHandItem instanceof TridentItem
                     || mainHandItem instanceof AxeItem)
-                    && (!lethalConfig.getValue() || mc.player.getHealth() >= healthConfig.getValue()))
+                    && (!lethalGappleConfig.getValue() || mc.player.getHealth() >= healthConfig.getValue()))
             {
 
                 offhandItem = getGoldenAppleType();
@@ -104,7 +104,8 @@ public final class AutoTotemModule extends ToggleModule
         }
         swapToOffhand(offhandItem, inventorySlot);
         // Try to swap two totems just in case the first one didn't get swapped in time
-        if (fastConfig.getValue()) {
+        if (fastConfig.getValue())
+        {
             final int inventorySlot1 = getInventorySlot(offhandItem, inventorySlot);
             if (inventorySlot1 == -1)
             {
@@ -168,12 +169,15 @@ public final class AutoTotemModule extends ToggleModule
         }
         else
         {
-            boolean replaceSlot = !mc.player.currentScreenHandler.getCursorStack().isEmpty();
-            boolean replace = !mc.player.getOffHandStack().isEmpty();
-            Managers.INVENTORY.pickupSlot(slot);
-            revisions.put(Managers.INVENTORY.pickupSlot(45), System.currentTimeMillis());
-            if (replace) {
-                Managers.INVENTORY.pickupSlot(replaceSlot ? Managers.INVENTORY.findEmptySlot() : slot);
+            ItemStack cursorStack = mc.player.currentScreenHandler.getCursorStack();
+            if (!cursorStack.isEmpty() && cursorStack.getItem() == offhandItem)
+            {
+                revisions.put(Managers.INVENTORY.pickupSlot(45), System.currentTimeMillis());
+            }
+            else
+            {
+                Managers.INVENTORY.pickupSlot(slot);
+                revisions.put(Managers.INVENTORY.pickupSlot(45), System.currentTimeMillis());
             }
         }
         // Subtracting 1 from this number accounts for this totem that we are replacing

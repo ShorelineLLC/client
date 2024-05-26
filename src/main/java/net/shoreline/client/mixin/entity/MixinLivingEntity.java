@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * @author linus
@@ -124,5 +125,16 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
         }
         StatusEffectEvent.Remove statusEffectEvent = new StatusEffectEvent.Remove(effect);
         EventBus.INSTANCE.dispatch(statusEffectEvent);
+    }
+
+    @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
+    public void hookIsFallFlying(CallbackInfoReturnable<Boolean> cir) {
+        FallFlyingEvent fallFlyingEvent = new FallFlyingEvent(cir.getReturnValueZ());
+        EventBus.INSTANCE.dispatch(fallFlyingEvent);
+        if (fallFlyingEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(fallFlyingEvent.isFallFlying());
+        }
     }
 }

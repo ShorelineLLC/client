@@ -23,8 +23,7 @@ public class MovementManager implements Globals {
      * @param y
      */
     public void setMotionY(double y) {
-        Vec3d motion = mc.player.getVelocity();
-        mc.player.setVelocity(motion.getX(), y, motion.getZ());
+        mc.player.setVelocity(mc.player.getVelocity().getX(), y, mc.player.getVelocity().getZ());
     }
 
     /**
@@ -32,9 +31,17 @@ public class MovementManager implements Globals {
      * @param z
      */
     public void setMotionXZ(double x, double z) {
-        Vec3d motion = mc.player.getVelocity();
-        mc.player.setVelocity(x, motion.y, z);
+        mc.player.setVelocity(x, mc.player.getVelocity().y, z);
     }
+
+    public void setMotionX(double x) {
+        mc.player.setVelocity(x, mc.player.getVelocity().y, mc.player.getVelocity().z);
+    }
+
+    public void setMotionZ(double z) {
+        mc.player.setVelocity(mc.player.getVelocity().x, mc.player.getVelocity().y, z);
+    }
+
 
     public void setPacketSneaking(final boolean packetSneaking) {
         this.packetSneaking = packetSneaking;

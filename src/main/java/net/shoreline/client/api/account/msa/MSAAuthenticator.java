@@ -2,6 +2,7 @@ package net.shoreline.client.api.account.msa;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.util.UndashedUuid;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -354,17 +355,21 @@ public final class MSAAuthenticator
 
     private String loginWithXboxLive(final XboxLiveData data) throws MSAAuthException
     {
-        final String body = "{\"ensureLegacyEnabled\":true,\"identityToken\":\"XBL3.0 x=" + data.getUserHash() + ";" + data.getToken() + "\"}";
-        final String content = makePostRequest(LOGIN_WITH_XBOX_URL, body, ContentType.APPLICATION_JSON);
-        if (content != null && !content.isEmpty())
-        {
-            final JsonObject object = JsonParser.parseString(content).getAsJsonObject();
-            if (object.has("errorMessage")) {
-                throw new MSAAuthException(object.get("errorMessage").getAsString());
+        try {
+            final String body = "{\"ensureLegacyEnabled\":true,\"identityToken\":\"XBL3.0 x=" + data.getUserHash() + ";" + data.getToken() + "\"}";
+            final String content = makePostRequest(LOGIN_WITH_XBOX_URL, body, ContentType.APPLICATION_JSON);
+            if (content != null && !content.isEmpty())
+            {
+                final JsonObject object = JsonParser.parseString(content).getAsJsonObject();
+                if (object.has("errorMessage")) {
+                    throw new MSAAuthException(object.get("errorMessage").getAsString());
+                }
+                if (object.has("access_token")) {
+                    return object.get("access_token").getAsString();
+                }
             }
-            if (object.has("access_token")) {
-                return object.get("access_token").getAsString();
-            }
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
         }
         return null;
     }
