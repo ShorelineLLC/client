@@ -69,7 +69,8 @@ public final class AutoTotemModule extends ToggleModule
     @EventListener
     public void onRunTick(final RunTickEvent event)
     {
-        if (mc.player == null) {
+        if (mc.player == null)
+        {
             return;
         }
         Item offhandItem = itemConfig.getValue().getItem();
@@ -91,27 +92,15 @@ public final class AutoTotemModule extends ToggleModule
                 offhandItem = getGoldenAppleType();
             }
         }
-        // If we already have that item in our offhand, return
-        if (mc.player.getOffHandStack().getItem() == offhandItem)
+        // Check item
+        if (mc.player.getOffHandStack().isEmpty() || mc.player.getOffHandStack().getItem() != offhandItem)
         {
-            return;
-        }
-
-        final int inventorySlot = getInventorySlot(offhandItem, -1);
-        if (inventorySlot == -1)
-        {
-            return;
-        }
-        swapToOffhand(offhandItem, inventorySlot);
-        // Try to swap two totems just in case the first one didn't get swapped in time
-        if (fastConfig.getValue())
-        {
-            final int inventorySlot1 = getInventorySlot(offhandItem, inventorySlot);
-            if (inventorySlot1 == -1)
+            final int inventorySlot = getInventorySlot(offhandItem);
+            if (inventorySlot == -1)
             {
                 return;
             }
-            swapToOffhand(offhandItem, inventorySlot1);
+            swapToOffhand(offhandItem, inventorySlot);
         }
     }
 
@@ -184,7 +173,7 @@ public final class AutoTotemModule extends ToggleModule
         lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
     }
 
-    private int getInventorySlot(Item item, int excludeSlot)
+    private int getInventorySlot(Item item)
     {
         if (lastHotbarSlot != -1 && lastHotbarItem != null)
         {
@@ -200,9 +189,6 @@ public final class AutoTotemModule extends ToggleModule
         // Search through our inventory
         for (int slot = 35; slot >= 0; slot--)
         {
-            if (slot == excludeSlot) {
-                continue;
-            }
             final ItemStack itemStack = mc.player.getInventory().getStack(slot);
             if (!itemStack.isEmpty() && itemStack.getItem().equals(item))
             {
