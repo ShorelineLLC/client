@@ -977,6 +977,10 @@ public class AutoCrystalModule extends RotationModule {
         return (int) avg;
     }
 
+    public boolean getIgnoreTerrain() {
+        return blockDestructionConfig.getValue();
+    }
+
     public enum Swap {
         NORMAL,
         SILENT,

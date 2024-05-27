@@ -5,7 +5,6 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
@@ -16,7 +15,6 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.RunTickEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
@@ -136,20 +134,28 @@ public final class AutoTotemModule extends ToggleModule
                 }
                 int slot = n < 9 ? n + 36 : n;
                 replacing = true;
-                if (mc.player.currentScreenHandler.getCursorStack().getItem() != offhandItem)
+                if (alternativeConfig.getValue())
                 {
-                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(0, slot, 40, SlotActionType.SWAP, mc.player);
+                    replacing = false;
                 }
-                if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
+                else
                 {
-                    mc.interactionManager.clickSlot(0, 45, 0, SlotActionType.PICKUP, mc.player);
-                    lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
-                }
-                replacing = false;
-                if (!mc.player.currentScreenHandler.getCursorStack().isEmpty() && mc.player.getOffHandStack().getItem() == offhandItem)
-                {
-                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
-                    return;
+                    if (mc.player.currentScreenHandler.getCursorStack().getItem() != offhandItem)
+                    {
+                        mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                    }
+                    if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
+                    {
+                        mc.interactionManager.clickSlot(0, 45, 0, SlotActionType.PICKUP, mc.player);
+                        lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
+                    }
+                    replacing = false;
+                    if (!mc.player.currentScreenHandler.getCursorStack().isEmpty() && mc.player.getOffHandStack().getItem() == offhandItem)
+                    {
+                        mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                        return;
+                    }
                 }
             }
             n--;
@@ -182,7 +188,7 @@ public final class AutoTotemModule extends ToggleModule
         }
         // Server should only send this when we pop a totem
         if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet
-                && packet.getSlot() == 45 && offhandItem == Items.TOTEM_OF_UNDYING && fastConfig.getValue())
+                && packet.getSlot() == 45 && offhandItem == Items.TOTEM_OF_UNDYING)
         {
             if (mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING || !packet.getStack().isEmpty())
             {
