@@ -1,9 +1,11 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
@@ -12,18 +14,21 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.impl.event.RunTickEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.RunTickEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author xgraza, Shoreline
@@ -31,6 +36,8 @@ import java.util.*;
  */
 public final class AutoTotemModule extends ToggleModule
 {
+    private static AutoTotemModule INSTANCE;
+
     Config<OffhandItem> itemConfig = register(new EnumConfig<>("Item", "The item to wield in your offhand", OffhandItem.TOTEM, OffhandItem.values()));
     Config<Float> healthConfig = register(new NumberConfig<>("Health", "The health required to fall below before swapping to a totem", 0.0f, 14.0f, 20.0f));
     Config<Boolean> gappleConfig = register(new BooleanConfig("OffhandGapple", "Equips a golden apple if holding down the item use button", true));
@@ -41,13 +48,21 @@ public final class AutoTotemModule extends ToggleModule
     Config<Boolean> alternativeConfig = register(new BooleanConfig("Alternative", "Replaces totem using the swap packet", false));
     Config<Boolean> debugConfig = register(new BooleanConfig("Debug", "Debug on death", false));
 
-    private final Map<Integer, Long> revisions = new LinkedHashMap<>();
     private int lastHotbarSlot, lastTotemCount;
     private Item lastHotbarItem;
+    private Item offhandItem;
+    private boolean replacing;
+    private long replaceTime;
 
     public AutoTotemModule()
     {
         super("AutoTotem", "Automatically replenishes the totem in your offhand", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static AutoTotemModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -63,17 +78,18 @@ public final class AutoTotemModule extends ToggleModule
         super.onDisable();
         lastHotbarSlot = -1;
         lastHotbarItem = null;
-        revisions.clear();
+        offhandItem = null;
     }
 
     @EventListener
-    public void onRunTick(final RunTickEvent event)
+    public void onTick(final TickEvent event)
     {
-        if (mc.player == null)
+        if (mc.player == null || mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen) || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
         }
-        Item offhandItem = itemConfig.getValue().getItem();
+
+        offhandItem = itemConfig.getValue().getItem();
         if (offhandItem != Items.TOTEM_OF_UNDYING && checkLethal())
         {
             offhandItem = Items.TOTEM_OF_UNDYING;
@@ -92,15 +108,51 @@ public final class AutoTotemModule extends ToggleModule
                 offhandItem = getGoldenAppleType();
             }
         }
-        // Check item
-        if (mc.player.getOffHandStack().isEmpty() || mc.player.getOffHandStack().getItem() != offhandItem)
+
+        if (mc.player.getOffHandStack().getItem() == offhandItem)
         {
-            final int inventorySlot = getInventorySlot(offhandItem);
-            if (inventorySlot == -1)
+            return;
+        }
+        int n = 35;
+        if (lastHotbarSlot != -1 && lastHotbarItem != null)
+        {
+            final ItemStack stack = mc.player.getInventory().getStack(lastHotbarSlot);
+            if (stack.getItem().equals(offhandItem) && lastHotbarItem.equals(mc.player.getOffHandStack().getItem()))
             {
-                return;
+                final int tmp = lastHotbarSlot;
+                lastHotbarSlot = -1;
+                lastHotbarItem = null;
+                n = tmp;
             }
-            swapToOffhand(offhandItem, inventorySlot);
+        }
+        while (n >= 0)
+        {
+            if (mc.player.getInventory().getStack(n).getItem() == offhandItem)
+            {
+                if (n < 9)
+                {
+                    lastHotbarItem = offhandItem;
+                    lastHotbarSlot = n;
+                }
+                int slot = n < 9 ? n + 36 : n;
+                replacing = true;
+                if (mc.player.currentScreenHandler.getCursorStack().getItem() != offhandItem)
+                {
+                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                }
+                if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
+                {
+                    mc.interactionManager.clickSlot(0, 45, 0, SlotActionType.PICKUP, mc.player);
+                    lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
+                }
+                replacing = false;
+                if (!mc.player.currentScreenHandler.getCursorStack().isEmpty() && mc.player.getOffHandStack().getItem() == offhandItem)
+                {
+                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                    return;
+                }
+            }
+            n--;
         }
     }
 
@@ -121,11 +173,22 @@ public final class AutoTotemModule extends ToggleModule
             final Set<String> failureReasonsSet = getFailureReasons();
             if (failureReasonsSet.isEmpty())
             {
-                sendModuleMessage("Failed to replace totem!");
+                long serverLatency = System.currentTimeMillis() - replaceTime;
+                sendModuleMessage("Failed to replace totem in %sms!", serverLatency);
             } else
             {
                 sendModuleMessage("Failed to replace totem! Possible reasons: %s", String.join(", ", failureReasonsSet));
             }
+        }
+        // Server should only send this when we pop a totem
+        if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet
+                && packet.getSlot() == 45 && offhandItem == Items.TOTEM_OF_UNDYING && fastConfig.getValue())
+        {
+            if (mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING || !packet.getStack().isEmpty())
+            {
+                return;
+            }
+            replaceTime = System.currentTimeMillis();
         }
     }
 
@@ -141,61 +204,6 @@ public final class AutoTotemModule extends ToggleModule
             failureReasonsSet.add("Totem was not placed in offhand on time");
         }
         return failureReasonsSet;
-    }
-
-    private void swapToOffhand(final Item offhandItem, final int itemSlot)
-    {
-        if (itemSlot < 9)
-        {
-            lastHotbarItem = offhandItem;
-            lastHotbarSlot = itemSlot;
-        }
-        int slot = itemSlot < 9 ? itemSlot + 36 : itemSlot;
-        if (alternativeConfig.getValue())
-        {
-            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                    slot, 40, SlotActionType.SWAP, mc.player);
-        }
-        else
-        {
-            ItemStack cursorStack = mc.player.currentScreenHandler.getCursorStack();
-            if (!cursorStack.isEmpty() && cursorStack.getItem() == offhandItem)
-            {
-                revisions.put(Managers.INVENTORY.pickupSlot(45), System.currentTimeMillis());
-            }
-            else
-            {
-                Managers.INVENTORY.pickupSlot(slot);
-                revisions.put(Managers.INVENTORY.pickupSlot(45), System.currentTimeMillis());
-            }
-        }
-        // Subtracting 1 from this number accounts for this totem that we are replacing
-        lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
-    }
-
-    private int getInventorySlot(Item item)
-    {
-        if (lastHotbarSlot != -1 && lastHotbarItem != null)
-        {
-            final ItemStack stack = mc.player.getInventory().getStack(lastHotbarSlot);
-            if (stack.getItem().equals(item) && lastHotbarItem.equals(mc.player.getOffHandStack().getItem()))
-            {
-                final int tmp = lastHotbarSlot;
-                lastHotbarSlot = -1;
-                lastHotbarItem = null;
-                return tmp;
-            }
-        }
-        // Search through our inventory
-        for (int slot = 35; slot >= 0; slot--)
-        {
-            final ItemStack itemStack = mc.player.getInventory().getStack(slot);
-            if (!itemStack.isEmpty() && itemStack.getItem().equals(item))
-            {
-                return slot;
-            }
-        }
-        return -1;
     }
 
     private boolean checkLethal()
@@ -244,6 +252,11 @@ public final class AutoTotemModule extends ToggleModule
             return Items.GOLDEN_APPLE;
         }
         return Items.ENCHANTED_GOLDEN_APPLE;
+    }
+
+    public boolean isReplacing()
+    {
+        return replacing;
     }
 
     private enum OffhandItem

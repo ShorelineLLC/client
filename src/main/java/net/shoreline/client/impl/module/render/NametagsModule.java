@@ -12,6 +12,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -67,6 +68,7 @@ public class NametagsModule extends ToggleModule {
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Renders nametags on invisible players", true));
     Config<Boolean> borderedConfig = register(new BooleanConfig("TextBorder", "Renders a border behind the nametag", true));
     Config<Boolean> itemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
+    Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
 
     public NametagsModule() {
         super("Nametags", "Renders info on player nametags", ModuleCategory.RENDER);
@@ -123,6 +125,17 @@ public class NametagsModule extends ToggleModule {
                 ItemStack stack = itemEntity.getStack();
                 String stackNametag = stack.getName().getString() + (stack.getCount() > 1 ? " x" + stack.getCount() : "");
                 RenderManager.renderSign(stackNametag, rx, ry, rz, -1);
+            }
+            if (entity instanceof EnderPearlEntity pearlEntity && pearlsConfig.getValue()) {
+                if (pearlEntity.getOwner() == null)
+                {
+                    return;
+                }
+                Vec3d itemPos = Interpolation.getRenderPosition(pearlEntity, mc.getTickDelta());
+                double rx = pearlEntity.getX() - itemPos.getX();
+                double ry = pearlEntity.getY() - itemPos.getY();
+                double rz = pearlEntity.getZ() - itemPos.getZ();
+                RenderManager.renderSign(pearlEntity.getOwner().getName().getString(), rx, ry, rz, -1);
             }
         }
 

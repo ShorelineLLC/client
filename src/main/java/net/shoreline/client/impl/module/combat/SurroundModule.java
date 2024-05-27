@@ -177,6 +177,10 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     private void attackPlace(BlockPos targetPos) {
+        if (AutoTotemModule.getInstance().isReplacing())
+        {
+            return;
+        }
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
         if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
         {

@@ -2,21 +2,23 @@ package net.shoreline.client.util.world;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.AmbientEntity;
-import net.minecraft.entity.mob.Angerable;
-import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.*;
+import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.SquidEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
+import net.shoreline.client.util.Globals;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class EntityUtil {
+public class EntityUtil implements Globals
+{
 
     /**
      * @param entity
@@ -34,7 +36,7 @@ public class EntityUtil {
      * @return
      */
     public static boolean isMonster(Entity e) {
-        return e instanceof Monster && !isNeutral(e);
+        return e instanceof HostileEntity && !isNeutral(e);
     }
 
     /**
@@ -42,7 +44,10 @@ public class EntityUtil {
      * @return
      */
     public static boolean isNeutral(Entity e) {
-        return e instanceof Angerable && !((Angerable) e).hasAngerTime();
+        return e instanceof EndermanEntity enderman && !enderman.isAngry()
+                || e instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()
+                || e instanceof WolfEntity wolf && !wolf.isAttacking()
+                || e instanceof IronGolemEntity golem && !golem.isAttacking();
     }
 
     /**
@@ -50,8 +55,7 @@ public class EntityUtil {
      * @return
      */
     public static boolean isPassive(Entity e) {
-        return e instanceof PassiveEntity || e instanceof AmbientEntity
-                || e instanceof SquidEntity;
+        return e instanceof PassiveEntity || e instanceof AmbientEntity || e instanceof SquidEntity;
     }
 
     public static boolean isVehicle(Entity e) {
