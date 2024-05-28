@@ -16,6 +16,7 @@ public class RotationsModule extends ConcurrentModule {
     //
     Config<Float> preserveTicksConfig = register(new NumberConfig<>("PreserveTicks", "Time to preserve rotations after reaching the target rotations", 0.0f, 10.0f, 20.0f));
     Config<Boolean> movementFixConfig = register(new BooleanConfig("MovementFix", "Fixes movement on Grim when rotating", false));
+    Config<Boolean> mouseSensFixConfig = register(new BooleanConfig("MouseSensFix", "Fixes movement on Grim when applying mouse sensitivity", false));
     //
     private float prevYaw;
 
@@ -33,6 +34,11 @@ public class RotationsModule extends ConcurrentModule {
 
     public boolean getMovementFix() {
         return movementFixConfig.getValue();
+    }
+
+    public boolean getMouseSensFix()
+    {
+        return mouseSensFixConfig.getValue();
     }
 
     /**

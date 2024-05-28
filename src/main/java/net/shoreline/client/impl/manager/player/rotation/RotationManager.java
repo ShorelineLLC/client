@@ -169,6 +169,12 @@ public class RotationManager implements Globals {
      */
     public void setRotation(Rotation rotation) {
 
+        if (RotationsModule.getInstance().getMouseSensFix())
+        {
+            double fix = Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0) * 1.2;
+            rotation.setYaw((float) (rotation.getYaw() - (rotation.getYaw() - serverYaw) % fix));
+            rotation.setPitch((float) (rotation.getPitch() - (rotation.getPitch() - serverPitch) % fix));
+        }
         if (rotation.getPriority() == MAX_VALUE)
         {
             this.rotation = rotation;
@@ -196,8 +202,14 @@ public class RotationManager implements Globals {
         mc.player.setPitch(pitch);
     }
 
-    public void setRotationSilent(final float yaw, final float pitch, final boolean grim)
+    public void setRotationSilent(float yaw, float pitch, final boolean grim)
     {
+        if (RotationsModule.getInstance().getMouseSensFix())
+        {
+            double fix = Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0) * 1.2;
+            yaw = (float) (yaw - (yaw - serverYaw) % fix);
+            pitch = (float) (pitch - (pitch - serverPitch) % fix);
+        }
         if (grim)
         {
             setRotation(new Rotation(MAX_VALUE, yaw, pitch, true));
