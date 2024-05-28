@@ -2,9 +2,11 @@ package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.LlamaEntity;
+import net.minecraft.entity.passive.PigEntity;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
+import net.shoreline.client.impl.event.entity.mob.PigAIEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
@@ -21,12 +23,8 @@ public class EntityControlModule extends ToggleModule {
     Config<Float> jumpStrengthConfig = register(new NumberConfig<>("JumpStrength", "The fixed jump strength of the mounted entity", 0.1f, 0.7f, 2.0f));
     Config<Boolean> noPigMoveConfig = register(new BooleanConfig("NoPigAI", "Prevents the pig movement when controlling pigs", false));
 
-    /**
-     *
-     */
     public EntityControlModule() {
-        super("EntityControl", "Allows you to steer entities without a saddle",
-                ModuleCategory.MOVEMENT);
+        super("EntityControl", "Allows you to steer entities without a saddle", ModuleCategory.MOVEMENT);
     }
 
     @EventListener
@@ -50,5 +48,14 @@ public class EntityControlModule extends ToggleModule {
     public void onMountJumpStrength(MountJumpStrengthEvent event) {
         event.cancel();
         event.setJumpStrength(jumpStrengthConfig.getValue());
+    }
+
+    @EventListener
+    public void onPigAI(PigAIEvent event)
+    {
+        if (noPigMoveConfig.getValue() && mc.player.isRiding() && mc.player.getVehicle() == event.getPigEntity())
+        {
+            event.cancel();
+        }
     }
 }

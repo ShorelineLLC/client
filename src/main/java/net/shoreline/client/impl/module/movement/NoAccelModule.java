@@ -7,6 +7,7 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
+import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class NoAccelModule extends ToggleModule
@@ -22,7 +23,7 @@ public class NoAccelModule extends ToggleModule
     @EventListener
     public void onPlayerMove(PlayerMoveEvent event)
     {
-        if (!mc.player.isOnGround() && !airConfig.getValue() || mc.player.getVelocity().y < 0.0 && !downwardsConfig.getValue())
+        if (!mc.player.isOnGround() && !airConfig.getValue() || mc.player.getVelocity().y < 0.0 && !downwardsConfig.getValue() || !MovementUtil.isInputtingMovement())
         {
             return;
         }
