@@ -33,7 +33,7 @@ public class ConfigArgumentType implements ArgumentType<Config<?>> {
         Config<?> config = null;
         for (Config<?> config1 : module.getConfigs()) {
             if (config1.getName().equalsIgnoreCase("Enabled") || config1.getName().equalsIgnoreCase("Keybind")
-                    || config1.getName().equalsIgnoreCase("Hidden")) {
+                    || config1.getName().equalsIgnoreCase("Hidden") || config1.getName().equalsIgnoreCase("Notify")) {
                 continue;
             }
             if (config1.getName().equalsIgnoreCase(string)) {

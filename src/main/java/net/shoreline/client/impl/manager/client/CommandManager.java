@@ -55,6 +55,7 @@ public class CommandManager implements Globals {
                 new HideAllCommand(),
                 new ModulesCommand(),
                 new NbtCommand(),
+                new NotifyCommand(),
                 new OpenFolderCommand(),
                 new PrefixCommand(),
                 new ResetCommand(),

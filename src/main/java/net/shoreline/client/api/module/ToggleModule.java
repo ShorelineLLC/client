@@ -6,6 +6,7 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.MacroConfig;
 import net.shoreline.client.api.config.setting.ToggleConfig;
 import net.shoreline.client.api.macro.Macro;
+import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
@@ -42,6 +43,9 @@ public class ToggleModule extends Module implements Hideable {
     // Arraylist rendering info
     Config<Boolean> hiddenConfig = register(new BooleanConfig("Hidden", "The hidden " +
             "state of the module in the Arraylist", false));
+    // Notifies in chat
+    Config<Boolean> notifyConfig = register(new BooleanConfig("Notify", "Notifies the module in chat",
+            false, () -> false));
 
     /**
      * @param name     The module unique identifier
@@ -108,6 +112,10 @@ public class ToggleModule extends Module implements Hideable {
     public void enable() {
         enabledConfig.setValue(true);
         onEnable();
+        if (notifyConfig.getValue() && mc.world != null)
+        {
+            ChatUtil.clientSendMessage("§7" + getName() + "§f toggled §son", 1000);
+        }
     }
 
     /**
@@ -120,6 +128,10 @@ public class ToggleModule extends Module implements Hideable {
     public void disable() {
         enabledConfig.setValue(false);
         onDisable();
+        if (notifyConfig.getValue() && mc.world != null)
+        {
+            ChatUtil.clientSendMessage("§7" + getName() + "§f toggled §coff", 1000);
+        }
     }
 
     /**
@@ -172,6 +184,16 @@ public class ToggleModule extends Module implements Hideable {
      */
     public Macro getKeybinding() {
         return keybindingConfig.getValue();
+    }
+
+    public void setNotify(boolean notify)
+    {
+        notifyConfig.setValue(notify);
+    }
+
+    public boolean getNotify()
+    {
+        return notifyConfig.getValue();
     }
 
     /**
