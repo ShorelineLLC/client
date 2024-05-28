@@ -29,6 +29,7 @@
     "accessor.AccessorLightmapTextureManager",
     "accessor.AccessorLimbAnimator",
     "accessor.AccessorMinecraftClient",
+    "accessor.AccessorNativeImage",
     "accessor.AccessorPlayerMoveC2SPacket",
     "accessor.AccessorPlayerPositionLookS2CPacket",
     "accessor.AccessorPlayerSkinProvider",

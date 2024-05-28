@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.gui.click.impl.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Colors;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
@@ -105,7 +106,7 @@ public class ModuleButton extends Button {
             scaledTime = 1.7f;
         }
         rectGradient(context, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : 0x555555, fill ? ClickGuiModule.getInstance().getColor1(scaledTime) : 0x555555);
-        RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? -1 : 0xaaaaaa);
+        RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? -1 : Colors.GRAY);
         if (settingsAnimation.getFactor() > 0.01f) {
             off = y + height + 1.0f;
             float fheight = 0.0f;

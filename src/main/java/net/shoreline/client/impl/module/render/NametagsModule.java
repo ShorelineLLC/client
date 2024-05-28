@@ -174,16 +174,19 @@ public class NametagsModule extends ToggleModule {
             if (armorConfig.getValue()) {
                 renderItems(matrices, entity);
             }
-            drawText(matrices, info, -width, 0.0f, color, false);
+            drawText(matrices, info, -width, 0.0f, color);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             RenderSystem.disableBlend();
         });
     }
 
-    private void drawText(MatrixStack matrices, String text, float x, float y, int color, boolean shadow) {
-        if (FontModule.getInstance().isEnabled()) {
-            Fonts.draw(matrices, text, x, y, color, shadow);
-        } else {
+    private void drawText(MatrixStack matrices, String text, float x, float y, int color) {
+        if (FontModule.getInstance().isEnabled())
+        {
+            Fonts.CLIENT.drawStringWithShadow(matrices, text, x, y, color);
+        }
+        else
+        {
             Fonts.VANILLA.drawWithShadow(matrices, text, x, y, color);
         }
     }
@@ -286,7 +289,7 @@ public class NametagsModule extends ToggleModule {
         if (stack.getCount() != 1) {
             String string = String.valueOf(stack.getCount());
             // this.matrices.translate(0.0f, 0.0f, 200.0f);
-            drawText(matrixStack, string, x + 17 - mc.textRenderer.getWidth(string), y + 9.0f, -1, false);
+            drawText(matrixStack, string, x + 17 - mc.textRenderer.getWidth(string), y + 9.0f, -1);
         }
         if (stack.isItemBarVisible())
         {
@@ -308,12 +311,12 @@ public class NametagsModule extends ToggleModule {
         int n2 = itemStack.getDamage();
         int durability = (int) ((n - n2) / ((float) n) * 100.0f);
         drawText(matrixStack, durability + "%", x * 2, y * 2,
-                ColorUtil.hslToColor((float) (n - n2) / (float) n * 120.0f, 100.0f, 50.0f, 1.0f).getRGB(), false);
+                ColorUtil.hslToColor((float) (n - n2) / (float) n * 120.0f, 100.0f, 50.0f, 1.0f).getRGB());
     }
 
     private void renderEnchants(MatrixStack matrixStack, ItemStack itemStack, float x, float y) {
         if (itemStack.getItem() instanceof EnchantedGoldenAppleItem) {
-            drawText(matrixStack, "God", x * 2, y * 2, 0xffc34e41, false);
+            drawText(matrixStack, "God", x * 2, y * 2, 0xffc34e41);
             return;
         }
         if (!itemStack.hasEnchantments()) {
@@ -338,7 +341,7 @@ public class NametagsModule extends ToggleModule {
                 enchantString.append(translatedName);
                 enchantString.append(lvl);
             }
-            drawText(matrixStack, enchantString.toString(), x * 2, (y + n2) * 2, -1, false);
+            drawText(matrixStack, enchantString.toString(), x * 2, (y + n2) * 2, -1);
             n2 += 4.5f;
         }
     }
@@ -355,7 +358,7 @@ public class NametagsModule extends ToggleModule {
     private void renderItemName(MatrixStack matrixStack, ItemStack itemStack, float x, float y) {
         String itemName = itemStack.getName().getString();
         float width = mc.textRenderer.getWidth(itemName) / 4.0f;
-        drawText(matrixStack, itemName, (x - width) * 2, y * 2, -1, false);
+        drawText(matrixStack, itemName, (x - width) * 2, y * 2, -1);
     }
 
     private String getNametagInfo(PlayerEntity player) {

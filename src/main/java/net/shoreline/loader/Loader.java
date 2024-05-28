@@ -9,7 +9,9 @@ import net.shoreline.loader.impl.natives.NativeLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 
 public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 {
@@ -60,6 +62,8 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
     @Override
     public void onPreLaunch()
     {
+        System.setProperty("java.awt.headless", "true");
+        GraphicsEnvironment.isHeadless();
         if (FabricLoader.getInstance().isDevelopmentEnvironment())
         {
             Loader.LOGGER.info("Dev workspace detected, loading natives...");

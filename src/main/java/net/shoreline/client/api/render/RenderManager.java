@@ -262,7 +262,7 @@ public class RenderManager implements Globals {
             GL11.glDepthFunc(GL11.GL_ALWAYS);
 
             if (FontModule.getInstance().isEnabled()) {
-                Fonts.draw(matrices, text, -hwidth, 0.0f, color, false);
+                Fonts.CLIENT.drawStringWithShadow(matrices, text, -hwidth, 0.0f, color);
             }
             else {
                 Fonts.VANILLA.drawWithShadow(matrices, text, -hwidth, 0.0f, color);
@@ -347,8 +347,9 @@ public class RenderManager implements Globals {
      * @param color
      */
     public static void renderText(DrawContext context, String text, float x, float y, int color) {
-        if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null) {
-            context.drawText(Fonts.CLIENT, text, (int) x, (int) y, color, FontModule.getInstance().getShadow());
+        if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null)
+        {
+            Fonts.CLIENT.drawStringWithShadow(context.getMatrices(), text, x, y, color);
             return;
         }
         context.drawText(mc.textRenderer, text, (int) x, (int) y, color, true);
@@ -359,8 +360,9 @@ public class RenderManager implements Globals {
      * @return
      */
     public static int textWidth(String text) {
-        if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null) {
-            return Fonts.CLIENT.getWidth(text);
+        if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null)
+        {
+            return (int) Fonts.CLIENT.getStringWidth(text);
         }
         return mc.textRenderer.getWidth(text);
     }

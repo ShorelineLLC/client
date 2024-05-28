@@ -3,6 +3,7 @@ package net.shoreline.client;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.file.ClientConfiguration;
 import net.shoreline.client.api.render.RenderLayersClient;
+import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

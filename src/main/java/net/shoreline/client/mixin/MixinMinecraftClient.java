@@ -98,7 +98,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
     private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext, CallbackInfoReturnable<Runnable> cir) {
         FinishLoadingEvent finishLoadingEvent = new FinishLoadingEvent();
         EventBus.INSTANCE.dispatch(finishLoadingEvent);
-        if (!Fonts.isInitialized()) {
+        if (!Fonts.isInitialized())
+        {
             Fonts.init();
         }
         // Managers.CAPES.init();

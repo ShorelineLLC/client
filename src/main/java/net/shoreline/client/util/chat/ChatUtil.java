@@ -45,7 +45,7 @@ public class ChatUtil implements Globals {
     }
 
     public static void clientSendMessageRaw(String message, int id) {
-        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(PREFIX + message), id);
+        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(message), id);
     }
 
     /**
