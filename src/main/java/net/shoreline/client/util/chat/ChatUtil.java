@@ -3,6 +3,7 @@ package net.shoreline.client.util.chat;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.mixin.accessor.AccessorChatHud;
 import net.shoreline.client.util.Globals;
 
@@ -21,7 +22,11 @@ public class ChatUtil implements Globals {
      * @param message The message
      */
     public static void clientSendMessage(String message) {
-        ((AccessorChatHud) mc.inGameHud.getChatHud()).hookAddMessage(Text.of(PREFIX + message), null, mc.inGameHud.getTicks(), null, true);
+        clientSendMessage(message, 0);
+    }
+
+    public static void clientSendMessage(String message, int id) {
+        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(PREFIX + message), id);
     }
 
     /**
@@ -36,7 +41,11 @@ public class ChatUtil implements Globals {
      * @param message
      */
     public static void clientSendMessageRaw(String message) {
-        ((AccessorChatHud) mc.inGameHud.getChatHud()).hookAddMessage(Text.of(message), null, mc.inGameHud.getTicks(), null, true);
+        clientSendMessage(message, 0);
+    }
+
+    public static void clientSendMessageRaw(String message, int id) {
+        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(PREFIX + message), id);
     }
 
     /**

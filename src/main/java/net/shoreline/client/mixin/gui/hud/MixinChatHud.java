@@ -13,6 +13,8 @@ import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.impl.imixin.IChatHudLine;
+import net.shoreline.client.impl.imixin.IChatHudLineVisible;
 import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
@@ -99,7 +101,8 @@ public abstract class MixinChatHud implements IChatHud
 
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/" +
             "ChatHudLine$Visible;indicator()Lnet/minecraft/client/gui/hud/MessageIndicator;"))
-    private MessageIndicator hookRender(MessageIndicator original) {
+    private MessageIndicator hookRender(MessageIndicator original)
+    {
         SignatureIndicatorEvent signatureIndicatorEvent = new SignatureIndicatorEvent();
         EventBus.INSTANCE.dispatch(signatureIndicatorEvent);
         return signatureIndicatorEvent.isCanceled() ? null : original;
@@ -115,9 +118,14 @@ public abstract class MixinChatHud implements IChatHud
      */
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void hookAddMessage(Text message, MessageSignatureData signature,
-                                int ticks, MessageIndicator indicator,
-                                boolean refresh, CallbackInfo ci) {
+                                int ticks, MessageIndicator indicator, boolean refresh, CallbackInfo ci) {
         ci.cancel();
+        visibleMessages.removeIf(msg -> ((IChatHudLineVisible) (Object) msg).getId() == currentId && currentId != 0);
+        for (int i = messages.size() - 1; i > -1; i--) {
+            if (((IChatHudLine) (Object) messages.get(i)).getId() == currentId && currentId != 0) {
+                messages.remove(i);
+            }
+        }
         ChatMessageEvent chatTextEvent = new ChatMessageEvent(message);
         EventBus.INSTANCE.dispatch(chatTextEvent);
         int i = MathHelper.floor((double)this.getWidth() / this.getChatScale());
@@ -135,13 +143,17 @@ public abstract class MixinChatHud implements IChatHud
             ChatTextEvent chatMessageEvent = new ChatTextEvent(orderedText);
             EventBus.INSTANCE.dispatch(chatMessageEvent);
             boolean bl2 = j == list.size() - 1;
-            this.visibleMessages.add(0, new ChatHudLine.Visible(ticks, chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2));
+            ChatHudLine.Visible visibleLine = new ChatHudLine.Visible(ticks, chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2);
+            ((IChatHudLineVisible) (Object) visibleLine).setId(currentId);
+            this.visibleMessages.add(0, visibleLine);
         }
         while (this.visibleMessages.size() > 100) {
             this.visibleMessages.remove(this.visibleMessages.size() - 1);
         }
         if (!refresh) {
-            this.messages.add(0, new ChatHudLine(ticks, chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, signature, indicator));
+            ChatHudLine chatHudLine = new ChatHudLine(ticks, chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, signature, indicator);
+            ((IChatHudLine) (Object) chatHudLine).setId(currentId);
+            this.messages.add(0, chatHudLine);
             while (this.messages.size() > 100) {
                 this.messages.remove(this.messages.size() - 1);
             }
@@ -149,9 +161,9 @@ public abstract class MixinChatHud implements IChatHud
     }
 
     @Override
-    public void addMessage(String message, int id) {
+    public void addMessage(Text message, int id) {
         currentId = id;
-        addMessage(Text.of(message));
-        currentId = -1;
+        addMessage(message);
+        currentId = 0;
     }
 }
