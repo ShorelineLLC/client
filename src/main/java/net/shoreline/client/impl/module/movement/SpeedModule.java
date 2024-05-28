@@ -39,7 +39,6 @@ public class SpeedModule extends ToggleModule {
     //
     Config<Speed> speedModeConfig = register(new EnumConfig<>("Mode", "Speed mode", Speed.STRAFE, Speed.values()));
     Config<Float> collisionDistanceConfig = register(new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE));
-    Config<Boolean> vanillaStrafeConfig = register(new BooleanConfig("Strafe-Vanilla", "Applies strafe speeds to vanilla speed", false, () -> speedModeConfig.getValue() == Speed.VANILLA));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f, () -> speedModeConfig.getValue() == Speed.VANILLA));
     Config<Boolean> timerConfig = register(new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false, () -> isStrafe()));
     Config<Boolean> strafeBoostConfig = register(new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false, () -> isStrafe()));
@@ -407,8 +406,7 @@ public class SpeedModule extends ToggleModule {
                 event.setZ(motion.y);
                 strafe++;
             } else if (speedModeConfig.getValue() == Speed.VANILLA) {
-                Vec2f motion = handleVanillaMotion(vanillaStrafeConfig.getValue() ? (float) base :
-                        speedConfig.getValue() / 10.0f);
+                Vec2f motion = handleVanillaMotion(speedConfig.getValue() / 10.0f);
                 event.setX(motion.x);
                 event.setZ(motion.y);
             }

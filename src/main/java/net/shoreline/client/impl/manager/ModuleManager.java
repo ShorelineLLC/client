@@ -117,6 +117,7 @@ public final class ModuleManager
                 new IceSpeedModule(),
                 new JesusModule(),
                 new LongJumpModule(),
+                new NoAccelModule(),
                 new NoFallModule(),
                 new NoJumpDelayModule(),
                 new NoSlowModule(),
