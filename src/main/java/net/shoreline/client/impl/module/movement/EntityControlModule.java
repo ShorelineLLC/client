@@ -53,7 +53,11 @@ public class EntityControlModule extends ToggleModule {
     @EventListener
     public void onPigAI(PigAIEvent event)
     {
-        if (noPigMoveConfig.getValue() && mc.player.isRiding() && mc.player.getVehicle() == event.getPigEntity())
+        if (mc.player == null)
+        {
+            return;
+        }
+        if (noPigMoveConfig.getValue() && event.getPigEntity().getPassengerList().contains(mc.player))
         {
             event.cancel();
         }

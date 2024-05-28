@@ -113,6 +113,7 @@ public final class ModuleManager
                 new EntitySpeedModule(),
                 new FakeLagModule(),
                 new FastFallModule(),
+                new FastSwimModule(),
                 new FlightModule(),
                 new IceSpeedModule(),
                 new JesusModule(),

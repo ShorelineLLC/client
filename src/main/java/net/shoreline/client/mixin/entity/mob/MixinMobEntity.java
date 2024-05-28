@@ -16,9 +16,9 @@ public class MixinMobEntity
     private void hookIsAiDisabled(CallbackInfoReturnable<Boolean> cir)
     {
         MobEntity mobEntity = (MobEntity) (Object) this;
-        if (mobEntity instanceof PigEntity pigEntity)
+        if (mobEntity instanceof PigEntity)
         {
-            PigAIEvent pigAIEvent = new PigAIEvent(pigEntity);
+            PigAIEvent pigAIEvent = new PigAIEvent((PigEntity) mobEntity);
             EventBus.INSTANCE.dispatch(pigAIEvent);
             if (pigAIEvent.isCanceled())
             {
