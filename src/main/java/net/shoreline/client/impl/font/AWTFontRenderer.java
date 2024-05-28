@@ -7,7 +7,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.font.Glyph;
 import net.shoreline.client.api.font.GlyphCache;
 import net.shoreline.client.impl.module.client.ColorsModule;
@@ -69,7 +71,7 @@ public final class AWTFontRenderer implements Closeable, Globals
 
     public void drawStringWithShadow(MatrixStack stack, String text, double x, double y, int color)
     {
-        drawString(stack, text, x + 1.0, y + 1.0, color, true);
+        drawString(stack, text, x + 0.5f, y + 0.5f, color, true);
         drawString(stack, text, x, y, color, false);
     }
 
@@ -84,7 +86,7 @@ public final class AWTFontRenderer implements Closeable, Globals
         float r = ((color >> 16) & 0xff) / 255.0f * brightnessMultiplier;
         float g = ((color >> 8) & 0xff) / 255.0f * brightnessMultiplier;
         float b = ((color) & 0xff) / 255.0f * brightnessMultiplier;
-        float a = ((color >> 24) & 0xff) / 255.0f;
+        float a = (color & 0xff000000) != 0xff000000 ? 1.0f : ((color >> 24) & 0xff) / 255.0f;
         drawString(stack, text, (float) x, (float) y, r, g, b, a, brightnessMultiplier);
     }
 
@@ -130,12 +132,13 @@ public final class AWTFontRenderer implements Closeable, Globals
         boolean formatting = false;
         int lineStart = 0;
         synchronized (cache) {
-            for (int i = 0; i < chars.length; i++) {
+            for (int i = 0; i < chars.length; i++)
+            {
                 char c = chars[i];
-                if (formatting) {
+                if (formatting)
+                {
                     formatting = false;
-                    char c1 = Character.toUpperCase(c);
-                    if (c1 == 'R')
+                    if (c == 'r')
                     {
                         r2 = r;
                         g2 = g;
@@ -143,7 +146,7 @@ public final class AWTFontRenderer implements Closeable, Globals
                     }
                     else
                     {
-                        int colorCode = getColorFromCode(c1);
+                        int colorCode = getColorFromCode(c);
                         int[] col = toRgbComponents(colorCode);
                         r2 = col[0] / 255.0f * brightnessMultiplier;
                         g2 = col[1] / 255.0f * brightnessMultiplier;
@@ -226,7 +229,7 @@ public final class AWTFontRenderer implements Closeable, Globals
         float r = ((color >> 16) & 0xff) / 255.0f * brightnessMultiplier;
         float g = ((color >> 8) & 0xff) / 255.0f * brightnessMultiplier;
         float b = ((color) & 0xff) / 255.0f * brightnessMultiplier;
-        float a = ((color >> 24) & 0xff) / 255.0f * brightnessMultiplier;
+        float a = (color & 0xff000000) != 0xff000000 ? 1.0f : ((color >> 24) & 0xff) / 255.0f * brightnessMultiplier;
         drawString(stack, text, (float) (x - getStringWidth(text) / 2f), (float) y, r, g, b, a, brightnessMultiplier);
     }
 
@@ -331,12 +334,13 @@ public final class AWTFontRenderer implements Closeable, Globals
                 .collect(Collectors.joining()));
     }
 
-    public int[] toRgbComponents(int rgb)
+    public int[] toRgbComponents(int color)
     {
-        int red = rgb >> 8 * 2 & 0xFF;
-        int green = rgb >> 8 & 0xFF;
-        int blue = rgb & 0xFF;
-        return new int[] { red, green, blue };
+        float r = (color >> 16) & 0xff;
+        float g = (color >> 8) & 0xff;
+        float b = (color) & 0xff;
+        float a = (color & 0xff000000) != 0xff000000 ? 255.0f : (color >> 24) & 0xff;
+        return new int[] {(int) r, (int) g, (int) b, (int) a};
     }
 
     private int getColorFromCode(char code)
