@@ -13,6 +13,8 @@ import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
+import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.impl.imixin.IChatHudLineVisible;
 import net.shoreline.eventbus.bus.EventBus;
@@ -147,16 +149,36 @@ public abstract class MixinChatHud implements IChatHud
             ((IChatHudLineVisible) (Object) visibleLine).setId(currentId);
             this.visibleMessages.add(0, visibleLine);
         }
-        while (this.visibleMessages.size() > 100) {
-            this.visibleMessages.remove(this.visibleMessages.size() - 1);
+        ChatLengthEvent chatLengthEvent = new ChatLengthEvent();
+        EventBus.INSTANCE.dispatch(chatLengthEvent);
+        boolean bl1 = chatLengthEvent.isCanceled();
+        if (!bl1)
+        {
+            while (this.visibleMessages.size() > 100) {
+                this.visibleMessages.remove(this.visibleMessages.size() - 1);
+            }
         }
         if (!refresh) {
             ChatHudLine chatHudLine = new ChatHudLine(ticks, chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, signature, indicator);
             ((IChatHudLine) (Object) chatHudLine).setId(currentId);
             this.messages.add(0, chatHudLine);
-            while (this.messages.size() > 100) {
-                this.messages.remove(this.messages.size() - 1);
+            if (!bl1)
+            {
+                while (this.messages.size() > 100) {
+                    this.messages.remove(this.messages.size() - 1);
+                }
             }
+        }
+    }
+
+    @Inject(method = "clear", at = @At(value = "HEAD"), cancellable = true)
+    private void hookClear(boolean clearHistory, CallbackInfo ci)
+    {
+        ChatHistoryEvent chatHistoryEvent = new ChatHistoryEvent();
+        EventBus.INSTANCE.dispatch(chatHistoryEvent);
+        if (chatHistoryEvent.isCanceled())
+        {
+            ci.cancel();
         }
     }
 

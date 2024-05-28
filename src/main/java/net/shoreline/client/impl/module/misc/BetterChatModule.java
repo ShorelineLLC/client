@@ -6,6 +6,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
+import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
+import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
@@ -29,6 +31,8 @@ public class BetterChatModule extends ToggleModule
     Config<Boolean> animationConfig = register(new BooleanConfig("Animation", "Animates the chat", false));
     Config<Integer> timeConfig = register(new NumberConfig<>("Anim-Time", "Time for the animation", 0, 200, 1000, () -> false));
     Config<Boolean> noSignatureConfig = register(new BooleanConfig("NoSignatureIndicator", "Removes the message signature indicator", false));
+    Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Makes chat length infinite", false));
+    Config<Boolean> keepChatConfig = register(new BooleanConfig("KeepChat", "Maintains chat history", false));
 
     public final Map<ChatHudLine, TimeAnimation> animationMap = new HashMap<>();
 
@@ -81,6 +85,24 @@ public class BetterChatModule extends ToggleModule
     @EventListener
     public void onSignatureIndicator(SignatureIndicatorEvent event) {
         if (noSignatureConfig.getValue()) {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onChatHistory(ChatHistoryEvent event)
+    {
+        if (keepChatConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onChatLength(ChatLengthEvent event)
+    {
+        if (infiniteConfig.getValue())
+        {
             event.cancel();
         }
     }
