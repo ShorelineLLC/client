@@ -190,10 +190,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private void attackPlace(BlockPos targetPos)
     {
-        if (AutoTotemModule.getInstance().isReplacing())
-        {
-            return;
-        }
         List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
         if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
         {
@@ -206,6 +202,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
             attackTimer.reset();
         }
+        entities.removeIf(e -> SurroundModule.getInstance().isEntityBlockingSurround(e));
         if (!entities.isEmpty()) {
             return;
         }
@@ -219,7 +216,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {

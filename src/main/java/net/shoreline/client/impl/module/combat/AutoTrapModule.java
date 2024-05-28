@@ -163,6 +163,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             }
             attackTimer.reset();
         }
+        entities.removeIf(e -> SurroundModule.getInstance().isEntityBlockingSurround(e));
         if (!entities.isEmpty()) {
             return;
         }
