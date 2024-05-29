@@ -135,7 +135,11 @@ public class NametagsModule extends ToggleModule {
                 double rx = pearlEntity.getX() - itemPos.getX();
                 double ry = pearlEntity.getY() - itemPos.getY();
                 double rz = pearlEntity.getZ() - itemPos.getZ();
-                RenderManager.renderSign(pearlEntity.getOwner().getName().getString(), rx, ry, rz, -1);
+                Entity thrower = pearlEntity.getOwner();
+                if (thrower instanceof PlayerEntity player)
+                {
+                    RenderManager.renderSign(player.getName().getString(), rx, ry, rz, getNametagColor(player));
+                }
             }
         }
 
