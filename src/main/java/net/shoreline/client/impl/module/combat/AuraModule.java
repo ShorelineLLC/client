@@ -143,7 +143,7 @@ public class AuraModule extends RotationModule {
     @EventListener
     public void onPlayerUpdate(PlayerTickEvent event) {
         if (AutoCrystalModule.getInstance().isAttacking()
-                || AutoCrystalModule.getInstance().isPlacing()) {
+                || AutoCrystalModule.getInstance().isPlacing() || mc.player.isSpectator()) {
             return;
         }
         final Vec3d eyepos = Managers.POSITION.getEyePos();

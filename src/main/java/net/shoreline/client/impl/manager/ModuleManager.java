@@ -148,6 +148,7 @@ public final class ModuleManager
                 new NoWeatherModule(),
                 new ParticlesModule(),
                 new PhaseESPModule(),
+                new ShadersModule(),
                 new SkeletonModule(),
                 new SkyboxModule(),
                 new TooltipsModule(),

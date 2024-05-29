@@ -1,6 +1,7 @@
 package net.shoreline.client.init;
 
 import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.render.shader.ShaderManager;
 import net.shoreline.client.impl.manager.EventManager;
 import net.shoreline.client.impl.manager.ModuleManager;
 import net.shoreline.client.impl.manager.anticheat.AntiCheatManager;
@@ -48,6 +49,7 @@ public class Managers {
     public static InteractionManager INTERACT;
     public static SoundManager SOUND;
     public static CapeManager CAPES;
+    public static ShaderManager SHADER;
     // The initialized state of the managers. If this is true, all managers
     // have been initialized and the init process is complete. As a general
     // rule, it is good practice to check this state before accessing instances.
@@ -79,6 +81,7 @@ public class Managers {
             INTERACT = new InteractionManager();
             COMMAND = new CommandManager();
             SOUND = new SoundManager();
+            SHADER = new ShaderManager();
             initialized = true;
         }
     }

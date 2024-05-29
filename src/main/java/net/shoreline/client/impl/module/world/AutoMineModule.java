@@ -107,7 +107,7 @@ public class AutoMineModule extends RotationModule {
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
-        if (mc.player.isCreative())
+        if (mc.player.isCreative() || mc.player.isSpectator())
         {
             return;
         }
@@ -303,7 +303,7 @@ public class AutoMineModule extends RotationModule {
     public void onAttackBlock(final AttackBlockEvent event)
     {
         // Do not try to break unbreakable blocks
-        if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir() || mc.player.isCreative())
+        if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir() || mc.player.isCreative() || mc.player.isSpectator())
         {
             return;
         }

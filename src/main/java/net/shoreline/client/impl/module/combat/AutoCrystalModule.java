@@ -205,6 +205,10 @@ public class AutoCrystalModule extends RotationModule {
 
     @EventListener
     public void onPlayerUpdate(PlayerTickEvent event) {
+        if (mc.player.isSpectator())
+        {
+            return;
+        }
         if (mc.player.isUsingItem() && mc.player.getActiveHand() == Hand.MAIN_HAND
                 || mc.options.attackKey.isPressed() || PlayerUtil.isHotbarKeysPressed()) {
             autoSwapTimer.reset();
