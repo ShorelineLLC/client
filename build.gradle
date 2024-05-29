@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.5-SNAPSHOT'
+    id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'com.github.gmazzo.buildconfig' version '5.3.5'
 }
 
@@ -30,6 +30,9 @@ loom {
 }
 
 repositories {
+    maven {
+        url "https://maven.ladysnake.org/releases"
+    }
     mavenCentral() {
         url "https://jitpack.io"
         url "https://impactdevelopment.github.io/maven/"
@@ -39,8 +42,10 @@ repositories {
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_version}:v2"
+
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "org.ladysnake:satin:${project.satin_version}"
     modImplementation "cabaletta:baritone-api:${baritone_api_version}"
 }
 
