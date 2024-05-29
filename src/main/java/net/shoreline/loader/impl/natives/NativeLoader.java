@@ -1,10 +1,15 @@
 package net.shoreline.loader.impl.natives;
 
+import net.fabricmc.loader.api.FabricLoader;
+import net.shoreline.loader.Loader;
+import net.shoreline.loader.Natives;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.stream.Collectors;
 
 public final class NativeLoader
 {
@@ -34,6 +39,28 @@ public final class NativeLoader
         fos.close();
 
         System.load(natives.getAbsolutePath());
+    }
+
+    public static void setUserCredentials()
+    {
+        Loader.LOGGER.info("Locating user credentials...");
+
+        String res = (String) Natives.stop_decompiling_5("unused_obscure");
+
+        String[] user = res.split(":");
+
+        Loader.getContext()
+                .setHwid(user[0])
+                .setUsername(user[1])
+                .setUid(user[2])
+                .setRunningMods(
+                        FabricLoader.getInstance().getAllMods()
+                                .stream()
+                                .map(mod -> mod.getMetadata().getName())
+                                .collect(Collectors.toList())
+                );
+
+        Loader.LOGGER.info("Welcome, {}!", Loader.getContext().username());
     }
 
     private static OSType getOS()

@@ -64,6 +64,7 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
     {
         System.setProperty("java.awt.headless", "true");
         GraphicsEnvironment.isHeadless();
+
         if (FabricLoader.getInstance().isDevelopmentEnvironment())
         {
             Loader.LOGGER.info("Dev workspace detected, loading natives...");
@@ -75,6 +76,8 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
             {
                 Loader.LOGGER.error("Failed to load native libraries", t);
             }
+
+            NativeLoader.setUserCredentials();
 
             Loader.LOGGER.info("Native library successfully loaded, starting Shoreline...");
         }

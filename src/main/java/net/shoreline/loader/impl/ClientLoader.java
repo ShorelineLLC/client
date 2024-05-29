@@ -1,8 +1,8 @@
 package net.shoreline.loader.impl;
 
 import net.shoreline.loader.Loader;
-import net.shoreline.loader.impl.stage.LoadingStage;
-import net.shoreline.loader.impl.stage.authentication.AuthenticationStage;
+import net.shoreline.loader.impl.antidump.Measure;
+import net.shoreline.loader.impl.classloading.ClassLoader;
 
 public final class ClientLoader
 {
@@ -10,19 +10,14 @@ public final class ClientLoader
     {
         long startTime = System.currentTimeMillis();
 
-        LoadingStage currentStage = AuthenticationStage.getInstance();
-
-        while (currentStage != null)
+        try
         {
-            try
-            {
-                currentStage.run();
-            } catch (Throwable t)
-            {
-                currentStage.error(Loader.getContext(), t);
-            }
-
-            currentStage = currentStage.next();
+            // Run anti dump measures
+            Measure.runAllMeasures();
+            ClassLoader.loadAllClasses();
+        } catch (Throwable t)
+        {
+            throw new RuntimeException(t);
         }
 
         double timeElapsedInSeconds = (System.currentTimeMillis() - startTime) / 1000.0D;

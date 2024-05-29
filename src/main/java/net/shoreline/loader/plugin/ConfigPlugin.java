@@ -4,8 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.impl.launch.FabricLauncherBase;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.impl.ClientLoader;
@@ -14,11 +12,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +21,7 @@ public final class ConfigPlugin implements IMixinConfigPlugin
     @Override
     public void onLoad(String mixinPackage)
     {
-        Loader.LOGGER.info("Loading shoreline...");
+        Loader.LOGGER.info("Loading Shoreline...");
 
         try
         {
@@ -39,10 +32,11 @@ public final class ConfigPlugin implements IMixinConfigPlugin
             throw new RuntimeException(t);
         }
 
-        if (!FabricLoader.getInstance().isDevelopmentEnvironment())
-        {
-            ClientLoader.loadClient();
-        }
+        NativeLoader.setUserCredentials();
+
+        Natives.stop_decompiling_6(Loader.VERSION);
+
+        ClientLoader.loadClient();
     }
 
     @Override

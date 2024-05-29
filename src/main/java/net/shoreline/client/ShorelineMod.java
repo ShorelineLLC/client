@@ -17,6 +17,11 @@ public class ShorelineMod implements ClientModInitializer {
     public static final String MOD_BUILD_NUMBER = BuildConfig.BUILD_IDENTIFIER + "-" +  BuildConfig.BUILD_NUMBER;
     public static final String MOD_MC_VER = "1.20.4";
 
+    public ShorelineMod()
+    {
+
+    }
+
     /**
      * This code runs as soon as Minecraft is in a mod-load-ready state.
      * However, some things (like resources) may still be uninitialized.

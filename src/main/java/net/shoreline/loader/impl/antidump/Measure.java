@@ -1,9 +1,6 @@
-package net.shoreline.loader.impl.stage.antidump;
+package net.shoreline.loader.impl.antidump;
 
-import net.shoreline.loader.impl.stage.antidump.measures.AntiClassSaveDebug;
-import net.shoreline.loader.impl.stage.antidump.measures.ClassPresenceChecker;
-import net.shoreline.loader.impl.stage.antidump.measures.ClassReflectionDisabler;
-import net.shoreline.loader.impl.stage.antidump.measures.LaunchArgumentChecker;
+import net.shoreline.loader.impl.antidump.measures.*;
 
 import java.util.Set;
 
@@ -15,6 +12,7 @@ public abstract class Measure
     {
         Set<Measure> measures = Set.of(
                 new AntiClassSaveDebug(),
+                new AntiVirtualMachine(),
                 new ClassPresenceChecker(),
                 new ClassReflectionDisabler(),
                 new LaunchArgumentChecker()

@@ -1,6 +1,6 @@
-package net.shoreline.loader.impl.stage.antidump.measures;
+package net.shoreline.loader.impl.antidump.measures;
 
-import net.shoreline.loader.impl.stage.antidump.Measure;
+import net.shoreline.loader.impl.antidump.Measure;
 
 import java.lang.management.ManagementFactory;
 

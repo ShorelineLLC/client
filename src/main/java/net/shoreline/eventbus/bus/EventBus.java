@@ -4,7 +4,7 @@ import net.shoreline.eventbus.Event;
 
 public final class EventBus
 {
-    public static EventBus INSTANCE = new EventBus();
+    public static final EventBus INSTANCE = new EventBus();
 
     // Our null head invoker. Created natively in init
     private stop_decompiling a;

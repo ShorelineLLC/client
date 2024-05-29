@@ -48,9 +48,9 @@ public final class AWTFontRenderer implements Closeable, Globals
         {
             this.font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
         }
-        catch (FontFormatException | IOException e)
+        catch (Throwable t)
         {
-            e.printStackTrace();
+            t.printStackTrace();
             this.font = new Font("Verdana", Font.PLAIN, Math.round(size));
         }
         this.size = size;

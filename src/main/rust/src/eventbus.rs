@@ -1,6 +1,3 @@
-use std::ffi::CStr;
-use std::hash::{Hash, Hasher};
-use std::ptr::{null, null_mut};
 use jni::JNIEnv;
 use jni::objects::{JClass, JMethodID, JObject, JString, JValue};
 use jni::signature::JavaType;

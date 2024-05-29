@@ -13,6 +13,7 @@ fltk = { version = "1.1", features = ["fltk-bundled"] }
 serde_json = "1.0.117"
 priority-queue = "2.0.2"
 log = "0.4.21"
+winapi = { version = "0.3.9", default-features = false, features = ["debugapi"] }
 
 [lib]
 crate_type = ["cdylib"]

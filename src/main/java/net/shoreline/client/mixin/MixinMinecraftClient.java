@@ -12,7 +12,6 @@ import net.shoreline.client.impl.event.*;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.imixin.IMinecraftClient;
-import net.shoreline.client.init.Fonts;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

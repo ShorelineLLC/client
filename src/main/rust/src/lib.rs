@@ -1,5 +1,6 @@
 mod utils;
 mod eventbus;
+mod antivm;
 
 extern crate jni;
 
@@ -12,12 +13,17 @@ use jni::strings::{JNIString};
 use jni::objects::{JObject, JValue, JString, JClass, GlobalRef};
 use std::ffi::{CStr, CString};
 use std::fmt::format;
-use std::ptr::null_mut;
+use std::process::exit;
+use std::ptr::{null, null_mut};
 use hardware_id::get_id;
 use jni::signature::JavaType;
 use jni::signature::Primitive::Int;
+use winapi::um::debugapi::IsDebuggerPresent;
+use crate::antivm::inside_vm;
 use crate::eventbus::INVOKE;
 use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
+
+static mut USER_INFO: Option<GlobalRef> = None;
 
 static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
 
@@ -25,38 +31,152 @@ static mut MIXIN_CONFIG: Option<GlobalRef> = None;
 static mut MIXIN_REFMAP: Option<GlobalRef> = None;
 
 #[no_mangle]
-pub unsafe extern "system" fn JNI_OnLoad(vm: *mut JavaVM,
+pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
                                          _reserved: &mut c_void) -> c_int
 {
-    // Make our event bus
+    let env = vm.get_env().unwrap();
 
-    // let jvm_ptr = Vec::with_capacity(1).as_mut_ptr();
-    // let count = null_mut();
-    //
-    // JNI_GetCreatedJavaVMs(jvm_ptr, 1, count);
-    //
-    // let mut env_ptr: *mut c_void = null_mut();
-    //
-    // // Call GetEnv to obtain the JNIEnv pointer
-    // let result = (*jvm_ptr).GetEnv.unwrap()(jvm_ptr, &mut env_ptr, JNI_VERSION_1_8);
-    //
-    // let env = vm.get_env().unwrap();
-    //
-    // let event_bus = env.new_object(
-    //     obfstr!("net/shoreline/client/api/event/EventBus"),
-    //     obfstr!("()V"),
-    //     &[]
-    // ).unwrap();
-    //
-    //
-    // let event_bus_class = env.get_object_class(event_bus).unwrap();
-    //
-    // env.set_field(
-    //     event_bus_class,
-    //     obfstr!("INSTANCE"),
-    //     obfstr!("Lnet/shoreline/client/api/event/EventBus;"),
-    //     event_bus.into()
-    // ).unwrap();
+    let crash_clazz = env.find_class(
+        obfstr!("java/lang/System")
+    ).unwrap();
+
+    let raw_hwid = match get_id()
+    {
+        Ok(res) => {
+            res
+        }
+        Err(error) => {
+            error_message(
+                obfstr!("Shoreline failed to retrieve your computer information.\n\nPlease contact a developer!")
+            );
+
+            crash(&env, crash_clazz);
+
+            return JNI_VERSION_1_8;
+        }
+    };
+
+    let hwid = encrypt(&raw_hwid);
+
+    let url_string = JNIString::from(
+        obfstr!("https://api.shorelineclient.net/auth")
+    );
+
+    let url = env.new_object(
+        obfstr!("java/net/URL"),
+        obfstr!("(Ljava/lang/String;)V"),
+        &[env.new_string(url_string).unwrap().into()]
+    ).unwrap();
+
+    let url_connection = env.call_method(
+        url,
+        obfstr!("openConnection"),
+        obfstr!("()Ljava/net/URLConnection;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
+    let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
+
+    env.call_method(
+        url_connection,
+        obfstr!("addRequestProperty"),
+        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
+        &[user_agent.into(), user_agent_value.into()]
+    ).unwrap().v().unwrap();
+
+    let hwid_req = env.new_string(obfstr!("HWID")).unwrap();
+    let hwid_req_value = env.new_string(hwid).unwrap();
+
+    env.call_method(
+        url_connection,
+        obfstr!("addRequestProperty"),
+        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
+        &[hwid_req.into(), hwid_req_value.into()]
+    ).unwrap().v().unwrap();
+
+    let get_response_code = env.get_method_id(
+        obfstr!("java/net/HttpURLConnection"),
+        obfstr!("getResponseCode"),
+        obfstr!("()I")
+    ).unwrap();
+
+    let http_response = env.call_method_unchecked(
+        url_connection,
+        get_response_code,
+        JavaType::Primitive(Int),
+        &[]
+    );
+
+    let http_response_code = match http_response
+    {
+        Ok(code) => code.i().unwrap(),
+        Err(_) => {
+            -1
+        }
+    };
+
+    match http_response_code
+    {
+        -1 => {
+            error_message(
+                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
+            );
+
+            crash(&env, crash_clazz);
+        }
+        200 => {
+            let input_stream = env.call_method(
+                url_connection,
+                obfstr!("getInputStream"),
+                obfstr!("()Ljava/io/InputStream;"),
+                &[]
+            ).unwrap().l().unwrap();
+
+            let input_stream_reader = env.new_object(
+                obfstr!("java/io/InputStreamReader"),
+                obfstr!("(Ljava/io/InputStream;)V"),
+                &[input_stream.into()]
+            ).unwrap();
+
+            let buffered_reader = env.new_object(
+                obfstr!("java/io/BufferedReader"),
+                obfstr!("(Ljava/io/Reader;)V"),
+                &[input_stream_reader.into()]
+            ).unwrap();
+
+            let read_line = env.call_method(
+                buffered_reader,
+                obfstr!("readLine"),
+                obfstr!("()Ljava/lang/String;"),
+                &[]
+            ).unwrap().l().unwrap();
+
+            USER_INFO = Some(
+                env.new_global_ref(read_line).unwrap()
+            );
+        }
+        401 => {
+            error_message(
+                obfstr!("Invalid user credentials.\n\nPurchase your own version of Shoreline at shorelineclient.net!")
+            );
+
+            crash(&env, crash_clazz);
+        }
+
+        _ => {
+            let msg = format!(
+                "{}{}{}",
+                obfstr!("Internal server error "),
+                http_response_code,
+                obfstr!(".\n\nPlease contact Shoreline support!")
+            );
+
+            error_message(&msg);
+
+            crash(&env, crash_clazz);
+        }
+    }
 
     return JNI_VERSION_1_8
 }
@@ -99,14 +219,20 @@ pub extern "system" fn stop_decompiling_0<'a>(env: JNIEnv<'a>,
  */
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_11"]
-pub unsafe extern "system" fn stop_decompiling_1<'a>(_env: JNIEnv<'a>,
-                                                     _caller_class: JClass<'a>,
+pub unsafe extern "system" fn stop_decompiling_1<'a>(env: JNIEnv<'a>,
+                                                     caller_class: JClass<'a>,
                                                      _unused_obscure: JObject<'a>) -> JObject<'a>
 {
-    match MIXIN_CONFIG.as_ref().take()
+    return match MIXIN_CONFIG.as_ref().take()
     {
         Some(config_ref) => config_ref.as_obj(),
-        None => JObject::null(),
+        None => {
+            error_message(obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 1"));
+
+            crash(&env, caller_class);
+
+            JObject::null()
+        }
     }
 }
 
@@ -115,14 +241,20 @@ pub unsafe extern "system" fn stop_decompiling_1<'a>(_env: JNIEnv<'a>,
  */
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_12"]
-pub unsafe extern "system" fn stop_decompiling_2<'a>(_env: JNIEnv<'a>,
-                                                     _caller_class: JClass<'a>,
+pub unsafe extern "system" fn stop_decompiling_2<'a>(env: JNIEnv<'a>,
+                                                     caller_class: JClass<'a>,
                                                      _unused_obscure: JObject<'a>) -> JObject<'a>
 {
-    match MIXIN_REFMAP.as_ref().take()
+    return match MIXIN_REFMAP.as_ref().take()
     {
         Some(refmap_ptr) => refmap_ptr.as_obj().clone(),
-        None => JObject::null(),
+        None => {
+            error_message(obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 2"));
+
+            crash(&env, caller_class);
+
+            JObject::null()
+        }
     }
 }
 
@@ -490,11 +622,9 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                 match name
                 {
                     "mixins.shoreline.json" => {
-                        println!("found config");
                         MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
                     }
                     "shoreline-refmap.json" => {
-                        println!("found refmap");
                         MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
                     }
                     _ => {
@@ -502,7 +632,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                         {
                             let dependents = get_immediate_dependents(&env, jvm_bytes);
 
-                            if dependents.iter().any(|s| s.starts_with("net/minecraft/"))
+                            if dependents.iter().any(|s| s.starts_with(obfstr!("net/minecraft/")))
                             {
                                 env.call_method(
                                     class_map,
@@ -543,15 +673,13 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                             } else
                             {
                                 // Cache it if it is mentioned in a Mixin
-                                if name.contains("net/shoreline/client/impl/event/")
+                                if name.contains(obfstr!("net/shoreline/client/impl/event/"))
                                     // Other exclusions
-                                    || name.contains("net/shoreline/client/util/Globals")
-                                    || name.contains("net/shoreline/client/util/network/InteractType")
-                                    || name.contains("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture")
+                                    || name.contains(obfstr!("net/shoreline/client/util/Globals"))
+                                    || name.contains(obfstr!("net/shoreline/client/util/network/InteractType"))
+                                    || name.contains(obfstr!("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture"))
 
-                                    || name.contains("net/shoreline/client/init/Fonts")
-                                    || name.contains("net/shoreline/client/init/Managers")
-                                    || name.contains("net/shoreline/client/impl/manager/player/rotation/RotationManager")
+                                    || name.contains("net/shoreline/client/api/render/RenderLayersClient")
                                 {
                                     env.call_method(
                                         class_map,
@@ -567,6 +695,11 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                         } else if name.starts_with(obfstr!("assets/"))
                         {
 
+                            // zo lazy
+                            // we will just package assets with the loader for now
+
+                            // this would require making our own urlclassloader which is really
+                            // prone to dumping anyway and will definitely send us down a rabbit hole of issues
                         }
                     }
                 }
@@ -617,7 +750,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         let rs_name = env.get_string((*name).into()).unwrap().to_str().unwrap().to_string();
         let mut dependencies = get_immediate_dependents(&env, *bytes);
 
-        dependencies.retain(|s| s.starts_with("net/shoreline/client/"));
+        dependencies.retain(|s| s.starts_with(obfstr!("net/shoreline/client/")));
 
         dependency_map.insert(rs_name.clone(), dependencies);
         bytes_map.insert(rs_name.clone(), bytes);
@@ -631,17 +764,24 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         {
             if dependencies.is_empty()
             {
-                let bytes = bytes_map.remove(class_name).unwrap();
-                let clazz = define_class(&env, class_name, *bytes);
+                let bytes = *bytes_map.remove(class_name).unwrap();
+
+                let dependents = get_immediate_dependents(&env, bytes);
+
+                let clazz = define_class(&env, class_name, bytes);
                 defined_this_iteration.push(class_name.clone());
 
-                // Add it to the reflection filter map
-                env.call_static_method(
-                    caller_class,
-                    obfstr!("stop_decompiling_8"),
-                    obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-                    &[clazz.into()]
-                ).unwrap().l().unwrap();
+                // Can't do enums since the JVM uses reflection to find their value
+                if !dependents.iter().any(|s| s.starts_with(obfstr!("java/lang/Enum")))
+                {
+                    // Add it to the reflection filter map
+                    env.call_static_method(
+                        caller_class,
+                        obfstr!("stop_decompiling_8"),
+                        obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                        &[clazz.into()]
+                    ).unwrap().l().unwrap();
+                }
             }
         }
 
@@ -665,10 +805,10 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_14"]
 pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
-                                                     _caller_class: JClass<'a>,
+                                                     caller_class: JClass<'a>,
                                                      _unused_obscure: JObject<'a>) -> JObject<'a>
 {
-    match LATE_LOADING_CLASSES.as_ref().take()
+    return match LATE_LOADING_CLASSES.as_ref().take()
     {
         Some(class_cache) =>
             {
@@ -716,19 +856,39 @@ pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
                     let name_ptr = env.get_string_utf_chars(key).unwrap();
                     let name = CStr::from_ptr(name_ptr).to_str().unwrap();
 
-                    define_class(&env, name, value);
+                    let dependents = get_immediate_dependents(&env, value);
+
+                    let clazz = define_class(&env, name, value);
+
+                    // Can't do enums since the JVM uses reflection to find their value
+                    if !dependents.iter().any(|s| s.starts_with(obfstr!("java/lang/Enum")))
+                    {
+                        // Add it to the reflection filter map
+                        env.call_static_method(
+                            caller_class,
+                            obfstr!("stop_decompiling_8"),
+                            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[clazz.into()]
+                        ).unwrap().l().unwrap();
+                    }
 
                     env.release_string_utf_chars(key, name_ptr).unwrap();
                 }
-            },
-        None => panic!("unable to complete native method stop_decompiling_4")
-    }
 
-    return JObject::null();
+                JObject::null()
+            },
+        None => {
+            error_message(obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 4"));
+
+            crash(&env, caller_class);
+
+            JObject::null()
+        }
+    }
 }
 
 /**
- * Connect to the server and attempt to authorize the user
+ * Return the user information retrieved earlier
  */
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_15"]
@@ -736,144 +896,17 @@ pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      _unused_obscure: JObject<'a>) -> JObject<'a>
 {
-    let raw_hwid = match get_id()
+    return match USER_INFO.as_ref().take()
     {
-        Ok(res) => {
-            res
-        }
-        Err(error) => {
-            let error_message = CString::new(error.to_string());
-
-            env.throw_new(
-                obfstr!("java/lang/Throwable"),
-                error_message.unwrap().to_str().unwrap()
-            ).unwrap();
-
-            return JObject::null();
-        }
-    };
-
-    let hwid = encrypt(&raw_hwid);
-
-    let url_string = JNIString::from(
-        obfstr!("https://api.shorelineclient.net/auth")
-    );
-
-    let url = env.new_object(
-        obfstr!("java/net/URL"),
-        obfstr!("(Ljava/lang/String;)V"),
-        &[env.new_string(url_string).unwrap().into()]
-    ).unwrap();
-
-    let url_connection = env.call_method(
-        url,
-        obfstr!("openConnection"),
-        obfstr!("()Ljava/net/URLConnection;"),
-        &[]
-    ).unwrap().l().unwrap();
-
-    let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
-    let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
-
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[user_agent.into(), user_agent_value.into()]
-    ).unwrap().v().unwrap();
-
-    let hwid_req = env.new_string(obfstr!("HWID")).unwrap();
-    let hwid_req_value = env.new_string(hwid).unwrap();
-
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[hwid_req.into(), hwid_req_value.into()]
-    ).unwrap().v().unwrap();
-
-    let get_response_code = env.get_method_id(
-        obfstr!("java/net/HttpURLConnection"),
-        obfstr!("getResponseCode"),
-        obfstr!("()I")
-    ).unwrap();
-
-    let http_response = env.call_method_unchecked(
-        url_connection,
-        get_response_code,
-        JavaType::Primitive(Int),
-        &[]
-    );
-
-    let http_response_code = match http_response
-    {
-        Ok(code) => code.i().unwrap(),
-        Err(_) => {
-            -1
-        }
-    };
-
-    match http_response_code
-    {
-        -1 => {
-            error_message(
-                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
-            );
+        Some(user_info_ref) => user_info_ref.as_obj(),
+        None => {
+            error_message(obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 5"));
 
             crash(&env, caller_class);
-        }
-        200 => {
-            let input_stream = env.call_method(
-                url_connection,
-                obfstr!("getInputStream"),
-                obfstr!("()Ljava/io/InputStream;"),
-                &[]
-            ).unwrap().l().unwrap();
 
-            let input_stream_reader = env.new_object(
-                obfstr!("java/io/InputStreamReader"),
-                obfstr!("(Ljava/io/InputStream;)V"),
-                &[input_stream.into()]
-            ).unwrap();
-
-            let buffered_reader = env.new_object(
-                obfstr!("java/io/BufferedReader"),
-                obfstr!("(Ljava/io/Reader;)V"),
-                &[input_stream_reader.into()]
-            ).unwrap();
-
-            let read_line = env.call_method(
-                buffered_reader,
-                obfstr!("readLine"),
-                obfstr!("()Ljava/lang/String;"),
-                &[]
-            ).unwrap().l().unwrap();
-
-            return read_line;
-        }
-        401 => {
-            error_message(
-                obfstr!("Invalid user credentials.\n\nPurchase your own version of Shoreline at shorelineclient.net!")
-            );
-
-            crash(&env, caller_class);
-        }
-
-        _ => {
-            let msg = format!(
-                "{}{}{}",
-                obfstr!("Internal server error "),
-                http_response_code,
-                obfstr!(".\n\nPlease contact Shoreline support!")
-            );
-
-            error_message(&msg);
-
-            crash(&env, caller_class);
+            JObject::null()
         }
     }
-
-    return JObject::null();
 }
 
 /**
@@ -978,7 +1011,7 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
             if !server_ver.eq(loader_ver)
             {
                 error_message(
-                    obfstr!("Your Shoreline loader is out of date!\n\n Please install the latest version via the installer.")
+                    obfstr!("Your Shoreline loader is out of date!\n\nPlease install the latest version via the installer.")
                 );
 
                 crash(&env, caller_class);
@@ -1081,26 +1114,51 @@ pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
     return JObject::null();
 }
 
-/**
- * Returns an array of all methods in the class
- */
-
 #[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_19"]
 pub unsafe extern "system" fn stop_decompiling_9<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
-                                                     class: JObject<'a>) -> JObject<'a>
+                                                     information_array: JObject<'a>) -> JObject<'a>
 {
-    let get_declared_methods = env.get_method_id(
-        env.find_class(obfstr!("java/lang/Class")).unwrap(),
-        obfstr!("getDeclaredMethods0"),
-        obfstr!("(Z)[Ljava/lang/reflect/Method;")
-    ).unwrap();
+    if IsDebuggerPresent() != 0
+    {
+        error_message(
+            obfstr!("We know what you did")
+        );
 
-    return env.call_method_unchecked(
-        class,
-        get_declared_methods,
-        JavaType::Array(Box::from(JavaType::Object(String::from(obfstr!("Ljava/lang/reflect/Method;"))))),
-        &[JValue::Bool(0)]
-    ).unwrap().l().unwrap();
+        let message = env.new_string(obfstr!("Native debugger present")).unwrap();
+
+        env.set_object_array_element(*information_array, 0, message).unwrap();
+
+        env.call_static_method(
+            caller_class,
+            obfstr!("stop_decompiling_7"),
+            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+            &[information_array.into()]
+        ).unwrap().l().unwrap();
+
+        crash(&env, caller_class);
+    }
+
+    if inside_vm()
+    {
+        error_message(
+            obfstr!("We know what you did")
+        );
+
+        let message = env.new_string(obfstr!("Launched inside VM")).unwrap();
+
+        env.set_object_array_element(*information_array, 0, message).unwrap();
+
+        env.call_static_method(
+            caller_class,
+            obfstr!("stop_decompiling_7"),
+            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+            &[information_array.into()]
+        ).unwrap().l().unwrap();
+
+        crash(&env, caller_class);
+    }
+
+    return JObject::null();
 }
