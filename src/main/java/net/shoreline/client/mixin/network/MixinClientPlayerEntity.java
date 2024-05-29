@@ -12,14 +12,13 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.entity.SwingEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.imixin.IClientPlayerEntity;
-import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.bus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -180,7 +179,6 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     private void hookTickPre(CallbackInfo ci) {
         PlayerTickEvent playerTickEvent = new PlayerTickEvent();
         EventBus.INSTANCE.dispatch(playerTickEvent);
-        Managers.ROTATION.onUpdate();
     }
 
     /**

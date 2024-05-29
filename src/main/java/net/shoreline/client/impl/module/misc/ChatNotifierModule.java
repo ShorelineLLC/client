@@ -31,6 +31,10 @@ public class ChatNotifierModule extends ToggleModule {
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event) {
+        if (mc.world == null)
+        {
+            return;
+        }
         if (event.getPacket() instanceof EntityStatusS2CPacket packet && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING && totemPopConfig.getValue()) {
             Entity entity = packet.getEntity(mc.world);
             if (!(entity instanceof LivingEntity) || entity.getDisplayName() == null) {
@@ -53,11 +57,11 @@ public class ChatNotifierModule extends ToggleModule {
         {
             if (Managers.ANTICHEAT.isGrim())
             {
-                ChatUtil.clientSendMessage("This server is running GrimAC.");
+                ChatUtil.clientSendMessage("This server is running GrimAC.", 101);
             }
             else
             {
-                ChatUtil.clientSendMessage("This server is not running GrimAC.");
+                ChatUtil.clientSendMessage("This server is not running GrimAC.", 101);
             }
         }
     }

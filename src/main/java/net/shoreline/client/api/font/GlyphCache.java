@@ -40,7 +40,8 @@ public class GlyphCache implements Globals
         this.padding = padding;
     }
 
-    public Glyph getGlyph(char c) {
+    public Glyph getGlyph(char c)
+    {
         if (!generated)
         {
             createBitmap();

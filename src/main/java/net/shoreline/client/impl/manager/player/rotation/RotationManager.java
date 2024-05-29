@@ -3,6 +3,7 @@ package net.shoreline.client.impl.manager.player.rotation;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.eventbus.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.bus.EventBus;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.MIN_VALUE;
 
 /**
  * @author linus, bon55
@@ -58,7 +60,8 @@ public class RotationManager implements Globals {
         }
     }
 
-    public void onUpdate() {
+    @EventListener(priority = MIN_VALUE)
+    public void onUpdate(PlayerTickEvent event) {
         if (requests.isEmpty()) {
             rotation = null;
             return;

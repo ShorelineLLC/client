@@ -1,6 +1,7 @@
 package net.shoreline.client.init;
 
 import net.shoreline.client.Shoreline;
+import net.shoreline.client.impl.manager.EventManager;
 import net.shoreline.client.impl.manager.ModuleManager;
 import net.shoreline.client.impl.manager.anticheat.AntiCheatManager;
 import net.shoreline.client.impl.manager.client.AccountManager;
@@ -30,6 +31,7 @@ public class Managers {
     public static NetworkManager NETWORK;
     public static MacroManager MACRO;
     public static ModuleManager MODULE;
+    public static EventManager EVENT;
     public static CommandManager COMMAND;
     public static SocialManager SOCIAL;
     public static WaypointManager WAYPOINT;
@@ -62,6 +64,7 @@ public class Managers {
             NETWORK = new NetworkManager();
             MACRO = new MacroManager();
             MODULE = new ModuleManager();
+            EVENT = new EventManager();
             SOCIAL = new SocialManager();
             WAYPOINT = new WaypointManager();
             ACCOUNT = new AccountManager();
