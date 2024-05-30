@@ -288,7 +288,7 @@ public class ChamsModule extends ToggleModule {
             RenderSystem.enableBlend();
             // RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
             RenderSystem.defaultBlendFunc();
-            // RenderSystem.disableCull();
+            RenderSystem.disableCull();
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexConsumer = tessellator.getBuffer();
             RenderSystem.setShader(GameRenderer::getPositionProgram);
@@ -334,7 +334,7 @@ public class ChamsModule extends ToggleModule {
             tessellator.draw();
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             RenderSystem.disableBlend();
-            // RenderSystem.enableCull();
+            RenderSystem.enableCull();
             event.matrices.pop();
             event.cancel();
         }

@@ -66,7 +66,8 @@ public class NametagsModule extends ToggleModule {
     Config<Boolean> totemsConfig = register(new BooleanConfig("Totems", "Displays the player's popped totem count", false));
     Config<Float> scalingConfig = register(new NumberConfig<>("Scaling", "The nametag label scale", 0.001f, 0.003f, 0.01f));
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Renders nametags on invisible players", true));
-    Config<Boolean> borderedConfig = register(new BooleanConfig("TextBorder", "Renders a border behind the nametag", true));
+    Config<Boolean> backgroundConfig = register(new BooleanConfig("Background", "Renders a background behind the nametag", true));
+    Config<Boolean> borderedConfig = register(new BooleanConfig("Border", "Renders a border around the nametag", false));
     Config<Boolean> itemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
 
@@ -166,9 +167,14 @@ public class NametagsModule extends ToggleModule {
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.scale(-scaling, -scaling, -1.0f);
-        if (borderedConfig.getValue()) {
+        if (backgroundConfig.getValue()) {
             RenderManager.rect(matrices, -width - 1.0f, -1.0f, width * 2.0f + 2.0f,
                     mc.textRenderer.fontHeight + 1.0f, 0.0, 0x55000400);
+        }
+        if (borderedConfig.getValue())
+        {
+            RenderManager.borderedRect(matrices, -width - 1.0f, -1.0f, width * 2.0f + 2.0f,
+                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB());
         }
         int color = getNametagColor(entity);
         RenderManager.post(() -> {

@@ -202,7 +202,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
             attackTimer.reset();
         }
-        entities.removeIf(e -> SurroundModule.getInstance().isEntityBlockingSurround(e));
+        entities.removeIf(e -> isEntityBlockingTrap(e));
         if (!entities.isEmpty()) {
             return;
         }

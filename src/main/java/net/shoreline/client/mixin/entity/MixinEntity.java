@@ -202,4 +202,16 @@ public abstract class MixinEntity implements Globals {
             EventBus.INSTANCE.dispatch(setBBEvent);
         }
     }
+
+    @Inject(method = "doesRenderOnFire", at = @At(value = "HEAD"), cancellable = true)
+    private void hookDoesRenderOnFire(CallbackInfoReturnable<Boolean> cir)
+    {
+        RenderFireEntityEvent renderFireEntityEvent = new RenderFireEntityEvent();
+        EventBus.INSTANCE.dispatch(renderFireEntityEvent);
+        if (renderFireEntityEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(false);
+        }
+    }
 }

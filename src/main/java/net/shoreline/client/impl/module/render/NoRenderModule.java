@@ -14,6 +14,7 @@ import net.minecraft.registry.tag.FluidTags;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
 import net.shoreline.eventbus.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -56,6 +57,7 @@ public class NoRenderModule extends ToggleModule {
     Config<Boolean> explosionsConfig = register(new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true));
     Config<Boolean> campfiresConfig = register(new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false));
     Config<Boolean> totemConfig = register(new BooleanConfig("Totems", "Prevents totem particles from rendering", false));
+    Config<Boolean> fireEntityConfig = register(new BooleanConfig("FireEntities", "Prevents fire from rendering on entities", false));
     Config<Boolean> worldBorderConfig = register(new BooleanConfig("WorldBorder", "Prevents world border from rendering", false));
     Config<Boolean> interpolationConfig = register(new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false));
     Config<FogRender> fogConfig = register(new EnumConfig<>("Fog", "Prevents fog from rendering in the world", FogRender.OFF, FogRender.values()));
@@ -260,6 +262,15 @@ public class NoRenderModule extends ToggleModule {
     @EventListener
     public void onRenderToast(RenderToastEvent event) {
         if (guiToastConfig.getValue()) {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onRenderFireEntity(RenderFireEntityEvent event)
+    {
+        if (fireEntityConfig.getValue())
+        {
             event.cancel();
         }
     }

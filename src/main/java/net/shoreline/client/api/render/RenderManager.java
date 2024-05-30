@@ -294,6 +294,15 @@ public class RenderManager implements Globals {
         rect(matrices, x1, y1, x2, y2, 0.0, color);
     }
 
+    public static void borderedRect(MatrixStack matrices, double x1, double y1,
+                                    double x2, double y2, int borderColor)
+    {
+        rect(matrices, x1 - 0.5, y1 - 0.5, 0.5, y2 + 1.0, borderColor);
+        rect(matrices, x1 + x2, y1 - 0.5, 0.5, y2 + 1.0, borderColor);
+        rect(matrices, x1, y1 - 0.5, x2, 0.5, borderColor);
+        rect(matrices, x1, y1 + y2, x2, 0.5, borderColor);
+    }
+
     /**
      * @param matrices
      * @param x1
