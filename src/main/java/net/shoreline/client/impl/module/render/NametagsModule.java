@@ -174,7 +174,7 @@ public class NametagsModule extends ToggleModule {
         if (borderedConfig.getValue())
         {
             RenderManager.borderedRect(matrices, -width - 1.0f, -1.0f, width * 2.0f + 2.0f,
-                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB());
+                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB(), 0.3);
         }
         int color = getNametagColor(entity);
         RenderManager.post(() -> {
@@ -193,7 +193,7 @@ public class NametagsModule extends ToggleModule {
     private void drawText(MatrixStack matrices, String text, float x, float y, int color) {
         if (FontModule.getInstance().isEnabled())
         {
-            Fonts.CLIENT.drawStringWithShadow(matrices, text, x, y, color);
+            Fonts.CLIENT.drawStringWithShadow(matrices, text, x, y + 1.0f, color);
         }
         else
         {

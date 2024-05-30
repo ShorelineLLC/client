@@ -82,7 +82,7 @@ public final class AutoTotemModule extends ToggleModule
     @EventListener
     public void onTick(final TickEvent event)
     {
-        if (mc.player == null || mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen) || event.getStage() != StageEvent.EventStage.PRE)
+        if (mc.player == null || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
         }

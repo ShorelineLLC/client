@@ -7,11 +7,17 @@ out vec4 fragColor;
 uniform vec2 texelSize;
 uniform vec4 color;
 uniform float radius;
+uniform int dotRadius;
 
 void main() {
     vec4 centerCol = texture(DiffuseSampler, texCoord);
     if (centerCol.a > 0) {
-        fragColor = vec4(color.x, color.y, color.z, 0.5f);
+        if (dotRadius > 0 && int(gl_FragCoord.x) - (dotRadius * int(gl_FragCoord.x / dotRadius)) <= (dotRadius / 2.0f) && int(gl_FragCoord.y) - (dotRadius * int(gl_FragCoord.y / dotRadius)) <= (dotRadius / 2.0f)) {
+            fragColor = vec4(color.x, color.y, color.z, 1.0f);
+        }
+        else {
+            fragColor = color;
+        }
     }
     else {
         float closest = radius * 2.0f + 2.0f;
