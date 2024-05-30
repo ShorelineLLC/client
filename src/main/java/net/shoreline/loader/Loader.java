@@ -98,6 +98,6 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
             return new ByteArrayInputStream(content);
         }
 
-        return Loader.class.getResourceAsStream(name);
+        return Loader.class.getClassLoader().getResourceAsStream(name);
     }
 }
