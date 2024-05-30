@@ -1,11 +1,9 @@
 package net.shoreline.client.impl.module.render;
 
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.particle.FireworksSparkParticle;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityDamageS2CPacket;
 import net.minecraft.particle.ParticleTypes;
@@ -15,18 +13,19 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
-import net.shoreline.client.impl.event.entity.PlayerDamageEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class KillEffectsModule extends ToggleModule {
 
     Config<KillEffect> killEffectConfig = register(new EnumConfig<>("Effect", "The kill effect to apply", KillEffect.LIGHTNING, KillEffect.values()));
     Config<Integer> strikes = register(new NumberConfig<>("Strikes", "The number of lightning strikes", 1, 1, 5, () -> killEffectConfig.getValue() == KillEffect.LIGHTNING));
 
-    private Entity lastAttackedEntity;
-    private long lastAttackTime;
+    private final Map<Entity, Long> lastAttackedEntities = new HashMap<>();
 
     public KillEffectsModule() {
         super("KillEffects", "Adds effects to player deaths", ModuleCategory.RENDER);
@@ -65,13 +64,13 @@ public class KillEffectsModule extends ToggleModule {
         }
         if (event.getPacket() instanceof EntityDamageS2CPacket packet && packet.sourceCauseId() == mc.player.getId())
         {
+            lastAttackedEntities.entrySet().removeIf(e -> System.currentTimeMillis() - e.getValue() > 5000);
             Entity entity = mc.world.getEntityById(packet.entityId());
             if (entity == null)
             {
                 return;
             }
-            lastAttackedEntity = entity;
-            lastAttackTime = System.currentTimeMillis();
+            lastAttackedEntities.put(entity, System.currentTimeMillis());
         }
     }
     
@@ -105,7 +104,8 @@ public class KillEffectsModule extends ToggleModule {
 
     private boolean wasLastAttackedByPlayer(Entity entity)
     {
-        return entity.equals(lastAttackedEntity) && (System.currentTimeMillis() - lastAttackTime) < 5000;
+        Long lastAttackedTime = lastAttackedEntities.get(entity);
+        return lastAttackedTime != null && (System.currentTimeMillis() - lastAttackedTime) < 5000;
     }
 
     private enum KillEffect {
