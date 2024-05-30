@@ -106,6 +106,6 @@ public class ChatNotifierModule extends ToggleModule {
         if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player) {
             return;
         }
-        ChatUtil.clientSendMessage((isFriend ? "§b" : "§s") + playerName + "§f died after popping §s" + totems + "§f totems");
+        ChatUtil.clientSendMessage((isFriend ? "§b" : "§s") + playerName + "§f died after popping §s" + totems + "§f totems", 100);
     }
 }

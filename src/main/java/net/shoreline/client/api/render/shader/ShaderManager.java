@@ -21,7 +21,7 @@ public class ShaderManager implements Globals
 
     public void reloadShaders()
     {
-        if (framebuffer == null)
+        if (framebuffer == null || filledShaderEffect == null || filledShaderEffect1 == null)
         {
             framebuffer = new ShaderFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
             filledShaderEffect1 = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));

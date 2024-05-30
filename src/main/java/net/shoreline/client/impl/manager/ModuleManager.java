@@ -140,6 +140,7 @@ public final class ModuleManager
                 new FreecamModule(),
                 new FullbrightModule(),
                 new HoleESPModule(),
+                new KillEffectsModule(),
                 new NameProtectModule(),
                 new NametagsModule(),
                 new NoBobModule(),

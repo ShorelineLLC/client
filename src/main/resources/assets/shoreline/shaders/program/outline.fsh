@@ -12,7 +12,7 @@ uniform int dotRadius;
 void main() {
     vec4 centerCol = texture(DiffuseSampler, texCoord);
     if (centerCol.a > 0) {
-        if (dotRadius > 0 && int(gl_FragCoord.x) - (dotRadius * int(gl_FragCoord.x / dotRadius)) <= (dotRadius / 2.0f) && int(gl_FragCoord.y) - (dotRadius * int(gl_FragCoord.y / dotRadius)) <= (dotRadius / 2.0f)) {
+        if (dotRadius > 0 && int(gl_FragCoord.x) - (dotRadius * int(gl_FragCoord.x / dotRadius)) <= 2.0f && int(gl_FragCoord.y) - (dotRadius * int(gl_FragCoord.y / dotRadius)) <= 2.0f) {
             fragColor = vec4(color.x, color.y, color.z, 1.0f);
         }
         else {

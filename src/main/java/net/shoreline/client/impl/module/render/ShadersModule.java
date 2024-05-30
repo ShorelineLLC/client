@@ -32,7 +32,7 @@ public class ShadersModule extends ToggleModule {
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 0.5f, 1.0f, 2.0f, () -> outlineConfig.getValue()));
     Config<Boolean> dotsConfig = register(new BooleanConfig("Dots", "Hacker esp", false));
-    Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 2, 8, 16, () -> dotsConfig.getValue()));
+    Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue()));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render shaders on the player", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render shaders on other players", true));

@@ -5,12 +5,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.eventbus.bus.EventBus;
+import net.minecraft.world.entity.EntityLookup;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
-import org.jetbrains.annotations.Nullable;
+import net.shoreline.eventbus.bus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,8 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinClientWorld {
 
     @Shadow
-    @Nullable
-    public abstract Entity getEntityById(int id);
+    protected abstract EntityLookup<Entity> getEntityLookup();
 
     /**
      * @param entity
@@ -47,12 +46,12 @@ public abstract class MixinClientWorld {
      */
     @Inject(method = "removeEntity", at = @At(value = "HEAD"))
     private void hookRemoveEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci) {
-        Entity entity = getEntityById(entityId);
+        Entity entity = getEntityLookup().get(entityId);
         if (entity == null) {
             return;
         }
-        RemoveEntityEvent addEntityEvent = new RemoveEntityEvent(entity, removalReason);
-        EventBus.INSTANCE.dispatch(addEntityEvent);
+        RemoveEntityEvent removeEntityEvent = new RemoveEntityEvent(entity, removalReason);
+        EventBus.INSTANCE.dispatch(removeEntityEvent);
     }
 
     /**

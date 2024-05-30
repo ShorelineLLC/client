@@ -2,14 +2,15 @@ package net.shoreline.client.mixin.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.bus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -135,6 +136,17 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
         {
             cir.cancel();
             cir.setReturnValue(fallFlyingEvent.isFallFlying());
+        }
+    }
+
+    @Inject(method = "applyDamage", at = @At(value = "HEAD"))
+    private void hookDamage(DamageSource source, float amount, CallbackInfo ci)
+    {
+        // Idk this doesnt work with direct checks??
+        if (source.getAttacker() != null && source.getAttacker().getName().getString().equalsIgnoreCase(mc.player.getName().getString()))
+        {
+            PlayerDamageEvent playerDamageEvent = new PlayerDamageEvent((LivingEntity) (Object) this);
+            EventBus.INSTANCE.dispatch(playerDamageEvent);
         }
     }
 }

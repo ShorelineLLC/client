@@ -22,6 +22,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author linus
  * @since 1.0
@@ -125,6 +128,9 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
         rightClick = false;
     }
 
+    @Unique
+    private final List<Integer> deadList = new ArrayList<>();
+
     /**
      * @param ci
      */
@@ -135,9 +141,17 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
             tickPostEvent.setStage(StageEvent.EventStage.POST);
             EventBus.INSTANCE.dispatch(tickPostEvent);
             world.getEntities().forEach(entity -> {
-                if (entity instanceof LivingEntity e && e.isDead()) {
-                    EntityDeathEvent entityDeathEvent = new EntityDeathEvent(e);
-                    EventBus.INSTANCE.dispatch(entityDeathEvent);
+                if (entity instanceof LivingEntity e) {
+                    if (e.isDead() && !deadList.contains(e.getId()))
+                    {
+                        EntityDeathEvent entityDeathEvent = new EntityDeathEvent(e);
+                        EventBus.INSTANCE.dispatch(entityDeathEvent);
+                        deadList.add(e.getId());
+                    }
+                    else if (!e.isDead())
+                    {
+                        deadList.remove((Integer) e.getId());
+                    }
                 }
             });
         }
