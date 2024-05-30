@@ -76,7 +76,7 @@ public class ChatNotifierModule extends ToggleModule {
         if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player) {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" + playerName : playerName) + "§f entered your visual range");
+        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" + playerName : playerName) + "§f entered your visual range", 102);
     }
 
     @EventListener
@@ -89,7 +89,7 @@ public class ChatNotifierModule extends ToggleModule {
         if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player) {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" + playerName : "§c" + playerName) + "§f left your visual range");
+        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" + playerName : "§c" + playerName) + "§f left your visual range", 102);
     }
 
     @EventListener

@@ -41,7 +41,7 @@ public class ChatUtil implements Globals {
      * @param message
      */
     public static void clientSendMessageRaw(String message) {
-        clientSendMessage(message, 0);
+        clientSendMessageRaw(message, 0);
     }
 
     public static void clientSendMessageRaw(String message, int id) {
