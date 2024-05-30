@@ -1,10 +1,13 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.particle.FireworksSparkParticle;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.EntityDamageS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -13,6 +16,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.entity.PlayerDamageEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -53,10 +57,22 @@ public class KillEffectsModule extends ToggleModule {
     }
 
     @EventListener
-    public void onPlayerDamage(PlayerDamageEvent event)
+    public void onPacketInbound(PacketEvent.Inbound event)
     {
-        lastAttackedEntity = event.getDamaged();
-        lastAttackTime = System.currentTimeMillis();
+        if (mc.world == null || mc.player == null)
+        {
+            return;
+        }
+        if (event.getPacket() instanceof EntityDamageS2CPacket packet && packet.sourceCauseId() == mc.player.getId())
+        {
+            Entity entity = mc.world.getEntityById(packet.entityId());
+            if (entity == null)
+            {
+                return;
+            }
+            lastAttackedEntity = entity;
+            lastAttackTime = System.currentTimeMillis();
+        }
     }
     
     private void fireworkExplode(double x, double y, double z, double size, int amount)
