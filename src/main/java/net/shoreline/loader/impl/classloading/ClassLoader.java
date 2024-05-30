@@ -1,5 +1,7 @@
 package net.shoreline.loader.impl.classloading;
 
+import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
+import net.minecraft.resource.ResourcePack;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.context.UserContext;
@@ -20,6 +22,7 @@ public final class ClassLoader
         @SuppressWarnings("unchecked")
         Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.stop_decompiling_3(context.getInformationArray());
 
+        // Inject mixin service
         ShorelineMixinService service = new ShorelineMixinService(mixins);
 
         Method getInstance = MixinService.class.getDeclaredMethod("getInstance");
@@ -46,5 +49,17 @@ public final class ClassLoader
         serviceField.setAccessible(true);
 
         serviceField.set(internal, service);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static ShorelineResourcePack transformPack(ResourcePack pack)
+    {
+        if (pack instanceof ModNioResourcePack parent)
+        {
+            return new ShorelineResourcePack(parent);
+        }
+
+        // won't happen (pray to god)
+        throw new IllegalStateException("pack not instance of ModNioResourcePack");
     }
 }

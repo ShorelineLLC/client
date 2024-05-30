@@ -4,7 +4,6 @@ import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.asm.ClassScanner;
 import net.shoreline.loader.context.UserContext;
-import net.shoreline.loader.context.UserType;
 import net.shoreline.loader.impl.ClientLoader;
 import net.shoreline.loader.impl.antidump.Measure;
 import net.shoreline.loader.impl.classloading.ClassLoader;
@@ -23,7 +22,6 @@ public final class ClassReflectionDisabler extends Measure
                 ClassScanner.class,
 
                 UserContext.class,
-                UserType.class,
 
                 AntiClassSaveDebug.class,
                 AntiVirtualMachine.class,

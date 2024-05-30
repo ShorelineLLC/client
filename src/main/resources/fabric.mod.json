@@ -11,13 +11,12 @@
     "homepage": "https://fabricmc.net/"
   },
   "license": "None",
-  "icon": "assets/shoreline/icon/client_icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
+    "preLaunch": [
       "net.shoreline.loader.Loader"
     ],
-    "preLaunch": [
+    "client": [
       "net.shoreline.loader.Loader"
     ]
   },

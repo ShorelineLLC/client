@@ -30,6 +30,8 @@ static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
 static mut MIXIN_CONFIG: Option<GlobalRef> = None;
 static mut MIXIN_REFMAP: Option<GlobalRef> = None;
 
+static mut RESOURCES_MAP: Option<GlobalRef> = None;
+
 #[no_mangle]
 pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
                                          _reserved: &mut c_void) -> c_int
@@ -373,6 +375,16 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         &[user_agent.into(), user_agent_value.into()]
     ).unwrap().v().unwrap();
 
+    let user_type = env.new_string(obfstr!("User-Type")).unwrap();
+    let user_type_value = JString::from(env.get_object_array_element(*information_array, 3).unwrap());
+
+    env.call_method(
+        url_connection,
+        obfstr!("addRequestProperty"),
+        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
+        &[user_type.into(), user_type_value.into()]
+    ).unwrap().v().unwrap();
+
     let hash_req = env.new_string(obfstr!("hash")).unwrap();
     let hash_req_value = env.new_string(encrypted_bytes).unwrap();
 
@@ -512,6 +524,14 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         obfstr!("()V"),
         &[]
     ).unwrap();
+
+    let resources_map = env.new_object(
+        obfstr!("java/util/HashMap"),
+        obfstr!("()V"),
+        &[]
+    ).unwrap();
+
+    RESOURCES_MAP = env.new_global_ref(resources_map).ok();
 
     let url_string = JNIString::from(
         obfstr!("https://api.shorelineclient.net/assets/client.jar")
@@ -694,12 +714,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                             }
                         } else if name.starts_with(obfstr!("assets/"))
                         {
-
-                            // zo lazy
-                            // we will just package assets with the loader for now
-
-                            // this would require making our own urlclassloader which is really
-                            // prone to dumping anyway and will definitely send us down a rabbit hole of issues
+                            env.call_method(
+                                resources_map,
+                                obfstr!("put"),
+                                obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                &[jvm_name.into(), jvm_bytes.into()]
+                            ).unwrap();
                         }
                     }
                 }
@@ -1047,7 +1067,7 @@ pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
     let msg = env.get_object_array_element(*param_array, 0).unwrap();
     let hwid = env.get_object_array_element(*param_array, 1).unwrap();
     let username = env.get_object_array_element(*param_array, 2).unwrap();
-    let mods = env.get_object_array_element(*param_array, 3).unwrap();
+    let mods = env.get_object_array_element(*param_array, 4).unwrap(); // skip index 3, its usertype
 
     let msg_ptr = env.get_string_utf_chars(JString::from(msg)).unwrap();
     let hwid_ptr = env.get_string_utf_chars(JString::from(hwid)).unwrap();
@@ -1161,4 +1181,30 @@ pub unsafe extern "system" fn stop_decompiling_9<'a>(env: JNIEnv<'a>,
     }
 
     return JObject::null();
+}
+
+#[no_mangle]
+#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_110"]
+pub unsafe extern "system" fn stop_decompiling_10<'a>(env: JNIEnv<'a>,
+                                                     caller_class: JClass<'a>,
+                                                     resource_name: JObject<'a>) -> JObject<'a>
+{
+    return match RESOURCES_MAP.as_mut()
+    {
+        Some(resources_map) => {
+            return env.call_method(
+                resources_map.as_obj(),
+                obfstr!("get"),
+                obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                &[resource_name.into()]
+            ).unwrap().l().unwrap()
+        },
+        None => {
+            error_message(obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 10"));
+
+            crash(&env, caller_class);
+
+            JObject::null()
+        }
+    }
 }

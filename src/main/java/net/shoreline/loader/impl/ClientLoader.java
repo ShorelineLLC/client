@@ -10,10 +10,11 @@ public final class ClientLoader
     {
         long startTime = System.currentTimeMillis();
 
+        // Run anti dump measures
+        Measure.runAllMeasures();
+
         try
         {
-            // Run anti dump measures
-            Measure.runAllMeasures();
             ClassLoader.loadAllClasses();
         } catch (Throwable t)
         {

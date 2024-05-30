@@ -72,7 +72,7 @@ public final class AntiCheatManager implements Globals
             }
         }
         isGrim = true;
-        Shoreline.LOGGER.info("Server is running GrimAC.");
+        Shoreline.info("Server is running GrimAC.");
     }
 
     public boolean isGrim()

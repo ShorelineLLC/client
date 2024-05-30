@@ -3,7 +3,15 @@ package net.shoreline.client;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.LifecycledResourceManagerImpl;
+import net.minecraft.resource.NamespaceResourceManager;
+import net.minecraft.resource.ReloadableResourceManagerImpl;
+import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * Fabric {@link ModInitializer}.

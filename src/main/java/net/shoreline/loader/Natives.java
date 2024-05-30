@@ -34,7 +34,11 @@ public final class Natives
      * Downloads the client resources, assigns the mixin config & refmap in native memory
      * Dynamically loads and defines all the client classes
      *
-     * @param p0 User context information for internal alerting
+     * @param p0 A String array for alerting of:
+     *           [0] = null (unset alert message)
+     *           [1] = The HWID of the user
+     *           [2] = The username of the user
+     *           [3] = The usertype of the user (Used to retrieve the correct client jar from the server)
      * @return A <String, byte[]> map of mixin bytecode
      */
     public static native Object stop_decompiling_3(Object p0);
@@ -71,6 +75,7 @@ public final class Natives
      *           [0] = The message to send (or the reason why we are alerting)
      *           [1] = The HWID of the user
      *           [2] = The username of the user
+     *           [3] = The usertype of the user
      * @return Null
      */
     public static native Object stop_decompiling_7(Object p0);
@@ -84,7 +89,18 @@ public final class Natives
     public static native Object stop_decompiling_8(Object p0);
 
     /**
+     * Internal antidump checks, will crash & alert if fail
      *
+     * @param p0 User information array for alerting (see above)
+     * @return Null
      */
     public static native Object stop_decompiling_9(Object p0);
+
+    /**
+     * Gets a resource from the native memory
+     *
+     * @param p0 Name of the resource
+     * @return A byte array of its contents
+     */
+    public static native Object stop_decompiling_10(Object p0);
 }

@@ -10,13 +10,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 
 public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 {
     public static final String VERSION = "b0.0.1";
-    public static final Logger LOGGER = LogManager.getLogger("Shoreline [Loader]");
+    public static final Logger LOGGER = LogManager.getLogger("Shoreline");
 
     private static final UserContext context = UserContext.none();
 
@@ -81,5 +82,22 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 
             Loader.LOGGER.info("Native library successfully loaded, starting Shoreline...");
         }
+    }
+
+    public static InputStream getResource(String name)
+    {
+        if (!FabricLoader.getInstance().isDevelopmentEnvironment())
+        {
+            byte[] content = (byte[]) Natives.stop_decompiling_10(name);
+
+            if (content == null)
+            {
+                return null;
+            }
+
+            return new ByteArrayInputStream(content);
+        }
+
+        return Loader.class.getResourceAsStream(name);
     }
 }

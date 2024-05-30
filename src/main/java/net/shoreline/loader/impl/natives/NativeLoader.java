@@ -53,6 +53,7 @@ public final class NativeLoader
                 .setHwid(user[0])
                 .setUsername(user[1])
                 .setUid(user[2])
+                .setUserType(user[3])
                 .setRunningMods(
                         FabricLoader.getInstance().getAllMods()
                                 .stream()

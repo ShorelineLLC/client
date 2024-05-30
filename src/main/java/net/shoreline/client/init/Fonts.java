@@ -3,6 +3,7 @@ package net.shoreline.client.init;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.impl.font.AWTFontRenderer;
 import net.shoreline.client.impl.font.VanillaTextRenderer;
+import net.shoreline.loader.Loader;
 
 public class Fonts {
     //
@@ -17,7 +18,7 @@ public class Fonts {
         {
             return;
         }
-        CLIENT = new AWTFontRenderer(Shoreline.class.getClassLoader().getResourceAsStream("assets/shoreline/font/verdana.ttf"), 9.0f);
+        CLIENT = new AWTFontRenderer(Loader.getResource("assets/shoreline/font/verdana.ttf"), 9.0f);
         Shoreline.info("Loaded fonts!");
         initialized = true;
     }

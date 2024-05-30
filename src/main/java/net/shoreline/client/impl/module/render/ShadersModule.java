@@ -1,10 +1,15 @@
 package net.shoreline.client.impl.module.render;
 
 import ladysnake.satin.api.managed.ManagedShaderEffect;
+import ladysnake.satin.impl.ResettableManagedShaderEffect;
+import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.resource.Resource;
+import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -18,8 +23,10 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.loader.Loader;
 
 import java.awt.*;
+import java.util.List;
 
 /**
  * @author linus
@@ -42,6 +49,27 @@ public class ShadersModule extends ToggleModule {
     public ShadersModule()
     {
         super("Shaders", "Renders shaders over entities", ModuleCategory.RENDER);
+    }
+
+    @Override
+    protected void onEnable()
+    {
+        List<Resource> list = MinecraftClient
+                .getInstance()
+                .getResourceManager()
+                .getAllResources(new Identifier("shoreline", "program/"));
+
+        // namespaceresourcemanager.addpack
+
+        //ModNioResourcePack
+        // inputsupplier.create(path)
+
+        //ModNioResourcePack
+
+        for (Resource r : list)
+        {
+            Loader.LOGGER.info("Found resource " + r);
+        }
     }
 
     @EventListener

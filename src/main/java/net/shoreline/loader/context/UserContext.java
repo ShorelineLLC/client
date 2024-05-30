@@ -9,16 +9,19 @@ public final class UserContext
     private String hwid;
     private String username;
     private String uid;
+    private String usertype;
     private List<String> runningMods;
 
     public UserContext(String hwid,
                        String username,
                        String uid,
+                       String usertype,
                        List<String> runningMods)
     {
         this.hwid = hwid;
         this.username = username;
         this.uid = uid;
+        this.usertype = usertype;
         this.runningMods = runningMods;
     }
 
@@ -35,6 +38,11 @@ public final class UserContext
     public String uid()
     {
         return this.uid;
+    }
+
+    public String usertype()
+    {
+        return this.usertype;
     }
 
     public List<String> runningMods()
@@ -78,7 +86,19 @@ public final class UserContext
         return this;
     }
 
-    public UserContext setRunningMods(List<String> runningMods)
+    public UserContext setUserType(String usertype)
+    {
+        if (this.usertype != null)
+        {
+            throw new IllegalStateException("Field already set");
+        }
+
+        this.usertype = usertype;
+
+        return this;
+    }
+
+    public void setRunningMods(List<String> runningMods)
     {
         if (this.runningMods != null)
         {
@@ -86,13 +106,11 @@ public final class UserContext
         }
 
         this.runningMods = runningMods;
-
-        return this;
     }
 
     public boolean isNone()
     {
-        return this.hwid == null && this.username == null && this.uid == null && this.runningMods == null;
+        return this.hwid == null && this.username == null && this.uid == null && this.usertype == null && this.runningMods == null;
     }
 
     /**
@@ -120,12 +138,13 @@ public final class UserContext
                 null, // Message
                 this.hwid,
                 this.username,
+                this.usertype,
                 modList.substring(0, modList.length() - 2)
         };
     }
 
     public static UserContext none()
     {
-        return new UserContext(null, null, null, null);
+        return new UserContext(null, null, null, null, null);
     }
 }

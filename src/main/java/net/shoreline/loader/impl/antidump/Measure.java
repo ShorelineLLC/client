@@ -1,5 +1,6 @@
 package net.shoreline.loader.impl.antidump;
 
+import net.shoreline.loader.Loader;
 import net.shoreline.loader.impl.antidump.measures.*;
 
 import java.util.Set;
@@ -8,7 +9,7 @@ public abstract class Measure
 {
     public abstract void execute() throws Throwable;
 
-    public static void runAllMeasures() throws Throwable
+    public static void runAllMeasures()
     {
         Set<Measure> measures = Set.of(
                 new AntiClassSaveDebug(),
@@ -20,7 +21,13 @@ public abstract class Measure
 
         for (Measure measure : measures)
         {
-            measure.execute();
+            try
+            {
+                measure.execute();
+            } catch (Throwable t)
+            {
+                Loader.getContext().alert(t.getMessage());
+            }
         }
     }
 }
