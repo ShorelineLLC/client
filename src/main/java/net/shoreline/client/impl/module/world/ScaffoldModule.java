@@ -32,6 +32,7 @@ public final class ScaffoldModule extends RotationModule
 {
     Config<Mode> modeConfig = register(new EnumConfig<>("Mode", "", Mode.VANILLA, Mode.values()));
     Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "", false));
+    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true));
 
     private boolean stoppedServerSprint;
     private float[] lastAngles;
@@ -105,7 +106,7 @@ public final class ScaffoldModule extends RotationModule
         {
             Managers.INVENTORY.setSlot(slot);
         }
-        Managers.INTERACT.placeBlock(blockData.getHitResult(), slot, false, false, (state, angles) ->
+        boolean result = Managers.INTERACT.placeBlock(blockData.getHitResult(), slot, false, false, (state, angles) ->
         {
             final float[] rotations = blockData.getAngles();
             if (rotations == null)
@@ -130,6 +131,18 @@ public final class ScaffoldModule extends RotationModule
                 }
             }
         });
+        if (result)
+        {
+            if (towerConfig.getValue() && mc.options.jumpKey.isPressed())
+            {
+                final Vec3d velocity = mc.player.getVelocity();
+                final double velocityY = velocity.y;
+                if ((mc.player.isOnGround() || velocityY < 0.1) || velocityY <= 0.16477328182606651)
+                {
+                    mc.player.setVelocity(velocity.x, 0.42f, velocity.z);
+                }
+            }
+        }
     }
 
     @EventListener
