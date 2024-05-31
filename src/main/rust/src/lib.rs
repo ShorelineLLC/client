@@ -1,26 +1,22 @@
 mod utils;
 mod eventbus;
-mod antivm;
+mod antidump;
 
 extern crate jni;
 
 use std::collections::{HashMap, VecDeque};
 use jni::{JNIEnv, JavaVM};
 use obfstr::obfstr;
-use jni::sys::{JNI_GetCreatedJavaVMs, JNI_VERSION_1_8};
+use jni::sys::{JNI_VERSION_1_8};
 use std::os::raw::{c_void, c_int};
 use jni::strings::{JNIString};
 use jni::objects::{JObject, JValue, JString, JClass, GlobalRef};
-use std::ffi::{CStr, CString};
-use std::fmt::format;
-use std::process::exit;
-use std::ptr::{null, null_mut};
+use std::ffi::{CStr};
 use hardware_id::get_id;
 use jni::signature::JavaType;
 use jni::signature::Primitive::Int;
 use winapi::um::debugapi::IsDebuggerPresent;
-use crate::antivm::inside_vm;
-use crate::eventbus::INVOKE;
+use crate::antidump::{inside_vm, is_debugger_present, run_antidump_checks};
 use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
 
 static mut USER_INFO: Option<GlobalRef> = None;
@@ -47,7 +43,7 @@ pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
         Ok(res) => {
             res
         }
-        Err(error) => {
+        Err(_err) => {
             error_message(
                 obfstr!("Shoreline failed to retrieve your computer information.\n\nPlease contact a developer!")
             );
@@ -189,7 +185,6 @@ pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
  * Also, wow. Turns out native methods with underscores in them need to have a '1' appended
  * after the underscore, or it's not recognized as the correct function signature. What the fuck.
  */
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_10"]
 pub extern "system" fn stop_decompiling_0<'a>(env: JNIEnv<'a>,
                                               _caller_class: JClass<'a>,
@@ -219,7 +214,6 @@ pub extern "system" fn stop_decompiling_0<'a>(env: JNIEnv<'a>,
 /**
  * Return the mixin config
  */
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_11"]
 pub unsafe extern "system" fn stop_decompiling_1<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
@@ -241,7 +235,6 @@ pub unsafe extern "system" fn stop_decompiling_1<'a>(env: JNIEnv<'a>,
 /**
  * Return the mixin refmap
  */
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_12"]
 pub unsafe extern "system" fn stop_decompiling_2<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
@@ -281,7 +274,6 @@ pub fn log(env: &JNIEnv, msg: &str)
 /**
  * Download and store all client classes & resources
  */
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_13"]
 pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
@@ -639,89 +631,84 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                 let name_ptr = env.get_string_utf_chars(jvm_name).unwrap();
                 let name = CStr::from_ptr(name_ptr).to_str().unwrap();
 
-                match name
+                if name.ends_with(obfstr!(".class"))
                 {
-                    "mixins.shoreline.json" => {
-                        MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
-                    }
-                    "shoreline-refmap.json" => {
-                        MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
-                    }
-                    _ => {
-                        if name.ends_with(obfstr!(".class"))
+                    let dependents = get_immediate_dependents(&env, jvm_bytes);
+
+                    if dependents.iter().any(|s| s.starts_with(obfstr!("net/minecraft/")))
+                    {
+                        env.call_method(
+                            class_map,
+                            obfstr!("put"),
+                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[jvm_name.into(), jvm_bytes.into()]
+                        ).unwrap().l().unwrap();
+
+                        env.call_method(
+                            mc_class_dependents,
+                            obfstr!("put"),
+                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[jvm_name.into(), jvm_bytes.into()]
+                        ).unwrap();
+                    } else if is_mixin_class(&env, jvm_bytes)
+                    {
+                        env.call_method(
+                            class_map,
+                            obfstr!("put"),
+                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[jvm_name.into(), jvm_bytes.into()]
+                        ).unwrap().l().unwrap();
+
+                        if is_mixin_accessor(&env, jvm_bytes)
                         {
-                            let dependents = get_immediate_dependents(&env, jvm_bytes);
+                            class_queue.push_back((jvm_name, jvm_bytes));
+                        }
+                    } else if is_imixin_class(&env, jvm_bytes)
+                    {
+                        env.call_method(
+                            class_map,
+                            obfstr!("put"),
+                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[jvm_name.into(), jvm_bytes.into()]
+                        ).unwrap().l().unwrap();
 
-                            if dependents.iter().any(|s| s.starts_with(obfstr!("net/minecraft/")))
-                            {
-                                env.call_method(
-                                    class_map,
-                                    obfstr!("put"),
-                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                    &[jvm_name.into(), jvm_bytes.into()]
-                                ).unwrap().l().unwrap();
+                        class_queue.push_back((jvm_name, jvm_bytes));
+                    } else
+                    {
+                        // Cache it if it is mentioned in a Mixin
+                        if name.contains(obfstr!("net/shoreline/client/impl/event/"))
+                            // Other exclusions
+                            || name.contains(obfstr!("net/shoreline/client/util/Globals"))
+                            || name.contains(obfstr!("net/shoreline/client/util/network/InteractType"))
+                            || name.contains(obfstr!("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture"))
 
-                                env.call_method(
-                                    mc_class_dependents,
-                                    obfstr!("put"),
-                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                    &[jvm_name.into(), jvm_bytes.into()]
-                                ).unwrap();
-                            } else if is_mixin_class(&env, jvm_bytes)
-                            {
-                                env.call_method(
-                                    class_map,
-                                    obfstr!("put"),
-                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                    &[jvm_name.into(), jvm_bytes.into()]
-                                ).unwrap().l().unwrap();
-
-                                if is_mixin_accessor(&env, jvm_bytes)
-                                {
-                                    class_queue.push_back((jvm_name, jvm_bytes));
-                                }
-                            } else if is_imixin_class(&env, jvm_bytes)
-                            {
-                                env.call_method(
-                                    class_map,
-                                    obfstr!("put"),
-                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                    &[jvm_name.into(), jvm_bytes.into()]
-                                ).unwrap().l().unwrap();
-
-                                class_queue.push_back((jvm_name, jvm_bytes));
-                            } else
-                            {
-                                // Cache it if it is mentioned in a Mixin
-                                if name.contains(obfstr!("net/shoreline/client/impl/event/"))
-                                    // Other exclusions
-                                    || name.contains(obfstr!("net/shoreline/client/util/Globals"))
-                                    || name.contains(obfstr!("net/shoreline/client/util/network/InteractType"))
-                                    || name.contains(obfstr!("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture"))
-
-                                    || name.contains("net/shoreline/client/api/render/RenderLayersClient")
-                                {
-                                    env.call_method(
-                                        class_map,
-                                        obfstr!("put"),
-                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                        &[jvm_name.into(), jvm_bytes.into()]
-                                    ).unwrap().l().unwrap();
-                                }
-
-                                // Define it!
-                                class_queue.push_back((jvm_name, jvm_bytes));
-                            }
-                        } else if name.starts_with(obfstr!("assets/"))
+                            || name.contains("net/shoreline/client/api/render/RenderLayersClient")
                         {
                             env.call_method(
-                                resources_map,
+                                class_map,
                                 obfstr!("put"),
                                 obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
                                 &[jvm_name.into(), jvm_bytes.into()]
-                            ).unwrap();
+                            ).unwrap().l().unwrap();
                         }
+
+                        // Define it!
+                        class_queue.push_back((jvm_name, jvm_bytes));
                     }
+                } else if name.starts_with(obfstr!("assets/"))
+                {
+                    env.call_method(
+                        resources_map,
+                        obfstr!("put"),
+                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                        &[jvm_name.into(), jvm_bytes.into()]
+                    ).unwrap();
+                } else if name.eq(obfstr!("mixins.shoreline.json"))
+                {
+                    MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
+                } else if name.eq(obfstr!("shoreline-refmap.json"))
+                {
+                    MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
                 }
 
                 zip_entry = env.call_method(
@@ -822,7 +809,6 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 /**
  * Define all late-loading MC extending classes
  */
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_14"]
 pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
@@ -910,7 +896,6 @@ pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
 /**
  * Return the user information retrieved earlier
  */
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_15"]
 pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
@@ -932,7 +917,6 @@ pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
 /**
  * Confirm with the server that the loader versions match
  */
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_16"]
 pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
@@ -1058,7 +1042,6 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
  * Alerts the webhook and crashes
  */
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_17"]
 pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
@@ -1096,7 +1079,6 @@ pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
  * Adds the class to the reflection filter map
  */
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_18"]
 pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
                                                      _caller_class: JClass<'a>,
@@ -1134,39 +1116,20 @@ pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
     return JObject::null();
 }
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_19"]
 pub unsafe extern "system" fn stop_decompiling_9<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      information_array: JObject<'a>) -> JObject<'a>
 {
-    if IsDebuggerPresent() != 0
+    let antidump_check_result = run_antidump_checks();
+
+    if !antidump_check_result.eq(obfstr!("Safe"))
     {
         error_message(
             obfstr!("We know what you did")
         );
 
-        let message = env.new_string(obfstr!("Native debugger present")).unwrap();
-
-        env.set_object_array_element(*information_array, 0, message).unwrap();
-
-        env.call_static_method(
-            caller_class,
-            obfstr!("stop_decompiling_7"),
-            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-            &[information_array.into()]
-        ).unwrap().l().unwrap();
-
-        crash(&env, caller_class);
-    }
-
-    if inside_vm()
-    {
-        error_message(
-            obfstr!("We know what you did")
-        );
-
-        let message = env.new_string(obfstr!("Launched inside VM")).unwrap();
+        let message = env.new_string(antidump_check_result).unwrap();
 
         env.set_object_array_element(*information_array, 0, message).unwrap();
 
@@ -1183,7 +1146,6 @@ pub unsafe extern "system" fn stop_decompiling_9<'a>(env: JNIEnv<'a>,
     return JObject::null();
 }
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_110"]
 pub unsafe extern "system" fn stop_decompiling_10<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,

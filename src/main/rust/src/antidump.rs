@@ -1,4 +1,34 @@
 use std::arch::x86_64::{CpuidResult, __cpuid, _rdtsc};
+use std::ptr::null;
+use obfstr::obfstr;
+use winapi::um::debugapi::{CheckRemoteDebuggerPresent, IsDebuggerPresent};
+
+pub unsafe fn run_antidump_checks() -> String
+{
+    if is_debugger_present()
+    {
+        return String::from(obfstr!("Native debugger present"));
+    }
+
+    if inside_vm()
+    {
+        return String::from(obfstr!("Launched from VM"));
+    }
+
+    return String::from(obfstr!("Safe"));
+}
+
+// amazing code
+// we will be adding more checks later
+pub unsafe fn is_debugger_present() -> bool
+{
+    if IsDebuggerPresent() != 0
+    {
+        return true;
+    }
+
+    return false;
+}
 
 pub unsafe fn inside_vm() -> bool
 {

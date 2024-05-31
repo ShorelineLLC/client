@@ -10,11 +10,9 @@ public final class AntiClassSaveDebug extends Measure
     @Override
     public void execute() throws Throwable
     {
-        List<String> inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
-
-        boolean debugClassLoading = Boolean.parseBoolean(System.getProperty("legacy.debugClassLoading", "false")) || inputArguments.contains("-Dlegacy.debugClassLoading");
-        boolean debugClassLoadingFiner = Boolean.parseBoolean(System.getProperty("legacy.debugClassLoadingFiner", "false")) || inputArguments.contains("-Dlegacy.debugClassLoadingFiner");
-        boolean debugClassLoadingSave = Boolean.parseBoolean(System.getProperty("legacy.debugClassLoadingSave", "false")) || inputArguments.contains("-Dlegacy.debugClassLoadingSave");
+        boolean debugClassLoading = Boolean.parseBoolean(System.getProperty("legacy.debugClassLoading", "false"));
+        boolean debugClassLoadingFiner = Boolean.parseBoolean(System.getProperty("legacy.debugClassLoadingFiner", "false"));
+        boolean debugClassLoadingSave = Boolean.parseBoolean(System.getProperty("legacy.debugClassLoadingSave", "false"));
 
         if (debugClassLoading || debugClassLoadingFiner || debugClassLoadingSave)
         {

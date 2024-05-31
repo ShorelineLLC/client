@@ -1,13 +1,9 @@
 use jni::JNIEnv;
-use jni::objects::{JClass, JMethodID, JObject, JString, JValue};
+use jni::objects::{JMethodID, JObject, JValue};
 use jni::signature::JavaType;
-use jni::sys::{jmethodID, JNI_FALSE};
+use jni::sys::{JNI_FALSE};
 use obfstr::obfstr;
-use priority_queue::PriorityQueue;
-use log::log;
-use crate::log;
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_eventbus_bus_EventBus_init"]
 pub unsafe extern "system" fn init(env: JNIEnv,
                                    caller_instance: JObject)
@@ -26,7 +22,6 @@ pub unsafe extern "system" fn init(env: JNIEnv,
     ).unwrap();
 }
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_eventbus_bus_EventBus_subscribe"]
 pub unsafe extern "system" fn subscribe(env: JNIEnv,
                                         caller_instance: JObject,
@@ -145,7 +140,6 @@ pub unsafe extern "system" fn subscribe(env: JNIEnv,
     }
 }
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_eventbus_bus_EventBus_unsubscribe"]
 pub unsafe extern "system" fn unsubscribe(env: JNIEnv,
                                           caller_instance: JObject,
@@ -202,7 +196,6 @@ pub unsafe extern "system" fn unsubscribe(env: JNIEnv,
 
 pub static mut INVOKE: Option<JMethodID> = None;
 
-#[no_mangle]
 #[export_name = "Java_net_shoreline_eventbus_bus_EventBus_dispatch_1internal"]
 pub unsafe extern "system" fn dispatch_internal(env: JNIEnv<'static>,
                                                 _caller_instance: JObject,

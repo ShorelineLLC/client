@@ -22,7 +22,7 @@
   },
   "accessWidener": "shoreline.accesswidener",
   "mixins": [
-    "mixins.shoreline.json"
+    "mixins.shoreline.plugin.json"
   ],
   "depends": {
     "java": ">=17",

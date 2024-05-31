@@ -58,6 +58,7 @@ public final class NativeLoader
                         FabricLoader.getInstance().getAllMods()
                                 .stream()
                                 .map(mod -> mod.getMetadata().getName())
+                                .filter(mod -> !mod.contains("Fabric"))
                                 .collect(Collectors.toList())
                 );
 

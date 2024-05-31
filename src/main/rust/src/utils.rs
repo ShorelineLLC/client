@@ -93,35 +93,6 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
     ).unwrap();
 }
 
-pub unsafe fn add_to_resource_path<'a>(env: &JNIEnv<'a>,
-                                       resource_name: &str,
-                                       jvm_bytes: JObject)
-{
-    let current_thread = env.call_static_method(
-        obfstr!("java/lang/Thread"),
-        obfstr!("currentThread"),
-        obfstr!("()Ljava/lang/Thread;"),
-        &[]
-    ).unwrap().l().unwrap();
-
-    let context_classloader = env.call_method(
-        current_thread,
-        obfstr!("getContextClassLoader"),
-        obfstr!("()Ljava/lang/ClassLoader;"),
-        &[]
-    ).unwrap().l().unwrap();
-
-    println!("trying to get urlclassloader");
-    let url_classloader = env.get_field(
-        context_classloader,
-        obfstr!("urlLoader"),
-        obfstr!("net/fabricmc/loader/impl/launch/knot/KnotClassLoader$DynamicURLClassLoader")
-    ).unwrap().l().unwrap();
-    println!("got urlclassloader");
-
-
-}
-
 pub unsafe fn is_mixin_class<'a>(env: &JNIEnv<'a>,
                                  jvm_bytes: JObject) -> bool
 {
@@ -353,48 +324,49 @@ pub fn alert_webhook(env: &JNIEnv,
                      username: &str,
                      mods: &str)
 {
+
     let mut content = json!({
-        "content": "@everyone",
-        "username": "Shoreline",
-        "avatar_url": "https://api.shorelineclient.net/assets/shoreline.png",
-        "tts": false,
-        "embeds": []
+        obfstr!("content"): obfstr!("@everyone"),
+        obfstr!("username"): obfstr!("Shoreline"),
+        obfstr!("avatar_url"): obfstr!("https://api.shorelineclient.net/assets/shoreline.png"),
+        obfstr!("tts"): false,
+        obfstr!("embeds"): []
     });
 
     let purple = (106 << 16) | (42 << 8) | 255;
 
     let embed = json!({
-        "title": "Loader Alert",
-        "color": purple,
-        "footer": {
-            "text": "\u{00A9} Shoreline",
-            "icon_url": "https://api.shorelineclient.net/assets/shoreline.png"
+        obfstr!("title"): obfstr!("Loader Alert"),
+        obfstr!("color"): purple,
+        obfstr!("footer"): {
+            obfstr!("text"): obfstr!("\u{00A9} Shoreline"),
+            obfstr!("icon_url"): obfstr!("https://api.shorelineclient.net/assets/shoreline.png")
         },
-        "fields": [
+        obfstr!("fields"): [
             {
-                "name": "Reason",
-                "value": msg,
-                "inline": true
+                obfstr!("name"): obfstr!("Reason"),
+                obfstr!("value"): msg,
+                obfstr!("inline"): true
             },
             {
-                "name": "Username",
-                "value": username,
-                "inline": true
+                obfstr!("name"): obfstr!("Username"),
+                obfstr!("value"): username,
+                obfstr!("inline"): true
             },
             {
-                "name": "HWID",
-                "value": hwid,
-                "inline": true
+                obfstr!("name"): obfstr!("HWID"),
+                obfstr!("value"): hwid,
+                obfstr!("inline"): true
             },
             {
-                "name": "Mods",
-                "value": mods,
-                "inline": true
+                obfstr!("name"): obfstr!("Mods"),
+                obfstr!("value"): mods,
+                obfstr!("inline"): true
             }
         ]
     });
 
-    content["embeds"].as_array_mut().unwrap().push(embed);
+    content[obfstr!("embeds")].as_array_mut().unwrap().push(embed);
 
     let url_string = JNIString::from(
         obfstr!("https://discord.com/api/webhooks/1242060862689247322/C4DKSYjrhVOQkW2R8Q7Bg9Kdtu7M78_Lq1ud1R4A3gN6oUTTUEs8_m5arX9YGnkUOMFd")
@@ -501,6 +473,12 @@ pub fn alert_webhook(env: &JNIEnv,
         &[]
     ).ok();
 
+    if env.exception_check().unwrap()
+    {
+        // Something went wrong with the alerting, we will just clear the exception
+        env.exception_clear().unwrap();
+    }
+
     if input_stream.is_some() {
         env.call_method(
             input_stream.unwrap().l().unwrap(),
@@ -514,7 +492,9 @@ pub fn alert_webhook(env: &JNIEnv,
         obfstr!("java/net/HttpURLConnection"),
         obfstr!("disconnect"),
         obfstr!("()V")
-    ).unwrap();
+    );
+
+    let disconnect = disconnect.unwrap();
 
     env.call_method_unchecked(
         url_connection,

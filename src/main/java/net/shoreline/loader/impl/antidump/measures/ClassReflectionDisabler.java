@@ -8,6 +8,7 @@ import net.shoreline.loader.impl.ClientLoader;
 import net.shoreline.loader.impl.antidump.Measure;
 import net.shoreline.loader.impl.classloading.ClassLoader;
 import net.shoreline.loader.impl.classloading.ShorelineMixinService;
+import net.shoreline.loader.impl.classloading.ShorelineResourcePack;
 import net.shoreline.loader.impl.natives.NativeLoader;
 import net.shoreline.loader.plugin.ConfigPlugin;
 
@@ -33,6 +34,7 @@ public final class ClassReflectionDisabler extends Measure
 
                 ClassLoader.class,
                 ShorelineMixinService.class,
+                ShorelineResourcePack.class,
 
                 NativeLoader.class,
 
