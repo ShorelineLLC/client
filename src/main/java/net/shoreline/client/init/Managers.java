@@ -12,6 +12,7 @@ import net.shoreline.client.impl.manager.client.SocialManager;
 import net.shoreline.client.impl.manager.client.cape.CapeManager;
 import net.shoreline.client.impl.manager.combat.TotemManager;
 import net.shoreline.client.impl.manager.combat.hole.HoleManager;
+import net.shoreline.client.impl.manager.mojang.LookupManager;
 import net.shoreline.client.impl.manager.network.NetworkManager;
 import net.shoreline.client.impl.manager.player.InventoryManager;
 import net.shoreline.client.impl.manager.player.MovementManager;
@@ -50,6 +51,7 @@ public class Managers {
     public static SoundManager SOUND;
     public static CapeManager CAPES;
     public static ShaderManager SHADER;
+    public static LookupManager LOOKUP;
     // The initialized state of the managers. If this is true, all managers
     // have been initialized and the init process is complete. As a general
     // rule, it is good practice to check this state before accessing instances.
@@ -82,6 +84,7 @@ public class Managers {
             COMMAND = new CommandManager();
             SOUND = new SoundManager();
             SHADER = new ShaderManager();
+            LOOKUP = new LookupManager();
             initialized = true;
         }
     }

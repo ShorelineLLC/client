@@ -33,7 +33,7 @@ public class KillEffectsModule extends ToggleModule {
 
     @EventListener
     public void onEntityDeath(EntityDeathEvent event) {
-        if (!(event.getEntity() instanceof PlayerEntity player) || !wasLastAttackedByPlayer(player))
+        if (event.getEntity() == mc.player || !(event.getEntity() instanceof PlayerEntity player) || !wasLastAttackedByPlayer(player))
         {
             return;
         }

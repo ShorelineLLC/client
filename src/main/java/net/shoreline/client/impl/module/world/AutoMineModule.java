@@ -150,7 +150,8 @@ public class AutoMineModule extends RotationModule {
                 if (playerTarget != null)
                 {
                     PriorityQueue<AutoMineCalc> miningPositions = getMiningPosition(playerTarget);
-                    PriorityQueue<AutoMineCalc> miningPositionsNoAir = getNoAir(miningPositions, playerTarget);
+                    miningPositions.removeIf(p -> miningQueue.stream().anyMatch(p1 -> p.pos().equals(p1.getPos())));
+                    PriorityQueue<AutoMineCalc> miningPositionsNoAir = getNoAir(miningPositions);
                     PriorityQueue<AutoMineCalc> cityPositions = autoRemineConfig.getValue() ? miningPositions : miningPositionsNoAir;
                     if (cityPositions.isEmpty())
                     {
@@ -172,7 +173,7 @@ public class AutoMineModule extends RotationModule {
                             }
                             else if (!mc.world.isAir(cityBlockPos.pos()) && !isBlockDelayGrim())
                             {
-                                miningPositionsNoAir.removeIf(p -> p.pos().equals(cityBlockPos.pos()) || miningQueue.stream().anyMatch(p1 -> p.pos().equals(p1.getPos())));
+                                miningPositionsNoAir.removeIf(p -> p.pos().equals(cityBlockPos.pos()));
                                 final AutoMineCalc cityBlockPos2 = miningPositionsNoAir.poll();
                                 if (cityBlockPos2 != null)
                                 {
@@ -424,7 +425,7 @@ public class AutoMineModule extends RotationModule {
     }
 
     // LOL
-    private PriorityQueue<AutoMineCalc> getNoAir(PriorityQueue<AutoMineCalc> calcs, PlayerEntity player) {
+    private PriorityQueue<AutoMineCalc> getNoAir(PriorityQueue<AutoMineCalc> calcs) {
         PriorityQueue<AutoMineCalc> noAir = new PriorityQueue<>();
         for (AutoMineCalc calc : calcs) {
             if (mc.world.isAir(calc.pos())) {
@@ -448,7 +449,7 @@ public class AutoMineModule extends RotationModule {
             }
             if (!mc.world.getBlockState(blockPos).isReplaceable())
             {
-                miningPositions.add(new AutoMineCalc(blockPos, Double.MAX_VALUE - 100.0));
+                miningPositions.add(new AutoMineCalc(blockPos, Double.MAX_VALUE));
             }
         }
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getEntitySurroundNoSupport(entity);
@@ -492,8 +493,19 @@ public class AutoMineModule extends RotationModule {
     private record AutoMineCalc(BlockPos pos, double entityDamage) implements Comparable<AutoMineCalc> {
 
         @Override
-        public int compareTo(@NotNull AutoMineCalc o) {
+        public int compareTo(@NotNull AutoMineCalc o)
+        {
             return Double.compare(-entityDamage(), -o.entityDamage());
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (o instanceof AutoMineCalc calc)
+            {
+                return calc.pos().equals(pos);
+            }
+            return false;
         }
     }
 

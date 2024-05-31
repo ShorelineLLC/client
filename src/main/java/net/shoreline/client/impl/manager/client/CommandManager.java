@@ -53,6 +53,8 @@ public class CommandManager implements Globals {
                 new HClipCommand(),
                 new HelpCommand(),
                 new HideAllCommand(),
+                new HistoryCommand(),
+                new LeaveCommand(),
                 new ModulesCommand(),
                 new NbtCommand(),
                 new NotifyCommand(),
@@ -63,7 +65,8 @@ public class CommandManager implements Globals {
                 new ToggleCommand(),
                 new VanishCommand(),
                 new VClipCommand(),
-                new WaypointCommand()
+                new WaypointCommand(),
+                new YawCommand()
         );
         //
         for (Module module : Managers.MODULE.getModules()) {
