@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;

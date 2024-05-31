@@ -28,7 +28,7 @@ import java.util.Map;
 public class BetterChatModule extends ToggleModule
 {
     Config<Timestamp> timestampConfig = register(new EnumConfig<>("Timestamp", "Shows chat timestamps", Timestamp.OFF, Timestamp.values()));
-    Config<Boolean> animationConfig = register(new BooleanConfig("Animation", "Animates the chat", false));
+    Config<AnimationMode> animationConfig = register(new EnumConfig<>("Animation", "Animates the chat", AnimationMode.OFF, AnimationMode.values()));
     Config<Integer> timeConfig = register(new NumberConfig<>("Anim-Time", "Time for the animation", 0, 200, 1000, () -> false));
     Config<Boolean> noSignatureConfig = register(new BooleanConfig("NoSignatureIndicator", "Removes the message signature indicator", false));
     Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Makes chat length infinite", false));
@@ -64,7 +64,7 @@ public class BetterChatModule extends ToggleModule
 
     @EventListener
     public void onChatLineRender(RenderChatHudEvent event) {
-        if (animationConfig.getValue()) {
+        if (animationConfig.getValue() != AnimationMode.OFF) {
             TimeAnimation animation = null;
             if (event.getChatHudLine() != null)
             {
@@ -78,6 +78,7 @@ public class BetterChatModule extends ToggleModule
                 animation.setState(true);
                 event.cancel();
                 event.setAnimation(animation.getCurrent());
+                event.setAnimationMode(animationConfig.getValue());
             }
         }
     }
@@ -111,6 +112,13 @@ public class BetterChatModule extends ToggleModule
         NORMAL,
         GRAY,
         COLOR,
+        OFF
+    }
+
+    public enum AnimationMode
+    {
+        SLIDE,
+        FADE,
         OFF
     }
 }

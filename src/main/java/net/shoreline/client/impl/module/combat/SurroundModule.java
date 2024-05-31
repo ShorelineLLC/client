@@ -307,8 +307,7 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     public boolean canPlaceOnEntity(Entity entity) {
-        return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity
-                || (entity instanceof EndCrystalEntity && attackConfig.getValue());
+        return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity;
     }
 
     @EventListener
