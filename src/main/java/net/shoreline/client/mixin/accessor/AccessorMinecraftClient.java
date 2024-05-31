@@ -2,6 +2,8 @@ package net.shoreline.client.mixin.accessor;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.session.Session;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -36,4 +38,10 @@ public interface AccessorMinecraftClient {
     @Final
     @Mutable
     void setSession(Session session);
+
+    @Accessor("world")
+    void hookSetWorld(ClientWorld world);
+
+    @Accessor("disconnecting")
+    void hookSetDisconnecting(boolean disconnecting);
 }

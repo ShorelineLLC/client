@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
+import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
 import net.shoreline.client.util.chat.ChatUtil;
 
 public class LeaveCommand extends Command
@@ -18,28 +19,18 @@ public class LeaveCommand extends Command
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
-        builder.then(argument("unload", BoolArgumentType.bool()).executes(c ->
+        builder.executes(c ->
         {
             if (mc.isInSingleplayer())
             {
                 ChatUtil.error("Not connected to a server!");
                 return 0;
             }
-            boolean unload = BoolArgumentType.getBool(c, "unload");
-            if (unload)
-            {
-                mc.joinWorld(null);
-            }
-            mc.setScreen(new MultiplayerScreen(new TitleScreen()));
-            return 1;
-        })).executes(c ->
-        {
-            if (mc.isInSingleplayer())
-            {
-                ChatUtil.error("Not connected to a server!");
-                return 0;
-            }
-            mc.setScreen(new MultiplayerScreen(new TitleScreen()));
+            mc.getNetworkHandler().unloadWorld();
+            mc.world = null;
+            mc.player = null;
+            ((AccessorMinecraftClient) mc).hookSetWorld(null);
+            mc.setScreenAndRender(new TitleScreen());
             return 1;
         });
     }
