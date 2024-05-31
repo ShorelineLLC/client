@@ -101,6 +101,7 @@ public final class ModuleManager
                 new NoPacketKickModule(),
                 new NoSoundLagModule(),
                 new PacketLoggerModule(),
+                new ShulkerceptionModule(),
                 new TimerModule(),
                 new TrueDurabilityModule(),
                 new UnfocusedFPSModule(),

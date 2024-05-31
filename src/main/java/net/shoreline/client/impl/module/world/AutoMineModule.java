@@ -229,7 +229,7 @@ public class AutoMineModule extends RotationModule {
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (data.getBlockDamage() >= 1.0f && isDataPacketMine(data))
+            if (data.getBlockDamage() >= 0.95f && isDataPacketMine(data))
             {
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                 {
