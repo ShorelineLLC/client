@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -16,6 +14,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
@@ -106,8 +105,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
         // Do we need this check?? Surround is always highest prio
         blocksPlaced = 0;
-        BlockPos pos = PlayerUtil.getRoundedBlockPos(target.getX(), target.getY(), target.getZ());
-        if (shiftDelay < shiftDelayConfig.getValue())
+        if (shiftDelayConfig.getValue() > 0 && shiftDelay < shiftDelayConfig.getValue())
         {
             shiftDelay++;
             return;
@@ -117,6 +115,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             return;
         }
+        BlockPos pos = PlayerUtil.getRoundedBlockPos(target.getX(), target.getY(), target.getZ());
         surround = getAutoTrapPositions(pos);
         placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
 
@@ -125,6 +124,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             return;
         }
 
+        placements.sort(Comparator.comparingInt(Vec3i::getY));
+        runAttackBlockingCrystals();
         final int shiftTicks = shiftTicksConfig.getValue();
         while (blocksPlaced < shiftTicks && !placements.isEmpty())
         {
@@ -133,11 +134,36 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 break;
             }
             BlockPos targetPos = placements.get(blocksPlaced);
+            double dist = mc.player.squaredDistanceTo(targetPos.toCenterPos());
+            if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
+            {
+                continue;
+            }
             blocksPlaced++;
             shiftDelay = 0;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            attackPlace(targetPos);
+            place(targetPos);
+        }
+    }
+
+    private void runAttackBlockingCrystals()
+    {
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
+        {
+            for (BlockPos block : placements)
+            {
+                List<Entity> crystalEntities = mc.world.getOtherEntities(null, new Box(block)).stream()
+                        .filter(e -> e instanceof EndCrystalEntity).toList();
+                for (Entity entity : crystalEntities)
+                {
+                    if (attack(entity))
+                    {
+                        attackTimer.reset();
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -147,28 +173,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         return true;
-    }
-
-    private void attackPlace(BlockPos targetPos)
-    {
-        List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos));
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
-        {
-            List<Entity> crystalEntities = entities.stream().filter(e -> e instanceof EndCrystalEntity).toList();
-            for (Entity entity : crystalEntities)
-            {
-                if (attack(entity)) {
-                    entities.remove(entity);
-                }
-            }
-            attackTimer.reset();
-        }
-        entities.removeIf(e -> SurroundModule.getInstance().isEntityBlockingSurround(e));
-        if (!entities.isEmpty()) {
-            return;
-        }
-
-        place(targetPos);
     }
 
     private void place(BlockPos targetPos) {
@@ -217,7 +221,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 }
                 BlockPos pos1 = pos.add(dir.getVector());
                 List<Entity> box = mc.world.getOtherEntities(null, new Box(pos1))
-                        .stream().filter(e -> !isEntityBlockingTrap(e)).toList();
+                        .stream().filter(e -> !SurroundModule.getInstance().canPlaceOnEntity(e)).toList();
                 if (box.isEmpty())
                 {
                     continue;
@@ -242,11 +246,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 {
                     continue;
                 }
-                double dist = mc.player.squaredDistanceTo(pos2.toCenterPos());
-                if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
-                {
-                    continue;
-                }
                 blocks.add(pos2);
             }
         }
@@ -261,12 +260,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             final BlockPos trapBlockPos = blockPos.up();
             if (entities.contains(blockPos) || entities.contains(trapBlockPos) || isOutOfEyeRange(trapBlockPos))
-            {
-                continue;
-            }
-            // Check if we are still in bounds to place
-            final double distance = trapBlockPos.getSquaredDistance(mc.player.getX(), mc.player.getY(), mc.player.getZ());
-            if (distance > ((NumberConfig<Float>) placeRangeConfig).getValueSq())
             {
                 continue;
             }
@@ -293,12 +286,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     private boolean isOutOfEyeRange(final BlockPos pos)
     {
         return strictDirectionConfig.getValue() && Managers.INTERACT.isInEyeRange(pos);
-    }
-
-    private boolean isEntityBlockingTrap(Entity entity)
-    {
-        return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity
-                || (entity instanceof EndCrystalEntity && attackConfig.getValue());
     }
 
     /**
@@ -336,7 +323,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             if (surround.contains(targetPos) && state.isReplaceable())
             {
                 blocksPlaced++;
-                RenderSystem.recordRenderCall(() -> attackPlace(targetPos));
+                RenderSystem.recordRenderCall(() -> place(targetPos));
             }
         }
         else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
@@ -344,7 +331,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 Entity entity = mc.world.getEntityById(id);
                 if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
                     blocksPlaced++;
-                    RenderSystem.recordRenderCall(() -> attackPlace(entity.getBlockPos()));
+                    RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
                 }
             }
         }

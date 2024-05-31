@@ -81,7 +81,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
     public void onPlayerTick(PlayerTickEvent event) {
         //
         int blocksPlaced = 0;
-        if (shiftDelay < shiftDelayConfig.getValue()) {
+        if (shiftDelayConfig.getValue() > 0 && shiftDelay < shiftDelayConfig.getValue()) {
             shiftDelay++;
             return;
         }
@@ -94,7 +94,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
                 continue;
             }
             if (mc.world.getOtherEntities(null, new Box(hole.getPos()))
-                    .stream().anyMatch(e -> !SurroundModule.getInstance().isEntityBlockingSurround(e))) {
+                    .stream().anyMatch(e -> !SurroundModule.getInstance().canPlaceOnEntity(e))) {
                 continue;
             }
             if (autoConfig.getValue()) {

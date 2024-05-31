@@ -8,7 +8,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class ShulkerceptionModule extends ToggleModule {
     public ShulkerceptionModule()
     {
-        super("Shulkerception", "Allows you to put shulkers in shulkers in singleplayer", ModuleCategory.MISCELLANEOUS);
+        super("Shulkerception", "Allows you to put shulkers in shulkers", ModuleCategory.MISCELLANEOUS);
     }
 
     @EventListener

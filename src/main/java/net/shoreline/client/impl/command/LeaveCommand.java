@@ -1,9 +1,7 @@
 package net.shoreline.client.impl.command;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
