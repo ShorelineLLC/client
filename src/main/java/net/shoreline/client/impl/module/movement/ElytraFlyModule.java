@@ -199,9 +199,9 @@ public class ElytraFlyModule extends RotationModule
                     pitch = 12;
                     double rx = Math.cos(Math.toRadians(yaw + 90.0f));
                     double rz = Math.sin(Math.toRadians(yaw + 90.0f));
-                    Managers.MOVEMENT.setMotionXZ(((forward * speedConfig.getValue() * rx)
-                            + (strafe * speedConfig.getValue() * rz)), (forward * speedConfig.getValue() * rz)
-                            - (strafe * speedConfig.getValue() * rx));
+                    Managers.MOVEMENT.setMotionXZ(((forward * speed * rx)
+                            + (strafe * speed * rz)), (forward * speed * rz)
+                            - (strafe * speed * rx));
                 }
                 Managers.MOVEMENT.setMotionY(0.0);
                 pitch = 0;
