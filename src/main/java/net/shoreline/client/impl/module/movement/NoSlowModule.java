@@ -164,8 +164,8 @@ public class NoSlowModule extends ToggleModule {
     @EventListener
     public void onStrafeFix(StrafeFixEvent event) {
         if (strafeFixConfig.getValue()) {
-            float yaw = mc.player.getYaw();
-            float pitch = mc.player.getPitch();
+            float yaw = Managers.ROTATION.getServerYaw();
+            float pitch = Managers.ROTATION.getServerPitch();
             if (Managers.ROTATION.isRotating())
             {
                 yaw = Managers.ROTATION.getRotationYaw();

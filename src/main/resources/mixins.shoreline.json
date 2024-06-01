@@ -63,6 +63,7 @@
     "gui.hud.MixinInGameHud",
     "gui.hud.MixinInGameOverlayRenderer",
     "gui.hud.MixinPlayerListHud",
+    "gui.screen.pack.MixinPackScreen",
     "gui.screen.slot.MixinShulkerBoxSlot",
     "gui.screen.MixinChatInputSuggestor",
     "gui.screen.MixinChatScreen",
