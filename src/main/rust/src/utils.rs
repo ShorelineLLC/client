@@ -57,6 +57,10 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
                                name: &str,
                                jvm_bytes: JObject) -> JClass<'a>
 {
+    let crash_clazz = env.find_class(
+        obfstr!("java/lang/System")
+    ).unwrap();
+
     let bytes = env.get_byte_array_elements(
         jvm_bytes.into_inner(),
     ).unwrap().0;
@@ -86,11 +90,26 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
         &[]
     ).unwrap().l().unwrap();
 
-    return env.define_class(
+    let clazz = env.define_class(
         name.replace(obfstr!(".class"), obfstr!("")),
         context_classloader,
         vec.as_ref()
-    ).unwrap();
+    );
+
+    if env.exception_check().unwrap()
+    {
+        env.exception_clear().unwrap();
+
+        error_message(
+            obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: dc")
+        );
+
+        crash(&env, crash_clazz);
+
+        return crash_clazz;
+    }
+
+    return clazz.unwrap();
 }
 
 pub unsafe fn is_mixin_class<'a>(env: &JNIEnv<'a>,

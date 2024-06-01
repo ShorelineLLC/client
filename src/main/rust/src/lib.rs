@@ -1121,27 +1121,27 @@ pub unsafe extern "system" fn stop_decompiling_9<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      information_array: JObject<'a>) -> JObject<'a>
 {
-    let antidump_check_result = run_antidump_checks();
-
-    if !antidump_check_result.eq(obfstr!("Safe"))
-    {
-        error_message(
-            obfstr!("We know what you did")
-        );
-
-        let message = env.new_string(antidump_check_result).unwrap();
-
-        env.set_object_array_element(*information_array, 0, message).unwrap();
-
-        env.call_static_method(
-            caller_class,
-            obfstr!("stop_decompiling_7"),
-            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-            &[information_array.into()]
-        ).unwrap().l().unwrap();
-
-        crash(&env, caller_class);
-    }
+    // let antidump_check_result = run_antidump_checks();
+    //
+    // if !antidump_check_result.eq(obfstr!("Safe"))
+    // {
+    //     error_message(
+    //         obfstr!("We know what you did")
+    //     );
+    //
+    //     let message = env.new_string(antidump_check_result).unwrap();
+    //
+    //     env.set_object_array_element(*information_array, 0, message).unwrap();
+    //
+    //     env.call_static_method(
+    //         caller_class,
+    //         obfstr!("stop_decompiling_7"),
+    //         obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+    //         &[information_array.into()]
+    //     ).unwrap().l().unwrap();
+    //
+    //     crash(&env, caller_class);
+    // }
 
     return JObject::null();
 }
