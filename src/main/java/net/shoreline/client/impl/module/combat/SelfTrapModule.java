@@ -217,7 +217,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private void place(BlockPos targetPos) {
         List<Entity> box = mc.world.getOtherEntities(null, new Box(targetPos))
-                .stream().filter(e -> !SurroundModule.getInstance().canPlaceOnEntity(e)).toList();
+                .stream().filter(e -> !SurroundModule.getInstance().canPlaceOnEntityNoCrystal(e)).toList();
         if (!box.isEmpty())
         {
             return;

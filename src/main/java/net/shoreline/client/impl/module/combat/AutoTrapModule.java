@@ -176,6 +176,12 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     }
 
     private void place(BlockPos targetPos) {
+        List<Entity> box = mc.world.getOtherEntities(null, new Box(targetPos))
+                .stream().filter(e -> !SurroundModule.getInstance().canPlaceOnEntityNoCrystal(e)).toList();
+        if (!box.isEmpty())
+        {
+            return;
+        }
         final int slot = getResistantBlockItem();
         if (slot == -1)
         {

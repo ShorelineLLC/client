@@ -204,7 +204,7 @@ public class SurroundModule extends ObsidianPlacerModule {
 
     private void place(BlockPos targetPos) {
         List<Entity> box = mc.world.getOtherEntities(null, new Box(targetPos))
-                .stream().filter(e -> !canPlaceOnEntity(e)).toList();
+                .stream().filter(e -> !canPlaceOnEntityNoCrystal(e)).toList();
         if (!box.isEmpty())
         {
             return;
@@ -311,6 +311,10 @@ public class SurroundModule extends ObsidianPlacerModule {
     public boolean canPlaceOnEntity(Entity entity) {
         return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity
                 || (entity instanceof EndCrystalEntity && attackConfig.getValue());
+    }
+
+    public boolean canPlaceOnEntityNoCrystal(Entity entity) {
+        return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity;
     }
 
     @EventListener
