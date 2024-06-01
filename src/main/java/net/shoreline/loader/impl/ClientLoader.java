@@ -22,6 +22,6 @@ public final class ClientLoader
         }
 
         double timeElapsedInSeconds = (System.currentTimeMillis() - startTime) / 1000.0D;
-        Loader.LOGGER.info("Finished loading Shoreline in " + timeElapsedInSeconds + " seconds.");
+        Loader.info("Finished loading Shoreline in " + timeElapsedInSeconds + " seconds.");
     }
 }

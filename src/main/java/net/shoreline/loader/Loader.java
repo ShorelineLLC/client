@@ -17,14 +17,14 @@ import java.lang.reflect.Constructor;
 public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 {
     public static final String VERSION = "b0.0.1";
-    public static final Logger LOGGER = LogManager.getLogger("Shoreline");
+    private static final Logger LOGGER = LogManager.getLogger("Shoreline");
 
     private static final UserContext context = UserContext.none();
 
     @Override
     public void onInitializeClient()
     {
-        LOGGER.info("Initializing Shoreline...");
+        info("Initializing Shoreline...");
 
         try
         {
@@ -55,11 +55,6 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
         }
     }
 
-    public static UserContext getContext()
-    {
-        return context;
-    }
-
     @Override
     public void onPreLaunch()
     {
@@ -84,6 +79,11 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
         }
     }
 
+    public static UserContext getContext()
+    {
+        return context;
+    }
+
     public static InputStream getResource(String name)
     {
         if (!FabricLoader.getInstance().isDevelopmentEnvironment())
@@ -99,5 +99,27 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
         }
 
         return Loader.class.getClassLoader().getResourceAsStream(name);
+    }
+
+    public static void info(String message)
+    {
+        Loader.LOGGER.info(String.format("[Shoreline] %s", message));
+    }
+
+    public static void info(String message,
+                            Object... params)
+    {
+        Loader.LOGGER.info(String.format("[Shoreline] %s", message), params);
+    }
+
+    public static void error(String message)
+    {
+        Loader.LOGGER.error(message);
+    }
+
+    public static void error(String message,
+                             Object... params)
+    {
+        Loader.LOGGER.error(message, params);
     }
 }

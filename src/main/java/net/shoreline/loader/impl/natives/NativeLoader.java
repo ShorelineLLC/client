@@ -43,7 +43,7 @@ public final class NativeLoader
 
     public static void setUserCredentials()
     {
-        Loader.LOGGER.info("Locating user credentials...");
+        Loader.info("Locating user credentials...");
 
         String res = (String) Natives.stop_decompiling_5("unused_obscure");
 
@@ -62,7 +62,7 @@ public final class NativeLoader
                                 .collect(Collectors.toList())
                 );
 
-        Loader.LOGGER.info("Welcome, {}!", Loader.getContext().username());
+        Loader.info("Welcome, {}!", Loader.getContext().username());
     }
 
     private static OSType getOS()

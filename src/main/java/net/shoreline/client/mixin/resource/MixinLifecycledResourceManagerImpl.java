@@ -29,7 +29,7 @@ public final class MixinLifecycledResourceManagerImpl
         if (pack.getName().equals("shoreline"))
         {
             pack = ClassLoader.transformPack(pack);
-            Loader.LOGGER.info("Loaded resources!");
+            Loader.info("Loaded resources!");
         }
 
         instance.addPack(pack);

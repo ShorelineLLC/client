@@ -51,37 +51,49 @@ public class Shoreline {
         CONFIG.loadClient();
     }
 
-    public static void info(String message) {
-        Loader.LOGGER.info(String.format("[Shoreline] %s", message));
+    public static void info(String message)
+    {
+        Loader.info(String.format("[Shoreline] %s", message));
     }
 
-    public static void info(String message, Object... params) {
-        Loader.LOGGER.info(String.format("[Shoreline] %s", message), params);
+    public static void info(String message,
+                            Object... params)
+    {
+        Loader.info(String.format("[Shoreline] %s", message), params);
     }
 
-    public static void info(Identifiable feature, String message) {
-        Loader.LOGGER.info(String.format("[%s] %s", feature.getId(), message));
+    public static void info(Identifiable feature,
+                            String message)
+    {
+        Loader.info(String.format("[%s] %s", feature.getId(), message));
     }
 
-    public static void info(Identifiable feature, String message,
+    public static void info(Identifiable feature,
+                            String message,
                             Object... params) {
-        Loader.LOGGER.info(String.format("[%s] %s", feature.getId(), message), params);
+        Loader.info(String.format("[%s] %s", feature.getId(), message), params);
     }
 
-    public static void error(String message) {
-        Loader.LOGGER.error(message);
+    public static void error(String message)
+    {
+        Loader.error(message);
     }
 
-    public static void error(String message, Object... params) {
-        Loader.LOGGER.error(message, params);
+    public static void error(String message,
+                             Object... params)
+    {
+        Loader.error(message, params);
     }
 
-    public static void error(Identifiable feature, String message) {
-        Loader.LOGGER.error(String.format("[%s] %s", feature.getId(), message));
+    public static void error(Identifiable feature, String message)
+    {
+        Loader.error(String.format("[%s] %s", feature.getId(), message));
     }
 
-    public static void error(Identifiable feature, String message,
-                             Object... params) {
-        Loader.LOGGER.error(String.format("[%s] %s", feature.getId(), message), params);
+    public static void error(Identifiable feature,
+                             String message,
+                             Object... params)
+    {
+        Loader.error(String.format("[%s] %s", feature.getId(), message), params);
     }
 }

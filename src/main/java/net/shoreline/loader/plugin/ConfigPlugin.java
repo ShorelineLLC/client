@@ -21,14 +21,14 @@ public final class ConfigPlugin implements IMixinConfigPlugin
     @Override
     public void onLoad(String mixinPackage)
     {
-        Loader.LOGGER.info("Loading Shoreline...");
+        Loader.info("Loading Shoreline...");
 
         try
         {
             NativeLoader.load();
         } catch (Throwable t)
         {
-            Loader.LOGGER.error("Encountered an error loading Shoreline natives.", t);
+            Loader.error("Encountered an error loading Shoreline natives.", t);
             throw new RuntimeException(t);
         }
 
