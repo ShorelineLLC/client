@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.combat;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.gui.screen.pack.PackScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -161,7 +162,8 @@ public class SurroundModule extends ObsidianPlacerModule {
             }
             BlockPos targetPos = placements.get(blocksPlaced);
             double dist = mc.player.squaredDistanceTo(targetPos.toCenterPos());
-            if (dist > ((NumberConfig) placeRangeConfig).getValueSq()) {
+            if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
+            {
                 continue;
             }
             blocksPlaced++;
@@ -307,7 +309,8 @@ public class SurroundModule extends ObsidianPlacerModule {
     }
 
     public boolean canPlaceOnEntity(Entity entity) {
-        return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity;
+        return entity instanceof ItemEntity || entity instanceof ExperienceOrbEntity
+                || (entity instanceof EndCrystalEntity && attackConfig.getValue());
     }
 
     @EventListener

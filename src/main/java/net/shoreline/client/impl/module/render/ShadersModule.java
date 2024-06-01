@@ -13,6 +13,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.EntityOutlineEvent;
+import net.shoreline.client.impl.event.gui.screen.pack.RefreshPacksEvent;
 import net.shoreline.client.impl.event.render.ReloadShaderEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.init.Managers;
@@ -21,6 +22,7 @@ import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.sql.Ref;
 
 /**
  * @author linus
@@ -68,6 +70,12 @@ public class ShadersModule extends ToggleModule {
         shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
         shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
         shaderEffect.render(mc.getTickDelta());
+    }
+
+    @EventListener
+    public void onPackRefresh(RefreshPacksEvent event)
+    {
+        Managers.SHADER.reloadShaders();
     }
 
     @EventListener
