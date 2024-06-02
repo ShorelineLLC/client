@@ -117,8 +117,16 @@ public class CategoryFrame extends Frame {
 
         int whiteText = ClickGuiModule.getInstance().getColor(-1);
         RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, whiteText);
-        if (categoryAnimation.getFactor() > 0.01f) {
-            //enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));
+        if (categoryAnimation.getFactor() > 0.01f)
+        {
+            // Enabling scissor during the animation zoom in process causes some weird visual bugs
+            boolean canScissor = ClickGuiModule.getInstance().getScaleFactor() == 1.0F;
+
+            if (canScissor)
+            {
+                enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));
+            }
+
             int fillColor = ClickGuiModule.getInstance().getColor(0x77000000);
             fill(context, x, y + height, width, fheight, fillColor);
             off = y + height + 1.0f;
@@ -128,7 +136,11 @@ public class CategoryFrame extends Frame {
                 off += (float) ((moduleButton.getHeight() + 1.0f) * categoryAnimation.getFactor());
                 inner += moduleButton.getHeight() + 1.0f;
             }
-            //disableScissor();
+
+            if (canScissor)
+            {
+                disableScissor();
+            }
         }
         // update previous position
         px = ClickGuiScreen.MOUSE_X;
