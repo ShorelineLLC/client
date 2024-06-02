@@ -26,6 +26,7 @@ import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.FirstOutQueue;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
@@ -439,7 +440,7 @@ public class AutoMineModule extends RotationModule {
     private PriorityQueue<AutoMineCalc> getMiningPosition(PlayerEntity entity)
     {
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
-        List<BlockPos> entityIntersections = SurroundModule.getInstance().getSurroundEntities(entity);
+        List<BlockPos> entityIntersections = PositionUtil.getAllInBox(entity.getBoundingBox(), entity.getBlockPos());
         for (BlockPos blockPos : entityIntersections)
         {
             double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
@@ -452,7 +453,7 @@ public class AutoMineModule extends RotationModule {
                 miningPositions.add(new AutoMineCalc(blockPos, Double.MAX_VALUE));
             }
         }
-        List<BlockPos> surroundBlocks = SurroundModule.getInstance().getEntitySurroundNoSupport(entity);
+        List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity.getBlockPos());
         for (BlockPos blockPos : surroundBlocks)
         {
             double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());

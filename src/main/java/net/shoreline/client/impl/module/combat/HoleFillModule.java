@@ -94,7 +94,7 @@ public class HoleFillModule extends ObsidianPlacerModule {
                 continue;
             }
             if (mc.world.getOtherEntities(null, new Box(hole.getPos()))
-                    .stream().anyMatch(e -> !SurroundModule.getInstance().canPlaceOnEntity(e))) {
+                    .stream().anyMatch(e -> SurroundModule.getInstance().invalidEntity(e))) {
                 continue;
             }
             if (autoConfig.getValue()) {
