@@ -217,25 +217,28 @@ public class ClickGuiScreen extends Screen implements Globals {
                 context.getScaledWindowHeight(),
                 backgroundColor
         );
+        
+        if (ClickGuiModule.getInstance().underGlow.getValue())
+        {
+            int fadeColor = ClickGuiModule.getInstance().getColor();
+            fadeColor = ClickGuiModule.getInstance().fixTransparency(fadeColor);
 
-        int fadeColor = ClickGuiModule.getInstance().getColor();
-        fadeColor = ClickGuiModule.getInstance().fixTransparency(fadeColor);
+            float progress = ClickGuiModule.getInstance().getScaleFactor();
+            int startHeight = context.getScaledWindowHeight() / 3;
 
-        float progress = ClickGuiModule.getInstance().getScaleFactor();
-        int startHeight = context.getScaledWindowHeight() / 3;
+            float yOffset = 300 - (300 * progress);
 
-        float yOffset = 300 - (300 * progress);
-
-        RenderManager.fillGradientQuad(
-                context,
-                0.0F,
-                startHeight - yOffset,
-                context.getScaledWindowWidth(),
-                context.getScaledWindowHeight() - yOffset,
-                0x0,
-                fadeColor,
-                false
-        );
+            RenderManager.fillGradientQuad(
+                    context,
+                    0.0F,
+                    startHeight - yOffset,
+                    context.getScaledWindowWidth(),
+                    context.getScaledWindowHeight() - yOffset,
+                    0x0,
+                    fadeColor,
+                    false
+            );
+        }
 
         float currentProgress = ClickGuiModule.getInstance().getScaleFactor(); // [0.0 .. 1.0]
 

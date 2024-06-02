@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.client;
 
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
@@ -15,6 +17,8 @@ import org.lwjgl.glfw.GLFW;
 public class ClickGuiModule extends ToggleModule {
 
     private static ClickGuiModule INSTANCE;
+
+    public Config<Boolean> underGlow = register(new BooleanConfig("UnderGlow", "GUI underglow", true));
 
 //    Config<Integer> hueConfig = register(new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
 //    Config<Integer> saturationConfig = register(new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
