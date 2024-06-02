@@ -103,4 +103,12 @@ public final class Natives
      * @return A byte array of its contents
      */
     public static native Object stop_decompiling_10(Object p0);
+
+    /**
+     * Check for Fabric API
+     *
+     * @param p0 Unused obscure
+     * @return Null
+     */
+    public static native Object stop_decompiling_11(Object p0);
 }

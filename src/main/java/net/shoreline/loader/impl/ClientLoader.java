@@ -1,6 +1,7 @@
 package net.shoreline.loader.impl;
 
 import net.shoreline.loader.Loader;
+import net.shoreline.loader.Natives;
 import net.shoreline.loader.impl.antidump.Measure;
 import net.shoreline.loader.impl.classloading.ClassLoader;
 
@@ -9,6 +10,9 @@ public final class ClientLoader
     public static void loadClient()
     {
         long startTime = System.currentTimeMillis();
+
+        // Check for Fabric API, warn user if not found
+        Natives.stop_decompiling_11(startTime);
 
         // Run anti dump measures
         Measure.runAllMeasures();

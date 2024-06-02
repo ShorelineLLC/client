@@ -1170,3 +1170,31 @@ pub unsafe extern "system" fn stop_decompiling_10<'a>(env: JNIEnv<'a>,
         }
     }
 }
+
+/**
+ * Check for Fabric API
+ */
+#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_111"]
+pub unsafe extern "system" fn stop_decompiling_11<'a>(env: JNIEnv<'a>,
+                                                      caller_class: JClass<'a>,
+                                                      _unused_obscure: JObject<'a>) -> JObject<'a>
+{
+    let fabric_api_class = env.find_class(
+        obfstr!("net/fabricmc/fabric/api/resource/ModResourcePack")
+    );
+
+    if env.exception_check().unwrap()
+    {
+        env.exception_clear().unwrap();
+
+        error_message(
+            obfstr!("Shoreline depends on Fabric API.\n\nPlease install it from the Fabric website!")
+        );
+
+        crash(&env, caller_class);
+    }
+
+    fabric_api_class.unwrap();
+
+    return JObject::null();
+}
