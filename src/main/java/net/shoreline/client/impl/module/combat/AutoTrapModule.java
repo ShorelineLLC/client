@@ -177,7 +177,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
     private void place(BlockPos targetPos) {
         List<Entity> box = mc.world.getOtherEntities(null, new Box(targetPos))
-                .stream().filter(e -> !SurroundModule.getInstance().canPlaceOnEntityNoCrystal(e)).toList();
+                .stream().filter(e -> SurroundModule.getInstance().invalidEntity(e)).toList();
         if (!box.isEmpty())
         {
             return;
@@ -227,7 +227,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 }
                 BlockPos pos1 = pos.add(dir.getVector());
                 List<Entity> box = mc.world.getOtherEntities(null, new Box(pos1))
-                        .stream().filter(e -> !SurroundModule.getInstance().canPlaceOnEntity(e)).toList();
+                        .stream().filter(e -> SurroundModule.getInstance().invalidEntity(e)).toList();
                 if (box.isEmpty())
                 {
                     continue;
