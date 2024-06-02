@@ -2,11 +2,20 @@ package net.shoreline.client.util.math.position;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PositionUtil {
+
+    public static BlockPos getRoundedBlockPos(final double x, final double y, final double z)
+    {
+        final int flooredX = MathHelper.floor(x);
+        final int flooredY = (int) Math.round(y);
+        final int flooredZ = MathHelper.floor(z);
+        return new BlockPos(flooredX, flooredY, flooredZ);
+    }
 
     /**
      * Returns a {@link List} of all the {@link BlockPos} positions in the

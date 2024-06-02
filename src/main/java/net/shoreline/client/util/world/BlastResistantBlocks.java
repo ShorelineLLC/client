@@ -46,9 +46,6 @@ public class BlastResistantBlocks implements Globals {
      * @return <tt>true</tt> if the mining block is breakable
      */
     public static boolean isBreakable(Block block) {
-        if (mc.world == null) {
-            return false;
-        }
         return !UNBREAKABLE.contains(block);
     }
 
@@ -68,9 +65,6 @@ public class BlastResistantBlocks implements Globals {
      * @return
      */
     public static boolean isUnbreakable(Block block) {
-        if (mc.world == null) {
-            return false;
-        }
         return UNBREAKABLE.contains(block);
     }
 
@@ -84,15 +78,20 @@ public class BlastResistantBlocks implements Globals {
         }
         return isBlastResistant(mc.world.getBlockState(pos).getBlock());
     }
+    /**
+     * @param state
+     * @return
+     */
+    public static boolean isBlastResistant(BlockState state) {
+        return isBlastResistant(state.getBlock());
+    }
+
 
     /**
      * @param block
      * @return
      */
     public static boolean isBlastResistant(Block block) {
-        if (mc.world == null) {
-            return false;
-        }
         return BLAST_RESISTANT.contains(block);
     }
 }

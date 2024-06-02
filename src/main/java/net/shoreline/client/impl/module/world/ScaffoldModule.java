@@ -11,6 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
@@ -205,7 +206,7 @@ public final class ScaffoldModule extends RotationModule
             }
             posY = groundPosY;
         }
-        final BlockPos pos = PlayerUtil.getRoundedBlockPos(
+        final BlockPos pos = PositionUtil.getRoundedBlockPos(
                 mc.player.getX(), posY, mc.player.getZ());
         for (final Direction direction : Direction.values())
         {

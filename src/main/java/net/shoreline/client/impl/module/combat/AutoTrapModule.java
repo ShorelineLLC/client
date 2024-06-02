@@ -29,9 +29,9 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -115,7 +115,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        BlockPos pos = PlayerUtil.getRoundedBlockPos(target.getX(), target.getY(), target.getZ());
+        BlockPos pos = PositionUtil.getRoundedBlockPos(target.getX(), target.getY(), target.getZ());
         surround = getAutoTrapPositions(pos);
         placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
 
