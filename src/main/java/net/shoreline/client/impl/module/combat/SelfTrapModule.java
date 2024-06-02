@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.*;
 
 /**
- * @author Shorel
+ * @author Shoreline
  * @since 1.0
  */
 public final class SelfTrapModule extends ObsidianPlacerModule
@@ -50,7 +50,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap  if there is none", false));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5));
-    Config<Integer> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5));
+    Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after placing the blocks", true));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where trap is placing blocks", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
