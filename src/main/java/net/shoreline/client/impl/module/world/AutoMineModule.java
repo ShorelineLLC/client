@@ -152,7 +152,6 @@ public class AutoMineModule extends RotationModule {
                 if (playerTarget != null)
                 {
                     PriorityQueue<AutoMineCalc> miningPositions = getMiningPosition(playerTarget);
-                    miningPositions.removeIf(p -> miningQueue.stream().anyMatch(p1 -> p.pos().equals(p1.getPos())));
                     PriorityQueue<AutoMineCalc> miningPositionsNoAir = getNoAir(miningPositions);
                     PriorityQueue<AutoMineCalc> cityPositions = autoRemineConfig.getValue() ? miningPositions : miningPositionsNoAir;
                     if (cityPositions.isEmpty())
@@ -175,19 +174,19 @@ public class AutoMineModule extends RotationModule {
                             }
                             else if (!mc.world.isAir(cityBlockPos.pos()) && !isBlockDelayGrim())
                             {
-                                miningPositionsNoAir.removeIf(p -> p.pos().equals(cityBlockPos.pos()));
-                                final AutoMineCalc cityBlockPos2 = miningPositionsNoAir.poll();
-                                if (cityBlockPos2 != null)
-                                {
-                                    MiningData data = new AutoMiningData(cityBlockPos2.pos(),
-                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos2.pos()) : Direction.UP);
-                                    startMining(data);
-                                    miningQueue.addFirst(data);
-                                }
                                 MiningData data = new AutoMiningData(cityBlockPos.pos(),
                                         strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos.pos()) : Direction.UP);
                                 startMining(data);
                                 miningQueue.addFirst(data);
+                                miningPositionsNoAir.removeIf(p -> p.pos().equals(cityBlockPos.pos()));
+                                final AutoMineCalc cityBlockPos2 = miningPositionsNoAir.poll();
+                                if (cityBlockPos2 != null && miningQueue.stream().noneMatch(p1 -> cityBlockPos2.pos().equals(p1.getPos())))
+                                {
+                                    MiningData data2 = new AutoMiningData(cityBlockPos2.pos(),
+                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos2.pos()) : Direction.UP);
+                                    startMining(data2);
+                                    miningQueue.addFirst(data2);
+                                }
                             }
                         }
                     }
