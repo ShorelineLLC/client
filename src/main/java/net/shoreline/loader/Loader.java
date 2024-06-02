@@ -16,7 +16,7 @@ import java.lang.reflect.Constructor;
 
 public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 {
-    public static final String VERSION = "b0.0.1";
+    public static final String VERSION = "b0.0.2";
     private static final Logger LOGGER = LogManager.getLogger("Shoreline");
 
     private static final UserContext context = UserContext.none();
