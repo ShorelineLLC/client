@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.gui.click;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -11,6 +12,7 @@ import net.shoreline.client.impl.gui.click.impl.config.setting.BindButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.render.animation.Animation;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -48,7 +50,7 @@ public class ClickGuiScreen extends Screen implements Globals {
     public ClickGuiScreen(ClickGuiModule module) {
         super(Text.literal("ClickGui"));
         this.module = module;
-        float x = 2.0f;
+        float x = 15.0f;
         for (ModuleCategory category : ModuleCategory.values()) {
             CategoryFrame frame = new CategoryFrame(category, x, 15.0f);
             frames.add(frame);
@@ -63,7 +65,9 @@ public class ClickGuiScreen extends Screen implements Globals {
      * @param delta
      */
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta)
+    {
+        scaleGui(context);
         for (CategoryFrame frame : frames) {
             if (frame.isWithinTotal(mouseX, mouseY)) {
                 focus = frame;
@@ -200,6 +204,19 @@ public class ClickGuiScreen extends Screen implements Globals {
     @Override
     public boolean shouldCloseOnEsc() {
         return closeOnEscape;
+    }
+
+    private void scaleGui(DrawContext context)
+    {
+        // Translate the scale to the center of the screen
+        context.getMatrices().translate(context.getScaledWindowHeight(), context.getScaledWindowHeight() / 2.0F, 0.0F);
+
+        float currentProgress = ClickGuiModule.getInstance().getScaleFactor(); // [0.0 .. 1.0]
+        float goal = currentProgress * 0.2F;
+        context.getMatrices().scale(0.8F + goal, 0.8F + goal, 0.0F);
+
+        // Translate back
+        context.getMatrices().translate(-context.getScaledWindowHeight(), -context.getScaledWindowHeight() / 2.0F, 0.0F);
     }
 
     private boolean checkDragging() {

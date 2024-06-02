@@ -39,8 +39,9 @@ public class CheckboxButton extends ConfigButton<Boolean> {
         y = iy;
         Animation checkboxAnimation = config.getAnimation();
         rectGradient(context, checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor((float) checkboxAnimation.getFactor()) : 0x00000000,
-                checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor1((float) checkboxAnimation.getFactor()) : 0x00000000);
-        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, -1);
+                checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor((float) checkboxAnimation.getFactor()) : 0x00000000);
+        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
     }
 
     /**

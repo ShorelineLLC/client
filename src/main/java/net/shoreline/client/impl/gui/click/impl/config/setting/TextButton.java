@@ -5,6 +5,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 
 /**
  * @author linus
@@ -34,7 +35,8 @@ public class TextButton extends ConfigButton<String> {
      */
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX, float mouseY, float delta) {
-        RenderManager.renderText(context, config.getValue(), ix + 3.0f, iy + 3.0f, -1);
+        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        RenderManager.renderText(context, config.getValue(), ix + 3.0f, iy + 3.0f, whiteText);
     }
 
     /**

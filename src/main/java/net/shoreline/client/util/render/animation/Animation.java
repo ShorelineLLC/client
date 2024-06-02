@@ -69,4 +69,9 @@ public class Animation
     {
         return !getState() && getFactor() == 0.0 || getState() && getFactor() == 1.0;
     }
+
+    public void reset()
+    {
+        last = System.currentTimeMillis();
+    }
 }

@@ -114,10 +114,13 @@ public class CategoryFrame extends Frame {
             y = mc.getWindow().getHeight() - 10;
         }
         rect(context, ClickGuiModule.getInstance().getColor(1.7f));
-        RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, -1);
+
+        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, whiteText);
         if (categoryAnimation.getFactor() > 0.01f) {
-            enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));
-            fill(context, x, y + height, width, fheight, 0x77000000);
+            //enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));
+            int fillColor = ClickGuiModule.getInstance().getColor(0x77000000);
+            fill(context, x, y + height, width, fheight, fillColor);
             off = y + height + 1.0f;
             inner = off;
             for (ModuleButton moduleButton : moduleButtons) {
@@ -125,7 +128,7 @@ public class CategoryFrame extends Frame {
                 off += (float) ((moduleButton.getHeight() + 1.0f) * categoryAnimation.getFactor());
                 inner += moduleButton.getHeight() + 1.0f;
             }
-            disableScissor();
+            //disableScissor();
         }
         // update previous position
         px = ClickGuiScreen.MOUSE_X;

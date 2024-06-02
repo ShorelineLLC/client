@@ -53,13 +53,13 @@ public class Shoreline {
 
     public static void info(String message)
     {
-        Loader.info(String.format("[Shoreline] %s", message));
+        Loader.info(message);
     }
 
     public static void info(String message,
                             Object... params)
     {
-        Loader.info(String.format("[Shoreline] %s", message), params);
+        Loader.info(message, params);
     }
 
     public static void info(Identifiable feature,

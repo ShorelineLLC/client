@@ -321,14 +321,15 @@ public class AutoCrystalModule extends RotationModule {
             }
             RenderBuffers.postRender();
 
+            fadeList.entrySet().removeIf(e ->
+                    e.getValue().getFactor() == 0.0);
+
             if (renderPos != null && isHoldingCrystal())
             {
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(renderPos, animation);
             }
 
-            fadeList.entrySet().removeIf(e ->
-                    e.getValue().getFactor() == 0.0);
         }
     }
 

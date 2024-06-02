@@ -41,9 +41,11 @@ public class ColorButton extends ConfigButton<Color> {
                        float mouseY, float delta) {
         x = ix;
         y = iy;
-        //
-        fill(context, ix + width - 11.0f, iy + 2.0f, 10.0f, 10.0f, ((ColorConfig) config).getRgb());
-        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, -1);
+        int originalColor = ((ColorConfig) config).getRgb();
+        int modifiedTransparencyColor = ClickGuiModule.getInstance().getColor(originalColor);
+        fill(context, ix + width - 11.0f, iy + 2.0f, 10.0f, 10.0f, modifiedTransparencyColor);
+        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
         if (pickerAnimation.getFactor() > 0.01f) {
             ColorConfig colorConfig = (ColorConfig) config;
             if (ClickGuiScreen.MOUSE_LEFT_HOLD) {
@@ -81,7 +83,7 @@ public class ColorButton extends ConfigButton<Color> {
                 if (globalAnimation.getFactor() > 0.01) {
                     fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, ClickGuiModule.getInstance().getColor((float) globalAnimation.getFactor()));
                 }
-                RenderManager.renderText(context, "ClientColor", x + 3.0f, y + height + (colorConfig.allowAlpha() ? 31.0f : 21.0f) + width, -1);
+                RenderManager.renderText(context, "ClientColor", x + 3.0f, y + height + (colorConfig.allowAlpha() ? 31.0f : 21.0f) + width, whiteText);
             }
             moduleButton.offset((float) (getPickerHeight() * pickerAnimation.getFactor()));
             ((CategoryFrame) frame).offset((float) (getPickerHeight() * pickerAnimation.getFactor() * moduleButton.getScaledTime()));

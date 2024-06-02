@@ -25,7 +25,8 @@ public class ClickGuiModule extends ToggleModule {
 //    Config<Integer> alphaConfig = register(new NumberConfig<>("Alpha", "The alpha of colors", 0, 100, 100);
     //
     public static ClickGuiScreen CLICK_GUI_SCREEN;
-    private final Animation openCloseAnimation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
+    private final Animation openCloseAnimation = new Animation(false, 400, Easing.BACK_OUT);
+    private final Animation transparencyAnimation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
 
     // TODO: Fix Gui scaling
     public float scaleConfig = 1.0f;
@@ -53,8 +54,11 @@ public class ClickGuiModule extends ToggleModule {
         if (CLICK_GUI_SCREEN == null) {
             CLICK_GUI_SCREEN = new ClickGuiScreen(this);
         }
-        mc.setScreen(CLICK_GUI_SCREEN);
         openCloseAnimation.setState(true);
+        transparencyAnimation.setState(true);
+        openCloseAnimation.reset();
+        transparencyAnimation.reset();
+        mc.setScreen(CLICK_GUI_SCREEN);
     }
 
     @Override
@@ -65,26 +69,46 @@ public class ClickGuiModule extends ToggleModule {
         }
         mc.player.closeScreen();
         openCloseAnimation.setState(false);
+        transparencyAnimation.setState(false);
     }
 
-    public int getColor() {
+    public int getColor()
+    {
         return ColorsModule.getInstance().getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
-        // return ColorUtil.hslToColor(hueConfig.getValue(), saturationConfig.getValue(), brightnessConfig.getValue(), alphaConfig.getValue() / 100.0f).getRGB();
     }
 
-    public int getColor1() {
-        return ColorsModule.getInstance().getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
-        // return ColorUtil.hslToColor(hue1Config.getValue(), saturation1Config.getValue(), brightness1Config.getValue(), alphaConfig.getValue() / 100.0f).getRGB();
-    }
-
-    public int getColor(float alpha) {
+    public int getColor(float alpha)
+    {
         return ColorsModule.getInstance().getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
-        // return ColorUtil.hslToColor(hueConfig.getValue(), saturationConfig.getValue(), brightnessConfig.getValue(), MathHelper.clamp(alphaConfig.getValue() * alpha / 100.0f, 0.0f, 1.0f)).getRGB();
     }
 
-    public int getColor1(float alpha) {
-        return ColorsModule.getInstance().getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
-        // return ColorUtil.hslToColor(hue1Config.getValue(), saturation1Config.getValue(), brightness1Config.getValue(), MathHelper.clamp(alphaConfig.getValue() * alpha / 100.0f, 0.0f, 1.0f)).getRGB();
+    // Applies a transparency to a color
+    public int getColor(int color)
+    {
+        float alpha = getAlpha();
+
+        if (alpha == 1.0F)
+        {
+            return color;
+        }
+
+        float colorAlpha = (color >> 24) & 0xFF;
+
+        alpha = Math.max(0.0F, Math.min(1.0F, alpha));
+
+        int colorAlphaInt = Math.max(10, (int) (colorAlpha * alpha));
+
+        return (colorAlphaInt << 24) | (color & 0xFFFFFF);
+    }
+
+    public float getAlpha()
+    {
+        return (float) (transparencyAnimation.getFactor());
+    }
+
+    public float getScaleFactor()
+    {
+        return (float) (openCloseAnimation.getFactor());
     }
 
     /**

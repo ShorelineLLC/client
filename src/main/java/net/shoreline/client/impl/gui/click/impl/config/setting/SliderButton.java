@@ -83,9 +83,16 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
         // slider fill
         float fill = (config.getValue().floatValue() - min.floatValue())
                 / (max.floatValue() - min.floatValue());
-        fillGradient(context, ix, iy, ix + (fill * width), iy + height, ClickGuiModule.getInstance().getColor(), ClickGuiModule.getInstance().getColor1());
-        RenderManager.renderText(context, config.getName() + Formatting.GRAY
-                + " " + config.getValue(), ix + 2.0f, iy + 4.0f, -1);
+        fillGradient(context, ix, iy, ix + (fill * width), iy + height, ClickGuiModule.getInstance().getColor(), ClickGuiModule.getInstance().getColor());
+
+        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
+
+        int textLeng = RenderManager.textWidth(config.getName());
+
+        int grayText = ClickGuiModule.getInstance().getColor(0xFFAAAAAA);
+
+        RenderManager.renderText(context, " " + config.getValue(), ix + 2.0F + textLeng, iy + 4.0F, grayText);
     }
 
     /**

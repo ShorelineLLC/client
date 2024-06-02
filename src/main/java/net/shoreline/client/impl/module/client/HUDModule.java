@@ -35,6 +35,7 @@ import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.string.EnumFormatter;
+import net.shoreline.loader.Loader;
 
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -51,6 +52,7 @@ public class HUDModule extends ToggleModule {
     // private static final HudScreen HUD_SCREEN = new HudScreen();
     //
     Config<Boolean> watermarkConfig = register(new BooleanConfig("Watermark", "Displays client name and version watermark", true));
+    Config<Boolean> userInfo = register(new BooleanConfig("UserInfo", "Displays your user information", true));
     Config<Boolean> directionConfig = register(new BooleanConfig("Direction", "Displays facing direction", true));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays player equipped armor and durability", true));
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
@@ -138,8 +140,22 @@ public class HUDModule extends ToggleModule {
                 RenderManager.renderText(event.getContext(), String.format("%s %s (%s%s)",
                         ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER,
                         ShorelineMod.MOD_BUILD_NUMBER, !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""), 2.0f, topLeft, getHudColor(rainbowOffset));
-                // topLeft += 9.0f;
+                topLeft += 9.0f;
             }
+
+            if (userInfo.getValue())
+            {
+                RenderManager.renderText(
+                        event.getContext(),
+                        String.format("UID %s", Loader.getContext().uid()),
+                        2.0F,
+                        topLeft,
+                        getHudColor(rainbowOffset)
+                );
+
+                topLeft += 9.0F;
+            }
+
             if (arraylistConfig.getValue()) {
                 List<Module> modules = Managers.MODULE.getModules();
 

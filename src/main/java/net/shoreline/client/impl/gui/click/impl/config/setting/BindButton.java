@@ -49,8 +49,15 @@ public class BindButton extends ConfigButton<Macro> {
         final Macro macro = config.getValue();
         String val = listening ? "..." : macro.getKeyName();
         rect(context, 0x00000000);
-        RenderManager.renderText(context, config.getName() + Formatting.GRAY
-                + " " + val, ix + 2.0f, iy + 4.0f, -1);
+
+        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
+
+        int textLeng = RenderManager.textWidth(config.getName());
+
+        int grayText = ClickGuiModule.getInstance().getColor(0xFFAAAAAA);
+
+        RenderManager.renderText(context, " " + val, ix + 2.0F + textLeng, iy + 4.0F, grayText);
     }
 
     /**
