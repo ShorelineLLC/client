@@ -139,6 +139,7 @@ public final class ModuleManager
                 new ESPModule(),
                 new ExtraTabModule(),
                 new FreecamModule(),
+                new FreeLookModule(),
                 new FullbrightModule(),
                 new HoleESPModule(),
                 new KillEffectsModule(),
