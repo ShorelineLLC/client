@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.world;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -136,7 +137,7 @@ public class AutoMineModule extends RotationModule {
                 PlayerEntity playerTarget = null;
                 double minDistance = Float.MAX_VALUE;
                 for (PlayerEntity entity : mc.world.getPlayers()) {
-                    if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getName())) {
+                    if (entity instanceof ClientPlayerEntity || Managers.SOCIAL.isFriend(entity.getName())) {
                         continue;
                     }
                     double dist = mc.player.distanceTo(entity);
@@ -453,7 +454,7 @@ public class AutoMineModule extends RotationModule {
                 miningPositions.add(new AutoMineCalc(blockPos, Double.MAX_VALUE));
             }
         }
-        List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity.getBlockPos());
+        List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
         for (BlockPos blockPos : surroundBlocks)
         {
             double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
@@ -518,13 +519,13 @@ public class AutoMineModule extends RotationModule {
         }
         if (doubleBreakConfig.getValue())
         {
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             if (grimConfig.getValue())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             }
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
         }
