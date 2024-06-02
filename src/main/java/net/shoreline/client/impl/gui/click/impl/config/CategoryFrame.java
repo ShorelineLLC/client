@@ -115,7 +115,7 @@ public class CategoryFrame extends Frame {
         }
         rect(context, ClickGuiModule.getInstance().getColor(1.7f));
 
-        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
         RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, whiteText);
         if (categoryAnimation.getFactor() > 0.01f)
         {
@@ -127,7 +127,7 @@ public class CategoryFrame extends Frame {
                 enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));
             }
 
-            int fillColor = ClickGuiModule.getInstance().getColor(0x77000000);
+            int fillColor = ClickGuiModule.getInstance().fixTransparency(0x77000000);
             fill(context, x, y + height, width, fheight, fillColor);
             off = y + height + 1.0f;
             inner = off;

@@ -42,9 +42,9 @@ public class ColorButton extends ConfigButton<Color> {
         x = ix;
         y = iy;
         int originalColor = ((ColorConfig) config).getRgb();
-        int modifiedTransparencyColor = ClickGuiModule.getInstance().getColor(originalColor);
+        int modifiedTransparencyColor = ClickGuiModule.getInstance().fixTransparency(originalColor);
         fill(context, ix + width - 11.0f, iy + 2.0f, 10.0f, 10.0f, modifiedTransparencyColor);
-        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
         if (pickerAnimation.getFactor() > 0.01f) {
             ColorConfig colorConfig = (ColorConfig) config;
@@ -65,7 +65,12 @@ public class ColorButton extends ConfigButton<Color> {
             }
             float[] hsb = colorConfig.getHsb();
             int color = Color.HSBtoRGB(hsb[0], 1.0f, 1.0f);
-            enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + (getPickerHeight() * getScaledTime())));
+            boolean canScissor = ClickGuiModule.getInstance().getScaleFactor() == 1.0F;
+
+            if (canScissor)
+            {
+                enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + (getPickerHeight() * getScaledTime())));
+            }
             for (float i = 0.0f; i < width - 2.0f; i += 1.0f) {
                 float hue = i / (width - 2.0f);
                 fill(context, x + 1.0f + i, y + height + 4.0f + width, 1.0f, 10.0f, Color.getHSBColor(hue, 1.0f, 1.0f).getRGB());
@@ -87,7 +92,11 @@ public class ColorButton extends ConfigButton<Color> {
             }
             moduleButton.offset((float) (getPickerHeight() * pickerAnimation.getFactor()));
             ((CategoryFrame) frame).offset((float) (getPickerHeight() * pickerAnimation.getFactor() * moduleButton.getScaledTime()));
-            disableScissor();
+
+            if (canScissor)
+            {
+                disableScissor();
+            }
         }
     }
 

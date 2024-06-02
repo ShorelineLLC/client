@@ -1,8 +1,6 @@
 package net.shoreline.client.impl.gui.click.impl.config;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
@@ -107,11 +105,11 @@ public class ModuleButton extends Button {
             scaledTime = 1.7f;
         }
 
-        int unfilledColor = ClickGuiModule.getInstance().getColor(0x33000000);
+        int unfilledColor = ClickGuiModule.getInstance().fixTransparency(0x33000000);
         rectGradient(context, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : unfilledColor, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : unfilledColor);
 
-        int whiteText = ClickGuiModule.getInstance().getColor(-1);
-        int grayText = ClickGuiModule.getInstance().getColor(0xFFAAAAAA);
+        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
+        int grayText = ClickGuiModule.getInstance().fixTransparency(0xFFAAAAAA);
 
         RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? whiteText : grayText);
         if (settingsAnimation.getFactor() > 0.01f) {
@@ -126,7 +124,12 @@ public class ModuleButton extends Button {
                     fheight += colorPicker.getPickerHeight() * colorPicker.getScaledTime() * getScaledTime();
                 }
             }
-            enableScissor((int) x, (int) (off - 1.0f), (int) (x + width), (int) (off + 2.0f + (fheight * settingsAnimation.getFactor())));
+            boolean canScissor = ClickGuiModule.getInstance().getScaleFactor() == 1.0F;
+
+            if (canScissor)
+            {
+                enableScissor((int) x, (int) (off - 1.0f), (int) (x + width), (int) (off + 2.0f + (fheight * settingsAnimation.getFactor())));
+            }
             for (ConfigButton<?> configButton : configComponents) {
                 if (!configButton.getConfig().isVisible()) {
                     continue;
@@ -141,7 +144,10 @@ public class ModuleButton extends Button {
                 fill(context, ix + width - 1.0f, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.getInstance().getColor(scaledTime));
                 fillGradient(context, ix, off + 1.0f, ix + width, off + 2.0f, ClickGuiModule.getInstance().getColor(scaledTime), ClickGuiModule.getInstance().getColor(scaledTime));
             }
-            disableScissor();
+            if (canScissor)
+            {
+                disableScissor();
+            }
             ((CategoryFrame) frame).offset((float) (3.0f * settingsAnimation.getFactor()));
         }
     }

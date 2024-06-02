@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.gui.click.impl.config.setting;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
@@ -44,12 +43,12 @@ public class DropdownButton extends ConfigButton<Enum<?>> {
         String val = EnumFormatter.formatEnum(config.getValue());
         rectGradient(context, ClickGuiModule.getInstance().getColor(), ClickGuiModule.getInstance().getColor());
 
-        int whiteText = ClickGuiModule.getInstance().getColor(-1);
+        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
 
         int textLeng = RenderManager.textWidth(config.getName());
 
-        int grayText = ClickGuiModule.getInstance().getColor(0xFFAAAAAA);
+        int grayText = ClickGuiModule.getInstance().fixTransparency(0xFFAAAAAA);
 
         RenderManager.renderText(context, " " + val, ix + 2.0F + textLeng, iy + 4.0F, grayText);
     }

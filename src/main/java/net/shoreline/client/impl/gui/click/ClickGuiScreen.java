@@ -1,10 +1,10 @@
 package net.shoreline.client.impl.gui.click;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.ScissorStack;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
@@ -12,7 +12,6 @@ import net.shoreline.client.impl.gui.click.impl.config.setting.BindButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.Globals;
-import net.shoreline.client.util.render.animation.Animation;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -67,7 +66,7 @@ public class ClickGuiScreen extends Screen implements Globals {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta)
     {
-        scaleGui(context);
+        renderAndScaleGUI(context);
         for (CategoryFrame frame : frames) {
             if (frame.isWithinTotal(mouseX, mouseY)) {
                 focus = frame;
@@ -206,12 +205,48 @@ public class ClickGuiScreen extends Screen implements Globals {
         return closeOnEscape;
     }
 
-    private void scaleGui(DrawContext context)
+    private void renderAndScaleGUI(DrawContext context)
     {
+        int backgroundColor = ClickGuiModule.getInstance().fixTransparency(0x66000000);
+
+        RenderManager.rect(
+                context.getMatrices(),
+                0.0D,
+                0.0D,
+                context.getScaledWindowWidth(),
+                context.getScaledWindowHeight(),
+                backgroundColor
+        );
+
+        int fadeColor = ClickGuiModule.getInstance().getColor();
+        fadeColor = ClickGuiModule.getInstance().fixTransparency(fadeColor);
+
+        float progress = ClickGuiModule.getInstance().getScaleFactor();
+        int startHeight = context.getScaledWindowHeight() / 3;
+
+        float yOffset = 300 - (300 * progress);
+
+        RenderManager.fillGradientQuad(
+                context,
+                0.0F,
+                startHeight - yOffset,
+                context.getScaledWindowWidth(),
+                context.getScaledWindowHeight() - yOffset,
+                0x0,
+                fadeColor,
+                false
+        );
+
+        float currentProgress = ClickGuiModule.getInstance().getScaleFactor(); // [0.0 .. 1.0]
+
+        if (currentProgress == 1.0F)
+        {
+            return;
+        }
+
         // Translate the scale to the center of the screen
         context.getMatrices().translate(context.getScaledWindowHeight(), context.getScaledWindowHeight() / 2.0F, 0.0F);
 
-        float currentProgress = ClickGuiModule.getInstance().getScaleFactor(); // [0.0 .. 1.0]
         float goal = currentProgress * 0.2F;
         context.getMatrices().scale(0.8F + goal, 0.8F + goal, 0.0F);
 

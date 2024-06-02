@@ -83,7 +83,7 @@ public class ClickGuiModule extends ToggleModule {
     }
 
     // Applies a transparency to a color
-    public int getColor(int color)
+    public int fixTransparency(int color)
     {
         float alpha = getAlpha();
 

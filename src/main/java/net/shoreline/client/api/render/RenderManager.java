@@ -348,6 +348,45 @@ public class RenderManager implements Globals {
         RenderSystem.disableBlend();
     }
 
+    public static void fillGradientQuad(DrawContext context,
+                                        float x1,
+                                        float y1,
+                                        float x2,
+                                        float y2,
+                                        int startColor,
+                                        int endColor,
+                                        boolean sideways)
+    {
+        float f = (float) (startColor >> 24 & 255) / 255.0F;
+        float f1 = (float) (startColor >> 16 & 255) / 255.0F;
+        float f2 = (float) (startColor >> 8 & 255) / 255.0F;
+        float f3 = (float) (startColor & 255) / 255.0F;
+        float f4 = (float) (endColor >> 24 & 255) / 255.0F;
+        float f5 = (float) (endColor >> 16 & 255) / 255.0F;
+        float f6 = (float) (endColor >> 8 & 255) / 255.0F;
+        float f7 = (float) (endColor & 255) / 255.0F;
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        if (sideways) {
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f).next();
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4).next();
+        } else {
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f).next();
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4).next();
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
+        }
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+    }
+
     /**
      * @param context
      * @param text
