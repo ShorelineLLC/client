@@ -14,7 +14,7 @@ public class FontModule extends ToggleModule
     private static FontModule INSTANCE;
 
     //
-    Config<Boolean> shadowConfig = register(new BooleanConfig("Shadow", "Renders text with a shadow background", true));
+    // Config<Boolean> shadowConfig = register(new BooleanConfig("Shadow", "Renders text with a shadow background", true));
 
     /**
      *
@@ -35,6 +35,6 @@ public class FontModule extends ToggleModule
      */
     public boolean getShadow()
     {
-        return shadowConfig.getValue();
+        return false;
     }
 }

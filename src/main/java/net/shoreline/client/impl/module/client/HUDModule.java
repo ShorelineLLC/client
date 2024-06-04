@@ -59,7 +59,7 @@ public class HUDModule extends ToggleModule
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
     Config<VanillaHud> itemNameConfig = register(new EnumConfig<>("ItemName", "Renders the Minecraft item name display", VanillaHud.HIDE, VanillaHud.values()));
     Config<Boolean> potionEffectsConfig = register(new BooleanConfig("PotionEffects", "Displays active potion effects", true));
-    Config<Boolean> potionColorsConfig = register(new BooleanConfig("PotionColors", "Displays active potion colors", true));
+    Config<Boolean> potionColorsConfig = register(new BooleanConfig("PotionColors", "Displays active potion colors", true, () -> potionEffectsConfig.getValue()));
     Config<Boolean> durabilityConfig = register(new BooleanConfig("Durability", "Displays the current held items durability", false));
     Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Displays world coordinates", true));
     Config<Boolean> netherCoordsConfig = register(new BooleanConfig("NetherCoords", "Displays nether coordinates", true, () -> coordsConfig.getValue()));

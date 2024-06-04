@@ -66,7 +66,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> whileMiningConfig = register(new BooleanConfig("WhileMining", "Allows attacking while mining blocks", false));
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instantly attacks crystals when they spawn", false));
-    Config<Boolean> instantCalcConfig = register(new BooleanConfig("Instant-Calc", "Calculates a crystal when it spawns and attacks if it meets MINIMUM requirements, this will result in non-ideal crystal attacks", false, () -> instantConfig.getValue()));
+    Config<Boolean> instantCalcConfig = register(new BooleanConfig("Instant-Calc", "Calculates a crystal when it spawns and attacks if it meets MINIMUM requirements, this will result in non-ideal crystal attacks", false, () -> false));
     Config<Float> instantDamageConfig = register(new NumberConfig<>("InstantDamage", "Minimum damage to attack crystals instantly", 1.0f, 6.0f, 10.0f, () -> instantConfig.getValue() && instantCalcConfig.getValue()));
     Config<Boolean> instantMaxConfig = register(new BooleanConfig("InstantMax", "Attacks crystals instantly if they exceed the previous max attack damage (Note: This is still not a perfect check because the next tick could have better damages)", true, () -> instantConfig.getValue()));
     Config<Boolean> raytraceConfig = register(new BooleanConfig("Raytrace", "Raytrace to crystal position", true));
