@@ -19,6 +19,7 @@ import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
@@ -39,10 +40,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
 
 // Do not look at this code
 
@@ -113,6 +112,15 @@ public class AutoMineModule extends RotationModule
     }
 
     @EventListener
+    public void onDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() == mc.player)
+        {
+            Managers.INVENTORY.syncToClient();
+        }
+    }
+
+    @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
         if (mc.player.isCreative() || mc.player.isSpectator())
@@ -120,23 +128,22 @@ public class AutoMineModule extends RotationModule
             return;
         }
         MiningData miningData = null;
+        MiningData miningDataLast = null;
         if (!miningQueue.isEmpty())
         {
             miningData = miningQueue.getFirst();
+            miningDataLast = miningQueue.getLast();
         }
-        if (autoConfig.getValue() && (!manualOverride && (miningData == null || mc.world.getBlockState(miningData.getPos()).isReplaceable())))
+        if (autoConfig.getValue())
         {
             if (mc.player.isCrawling() && crawlingConfig.getValue() != AntiCrawling.OFF && getCrawlingMine() != null)
             {
                 BlockPos crawlingMine = getCrawlingMine();
-                if (!miningQueue.isEmpty())
-                {
-                    miningQueue.remove();
-                }
+                miningQueue.clear();
                 manualOverride = true;
                 MiningData data = new AutoMiningData(crawlingMine, Direction.UP);
                 startMining(data);
-                miningQueue.addFirst(data);
+                queueMiningData(data);
             }
             else
             {
@@ -168,11 +175,13 @@ public class AutoMineModule extends RotationModule
                     {
                         return;
                     }
-                    if (doubleBreakConfig.getValue())
+                    if (doubleBreakConfig.getValue() && !manualOverride && (miningData == null || (mc.world.getBlockState(miningData.getPos()).isReplaceable() && mc.world.getBlockState(miningDataLast.getPos()).isReplaceable())))
                     {
-                        final AutoMineCalc cityBlockPos = cityPositions.poll();
+                        final AutoMineCalc cityBlockPos = cityPositions.peek();
                         if (cityBlockPos != null)
                         {
+                            miningPositionsNoAir.removeIf(p -> p.pos().equals(cityBlockPos.pos()));
+                            final AutoMineCalc cityBlockPos2 = miningPositionsNoAir.peek();
                             // If we are re-mining, bypass throttle check below
                             if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                             {
@@ -184,23 +193,22 @@ public class AutoMineModule extends RotationModule
                             }
                             else if (!mc.world.isAir(cityBlockPos.pos()) && !isBlockDelayGrim())
                             {
+                                miningQueue.clear();
                                 MiningData data = new AutoMiningData(cityBlockPos.pos(),
                                         strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos.pos()) : Direction.UP);
                                 startMining(data);
-                                miningQueue.addFirst(data);
-                                miningPositionsNoAir.removeIf(p -> p.pos().equals(cityBlockPos.pos()));
-                                final AutoMineCalc cityBlockPos2 = miningPositionsNoAir.poll();
-                                if (cityBlockPos2 != null && miningQueue.stream().noneMatch(p1 -> cityBlockPos2.pos().equals(p1.getPos())))
+                                queueMiningData(data);
+                                if (cityBlockPos2 != null && !mc.world.isAir(cityBlockPos2.pos()))
                                 {
                                     MiningData data2 = new AutoMiningData(cityBlockPos2.pos(),
                                             strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos2.pos()) : Direction.UP);
                                     startMining(data2);
-                                    miningQueue.addFirst(data2);
+                                    queueMiningData(data2);
                                 }
                             }
                         }
                     }
-                    else
+                    else if (!manualOverride && (miningData == null || mc.world.getBlockState(miningData.getPos()).isReplaceable()))
                     {
                         final AutoMineCalc cityBlockPos = cityPositions.poll();
                         if (cityBlockPos != null)
@@ -219,7 +227,7 @@ public class AutoMineModule extends RotationModule
                                 MiningData data = new AutoMiningData(cityBlockPos.pos(),
                                         strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos.pos()) : Direction.UP);
                                 startMining(data);
-                                miningQueue.addFirst(data);
+                                queueMiningData(data);
                             }
                         }
                     }
@@ -443,7 +451,16 @@ public class AutoMineModule extends RotationModule
         }
         MiningData miningData = new MiningData(pos, direction);
         startMining(miningData);
-        miningQueue.addFirst(miningData);
+        queueMiningData(miningData);
+    }
+
+    private void queueMiningData(MiningData data)
+    {
+        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())))
+        {
+            return;
+        }
+        miningQueue.addFirst(data);
     }
 
     // LOL
@@ -542,7 +559,7 @@ public class AutoMineModule extends RotationModule
         {
             return;
         }
-        if (doubleBreakConfig.getValue())
+        if (doubleBreakConfig.getValue() && !isMiningFloor(data))
         {
             if (grimConfig.getValue())
             {
@@ -560,6 +577,18 @@ public class AutoMineModule extends RotationModule
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
         }
         data.setStarted();
+    }
+
+    public boolean isMiningFloor(MiningData data)
+    {
+        for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
+        {
+            if (data.getPos().equals(pos.down()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void abortMining(MiningData data)

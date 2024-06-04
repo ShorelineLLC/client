@@ -12,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -438,13 +439,17 @@ public class AutoCrystalModule extends RotationModule
     }
 
     @EventListener
-    public void onPlaySound(PlaySoundEvent event)
+    public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (event.getSoundEvent() == SoundEvents.ENTITY_GENERIC_EXPLODE && event.getCategory() == SoundCategory.BLOCKS)
+        if (!(event.getPacket() instanceof PlaySoundS2CPacket packet))
+        {
+            return;
+        }
+        if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE && packet.getCategory() == SoundCategory.BLOCKS)
         {
             for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
             {
-                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getPos()) < 144.0)
+                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
                 {
                     mc.executeSync(() ->
                     {
