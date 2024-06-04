@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event;
 
-import net.shoreline.eventbus.Event;
 import net.shoreline.client.mixin.MixinMinecraftClient;
+import net.shoreline.eventbus.Event;
 
 /**
  * The main game loop event, this "tick" runs while the
@@ -11,6 +11,7 @@ import net.shoreline.client.mixin.MixinMinecraftClient;
  * @see MixinMinecraftClient
  * @since 1.0
  */
-public class RunTickEvent extends Event {
+public class RunTickEvent extends Event
+{
 
 }

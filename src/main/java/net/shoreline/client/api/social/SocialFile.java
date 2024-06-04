@@ -15,7 +15,8 @@ import java.nio.file.Path;
  * @author linus
  * @since 1.0
  */
-public class SocialFile extends ConfigFile {
+public class SocialFile extends ConfigFile
+{
     //
     private final SocialRelation relation;
 
@@ -23,7 +24,8 @@ public class SocialFile extends ConfigFile {
      * @param dir
      * @param relation
      */
-    public SocialFile(Path dir, SocialRelation relation) {
+    public SocialFile(Path dir, SocialRelation relation)
+    {
         super(dir, relation.name());
         this.relation = relation;
     }
@@ -32,20 +34,25 @@ public class SocialFile extends ConfigFile {
      *
      */
     @Override
-    public void save() {
-        try {
+    public void save()
+    {
+        try
+        {
             Path filepath = getFilepath();
-            if (!Files.exists(filepath)) {
+            if (!Files.exists(filepath))
+            {
                 Files.createFile(filepath);
             }
             final JsonArray array = new JsonArray();
-            for (String socials : Managers.SOCIAL.getRelations(relation)) {
+            for (String socials : Managers.SOCIAL.getRelations(relation))
+            {
                 array.add(new JsonPrimitive(socials));
             }
             write(filepath, serialize(array));
         }
         // error writing file
-        catch (IOException e) {
+        catch (IOException e)
+        {
             Shoreline.error("Could not save file for {}.json!",
                     relation.name().toLowerCase());
             e.printStackTrace();
@@ -56,22 +63,28 @@ public class SocialFile extends ConfigFile {
      *
      */
     @Override
-    public void load() {
-        try {
+    public void load()
+    {
+        try
+        {
             Path filepath = getFilepath();
-            if (Files.exists(filepath)) {
+            if (Files.exists(filepath))
+            {
                 final String content = read(filepath);
                 JsonArray json = parseArray(content);
-                if (json == null) {
+                if (json == null)
+                {
                     return;
                 }
-                for (JsonElement element : json.asList()) {
+                for (JsonElement element : json.asList())
+                {
                     Managers.SOCIAL.addRelation(element.getAsString(), relation);
                 }
             }
         }
         // error reading file
-        catch (IOException e) {
+        catch (IOException e)
+        {
             Shoreline.error("Could not read file for {}.json!",
                     relation.name().toLowerCase());
             e.printStackTrace();

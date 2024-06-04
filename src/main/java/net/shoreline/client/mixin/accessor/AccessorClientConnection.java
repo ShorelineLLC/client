@@ -8,7 +8,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ClientConnection.class)
-public interface AccessorClientConnection {
+public interface AccessorClientConnection
+{
 
     @Invoker("sendInternal")
     void hookSendInternal(Packet<?> packet, @Nullable PacketCallbacks callbacks, boolean flush);

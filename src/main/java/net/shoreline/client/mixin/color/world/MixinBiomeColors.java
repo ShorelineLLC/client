@@ -13,16 +13,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BiomeColors.class)
-public class MixinBiomeColors implements Globals {
+public class MixinBiomeColors implements Globals
+{
 
     @Inject(method = "getColor", at = @At("HEAD"), cancellable = true)
-    private static void hookGetColor(BlockRenderView world, BlockPos pos, ColorResolver resolver, CallbackInfoReturnable<Integer> cir) {
-        if (mc.world == null) {
+    private static void hookGetColor(BlockRenderView world, BlockPos pos, ColorResolver resolver, CallbackInfoReturnable<Integer> cir)
+    {
+        if (mc.world == null)
+        {
             return;
         }
         BiomeColorEvent biomeColorEvent = new BiomeColorEvent(resolver);
         EventBus.INSTANCE.dispatch(biomeColorEvent);
-        if (biomeColorEvent.isCanceled()) {
+        if (biomeColorEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(biomeColorEvent.getRGB());
         }

@@ -14,17 +14,21 @@ import java.util.List;
 import java.util.UUID;
 
 @Mixin(EntityView.class)
-public abstract class MixinEntityView {
+public abstract class MixinEntityView
+{
 
-    @Shadow public abstract List<? extends PlayerEntity> getPlayers();
+    @Shadow
+    public abstract List<? extends PlayerEntity> getPlayers();
 
     @Inject(method = "getPlayerByUuid", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetPlayerByUuid(UUID uuid, CallbackInfoReturnable<EntityView> cir)
     {
         cir.cancel();
-        for (int i = 0; i < this.getPlayers().size(); ++i) {
+        for (int i = 0; i < this.getPlayers().size(); ++i)
+        {
             PlayerEntity playerEntity = this.getPlayers().get(i);
-            if (playerEntity != null && uuid.equals(playerEntity.getUuid())) {
+            if (playerEntity != null && uuid.equals(playerEntity.getUuid()))
+            {
                 cir.setReturnValue((EntityView) playerEntity);
             }
         }

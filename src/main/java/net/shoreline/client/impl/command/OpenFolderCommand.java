@@ -13,21 +13,28 @@ import java.io.IOException;
  * @author linus
  * @since 1.0
  */
-public class OpenFolderCommand extends Command {
+public class OpenFolderCommand extends Command
+{
 
     /**
      *
      */
-    public OpenFolderCommand() {
+    public OpenFolderCommand()
+    {
         super("OpenFolder", "Opens the client configurations folder", literal("openfolder"));
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.executes(c -> {
-            try {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
+        builder.executes(c ->
+        {
+            try
+            {
                 Desktop.getDesktop().open(Shoreline.CONFIG.getClientDirectory().toFile());
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 e.printStackTrace();
                 ChatUtil.error("Failed to open client folder!");
             }

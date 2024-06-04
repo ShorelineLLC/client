@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(WorldRenderer.class)
-public interface AccessorWorldRenderer {
+public interface AccessorWorldRenderer
+{
     /**
      * @return
      */

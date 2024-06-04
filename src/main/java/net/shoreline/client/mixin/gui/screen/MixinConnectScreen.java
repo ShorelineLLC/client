@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(ConnectScreen.class)
-public class MixinConnectScreen {
+public class MixinConnectScreen
+{
     /**
      * @param client
      * @param address
@@ -27,7 +28,8 @@ public class MixinConnectScreen {
             "Lnet/minecraft/client/network/ServerAddress;Lnet/" +
             "minecraft/client/network/ServerInfo;)V", at = @At(value = "HEAD"))
     private void onConnect(MinecraftClient client, ServerAddress address,
-                           ServerInfo info, CallbackInfo ci) {
+                           ServerInfo info, CallbackInfo ci)
+    {
         ConnectScreenEvent connectScreenEvent = new ConnectScreenEvent(address, info);
         EventBus.INSTANCE.dispatch(connectScreenEvent);
     }

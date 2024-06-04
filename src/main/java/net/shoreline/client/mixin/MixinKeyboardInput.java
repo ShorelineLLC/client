@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(KeyboardInput.class)
-public class MixinKeyboardInput {
+public class MixinKeyboardInput
+{
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void hookTick$Pre(boolean slowDown, float slowDownFactor, CallbackInfo info)
@@ -36,11 +37,13 @@ public class MixinKeyboardInput {
      */
     @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/" +
             "client/input/KeyboardInput;sneaking:Z", shift = At.Shift.BEFORE), cancellable = true)
-    private void hookTick$Post(boolean slowDown, float f, CallbackInfo ci) {
+    private void hookTick$Post(boolean slowDown, float f, CallbackInfo ci)
+    {
         KeyboardTickEvent keyboardTickEvent = new KeyboardTickEvent((Input) (Object) this);
         keyboardTickEvent.setStage(StageEvent.EventStage.POST);
         EventBus.INSTANCE.dispatch(keyboardTickEvent);
-        if (keyboardTickEvent.isCanceled()) {
+        if (keyboardTickEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

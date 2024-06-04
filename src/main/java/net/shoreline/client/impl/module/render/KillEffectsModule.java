@@ -20,19 +20,22 @@ import net.shoreline.eventbus.annotation.EventListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class KillEffectsModule extends ToggleModule {
+public class KillEffectsModule extends ToggleModule
+{
 
     Config<KillEffect> killEffectConfig = register(new EnumConfig<>("Effect", "The kill effect to apply", KillEffect.LIGHTNING, KillEffect.values()));
     Config<Integer> strikes = register(new NumberConfig<>("Strikes", "The number of lightning strikes", 1, 1, 5, () -> killEffectConfig.getValue() == KillEffect.LIGHTNING));
 
     private final Map<Entity, Long> lastAttackedEntities = new HashMap<>();
 
-    public KillEffectsModule() {
+    public KillEffectsModule()
+    {
         super("KillEffects", "Adds effects to player deaths", ModuleCategory.RENDER);
     }
 
     @EventListener
-    public void onEntityDeath(EntityDeathEvent event) {
+    public void onEntityDeath(EntityDeathEvent event)
+    {
         if (event.getEntity() == mc.player || !(event.getEntity() instanceof PlayerEntity player) || !wasLastAttackedByPlayer(player))
         {
             return;
@@ -73,18 +76,21 @@ public class KillEffectsModule extends ToggleModule {
             lastAttackedEntities.put(entity, System.currentTimeMillis());
         }
     }
-    
+
     private void fireworkExplode(double x, double y, double z, double size, int amount)
     {
         double d = x;
         double e = y;
         double f = z;
-        for (int i = -amount; i <= amount; ++i) {
-            for (int j = -amount; j <= amount; ++j) {
-                for (int k = -amount; k <= amount; ++k) {
-                    double g = (double)j + (RANDOM.nextDouble() - RANDOM.nextDouble()) * 0.5;
-                    double h = (double)i + (RANDOM.nextDouble() - RANDOM.nextDouble()) * 0.5;
-                    double l = (double)k + (RANDOM.nextDouble() - RANDOM.nextDouble()) * 0.5;
+        for (int i = -amount; i <= amount; ++i)
+        {
+            for (int j = -amount; j <= amount; ++j)
+            {
+                for (int k = -amount; k <= amount; ++k)
+                {
+                    double g = (double) j + (RANDOM.nextDouble() - RANDOM.nextDouble()) * 0.5;
+                    double h = (double) i + (RANDOM.nextDouble() - RANDOM.nextDouble()) * 0.5;
+                    double l = (double) k + (RANDOM.nextDouble() - RANDOM.nextDouble()) * 0.5;
                     double m = Math.sqrt(g * g + h * h + l * l) / size + RANDOM.nextGaussian() * 0.05;
                     addExplosionParticle(d, e, f, g / m, h / m, l / m);
                     if (i == -amount || i == amount || j == -amount || j == amount) continue;
@@ -108,7 +114,8 @@ public class KillEffectsModule extends ToggleModule {
         return lastAttackedTime != null && (System.currentTimeMillis() - lastAttackedTime) < 5000;
     }
 
-    private enum KillEffect {
+    private enum KillEffect
+    {
         LIGHTNING,
         FIREWORK
     }

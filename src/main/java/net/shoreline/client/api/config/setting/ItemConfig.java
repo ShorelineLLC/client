@@ -9,7 +9,8 @@ import net.shoreline.client.api.config.Config;
  * @author linus
  * @since 1.0
  */
-public class ItemConfig extends Config<Item> {
+public class ItemConfig extends Config<Item>
+{
     //
     private final Item[] values;
 
@@ -22,7 +23,8 @@ public class ItemConfig extends Config<Item> {
      * @param values The allowed items
      * @throws NullPointerException if value is <tt>null</tt>
      */
-    public ItemConfig(String name, String desc, Item value, Item[] values) {
+    public ItemConfig(String name, String desc, Item value, Item[] values)
+    {
         super(name, desc, value);
         this.values = values;
     }
@@ -36,7 +38,8 @@ public class ItemConfig extends Config<Item> {
      * @param value The default item
      * @throws NullPointerException if value is <tt>null</tt>
      */
-    public ItemConfig(String name, String desc, Item value) {
+    public ItemConfig(String name, String desc, Item value)
+    {
         this(name, desc, value, (Item[]) Registries.ITEM.stream().toArray());
     }
 
@@ -46,7 +49,8 @@ public class ItemConfig extends Config<Item> {
      * @return The data as a json object
      */
     @Override
-    public JsonObject toJson() {
+    public JsonObject toJson()
+    {
         return null;
     }
 
@@ -59,7 +63,8 @@ public class ItemConfig extends Config<Item> {
      * @see #toJson()
      */
     @Override
-    public Item fromJson(JsonObject jsonObj) {
+    public Item fromJson(JsonObject jsonObj)
+    {
         return null;
     }
 }

@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerListEntry.class)
-public class MixinPlayerListEntry implements Globals {
+public class MixinPlayerListEntry implements Globals
+{
 
     @Unique
     private Identifier capeTexture;
@@ -24,17 +25,19 @@ public class MixinPlayerListEntry implements Globals {
     private boolean capeTextureLoaded;
 
     /**
-     *
      * @param profile
      * @param secureChatEnforced
      * @param ci
      */
     @Inject(method = "<init>(Lcom/mojang/authlib/GameProfile;Z)V", at = @At("TAIL"))
-    private void hookInit(GameProfile profile, boolean secureChatEnforced, CallbackInfo ci) {
-        if (capeTextureLoaded) {
+    private void hookInit(GameProfile profile, boolean secureChatEnforced, CallbackInfo ci)
+    {
+        if (capeTextureLoaded)
+        {
             return;
         }
-        LoadCapeEvent loadCapeEvent = new LoadCapeEvent(profile, identifier -> {
+        LoadCapeEvent loadCapeEvent = new LoadCapeEvent(profile, identifier ->
+        {
             capeTexture = identifier;
         });
         EventBus.INSTANCE.dispatch(loadCapeEvent);
@@ -42,15 +45,17 @@ public class MixinPlayerListEntry implements Globals {
     }
 
     /**
-     *
      * @param cir
      */
     @Inject(method = "getSkinTextures", at = @At("TAIL"), cancellable = true)
-    private void hookGetSkinTextures(CallbackInfoReturnable<SkinTextures> cir) {
-        if (capeTexture != null) {
+    private void hookGetSkinTextures(CallbackInfoReturnable<SkinTextures> cir)
+    {
+        if (capeTexture != null)
+        {
             CapesEvent capesEvent = new CapesEvent();
             EventBus.INSTANCE.dispatch(capesEvent);
-            if (!capesEvent.isCanceled()) {
+            if (!capesEvent.isCanceled())
+            {
                 return;
             }
             SkinTextures t = cir.getReturnValue();

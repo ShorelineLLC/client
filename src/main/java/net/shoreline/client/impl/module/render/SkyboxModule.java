@@ -5,13 +5,13 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
 
@@ -19,7 +19,8 @@ import java.awt.*;
  * @author linus
  * @since 1.0
  */
-public class SkyboxModule extends ToggleModule {
+public class SkyboxModule extends ToggleModule
+{
 
     Config<Integer> dayTimeConfig = register(new NumberConfig<>("WorldTime", "The world time of day", 0, 6000, 24000));
     Config<Boolean> skyConfig = register(new BooleanConfig("Sky", "Changes the world skybox color", true));
@@ -29,7 +30,8 @@ public class SkyboxModule extends ToggleModule {
     Config<Boolean> fogConfig = register(new BooleanConfig("Fog", "Changes the world fog color", false));
     Config<Color> fogColorConfig = register(new ColorConfig("FogColor", "The color for the world fog", new Color(255, 0, 0), false, true, () -> fogConfig.getValue()));
 
-    public SkyboxModule() {
+    public SkyboxModule()
+    {
         super("Skybox", "Changes the rendering of the world skybox", ModuleCategory.RENDER);
     }
 
@@ -87,38 +89,48 @@ public class SkyboxModule extends ToggleModule {
 //    }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() == StageEvent.EventStage.POST) {
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.POST)
+        {
             mc.world.setTimeOfDay(dayTimeConfig.getValue());
         }
     }
 
     @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event) {
-        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket) {
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket)
+        {
             event.cancel();
         }
     }
 
     @EventListener
-    public void onSkyboxSky(SkyboxEvent.Sky event) {
-        if (skyConfig.getValue()) {
+    public void onSkyboxSky(SkyboxEvent.Sky event)
+    {
+        if (skyConfig.getValue())
+        {
             event.cancel();
             event.setColor(skyColorConfig.getValue());
         }
     }
 
     @EventListener
-    public void onSkyboxCloud(SkyboxEvent.Cloud event) {
-        if (cloudConfig.getValue()) {
+    public void onSkyboxCloud(SkyboxEvent.Cloud event)
+    {
+        if (cloudConfig.getValue())
+        {
             event.cancel();
             event.setColor(cloudColorConfig.getValue());
         }
     }
 
     @EventListener
-    public void onSkyboxFog(SkyboxEvent.Fog event) {
-        if (fogConfig.getValue()) {
+    public void onSkyboxFog(SkyboxEvent.Fog event)
+    {
+        if (fogConfig.getValue())
+        {
             event.cancel();
             event.setColor(fogColorConfig.getValue());
         }

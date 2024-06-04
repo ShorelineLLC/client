@@ -10,7 +10,8 @@ import net.shoreline.client.api.module.ModuleCategory;
  * @author linus
  * @since 1.0
  */
-public class RotationsModule extends ConcurrentModule {
+public class RotationsModule extends ConcurrentModule
+{
     private static RotationsModule INSTANCE;
 
     //
@@ -23,16 +24,19 @@ public class RotationsModule extends ConcurrentModule {
     /**
      *
      */
-    public RotationsModule() {
+    public RotationsModule()
+    {
         super("Rotations", "Manages client rotations", ModuleCategory.CLIENT);
         INSTANCE = this;
     }
 
-    public static RotationsModule getInstance() {
+    public static RotationsModule getInstance()
+    {
         return INSTANCE;
     }
 
-    public boolean getMovementFix() {
+    public boolean getMovementFix()
+    {
         return movementFixConfig.getValue();
     }
 
@@ -44,7 +48,8 @@ public class RotationsModule extends ConcurrentModule {
     /**
      * @return
      */
-    public float getPreserveTicks() {
+    public float getPreserveTicks()
+    {
         return preserveTicksConfig.getValue();
     }
 }

@@ -5,7 +5,8 @@ package net.shoreline.client.api;
  * @author linus
  * @since 1.0
  */
-public interface Invokable<T> {
+public interface Invokable<T>
+{
     /**
      * @param arg The argument
      */

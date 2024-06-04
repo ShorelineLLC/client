@@ -23,7 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(ClientWorld.class)
-public abstract class MixinClientWorld {
+public abstract class MixinClientWorld
+{
 
     @Shadow
     protected abstract EntityLookup<Entity> getEntityLookup();
@@ -33,21 +34,23 @@ public abstract class MixinClientWorld {
      * @param ci
      */
     @Inject(method = "addEntity", at = @At(value = "HEAD"))
-    private void hookAddEntity(Entity entity, CallbackInfo ci) {
+    private void hookAddEntity(Entity entity, CallbackInfo ci)
+    {
         AddEntityEvent addEntityEvent = new AddEntityEvent(entity);
         EventBus.INSTANCE.dispatch(addEntityEvent);
     }
 
     /**
-     *
      * @param entityId
      * @param removalReason
      * @param ci
      */
     @Inject(method = "removeEntity", at = @At(value = "HEAD"))
-    private void hookRemoveEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci) {
+    private void hookRemoveEntity(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci)
+    {
         Entity entity = getEntityLookup().get(entityId);
-        if (entity == null) {
+        if (entity == null)
+        {
             return;
         }
         RemoveEntityEvent removeEntityEvent = new RemoveEntityEvent(entity, removalReason);
@@ -61,10 +64,12 @@ public abstract class MixinClientWorld {
      */
     @Inject(method = "getSkyColor", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetSkyColor(Vec3d cameraPos, float tickDelta,
-                                 CallbackInfoReturnable<Vec3d> cir) {
+                                 CallbackInfoReturnable<Vec3d> cir)
+    {
         SkyboxEvent.Sky skyboxEvent = new SkyboxEvent.Sky();
         EventBus.INSTANCE.dispatch(skyboxEvent);
-        if (skyboxEvent.isCanceled()) {
+        if (skyboxEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getColorVec());
         }
@@ -76,10 +81,12 @@ public abstract class MixinClientWorld {
      */
     @Inject(method = "getCloudsColor", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetCloudsColor(float tickDelta,
-                                    CallbackInfoReturnable<Vec3d> cir) {
+                                    CallbackInfoReturnable<Vec3d> cir)
+    {
         SkyboxEvent.Cloud skyboxEvent = new SkyboxEvent.Cloud();
         EventBus.INSTANCE.dispatch(skyboxEvent);
-        if (skyboxEvent.isCanceled()) {
+        if (skyboxEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(skyboxEvent.getColorVec());
         }
@@ -87,10 +94,12 @@ public abstract class MixinClientWorld {
 
     @Inject(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V", at = @At(value = "HEAD"), cancellable = true)
     private void hookPlaySound(double x, double y, double z, SoundEvent event, SoundCategory category,
-                               float volume, float pitch, boolean useDistance, long seed, CallbackInfo ci) {
+                               float volume, float pitch, boolean useDistance, long seed, CallbackInfo ci)
+    {
         PlaySoundEvent playSoundEvent = new PlaySoundEvent(new Vec3d(x, y, z), event, category);
         EventBus.INSTANCE.dispatch(playSoundEvent);
-        if (playSoundEvent.isCanceled()) {
+        if (playSoundEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

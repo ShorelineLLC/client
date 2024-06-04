@@ -12,27 +12,33 @@ public class RenderChatHudEvent extends Event
     private double animation;
     private BetterChatModule.AnimationMode animationMode;
 
-    public RenderChatHudEvent(ChatHudLine chatHudLine) {
+    public RenderChatHudEvent(ChatHudLine chatHudLine)
+    {
         this.chatHudLine = chatHudLine;
     }
 
-    public double getAnimation() {
+    public double getAnimation()
+    {
         return animation;
     }
 
-    public void setAnimation(double animation) {
+    public void setAnimation(double animation)
+    {
         this.animation = animation;
     }
 
-    public void setAnimationMode(BetterChatModule.AnimationMode animationMode) {
+    public void setAnimationMode(BetterChatModule.AnimationMode animationMode)
+    {
         this.animationMode = animationMode;
     }
 
-    public ChatHudLine getChatHudLine() {
+    public ChatHudLine getChatHudLine()
+    {
         return chatHudLine;
     }
 
-    public BetterChatModule.AnimationMode getAnimationMode() {
+    public BetterChatModule.AnimationMode getAnimationMode()
+    {
         return animationMode;
     }
 }

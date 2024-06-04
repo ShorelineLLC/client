@@ -39,15 +39,19 @@ import net.shoreline.eventbus.annotation.EventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 // Do not look at this code
+
 /**
  * @author Shoreline
  * @since 1.0
  */
-public class AutoMineModule extends RotationModule {
+public class AutoMineModule extends RotationModule
+{
 
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows mining while using items", false));
     Config<Boolean> autoConfig = register(new BooleanConfig("Auto", "Automatically mines nearby players feet", false));
@@ -71,12 +75,14 @@ public class AutoMineModule extends RotationModule {
     private long lastBreak;
     private boolean manualOverride;
 
-    public AutoMineModule() {
+    public AutoMineModule()
+    {
         super("AutoMine", "Automatically mines blocks", ModuleCategory.WORLD, 900);
     }
 
     @Override
-    public String getModuleData() {
+    public String getModuleData()
+    {
         if (miningQueue.peek() != null)
         {
             return String.format("%.1f", Math.min(miningQueue.peek().getBlockDamage(), 1.0f));
@@ -136,15 +142,19 @@ public class AutoMineModule extends RotationModule {
             {
                 PlayerEntity playerTarget = null;
                 double minDistance = Float.MAX_VALUE;
-                for (PlayerEntity entity : mc.world.getPlayers()) {
-                    if (entity instanceof ClientPlayerEntity || Managers.SOCIAL.isFriend(entity.getName())) {
+                for (PlayerEntity entity : mc.world.getPlayers())
+                {
+                    if (entity instanceof ClientPlayerEntity || Managers.SOCIAL.isFriend(entity.getName()))
+                    {
                         continue;
                     }
                     double dist = mc.player.distanceTo(entity);
-                    if (dist > enemyRangeConfig.getValue()) {
+                    if (dist > enemyRangeConfig.getValue())
+                    {
                         continue;
                     }
-                    if (dist < minDistance) {
+                    if (dist < minDistance)
+                    {
                         minDistance = dist;
                         playerTarget = entity;
                     }
@@ -267,7 +277,8 @@ public class AutoMineModule extends RotationModule {
             }
             if (instantConfig.getValue())
             {
-                if (miningData2 instanceof AutoMiningData && !autoRemineConfig.getValue()) {
+                if (miningData2 instanceof AutoMiningData && !autoRemineConfig.getValue())
+                {
                     miningQueue.remove(miningData2);
                     return;
                 }
@@ -318,11 +329,13 @@ public class AutoMineModule extends RotationModule {
         else if (queueSize == 1)
         {
             MiningData data = miningQueue.getFirst();
-            if (data.getPos().equals(event.getPos())) {
+            if (data.getPos().equals(event.getPos()))
+            {
 //              abortMining(miningData);
                 return;
             }
-            if (data instanceof AutoMiningData) {
+            if (data instanceof AutoMiningData)
+            {
                 miningQueue.clear();
                 manualOverride = true;
             }
@@ -332,11 +345,13 @@ public class AutoMineModule extends RotationModule {
         {
             MiningData data1 = miningQueue.getFirst();
             MiningData data2 = miningQueue.getLast();
-            if (data1.getPos().equals(event.getPos()) || data2.getPos().equals(event.getPos())) {
+            if (data1.getPos().equals(event.getPos()) || data2.getPos().equals(event.getPos()))
+            {
 //              abortMining(miningData);
                 return;
             }
-            if (data1 instanceof AutoMiningData && data2 instanceof AutoMiningData) {
+            if (data1 instanceof AutoMiningData && data2 instanceof AutoMiningData)
+            {
                 miningQueue.remove();
                 manualOverride = true;
             }
@@ -346,7 +361,8 @@ public class AutoMineModule extends RotationModule {
     }
 
     @EventListener
-    public void onPacketOutbound(PacketEvent.Outbound event) {
+    public void onPacketOutbound(PacketEvent.Outbound event)
+    {
         if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket && switchResetConfig.getValue())
         {
             for (MiningData data : miningQueue)
@@ -357,7 +373,8 @@ public class AutoMineModule extends RotationModule {
     }
 
     @EventListener
-    public void onConfigUpdate(ConfigUpdateEvent event) {
+    public void onConfigUpdate(ConfigUpdateEvent event)
+    {
         if (event.getStage() == StageEvent.EventStage.POST && event.getConfig() == doubleBreakConfig)
         {
             if (doubleBreakConfig.getValue())
@@ -389,7 +406,8 @@ public class AutoMineModule extends RotationModule {
             int lineColor = data.getBlockDamage() >= 0.95f ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
             BlockPos mining = data.getPos();
             VoxelShape outlineShape = VoxelShapes.fullCube();
-            if (!data.isInstantRemine()) {
+            if (!data.isInstantRemine())
+            {
                 outlineShape = data.getState().getOutlineShape(mc.world, mining);
                 outlineShape = outlineShape.isEmpty() ? VoxelShapes.fullCube() : outlineShape;
             }
@@ -407,7 +425,8 @@ public class AutoMineModule extends RotationModule {
             RenderManager.renderBox(event.getMatrices(), scaled, boxColor);
             RenderManager.renderBoundingBox(event.getMatrices(), scaled, 1.5f, lineColor);
         }
-        for (MiningData data : miningQueue) {
+        for (MiningData data : miningQueue)
+        {
             Animation animation = new Animation(true, fadeTimeConfig.getValue());
             fadeList.put(data, animation);
         }
@@ -416,8 +435,10 @@ public class AutoMineModule extends RotationModule {
         RenderBuffers.postRender();
     }
 
-    private void startManualMine(BlockPos pos, Direction direction) {
-        if (isBlockDelayGrim()) {
+    private void startManualMine(BlockPos pos, Direction direction)
+    {
+        if (isBlockDelayGrim())
+        {
             return;
         }
         MiningData miningData = new MiningData(pos, direction);
@@ -426,10 +447,13 @@ public class AutoMineModule extends RotationModule {
     }
 
     // LOL
-    private PriorityQueue<AutoMineCalc> getNoAir(PriorityQueue<AutoMineCalc> calcs) {
+    private PriorityQueue<AutoMineCalc> getNoAir(PriorityQueue<AutoMineCalc> calcs)
+    {
         PriorityQueue<AutoMineCalc> noAir = new PriorityQueue<>();
-        for (AutoMineCalc calc : calcs) {
-            if (mc.world.isAir(calc.pos())) {
+        for (AutoMineCalc calc : calcs)
+        {
+            if (mc.world.isAir(calc.pos()))
+            {
                 continue;
             }
             noAir.add(calc);
@@ -474,7 +498,8 @@ public class AutoMineModule extends RotationModule {
         BlockPos crawlingPos = mc.player.getBlockPos();
         switch (crawlingConfig.getValue())
         {
-            case UP -> {
+            case UP ->
+            {
                 if (!BlastResistantBlocks.isUnbreakable(crawlingPos.up()) && !mc.world.isAir(crawlingPos.up()))
                 {
                     return crawlingPos.up();
@@ -491,7 +516,8 @@ public class AutoMineModule extends RotationModule {
         return null;
     }
 
-    private record AutoMineCalc(BlockPos pos, double entityDamage) implements Comparable<AutoMineCalc> {
+    private record AutoMineCalc(BlockPos pos, double entityDamage) implements Comparable<AutoMineCalc>
+    {
 
         @Override
         public int compareTo(@NotNull AutoMineCalc o)
@@ -555,7 +581,7 @@ public class AutoMineModule extends RotationModule {
         }
         if (rotateConfig.getValue())
         {
-            float rotations[] = RotationUtil.getRotationsTo(mc.player.getEyePos(), data.getPos().toCenterPos());
+            float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), data.getPos().toCenterPos());
             if (grimConfig.getValue())
             {
                 setRotationSilent(rotations[0], rotations[1]);
@@ -596,22 +622,27 @@ public class AutoMineModule extends RotationModule {
     }
 
     // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L80
-    public boolean isBlockDelayGrim() {
+    public boolean isBlockDelayGrim()
+    {
         return System.currentTimeMillis() - lastBreak <= 280 && grimConfig.getValue();
     }
 
-    private boolean isDataPacketMine(MiningData data) {
+    private boolean isDataPacketMine(MiningData data)
+    {
         return miningQueue.size() == 2 && data == miningQueue.getLast();
     }
 
-    public static class AutoMiningData extends MiningData {
+    public static class AutoMiningData extends MiningData
+    {
 
-        public AutoMiningData(BlockPos pos, Direction direction) {
+        public AutoMiningData(BlockPos pos, Direction direction)
+        {
             super(pos, direction);
         }
     }
 
-    public static class MiningData {
+    public static class MiningData
+    {
 
         private boolean attemptedBreak;
         private final Timer attemptBreakTimer = new CacheTimer();
@@ -622,7 +653,8 @@ public class AutoMineModule extends RotationModule {
         private boolean instantRemine;
         private boolean started;
 
-        public MiningData(BlockPos pos, Direction direction) {
+        public MiningData(BlockPos pos, Direction direction)
+        {
             this.pos = pos;
             this.direction = direction;
         }
@@ -648,11 +680,13 @@ public class AutoMineModule extends RotationModule {
             return attemptBreakTimer.passed(time);
         }
 
-        public boolean isInstantRemine() {
+        public boolean isInstantRemine()
+        {
             return instantRemine;
         }
 
-        public void setInstantRemine() {
+        public void setInstantRemine()
+        {
             this.instantRemine = true;
         }
 
@@ -663,44 +697,54 @@ public class AutoMineModule extends RotationModule {
             return blockDamage;
         }
 
-        public void setDamage(float blockDamage) {
+        public void setDamage(float blockDamage)
+        {
             this.blockDamage = blockDamage;
         }
 
-        public void resetDamage() {
+        public void resetDamage()
+        {
             instantRemine = false;
             blockDamage = 0.0f;
         }
 
-        public BlockPos getPos() {
+        public BlockPos getPos()
+        {
             return pos;
         }
 
-        public Direction getDirection() {
+        public Direction getDirection()
+        {
             return direction;
         }
 
-        public int getSlot() {
+        public int getSlot()
+        {
             return AutoToolModule.getInstance().getBestToolNoFallback(getState());
         }
 
-        public BlockState getState() {
+        public BlockState getState()
+        {
             return mc.world.getBlockState(pos);
         }
 
-        public boolean isStarted() {
+        public boolean isStarted()
+        {
             return started;
         }
 
-        public void setStarted() {
+        public void setStarted()
+        {
             this.started = true;
         }
 
-        public float getBlockDamage() {
+        public float getBlockDamage()
+        {
             return blockDamage;
         }
 
-        public float getLastDamage() {
+        public float getLastDamage()
+        {
             return lastDamage;
         }
     }

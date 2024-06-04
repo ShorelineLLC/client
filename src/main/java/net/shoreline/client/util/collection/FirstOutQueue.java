@@ -26,13 +26,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Kurt Alfred Kluever
  * @since 15.0
  */
-public final class FirstOutQueue<E> extends ForwardingQueue<E> implements Serializable {
+public final class FirstOutQueue<E> extends ForwardingQueue<E> implements Serializable
+{
 
     private final ArrayDeque<E> delegate;
 
     final int maxSize;
 
-    public FirstOutQueue(int maxSize) {
+    public FirstOutQueue(int maxSize)
+    {
         checkArgument(maxSize >= 0, "maxSize (%s) must >= 0", maxSize);
         this.delegate = new ArrayDeque<>(maxSize);
         this.maxSize = maxSize;
@@ -44,12 +46,14 @@ public final class FirstOutQueue<E> extends ForwardingQueue<E> implements Serial
      *
      * @since 16.0
      */
-    public int remainingCapacity() {
+    public int remainingCapacity()
+    {
         return maxSize - size();
     }
 
     @Override
-    protected @NotNull ArrayDeque<E> delegate() {
+    protected @NotNull ArrayDeque<E> delegate()
+    {
         return delegate;
     }
 
@@ -60,7 +64,8 @@ public final class FirstOutQueue<E> extends ForwardingQueue<E> implements Serial
      * @return {@code true} always
      */
     @Override
-    public boolean offer(E e) {
+    public boolean offer(E e)
+    {
         return add(e);
     }
 
@@ -71,42 +76,52 @@ public final class FirstOutQueue<E> extends ForwardingQueue<E> implements Serial
      * @return {@code true} always
      */
     @Override
-    public boolean add(E e) {
+    public boolean add(E e)
+    {
         checkNotNull(e); // check before removing
-        if (maxSize == 0) {
+        if (maxSize == 0)
+        {
             return true;
         }
-        if (size() == maxSize) {
+        if (size() == maxSize)
+        {
             delegate.remove();
         }
         delegate.add(e);
         return true;
     }
 
-    public boolean addFirst(E e) {
+    public boolean addFirst(E e)
+    {
         checkNotNull(e); // check before removing
-        if (maxSize == 0) {
+        if (maxSize == 0)
+        {
             return true;
         }
-        if (size() == maxSize) {
+        if (size() == maxSize)
+        {
             delegate.remove();
         }
         delegate.addFirst(e);
         return true;
     }
 
-    public E getFirst() {
+    public E getFirst()
+    {
         return delegate.getFirst();
     }
 
-    public E getLast() {
+    public E getLast()
+    {
         return delegate.getLast();
     }
 
     @Override
-    public boolean addAll(Collection<? extends E> collection) {
+    public boolean addAll(Collection<? extends E> collection)
+    {
         int size = collection.size();
-        if (size >= maxSize) {
+        if (size >= maxSize)
+        {
             clear();
             return Iterables.addAll(this, Iterables.skip(collection, size - maxSize));
         }
@@ -114,7 +129,8 @@ public final class FirstOutQueue<E> extends ForwardingQueue<E> implements Serial
     }
 
     @Override // Incompatible return type change. Use inherited implementation
-    public Object[] toArray() {
+    public Object[] toArray()
+    {
         /*
          * If we could, we'd declare the no-arg `Collection.toArray()` to return "Object[] but elements
          * have the same nullness as E." Since we can't, we declare it to return nullable elements, and

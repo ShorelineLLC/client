@@ -151,7 +151,7 @@ public enum Easing
                 @Override
                 public double ease(double factor)
                 {
-                    return factor < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * factor, 2))) / 2 :  (Math.sqrt(1 - Math.pow(-2 * factor + 2, 2)) + 1) / 2;
+                    return factor < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * factor, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * factor + 2, 2)) + 1) / 2;
                 }
             },
     EXPO_IN

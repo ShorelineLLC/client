@@ -4,31 +4,37 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.eventbus.Event;
 
-public class EntityCameraPositionEvent extends Event {
+public class EntityCameraPositionEvent extends Event
+{
 
     private Vec3d position;
     private final float tickDelta;
     private final Entity entity;
 
-    public EntityCameraPositionEvent(Vec3d position, Entity entity, float tickDelta) {
+    public EntityCameraPositionEvent(Vec3d position, Entity entity, float tickDelta)
+    {
         this.position = position;
         this.tickDelta = tickDelta;
         this.entity = entity;
     }
 
-    public float getTickDelta() {
+    public float getTickDelta()
+    {
         return tickDelta;
     }
 
-    public Vec3d getPosition() {
+    public Vec3d getPosition()
+    {
         return position;
     }
 
-    public void setPosition(Vec3d position) {
+    public void setPosition(Vec3d position)
+    {
         this.position = position;
     }
 
-    public Entity getEntity() {
+    public Entity getEntity()
+    {
         return entity;
     }
 }

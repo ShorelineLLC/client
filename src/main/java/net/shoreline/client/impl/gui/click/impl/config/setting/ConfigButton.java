@@ -11,7 +11,8 @@ import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
  * @author linus
  * @since 1.0
  */
-public abstract class ConfigButton<T> extends Button {
+public abstract class ConfigButton<T> extends Button
+{
     //
     protected final Config<T> config;
     protected final ModuleButton moduleButton;
@@ -20,7 +21,8 @@ public abstract class ConfigButton<T> extends Button {
      * @param frame
      * @param config
      */
-    public ConfigButton(CategoryFrame frame, ModuleButton moduleButton, Config<T> config, float x, float y) {
+    public ConfigButton(CategoryFrame frame, ModuleButton moduleButton, Config<T> config, float x, float y)
+    {
         super(frame, x, y, 99.0f, 13.0f);
         this.moduleButton = moduleButton;
         this.config = config;
@@ -33,7 +35,8 @@ public abstract class ConfigButton<T> extends Button {
      * @param delta
      */
     @Override
-    public void render(DrawContext context, float mouseX, float mouseY, float delta) {
+    public void render(DrawContext context, float mouseX, float mouseY, float delta)
+    {
         render(context, x, y, mouseX, mouseY, delta);
     }
 
@@ -51,7 +54,8 @@ public abstract class ConfigButton<T> extends Button {
     /**
      * @return
      */
-    public Config<T> getConfig() {
+    public Config<T> getConfig()
+    {
         return config;
     }
 }

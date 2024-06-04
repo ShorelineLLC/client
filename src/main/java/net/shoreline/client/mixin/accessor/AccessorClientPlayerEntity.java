@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(ClientPlayerEntity.class)
-public interface AccessorClientPlayerEntity {
+public interface AccessorClientPlayerEntity
+{
     /**
      * @return
      */

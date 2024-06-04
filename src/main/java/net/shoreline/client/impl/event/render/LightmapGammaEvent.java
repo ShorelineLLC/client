@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.render;
 
+import net.shoreline.client.mixin.render.MixinLightmapTextureManager;
 import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
-import net.shoreline.client.mixin.render.MixinLightmapTextureManager;
 
 /**
  * @author linus
@@ -10,22 +10,26 @@ import net.shoreline.client.mixin.render.MixinLightmapTextureManager;
  * @since 1.0
  */
 @Cancelable
-public class LightmapGammaEvent extends Event {
+public class LightmapGammaEvent extends Event
+{
     //
     private int gamma;
 
     /**
      * @param gamma
      */
-    public LightmapGammaEvent(int gamma) {
+    public LightmapGammaEvent(int gamma)
+    {
         this.gamma = gamma;
     }
 
-    public int getGamma() {
+    public int getGamma()
+    {
         return gamma;
     }
 
-    public void setGamma(int gamma) {
+    public void setGamma(int gamma)
+    {
         this.gamma = gamma;
     }
 }

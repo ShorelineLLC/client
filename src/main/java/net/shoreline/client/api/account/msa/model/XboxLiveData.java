@@ -8,19 +8,23 @@ public final class XboxLiveData
 {
     private String token, userHash;
 
-    public String getToken() {
+    public String getToken()
+    {
         return token;
     }
 
-    public void setToken(String token) {
+    public void setToken(String token)
+    {
         this.token = token;
     }
 
-    public String getUserHash() {
+    public String getUserHash()
+    {
         return userHash;
     }
 
-    public void setUserHash(String userHash) {
+    public void setUserHash(String userHash)
+    {
         this.userHash = userHash;
     }
 }

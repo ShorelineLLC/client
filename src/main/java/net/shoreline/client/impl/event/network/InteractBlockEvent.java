@@ -7,7 +7,8 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class InteractBlockEvent extends Event {
+public class InteractBlockEvent extends Event
+{
     //
     private final ClientPlayerEntity player;
     private final Hand hand;
@@ -19,21 +20,25 @@ public class InteractBlockEvent extends Event {
      * @param hitResult
      */
     public InteractBlockEvent(ClientPlayerEntity player, Hand hand,
-                              BlockHitResult hitResult) {
+                              BlockHitResult hitResult)
+    {
         this.player = player;
         this.hand = hand;
         this.hitResult = hitResult;
     }
 
-    public ClientPlayerEntity getPlayer() {
+    public ClientPlayerEntity getPlayer()
+    {
         return player;
     }
 
-    public Hand getHand() {
+    public Hand getHand()
+    {
         return hand;
     }
 
-    public BlockHitResult getHitResult() {
+    public BlockHitResult getHitResult()
+    {
         return hitResult;
     }
 }

@@ -3,7 +3,8 @@ package net.shoreline.client.impl.event.entity;
 import net.minecraft.entity.LivingEntity;
 import net.shoreline.eventbus.Event;
 
-public class PlayerDamageEvent extends Event {
+public class PlayerDamageEvent extends Event
+{
     private final LivingEntity damaged;
 
     public PlayerDamageEvent(LivingEntity damaged)

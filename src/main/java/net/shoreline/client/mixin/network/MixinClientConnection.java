@@ -24,16 +24,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(ClientConnection.class)
-public class MixinClientConnection {
-    @Shadow @Nullable private volatile PacketListener packetListener;
+public class MixinClientConnection
+{
+    @Shadow
+    @Nullable
+    private volatile PacketListener packetListener;
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
 
     @Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
-    private void hookExceptionCaught(ChannelHandlerContext context, Throwable ex, CallbackInfo ci) {
+    private void hookExceptionCaught(ChannelHandlerContext context, Throwable ex, CallbackInfo ci)
+    {
         DecodePacketEvent decodePacketEvent = new DecodePacketEvent();
         EventBus.INSTANCE.dispatch(decodePacketEvent);
-        if (decodePacketEvent.isCanceled()) {
+        if (decodePacketEvent.isCanceled())
+        {
             LOGGER.error("Exception caught on network thread:", ex);
             ci.cancel();
         }
@@ -47,11 +54,13 @@ public class MixinClientConnection {
     @Inject(method = "sendImmediately", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookSendImmediately(Packet<?> packet, @Nullable PacketCallbacks callbacks,
-                                     boolean flush, CallbackInfo ci) {
+                                     boolean flush, CallbackInfo ci)
+    {
         PacketEvent.Outbound packetOutboundEvent =
                 new PacketEvent.Outbound(packet);
         EventBus.INSTANCE.dispatch(packetOutboundEvent);
-        if (packetOutboundEvent.isCanceled()) {
+        if (packetOutboundEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -65,12 +74,14 @@ public class MixinClientConnection {
             "Lnet/minecraft/network/packet/Packet;)V", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookChannelRead0(ChannelHandlerContext channelHandlerContext,
-                                  Packet<?> packet, CallbackInfo ci) {
+                                  Packet<?> packet, CallbackInfo ci)
+    {
         PacketEvent.Inbound packetInboundEvent =
                 new PacketEvent.Inbound(packetListener, packet);
         EventBus.INSTANCE.dispatch(packetInboundEvent);
         // prevent client from receiving packet from server
-        if (packetInboundEvent.isCanceled()) {
+        if (packetInboundEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -80,7 +91,8 @@ public class MixinClientConnection {
      * @param ci
      */
     @Inject(method = "disconnect", at = @At(value = "HEAD"))
-    private void hookDisconnect(Text disconnectReason, CallbackInfo ci) {
+    private void hookDisconnect(Text disconnectReason, CallbackInfo ci)
+    {
         DisconnectEvent disconnectEvent = new DisconnectEvent();
         EventBus.INSTANCE.dispatch(disconnectEvent);
     }

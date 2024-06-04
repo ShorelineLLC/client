@@ -5,14 +5,17 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.StageEvent;
 
 @Cancelable
-public class TravelEvent extends StageEvent {
+public class TravelEvent extends StageEvent
+{
     private final Vec3d movementInput;
 
-    public TravelEvent(Vec3d movementInput) {
+    public TravelEvent(Vec3d movementInput)
+    {
         this.movementInput = movementInput;
     }
 
-    public Vec3d getMovementInput() {
+    public Vec3d getMovementInput()
+    {
         return movementInput;
     }
 }

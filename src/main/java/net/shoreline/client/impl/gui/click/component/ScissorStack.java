@@ -6,7 +6,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
 
-public class ScissorStack {
+public class ScissorStack
+{
     //
     private final Deque<ScreenRect> stack = new ArrayDeque<>();
 
@@ -14,13 +15,17 @@ public class ScissorStack {
      * @param rect
      * @return
      */
-    public ScreenRect push(ScreenRect rect) {
+    public ScreenRect push(ScreenRect rect)
+    {
         ScreenRect screenRect = stack.peekLast();
-        if (screenRect != null) {
+        if (screenRect != null)
+        {
             ScreenRect screenRect2 = Objects.requireNonNullElse(rect.intersection(screenRect), ScreenRect.empty());
             stack.addLast(screenRect2);
             return screenRect2;
-        } else {
+        }
+        else
+        {
             stack.addLast(rect);
             return rect;
         }
@@ -29,10 +34,14 @@ public class ScissorStack {
     /**
      * @return
      */
-    public ScreenRect pop() {
-        if (stack.isEmpty()) {
+    public ScreenRect pop()
+    {
+        if (stack.isEmpty())
+        {
             throw new IllegalStateException("Scissor stack underflow");
-        } else {
+        }
+        else
+        {
             stack.removeLast();
             return stack.peekLast();
         }

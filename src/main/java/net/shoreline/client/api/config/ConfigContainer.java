@@ -22,7 +22,8 @@ import java.util.concurrent.ConcurrentMap;
  * @see Config
  * @since 1.0
  */
-public class ConfigContainer implements Identifiable, Serializable<Config<?>>, Globals {
+public class ConfigContainer implements Identifiable, Serializable<Config<?>>, Globals
+{
     // Container name is its UNIQUE identifier.
     protected final String name;
     // List of all configurations in the container. The configs are managed
@@ -35,7 +36,8 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
      *
      * @param name The container name
      */
-    public ConfigContainer(String name) {
+    public ConfigContainer(String name)
+    {
         // set name of this container early
         // DO NOT MOVE THIS BACK - aesthetical
         this.name = name;
@@ -44,7 +46,8 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
     /**
      * @param config
      */
-    protected <T> Config<T> register(Config<T> config) {
+    protected <T> Config<T> register(Config<T> config)
+    {
         config.setContainer(this);
         configurations.put(config.getId(), config);
         return config;
@@ -53,18 +56,23 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
     /**
      * @param configs
      */
-    protected void register(Config<?>... configs) {
-        for (Config<?> config : configs) {
+    protected void register(Config<?>... configs)
+    {
+        for (Config<?> config : configs)
+        {
             register(config);
         }
     }
 
-    protected void unregister(Config<?> config) {
+    protected void unregister(Config<?> config)
+    {
         configurations.remove(config.getId());
     }
 
-    protected void unregister(Config<?>... configs) {
-        for (Config<?> config : configs) {
+    protected void unregister(Config<?>... configs)
+    {
+        for (Config<?> config : configs)
+        {
             unregister(config);
         }
     }
@@ -96,13 +104,16 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
      * @see Config#toJson()
      */
     @Override
-    public JsonObject toJson() {
+    public JsonObject toJson()
+    {
         final JsonObject out = new JsonObject();
         out.addProperty("name", getName());
         out.addProperty("id", getId());
         final JsonArray array = new JsonArray();
-        for (Config<?> config : getConfigs()) {
-            if (config.getValue() instanceof Macro) {
+        for (Config<?> config : getConfigs())
+        {
+            if (config.getValue() instanceof Macro)
+            {
                 continue;
             }
             array.add(config.toJson());
@@ -120,59 +131,87 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
      * @see Config#fromJson(JsonObject)
      */
     @Override
-    public Config<?> fromJson(JsonObject jsonObj) {
-        if (jsonObj.has("configs")) {
+    public Config<?> fromJson(JsonObject jsonObj)
+    {
+        if (jsonObj.has("configs"))
+        {
             JsonElement element = jsonObj.get("configs");
-            if (!element.isJsonArray()) {
+            if (!element.isJsonArray())
+            {
                 return null;
             }
-            for (JsonElement je : element.getAsJsonArray()) {
-                if (!je.isJsonObject()) {
+            for (JsonElement je : element.getAsJsonArray())
+            {
+                if (!je.isJsonObject())
+                {
                     continue;
                 }
                 final JsonObject configObj = je.getAsJsonObject();
                 final JsonElement id = configObj.get("id");
                 //
                 Config<?> config = getConfig(id.getAsString());
-                if (config == null) {
+                if (config == null)
+                {
                     continue;
                 }
-                try {
-                    if (config instanceof ToggleConfig cfg) {
+                try
+                {
+                    if (config instanceof ToggleConfig cfg)
+                    {
                         Boolean val = cfg.fromJson(configObj);
-                        if (mc.world != null) {
-                            if (val) {
+                        if (mc.world != null)
+                        {
+                            if (val)
+                            {
                                 cfg.enable();
-                            } else {
+                            }
+                            else
+                            {
                                 cfg.disable();
                             }
-                        } else {
+                        }
+                        else
+                        {
                             cfg.setValue(val);
                         }
-                    } else if (config instanceof BooleanConfig cfg) {
+                    }
+                    else if (config instanceof BooleanConfig cfg)
+                    {
                         Boolean val = cfg.fromJson(configObj);
                         cfg.setValue(val);
-                    } else if (config instanceof ColorConfig cfg) {
+                    }
+                    else if (config instanceof ColorConfig cfg)
+                    {
                         Color val = cfg.fromJson(configObj);
                         cfg.setValue(val);
-                    } else if (config instanceof EnumConfig cfg) {
+                    }
+                    else if (config instanceof EnumConfig cfg)
+                    {
                         Enum<?> val = cfg.fromJson(configObj);
-                        if (val != null) {
+                        if (val != null)
+                        {
                             cfg.setValue(val);
                         }
-                    } else if (config instanceof ItemListConfig cfg) {
+                    }
+                    else if (config instanceof ItemListConfig cfg)
+                    {
                         List<?> val = cfg.fromJson(configObj);
                         cfg.setValue(val);
-                    } else if (config instanceof NumberConfig cfg) {
+                    }
+                    else if (config instanceof NumberConfig cfg)
+                    {
                         Number val = cfg.fromJson(configObj);
                         cfg.setValue(val);
-                    } else if (config instanceof StringConfig cfg) {
+                    }
+                    else if (config instanceof StringConfig cfg)
+                    {
                         String val = cfg.fromJson(configObj);
                         cfg.setValue(val);
                     }
                 }
                 // couldn't parse Json value
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Shoreline.error("Couldn't parse Json for {}!", config.getName());
                     e.printStackTrace();
                 }
@@ -187,7 +226,8 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
      *
      * @return The unique name
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -195,7 +235,8 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
      * @return
      */
     @Override
-    public String getId() {
+    public String getId()
+    {
         return String.format("%s-container", name.toLowerCase());
     }
 
@@ -207,14 +248,16 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
      * @return The config from the id
      * @see Config#getId()
      */
-    public Config<?> getConfig(String id) {
+    public Config<?> getConfig(String id)
+    {
         return configurations.get(id);
     }
 
     /**
      * @return
      */
-    public Collection<Config<?>> getConfigs() {
+    public Collection<Config<?>> getConfigs()
+    {
         return configurations.values();
     }
 }

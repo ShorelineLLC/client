@@ -8,17 +8,20 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 
 import java.util.function.Predicate;
 
-public class BlockPlacerModule extends RotationModule {
+public class BlockPlacerModule extends RotationModule
+{
 
     protected Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Places on visible sides only", false));
     protected Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false));
 
-    public BlockPlacerModule(String name, String desc, ModuleCategory category) {
+    public BlockPlacerModule(String name, String desc, ModuleCategory category)
+    {
         super(name, desc, category);
         register(strictDirectionConfig, grimConfig);
     }
 
-    public BlockPlacerModule(String name, String desc, ModuleCategory category, int rotationPriority) {
+    public BlockPlacerModule(String name, String desc, ModuleCategory category, int rotationPriority)
+    {
         super(name, desc, category, rotationPriority);
         register(strictDirectionConfig, grimConfig);
     }

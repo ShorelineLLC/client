@@ -17,7 +17,8 @@ import java.util.concurrent.Executors;
  * @see ShorelineMod
  * @since 1.0
  */
-public class Shoreline {
+public class Shoreline
+{
     // Client configuration handler. This master saves/loads the client
     // configuration files which have been saved locally.
     public static ClientConfiguration CONFIG;
@@ -31,7 +32,8 @@ public class Shoreline {
     /**
      * Called during {@link ShorelineMod#onInitializeClient()}
      */
-    public static void init() {
+    public static void init()
+    {
         // Debug information - required when submitting a crash / bug report
         info("This build of Shoreline is on Git hash {} and was compiled on {}", BuildConfig.HASH, BuildConfig.BUILD_TIME);
         info("Starting preInit ...");
@@ -70,7 +72,8 @@ public class Shoreline {
 
     public static void info(Identifiable feature,
                             String message,
-                            Object... params) {
+                            Object... params)
+    {
         Loader.info(String.format("[%s] %s", feature.getId(), message), params);
     }
 

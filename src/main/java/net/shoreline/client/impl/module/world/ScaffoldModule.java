@@ -11,16 +11,15 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.util.math.position.PositionUtil;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.player.PlayerUtil;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.player.RayCastUtil;
 import net.shoreline.client.util.player.RotationUtil;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.START_SPRINTING;
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.STOP_SPRINTING;
@@ -120,11 +119,13 @@ public final class ScaffoldModule extends RotationModule
                 if (modeConfig.getValue() == Mode.GRIM)
                 {
                     Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], true);
-                } else
+                }
+                else
                 {
                     setRotation(rotations[0], rotations[1]);
                 }
-            } else
+            }
+            else
             {
                 if (modeConfig.getValue() == Mode.GRIM)
                 {
@@ -177,7 +178,7 @@ public final class ScaffoldModule extends RotationModule
                 {
                     for (float offsetPitch = 0.0f; offsetPitch <= 15.0f; offsetPitch += 0.5f)
                     {
-                        final float[] angles = { yaw + offsetYaw, pitch + offsetPitch };
+                        final float[] angles = {yaw + offsetYaw, pitch + offsetPitch};
                         final HitResult hitResult = RayCastUtil.rayCast(4.0, angles);
                         if (hitResult instanceof BlockHitResult blockHitResult
                                 && blockHitResult.getBlockPos().equals(pos)
@@ -197,12 +198,12 @@ public final class ScaffoldModule extends RotationModule
 
     private BlockData getBlockData()
     {
-        int posY = (int)Math.floor(mc.player.getY()) - 1;
+        int posY = (int) Math.floor(mc.player.getY()) - 1;
         if (keepYConfig.getValue())
         {
             if (mc.player.isOnGround() || groundPosY == -1)
             {
-                groundPosY = (int)Math.floor(mc.player.getY()) - 1;
+                groundPosY = (int) Math.floor(mc.player.getY()) - 1;
             }
             posY = groundPosY;
         }

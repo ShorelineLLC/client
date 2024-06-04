@@ -29,11 +29,13 @@ public class NoAccelModule extends ToggleModule
         }
         double speedEffect = 1.0;
         double slowEffect = 1.0;
-        if (mc.player.hasStatusEffect(StatusEffects.SPEED)) {
+        if (mc.player.hasStatusEffect(StatusEffects.SPEED))
+        {
             double amplifier = mc.player.getStatusEffect(StatusEffects.SPEED).getAmplifier();
             speedEffect = 1 + (0.2 * (amplifier + 1));
         }
-        if (mc.player.hasStatusEffect(StatusEffects.SLOWNESS)) {
+        if (mc.player.hasStatusEffect(StatusEffects.SLOWNESS))
+        {
             double amplifier = mc.player.getStatusEffect(StatusEffects.SLOWNESS).getAmplifier();
             slowEffect = 1 + (0.2 * (amplifier + 1));
         }

@@ -16,10 +16,12 @@ import java.util.List;
  * @author linus
  * @since 1.0
  */
-public class ItemListConfig<T extends List<Item>> extends Config<T> {
+public class ItemListConfig<T extends List<Item>> extends Config<T>
+{
 
     @SuppressWarnings("unchecked")
-    public ItemListConfig(String name, String desc, Item... values) {
+    public ItemListConfig(String name, String desc, Item... values)
+    {
         super(name, desc, (T) List.of(values));
     }
 
@@ -27,8 +29,10 @@ public class ItemListConfig<T extends List<Item>> extends Config<T> {
      * @param obj
      * @return
      */
-    public boolean contains(Object obj) {
-        if (obj instanceof Item) {
+    public boolean contains(Object obj)
+    {
+        if (obj instanceof Item)
+        {
             return value.contains(obj);
         }
         return false;
@@ -40,10 +44,12 @@ public class ItemListConfig<T extends List<Item>> extends Config<T> {
      * @return The data as a json object
      */
     @Override
-    public JsonObject toJson() {
+    public JsonObject toJson()
+    {
         JsonObject jsonObj = super.toJson();
         JsonArray array = new JsonArray();
-        for (Item item : getValue()) {
+        for (Item item : getValue())
+        {
             Identifier id = Registries.ITEM.getId(item);
             array.add(id.toString());
         }
@@ -60,11 +66,14 @@ public class ItemListConfig<T extends List<Item>> extends Config<T> {
      * @see #toJson()
      */
     @Override
-    public T fromJson(JsonObject jsonObj) {
-        if (jsonObj.has("value")) {
+    public T fromJson(JsonObject jsonObj)
+    {
+        if (jsonObj.has("value"))
+        {
             JsonElement element = jsonObj.get("value");
             List<Item> temp = new ArrayList<>();
-            for (JsonElement je : element.getAsJsonArray()) {
+            for (JsonElement je : element.getAsJsonArray())
+            {
                 String val = je.getAsString();
                 Item item = Registries.ITEM.get(new Identifier(val));
                 temp.add(item);

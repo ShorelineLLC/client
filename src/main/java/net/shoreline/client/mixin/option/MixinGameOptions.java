@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.io.File;
 
 @Mixin(GameOptions.class)
-public class MixinGameOptions {
+public class MixinGameOptions
+{
 
     @Mutable
     @Shadow
@@ -27,12 +28,14 @@ public class MixinGameOptions {
     private SimpleOption<Integer> fov;
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;load()V", shift = At.Shift.BEFORE))
-    private void hookInit(MinecraftClient client, File optionsFile, CallbackInfo ci) {
-        fov = new SimpleOption<>("options.fov", SimpleOption.emptyTooltip(), (optionText, value) -> switch (value) {
+    private void hookInit(MinecraftClient client, File optionsFile, CallbackInfo ci)
+    {
+        fov = new SimpleOption<>("options.fov", SimpleOption.emptyTooltip(), (optionText, value) -> switch (value)
+        {
             case 70 -> GameOptions.getGenericValueText(optionText, Text.translatable("options.fov.min"));
             case 110 -> GameOptions.getGenericValueText(optionText, Text.translatable("options.fov.max"));
             default -> GameOptions.getGenericValueText(optionText, value);
-        }, new SimpleOption.ValidatingIntSliderCallbacks(30, 180), Codec.DOUBLE.xmap(value -> (int)(value * 40.0 + 70.0), value -> ((double)value.intValue() - 70.0) / 40.0), 70, value -> MinecraftClient.getInstance().worldRenderer.scheduleTerrainUpdate());
+        }, new SimpleOption.ValidatingIntSliderCallbacks(30, 180), Codec.DOUBLE.xmap(value -> (int) (value * 40.0 + 70.0), value -> ((double) value.intValue() - 70.0) / 40.0), 70, value -> MinecraftClient.getInstance().worldRenderer.scheduleTerrainUpdate());
     }
 
     @Inject(method = "setPerspective", at = @At(value = "HEAD"))

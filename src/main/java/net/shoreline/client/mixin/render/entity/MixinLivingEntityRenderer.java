@@ -22,7 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(LivingEntityRenderer.class)
-public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extends EntityModel<T>> {
+public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extends EntityModel<T>>
+{
     //
     @Shadow
     protected M model;
@@ -45,17 +46,20 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
      */
     @Inject(method = "render*", at = @At(value = "HEAD"), cancellable = true)
     private void hookRender(LivingEntity livingEntity, float f, float g,
-                            MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
+                            MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci)
+    {
         RenderEntityEvent renderEntityEvent = new RenderEntityEvent(livingEntity,
                 f, g, matrixStack, vertexConsumerProvider, i, model, getRenderLayer((T) livingEntity, true, false, false), features);
         EventBus.INSTANCE.dispatch(renderEntityEvent);
-        if (renderEntityEvent.isCanceled()) {
+        if (renderEntityEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
 
     @Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z"))
-    private boolean redirectRender$isInvisibleTo(LivingEntity entity, PlayerEntity player) {
+    private boolean redirectRender$isInvisibleTo(LivingEntity entity, PlayerEntity player)
+    {
         final RenderEntityInvisibleEvent event = new RenderEntityInvisibleEvent(entity);
         EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())

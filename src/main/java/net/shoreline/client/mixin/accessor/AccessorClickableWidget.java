@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  *
  */
 @Mixin(ClickableWidget.class)
-public interface AccessorClickableWidget {
+public interface AccessorClickableWidget
+{
     /**
      * @param message
      */

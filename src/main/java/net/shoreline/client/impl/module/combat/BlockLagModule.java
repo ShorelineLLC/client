@@ -11,13 +11,13 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.List;
 
@@ -25,7 +25,8 @@ import java.util.List;
  * @author linus
  * @since 1.0
  */
-public class BlockLagModule extends ObsidianPlacerModule {
+public class BlockLagModule extends ObsidianPlacerModule
+{
     //
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates before placing the block", false));
     // Config<Boolean> strictConfig = register(new BooleanConfig("Strict", "Allows you to fake lag on strict servers", false);
@@ -37,31 +38,38 @@ public class BlockLagModule extends ObsidianPlacerModule {
     /**
      *
      */
-    public BlockLagModule() {
+    public BlockLagModule()
+    {
         super("BlockLag", "Lags you into a block", ModuleCategory.COMBAT);
     }
 
     @Override
-    public void onEnable() {
-        if (mc.player == null) {
+    public void onEnable()
+    {
+        if (mc.player == null)
+        {
             return;
         }
         prevY = mc.player.getY();
     }
 
     @EventListener
-    public void onDisconnect(DisconnectEvent event) {
+    public void onDisconnect(DisconnectEvent event)
+    {
         disable();
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event) {
-        if (Math.abs(mc.player.getY() - prevY) > 0.5) {
+    public void onPlayerTick(PlayerTickEvent event)
+    {
+        if (Math.abs(mc.player.getY() - prevY) > 0.5)
+        {
             disable();
             return;
         }
         final BlockPos pos = mc.player.getBlockPos();
-        if (!isInsideBlock()) {
+        if (!isInsideBlock())
+        {
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                     mc.player.getX(), mc.player.getY() + 0.42,
                     mc.player.getZ(), true));
@@ -83,12 +91,14 @@ public class BlockLagModule extends ObsidianPlacerModule {
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                     dist.x, dist.y, dist.z, false));
         }
-        if (autoDisableConfig.getValue()) {
+        if (autoDisableConfig.getValue())
+        {
             disable();
         }
     }
 
-    private void attack(Entity entity) {
+    private void attack(Entity entity)
+    {
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
@@ -103,10 +113,13 @@ public class BlockLagModule extends ObsidianPlacerModule {
         attackPlace(targetPos, slot);
     }
 
-    private void attackPlace(BlockPos targetPos, int slot) {
-        if (attackConfig.getValue()) {
+    private void attackPlace(BlockPos targetPos, int slot)
+    {
+        if (attackConfig.getValue())
+        {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-            for (Entity entity : entities) {
+            for (Entity entity : entities)
+            {
                 attack(entity);
             }
         }
@@ -127,12 +140,14 @@ public class BlockLagModule extends ObsidianPlacerModule {
         });
     }
 
-    public boolean isInsideBlock() {
+    public boolean isInsideBlock()
+    {
         return PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()).stream().anyMatch(pos -> !mc.world.getBlockState(pos).isReplaceable());
     }
 
     // TODO: strict offset calcs
-    public Vec3d getLagOffsetVec() {
+    public Vec3d getLagOffsetVec()
+    {
         return new Vec3d(mc.player.getX(), mc.player.getY() + 3.5, mc.player.getZ());
     }
 }

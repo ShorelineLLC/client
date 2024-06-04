@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 /**
  * @author xgraza
  * @since 01/14/24
- *
+ * <p>
  * I deeply apologize for the code you see here - this was a brain fuck
  * https://mojang-api-docs.gapple.pw/authentication/
  */
@@ -104,7 +104,8 @@ public final class MSAAuthenticator
         {
             // TODO: Auto close server if no interaction in a minute or so
             localServer = HttpServer.create();
-            localServer.createContext("/login", (ctx) -> {
+            localServer.createContext("/login", (ctx) ->
+            {
                 setLoginStage("Parsing access token from response");
                 final Map<String, String> query = parseQueryString(ctx.getRequestURI().getQuery());
 
@@ -184,11 +185,11 @@ public final class MSAAuthenticator
         httpPost.setHeader("Origin", "http://localhost:" + PORT + "/");
         httpPost.setEntity(new StringEntity(
                 makeQueryString(new String[][]{
-                        new String[] { "client_id", CLIENT_ID },
-                        new String[] { "code_verifier", pkceData.verifier() },
-                        new String[] { "code", oauthToken },
-                        new String[] { "grant_type", "authorization_code" },
-                        new String[] { "redirect_uri", "http://localhost:" + PORT + "/login" }
+                        new String[]{"client_id", CLIENT_ID},
+                        new String[]{"code_verifier", pkceData.verifier()},
+                        new String[]{"code", oauthToken},
+                        new String[]{"grant_type", "authorization_code"},
+                        new String[]{"redirect_uri", "http://localhost:" + PORT + "/login"}
                 }), ContentType.create(
                 ContentType.APPLICATION_FORM_URLENCODED.getMimeType(), Charset.defaultCharset())));
         try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpPost))
@@ -199,12 +200,14 @@ public final class MSAAuthenticator
                 throw new MSAAuthException("Failed to get login token from MSA OAuth");
             }
             final JsonObject obj = JsonParser.parseString(content).getAsJsonObject();
-            if (obj.has("error")) {
+            if (obj.has("error"))
+            {
                 throw new MSAAuthException(obj.get("error").getAsString() + ": " + obj.get("error_description").getAsString());
             }
             return obj.get("access_token").getAsString();
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             e.printStackTrace();
             throw new MSAAuthException("Failed to get login token");
         }
@@ -260,10 +263,10 @@ public final class MSAAuthenticator
         String encodedPassword = URLEncoder.encode(password);
         httpPost.setEntity(new StringEntity(
                 makeQueryString(new String[][]{
-                        new String[] { "login", encodedEmail },
-                        new String[] { "loginfmt", encodedEmail },
-                        new String[] { "passwd", encodedPassword },
-                        new String[] { "PPFT", result.getSfttTag() }
+                        new String[]{"login", encodedEmail},
+                        new String[]{"loginfmt", encodedEmail},
+                        new String[]{"passwd", encodedPassword},
+                        new String[]{"PPFT", result.getSfttTag()}
                 }), ContentType.create(contentTypeRaw)));
 
         final HttpClientContext ctx = HttpClientContext.create();
@@ -355,20 +358,25 @@ public final class MSAAuthenticator
 
     private String loginWithXboxLive(final XboxLiveData data) throws MSAAuthException
     {
-        try {
+        try
+        {
             final String body = "{\"ensureLegacyEnabled\":true,\"identityToken\":\"XBL3.0 x=" + data.getUserHash() + ";" + data.getToken() + "\"}";
             final String content = makePostRequest(LOGIN_WITH_XBOX_URL, body, ContentType.APPLICATION_JSON);
             if (content != null && !content.isEmpty())
             {
                 final JsonObject object = JsonParser.parseString(content).getAsJsonObject();
-                if (object.has("errorMessage")) {
+                if (object.has("errorMessage"))
+                {
                     throw new MSAAuthException(object.get("errorMessage").getAsString());
                 }
-                if (object.has("access_token")) {
+                if (object.has("access_token"))
+                {
                     return object.get("access_token").getAsString();
                 }
             }
-        } catch (JsonSyntaxException e) {
+        }
+        catch (JsonSyntaxException e)
+        {
             e.printStackTrace();
         }
         return null;
@@ -408,7 +416,7 @@ public final class MSAAuthenticator
         httpPost.setHeader("Accept", "application/json");
         httpPost.setEntity(new StringEntity(
                 body, ContentType.create(
-                        contentType.getMimeType(),
+                contentType.getMimeType(),
                 Charset.defaultCharset())));
         try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpPost))
         {

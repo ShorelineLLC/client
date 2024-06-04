@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author linus
  * @since 1.0
  */
-public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals {
+public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
+{
     //
     public static final AtomicInteger CURRENT_ID = new AtomicInteger(1000000);
     //
@@ -23,7 +24,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
      * @param player
      * @param name
      */
-    public FakePlayerEntity(PlayerEntity player, String name) {
+    public FakePlayerEntity(PlayerEntity player, String name)
+    {
         super(MinecraftClient.getInstance().world,
                 new GameProfile(UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7"), name));
         this.player = player;
@@ -51,7 +53,8 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
      * @param player
      * @param profile
      */
-    public FakePlayerEntity(PlayerEntity player, GameProfile profile) {
+    public FakePlayerEntity(PlayerEntity player, GameProfile profile)
+    {
         super(MinecraftClient.getInstance().world, profile);
         this.player = player;
         copyPositionAndRotation(player);
@@ -77,15 +80,18 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
     /**
      * @param player
      */
-    public FakePlayerEntity(PlayerEntity player) {
+    public FakePlayerEntity(PlayerEntity player)
+    {
         this(player, player.getName().getString());
     }
 
     /**
      *
      */
-    public void spawnPlayer() {
-        if (mc.world != null) {
+    public void spawnPlayer()
+    {
+        if (mc.world != null)
+        {
             unsetRemoved();
             mc.world.addEntity(this);
         }
@@ -94,8 +100,10 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
     /**
      *
      */
-    public void despawnPlayer() {
-        if (mc.world != null) {
+    public void despawnPlayer()
+    {
+        if (mc.world != null)
+        {
             mc.world.removeEntity(getId(), RemovalReason.DISCARDED);
             setRemoved(RemovalReason.DISCARDED);
         }
@@ -105,14 +113,16 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
      * @return
      */
     @Override
-    public boolean isDead() {
+    public boolean isDead()
+    {
         return false;
     }
 
     /**
      * @return
      */
-    public PlayerEntity getPlayer() {
+    public PlayerEntity getPlayer()
+    {
         return player;
     }
 }

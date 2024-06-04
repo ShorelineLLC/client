@@ -22,7 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(BackgroundRenderer.class)
-public class MixinBackgroundRenderer {
+public class MixinBackgroundRenderer
+{
 
     @Shadow
     private static float red;
@@ -43,23 +44,28 @@ public class MixinBackgroundRenderer {
      */
     @Inject(method = "applyFog", at = @At(value = "TAIL"))
     private static void hookApplyFog(Camera camera, BackgroundRenderer.FogType fogType,
-                                     float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci) {
-        if (fogType != BackgroundRenderer.FogType.FOG_TERRAIN) {
+                                     float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci)
+    {
+        if (fogType != BackgroundRenderer.FogType.FOG_TERRAIN)
+        {
             return;
         }
         RenderFogEvent renderFogEvent = new RenderFogEvent();
         EventBus.INSTANCE.dispatch(renderFogEvent);
-        if (renderFogEvent.isCanceled()) {
+        if (renderFogEvent.isCanceled())
+        {
             RenderSystem.setShaderFogStart(viewDistance * 4.0f);
             RenderSystem.setShaderFogEnd(viewDistance * 4.25f);
         }
     }
 
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-    private static void hookRender(Camera camera, float tickDelta, ClientWorld world, int viewDistance, float skyDarkness, CallbackInfo ci) {
+    private static void hookRender(Camera camera, float tickDelta, ClientWorld world, int viewDistance, float skyDarkness, CallbackInfo ci)
+    {
         SkyboxEvent.Fog skyboxEvent = new SkyboxEvent.Fog(tickDelta);
         EventBus.INSTANCE.dispatch(skyboxEvent);
-        if (skyboxEvent.isCanceled()) {
+        if (skyboxEvent.isCanceled())
+        {
             ci.cancel();
             Vec3d vec3d = skyboxEvent.getColorVec();
             red = (float) vec3d.x;
@@ -71,10 +77,12 @@ public class MixinBackgroundRenderer {
 
     @Inject(method = "getFogModifier(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/" +
             "BackgroundRenderer$StatusEffectFogModifier;", at = @At("HEAD"), cancellable = true)
-    private static void onGetFogModifier(Entity entity, float tickDelta, CallbackInfoReturnable<BackgroundRenderer.StatusEffectFogModifier> cir) {
+    private static void onGetFogModifier(Entity entity, float tickDelta, CallbackInfoReturnable<BackgroundRenderer.StatusEffectFogModifier> cir)
+    {
         BlindnessEvent blindnessEvent = new BlindnessEvent();
         EventBus.INSTANCE.dispatch(blindnessEvent);
-        if (blindnessEvent.isCanceled()) {
+        if (blindnessEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(null);
         }

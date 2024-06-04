@@ -6,7 +6,8 @@ import net.minecraft.util.Identifier;
  * @author linus
  * @since 1.0
  */
-public enum SoundEvents {
+public enum SoundEvents
+{
     CLICK("gui_click");
 
     //
@@ -15,14 +16,16 @@ public enum SoundEvents {
     /**
      * @param id
      */
-    SoundEvents(String id) {
+    SoundEvents(String id)
+    {
         this.id = new Identifier("caspian", String.format("sounds/%s.ogg", id));
     }
 
     /**
      * @return
      */
-    public Identifier getId() {
+    public Identifier getId()
+    {
         return id;
     }
 }

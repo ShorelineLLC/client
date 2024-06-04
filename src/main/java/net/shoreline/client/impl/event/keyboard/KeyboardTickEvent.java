@@ -5,15 +5,18 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.StageEvent;
 
 @Cancelable
-public class KeyboardTickEvent extends StageEvent {
+public class KeyboardTickEvent extends StageEvent
+{
 
     private final Input input;
 
-    public KeyboardTickEvent(Input input) {
+    public KeyboardTickEvent(Input input)
+    {
         this.input = input;
     }
 
-    public Input getInput() {
+    public Input getInput()
+    {
         return input;
     }
 }

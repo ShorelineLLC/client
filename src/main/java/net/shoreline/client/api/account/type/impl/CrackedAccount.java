@@ -10,9 +10,11 @@ import java.util.UUID;
  * @author xgraza
  * @since 03/31/24
  */
-public record CrackedAccount(String username) implements MinecraftAccount {
+public record CrackedAccount(String username) implements MinecraftAccount
+{
     @Override
-    public Session login() {
+    public Session login()
+    {
         return new Session(username(),
                 UUID.randomUUID(), "", Optional.empty(),
                 Optional.empty(), Session.AccountType.LEGACY);

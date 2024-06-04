@@ -20,7 +20,8 @@ import java.io.IOException;
 import java.util.List;
 
 @Deprecated
-public class VanillaTextRenderer implements Globals {
+public class VanillaTextRenderer implements Globals
+{
 
     public static TextRenderer getTextRender(String fontName) throws IOException
     {
@@ -41,17 +42,21 @@ public class VanillaTextRenderer implements Globals {
     }
 
     // Autism
-    public void drawWithShadow(MatrixStack matrices, String text, float x, float y, int color) {
+    public void drawWithShadow(MatrixStack matrices, String text, float x, float y, int color)
+    {
         draw(matrices, text, x + 1.0f, y + 1.0f, color, true);
         draw(matrices, text, x, y, color, false);
     }
 
-    public void draw(MatrixStack matrices, String text, float x, float y, int color, boolean shadow) {
+    public void draw(MatrixStack matrices, String text, float x, float y, int color, boolean shadow)
+    {
         this.draw(text, x, y, color, matrices.peek().getPositionMatrix(), shadow);
     }
 
-    private void draw(String text, float x, float y, int color, Matrix4f matrix, boolean shadow) {
-        if (text == null) {
+    private void draw(String text, float x, float y, int color, Matrix4f matrix, boolean shadow)
+    {
+        if (text == null)
+        {
             return;
         }
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(
@@ -63,13 +68,15 @@ public class VanillaTextRenderer implements Globals {
 
     public void draw(String text, float x, float y, int color, boolean shadow,
                      Matrix4f matrix, VertexConsumerProvider vertexConsumers,
-                     TextRenderer.TextLayerType layerType, int backgroundColor, int light) {
+                     TextRenderer.TextLayerType layerType, int backgroundColor, int light)
+    {
         drawInternal(text, x, y, color, shadow, matrix, vertexConsumers, layerType, backgroundColor, light);
     }
 
     private void drawInternal(String text, float x, float y, int color, boolean shadow,
                               Matrix4f matrix, VertexConsumerProvider vertexConsumers,
-                              TextRenderer.TextLayerType layerType, int backgroundColor, int light) {
+                              TextRenderer.TextLayerType layerType, int backgroundColor, int light)
+    {
         // color = TextRenderer.tweakTransparency(color);
         Matrix4f matrix4f = new Matrix4f(matrix);
         drawLayer(text, x, y, color, shadow, matrix4f, vertexConsumers, layerType, backgroundColor, light);
@@ -77,13 +84,15 @@ public class VanillaTextRenderer implements Globals {
 
     private void drawLayer(String text, float x, float y, int color, boolean shadow,
                            Matrix4f matrix, VertexConsumerProvider vertexConsumerProvider,
-                           TextRenderer.TextLayerType layerType, int underlineColor, int light) {
+                           TextRenderer.TextLayerType layerType, int underlineColor, int light)
+    {
         Drawer drawer = new Drawer(vertexConsumerProvider, x, y, color, shadow, matrix, layerType, light);
-        TextVisitFactory.visitFormatted(text, Style.EMPTY, (CharacterVisitor) drawer);
+        TextVisitFactory.visitFormatted(text, Style.EMPTY, drawer);
         drawer.drawLayer();
     }
 
-    public static class Drawer implements CharacterVisitor {
+    public static class Drawer implements CharacterVisitor
+    {
         final VertexConsumerProvider vertexConsumers;
         private final float brightnessMultiplier;
         private final float red;
@@ -100,7 +109,8 @@ public class VanillaTextRenderer implements Globals {
 
         public Drawer(VertexConsumerProvider vertexConsumers, float x,
                       float y, int color, boolean shadow, Matrix4f matrix,
-                      TextRenderer.TextLayerType layerType, int light) {
+                      TextRenderer.TextLayerType layerType, int light)
+        {
             this.vertexConsumers = vertexConsumers;
             this.x = x;
             this.y = y;
@@ -115,7 +125,8 @@ public class VanillaTextRenderer implements Globals {
         }
 
         @Override
-        public boolean accept(int i, Style style, int j) {
+        public boolean accept(int i, Style style, int j)
+        {
             // float n;
             float l;
             float h;
@@ -126,17 +137,21 @@ public class VanillaTextRenderer implements Globals {
             boolean bl = style.isBold();
             float f = this.alpha;
             TextColor textColor = style.getColor();
-            if (textColor != null) {
+            if (textColor != null)
+            {
                 int k = textColor.getRgb();
                 g = (float) (k >> 16 & 0xFF) / 255.0f * this.brightnessMultiplier;
                 h = (float) (k >> 8 & 0xFF) / 255.0f * this.brightnessMultiplier;
                 l = (float) (k & 0xFF) / 255.0f * this.brightnessMultiplier;
-            } else {
+            }
+            else
+            {
                 g = this.red;
                 h = this.green;
                 l = this.blue;
             }
-            if (!(glyphRenderer instanceof EmptyGlyphRenderer)) {
+            if (!(glyphRenderer instanceof EmptyGlyphRenderer))
+            {
                 float m = bl ? glyph.getBoldOffset() : 0.0f;
                 // n = this.shadow ? glyph.getShadowOffset() : 0.0f;
                 VertexConsumer vertexConsumer = this.vertexConsumers.getBuffer(glyphRenderer.getLayer(this.layerType));
@@ -147,11 +162,14 @@ public class VanillaTextRenderer implements Globals {
             return true;
         }
 
-        public void drawLayer() {
-            if (this.rectangles != null) {
+        public void drawLayer()
+        {
+            if (this.rectangles != null)
+            {
                 GlyphRenderer glyphRenderer = ((AccessorTextRenderer) mc.textRenderer).hookGetFontStorage(Style.DEFAULT_FONT_ID).getRectangleRenderer();
                 VertexConsumer vertexConsumer = this.vertexConsumers.getBuffer(glyphRenderer.getLayer(this.layerType));
-                for (GlyphRenderer.Rectangle rectangle : this.rectangles) {
+                for (GlyphRenderer.Rectangle rectangle : this.rectangles)
+                {
                     glyphRenderer.drawRectangle(rectangle, this.matrix, vertexConsumer, this.light);
                 }
             }

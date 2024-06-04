@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.Mixin;
  * @since 1.0
  */
 @Mixin(DisconnectedScreen.class)
-public abstract class MixinDisconnectedScreen extends MixinScreen implements Globals {
+public abstract class MixinDisconnectedScreen extends MixinScreen implements Globals
+{
 //    @Shadow
 //    @Final
 //    private DirectionalLayoutWidget grid;

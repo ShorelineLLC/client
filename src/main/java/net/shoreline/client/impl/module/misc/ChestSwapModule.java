@@ -15,28 +15,36 @@ import net.shoreline.client.init.Managers;
  * @author Shoreline
  * @since 1.0
  */
-public class ChestSwapModule extends ToggleModule {
+public class ChestSwapModule extends ToggleModule
+{
 
     Config<Priority> priorityConfig = register(new EnumConfig<>("Priority", "The chestplate material to prioritize", Priority.NETHERITE, Priority.values()));
 
-    public ChestSwapModule() {
+    public ChestSwapModule()
+    {
         super("ChestSwap", "Automatically swaps chestplate", ModuleCategory.MISCELLANEOUS);
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable()
+    {
         ItemStack armorStack = mc.player.getInventory().getArmorStack(2);
         if (armorStack.getItem() instanceof ArmorItem armorItem
-                && armorItem.getSlotType() == EquipmentSlot.CHEST) {
+                && armorItem.getSlotType() == EquipmentSlot.CHEST)
+        {
             int elytraSlot = getElytraSlot();
-            if (elytraSlot != -1) {
+            if (elytraSlot != -1)
+            {
                 Managers.INVENTORY.pickupSlot(elytraSlot);
                 Managers.INVENTORY.pickupSlot(6);
                 Managers.INVENTORY.pickupSlot(elytraSlot);
             }
-        } else {
+        }
+        else
+        {
             int chestplateSlot = getChestplateSlot();
-            if (chestplateSlot != -1) {
+            if (chestplateSlot != -1)
+            {
                 Managers.INVENTORY.pickupSlot(chestplateSlot);
                 Managers.INVENTORY.pickupSlot(6);
                 Managers.INVENTORY.pickupSlot(chestplateSlot);
@@ -45,19 +53,27 @@ public class ChestSwapModule extends ToggleModule {
         disable();
     }
 
-    private int getChestplateSlot() {
+    private int getChestplateSlot()
+    {
         int slot = -1;
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 36; i++)
+        {
             ItemStack stack = mc.player.getInventory().getStack(i);
             if (stack.getItem() instanceof ArmorItem armorItem
-                    && armorItem.getSlotType() == EquipmentSlot.CHEST) {
-                if (armorItem.getMaterial() == ArmorMaterials.NETHERITE && priorityConfig.getValue() == Priority.NETHERITE) {
+                    && armorItem.getSlotType() == EquipmentSlot.CHEST)
+            {
+                if (armorItem.getMaterial() == ArmorMaterials.NETHERITE && priorityConfig.getValue() == Priority.NETHERITE)
+                {
                     slot = i;
                     break;
-                } else if (armorItem.getMaterial() == ArmorMaterials.DIAMOND && priorityConfig.getValue() == Priority.DIAMOND) {
+                }
+                else if (armorItem.getMaterial() == ArmorMaterials.DIAMOND && priorityConfig.getValue() == Priority.DIAMOND)
+                {
                     slot = i;
                     break;
-                } else {
+                }
+                else
+                {
                     slot = i;
                 }
             }
@@ -65,11 +81,14 @@ public class ChestSwapModule extends ToggleModule {
         return slot;
     }
 
-    private int getElytraSlot() {
+    private int getElytraSlot()
+    {
         int slot = -1;
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 36; i++)
+        {
             ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() instanceof ElytraItem) {
+            if (stack.getItem() instanceof ElytraItem)
+            {
                 slot = i;
                 break;
             }
@@ -77,7 +96,8 @@ public class ChestSwapModule extends ToggleModule {
         return slot;
     }
 
-    private enum Priority {
+    private enum Priority
+    {
         NETHERITE,
         DIAMOND
     }

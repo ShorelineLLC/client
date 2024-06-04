@@ -15,7 +15,8 @@ import java.util.Arrays;
  * @author linus
  * @since 1.0
  */
-public class DropdownButton extends ConfigButton<Enum<?>> {
+public class DropdownButton extends ConfigButton<Enum<?>>
+{
     // Current enum value index
     private int index;
 
@@ -23,7 +24,8 @@ public class DropdownButton extends ConfigButton<Enum<?>> {
      * @param frame
      * @param config
      */
-    public DropdownButton(CategoryFrame frame, ModuleButton moduleButton, Config<Enum<?>> config, float x, float y) {
+    public DropdownButton(CategoryFrame frame, ModuleButton moduleButton, Config<Enum<?>> config, float x, float y)
+    {
         super(frame, moduleButton, config, x, y);
     }
 
@@ -37,7 +39,8 @@ public class DropdownButton extends ConfigButton<Enum<?>> {
      */
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX,
-                       float mouseY, float delta) {
+                       float mouseY, float delta)
+    {
         x = ix;
         y = iy;
         String val = EnumFormatter.formatEnum(config.getValue());
@@ -60,14 +63,19 @@ public class DropdownButton extends ConfigButton<Enum<?>> {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isWithin(mouseX, mouseY)) {
+    public void mouseClicked(double mouseX, double mouseY, int button)
+    {
+        if (isWithin(mouseX, mouseY))
+        {
             Enum<?> val = config.getValue();
             String[] values = Arrays.stream(val.getClass().getEnumConstants()).map(Enum::name).toArray(String[]::new);
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+            {
                 index = index + 1 > values.length - 1 ? 0 : index + 1;
                 config.setValue(Enum.valueOf(val.getClass(), values[index]));
-            } else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            }
+            else if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+            {
                 index = index - 1 < 0 ? values.length - 1 : index - 1;
                 config.setValue(Enum.valueOf(val.getClass(), values[index]));
             }
@@ -80,7 +88,8 @@ public class DropdownButton extends ConfigButton<Enum<?>> {
      * @param button
      */
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    public void mouseReleased(double mouseX, double mouseY, int button)
+    {
 
     }
 
@@ -90,7 +99,8 @@ public class DropdownButton extends ConfigButton<Enum<?>> {
      * @param modifiers
      */
     @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers)
+    {
 
     }
 }

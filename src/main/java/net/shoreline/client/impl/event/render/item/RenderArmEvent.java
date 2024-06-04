@@ -8,7 +8,8 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class RenderArmEvent extends Event {
+public class RenderArmEvent extends Event
+{
 
     public final MatrixStack matrices;
     public final VertexConsumerProvider vertexConsumers;
@@ -18,7 +19,8 @@ public class RenderArmEvent extends Event {
     public final float swingProgress;
     public final PlayerEntityRenderer playerEntityRenderer;
 
-    public RenderArmEvent(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, PlayerEntityRenderer playerEntityRenderer) {
+    public RenderArmEvent(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, PlayerEntityRenderer playerEntityRenderer)
+    {
         this.matrices = matrices;
         this.vertexConsumers = vertexConsumers;
         this.light = light;

@@ -4,11 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.config.setting.*;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.bus.EventBus;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 import java.util.function.Supplier;
@@ -32,7 +32,8 @@ import java.util.function.Supplier;
  * @see StringConfig
  * @since 1.0
  */
-public abstract class Config<T> implements Identifiable, Serializable<T> {
+public abstract class Config<T> implements Identifiable, Serializable<T>
+{
     // Config name is its UNIQUE identifier
     private final String name;
     // Concise config description, displayed in the ClickGui to help users
@@ -61,8 +62,10 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      * @param value The default config value
      * @throws NullPointerException if value is <tt>null</tt>
      */
-    public Config(String name, String desc, T value) {
-        if (value == null) {
+    public Config(String name, String desc, T value)
+    {
+        if (value == null)
+        {
             throw new NullPointerException("Null values not supported");
         }
         this.name = name;
@@ -82,7 +85,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      * @param visible The visibility of the config
      * @throws NullPointerException if value is <tt>null</tt>
      */
-    public Config(String name, String desc, T value, Supplier<Boolean> visible) {
+    public Config(String name, String desc, T value, Supplier<Boolean> visible)
+    {
         this(name, desc, value);
         this.visible = visible;
     }
@@ -95,7 +99,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      * @param desc
      */
     @Internal
-    public Config(String name, String desc) {
+    public Config(String name, String desc)
+    {
         this.name = name;
         this.desc = desc;
         this.defaultValue = null;
@@ -105,7 +110,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      * @return
      */
     @Override
-    public JsonObject toJson() {
+    public JsonObject toJson()
+    {
         final JsonObject obj = new JsonObject();
         obj.addProperty("name", getName());
         obj.addProperty("id", getId());
@@ -117,8 +123,10 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      * @return
      */
     @Override
-    public T fromJson(JsonObject obj) {
-        if (obj.has("value")) {
+    public T fromJson(JsonObject obj)
+    {
+        if (obj.has("value"))
+        {
             JsonElement element = obj.get("value");
             return (T) (Byte) element.getAsByte();
         }
@@ -128,7 +136,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
     /**
      * @return
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -137,7 +146,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      * @see ConfigContainer#getName()
      */
     @Override
-    public String getId() {
+    public String getId()
+    {
         return String.format("%s-%s-config", container.getName().toLowerCase(), name.toLowerCase());
     }
 
@@ -147,7 +157,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      *
      * @return The config value description
      */
-    public String getDescription() {
+    public String getDescription()
+    {
         return desc;
     }
 
@@ -156,7 +167,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      *
      * @return The config value
      */
-    public T getValue() {
+    public T getValue()
+    {
         return value;
     }
 
@@ -167,8 +179,10 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      * @param val The param value
      * @throws NullPointerException if value is <tt>null</tt>
      */
-    public void setValue(final T val) {
-        if (val == null) {
+    public void setValue(final T val)
+    {
+        if (val == null)
+        {
             throw new NullPointerException("Null values not supported!");
         }
         final ConfigUpdateEvent event = new ConfigUpdateEvent(this);
@@ -184,7 +198,8 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
     /**
      * @return
      */
-    public ConfigContainer getContainer() {
+    public ConfigContainer getContainer()
+    {
         return container;
     }
 
@@ -196,25 +211,30 @@ public abstract class Config<T> implements Identifiable, Serializable<T> {
      *
      * @param cont The parent container
      */
-    public void setContainer(final ConfigContainer cont) {
+    public void setContainer(final ConfigContainer cont)
+    {
         container = cont;
     }
 
-    public Animation getAnimation() {
+    public Animation getAnimation()
+    {
         return configAnimation;
     }
 
     /**
      * @return
      */
-    public boolean isVisible() {
-        if (visible != null) {
+    public boolean isVisible()
+    {
+        if (visible != null)
+        {
             return visible.get();
         }
         return true;
     }
 
-    public void resetValue() {
+    public void resetValue()
+    {
         setValue(defaultValue);
     }
 }

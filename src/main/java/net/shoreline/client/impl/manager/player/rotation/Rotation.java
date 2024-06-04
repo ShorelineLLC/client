@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.manager.player.rotation;
 
-public class Rotation {
+public class Rotation
+{
     private final int priority;
     private float yaw, pitch;
     private boolean snap;
@@ -13,35 +14,43 @@ public class Rotation {
         this.snap = snap;
     }
 
-    public Rotation(int priority, float yaw, float pitch) {
+    public Rotation(int priority, float yaw, float pitch)
+    {
         this(priority, yaw, pitch, false);
     }
 
-    public int getPriority() {
+    public int getPriority()
+    {
         return priority;
     }
 
-    public void setYaw(float yaw) {
+    public void setYaw(float yaw)
+    {
         this.yaw = yaw;
     }
 
-    public void setPitch(float pitch) {
+    public void setPitch(float pitch)
+    {
         this.pitch = pitch;
     }
 
-    public float getYaw() {
+    public float getYaw()
+    {
         return yaw;
     }
 
-    public float getPitch() {
+    public float getPitch()
+    {
         return pitch;
     }
 
-    public void setSnap(boolean snap) {
+    public void setSnap(boolean snap)
+    {
         this.snap = snap;
     }
 
-    public boolean isSnap() {
+    public boolean isSnap()
+    {
         return snap;
     }
 }

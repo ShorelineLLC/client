@@ -14,14 +14,16 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * @see ArrayDeque
  * @since 1.0
  */
-public class EvictingQueue<E> extends ConcurrentLinkedDeque<E> {
+public class EvictingQueue<E> extends ConcurrentLinkedDeque<E>
+{
     //
     private final int limit;
 
     /**
      * @param limit
      */
-    public EvictingQueue(int limit) {
+    public EvictingQueue(int limit)
+    {
         this.limit = limit;
     }
 
@@ -30,9 +32,11 @@ public class EvictingQueue<E> extends ConcurrentLinkedDeque<E> {
      * @return
      */
     @Override
-    public boolean add(@NotNull E element) {
+    public boolean add(@NotNull E element)
+    {
         boolean add = super.add(element);
-        while (add && size() > limit) {
+        while (add && size() > limit)
+        {
             super.remove();
         }
         return add;
@@ -41,9 +45,11 @@ public class EvictingQueue<E> extends ConcurrentLinkedDeque<E> {
     /**
      * @param element element whose presence in this collection is to be ensured
      */
-    public void addFirst(@NotNull E element) {
+    public void addFirst(@NotNull E element)
+    {
         super.addFirst(element);
-        while (size() > limit) {
+        while (size() > limit)
+        {
             super.removeLast();
         }
     }
@@ -51,7 +57,8 @@ public class EvictingQueue<E> extends ConcurrentLinkedDeque<E> {
     /**
      * @return
      */
-    public int limit() {
+    public int limit()
+    {
         return limit;
     }
 }

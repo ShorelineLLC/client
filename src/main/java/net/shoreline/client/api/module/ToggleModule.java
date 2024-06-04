@@ -27,7 +27,8 @@ import org.lwjgl.glfw.GLFW;
  * @see ToggleConfig
  * @since 1.0
  */
-public class ToggleModule extends Module implements Hideable {
+public class ToggleModule extends Module implements Hideable
+{
     //
     private final Animation animation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
     // Config representing the module enabled state. Cannot interact with
@@ -52,7 +53,8 @@ public class ToggleModule extends Module implements Hideable {
      * @param desc     The module description
      * @param category The module category
      */
-    public ToggleModule(String name, String desc, ModuleCategory category) {
+    public ToggleModule(String name, String desc, ModuleCategory category)
+    {
         super(name, desc, category);
         // Toggle settings
         register(keybindingConfig, enabledConfig, hiddenConfig);
@@ -65,7 +67,8 @@ public class ToggleModule extends Module implements Hideable {
      * @param keycode  The module default keybind
      */
     public ToggleModule(String name, String desc, ModuleCategory category,
-                        Integer keycode) {
+                        Integer keycode)
+    {
         this(name, desc, category);
         keybind(keycode);
     }
@@ -74,7 +77,8 @@ public class ToggleModule extends Module implements Hideable {
      * @return
      */
     @Override
-    public boolean isHidden() {
+    public boolean isHidden()
+    {
         return hiddenConfig.getValue();
     }
 
@@ -82,7 +86,8 @@ public class ToggleModule extends Module implements Hideable {
      * @param hidden
      */
     @Override
-    public void setHidden(boolean hidden) {
+    public void setHidden(boolean hidden)
+    {
         hiddenConfig.setValue(hidden);
     }
 
@@ -94,10 +99,14 @@ public class ToggleModule extends Module implements Hideable {
      * @see #enable()
      * @see #disable()
      */
-    public void toggle() {
-        if (isEnabled()) {
+    public void toggle()
+    {
+        if (isEnabled())
+        {
             disable();
-        } else {
+        }
+        else
+        {
             enable();
         }
     }
@@ -109,7 +118,8 @@ public class ToggleModule extends Module implements Hideable {
      * @see #onEnable()
      * @see ToggleConfig#setValue(Boolean)
      */
-    public void enable() {
+    public void enable()
+    {
         enabledConfig.setValue(true);
         onEnable();
         if (notifyConfig.getValue() && mc.world != null)
@@ -125,7 +135,8 @@ public class ToggleModule extends Module implements Hideable {
      * @see #onDisable()
      * @see ToggleConfig#setValue(Boolean)
      */
-    public void disable() {
+    public void disable()
+    {
         enabledConfig.setValue(false);
         onDisable();
         if (notifyConfig.getValue() && mc.world != null)
@@ -140,7 +151,8 @@ public class ToggleModule extends Module implements Hideable {
      *
      * @see #enable()
      */
-    protected void onEnable() {
+    protected void onEnable()
+    {
 
     }
 
@@ -150,7 +162,8 @@ public class ToggleModule extends Module implements Hideable {
      *
      * @see #disable()
      */
-    protected void onDisable() {
+    protected void onDisable()
+    {
 
     }
 
@@ -163,7 +176,8 @@ public class ToggleModule extends Module implements Hideable {
      * @see Macro
      * @see #keybindingConfig
      */
-    public void keybind(int keycode) {
+    public void keybind(int keycode)
+    {
         keybindingConfig.setContainer(this);
         ((MacroConfig) keybindingConfig).setValue(keycode);
     }
@@ -175,14 +189,16 @@ public class ToggleModule extends Module implements Hideable {
      * @return <tt>true</tt> if the module is enabled
      * @see #enabledConfig
      */
-    public boolean isEnabled() {
+    public boolean isEnabled()
+    {
         return enabledConfig.getValue();
     }
 
     /**
      * @return
      */
-    public Macro getKeybinding() {
+    public Macro getKeybinding()
+    {
         return keybindingConfig.getValue();
     }
 
@@ -199,7 +215,8 @@ public class ToggleModule extends Module implements Hideable {
     /**
      * @return
      */
-    public Animation getAnimation() {
+    public Animation getAnimation()
+    {
         return animation;
     }
 }

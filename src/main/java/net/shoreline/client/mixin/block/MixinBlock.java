@@ -13,17 +13,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(Block.class)
-public class MixinBlock {
+public class MixinBlock
+{
     /**
      * @param cir
      */
     @Inject(method = "getSlipperiness", at = @At(value = "RETURN"),
             cancellable = true)
-    private void hookGetSlipperiness(CallbackInfoReturnable<Float> cir) {
+    private void hookGetSlipperiness(CallbackInfoReturnable<Float> cir)
+    {
         BlockSlipperinessEvent blockSlipperinessEvent =
                 new BlockSlipperinessEvent((Block) (Object) this, cir.getReturnValueF());
         EventBus.INSTANCE.dispatch(blockSlipperinessEvent);
-        if (blockSlipperinessEvent.isCanceled()) {
+        if (blockSlipperinessEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(blockSlipperinessEvent.getSlipperiness());
         }

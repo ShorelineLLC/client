@@ -2,7 +2,10 @@ package net.shoreline.client.util.world;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.*;
+import net.minecraft.entity.mob.AmbientEntity;
+import net.minecraft.entity.mob.EndermanEntity;
+import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.SquidEntity;
@@ -24,8 +27,10 @@ public class EntityUtil implements Globals
      * @param entity
      * @return
      */
-    public static float getHealth(Entity entity) {
-        if (entity instanceof LivingEntity e) {
+    public static float getHealth(Entity entity)
+    {
+        if (entity instanceof LivingEntity e)
+        {
             return e.getHealth() + e.getAbsorptionAmount();
         }
         return 0.0f;
@@ -35,7 +40,8 @@ public class EntityUtil implements Globals
      * @param e
      * @return
      */
-    public static boolean isMonster(Entity e) {
+    public static boolean isMonster(Entity e)
+    {
         return e instanceof HostileEntity && !isNeutral(e);
     }
 
@@ -43,7 +49,8 @@ public class EntityUtil implements Globals
      * @param e
      * @return
      */
-    public static boolean isNeutral(Entity e) {
+    public static boolean isNeutral(Entity e)
+    {
         return e instanceof EndermanEntity enderman && !enderman.isAngry()
                 || e instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()
                 || e instanceof WolfEntity wolf && !wolf.isAttacking()
@@ -54,11 +61,13 @@ public class EntityUtil implements Globals
      * @param e
      * @return
      */
-    public static boolean isPassive(Entity e) {
+    public static boolean isPassive(Entity e)
+    {
         return e instanceof PassiveEntity || e instanceof AmbientEntity || e instanceof SquidEntity;
     }
 
-    public static boolean isVehicle(Entity e) {
+    public static boolean isVehicle(Entity e)
+    {
         return e instanceof BoatEntity || e instanceof MinecartEntity
                 || e instanceof FurnaceMinecartEntity
                 || e instanceof ChestMinecartEntity;

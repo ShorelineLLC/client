@@ -50,14 +50,14 @@ public class FreeLookModule extends ToggleModule
     }
 
     /**
-     *
      * @param cursorDeltaX
      * @param cursorDeltaY
      * @see net.minecraft.entity.Entity#changeLookDirection(double, double)
      */
-    private void changeLookDirection(double cursorDeltaX, double cursorDeltaY) {
-        float f = (float)cursorDeltaY * 0.15F;
-        float g = (float)cursorDeltaX * 0.15F;
+    private void changeLookDirection(double cursorDeltaX, double cursorDeltaY)
+    {
+        float f = (float) cursorDeltaY * 0.15F;
+        float g = (float) cursorDeltaX * 0.15F;
         this.cameraPitch += f;
         this.cameraYaw += g;
         this.cameraPitch = MathHelper.clamp(cameraPitch, -90.0F, 90.0F);

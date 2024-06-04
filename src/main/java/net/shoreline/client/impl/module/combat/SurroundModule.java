@@ -39,7 +39,8 @@ import java.util.*;
  * @author linus
  * @since 1.0
  */
-public class SurroundModule extends ObsidianPlacerModule {
+public class SurroundModule extends ObsidianPlacerModule
+{
     private static SurroundModule INSTANCE;
 
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f));
@@ -98,7 +99,8 @@ public class SurroundModule extends ObsidianPlacerModule {
             return;
         }
         blocksPlaced = 0;
-        if (jumpDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5) {
+        if (jumpDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5)
+        {
             disable();
             return;
         }

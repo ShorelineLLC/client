@@ -8,13 +8,13 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.module.world.BlockInteractModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.SneakBlocks;
+import net.shoreline.eventbus.bus.EventBus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -251,14 +251,20 @@ public final class InteractionManager implements Globals
         return interactDirection.getOpposite();
     }
 
-    public Direction getPlaceDirectionNCP(BlockPos blockPos, boolean visible) {
+    public Direction getPlaceDirectionNCP(BlockPos blockPos, boolean visible)
+    {
         Vec3d eyePos = new Vec3d(mc.player.getX(), mc.player.getY() + mc.player.getStandingEyeHeight(), mc.player.getZ());
-        if (blockPos.getX() == eyePos.getX() && blockPos.getY() == eyePos.getY() && blockPos.getZ() == eyePos.getZ()) {
+        if (blockPos.getX() == eyePos.getX() && blockPos.getY() == eyePos.getY() && blockPos.getZ() == eyePos.getZ())
+        {
             return Direction.DOWN;
-        } else {
+        }
+        else
+        {
             Set<Direction> ncpDirections = getPlaceDirectionsNCP(eyePos, blockPos.toCenterPos());
-            for (Direction dir : ncpDirections) {
-                if (visible && !mc.world.isAir(blockPos.offset(dir))) {
+            for (Direction dir : ncpDirections)
+            {
+                if (visible && !mc.world.isAir(blockPos.offset(dir)))
+                {
                     continue;
                 }
                 return dir;
@@ -272,7 +278,8 @@ public final class InteractionManager implements Globals
         return getPlaceDirectionsNCP(eyePos.x, eyePos.y, eyePos.z, blockPos.x, blockPos.y, blockPos.z);
     }
 
-    public Direction getPlaceDirectionGrim(BlockPos blockPos) {
+    public Direction getPlaceDirectionGrim(BlockPos blockPos)
+    {
         Set<Direction> directions = getPlaceDirectionsGrim(mc.player.getPos(), blockPos);
         return directions.stream().findAny().orElse(Direction.UP);
     }
@@ -287,31 +294,39 @@ public final class InteractionManager implements Globals
         final Set<Direction> dirs = new HashSet<>(6);
         Box combined = getCombinedBox(pos);
         Box eyePositions = new Box(x, y + 0.4, z, x, y + 1.62, z).expand(0.0002);
-        if (eyePositions.minZ <= combined.minZ) {
+        if (eyePositions.minZ <= combined.minZ)
+        {
             dirs.add(Direction.NORTH);
         }
-        if (eyePositions.maxZ >= combined.maxZ) {
+        if (eyePositions.maxZ >= combined.maxZ)
+        {
             dirs.add(Direction.SOUTH);
         }
-        if (eyePositions.maxX >= combined.maxX) {
+        if (eyePositions.maxX >= combined.maxX)
+        {
             dirs.add(Direction.EAST);
         }
-        if (eyePositions.minX <= combined.minX) {
+        if (eyePositions.minX <= combined.minX)
+        {
             dirs.add(Direction.WEST);
         }
-        if (eyePositions.maxY >= combined.maxY) {
+        if (eyePositions.maxY >= combined.maxY)
+        {
             dirs.add(Direction.UP);
         }
-        if (eyePositions.minY <= combined.minY) {
+        if (eyePositions.minY <= combined.minY)
+        {
             dirs.add(Direction.DOWN);
         }
         return dirs;
     }
 
-    private Box getCombinedBox(BlockPos pos) {
+    private Box getCombinedBox(BlockPos pos)
+    {
         VoxelShape shape = mc.world.getBlockState(pos).getCollisionShape(mc.world, pos).offset(pos.getX(), pos.getY(), pos.getZ());
         Box combined = new Box(pos);
-        for (Box box : shape.getBoundingBoxes()) {
+        for (Box box : shape.getBoundingBoxes())
+        {
             double minX = Math.max(box.minX, combined.minX);
             double minY = Math.max(box.minY, combined.minY);
             double minZ = Math.max(box.minZ, combined.minZ);
@@ -323,7 +338,8 @@ public final class InteractionManager implements Globals
         return combined;
     }
 
-    private boolean isIntersected(Box bb, Box other) {
+    private boolean isIntersected(Box bb, Box other)
+    {
         return other.maxX - MathConstants.EPSILON > bb.minX
                 && other.minX + MathConstants.EPSILON < bb.maxX
                 && other.maxY - MathConstants.EPSILON > bb.minY
@@ -340,27 +356,42 @@ public final class InteractionManager implements Globals
         final double ydiff = y - dy;
         final double zdiff = z - dz;
         final Set<Direction> dirs = new HashSet<>(6);
-        if (ydiff > 0.5) {
+        if (ydiff > 0.5)
+        {
             dirs.add(Direction.UP);
-        } else if (ydiff < -0.5) {
+        }
+        else if (ydiff < -0.5)
+        {
             dirs.add(Direction.DOWN);
-        } else {
+        }
+        else
+        {
             dirs.add(Direction.UP);
             dirs.add(Direction.DOWN);
         }
-        if (xdiff > 0.5) {
+        if (xdiff > 0.5)
+        {
             dirs.add(Direction.EAST);
-        } else if (xdiff < -0.5) {
+        }
+        else if (xdiff < -0.5)
+        {
             dirs.add(Direction.WEST);
-        } else {
+        }
+        else
+        {
             dirs.add(Direction.EAST);
             dirs.add(Direction.WEST);
         }
-        if (zdiff > 0.5) {
+        if (zdiff > 0.5)
+        {
             dirs.add(Direction.SOUTH);
-        } else if (zdiff < -0.5) {
+        }
+        else if (zdiff < -0.5)
+        {
             dirs.add(Direction.NORTH);
-        } else {
+        }
+        else
+        {
             dirs.add(Direction.SOUTH);
             dirs.add(Direction.NORTH);
         }
@@ -370,6 +401,7 @@ public final class InteractionManager implements Globals
     /**
      * Checks if the block is within our "eye range"
      * You can't place blocks above your head for any direction other than DOWN
+     *
      * @param pos the block position
      * @return if the block pos is in range of our eye y coordinate
      */

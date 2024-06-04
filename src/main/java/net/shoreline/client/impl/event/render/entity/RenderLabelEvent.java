@@ -9,14 +9,17 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class RenderLabelEvent extends Event {
+public class RenderLabelEvent extends Event
+{
     private final Entity entity;
 
-    public RenderLabelEvent(Entity entity) {
+    public RenderLabelEvent(Entity entity)
+    {
         this.entity = entity;
     }
 
-    public Entity getEntity() {
+    public Entity getEntity()
+    {
         return entity;
     }
 }

@@ -8,7 +8,8 @@ import net.shoreline.client.api.config.Config;
  * @author linus
  * @since 1.0
  */
-public class StringConfig extends Config<String> {
+public class StringConfig extends Config<String>
+{
 
     /**
      * Initializes the config with a default value. This constructor should
@@ -20,7 +21,8 @@ public class StringConfig extends Config<String> {
      * @param value The default config value
      * @throws NullPointerException if value is <tt>null</tt>
      */
-    public StringConfig(String name, String desc, String value) {
+    public StringConfig(String name, String desc, String value)
+    {
         super(name, desc, value);
     }
 
@@ -28,7 +30,8 @@ public class StringConfig extends Config<String> {
      * @return
      */
     @Override
-    public JsonObject toJson() {
+    public JsonObject toJson()
+    {
         JsonObject configObj = super.toJson();
         configObj.addProperty("value", getValue());
         return configObj;
@@ -39,8 +42,10 @@ public class StringConfig extends Config<String> {
      * @return
      */
     @Override
-    public String fromJson(JsonObject jsonObj) {
-        if (jsonObj.has("value")) {
+    public String fromJson(JsonObject jsonObj)
+    {
+        if (jsonObj.has("value"))
+        {
             JsonElement element = jsonObj.get("value");
             return element.getAsString();
         }

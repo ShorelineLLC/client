@@ -17,7 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(EntityRenderer.class)
-public abstract class MixinEntityRenderer {
+public abstract class MixinEntityRenderer
+{
 
     /**
      * @param entity
@@ -30,10 +31,12 @@ public abstract class MixinEntityRenderer {
     @Inject(method = "renderLabelIfPresent", at = @At(value = "HEAD"),
             cancellable = true)
     public void hookRenderLabelIfPresent(Entity entity, Text text, MatrixStack matrices,
-                                         VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+                                         VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci)
+    {
         RenderLabelEvent renderLabelEvent = new RenderLabelEvent(entity);
         EventBus.INSTANCE.dispatch(renderLabelEvent);
-        if (renderLabelEvent.isCanceled()) {
+        if (renderLabelEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

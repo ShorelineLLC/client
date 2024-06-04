@@ -31,7 +31,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
  * @since 1.0
  */
 @Mixin(GameRenderer.class)
-public class MixinGameRenderer implements Globals {
+public class MixinGameRenderer implements Globals
+{
     //
     @Shadow
     @Final
@@ -44,19 +45,22 @@ public class MixinGameRenderer implements Globals {
     private float fovMultiplier;
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 1))
-    private void hookRenderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    private void hookRenderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
+    {
         RenderWorldEvent.Game renderWorldEvent = new RenderWorldEvent.Game(matrices, tickDelta);
         EventBus.INSTANCE.dispatch(renderWorldEvent);
     }
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
-    public void hookRenderWorld$2(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    public void hookRenderWorld$2(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
+    {
         ReloadShaderEvent reloadShaderEvent = new ReloadShaderEvent(matrices, tickDelta);
         EventBus.INSTANCE.dispatch(reloadShaderEvent);
     }
 
     @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.AFTER))
-    private void hookUpdateTargetedEntity$1(final float tickDelta, final CallbackInfo info) {
+    private void hookUpdateTargetedEntity$1(final float tickDelta, final CallbackInfo info)
+    {
         UpdateCrosshairTargetEvent event = new UpdateCrosshairTargetEvent(tickDelta, client.getCameraEntity());
         EventBus.INSTANCE.dispatch(event);
     }
@@ -69,10 +73,12 @@ public class MixinGameRenderer implements Globals {
     @Inject(method = "tiltViewWhenHurt", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookTiltViewWhenHurt(MatrixStack matrices, float tickDelta,
-                                      CallbackInfo ci) {
+                                      CallbackInfo ci)
+    {
         HurtCamEvent hurtCamEvent = new HurtCamEvent();
         EventBus.INSTANCE.dispatch(hurtCamEvent);
-        if (hurtCamEvent.isCanceled()) {
+        if (hurtCamEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -83,11 +89,13 @@ public class MixinGameRenderer implements Globals {
      */
     @Inject(method = "showFloatingItem", at = @At(value = "HEAD"),
             cancellable = true)
-    private void hookShowFloatingItem(ItemStack floatingItem, CallbackInfo ci) {
+    private void hookShowFloatingItem(ItemStack floatingItem, CallbackInfo ci)
+    {
         RenderFloatingItemEvent renderFloatingItemEvent =
                 new RenderFloatingItemEvent(floatingItem);
         EventBus.INSTANCE.dispatch(renderFloatingItemEvent);
-        if (renderFloatingItemEvent.isCanceled()) {
+        if (renderFloatingItemEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -97,10 +105,12 @@ public class MixinGameRenderer implements Globals {
      * @param ci
      */
     @Inject(method = "renderNausea", at = @At(value = "HEAD"), cancellable = true)
-    private void hookRenderNausea(DrawContext context, float distortionStrength, CallbackInfo ci) {
+    private void hookRenderNausea(DrawContext context, float distortionStrength, CallbackInfo ci)
+    {
         RenderNauseaEvent renderNauseaEvent = new RenderNauseaEvent();
         EventBus.INSTANCE.dispatch(renderNauseaEvent);
-        if (renderNauseaEvent.isCanceled()) {
+        if (renderNauseaEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -110,11 +120,13 @@ public class MixinGameRenderer implements Globals {
      */
     @Inject(method = "shouldRenderBlockOutline", at = @At(value = "HEAD"),
             cancellable = true)
-    private void hookShouldRenderBlockOutline(CallbackInfoReturnable<Boolean> cir) {
+    private void hookShouldRenderBlockOutline(CallbackInfoReturnable<Boolean> cir)
+    {
         RenderBlockOutlineEvent renderBlockOutlineEvent =
                 new RenderBlockOutlineEvent();
         EventBus.INSTANCE.dispatch(renderBlockOutlineEvent);
-        if (renderBlockOutlineEvent.isCanceled()) {
+        if (renderBlockOutlineEvent.isCanceled())
+        {
             cir.setReturnValue(false);
             cir.cancel();
         }
@@ -130,10 +142,12 @@ public class MixinGameRenderer implements Globals {
                     "Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/" +
                     "math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/" +
                     "util/hit/EntityHitResult;"), cancellable = true)
-    private void hookUpdateTargetedEntity$2(float tickDelta, CallbackInfo info) {
+    private void hookUpdateTargetedEntity$2(float tickDelta, CallbackInfo info)
+    {
         TargetEntityEvent targetEntityEvent = new TargetEntityEvent();
         EventBus.INSTANCE.dispatch(targetEntityEvent);
-        if (targetEntityEvent.isCanceled() && client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+        if (targetEntityEvent.isCanceled() && client.crosshairTarget.getType() == HitResult.Type.BLOCK)
+        {
             client.getProfiler().pop();
             info.cancel();
         }
@@ -144,7 +158,8 @@ public class MixinGameRenderer implements Globals {
      * @return
      */
     @ModifyConstant(method = "updateTargetedEntity", constant = @Constant(doubleValue = 9))
-    private double updateTargetedEntityModifySquaredMaxReach(double d) {
+    private double updateTargetedEntityModifySquaredMaxReach(double d)
+    {
         ReachEvent reachEvent = new ReachEvent();
         EventBus.INSTANCE.dispatch(reachEvent);
         double reach = reachEvent.getReach() + 3.0;
@@ -158,27 +173,30 @@ public class MixinGameRenderer implements Globals {
      * @param ci
      */
     @Inject(method = "bobView", at = @At(value = "HEAD"), cancellable = true)
-    private void hookBobView(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+    private void hookBobView(MatrixStack matrices, float tickDelta, CallbackInfo ci)
+    {
         BobViewEvent bobViewEvent = new BobViewEvent(matrices, tickDelta);
         EventBus.INSTANCE.dispatch(bobViewEvent);
-        if (bobViewEvent.isCanceled()) {
+        if (bobViewEvent.isCanceled())
+        {
             ci.cancel();
             matrices.translate(0.0f, bobViewEvent.getY(), 0.0f);
         }
     }
 
     /**
-     *
      * @param camera
      * @param tickDelta
      * @param changingFov
      * @param cir
      */
     @Inject(method = "getFov", at = @At(value = "HEAD"), cancellable = true)
-    private void hookGetFov(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cir) {
+    private void hookGetFov(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cir)
+    {
         FovEvent fovEvent = new FovEvent();
         EventBus.INSTANCE.dispatch(fovEvent);
-        if (fovEvent.isCanceled()) {
+        if (fovEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(fovEvent.getFov() * (double) MathHelper.lerp(tickDelta, lastFovMultiplier, fovMultiplier));
         }
@@ -191,7 +209,8 @@ public class MixinGameRenderer implements Globals {
     @Inject(method = "loadPrograms", at = @At(value = "INVOKE",
             target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
             ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void initPrograms(ResourceFactory factory, CallbackInfo ci) {
+    private void initPrograms(ResourceFactory factory, CallbackInfo ci)
+    {
         LoadProgramsEvent loadProgramsEvent = new LoadProgramsEvent();
         EventBus.INSTANCE.dispatch(loadProgramsEvent);
     }

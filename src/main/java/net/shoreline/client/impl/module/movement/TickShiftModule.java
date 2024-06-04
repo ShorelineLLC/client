@@ -2,19 +2,20 @@ package net.shoreline.client.impl.module.movement;
 
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.MovementUtil;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class TickShiftModule extends ToggleModule {
+public class TickShiftModule extends ToggleModule
+{
     // Basically auto timer for NCP
     //
     Config<Integer> ticksConfig = register(new NumberConfig<>("MaxTicks", "Maximum charge ticks", 1, 20, 40));
@@ -26,32 +27,41 @@ public class TickShiftModule extends ToggleModule {
     /**
      *
      */
-    public TickShiftModule() {
+    public TickShiftModule()
+    {
         super("TickShift", "Exploits NCP to speed up ticks",
                 ModuleCategory.MOVEMENT);
     }
 
     @Override
-    public String getModuleData() {
+    public String getModuleData()
+    {
         return String.valueOf(packets);
     }
 
     @EventListener
-    public void onPlayerUpdate(PlayerUpdateEvent event) {
-        if (event.getStage() != StageEvent.EventStage.PRE) {
+    public void onPlayerUpdate(PlayerUpdateEvent event)
+    {
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
             return;
         }
-        if (MovementUtil.isMoving() || !mc.player.isOnGround()) {
+        if (MovementUtil.isMoving() || !mc.player.isOnGround())
+        {
             packets -= packetsConfig.getValue();
-            if (packets <= 0) {
+            if (packets <= 0)
+            {
                 packets = 0;
                 Managers.TICK.setClientTick(1.0f);
                 return;
             }
             Managers.TICK.setClientTick(packetsConfig.getValue() + 1.0f);
-        } else {
+        }
+        else
+        {
             packets += chargeSpeedConfig.getValue();
-            if (packets > ticksConfig.getValue()) {
+            if (packets > ticksConfig.getValue())
+            {
                 packets = ticksConfig.getValue();
             }
         }

@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ItemRenderer.class)
-public interface AccessorItemRenderer {
+public interface AccessorItemRenderer
+{
     /**
      * @return
      */

@@ -4,14 +4,14 @@ import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.render.HoleESPModule;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.client.util.world.BlockUtil;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,13 +23,15 @@ import java.util.concurrent.*;
  * @author linus
  * @since 1.0
  */
-public class HoleManager implements Globals {
+public class HoleManager implements Globals
+{
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private Future<Set<Hole>> result;
     //
     private Set<Hole> holes = new ConcurrentSet<>();
 
-    public HoleManager() {
+    public HoleManager()
+    {
         EventBus.INSTANCE.subscribe(this);
     }
 
@@ -37,20 +39,26 @@ public class HoleManager implements Globals {
      * @param event
      */
     @EventListener
-    public void onTickEvent(TickEvent event) {
-        if (event.getStage() != StageEvent.EventStage.PRE) {
+    public void onTickEvent(TickEvent event)
+    {
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
             return;
         }
         HoleTask runnable = new HoleTask(getSphere(mc.player.getPos()));
         result = executor.submit(runnable);
     }
 
-    public List<BlockPos> getSphere(Vec3d start) {
+    public List<BlockPos> getSphere(Vec3d start)
+    {
         List<BlockPos> sphere = new ArrayList<>();
         double rad = Math.ceil(Math.max(5.0, HoleESPModule.getInstance().getRange()));
-        for (double x = -rad; x <= rad; ++x) {
-            for (double y = -rad; y <= rad; ++y) {
-                for (double z = -rad; z <= rad; ++z) {
+        for (double x = -rad; x <= rad; ++x)
+        {
+            for (double y = -rad; y <= rad; ++y)
+            {
+                for (double z = -rad; z <= rad; ++z)
+                {
                     Vec3i pos = new Vec3i((int) (start.getX() + x),
                             (int) (start.getY() + y), (int) (start.getZ() + z));
                     final BlockPos p = new BlockPos(pos);
@@ -66,26 +74,36 @@ public class HoleManager implements Globals {
      * @param pos
      * @return
      */
-    public Hole checkHole(BlockPos pos) {
-        if (pos.getY() == mc.world.getBottomY() && !BlastResistantBlocks.isUnbreakable(pos)) {
+    public Hole checkHole(BlockPos pos)
+    {
+        if (pos.getY() == mc.world.getBottomY() && !BlastResistantBlocks.isUnbreakable(pos))
+        {
             return new Hole(pos, HoleType.VOID);
         }
         int resistant = 0;
         int unbreakable = 0;
-        if (BlockUtil.isBlockAccessible(pos)) {
+        if (BlockUtil.isBlockAccessible(pos))
+        {
             BlockPos pos1 = pos.add(-1, 0, 0);
             BlockPos pos2 = pos.add(0, 0, -1);
-            if (BlastResistantBlocks.isBlastResistant(pos1)) {
+            if (BlastResistantBlocks.isBlastResistant(pos1))
+            {
                 resistant++;
-            } else if (BlastResistantBlocks.isUnbreakable(pos1)) {
+            }
+            else if (BlastResistantBlocks.isUnbreakable(pos1))
+            {
                 unbreakable++;
             }
-            if (BlastResistantBlocks.isBlastResistant(pos2)) {
+            if (BlastResistantBlocks.isBlastResistant(pos2))
+            {
                 resistant++;
-            } else if (BlastResistantBlocks.isUnbreakable(pos2)) {
+            }
+            else if (BlastResistantBlocks.isUnbreakable(pos2))
+            {
                 unbreakable++;
             }
-            if (resistant + unbreakable < 2) {
+            if (resistant + unbreakable < 2)
+            {
                 return null;
             }
             BlockPos pos3 = pos.add(0, 0, 1);
@@ -94,9 +112,11 @@ public class HoleManager implements Globals {
             boolean air4 = mc.world.isAir(pos4);
             // Quad hole, player can stand in the middle of four blocks
             // to prevent placements on these blocks
-            if (air3 && air4) {
+            if (air3 && air4)
+            {
                 BlockPos pos5 = pos.add(1, 0, 1);
-                if (!mc.world.isAir(pos5)) {
+                if (!mc.world.isAir(pos5))
+                {
                     return null;
                 }
                 BlockPos[] quad = new BlockPos[]
@@ -108,14 +128,19 @@ public class HoleManager implements Globals {
                                 pos.add(2, 0, 0),
                                 pos.add(1, 0, -1)
                         };
-                for (BlockPos p : quad) {
-                    if (BlastResistantBlocks.isBlastResistant(p)) {
+                for (BlockPos p : quad)
+                {
+                    if (BlastResistantBlocks.isBlastResistant(p))
+                    {
                         resistant++;
-                    } else if (BlastResistantBlocks.isUnbreakable(p)) {
+                    }
+                    else if (BlastResistantBlocks.isUnbreakable(p))
+                    {
                         unbreakable++;
                     }
                 }
-                if (resistant != 8 && unbreakable != 8 && resistant + unbreakable != 8) {
+                if (resistant != 8 && unbreakable != 8 && resistant + unbreakable != 8)
+                {
                     return null;
                 }
                 Hole quadHole = new Hole(pos, resistant == 8 ? HoleType.OBSIDIAN :
@@ -126,7 +151,8 @@ public class HoleManager implements Globals {
             }
             // Double Z hole, player can stand in the middle of the blocks
             // to prevent placements on these blocks
-            else if (air3 && BlockUtil.isBlockAccessible(pos3)) {
+            else if (air3 && BlockUtil.isBlockAccessible(pos3))
+            {
                 BlockPos[] doubleZ = new BlockPos[]
                         {
                                 pos.add(-1, 0, 1),
@@ -134,14 +160,19 @@ public class HoleManager implements Globals {
                                 pos.add(1, 0, 1),
                                 pos.add(1, 0, 0)
                         };
-                for (BlockPos p : doubleZ) {
-                    if (BlastResistantBlocks.isBlastResistant(p)) {
+                for (BlockPos p : doubleZ)
+                {
+                    if (BlastResistantBlocks.isBlastResistant(p))
+                    {
                         resistant++;
-                    } else if (BlastResistantBlocks.isUnbreakable(p)) {
+                    }
+                    else if (BlastResistantBlocks.isUnbreakable(p))
+                    {
                         unbreakable++;
                     }
                 }
-                if (resistant != 6 && unbreakable != 6 && resistant + unbreakable != 6) {
+                if (resistant != 6 && unbreakable != 6 && resistant + unbreakable != 6)
+                {
                     return null;
                 }
                 Hole doubleZHole = new Hole(pos, resistant == 6 ? HoleType.OBSIDIAN :
@@ -152,7 +183,8 @@ public class HoleManager implements Globals {
             }
             // Double X hole, player can stand in the middle of the blocks
             // to prevent placements on these blocks
-            else if (air4 && BlockUtil.isBlockAccessible(pos4)) {
+            else if (air4 && BlockUtil.isBlockAccessible(pos4))
+            {
                 BlockPos[] doubleX = new BlockPos[]
                         {
                                 pos.add(0, 0, 1),
@@ -160,14 +192,19 @@ public class HoleManager implements Globals {
                                 pos.add(2, 0, 0),
                                 pos.add(1, 0, -1)
                         };
-                for (BlockPos p : doubleX) {
-                    if (BlastResistantBlocks.isBlastResistant(p)) {
+                for (BlockPos p : doubleX)
+                {
+                    if (BlastResistantBlocks.isBlastResistant(p))
+                    {
                         resistant++;
-                    } else if (BlastResistantBlocks.isUnbreakable(p)) {
+                    }
+                    else if (BlastResistantBlocks.isUnbreakable(p))
+                    {
                         unbreakable++;
                     }
                 }
-                if (resistant != 6 && unbreakable != 6 && resistant + unbreakable != 6) {
+                if (resistant != 6 && unbreakable != 6 && resistant + unbreakable != 6)
+                {
                     return null;
                 }
                 Hole doubleXHole = new Hole(pos, resistant == 6 ? HoleType.OBSIDIAN :
@@ -178,18 +215,26 @@ public class HoleManager implements Globals {
             }
             // Standard hole, player can stand in them to prevent
             // large amounts of explosion damage
-            else {
-                if (BlastResistantBlocks.isBlastResistant(pos3)) {
+            else
+            {
+                if (BlastResistantBlocks.isBlastResistant(pos3))
+                {
                     resistant++;
-                } else if (BlastResistantBlocks.isUnbreakable(pos3)) {
+                }
+                else if (BlastResistantBlocks.isUnbreakable(pos3))
+                {
                     unbreakable++;
                 }
-                if (BlastResistantBlocks.isBlastResistant(pos4)) {
+                if (BlastResistantBlocks.isBlastResistant(pos4))
+                {
                     resistant++;
-                } else if (BlastResistantBlocks.isUnbreakable(pos4)) {
+                }
+                else if (BlastResistantBlocks.isUnbreakable(pos4))
+                {
                     unbreakable++;
                 }
-                if (resistant != 4 && unbreakable != 4 && resistant + unbreakable != 4) {
+                if (resistant != 4 && unbreakable != 4 && resistant + unbreakable != 4)
+                {
                     return null;
                 }
                 return new Hole(pos, resistant == 4 ? HoleType.OBSIDIAN :
@@ -203,30 +248,40 @@ public class HoleManager implements Globals {
     /**
      * @return
      */
-    public Set<Hole> getHoles() {
-        if (result != null) {
-            try {
+    public Set<Hole> getHoles()
+    {
+        if (result != null)
+        {
+            try
+            {
                 holes = result.get();
-            } catch (ExecutionException | InterruptedException e) {
+            }
+            catch (ExecutionException | InterruptedException e)
+            {
 
             }
         }
         return holes;
     }
 
-    public class HoleTask implements Callable<Set<Hole>> {
+    public class HoleTask implements Callable<Set<Hole>>
+    {
         private final List<BlockPos> blocks;
 
-        public HoleTask(List<BlockPos> blocks) {
+        public HoleTask(List<BlockPos> blocks)
+        {
             this.blocks = blocks;
         }
 
         @Override
-        public Set<Hole> call() throws Exception {
+        public Set<Hole> call() throws Exception
+        {
             Set<Hole> holes1 = new HashSet<>();
-            for (BlockPos blockPos : blocks) {
+            for (BlockPos blockPos : blocks)
+            {
                 Hole hole = checkHole(blockPos);
-                if (hole != null) {
+                if (hole != null)
+                {
                     holes1.add(hole);
                 }
             }

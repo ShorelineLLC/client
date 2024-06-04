@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.SortedMap;
 
 @Mixin(BufferBuilderStorage.class)
-public class MixinBufferBuilderStorage {
+public class MixinBufferBuilderStorage
+{
 
     @Shadow
     @Final
@@ -33,8 +34,10 @@ public class MixinBufferBuilderStorage {
     private OutlineVertexConsumerProvider outlineVertexConsumers;
 
     @Inject(method = "<init>", at = @At(value = "TAIL"))
-    private void hookInit(int maxBlockBuildersPoolSize, CallbackInfo ci) {
-        SortedMap sortedMap = Util.make(new Object2ObjectLinkedOpenHashMap(), map -> {
+    private void hookInit(int maxBlockBuildersPoolSize, CallbackInfo ci)
+    {
+        SortedMap sortedMap = Util.make(new Object2ObjectLinkedOpenHashMap(), map ->
+        {
             map.put(TexturedRenderLayers.getEntitySolid(), blockBufferBuilders.get(RenderLayer.getSolid()));
             map.put(TexturedRenderLayers.getEntityCutout(), blockBufferBuilders.get(RenderLayer.getCutout()));
             map.put(TexturedRenderLayers.getBannerPatterns(), blockBufferBuilders.get(RenderLayer.getCutoutMipped()));

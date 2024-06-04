@@ -4,5 +4,6 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class RenderToastEvent extends Event {
+public class RenderToastEvent extends Event
+{
 }

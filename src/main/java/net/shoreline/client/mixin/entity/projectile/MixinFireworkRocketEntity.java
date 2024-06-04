@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(FireworkRocketEntity.class)
-public class MixinFireworkRocketEntity implements Globals {
+public class MixinFireworkRocketEntity implements Globals
+{
     //
     @Shadow
     private int life;
@@ -28,17 +29,21 @@ public class MixinFireworkRocketEntity implements Globals {
      */
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/" +
             "FireworkRocketEntity;updateRotation()V", shift = At.Shift.AFTER), cancellable = true)
-    private void hookTickPre(CallbackInfo ci) {
+    private void hookTickPre(CallbackInfo ci)
+    {
         FireworkRocketEntity rocketEntity = ((FireworkRocketEntity) (Object) this);
         RemoveFireworkEvent removeFireworkEvent = new RemoveFireworkEvent(rocketEntity);
         EventBus.INSTANCE.dispatch(removeFireworkEvent);
-        if (removeFireworkEvent.isCanceled()) {
+        if (removeFireworkEvent.isCanceled())
+        {
             ci.cancel();
-            if (life == 0 && !rocketEntity.isSilent()) {
+            if (life == 0 && !rocketEntity.isSilent())
+            {
                 mc.world.playSound(null, rocketEntity.getX(), rocketEntity.getY(), rocketEntity.getZ(), SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.AMBIENT, 3.0f, 1.0f);
             }
             ++life;
-            if (mc.world.isClient && life % 2 < 2) {
+            if (mc.world.isClient && life % 2 < 2)
+            {
                 mc.world.addParticle(ParticleTypes.FIREWORK, rocketEntity.getX(), rocketEntity.getY(), rocketEntity.getZ(), mc.world.random.nextGaussian() * 0.05, -rocketEntity.getVelocity().y * 0.5, mc.world.random.nextGaussian() * 0.05);
             }
         }

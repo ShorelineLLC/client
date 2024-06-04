@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PackScreen.class)
-public class MixinPackScreen {
+public class MixinPackScreen
+{
 
     @Inject(method = "refresh", at = @At(value = "HEAD"))
     private void hookRefresh(CallbackInfo ci)

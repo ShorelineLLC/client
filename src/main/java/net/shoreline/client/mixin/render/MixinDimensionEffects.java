@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.awt.*;
 
 @Mixin(DimensionEffects.class)
-public class MixinDimensionEffects {
+public class MixinDimensionEffects
+{
 
     /**
      * @param skyAngle
@@ -20,10 +21,12 @@ public class MixinDimensionEffects {
      */
     @Inject(method = "getFogColorOverride", at = @At(value = "HEAD"), cancellable = true)
     private void hookGetFogColorOverride(float skyAngle, float tickDelta,
-                                         CallbackInfoReturnable<float[]> cir) {
+                                         CallbackInfoReturnable<float[]> cir)
+    {
         SkyboxEvent.Fog skyboxEvent = new SkyboxEvent.Fog(tickDelta);
         EventBus.INSTANCE.dispatch(skyboxEvent);
-        if (skyboxEvent.isCanceled()) {
+        if (skyboxEvent.isCanceled())
+        {
             Color color = skyboxEvent.getColor();
             cir.cancel();
             cir.setReturnValue(new float[]

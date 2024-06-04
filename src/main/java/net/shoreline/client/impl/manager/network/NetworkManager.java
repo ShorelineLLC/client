@@ -3,13 +3,13 @@ package net.shoreline.client.impl.manager.network;
 import net.minecraft.client.network.*;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
-import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.screen.ConnectScreenEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +18,8 @@ import java.util.Set;
  * @author linus
  * @since 1.0
  */
-public class NetworkManager implements Globals {
+public class NetworkManager implements Globals
+{
     //
     private static final Set<Packet<?>> PACKET_CACHE = new HashSet<>();
     //
@@ -28,12 +29,14 @@ public class NetworkManager implements Globals {
     /**
      *
      */
-    public NetworkManager() {
+    public NetworkManager()
+    {
         EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener
-    public void onConnect(ConnectScreenEvent event) {
+    public void onConnect(ConnectScreenEvent event)
+    {
         address = event.getAddress();
         info = event.getInfo();
     }
@@ -42,22 +45,27 @@ public class NetworkManager implements Globals {
      * @param event
      */
     @EventListener
-    public void onDisconnect(DisconnectEvent event) {
+    public void onDisconnect(DisconnectEvent event)
+    {
         PACKET_CACHE.clear();
     }
 
     /**
      * @param p
      */
-    public void sendPacket(final Packet<?> p) {
-        if (mc.getNetworkHandler() != null) {
+    public void sendPacket(final Packet<?> p)
+    {
+        if (mc.getNetworkHandler() != null)
+        {
             PACKET_CACHE.add(p);
             mc.getNetworkHandler().sendPacket(p);
         }
     }
 
-    public void sendQuietPacket(final Packet<?> p) {
-        if (mc.getNetworkHandler() != null) {
+    public void sendQuietPacket(final Packet<?> p)
+    {
+        if (mc.getNetworkHandler() != null)
+        {
             PACKET_CACHE.add(p);
             ((IClientPlayNetworkHandler) mc.getNetworkHandler()).sendQuietPacket(p);
         }
@@ -66,27 +74,37 @@ public class NetworkManager implements Globals {
     /**
      * @param p
      */
-    public void sendSequencedPacket(final SequencedPacketCreator p) {
-        if (mc.world != null) {
+    public void sendSequencedPacket(final SequencedPacketCreator p)
+    {
+        if (mc.world != null)
+        {
             PendingUpdateManager updater =
                     ((AccessorClientWorld) mc.world).hookGetPendingUpdateManager().incrementSequence();
-            try {
+            try
+            {
                 int i = updater.getSequence();
                 Packet<ServerPlayPacketListener> packet = p.predict(i);
                 sendPacket(packet);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 e.printStackTrace();
-                if (updater != null) {
-                    try {
+                if (updater != null)
+                {
+                    try
+                    {
                         updater.close();
-                    } catch (Throwable e1) {
+                    }
+                    catch (Throwable e1)
+                    {
                         e1.printStackTrace();
                         e.addSuppressed(e1);
                     }
                 }
                 throw e;
             }
-            if (updater != null) {
+            if (updater != null)
+            {
                 updater.close();
             }
         }
@@ -95,43 +113,54 @@ public class NetworkManager implements Globals {
     /**
      * @return
      */
-    public int getClientLatency() {
-        if (mc.getNetworkHandler() != null) {
+    public int getClientLatency()
+    {
+        if (mc.getNetworkHandler() != null)
+        {
             final PlayerListEntry playerEntry =
                     mc.getNetworkHandler().getPlayerListEntry(mc.player.getGameProfile().getId());
-            if (playerEntry != null) {
+            if (playerEntry != null)
+            {
                 return playerEntry.getLatency();
             }
         }
         return 0;
     }
 
-    public ServerAddress getAddress() {
+    public ServerAddress getAddress()
+    {
         return address;
     }
 
-    public void setAddress(ServerAddress address) {
+    public void setAddress(ServerAddress address)
+    {
         this.address = address;
     }
 
-    public ServerInfo getInfo() {
+    public ServerInfo getInfo()
+    {
         return info;
     }
 
-    public void setInfo(ServerInfo info) {
+    public void setInfo(ServerInfo info)
+    {
         this.info = info;
     }
 
-    public boolean isCrystalPvpCC() {
+    public boolean isCrystalPvpCC()
+    {
         return getServerIp().equalsIgnoreCase("us.crystalpvp.cc") || getServerIp().equalsIgnoreCase("crystalpvp.cc");
     }
 
-    public boolean isGrimCC() {
+    public boolean isGrimCC()
+    {
         return getServerIp().equalsIgnoreCase("grim.crystalpvp.cc");
     }
 
-    public String getServerIp() {
-        if (info != null) {
+    public String getServerIp()
+    {
+        if (info != null)
+        {
             return info.address;
         }
         return "Singleplayer";
@@ -141,7 +170,8 @@ public class NetworkManager implements Globals {
      * @param p
      * @return
      */
-    public boolean isCached(Packet<?> p) {
+    public boolean isCached(Packet<?> p)
+    {
         return PACKET_CACHE.contains(p);
     }
 }

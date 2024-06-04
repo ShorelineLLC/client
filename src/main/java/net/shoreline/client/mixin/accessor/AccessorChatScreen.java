@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(ChatScreen.class)
-public interface AccessorChatScreen {
+public interface AccessorChatScreen
+{
     /**
      * @return
      * @see ChatScreen#chatField

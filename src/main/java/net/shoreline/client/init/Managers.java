@@ -27,7 +27,8 @@ import net.shoreline.client.impl.manager.world.tick.TickManager;
  * @author linus
  * @since 1.0
  */
-public class Managers {
+public class Managers
+{
     // Manager instances. Managers can be statically referenced after
     // initialized. Managers will be initialized in this order.
     public static NetworkManager NETWORK;
@@ -63,8 +64,10 @@ public class Managers {
      *
      * @see #isInitialized()
      */
-    public static void init() {
-        if (!isInitialized()) {
+    public static void init()
+    {
+        if (!isInitialized())
+        {
             NETWORK = new NetworkManager();
             MACRO = new MacroManager();
             MODULE = new ModuleManager();
@@ -96,8 +99,10 @@ public class Managers {
      * @see #init()
      * @see #isInitialized()
      */
-    public static void postInit() {
-        if (isInitialized()) {
+    public static void postInit()
+    {
+        if (isInitialized())
+        {
             MACRO.postInit();
             ACCOUNT.postInit();
             CAPES = new CapeManager();
@@ -114,7 +119,8 @@ public class Managers {
      * @see #init()
      * @see #initialized
      */
-    public static boolean isInitialized() {
+    public static boolean isInitialized()
+    {
         return initialized;
     }
 }

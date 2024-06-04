@@ -11,22 +11,26 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @see Waypoint
  * @since 1.0
  */
-public class WaypointManager {
+public class WaypointManager
+{
     //
     private final List<Waypoint> waypoints = new CopyOnWriteArrayList<>();
 
     /**
      * @param waypoint
      */
-    public void register(Waypoint waypoint) {
+    public void register(Waypoint waypoint)
+    {
         waypoints.add(waypoint);
     }
 
     /**
      * @param waypoints
      */
-    public void register(Waypoint... waypoints) {
-        for (Waypoint waypoint : waypoints) {
+    public void register(Waypoint... waypoints)
+    {
+        for (Waypoint waypoint : waypoints)
+        {
             register(waypoint);
         }
     }
@@ -35,7 +39,8 @@ public class WaypointManager {
      * @param waypoint
      * @return
      */
-    public boolean remove(Waypoint waypoint) {
+    public boolean remove(Waypoint waypoint)
+    {
         return waypoints.remove(waypoint);
     }
 
@@ -43,7 +48,8 @@ public class WaypointManager {
      * @param waypoint
      * @return
      */
-    public boolean removeContains(String waypoint) {
+    public boolean removeContains(String waypoint)
+    {
         return waypoints.removeIf(w -> w.getName().contains(waypoint));
     }
 
@@ -51,31 +57,37 @@ public class WaypointManager {
      * @param waypoint
      * @return
      */
-    public boolean remove(String waypoint) {
+    public boolean remove(String waypoint)
+    {
         return waypoints.removeIf(w -> w.getName().equalsIgnoreCase(waypoint));
     }
 
-    public boolean contains(String waypoint) {
+    public boolean contains(String waypoint)
+    {
         return waypoints.stream().anyMatch(w -> w.getName().contains(waypoint));
     }
 
-    public void clear() {
+    public void clear()
+    {
         waypoints.clear();
     }
 
     /**
      * @return
      */
-    public List<Waypoint> getWaypoints() {
+    public List<Waypoint> getWaypoints()
+    {
         return waypoints;
     }
 
     /**
      * @return
      */
-    public List<String> getIps() {
+    public List<String> getIps()
+    {
         final List<String> ips = new ArrayList<>();
-        for (Waypoint waypoint : getWaypoints()) {
+        for (Waypoint waypoint : getWaypoints())
+        {
             ips.add(waypoint.getIp());
         }
         return ips;

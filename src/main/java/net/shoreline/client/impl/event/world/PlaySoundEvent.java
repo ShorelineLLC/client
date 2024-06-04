@@ -7,27 +7,32 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class PlaySoundEvent extends Event {
+public class PlaySoundEvent extends Event
+{
 
     private final Vec3d pos;
     private final SoundEvent event;
     private final SoundCategory category;
 
-    public PlaySoundEvent(Vec3d pos, SoundEvent event, SoundCategory category) {
+    public PlaySoundEvent(Vec3d pos, SoundEvent event, SoundCategory category)
+    {
         this.pos = pos;
         this.event = event;
         this.category = category;
     }
 
-    public Vec3d getPos() {
+    public Vec3d getPos()
+    {
         return pos;
     }
 
-    public SoundEvent getSoundEvent() {
+    public SoundEvent getSoundEvent()
+    {
         return event;
     }
 
-    public SoundCategory getCategory() {
+    public SoundCategory getCategory()
+    {
         return category;
     }
 }

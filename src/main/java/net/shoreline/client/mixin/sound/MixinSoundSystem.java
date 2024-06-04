@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Map;
 
 @Mixin(SoundSystem.class)
-public class MixinSoundSystem {
+public class MixinSoundSystem
+{
     @Shadow
     private boolean started;
     //

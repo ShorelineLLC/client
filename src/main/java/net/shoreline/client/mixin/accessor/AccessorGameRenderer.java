@@ -7,7 +7,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GameRenderer.class)
-public interface AccessorGameRenderer {
+public interface AccessorGameRenderer
+{
 
     @Invoker("renderHand")
     void hookRenderHand(MatrixStack matrices, Camera camera, float tickDelta);

@@ -17,7 +17,8 @@ import org.spongepowered.asm.mixin.Shadow;
  * @since 1.0
  */
 @Mixin(PlayerInteractEntityC2SPacket.class)
-public abstract class MixinPlayerInteractEntityC2SPacket implements IPlayerInteractEntityC2SPacket, Globals {
+public abstract class MixinPlayerInteractEntityC2SPacket implements IPlayerInteractEntityC2SPacket, Globals
+{
     // Mojang mane wtf ..
     //
     @Shadow
@@ -32,8 +33,10 @@ public abstract class MixinPlayerInteractEntityC2SPacket implements IPlayerInter
      * @return
      */
     @Override
-    public Entity getEntity() {
-        if (mc.world == null) {
+    public Entity getEntity()
+    {
+        if (mc.world == null)
+        {
             return null;
         }
         return mc.world.getEntityById(entityId);
@@ -46,7 +49,8 @@ public abstract class MixinPlayerInteractEntityC2SPacket implements IPlayerInter
      * @see <a href="https://github.com/BleachDev/BleachHack/blob/1.19.4/src/main/java/org/bleachhack/util/PlayerInteractEntityC2SUtils.java#L19">Bleachdev</a>
      */
     @Override
-    public InteractType getType() {
+    public InteractType getType()
+    {
         PacketByteBuf packetBuf = new PacketByteBuf(Unpooled.buffer());
         write(packetBuf);
         packetBuf.readVarInt();

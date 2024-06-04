@@ -15,7 +15,6 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -25,6 +24,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
 import net.shoreline.client.util.world.BlastResistantBlocks;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
 import java.util.Comparator;
@@ -35,7 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author linus
  * @since 1.0
  */
-public class BreakHighlightModule extends ToggleModule {
+public class BreakHighlightModule extends ToggleModule
+{
 
     Config<HighlightMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for highlighting blocks", HighlightMode.PACKET, HighlightMode.values()));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to render breaking blocks", 5.0f, 10.0f, 50.0f));
@@ -43,38 +44,47 @@ public class BreakHighlightModule extends ToggleModule {
     //
     private final Map<BlockBreakingProgressS2CPacket, Long> breakingProgress = new ConcurrentHashMap<>();
 
-    public BreakHighlightModule() {
+    public BreakHighlightModule()
+    {
         super("BreakHighlight", "Highlights blocks that are being broken", ModuleCategory.RENDER);
     }
 
     @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event) {
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
         if (event.getPacket() instanceof BlockBreakingProgressS2CPacket packet && !contains(packet.getPos())
-                && !BlastResistantBlocks.isUnbreakable(packet.getPos())) {
+                && !BlastResistantBlocks.isUnbreakable(packet.getPos()))
+        {
             breakingProgress.put(packet, System.currentTimeMillis());
         }
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event) {
-        if (mc.player == null || mc.world == null) {
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        if (mc.player == null || mc.world == null)
+        {
             return;
         }
         RenderBuffers.preRender();
-        if (modeConfig.getValue() == HighlightMode.NORMAL) {
+        if (modeConfig.getValue() == HighlightMode.NORMAL)
+        {
             Int2ObjectMap<BlockBreakingInfo> blockBreakProgressions =
                     ((AccessorWorldRenderer) mc.worldRenderer).getBlockBreakingProgressions();
             for (Int2ObjectMap.Entry<BlockBreakingInfo> info :
-                    Int2ObjectMaps.fastIterable(blockBreakProgressions)) {
+                    Int2ObjectMaps.fastIterable(blockBreakProgressions))
+            {
                 BlockPos pos = info.getValue().getPos();
                 double dist = mc.player.squaredDistanceTo(pos.toCenterPos());
-                if (dist > ((NumberConfig) rangeConfig).getValueSq()) {
+                if (dist > ((NumberConfig) rangeConfig).getValueSq())
+                {
                     continue;
                 }
                 int damage = info.getValue().getStage();
                 BlockState state = mc.world.getBlockState(pos);
                 VoxelShape outlineShape = state.getOutlineShape(mc.world, pos);
-                if (outlineShape.isEmpty()) {
+                if (outlineShape.isEmpty())
+                {
                     continue;
                 }
                 Box bb = outlineShape.getBoundingBox();
@@ -91,22 +101,28 @@ public class BreakHighlightModule extends ToggleModule {
                 RenderManager.renderBoundingBox(event.getMatrices(), new Box(x - sizeX,
                         y - sizeY, z - sizeZ, x + sizeX, y + sizeY, z + sizeZ), 1.5f, ColorsModule.getInstance().getRGB(125));
             }
-        } else {
-            for (Map.Entry<BlockBreakingProgressS2CPacket, Long> mine : breakingProgress.entrySet()) {
+        }
+        else
+        {
+            for (Map.Entry<BlockBreakingProgressS2CPacket, Long> mine : breakingProgress.entrySet())
+            {
                 BlockPos mining = mine.getKey().getPos();
                 long elapsedTime = System.currentTimeMillis() - mine.getValue();
                 long count = breakingProgress.keySet().stream().filter(p -> p.getEntityId() == mine.getKey().getEntityId()).count();
-                while (count > 2) {
+                while (count > 2)
+                {
                     breakingProgress.entrySet().stream().filter(p -> p.getKey().getEntityId() == mine.getKey().getEntityId())
                             .min(Comparator.comparingLong(Map.Entry::getValue)).ifPresent(min -> breakingProgress.remove(min.getKey(), min.getValue()));
                     count--;
                 }
-                if (mc.world.isAir(mining) || elapsedTime > 2500) {
+                if (mc.world.isAir(mining) || elapsedTime > 2500)
+                {
                     breakingProgress.remove(mine.getKey(), mine.getValue());
                     continue;
                 }
                 double dist = mc.player.squaredDistanceTo(mining.toCenterPos());
-                if (dist > ((NumberConfig) rangeConfig).getValueSq()) {
+                if (dist > ((NumberConfig) rangeConfig).getValueSq())
+                {
                     continue;
                 }
                 VoxelShape outlineShape = mc.world.getBlockState(mining).getOutlineShape(mc.world, mining);
@@ -128,11 +144,13 @@ public class BreakHighlightModule extends ToggleModule {
         }
     }
 
-    private boolean contains(BlockPos pos) {
+    private boolean contains(BlockPos pos)
+    {
         return breakingProgress.keySet().stream().anyMatch(p -> p.getPos().equals(pos));
     }
 
-    private enum HighlightMode {
+    private enum HighlightMode
+    {
         NORMAL,
         PACKET
     }

@@ -5,7 +5,8 @@ package net.shoreline.client.api.module;
  * @see Module
  * @since 1.0
  */
-public enum ModuleCategory {
+public enum ModuleCategory
+{
     /**
      * Modules used for combat (Ex: Aura, AutoCrystal, Surround, etc.)
      */

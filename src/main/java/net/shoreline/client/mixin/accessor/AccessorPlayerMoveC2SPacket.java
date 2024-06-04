@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(PlayerMoveC2SPacket.class)
-public interface AccessorPlayerMoveC2SPacket {
+public interface AccessorPlayerMoveC2SPacket
+{
     /**
      * @param onGround
      */

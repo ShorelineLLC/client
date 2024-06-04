@@ -18,7 +18,8 @@ import java.util.concurrent.ConcurrentMap;
  * @see SocialRelation
  * @since 1.0
  */
-public class SocialManager implements Globals {
+public class SocialManager implements Globals
+{
     //
     private final ConcurrentMap<String, SocialRelation> relationships =
             new ConcurrentHashMap<>();
@@ -28,7 +29,8 @@ public class SocialManager implements Globals {
      * @param relation
      * @return
      */
-    public boolean isRelation(String name, SocialRelation relation) {
+    public boolean isRelation(String name, SocialRelation relation)
+    {
         return relationships.get(name) == relation;
     }
 
@@ -37,11 +39,13 @@ public class SocialManager implements Globals {
      * @return
      * @see #isRelation(String, SocialRelation)
      */
-    public boolean isFriend(String name) {
+    public boolean isFriend(String name)
+    {
         return isRelation(name, SocialRelation.FRIEND);
     }
 
-    public boolean isFriend(Text name) {
+    public boolean isFriend(Text name)
+    {
         return name != null && isRelation(name.getString(), SocialRelation.FRIEND);
     }
 
@@ -49,12 +53,15 @@ public class SocialManager implements Globals {
      * @param name
      * @param relation
      */
-    public void addRelation(String name, SocialRelation relation) {
-        if (mc.player != null && name.equals(mc.player.getDisplayName().getString())) {
+    public void addRelation(String name, SocialRelation relation)
+    {
+        if (mc.player != null && name.equals(mc.player.getDisplayName().getString()))
+        {
             return;
         }
         final SocialRelation relationship = relationships.get(name);
-        if (relationship != null) {
+        if (relationship != null)
+        {
             relationships.replace(name, relation);
             return;
         }
@@ -65,19 +72,23 @@ public class SocialManager implements Globals {
      * @param name
      * @see #addRelation(String, SocialRelation)
      */
-    public void addFriend(String name) {
+    public void addFriend(String name)
+    {
         addRelation(name, SocialRelation.FRIEND);
     }
 
-    public void addFriend(Text name) {
+    public void addFriend(Text name)
+    {
         addRelation(name.getString(), SocialRelation.FRIEND);
     }
 
-    public SocialRelation remove(String playerName) {
+    public SocialRelation remove(String playerName)
+    {
         return relationships.remove(playerName);
     }
 
-    public SocialRelation remove(Text playerName) {
+    public SocialRelation remove(Text playerName)
+    {
         return relationships.remove(playerName.getString());
     }
 
@@ -85,11 +96,14 @@ public class SocialManager implements Globals {
      * @param relation
      * @return
      */
-    public Collection<String> getRelations(SocialRelation relation) {
+    public Collection<String> getRelations(SocialRelation relation)
+    {
         final List<String> friends = new ArrayList<>();
         for (Map.Entry<String, SocialRelation> relationship :
-                relationships.entrySet()) {
-            if (relationship.getValue() == relation) {
+                relationships.entrySet())
+        {
+            if (relationship.getValue() == relation)
+            {
                 friends.add(relationship.getKey());
             }
         }
@@ -100,7 +114,8 @@ public class SocialManager implements Globals {
      * @return
      * @see #getRelations(SocialRelation)
      */
-    public Collection<String> getFriends() {
+    public Collection<String> getFriends()
+    {
         return getRelations(SocialRelation.FRIEND);
     }
 }

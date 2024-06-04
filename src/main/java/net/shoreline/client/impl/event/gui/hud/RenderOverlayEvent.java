@@ -1,16 +1,17 @@
 package net.shoreline.client.impl.event.gui.hud;
 
 import net.minecraft.client.gui.DrawContext;
+import net.shoreline.client.mixin.gui.hud.MixinInGameHud;
 import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
-import net.shoreline.client.mixin.gui.hud.MixinInGameHud;
 
 /**
  * @author linus
  * @see MixinInGameHud
  * @since 1.0
  */
-public class RenderOverlayEvent extends Event {
+public class RenderOverlayEvent extends Event
+{
     //
     private final DrawContext context;
 
@@ -18,18 +19,21 @@ public class RenderOverlayEvent extends Event {
     /**
      * @param context
      */
-    public RenderOverlayEvent(DrawContext context) {
+    public RenderOverlayEvent(DrawContext context)
+    {
         this.context = context;
     }
 
     /**
      * @return
      */
-    public DrawContext getContext() {
+    public DrawContext getContext()
+    {
         return context;
     }
 
-    public static class Post extends RenderOverlayEvent {
+    public static class Post extends RenderOverlayEvent
+    {
         //
         private final float tickDelta;
 
@@ -37,7 +41,8 @@ public class RenderOverlayEvent extends Event {
          * @param context
          * @param tickDelta
          */
-        public Post(DrawContext context, float tickDelta) {
+        public Post(DrawContext context, float tickDelta)
+        {
             super(context);
             this.tickDelta = tickDelta;
         }
@@ -45,126 +50,150 @@ public class RenderOverlayEvent extends Event {
         /**
          * @return
          */
-        public float getTickDelta() {
+        public float getTickDelta()
+        {
             return tickDelta;
         }
     }
 
     @Cancelable
-    public static class StatusEffect extends RenderOverlayEvent {
+    public static class StatusEffect extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public StatusEffect(DrawContext context) {
+        public StatusEffect(DrawContext context)
+        {
             super(context);
         }
     }
 
     @Cancelable
-    public static class ItemName extends RenderOverlayEvent {
+    public static class ItemName extends RenderOverlayEvent
+    {
         //
         private int x, y;
 
         /**
          * @param context
          */
-        public ItemName(DrawContext context) {
+        public ItemName(DrawContext context)
+        {
             super(context);
         }
 
-        public boolean isUpdateXY() {
+        public boolean isUpdateXY()
+        {
             return x != 0 && y != 0;
         }
 
-        public int getX() {
+        public int getX()
+        {
             return x;
         }
 
         /**
          * @param x
          */
-        public void setX(int x) {
+        public void setX(int x)
+        {
             this.x = x;
         }
 
-        public int getY() {
+        public int getY()
+        {
             return y;
         }
 
         /**
          * @param y
          */
-        public void setY(int y) {
+        public void setY(int y)
+        {
             this.y = y;
         }
     }
 
     @Cancelable
-    public static class Fire extends RenderOverlayEvent {
+    public static class Fire extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public Fire(DrawContext context) {
+        public Fire(DrawContext context)
+        {
             super(context);
         }
     }
 
     @Cancelable
-    public static class Water extends RenderOverlayEvent {
+    public static class Water extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public Water(DrawContext context) {
+        public Water(DrawContext context)
+        {
             super(context);
         }
     }
 
     @Cancelable
-    public static class Block extends RenderOverlayEvent {
+    public static class Block extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public Block(DrawContext context) {
+        public Block(DrawContext context)
+        {
             super(context);
         }
     }
 
     @Cancelable
-    public static class Spyglass extends RenderOverlayEvent {
+    public static class Spyglass extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public Spyglass(DrawContext context) {
+        public Spyglass(DrawContext context)
+        {
             super(context);
         }
     }
 
     @Cancelable
-    public static class Pumpkin extends RenderOverlayEvent {
+    public static class Pumpkin extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public Pumpkin(DrawContext context) {
+        public Pumpkin(DrawContext context)
+        {
             super(context);
         }
     }
 
     @Cancelable
-    public static class BossBar extends RenderOverlayEvent {
+    public static class BossBar extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public BossBar(DrawContext context) {
+        public BossBar(DrawContext context)
+        {
             super(context);
         }
     }
 
     @Cancelable
-    public static class Frostbite extends RenderOverlayEvent {
+    public static class Frostbite extends RenderOverlayEvent
+    {
         /**
          * @param context
          */
-        public Frostbite(DrawContext context) {
+        public Frostbite(DrawContext context)
+        {
             super(context);
         }
     }

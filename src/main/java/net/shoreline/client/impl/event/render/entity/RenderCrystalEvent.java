@@ -7,7 +7,8 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class RenderCrystalEvent extends Event {
+public class RenderCrystalEvent extends Event
+{
     // ??
     public final EndCrystalEntity endCrystalEntity;
     public final float f;
@@ -27,7 +28,8 @@ public class RenderCrystalEvent extends Event {
      * @param frame
      */
     public RenderCrystalEvent(EndCrystalEntity endCrystalEntity, float f, float g,
-                              MatrixStack matrixStack, int i, ModelPart core, ModelPart frame) {
+                              MatrixStack matrixStack, int i, ModelPart core, ModelPart frame)
+    {
         this.endCrystalEntity = endCrystalEntity;
         this.f = f;
         this.g = g;

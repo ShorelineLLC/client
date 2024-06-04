@@ -14,13 +14,14 @@ import org.lwjgl.glfw.GLFW;
  * @see ClickGuiScreen
  * @since 1.0
  */
-public class ClickGuiModule extends ToggleModule {
+public class ClickGuiModule extends ToggleModule
+{
 
     private static ClickGuiModule INSTANCE;
 
-    public Config<Boolean> underGlow = register(new BooleanConfig("UnderGlow", "GUI underglow", true));
+    public Config<Boolean> underGlow = register(new BooleanConfig("UnderGlow", "GUI underglow", false));
 
-//    Config<Integer> hueConfig = register(new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
+    //    Config<Integer> hueConfig = register(new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
 //    Config<Integer> saturationConfig = register(new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
 //    Config<Integer> brightnessConfig = register(new NumberConfig<>("Brightness", "The brightness of colors", 0, 50, 100);
 //    Config<Integer> hue1Config = register(new NumberConfig<>("Hue1", "The saturation of colors", 0, 0, 360);
@@ -38,24 +39,29 @@ public class ClickGuiModule extends ToggleModule {
     /**
      *
      */
-    public ClickGuiModule() {
+    public ClickGuiModule()
+    {
         super("ClickGui", "Opens the clickgui screen", ModuleCategory.CLIENT,
                 GLFW.GLFW_KEY_RIGHT_SHIFT);
         INSTANCE = this;
     }
 
-    public static ClickGuiModule getInstance() {
+    public static ClickGuiModule getInstance()
+    {
         return INSTANCE;
     }
 
     @Override
-    public void onEnable() {
-        if (mc.player == null || mc.world == null) {
+    public void onEnable()
+    {
+        if (mc.player == null || mc.world == null)
+        {
             toggle();
             return;
         }
         // initialize the null gui screen instance
-        if (CLICK_GUI_SCREEN == null) {
+        if (CLICK_GUI_SCREEN == null)
+        {
             CLICK_GUI_SCREEN = new ClickGuiScreen(this);
         }
         openCloseAnimation.setState(true);
@@ -66,8 +72,10 @@ public class ClickGuiModule extends ToggleModule {
     }
 
     @Override
-    public void onDisable() {
-        if (mc.player == null || mc.world == null) {
+    public void onDisable()
+    {
+        if (mc.player == null || mc.world == null)
+        {
             toggle();
             return;
         }
@@ -118,7 +126,8 @@ public class ClickGuiModule extends ToggleModule {
     /**
      * @return
      */
-    public Float getScale() {
+    public Float getScale()
+    {
         return scaleConfig;
     }
 }

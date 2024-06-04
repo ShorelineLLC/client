@@ -4,33 +4,40 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 import net.shoreline.eventbus.Event;
 
-public class SuggestChatEvent extends Event {
+public class SuggestChatEvent extends Event
+{
 
     private CommandDispatcher dispatcher;
     private CommandSource source;
     private String prefix;
 
-    public String getPrefix() {
+    public String getPrefix()
+    {
         return prefix;
     }
 
-    public void setPrefix(String prefix) {
+    public void setPrefix(String prefix)
+    {
         this.prefix = prefix;
     }
 
-    public CommandSource getSource() {
+    public CommandSource getSource()
+    {
         return source;
     }
 
-    public void setSource(CommandSource source) {
+    public void setSource(CommandSource source)
+    {
         this.source = source;
     }
 
-    public void setDispatcher(CommandDispatcher dispatcher) {
+    public void setDispatcher(CommandDispatcher dispatcher)
+    {
         this.dispatcher = dispatcher;
     }
 
-    public CommandDispatcher getDispatcher() {
+    public CommandDispatcher getDispatcher()
+    {
         return dispatcher;
     }
 }

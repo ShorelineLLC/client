@@ -3,16 +3,17 @@ package net.shoreline.client.impl.module.misc;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class AntiAimModule extends RotationModule {
+public class AntiAimModule extends RotationModule
+{
     //
     Config<YawMode> yawModeConfig = register(new EnumConfig<>("Yaw", "The mode for the rotation yaw spin ", YawMode.SPIN, YawMode.values()));
     Config<PitchMode> pitchModeConfig = register(new EnumConfig<>("Pitch", "The mode for the rotation pitch spin", PitchMode.DOWN, PitchMode.values()));
@@ -29,7 +30,8 @@ public class AntiAimModule extends RotationModule {
     /**
      *
      */
-    public AntiAimModule() {
+    public AntiAimModule()
+    {
         super("AntiAim", "Makes it harder to accurately aim at the player",
                 ModuleCategory.MISCELLANEOUS, 50);
     }
@@ -38,8 +40,10 @@ public class AntiAimModule extends RotationModule {
      *
      */
     @Override
-    public void onEnable() {
-        if (mc.player == null) {
+    public void onEnable()
+    {
+        if (mc.player == null)
+        {
             return;
         }
         prevYaw = mc.player.getYaw();
@@ -50,17 +54,22 @@ public class AntiAimModule extends RotationModule {
      * @param event
      */
     @EventListener
-    public void onPlayerUpdate(PlayerTickEvent event) {
-        if (mc.options.attackKey.isPressed() || mc.options.useKey.isPressed()) {
+    public void onPlayerUpdate(PlayerTickEvent event)
+    {
+        if (mc.options.attackKey.isPressed() || mc.options.useKey.isPressed())
+        {
             return;
         }
-        yaw = switch (yawModeConfig.getValue()) {
+        yaw = switch (yawModeConfig.getValue())
+        {
             case OFF -> mc.player.getYaw();
             case STATIC -> mc.player.getYaw() + yawAddConfig.getValue();
             case ZERO -> prevYaw;
-            case SPIN -> {
+            case SPIN ->
+            {
                 float spin = yaw + spinSpeedConfig.getValue();
-                if (spin > 360.0f) {
+                if (spin > 360.0f)
+                {
                     yield spin - 360.0f;
                 }
                 yield spin;
@@ -68,18 +77,22 @@ public class AntiAimModule extends RotationModule {
             case JITTER -> mc.player.getYaw() + ((mc.player.age % flipTicksConfig.getValue() == 0) ?
                     yawAddConfig.getValue() : -yawAddConfig.getValue());
         };
-        pitch = switch (pitchModeConfig.getValue()) {
+        pitch = switch (pitchModeConfig.getValue())
+        {
             case OFF -> mc.player.getPitch();
             case STATIC -> pitchAddConfig.getValue();
             case ZERO -> prevPitch;
             case UP -> -90.0f;
             case DOWN -> 90.0f;
-            case JITTER -> {
+            case JITTER ->
+            {
                 float jitter = pitch + 30.0f;
-                if (jitter > 90.0f) {
+                if (jitter > 90.0f)
+                {
                     yield -90.0f;
                 }
-                if (jitter < -90.0f) {
+                if (jitter < -90.0f)
+                {
                     yield 90.0f;
                 }
                 yield jitter;
@@ -89,11 +102,13 @@ public class AntiAimModule extends RotationModule {
         setRotation(yaw, pitch);
     }
 
-    public enum YawMode {
+    public enum YawMode
+    {
         OFF, STATIC, ZERO, SPIN, JITTER
     }
 
-    public enum PitchMode {
+    public enum PitchMode
+    {
         OFF, STATIC, ZERO, UP, DOWN, JITTER
     }
 }

@@ -22,13 +22,13 @@ import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
-import java.sql.Ref;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class ShadersModule extends ToggleModule {
+public class ShadersModule extends ToggleModule
+{
 
     Config<ShaderMode> modeConfig = register(new EnumConfig<>("Mode", "The shader mode", ShaderMode.NORMAL, ShaderMode.values()));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));

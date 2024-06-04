@@ -8,21 +8,24 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class TickMovementEvent extends Event {
+public class TickMovementEvent extends Event
+{
     //
     private int iterations;
 
     /**
      * @return
      */
-    public int getIterations() {
+    public int getIterations()
+    {
         return iterations;
     }
 
     /**
      * @param iterations
      */
-    public void setIterations(int iterations) {
+    public void setIterations(int iterations)
+    {
         this.iterations = iterations;
     }
 }

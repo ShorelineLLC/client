@@ -25,7 +25,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOD_CONTROL;
  * @see ClickGuiModule
  * @since 1.0
  */
-public class ClickGuiScreen extends Screen implements Globals {
+public class ClickGuiScreen extends Screen implements Globals
+{
     // mouse position
     public static int MOUSE_X;
     public static int MOUSE_Y;
@@ -46,11 +47,13 @@ public class ClickGuiScreen extends Screen implements Globals {
     /**
      *
      */
-    public ClickGuiScreen(ClickGuiModule module) {
+    public ClickGuiScreen(ClickGuiModule module)
+    {
         super(Text.literal("ClickGui"));
         this.module = module;
         float x = 15.0f;
-        for (ModuleCategory category : ModuleCategory.values()) {
+        for (ModuleCategory category : ModuleCategory.values())
+        {
             CategoryFrame frame = new CategoryFrame(category, x, 15.0f);
             frames.add(frame);
             x += frame.getWidth() + 2.0f;
@@ -67,23 +70,30 @@ public class ClickGuiScreen extends Screen implements Globals {
     public void render(DrawContext context, int mouseX, int mouseY, float delta)
     {
         renderAndScaleGUI(context);
-        for (CategoryFrame frame : frames) {
-            if (frame.isWithinTotal(mouseX, mouseY)) {
+        for (CategoryFrame frame : frames)
+        {
+            if (frame.isWithinTotal(mouseX, mouseY))
+            {
                 focus = frame;
             }
-            if (frame.isWithin(mouseX, mouseY) && MOUSE_LEFT_HOLD && checkDragging()) {
+            if (frame.isWithin(mouseX, mouseY) && MOUSE_LEFT_HOLD && checkDragging())
+            {
                 frame.setDragging(true);
             }
             frame.render(context, mouseX, mouseY, delta);
             float scale = module.getScale();
-            if (scale != 1.0f) {
+            if (scale != 1.0f)
+            {
                 frame.setDimensions(frame.getWidth() * scale,
                         frame.getHeight() * scale);
-                for (ModuleButton button : frame.getModuleButtons()) {
+                for (ModuleButton button : frame.getModuleButtons())
+                {
                     button.setDimensions(button.getWidth() * scale,
                             button.getHeight() * scale);
-                    for (ConfigButton<?> component : button.getConfigButtons()) {
-                        if (component instanceof BindButton bindButton && bindButton.isListening() && !button.isOpen()) {
+                    for (ConfigButton<?> component : button.getConfigButtons())
+                    {
+                        if (component instanceof BindButton bindButton && bindButton.isListening() && !button.isOpen())
+                        {
                             bindButton.setListening(false);
                             setCloseOnEscape(true);
                         }
@@ -109,15 +119,20 @@ public class ClickGuiScreen extends Screen implements Globals {
      * @return
      */
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton)
+    {
+        if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+        {
             MOUSE_LEFT_CLICK = true;
             MOUSE_LEFT_HOLD = true;
-        } else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        }
+        else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+        {
             MOUSE_RIGHT_CLICK = true;
             MOUSE_RIGHT_HOLD = true;
         }
-        for (CategoryFrame frame : frames) {
+        for (CategoryFrame frame : frames)
+        {
             frame.mouseClicked(mouseX, mouseY, mouseButton);
         }
         return super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -130,27 +145,31 @@ public class ClickGuiScreen extends Screen implements Globals {
      * @return
      */
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    {
+        if (button == 0)
+        {
             MOUSE_LEFT_HOLD = false;
-        } else if (button == 1) {
+        }
+        else if (button == 1)
+        {
             MOUSE_RIGHT_HOLD = false;
         }
-        for (CategoryFrame frame : frames) {
+        for (CategoryFrame frame : frames)
+        {
             frame.mouseReleased(mouseX, mouseY, button);
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
     /**
-     *
-     *
      * @param mouseX the X coordinate of the mouse
      * @param mouseY the Y coordinate of the mouse
      * @return
      */
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
+    {
         if (focus != null)
         {
             focus.setPos(focus.getX(), (float) (focus.getY() + verticalAmount * 50f));
@@ -165,14 +184,17 @@ public class ClickGuiScreen extends Screen implements Globals {
      * @return
      */
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+    {
 
         // TODO: hard reset GUI in case something fails
-        if (keyCode == GLFW_KEY_R && (modifiers & GLFW_MOD_CONTROL) != 0) {
+        if (keyCode == GLFW_KEY_R && (modifiers & GLFW_MOD_CONTROL) != 0)
+        {
             // System.out.println("Hard reset");
         }
 
-        for (CategoryFrame frame : frames) {
+        for (CategoryFrame frame : frames)
+        {
             frame.keyPressed(keyCode, scanCode, modifiers);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -182,7 +204,8 @@ public class ClickGuiScreen extends Screen implements Globals {
      * @return
      */
     @Override
-    public boolean shouldPause() {
+    public boolean shouldPause()
+    {
         return false;
     }
 
@@ -190,7 +213,8 @@ public class ClickGuiScreen extends Screen implements Globals {
      *
      */
     @Override
-    public void close() {
+    public void close()
+    {
         module.disable();
         //
         MOUSE_LEFT_CLICK = false;
@@ -201,7 +225,8 @@ public class ClickGuiScreen extends Screen implements Globals {
     }
 
     @Override
-    public boolean shouldCloseOnEsc() {
+    public boolean shouldCloseOnEsc()
+    {
         return closeOnEscape;
     }
 
@@ -217,7 +242,7 @@ public class ClickGuiScreen extends Screen implements Globals {
                 context.getScaledWindowHeight(),
                 backgroundColor
         );
-        
+
         if (ClickGuiModule.getInstance().underGlow.getValue())
         {
             int fadeColor = ClickGuiModule.getInstance().getColor();
@@ -257,16 +282,20 @@ public class ClickGuiScreen extends Screen implements Globals {
         context.getMatrices().translate(-context.getScaledWindowHeight(), -context.getScaledWindowHeight() / 2.0F, 0.0F);
     }
 
-    private boolean checkDragging() {
-        for (CategoryFrame frame : frames) {
-            if (frame.isDragging()) {
+    private boolean checkDragging()
+    {
+        for (CategoryFrame frame : frames)
+        {
+            if (frame.isDragging())
+            {
                 return false;
             }
         }
         return true;
     }
 
-    public void setCloseOnEscape(boolean closeOnEscape) {
+    public void setCloseOnEscape(boolean closeOnEscape)
+    {
         this.closeOnEscape = closeOnEscape;
     }
 }

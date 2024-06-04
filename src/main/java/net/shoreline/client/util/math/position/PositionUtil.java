@@ -7,7 +7,8 @@ import net.minecraft.util.math.MathHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PositionUtil {
+public class PositionUtil
+{
 
     public static BlockPos getRoundedBlockPos(final double x, final double y, final double z)
     {
@@ -25,21 +26,28 @@ public class PositionUtil {
      * @param pos The player position
      * @return
      */
-    public static List<BlockPos> getAllInBox(Box box, BlockPos pos) {
+    public static List<BlockPos> getAllInBox(Box box, BlockPos pos)
+    {
         final List<BlockPos> intersections = new ArrayList<>();
-        for (int x = (int) Math.floor(box.minX); x < Math.ceil(box.maxX); x++) {
-            for (int z = (int) Math.floor(box.minZ); z < Math.ceil(box.maxZ); z++) {
+        for (int x = (int) Math.floor(box.minX); x < Math.ceil(box.maxX); x++)
+        {
+            for (int z = (int) Math.floor(box.minZ); z < Math.ceil(box.maxZ); z++)
+            {
                 intersections.add(new BlockPos(x, pos.getY(), z));
             }
         }
         return intersections;
     }
 
-    public static List<BlockPos> getAllInBox(Box box) {
+    public static List<BlockPos> getAllInBox(Box box)
+    {
         final List<BlockPos> intersections = new ArrayList<>();
-        for (int x = (int) Math.floor(box.minX); x < Math.ceil(box.maxX); x++) {
-            for (int y = (int) Math.floor(box.minY); y < Math.ceil(box.maxY); y++) {
-                for (int z = (int) Math.floor(box.minZ); z < Math.ceil(box.maxZ); z++) {
+        for (int x = (int) Math.floor(box.minX); x < Math.ceil(box.maxX); x++)
+        {
+            for (int y = (int) Math.floor(box.minY); y < Math.ceil(box.maxY); y++)
+            {
+                for (int z = (int) Math.floor(box.minZ); z < Math.ceil(box.maxZ); z++)
+                {
                     intersections.add(new BlockPos(x, y, z));
                 }
             }

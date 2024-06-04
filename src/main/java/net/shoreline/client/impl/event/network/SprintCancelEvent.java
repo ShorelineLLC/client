@@ -8,6 +8,7 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class SprintCancelEvent extends Event {
+public class SprintCancelEvent extends Event
+{
 
 }

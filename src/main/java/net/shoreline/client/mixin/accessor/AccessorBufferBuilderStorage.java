@@ -7,7 +7,8 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(BufferBuilderStorage.class)
-public interface AccessorBufferBuilderStorage {
+public interface AccessorBufferBuilderStorage
+{
     /**
      * @param vertexConsumerProvider
      */

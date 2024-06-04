@@ -5,7 +5,8 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.item.ItemStack;
 import net.shoreline.client.api.command.Command;
 
-public class PeekCommand extends Command {
+public class PeekCommand extends Command
+{
 
     public PeekCommand()
     {

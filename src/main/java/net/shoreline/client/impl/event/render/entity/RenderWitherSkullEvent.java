@@ -8,6 +8,7 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class RenderWitherSkullEvent extends Event {
+public class RenderWitherSkullEvent extends Event
+{
 
 }

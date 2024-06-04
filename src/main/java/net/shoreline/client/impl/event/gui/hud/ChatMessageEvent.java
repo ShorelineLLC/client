@@ -5,18 +5,22 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class ChatMessageEvent extends Event {
+public class ChatMessageEvent extends Event
+{
     private Text text;
 
-    public ChatMessageEvent(Text text) {
+    public ChatMessageEvent(Text text)
+    {
         this.text = text;
     }
 
-    public void setText(Text text) {
+    public void setText(Text text)
+    {
         this.text = text;
     }
 
-    public Text getText() {
+    public Text getText()
+    {
         return text;
     }
 }

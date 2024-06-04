@@ -6,8 +6,6 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
@@ -15,6 +13,8 @@ import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.FakePlayerEntity;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -23,7 +23,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author linus
  * @since 1.0
  */
-public class FakeLagModule extends ToggleModule {
+public class FakeLagModule extends ToggleModule
+{
 
     //
     Config<LagMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for caching packets", LagMode.BLINK, LagMode.values()));
@@ -39,13 +40,16 @@ public class FakeLagModule extends ToggleModule {
     /**
      *
      */
-    public FakeLagModule() {
+    public FakeLagModule()
+    {
         super("FakeLag", "Withholds packets from the server, creating clientside lag", ModuleCategory.MOVEMENT);
     }
 
     @Override
-    public void onEnable() {
-        if (renderConfig.getValue()) {
+    public void onEnable()
+    {
+        if (renderConfig.getValue())
+        {
             serverModel = new FakePlayerEntity(mc.player, mc.getGameProfile());
             serverModel.despawnPlayer();
             serverModel.spawnPlayer();
@@ -53,32 +57,42 @@ public class FakeLagModule extends ToggleModule {
     }
 
     @Override
-    public void onDisable() {
-        if (mc.player == null) {
+    public void onDisable()
+    {
+        if (mc.player == null)
+        {
             return;
         }
-        if (!packets.isEmpty()) {
-            for (Packet<?> p : packets) {
+        if (!packets.isEmpty())
+        {
+            for (Packet<?> p : packets)
+            {
                 Managers.NETWORK.sendPacket(p);
             }
             packets.clear();
         }
-        if (serverModel != null) {
+        if (serverModel != null)
+        {
             serverModel.despawnPlayer();
         }
     }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() == StageEvent.EventStage.PRE && pulseConfig.getValue() && packets.size() > factorConfig.getValue() * 10.0f) {
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.PRE && pulseConfig.getValue() && packets.size() > factorConfig.getValue() * 10.0f)
+        {
             blinking = true;
-            if (!packets.isEmpty()) {
-                for (Packet<?> p : packets) {
+            if (!packets.isEmpty())
+            {
+                for (Packet<?> p : packets)
+                {
                     Managers.NETWORK.sendPacket(p);
                 }
             }
             packets.clear();
-            if (serverModel != null) {
+            if (serverModel != null)
+            {
                 serverModel.copyPositionAndRotation(mc.player);
                 serverModel.setHeadYaw(mc.player.headYaw);
             }
@@ -87,26 +101,31 @@ public class FakeLagModule extends ToggleModule {
     }
 
     @EventListener
-    public void onDisconnectEvent(DisconnectEvent event) {
+    public void onDisconnectEvent(DisconnectEvent event)
+    {
         // packets.clear();
         disable();
     }
 
     @EventListener
-    public void onPacketOutbound(PacketEvent.Outbound event) {
-        if (mc.player == null || mc.player.isRiding() || blinking) {
+    public void onPacketOutbound(PacketEvent.Outbound event)
+    {
+        if (mc.player == null || mc.player.isRiding() || blinking)
+        {
             return;
         }
         if (event.getPacket() instanceof PlayerActionC2SPacket || event.getPacket() instanceof PlayerMoveC2SPacket
                 || event.getPacket() instanceof ClientCommandC2SPacket || event.getPacket() instanceof HandSwingC2SPacket
                 || event.getPacket() instanceof PlayerInteractEntityC2SPacket || event.getPacket() instanceof PlayerInteractBlockC2SPacket
-                || event.getPacket() instanceof PlayerInteractItemC2SPacket) {
+                || event.getPacket() instanceof PlayerInteractItemC2SPacket)
+        {
             event.cancel();
             packets.add(event.getPacket());
         }
     }
 
-    public enum LagMode {
+    public enum LagMode
+    {
         BLINK
     }
 }

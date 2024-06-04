@@ -29,7 +29,8 @@ public final class ModuleManager
     /**
      * Initializes the module register.
      */
-    public ModuleManager() {
+    public ModuleManager()
+    {
         // MAINTAIN ALPHABETICAL ORDER
         register(
                 // Client
@@ -175,12 +176,15 @@ public final class ModuleManager
                 new SpeedmineModule()
                 // new WallhackModule()
         );
-        if (ShorelineMod.isBaritonePresent()) {
+        if (ShorelineMod.isBaritonePresent())
+        {
             register(new BaritoneModule());
         }
         // Register keybinds
-        for (Module module : getModules()) {
-            if (module instanceof ToggleModule t) {
+        for (Module module : getModules())
+        {
+            if (module instanceof ToggleModule t)
+            {
                 Managers.MACRO.register(t.getKeybinding());
             }
         }
@@ -190,7 +194,8 @@ public final class ModuleManager
     /**
      *
      */
-    public void postInit() {
+    public void postInit()
+    {
         // TODO
     }
 
@@ -198,8 +203,10 @@ public final class ModuleManager
      * @param modules
      * @see #register(Module)
      */
-    private void register(Module... modules) {
-        for (Module module : modules) {
+    private void register(Module... modules)
+    {
+        for (Module module : modules)
+        {
             register(module);
         }
     }
@@ -207,7 +214,8 @@ public final class ModuleManager
     /**
      * @param module
      */
-    private void register(Module module) {
+    private void register(Module module)
+    {
         modules.put(module.getId(), module);
     }
 
@@ -215,14 +223,16 @@ public final class ModuleManager
      * @param id
      * @return
      */
-    public Module getModuleById(String id) {
+    public Module getModuleById(String id)
+    {
         return modules.get(id);
     }
 
     /**
      * @return
      */
-    public List<Module> getModules() {
+    public List<Module> getModules()
+    {
         return new ArrayList<>(modules.values());
     }
 }

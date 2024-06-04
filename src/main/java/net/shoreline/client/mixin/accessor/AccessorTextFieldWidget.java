@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(TextFieldWidget.class)
-public interface AccessorTextFieldWidget {
+public interface AccessorTextFieldWidget
+{
     /**
      * @return
      * @see TextFieldWidget#drawsBackground

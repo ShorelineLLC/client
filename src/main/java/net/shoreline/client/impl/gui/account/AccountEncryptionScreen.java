@@ -38,9 +38,9 @@ public final class AccountEncryptionScreen extends Screen
         addDrawableChild(passwordTextField);
 
         addDrawableChild(ButtonWidget.builder(Text.of("Encrypt"), (action) ->
-        {
-            // TODO
-        }).dimensions(width / 2 - 145 / 2, passwordTextField.getY() + 90, 145, 20)
+                {
+                    // TODO
+                }).dimensions(width / 2 - 145 / 2, passwordTextField.getY() + 90, 145, 20)
                 .tooltip(Tooltip.of(Text.of("This will require you to enter a password every time you enter the account manager the first time!")))
                 .build());
         addDrawableChild(ButtonWidget.builder(Text.of("Go Back"), (action) -> client.setScreen(parent))
@@ -78,6 +78,7 @@ public final class AccountEncryptionScreen extends Screen
 
     /**
      * Checks if the password is "secure"
+     *
      * @return if the password is greater than 8 characters, contains a special character, a number, and an uppercase letter
      */
     private boolean isPasswordSecure(final String password)

@@ -7,21 +7,25 @@ import net.shoreline.eventbus.Event;
  * @author xgraza
  * @since 03/29/24
  */
-public final class UpdateCrosshairTargetEvent extends Event {
+public final class UpdateCrosshairTargetEvent extends Event
+{
 
     private final float tickDelta;
     private final Entity cameraEntity;
 
-    public UpdateCrosshairTargetEvent(float tickDelta, Entity cameraEntity) {
+    public UpdateCrosshairTargetEvent(float tickDelta, Entity cameraEntity)
+    {
         this.tickDelta = tickDelta;
         this.cameraEntity = cameraEntity;
     }
 
-    public float getTickDelta() {
+    public float getTickDelta()
+    {
         return tickDelta;
     }
 
-    public Entity getCameraEntity() {
+    public Entity getCameraEntity()
+    {
         return cameraEntity;
     }
 }

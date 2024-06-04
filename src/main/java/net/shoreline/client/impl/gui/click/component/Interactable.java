@@ -5,7 +5,8 @@ package net.shoreline.client.impl.gui.click.component;
  * @see Drawable
  * @since 1.0
  */
-public interface Interactable extends Drawable {
+public interface Interactable extends Drawable
+{
     /**
      * @param mouseX
      * @param mouseY

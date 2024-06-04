@@ -12,17 +12,22 @@ import net.shoreline.client.util.chat.ChatUtil;
  * @author linus
  * @since 1.0
  */
-public class PrefixCommand extends Command {
+public class PrefixCommand extends Command
+{
 
-    public PrefixCommand() {
+    public PrefixCommand()
+    {
         super("Prefix", "Allows you to change the chat command prefix", literal("prefix"));
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.then(argument("prefix", StringArgumentType.string()).executes(c -> {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
+        builder.then(argument("prefix", StringArgumentType.string()).executes(c ->
+        {
             final String prefix = StringArgumentType.getString(c, "prefix");
-            if (prefix.length() > 1) {
+            if (prefix.length() > 1)
+            {
                 ChatUtil.error("Prefix can only be one character!");
                 return 0;
             }
@@ -30,7 +35,8 @@ public class PrefixCommand extends Command {
             Managers.COMMAND.setPrefix(prefix, keycode);
             ChatUtil.clientSendMessage("Command prefix changed to §s" + prefix);
             return 1;
-        })).executes(c -> {
+        })).executes(c ->
+        {
             ChatUtil.error("Please provide a new prefix!");
             return 1;
         });

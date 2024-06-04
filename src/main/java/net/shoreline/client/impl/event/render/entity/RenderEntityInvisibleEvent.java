@@ -5,14 +5,17 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class RenderEntityInvisibleEvent extends Event {
+public class RenderEntityInvisibleEvent extends Event
+{
     private final LivingEntity entity;
 
-    public RenderEntityInvisibleEvent(LivingEntity entity) {
+    public RenderEntityInvisibleEvent(LivingEntity entity)
+    {
         this.entity = entity;
     }
 
-    public LivingEntity getEntity() {
+    public LivingEntity getEntity()
+    {
         return entity;
     }
 }

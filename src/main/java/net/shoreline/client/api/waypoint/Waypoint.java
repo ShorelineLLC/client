@@ -12,7 +12,8 @@ import net.shoreline.client.util.math.timer.Timer;
  * @author linus
  * @since 1.0
  */
-public class Waypoint extends ConfigContainer implements Position {
+public class Waypoint extends ConfigContainer implements Position
+{
     //
     private final String ip;
     //
@@ -31,7 +32,8 @@ public class Waypoint extends ConfigContainer implements Position {
      * @param y
      * @param z
      */
-    public Waypoint(String name, String ip, double x, double y, double z) {
+    public Waypoint(String name, String ip, double x, double y, double z)
+    {
         super(name);
         this.ip = ip;
         xConfig.setValue(x);
@@ -44,33 +46,39 @@ public class Waypoint extends ConfigContainer implements Position {
      * @param time
      * @return
      */
-    private boolean passedTime(long time) {
+    private boolean passedTime(long time)
+    {
         return timer.passed(time);
     }
 
-    public String getIp() {
+    public String getIp()
+    {
         return ip;
     }
 
     @Override
-    public double getX() {
+    public double getX()
+    {
         return xConfig.getValue();
     }
 
     @Override
-    public double getY() {
+    public double getY()
+    {
         return yConfig.getValue();
     }
 
     @Override
-    public double getZ() {
+    public double getZ()
+    {
         return zConfig.getValue();
     }
 
     /**
      * @return
      */
-    public Vec3d getPos() {
+    public Vec3d getPos()
+    {
         return new Vec3d(getX(), getY(), getZ());
     }
 }

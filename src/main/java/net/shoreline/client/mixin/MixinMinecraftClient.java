@@ -30,7 +30,8 @@ import java.util.List;
  * @since 1.0
  */
 @Mixin(MinecraftClient.class)
-public abstract class MixinMinecraftClient implements IMinecraftClient {
+public abstract class MixinMinecraftClient implements IMinecraftClient
+{
     //
     @Shadow
     public ClientWorld world;
@@ -70,7 +71,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      *
      */
     @Override
-    public void leftClick() {
+    public void leftClick()
+    {
         leftClick = true;
     }
 
@@ -78,7 +80,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      *
      */
     @Override
-    public void rightClick() {
+    public void rightClick()
+    {
         rightClick = true;
     }
 
@@ -87,7 +90,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      */
     @Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet" +
             "/minecraft/client/MinecraftClient;render(Z)V", shift = At.Shift.BEFORE))
-    private void hookRun(CallbackInfo ci) {
+    private void hookRun(CallbackInfo ci)
+    {
         final RunTickEvent runTickEvent = new RunTickEvent();
         EventBus.INSTANCE.dispatch(runTickEvent);
     }
@@ -97,7 +101,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param cir
      */
     @Inject(method = "onInitFinished", at = @At(value = "RETURN"))
-    private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext, CallbackInfoReturnable<Runnable> cir) {
+    private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext, CallbackInfoReturnable<Runnable> cir)
+    {
         FinishLoadingEvent finishLoadingEvent = new FinishLoadingEvent();
         EventBus.INSTANCE.dispatch(finishLoadingEvent);
         // Managers.CAPES.init();
@@ -107,21 +112,26 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param ci
      */
     @Inject(method = "tick", at = @At(value = "HEAD"))
-    private void hookTickPre(CallbackInfo ci) {
+    private void hookTickPre(CallbackInfo ci)
+    {
         doAttackCalled = false;
         doItemUseCalled = false;
-        if (player != null && world != null) {
+        if (player != null && world != null)
+        {
             TickEvent tickPreEvent = new TickEvent();
             tickPreEvent.setStage(StageEvent.EventStage.PRE);
             EventBus.INSTANCE.dispatch(tickPreEvent);
         }
-        if (interactionManager == null) {
+        if (interactionManager == null)
+        {
             return;
         }
-        if (leftClick && !doAttackCalled) {
+        if (leftClick && !doAttackCalled)
+        {
             doAttack();
         }
-        if (rightClick && !doItemUseCalled) {
+        if (rightClick && !doItemUseCalled)
+        {
             doItemUse();
         }
         leftClick = false;
@@ -135,13 +145,17 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param ci
      */
     @Inject(method = "tick", at = @At(value = "TAIL"))
-    private void hookTickPost(CallbackInfo ci) {
-        if (player != null && world != null) {
+    private void hookTickPost(CallbackInfo ci)
+    {
+        if (player != null && world != null)
+        {
             TickEvent tickPostEvent = new TickEvent();
             tickPostEvent.setStage(StageEvent.EventStage.POST);
             EventBus.INSTANCE.dispatch(tickPostEvent);
-            world.getEntities().forEach(entity -> {
-                if (entity instanceof LivingEntity e) {
+            world.getEntities().forEach(entity ->
+            {
+                if (entity instanceof LivingEntity e)
+                {
                     if (e.isDead() && !deadList.contains(e.getId()))
                     {
                         EntityDeathEvent entityDeathEvent = new EntityDeathEvent(e);
@@ -162,7 +176,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param ci
      */
     @Inject(method = "setScreen", at = @At(value = "TAIL"))
-    private void hookSetScreen(Screen screen, CallbackInfo ci) {
+    private void hookSetScreen(Screen screen, CallbackInfo ci)
+    {
         ScreenOpenEvent screenOpenEvent = new ScreenOpenEvent(screen);
         EventBus.INSTANCE.dispatch(screenOpenEvent);
     }
@@ -171,7 +186,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param ci
      */
     @Inject(method = "doItemUse", at = @At(value = "HEAD"))
-    private void hookDoItemUse(CallbackInfo ci) {
+    private void hookDoItemUse(CallbackInfo ci)
+    {
         doItemUseCalled = true;
     }
 
@@ -179,11 +195,13 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param cir
      */
     @Inject(method = "doAttack", at = @At(value = "HEAD"))
-    private void hookDoAttack(CallbackInfoReturnable<Boolean> cir) {
+    private void hookDoAttack(CallbackInfoReturnable<Boolean> cir)
+    {
         doAttackCalled = true;
         AttackCooldownEvent attackCooldownEvent = new AttackCooldownEvent();
         EventBus.INSTANCE.dispatch(attackCooldownEvent);
-        if (attackCooldownEvent.isCanceled()) {
+        if (attackCooldownEvent.isCanceled())
+        {
             attackCooldown = 0;
         }
     }
@@ -194,7 +212,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      */
     @Redirect(method = "handleBlockBreaking", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
-    private boolean hookIsUsingItem(ClientPlayerEntity instance) {
+    private boolean hookIsUsingItem(ClientPlayerEntity instance)
+    {
         ItemMultitaskEvent itemMultitaskEvent = new ItemMultitaskEvent();
         EventBus.INSTANCE.dispatch(itemMultitaskEvent);
         return !itemMultitaskEvent.isCanceled() && instance.isUsingItem();
@@ -206,7 +225,8 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      */
     @Redirect(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet" +
             "/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
-    private boolean hookIsBreakingBlock(ClientPlayerInteractionManager instance) {
+    private boolean hookIsBreakingBlock(ClientPlayerInteractionManager instance)
+    {
         ItemMultitaskEvent itemMultitaskEvent = new ItemMultitaskEvent();
         EventBus.INSTANCE.dispatch(itemMultitaskEvent);
         return !itemMultitaskEvent.isCanceled() && instance.isBreakingBlock();
@@ -216,10 +236,12 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param cir
      */
     @Inject(method = "getFramerateLimit", at = @At(value = "HEAD"), cancellable = true)
-    private void hookGetFramerateLimit(CallbackInfoReturnable<Integer> cir) {
+    private void hookGetFramerateLimit(CallbackInfoReturnable<Integer> cir)
+    {
         FramerateLimitEvent framerateLimitEvent = new FramerateLimitEvent();
         EventBus.INSTANCE.dispatch(framerateLimitEvent);
-        if (framerateLimitEvent.isCanceled()) {
+        if (framerateLimitEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(framerateLimitEvent.getFramerateLimit());
         }
@@ -230,10 +252,12 @@ public abstract class MixinMinecraftClient implements IMinecraftClient {
      * @param cir
      */
     @Inject(method = "hasOutline", at = @At(value = "HEAD"), cancellable = true)
-    private void hookHasOutline(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+    private void hookHasOutline(Entity entity, CallbackInfoReturnable<Boolean> cir)
+    {
         EntityOutlineEvent entityOutlineEvent = new EntityOutlineEvent(entity);
         EventBus.INSTANCE.dispatch(entityOutlineEvent);
-        if (entityOutlineEvent.isCanceled()) {
+        if (entityOutlineEvent.isCanceled())
+        {
             cir.cancel();
             cir.setReturnValue(true);
         }

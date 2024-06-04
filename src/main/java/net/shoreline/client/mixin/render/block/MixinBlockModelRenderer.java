@@ -20,7 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(BlockModelRenderer.class)
-public class MixinBlockModelRenderer {
+public class MixinBlockModelRenderer
+{
     /**
      * @param world
      * @param model
@@ -45,11 +46,13 @@ public class MixinBlockModelRenderer {
                             MatrixStack matrices,
                             VertexConsumer vertexConsumer, boolean cull,
                             Random random, long seed, int overlay,
-                            CallbackInfo ci) {
+                            CallbackInfo ci)
+    {
         RenderBlockEvent renderBlockEvent =
                 new RenderBlockEvent(state, pos);
         EventBus.INSTANCE.dispatch(renderBlockEvent);
-        if (renderBlockEvent.isCanceled()) {
+        if (renderBlockEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

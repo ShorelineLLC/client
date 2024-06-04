@@ -24,12 +24,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(PlayerEntity.class)
-public abstract class MixinPlayerEntity extends LivingEntity implements Globals {
+public abstract class MixinPlayerEntity extends LivingEntity implements Globals
+{
     /**
      * @param entityType
      * @param world
      */
-    protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {
+    protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world)
+    {
         super(entityType, world);
     }
 
@@ -41,11 +43,13 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
      * @param ci
      */
     @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
-    private void hookTravelHead(Vec3d movementInput, CallbackInfo ci) {
+    private void hookTravelHead(Vec3d movementInput, CallbackInfo ci)
+    {
         TravelEvent travelEvent = new TravelEvent(movementInput);
         travelEvent.setStage(StageEvent.EventStage.PRE);
         EventBus.INSTANCE.dispatch(travelEvent);
-        if (travelEvent.isCanceled()) {
+        if (travelEvent.isCanceled())
+        {
             move(MovementType.SELF, getVelocity());
             ci.cancel();
         }
@@ -57,7 +61,8 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
      * @param ci
      */
     @Inject(method = "travel", at = @At(value = "RETURN"), cancellable = true)
-    private void hookTravelTail(Vec3d movementInput, CallbackInfo ci) {
+    private void hookTravelTail(Vec3d movementInput, CallbackInfo ci)
+    {
         TravelEvent travelEvent = new TravelEvent(movementInput);
         travelEvent.setStage(StageEvent.EventStage.POST);
         EventBus.INSTANCE.dispatch(travelEvent);
@@ -68,13 +73,16 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
      */
     @Inject(method = "isPushedByFluids", at = @At(value = "HEAD"),
             cancellable = true)
-    private void hookIsPushedByFluids(CallbackInfoReturnable<Boolean> cir) {
-        if ((Object) this != mc.player) {
+    private void hookIsPushedByFluids(CallbackInfoReturnable<Boolean> cir)
+    {
+        if ((Object) this != mc.player)
+        {
             return;
         }
         PushFluidsEvent pushFluidsEvent = new PushFluidsEvent();
         EventBus.INSTANCE.dispatch(pushFluidsEvent);
-        if (pushFluidsEvent.isCanceled()) {
+        if (pushFluidsEvent.isCanceled())
+        {
             cir.setReturnValue(false);
             cir.cancel();
         }
@@ -84,14 +92,17 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
      * @param ci
      */
     @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
-    private void hookJumpPre(CallbackInfo ci) {
-        if ((Object) this != mc.player) {
+    private void hookJumpPre(CallbackInfo ci)
+    {
+        if ((Object) this != mc.player)
+        {
             return;
         }
         PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent();
         playerJumpEvent.setStage(StageEvent.EventStage.PRE);
         EventBus.INSTANCE.dispatch(playerJumpEvent);
-        if (playerJumpEvent.isCanceled()) {
+        if (playerJumpEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -100,8 +111,10 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals 
      * @param ci
      */
     @Inject(method = "jump", at = @At(value = "RETURN"), cancellable = true)
-    private void hookJumpPost(CallbackInfo ci) {
-        if ((Object) this != mc.player) {
+    private void hookJumpPost(CallbackInfo ci)
+    {
+        if ((Object) this != mc.player)
+        {
             return;
         }
         PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent();

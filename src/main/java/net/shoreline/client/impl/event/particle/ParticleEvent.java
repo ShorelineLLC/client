@@ -10,37 +10,43 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class ParticleEvent extends Event {
+public class ParticleEvent extends Event
+{
     //
     private final ParticleEffect particle;
 
     /**
      * @param particle
      */
-    public ParticleEvent(ParticleEffect particle) {
+    public ParticleEvent(ParticleEffect particle)
+    {
         this.particle = particle;
     }
 
     /**
      * @return
      */
-    public ParticleEffect getParticle() {
+    public ParticleEffect getParticle()
+    {
         return particle;
     }
 
     /**
      * @return
      */
-    public ParticleType<?> getParticleType() {
+    public ParticleType<?> getParticleType()
+    {
         return particle.getType();
     }
 
     @Cancelable
-    public static class Emitter extends ParticleEvent {
+    public static class Emitter extends ParticleEvent
+    {
         /**
          * @param particle
          */
-        public Emitter(ParticleEffect particle) {
+        public Emitter(ParticleEffect particle)
+        {
             super(particle);
         }
     }

@@ -3,7 +3,8 @@ package net.shoreline.client.impl.event.render;
 import net.minecraft.client.util.math.MatrixStack;
 import net.shoreline.eventbus.Event;
 
-public class ReloadShaderEvent extends Event {
+public class ReloadShaderEvent extends Event
+{
 
     private final MatrixStack matrixStack;
     private final float delta;
@@ -14,11 +15,13 @@ public class ReloadShaderEvent extends Event {
         this.delta = delta;
     }
 
-    public MatrixStack getMatrixStack() {
+    public MatrixStack getMatrixStack()
+    {
         return matrixStack;
     }
 
-    public float getDelta() {
+    public float getDelta()
+    {
         return delta;
     }
 }

@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(PlayerEntityRenderer.class)
-public class MixinPlayerEntityRenderer {
+public class MixinPlayerEntityRenderer
+{
     //
     @Unique
     private float yaw, prevYaw, bodyYaw, prevBodyYaw, headYaw, prevHeadYaw;
@@ -41,7 +42,8 @@ public class MixinPlayerEntityRenderer {
     private void onRenderHead(AbstractClientPlayerEntity abstractClientPlayerEntity,
                               float f, float g, MatrixStack matrixStack,
                               VertexConsumerProvider vertexConsumerProvider,
-                              int i, CallbackInfo ci) {
+                              int i, CallbackInfo ci)
+    {
         final RenderPlayerEvent renderPlayerEvent =
                 new RenderPlayerEvent(abstractClientPlayerEntity);
         EventBus.INSTANCE.dispatch(renderPlayerEvent);
@@ -53,7 +55,8 @@ public class MixinPlayerEntityRenderer {
         prevHeadYaw = abstractClientPlayerEntity.prevHeadYaw;
         pitch = abstractClientPlayerEntity.getPitch();
         prevPitch = abstractClientPlayerEntity.prevPitch;
-        if (renderPlayerEvent.isCanceled()) {
+        if (renderPlayerEvent.isCanceled())
+        {
             abstractClientPlayerEntity.setYaw(renderPlayerEvent.getYaw());
             abstractClientPlayerEntity.prevYaw = renderPlayerEvent.getYaw();
             abstractClientPlayerEntity.setBodyYaw(renderPlayerEvent.getYaw());
@@ -81,7 +84,8 @@ public class MixinPlayerEntityRenderer {
     private void onRenderTail(AbstractClientPlayerEntity abstractClientPlayerEntity,
                               float f, float g, MatrixStack matrixStack,
                               VertexConsumerProvider vertexConsumerProvider,
-                              int i, CallbackInfo ci) {
+                              int i, CallbackInfo ci)
+    {
         abstractClientPlayerEntity.setYaw(yaw);
         abstractClientPlayerEntity.prevYaw = prevYaw;
         abstractClientPlayerEntity.setBodyYaw(bodyYaw);

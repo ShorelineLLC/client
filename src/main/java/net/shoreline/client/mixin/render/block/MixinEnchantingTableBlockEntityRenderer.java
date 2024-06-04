@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(EnchantingTableBlockEntityRenderer.class)
-public class MixinEnchantingTableBlockEntityRenderer {
+public class MixinEnchantingTableBlockEntityRenderer
+{
     @Shadow
     @Final
     private BookModel book;
@@ -37,11 +38,13 @@ public class MixinEnchantingTableBlockEntityRenderer {
     private void hookRender(EnchantingTableBlockEntity enchantingTableBlockEntity,
                             float f, MatrixStack matrixStack,
                             VertexConsumerProvider vertexConsumerProvider,
-                            int i, int j, CallbackInfo ci) {
+                            int i, int j, CallbackInfo ci)
+    {
         RenderTileEntityEvent.EnchantingTableBook renderTileEntityEvent =
                 new RenderTileEntityEvent.EnchantingTableBook();
         EventBus.INSTANCE.dispatch(renderTileEntityEvent);
-        if (renderTileEntityEvent.isCanceled()) {
+        if (renderTileEntityEvent.isCanceled())
+        {
             ci.cancel();
             matrixStack.pop();
         }

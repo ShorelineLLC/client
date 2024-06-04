@@ -9,14 +9,17 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class RenderArmorEvent extends Event {
+public class RenderArmorEvent extends Event
+{
     private final LivingEntity entity;
 
-    public RenderArmorEvent(LivingEntity entity) {
+    public RenderArmorEvent(LivingEntity entity)
+    {
         this.entity = entity;
     }
 
-    public LivingEntity getEntity() {
+    public LivingEntity getEntity()
+    {
         return entity;
     }
 }

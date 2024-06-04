@@ -11,7 +11,8 @@ import com.google.gson.JsonObject;
  * @see JsonObject
  * @since 1.0
  */
-public interface Serializable<T> {
+public interface Serializable<T>
+{
     /**
      * Converts all data in the object to a {@link JsonObject}.
      *

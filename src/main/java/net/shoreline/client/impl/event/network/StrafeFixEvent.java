@@ -4,23 +4,28 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class StrafeFixEvent extends Event {
+public class StrafeFixEvent extends Event
+{
 
     private float yaw, pitch;
 
-    public float getYaw() {
+    public float getYaw()
+    {
         return yaw;
     }
 
-    public float getPitch() {
+    public float getPitch()
+    {
         return pitch;
     }
 
-    public void setYaw(float yaw) {
+    public void setYaw(float yaw)
+    {
         this.yaw = yaw;
     }
 
-    public void setPitch(float pitch) {
+    public void setPitch(float pitch)
+    {
         this.pitch = pitch;
     }
 }

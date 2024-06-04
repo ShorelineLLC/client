@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 
 @Mixin(TotemParticle.class)
-public abstract class MixinTotemParticle extends MixinParticle {
+public abstract class MixinTotemParticle extends MixinParticle
+{
 
     /**
-     *
      * @param world
      * @param x
      * @param y
@@ -29,10 +29,12 @@ public abstract class MixinTotemParticle extends MixinParticle {
      */
     @Inject(method = "<init>", at = @At(value = "TAIL"))
     private void hookInit(ClientWorld world, double x, double y, double z, double velocityX,
-                          double velocityY, double velocityZ, SpriteProvider spriteProvider, CallbackInfo ci) {
+                          double velocityY, double velocityZ, SpriteProvider spriteProvider, CallbackInfo ci)
+    {
         TotemParticleEvent totemParticleEvent = new TotemParticleEvent();
         EventBus.INSTANCE.dispatch(totemParticleEvent);
-        if (totemParticleEvent.isCanceled()) {
+        if (totemParticleEvent.isCanceled())
+        {
             Color color = totemParticleEvent.getColor();
             setColor(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f);
         }

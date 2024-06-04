@@ -5,4 +5,5 @@ package net.shoreline.client.api.account.msa.model;
  * @since 01/14/24
  */
 public record MinecraftProfile(String username, String id)
-{ }
+{
+}

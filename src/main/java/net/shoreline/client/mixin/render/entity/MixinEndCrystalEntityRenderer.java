@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EndCrystalEntityRenderer.class)
-public class MixinEndCrystalEntityRenderer {
+public class MixinEndCrystalEntityRenderer
+{
     //
     @Shadow
     @Final
@@ -39,12 +40,14 @@ public class MixinEndCrystalEntityRenderer {
             "render/VertexConsumerProvider;I)V", at = @At(value = "HEAD"), cancellable = true)
     private void hookRender(EndCrystalEntity endCrystalEntity, float f, float g,
                             MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider,
-                            int i, CallbackInfo ci) {
+                            int i, CallbackInfo ci)
+    {
         RenderCrystalEvent renderCrystalEvent = new RenderCrystalEvent(endCrystalEntity,
                 f, g, matrixStack, i, core, frame);
         // Does it matter if render comes before cancelling?
         EventBus.INSTANCE.dispatch(renderCrystalEvent);
-        if (renderCrystalEvent.isCanceled()) {
+        if (renderCrystalEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

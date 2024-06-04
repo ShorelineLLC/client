@@ -9,7 +9,8 @@ import net.shoreline.client.util.Globals;
 
 import java.util.Set;
 
-public class BlastResistantBlocks implements Globals {
+public class BlastResistantBlocks implements Globals
+{
     // All blocks that are resistant to explosions
     private static final Set<Block> BLAST_RESISTANT = new ReferenceOpenHashSet<>(Set.of(
             Blocks.OBSIDIAN,
@@ -31,8 +32,10 @@ public class BlastResistantBlocks implements Globals {
      * @param pos
      * @return
      */
-    public static boolean isBreakable(BlockPos pos) {
-        if (mc.world == null) {
+    public static boolean isBreakable(BlockPos pos)
+    {
+        if (mc.world == null)
+        {
             return false;
         }
         return isBreakable(mc.world.getBlockState(pos).getBlock());
@@ -45,7 +48,8 @@ public class BlastResistantBlocks implements Globals {
      * @param block The block state of the mining block
      * @return <tt>true</tt> if the mining block is breakable
      */
-    public static boolean isBreakable(Block block) {
+    public static boolean isBreakable(Block block)
+    {
         return !UNBREAKABLE.contains(block);
     }
 
@@ -53,8 +57,10 @@ public class BlastResistantBlocks implements Globals {
      * @param pos
      * @return
      */
-    public static boolean isUnbreakable(BlockPos pos) {
-        if (mc.world == null) {
+    public static boolean isUnbreakable(BlockPos pos)
+    {
+        if (mc.world == null)
+        {
             return false;
         }
         return isUnbreakable(mc.world.getBlockState(pos).getBlock());
@@ -64,7 +70,8 @@ public class BlastResistantBlocks implements Globals {
      * @param block
      * @return
      */
-    public static boolean isUnbreakable(Block block) {
+    public static boolean isUnbreakable(Block block)
+    {
         return UNBREAKABLE.contains(block);
     }
 
@@ -72,17 +79,21 @@ public class BlastResistantBlocks implements Globals {
      * @param pos
      * @return
      */
-    public static boolean isBlastResistant(BlockPos pos) {
-        if (mc.world == null) {
+    public static boolean isBlastResistant(BlockPos pos)
+    {
+        if (mc.world == null)
+        {
             return false;
         }
         return isBlastResistant(mc.world.getBlockState(pos).getBlock());
     }
+
     /**
      * @param state
      * @return
      */
-    public static boolean isBlastResistant(BlockState state) {
+    public static boolean isBlastResistant(BlockState state)
+    {
         return isBlastResistant(state.getBlock());
     }
 
@@ -91,7 +102,8 @@ public class BlastResistantBlocks implements Globals {
      * @param block
      * @return
      */
-    public static boolean isBlastResistant(Block block) {
+    public static boolean isBlastResistant(Block block)
+    {
         return BLAST_RESISTANT.contains(block);
     }
 }

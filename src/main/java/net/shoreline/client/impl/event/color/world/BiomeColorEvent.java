@@ -7,28 +7,34 @@ import net.shoreline.eventbus.Event;
 import java.awt.*;
 
 @Cancelable
-public class BiomeColorEvent extends Event {
+public class BiomeColorEvent extends Event
+{
 
     private final ColorResolver colorResolver;
     private Color color;
 
-    public BiomeColorEvent(ColorResolver colorResolver) {
+    public BiomeColorEvent(ColorResolver colorResolver)
+    {
         this.colorResolver = colorResolver;
     }
 
-    public ColorResolver getColorResolver() {
+    public ColorResolver getColorResolver()
+    {
         return colorResolver;
     }
 
-    public void setColor(Color color) {
+    public void setColor(Color color)
+    {
         this.color = color;
     }
 
-    public Color getColor() {
+    public Color getColor()
+    {
         return color;
     }
 
-    public int getRGB() {
+    public int getRGB()
+    {
         return color.getRGB();
     }
 }

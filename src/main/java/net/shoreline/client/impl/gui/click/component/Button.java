@@ -4,7 +4,8 @@ package net.shoreline.client.impl.gui.click.component;
  * @author linus
  * @since 1.0
  */
-public abstract class Button extends Component implements Interactable {
+public abstract class Button extends Component implements Interactable
+{
     //
     protected final Frame frame;
 
@@ -15,7 +16,8 @@ public abstract class Button extends Component implements Interactable {
      * @param width
      * @param height
      */
-    public Button(Frame frame, float x, float y, float width, float height) {
+    public Button(Frame frame, float x, float y, float width, float height)
+    {
         this.frame = frame;
         this.x = x;
         this.y = y;
@@ -26,7 +28,8 @@ public abstract class Button extends Component implements Interactable {
     /**
      * @param frame
      */
-    public Button(Frame frame) {
+    public Button(Frame frame)
+    {
         this.frame = frame;
     }
 
@@ -57,7 +60,8 @@ public abstract class Button extends Component implements Interactable {
     /**
      * @return
      */
-    public Frame getFrame() {
+    public Frame getFrame()
+    {
         return frame;
     }
 }

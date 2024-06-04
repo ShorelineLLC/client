@@ -74,7 +74,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         surround.clear();
         placements.clear();
     }
@@ -175,7 +176,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         return true;
     }
 
-    private void place(BlockPos targetPos) {
+    private void place(BlockPos targetPos)
+    {
         List<Entity> box = mc.world.getOtherEntities(null, new Box(targetPos))
                 .stream().filter(e -> SurroundModule.getInstance().invalidEntity(e)).toList();
         if (!box.isEmpty())
@@ -332,10 +334,13 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 RenderSystem.recordRenderCall(() -> place(targetPos));
             }
         }
-        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            for (int id : packet.getEntityIds()) {
+        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
                 Entity entity = mc.world.getEntityById(id);
-                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
+                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos()))
+                {
                     blocksPlaced++;
                     RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
                 }

@@ -24,7 +24,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(LivingEntity.class)
-public abstract class MixinLivingEntity extends MixinEntity implements Globals {
+public abstract class MixinLivingEntity extends MixinEntity implements Globals
+{
     //
     @Shadow
     protected ItemStack activeItemStack;
@@ -48,21 +49,26 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
     @Shadow
     public int deathTime;
 
-    @Shadow private int jumpingCooldown;
+    @Shadow
+    private int jumpingCooldown;
 
     @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
-    private void hookJump$getYaw(CallbackInfo ci) {
-        if ((LivingEntity) (Object) this != mc.player) {
+    private void hookJump$getYaw(CallbackInfo ci)
+    {
+        if ((Object) this != mc.player)
+        {
             return;
         }
         final JumpRotationEvent event = new JumpRotationEvent();
         EventBus.INSTANCE.dispatch(event);
-        if (event.isCanceled()) {
+        if (event.isCanceled())
+        {
             ci.cancel();
             Vec3d vec3d = this.getVelocity();
             setVelocity(new Vec3d(vec3d.x, getJumpVelocity(), vec3d.z));
-            if (isSprinting()) {
-                float f = event.getYaw() * ((float)Math.PI / 180);
+            if (isSprinting())
+            {
+                float f = event.getYaw() * ((float) Math.PI / 180);
                 setVelocity(getVelocity().add(-MathHelper.sin(f) * 0.2f, 0.0, MathHelper.cos(f) * 0.2f));
             }
             velocityDirty = true;
@@ -77,8 +83,10 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
     @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/" +
             "minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/" +
             "entity/effect/StatusEffect;)Z"))
-    private boolean hookHasStatusEffect(LivingEntity instance, StatusEffect effect) {
-        if (instance.equals(mc.player)) {
+    private boolean hookHasStatusEffect(LivingEntity instance, StatusEffect effect)
+    {
+        if (instance.equals(mc.player))
+        {
             LevitationEvent levitationEvent = new LevitationEvent();
             EventBus.INSTANCE.dispatch(levitationEvent);
             return !levitationEvent.isCanceled() && hasStatusEffect(effect);
@@ -93,8 +101,10 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
             "minecraft/item/ItemStack;finishUsing(Lnet/minecraft/world/World;" +
             "Lnet/minecraft/entity/LivingEntity;)" +
             "Lnet/minecraft/item/ItemStack;", shift = At.Shift.AFTER))
-    private void hookConsumeItem(CallbackInfo ci) {
-        if ((Object) this != mc.player) {
+    private void hookConsumeItem(CallbackInfo ci)
+    {
+        if ((Object) this != mc.player)
+        {
             return;
         }
         ConsumeItemEvent consumeItemEvent = new ConsumeItemEvent(activeItemStack);
@@ -102,17 +112,21 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
     }
 
     @Inject(method = "tickMovement", at = @At(value = "HEAD"), cancellable = true)
-    private void hookTickMovement(CallbackInfo ci) {
+    private void hookTickMovement(CallbackInfo ci)
+    {
         JumpDelayEvent jumpDelayEvent = new JumpDelayEvent();
         EventBus.INSTANCE.dispatch(jumpDelayEvent);
-        if (jumpDelayEvent.isCanceled()) {
+        if (jumpDelayEvent.isCanceled())
+        {
             jumpingCooldown = 0;
         }
     }
 
     @Inject(method = "onStatusEffectApplied", at = @At(value = "HEAD"))
-    private void hookAddStatusEffect(StatusEffectInstance effect, Entity source, CallbackInfo ci) {
-        if ((Object) this != mc.player) {
+    private void hookAddStatusEffect(StatusEffectInstance effect, Entity source, CallbackInfo ci)
+    {
+        if ((Object) this != mc.player)
+        {
             return;
         }
         StatusEffectEvent.Add statusEffectEvent = new StatusEffectEvent.Add(effect);
@@ -120,8 +134,10 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
     }
 
     @Inject(method = "onStatusEffectRemoved", at = @At(value = "HEAD"))
-    private void hookRemoveStatusEffect(StatusEffectInstance effect, CallbackInfo ci) {
-        if ((Object) this != mc.player) {
+    private void hookRemoveStatusEffect(StatusEffectInstance effect, CallbackInfo ci)
+    {
+        if ((Object) this != mc.player)
+        {
             return;
         }
         StatusEffectEvent.Remove statusEffectEvent = new StatusEffectEvent.Remove(effect);
@@ -129,7 +145,8 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals {
     }
 
     @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
-    public void hookIsFallFlying(CallbackInfoReturnable<Boolean> cir) {
+    public void hookIsFallFlying(CallbackInfoReturnable<Boolean> cir)
+    {
         FallFlyingEvent fallFlyingEvent = new FallFlyingEvent(cir.getReturnValueZ());
         EventBus.INSTANCE.dispatch(fallFlyingEvent);
         if (fallFlyingEvent.isCanceled())

@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * @since 1.0
  */
 @Mixin(ClientWorld.class)
-public interface AccessorClientWorld {
+public interface AccessorClientWorld
+{
     /**
      * @param x
      * @param y

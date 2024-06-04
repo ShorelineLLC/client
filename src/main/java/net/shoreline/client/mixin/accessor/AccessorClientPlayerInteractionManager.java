@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * @since 1.0
  */
 @Mixin(ClientPlayerInteractionManager.class)
-public interface AccessorClientPlayerInteractionManager {
+public interface AccessorClientPlayerInteractionManager
+{
     /**
      *
      */

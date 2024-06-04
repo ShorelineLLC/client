@@ -6,6 +6,7 @@ import net.shoreline.eventbus.Event;
  * @author linus
  * @since 1.0
  */
-public class DisconnectEvent extends Event {
+public class DisconnectEvent extends Event
+{
 
 }

@@ -16,22 +16,25 @@ import net.shoreline.client.init.Managers;
 /**
  * @author xgraza
  * @since 03/28/24
- *
+ * <p>
  * The code in this file may or not cause a seizure
  */
-public final class AccountSelectorScreen extends Screen {
+public final class AccountSelectorScreen extends Screen
+{
 
     private final Screen parent;
     private AccountListWidget accountListWidget;
     private TextFieldWidget searchWidget;
 
-    public AccountSelectorScreen(final Screen parent) {
+    public AccountSelectorScreen(final Screen parent)
+    {
         super(Text.of("Account Selector"));
         this.parent = parent;
     }
 
     @Override
-    protected void init() {
+    protected void init()
+    {
         accountListWidget = new AccountListWidget(client, width, height - 64 - 32, 32, 25);
         clearChildren();
         accountListWidget.setDimensionsAndPosition(width, height - 64 - 32, 0, 32);
@@ -44,12 +47,14 @@ public final class AccountSelectorScreen extends Screen {
         final int buttonHeight = 20;
         // my head hurts
         addDrawableChild(ButtonWidget.builder(Text.of("Add"),
-                (action) -> client.setScreen(new AccountAddAccountScreen(this)))
+                        (action) -> client.setScreen(new AccountAddAccountScreen(this)))
                 .dimensions(width / 2 + 2, accountListWidget.getHeight() + 40, buttonWidth, buttonHeight)
                 .build());
-        addDrawableChild(ButtonWidget.builder(Text.of("Login"), (action) -> {
+        addDrawableChild(ButtonWidget.builder(Text.of("Login"), (action) ->
+        {
             final AccountEntry entry = accountListWidget.getSelectedOrNull();
-            if (entry != null) {
+            if (entry != null)
+            {
                 final Session session = entry.getAccount().login();
                 if (session != null)
                 {
@@ -58,31 +63,36 @@ public final class AccountSelectorScreen extends Screen {
             }
         }).dimensions(width / 2 - buttonWidth - 2, accountListWidget.getHeight() + 40, buttonWidth, buttonHeight).build());
         addDrawableChild(ButtonWidget.builder(Text.of("Back"),
-                (action) -> client.setScreen(parent))
+                        (action) -> client.setScreen(parent))
                 .dimensions(width / 2 - buttonWidth - 2,
                         accountListWidget.getHeight() + 40 + buttonHeight + 2,
                         buttonWidth, buttonHeight).build());
-        addDrawableChild(ButtonWidget.builder(Text.of("Delete"), (action) -> {
+        addDrawableChild(ButtonWidget.builder(Text.of("Delete"), (action) ->
+        {
             final AccountEntry entry = accountListWidget.getSelectedOrNull();
-            if (entry == null) {
+            if (entry == null)
+            {
                 return;
             }
             // bypass if the user is holding down shift
             if (InputUtil.isKeyPressed(client.getWindow().getHandle(),
-                    InputUtil.GLFW_KEY_LEFT_SHIFT)) {
+                    InputUtil.GLFW_KEY_LEFT_SHIFT))
+            {
                 Managers.ACCOUNT.unregister(entry.getAccount());
                 client.setScreen(this);
                 return;
             }
-            client.setScreen(new ConfirmScreen((value) -> {
-                if (value) {
+            client.setScreen(new ConfirmScreen((value) ->
+            {
+                if (value)
+                {
                     Managers.ACCOUNT.unregister(entry.getAccount());
                 }
                 client.setScreen(this);
             }, Text.of("Delete account?"),
-                Text.of("Are you sure you would like to delete " + entry.getAccount().username() + "?"),
-                Text.of("Yes"),
-                Text.of("No")));
+                    Text.of("Are you sure you would like to delete " + entry.getAccount().username() + "?"),
+                    Text.of("Yes"),
+                    Text.of("No")));
         }).dimensions(width / 2 + 2,
                 accountListWidget.getHeight() + 40 + buttonHeight + 2,
                 buttonWidth, buttonHeight).build());
@@ -99,7 +109,8 @@ public final class AccountSelectorScreen extends Screen {
     }
 
     @Override
-    public void onDisplayed() {
+    public void onDisplayed()
+    {
         if (accountListWidget != null)
         {
             accountListWidget.populateEntries();
@@ -107,13 +118,16 @@ public final class AccountSelectorScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(DrawContext context, int mouseX, int mouseY, float delta)
+    {
         super.render(context, mouseX, mouseY, delta);
         accountListWidget.render(context, mouseX, mouseY, delta);
         context.drawTextWithShadow(client.textRenderer, Text.of(getLoginInfo()), 2, 2, 0xAAAAAA);
-        if (searchWidget.isSelected()) {
+        if (searchWidget.isSelected())
+        {
             String content = searchWidget.getText();
-            if (content == null || content.isEmpty()) {
+            if (content == null || content.isEmpty())
+            {
                 accountListWidget.setSearchFilter(null);
                 return;
             }
@@ -122,18 +136,21 @@ public final class AccountSelectorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
         accountListWidget.mouseClicked(mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    {
         accountListWidget.mouseReleased(mouseX, mouseY, button);
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    private String getLoginInfo() {
+    private String getLoginInfo()
+    {
         return AccountManager.MSA_AUTHENTICATOR.getLoginStage().isEmpty() ? "Logged in as " + client.getSession().getUsername() : AccountManager.MSA_AUTHENTICATOR.getLoginStage();
     }
 }

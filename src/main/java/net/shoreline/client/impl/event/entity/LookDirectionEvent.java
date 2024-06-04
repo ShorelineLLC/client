@@ -5,25 +5,30 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class LookDirectionEvent extends Event {
+public class LookDirectionEvent extends Event
+{
     private final Entity entity;
     private final double cursorDeltaX, cursorDeltaY;
 
-    public LookDirectionEvent(final Entity entity, double cursorDeltaX, double cursorDeltaY) {
+    public LookDirectionEvent(final Entity entity, double cursorDeltaX, double cursorDeltaY)
+    {
         this.entity = entity;
         this.cursorDeltaX = cursorDeltaX;
         this.cursorDeltaY = cursorDeltaY;
     }
 
-    public Entity getEntity() {
+    public Entity getEntity()
+    {
         return entity;
     }
 
-    public double getCursorDeltaX() {
+    public double getCursorDeltaX()
+    {
         return cursorDeltaX;
     }
 
-    public double getCursorDeltaY() {
+    public double getCursorDeltaY()
+    {
         return cursorDeltaY;
     }
 }

@@ -12,24 +12,29 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class RenderBlockEvent extends Event {
+public class RenderBlockEvent extends Event
+{
     private final BlockState state;
     private final BlockPos pos;
 
-    public RenderBlockEvent(BlockState state, BlockPos pos) {
+    public RenderBlockEvent(BlockState state, BlockPos pos)
+    {
         this.state = state;
         this.pos = pos;
     }
 
-    public BlockState getState() {
+    public BlockState getState()
+    {
         return state;
     }
 
-    public BlockPos getPos() {
+    public BlockPos getPos()
+    {
         return pos;
     }
 
-    public Block getBlock() {
+    public Block getBlock()
+    {
         return state.getBlock();
     }
 }

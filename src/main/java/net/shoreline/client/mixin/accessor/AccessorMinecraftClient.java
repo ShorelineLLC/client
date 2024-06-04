@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(MinecraftClient.class)
-public interface AccessorMinecraftClient {
+public interface AccessorMinecraftClient
+{
     /**
      * @param itemUseCooldown
      */

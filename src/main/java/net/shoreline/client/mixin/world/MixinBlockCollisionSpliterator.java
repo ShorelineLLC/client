@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * @since 1.0
  */
 @Mixin(BlockCollisionSpliterator.class)
-public class MixinBlockCollisionSpliterator implements Globals {
+public class MixinBlockCollisionSpliterator implements Globals
+{
     /**
      * @param instance
      * @param blockView
@@ -30,15 +31,18 @@ public class MixinBlockCollisionSpliterator implements Globals {
             "block/BlockState;getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/" +
             "util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;"))
     private VoxelShape hookGetCollisionShape(BlockState instance, BlockView blockView,
-                                             BlockPos blockPos, ShapeContext shapeContext) {
+                                             BlockPos blockPos, ShapeContext shapeContext)
+    {
         VoxelShape voxelShape = instance.getCollisionShape(blockView, blockPos, shapeContext);
-        if (blockView != mc.world) {
+        if (blockView != mc.world)
+        {
             return voxelShape;
         }
         BlockCollisionEvent blockCollisionEvent =
                 new BlockCollisionEvent(voxelShape, blockPos, instance);
         EventBus.INSTANCE.dispatch(blockCollisionEvent);
-        if (blockCollisionEvent.isCanceled()) {
+        if (blockCollisionEvent.isCanceled())
+        {
             return blockCollisionEvent.getVoxelShape();
         }
         return voxelShape;

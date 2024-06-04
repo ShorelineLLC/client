@@ -8,7 +8,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ChatHud.class)
-public interface AccessorChatHud {
+public interface AccessorChatHud
+{
 
     @Invoker("addMessage")
     void hookAddMessage(Text message, MessageSignatureData signature, int ticks, MessageIndicator indicator, boolean refresh);

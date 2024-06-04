@@ -7,14 +7,17 @@ import org.lwjgl.glfw.GLFW;
  * @see GLFW
  * @since 1.0
  */
-public class KeyboardUtil {
+public class KeyboardUtil
+{
 
     /**
      * @param keycode
      * @return
      */
-    public static String getKeyName(int keycode, int scancode) {
-        return switch (keycode) {
+    public static String getKeyName(int keycode, int scancode)
+    {
+        return switch (keycode)
+        {
             case GLFW.GLFW_KEY_RIGHT_SHIFT -> "RSHIFT";
             case GLFW.GLFW_KEY_LEFT_SHIFT -> "LSHIFT";
             case GLFW.GLFW_KEY_SPACE -> "SPACE";
@@ -50,7 +53,8 @@ public class KeyboardUtil {
         };
     }
 
-    public static String getKeyName(int keycode) {
+    public static String getKeyName(int keycode)
+    {
 
         return getKeyName(keycode, keycode < 1000 ? GLFW.glfwGetKeyScancode(keycode) : 0);
     }
@@ -59,27 +63,35 @@ public class KeyboardUtil {
      * @param key
      * @return
      */
-    public static int getKeyCode(String key) {
-        if (key.equalsIgnoreCase("NONE")) {
+    public static int getKeyCode(String key)
+    {
+        if (key.equalsIgnoreCase("NONE"))
+        {
             return GLFW.GLFW_KEY_UNKNOWN;
         }
         // Keyboard Keys
-        for (int i = 32; i < 97; i++) {
+        for (int i = 32; i < 97; i++)
+        {
             if (key.equalsIgnoreCase(getKeyName(i,
-                    GLFW.glfwGetKeyScancode(i)))) {
+                    GLFW.glfwGetKeyScancode(i))))
+            {
                 return i;
             }
         }
-        for (int i = 256; i < 349; i++) {
+        for (int i = 256; i < 349; i++)
+        {
             if (key.equalsIgnoreCase(getKeyName(i,
-                    GLFW.glfwGetKeyScancode(i)))) {
+                    GLFW.glfwGetKeyScancode(i))))
+            {
                 return i;
             }
         }
         // Mouse Buttons
-        for (int i = 1000; i < 1010; i++) {
+        for (int i = 1000; i < 1010; i++)
+        {
             if (key.equalsIgnoreCase(getKeyName(i,
-                    GLFW.glfwGetKeyScancode(i)))) {
+                    GLFW.glfwGetKeyScancode(i))))
+            {
                 return i;
             }
         }

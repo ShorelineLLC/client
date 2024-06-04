@@ -5,10 +5,10 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 /**
  * @author xgraza
@@ -24,7 +24,8 @@ public final class AutoToolModule extends ToggleModule
         INSTANCE = this;
     }
 
-    public static AutoToolModule getInstance() {
+    public static AutoToolModule getInstance()
+    {
         return INSTANCE;
     }
 
@@ -39,9 +40,11 @@ public final class AutoToolModule extends ToggleModule
         }
     }
 
-    public int getBestTool(final BlockState state) {
+    public int getBestTool(final BlockState state)
+    {
         int slot = getBestToolNoFallback(state);
-        if (slot != -1) {
+        if (slot != -1)
+        {
             return slot;
         }
         return mc.player.getInventory().selectedSlot;

@@ -3,14 +3,14 @@ package net.shoreline.client.impl.module.misc;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;
 
@@ -18,7 +18,8 @@ import java.text.DecimalFormat;
  * @author linus
  * @since 1.0
  */
-public class TimerModule extends ToggleModule {
+public class TimerModule extends ToggleModule
+{
     private static TimerModule INSTANCE;
 
     //
@@ -31,39 +32,49 @@ public class TimerModule extends ToggleModule {
     /**
      *
      */
-    public TimerModule() {
+    public TimerModule()
+    {
         super("Timer", "Changes the client tick speed", ModuleCategory.MISCELLANEOUS);
     }
 
-    public static TimerModule getInstance() {
-        if (INSTANCE == null) {
+    public static TimerModule getInstance()
+    {
+        if (INSTANCE == null)
+        {
             INSTANCE = new TimerModule();
         }
         return INSTANCE;
     }
 
     @Override
-    public String getModuleData() {
+    public String getModuleData()
+    {
         DecimalFormat decimal = new DecimalFormat("0.0#");
         return decimal.format(timer);
     }
 
     @Override
-    public void toggle() {
+    public void toggle()
+    {
         SpeedModule.getInstance().setPrevTimer();
-        if (SpeedModule.getInstance().isUsingTimer()) {
+        if (SpeedModule.getInstance().isUsingTimer())
+        {
             return;
         }
         super.toggle();
     }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() == StageEvent.EventStage.PRE) {
-            if (SpeedModule.getInstance().isUsingTimer()) {
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.PRE)
+        {
+            if (SpeedModule.getInstance().isUsingTimer())
+            {
                 return;
             }
-            if (tpsSyncConfig.getValue()) {
+            if (tpsSyncConfig.getValue())
+            {
                 timer = Math.max(Managers.TICK.getTpsCurrent() / 20.0f, 0.1f);
                 return;
             }
@@ -72,8 +83,10 @@ public class TimerModule extends ToggleModule {
     }
 
     @EventListener
-    public void onTickCounter(TickCounterEvent event) {
-        if (timer != 1.0f) {
+    public void onTickCounter(TickCounterEvent event)
+    {
+        if (timer != 1.0f)
+        {
             event.cancel();
             event.setTicks(timer);
         }
@@ -82,20 +95,24 @@ public class TimerModule extends ToggleModule {
     /**
      * @return
      */
-    public float getTimer() {
+    public float getTimer()
+    {
         return timer;
     }
 
     /**
      * @param timer
      */
-    public void setTimer(float timer) {
+    public void setTimer(float timer)
+    {
         prevTimer = this.timer;
         this.timer = timer;
     }
 
-    public void resetTimer() {
-        if (prevTimer > 0.0f) {
+    public void resetTimer()
+    {
+        if (prevTimer > 0.0f)
+        {
             this.timer = prevTimer;
             prevTimer = -1.0f;
         }

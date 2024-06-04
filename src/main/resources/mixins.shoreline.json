@@ -84,6 +84,7 @@
     "network.MixinPacketByteBuf",
     "network.MixinPlayerListEntry",
     "network.packet.c2s.MixinPlayerInteractEntityC2SPacket",
+    "network.server.MixinServerPlayerInteractionManager",
     "option.MixinGameOptions",
     "particle.MixinParticle",
     "particle.MixinParticleManager",

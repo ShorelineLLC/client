@@ -19,10 +19,11 @@ import java.util.Map;
  * @author linus
  * @since 1.0
  */
-public class ShorelineMod implements ClientModInitializer {
+public class ShorelineMod implements ClientModInitializer
+{
     public static final String MOD_NAME = "Shoreline";
     public static final String MOD_VER = BuildConfig.VERSION;
-    public static final String MOD_BUILD_NUMBER = BuildConfig.BUILD_IDENTIFIER + "-" +  BuildConfig.BUILD_NUMBER;
+    public static final String MOD_BUILD_NUMBER = BuildConfig.BUILD_IDENTIFIER + "-" + BuildConfig.BUILD_NUMBER;
     public static final String MOD_MC_VER = "1.20.4";
 
     public ShorelineMod()
@@ -46,7 +47,8 @@ public class ShorelineMod implements ClientModInitializer {
         Shoreline.init();
     }
 
-    public static boolean isBaritonePresent() {
+    public static boolean isBaritonePresent()
+    {
         return FabricLoader.getInstance().getModContainer("baritone").isPresent();
     }
 }

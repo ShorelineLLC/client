@@ -9,19 +9,23 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class PushEntityEvent extends Event {
+public class PushEntityEvent extends Event
+{
     private final Entity pushed, pusher;
 
-    public PushEntityEvent(Entity pushed, Entity pusher) {
+    public PushEntityEvent(Entity pushed, Entity pusher)
+    {
         this.pushed = pushed;
         this.pusher = pusher;
     }
 
-    public Entity getPushed() {
+    public Entity getPushed()
+    {
         return pushed;
     }
 
-    public Entity getPusher() {
+    public Entity getPusher()
+    {
         return pusher;
     }
 }

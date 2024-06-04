@@ -8,21 +8,24 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class TickCounterEvent extends Event {
+public class TickCounterEvent extends Event
+{
     //
     private float ticks;
 
     /**
      * @return
      */
-    public float getTicks() {
+    public float getTicks()
+    {
         return ticks;
     }
 
     /**
      * @param ticks
      */
-    public void setTicks(float ticks) {
+    public void setTicks(float ticks)
+    {
         this.ticks = ticks;
     }
 }

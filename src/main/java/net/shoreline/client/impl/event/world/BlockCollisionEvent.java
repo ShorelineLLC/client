@@ -12,36 +12,43 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class BlockCollisionEvent extends Event {
+public class BlockCollisionEvent extends Event
+{
     //
     private final BlockPos pos;
     private final BlockState state;
     //
     private VoxelShape voxelShape;
 
-    public BlockCollisionEvent(VoxelShape voxelShape, BlockPos pos, BlockState state) {
+    public BlockCollisionEvent(VoxelShape voxelShape, BlockPos pos, BlockState state)
+    {
         this.pos = pos;
         this.state = state;
         this.voxelShape = voxelShape;
     }
 
-    public BlockPos getPos() {
+    public BlockPos getPos()
+    {
         return pos;
     }
 
-    public BlockState getState() {
+    public BlockState getState()
+    {
         return state;
     }
 
-    public Block getBlock() {
+    public Block getBlock()
+    {
         return state.getBlock();
     }
 
-    public VoxelShape getVoxelShape() {
+    public VoxelShape getVoxelShape()
+    {
         return voxelShape;
     }
 
-    public void setVoxelShape(VoxelShape voxelShape) {
+    public void setVoxelShape(VoxelShape voxelShape)
+    {
         this.voxelShape = voxelShape;
     }
 }

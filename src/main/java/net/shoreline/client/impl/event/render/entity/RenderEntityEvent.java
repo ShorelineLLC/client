@@ -12,7 +12,8 @@ import net.shoreline.eventbus.Event;
 import java.util.List;
 
 @Cancelable
-public class RenderEntityEvent<T extends LivingEntity> extends Event {
+public class RenderEntityEvent<T extends LivingEntity> extends Event
+{
     public final LivingEntity entity;
 
     public final float f;
@@ -39,7 +40,8 @@ public class RenderEntityEvent<T extends LivingEntity> extends Event {
                              MatrixStack matrixStack,
                              VertexConsumerProvider vertexConsumerProvider,
                              int i, EntityModel model, RenderLayer layer,
-                             List<FeatureRenderer<T, EntityModel<T>>> features) {
+                             List<FeatureRenderer<T, EntityModel<T>>> features)
+    {
         this.entity = entity;
         this.f = f;
         this.g = g;

@@ -20,7 +20,8 @@ import static net.shoreline.client.api.render.RenderBuffers.QUADS;
  * @author linus
  * @since 1.0
  */
-public class RenderManager implements Globals {
+public class RenderManager implements Globals
+{
     //
     public static final Tessellator TESSELLATOR = RenderSystem.renderThreadTesselator();
     public static final BufferBuilder BUFFER = TESSELLATOR.getBuffer();
@@ -29,7 +30,8 @@ public class RenderManager implements Globals {
      * When rendering using vanilla methods, you should call this method in order to ensure the GL state does not get
      * leaked. This means you need to manually set the required GL state during the callback.
      */
-    public static void post(Runnable callback) {
+    public static void post(Runnable callback)
+    {
         RenderBuffers.post(callback);
     }
 
@@ -38,7 +40,8 @@ public class RenderManager implements Globals {
      * @param p
      * @param color
      */
-    public static void renderBox(MatrixStack matrices, BlockPos p, int color) {
+    public static void renderBox(MatrixStack matrices, BlockPos p, int color)
+    {
         renderBox(matrices, new Box(p), color);
     }
 
@@ -47,8 +50,10 @@ public class RenderManager implements Globals {
      * @param box
      * @param color
      */
-    public static void renderBox(MatrixStack matrices, Box box, int color) {
-        if (!isFrustumVisible(box)) {
+    public static void renderBox(MatrixStack matrices, Box box, int color)
+    {
+        if (!isFrustumVisible(box))
+        {
             return;
         }
         matrices.push();
@@ -60,7 +65,8 @@ public class RenderManager implements Globals {
      * @param matrices
      * @param box
      */
-    public static void drawBox(MatrixStack matrices, Box box, int color) {
+    public static void drawBox(MatrixStack matrices, Box box, int color)
+    {
         drawBox(matrices, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
     }
 
@@ -81,7 +87,8 @@ public class RenderManager implements Globals {
      * @param z2
      */
     public static void drawBox(MatrixStack matrices, double x1, double y1,
-                               double z1, double x2, double y2, double z2, int color) {
+                               double z1, double x2, double y2, double z2, int color)
+    {
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         QUADS.begin(matrix4f);
         QUADS.color(color);
@@ -102,7 +109,8 @@ public class RenderManager implements Globals {
      * @param color
      */
     public static void renderBoundingBox(MatrixStack matrices, BlockPos p,
-                                         float width, int color) {
+                                         float width, int color)
+    {
         renderBoundingBox(matrices, new Box(p), width, color);
     }
 
@@ -112,8 +120,10 @@ public class RenderManager implements Globals {
      * @param color
      */
     public static void renderBoundingBox(MatrixStack matrices, Box box,
-                                         float width, int color) {
-        if (!isFrustumVisible(box)) {
+                                         float width, int color)
+    {
+        if (!isFrustumVisible(box))
+        {
             return;
         }
         matrices.push();
@@ -126,7 +136,8 @@ public class RenderManager implements Globals {
      * @param matrices
      * @param box
      */
-    public static void drawBoundingBox(MatrixStack matrices, Box box, int color) {
+    public static void drawBoundingBox(MatrixStack matrices, Box box, int color)
+    {
         drawBoundingBox(matrices, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
     }
 
@@ -140,7 +151,8 @@ public class RenderManager implements Globals {
      * @param z2
      */
     public static void drawBoundingBox(MatrixStack matrices, double x1, double y1,
-                                       double z1, double x2, double y2, double z2, int color) {
+                                       double z1, double x2, double y2, double z2, int color)
+    {
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         LINES.begin(matrix4f);
         LINES.color(color);
@@ -170,7 +182,8 @@ public class RenderManager implements Globals {
      * @param width
      */
     public static void renderLine(MatrixStack matrices, Vec3d s,
-                                  Vec3d d, float width, int color) {
+                                  Vec3d d, float width, int color)
+    {
         renderLine(matrices, s.x, s.y, s.z, d.x, d.y, d.z, width, color);
     }
 
@@ -186,7 +199,8 @@ public class RenderManager implements Globals {
      */
     public static void renderLine(MatrixStack matrices, double x1, double y1,
                                   double z1, double x2, double y2, double z2,
-                                  float width, int color) {
+                                  float width, int color)
+    {
         matrices.push();
         RenderSystem.lineWidth(width);
         drawLine(matrices, x1, y1, z1, x2, y2, z2, color);
@@ -203,7 +217,8 @@ public class RenderManager implements Globals {
      * @param z2
      */
     public static void drawLine(MatrixStack matrices, double x1, double y1,
-                                double z1, double x2, double y2, double z2, int color) {
+                                double z1, double x2, double y2, double z2, int color)
+    {
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         LINES.begin(matrix4f);
         LINES.color(color);
@@ -216,7 +231,8 @@ public class RenderManager implements Globals {
      * @param text
      * @param pos
      */
-    public static void renderSign(String text, Vec3d pos, int color) {
+    public static void renderSign(String text, Vec3d pos, int color)
+    {
         renderSign(text, pos.getX(), pos.getY(), pos.getZ(), color);
     }
 
@@ -224,7 +240,8 @@ public class RenderManager implements Globals {
      * @param text
      * @param pos
      */
-    public static void renderSign(String text, Vec3d pos, float scaling, int color) {
+    public static void renderSign(String text, Vec3d pos, float scaling, int color)
+    {
         renderSign(text, pos.getX(), pos.getY(), pos.getZ(), scaling, color);
     }
 
@@ -234,18 +251,21 @@ public class RenderManager implements Globals {
      * @param y
      * @param z
      */
-    public static void renderSign(String text, double x, double y, double z, int color) {
+    public static void renderSign(String text, double x, double y, double z, int color)
+    {
         Camera camera = mc.gameRenderer.getCamera();
         final Vec3d pos = camera.getPos();
         double dist = Math.sqrt(pos.squaredDistanceTo(x, y, z));
         float scaling = 0.0018f + NametagsModule.getInstance().getScaling() * (float) dist;
-        if (dist <= 8.0) {
+        if (dist <= 8.0)
+        {
             scaling = 0.0245f;
         }
         renderSign(text, x, y, z, scaling, color);
     }
 
-    public static void renderSign(String text, double x, double y, double z, float scaling, int color) {
+    public static void renderSign(String text, double x, double y, double z, float scaling, int color)
+    {
         Camera camera = mc.gameRenderer.getCamera();
         final Vec3d pos = camera.getPos();
         MatrixStack matrices = new MatrixStack();
@@ -256,15 +276,18 @@ public class RenderManager implements Globals {
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.scale(-scaling, -scaling, -1.0f);
         float hwidth = mc.textRenderer.getWidth(text) / 2.0f;
-        RenderManager.post(() -> {
+        RenderManager.post(() ->
+        {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             GL11.glDepthFunc(GL11.GL_ALWAYS);
 
-            if (FontModule.getInstance().isEnabled()) {
+            if (FontModule.getInstance().isEnabled())
+            {
                 Fonts.CLIENT.drawStringWithShadow(matrices, text, -hwidth, 0.0f, color);
             }
-            else {
+            else
+            {
                 Fonts.VANILLA.drawWithShadow(matrices, text, -hwidth, 0.0f, color);
             }
 
@@ -277,7 +300,8 @@ public class RenderManager implements Globals {
      * @param box
      * @return
      */
-    public static boolean isFrustumVisible(Box box) {
+    public static boolean isFrustumVisible(Box box)
+    {
         return ((AccessorWorldRenderer) mc.worldRenderer).getFrustum().isVisible(box);
     }
 
@@ -290,7 +314,8 @@ public class RenderManager implements Globals {
      * @param color
      */
     public static void rect(MatrixStack matrices, double x1, double y1,
-                            double x2, double y2, int color) {
+                            double x2, double y2, int color)
+    {
         rect(matrices, x1, y1, x2, y2, 0.0, color);
     }
 
@@ -313,17 +338,20 @@ public class RenderManager implements Globals {
      * @param color
      */
     public static void rect(MatrixStack matrices, double x1, double y1,
-                            double x2, double y2, double z, int color) {
+                            double x2, double y2, double z, int color)
+    {
         x2 += x1;
         y2 += y1;
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         double i;
-        if (x1 < x2) {
+        if (x1 < x2)
+        {
             i = x1;
             x1 = x2;
             x2 = i;
         }
-        if (y1 < y2) {
+        if (y1 < y2)
+        {
             i = y1;
             y1 = y2;
             y2 = i;
@@ -372,12 +400,15 @@ public class RenderManager implements Globals {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        if (sideways) {
+        if (sideways)
+        {
             bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
             bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f).next();
             bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
             bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4).next();
-        } else {
+        }
+        else
+        {
             bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f).next();
             bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
             bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4).next();
@@ -394,7 +425,8 @@ public class RenderManager implements Globals {
      * @param y
      * @param color
      */
-    public static void renderText(DrawContext context, String text, float x, float y, int color) {
+    public static void renderText(DrawContext context, String text, float x, float y, int color)
+    {
         if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null)
         {
             Fonts.CLIENT.drawStringWithShadow(context.getMatrices(), text, x, y, color);
@@ -407,7 +439,8 @@ public class RenderManager implements Globals {
      * @param text
      * @return
      */
-    public static int textWidth(String text) {
+    public static int textWidth(String text)
+    {
         if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null)
         {
             return (int) Fonts.CLIENT.getStringWidth(text);

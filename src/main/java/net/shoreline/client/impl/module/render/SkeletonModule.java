@@ -13,12 +13,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
@@ -28,14 +28,17 @@ import java.awt.*;
  * @author linus
  * @since 1.0
  */
-public class SkeletonModule extends ToggleModule {
+public class SkeletonModule extends ToggleModule
+{
 
-    public SkeletonModule() {
+    public SkeletonModule()
+    {
         super("Skeleton", "Renders a skeleton to show player limbs", ModuleCategory.RENDER);
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent.Game event) {
+    public void onRenderWorld(RenderWorldEvent.Game event)
+    {
         MatrixStack matrixStack = event.getMatrices();
         float g = event.getTickDelta();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -44,12 +47,16 @@ public class SkeletonModule extends ToggleModule {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(MinecraftClient.isFancyGraphicsOrBetter());
         RenderSystem.enableCull();
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity == null || !entity.isAlive()) {
+        for (Entity entity : mc.world.getEntities())
+        {
+            if (entity == null || !entity.isAlive())
+            {
                 continue;
             }
-            if (entity instanceof PlayerEntity playerEntity) {
-                if (mc.options.getPerspective().isFirstPerson() && playerEntity == mc.player) {
+            if (entity instanceof PlayerEntity playerEntity)
+            {
+                if (mc.options.getPerspective().isFirstPerson() && playerEntity == mc.player)
+                {
                     continue;
                 }
                 Vec3d skeletonPos = Interpolation.getInterpolatedPosition(entity, g);
@@ -78,14 +85,17 @@ public class SkeletonModule extends ToggleModule {
                 ModelPart rightLeg = playerEntityModel.rightLeg;
                 matrixStack.push();
                 matrixStack.translate(skeletonPos.x, skeletonPos.y, skeletonPos.z);
-                if (swimming) {
+                if (swimming)
+                {
                     matrixStack.translate(0, 0.35f, 0);
                 }
                 matrixStack.multiply(new Quaternionf().setAngleAxis((h + 180.0f) * Math.PI / 180.0f, 0, -1, 0));
-                if (swimming || flying) {
+                if (swimming || flying)
+                {
                     matrixStack.multiply(new Quaternionf().setAngleAxis((90.0f + m) * Math.PI / 180.0f, -1, 0, 0));
                 }
-                if (swimming) {
+                if (swimming)
+                {
                     matrixStack.translate(0, -0.95f, 0);
                 }
                 Tessellator tessellator = Tessellator.getInstance();
@@ -142,13 +152,16 @@ public class SkeletonModule extends ToggleModule {
                 bufferBuilder.vertex(matrix4f, 0, -0.55f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
                 matrixStack.pop();
                 tessellator.draw();
-                if (swimming) {
+                if (swimming)
+                {
                     matrixStack.translate(0, 0.95f, 0);
                 }
-                if (swimming || flying) {
+                if (swimming || flying)
+                {
                     matrixStack.multiply(new Quaternionf().setAngleAxis((90.0f + m) * Math.PI / 180.0f, 1, 0, 0));
                 }
-                if (swimming) {
+                if (swimming)
+                {
                     matrixStack.translate(0, -0.35f, 0);
                 }
                 matrixStack.multiply(new Quaternionf().setAngleAxis((h + 180.0f) * Math.PI / 180.0f, 0, 1, 0));
@@ -163,14 +176,18 @@ public class SkeletonModule extends ToggleModule {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
     }
 
-    private void rotateSkeleton(MatrixStack matrix, ModelPart modelPart) {
-        if (modelPart.roll != 0.0f) {
+    private void rotateSkeleton(MatrixStack matrix, ModelPart modelPart)
+    {
+        if (modelPart.roll != 0.0f)
+        {
             matrix.multiply(RotationAxis.POSITIVE_Z.rotation(modelPart.roll));
         }
-        if (modelPart.yaw != 0.0f) {
+        if (modelPart.yaw != 0.0f)
+        {
             matrix.multiply(RotationAxis.NEGATIVE_Y.rotation(modelPart.yaw));
         }
-        if (modelPart.pitch != 0.0f) {
+        if (modelPart.pitch != 0.0f)
+        {
             matrix.multiply(RotationAxis.NEGATIVE_X.rotation(modelPart.pitch));
         }
     }

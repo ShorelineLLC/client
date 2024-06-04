@@ -5,9 +5,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.bus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,7 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(InGameHud.class)
-public class MixinInGameHud implements Globals {
+public class MixinInGameHud implements Globals
+{
     @Shadow
     @Final
     private static Identifier PUMPKIN_BLUR;
@@ -37,7 +38,8 @@ public class MixinInGameHud implements Globals {
      * @param ci
      */
     @Inject(method = "render", at = @At(value = "TAIL"))
-    private void hookRender(DrawContext context, float tickDelta, CallbackInfo ci) {
+    private void hookRender(DrawContext context, float tickDelta, CallbackInfo ci)
+    {
         RenderOverlayEvent.Post renderOverlayEvent =
                 new RenderOverlayEvent.Post(context, tickDelta);
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
@@ -55,11 +57,13 @@ public class MixinInGameHud implements Globals {
     @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookRenderStatusEffectOverlay(DrawContext context,
-                                               CallbackInfo ci) {
+                                               CallbackInfo ci)
+    {
         RenderOverlayEvent.StatusEffect renderOverlayEvent =
                 new RenderOverlayEvent.StatusEffect(context);
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
-        if (renderOverlayEvent.isCanceled()) {
+        if (renderOverlayEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -72,11 +76,13 @@ public class MixinInGameHud implements Globals {
     @Inject(method = "renderSpyglassOverlay", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookRenderSpyglassOverlay(DrawContext context, float scale,
-                                           CallbackInfo ci) {
+                                           CallbackInfo ci)
+    {
         RenderOverlayEvent.Spyglass renderOverlayEvent =
                 new RenderOverlayEvent.Spyglass(context);
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
-        if (renderOverlayEvent.isCanceled()) {
+        if (renderOverlayEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -89,19 +95,25 @@ public class MixinInGameHud implements Globals {
      */
     @Inject(method = "renderOverlay", at = @At(value = "HEAD"), cancellable = true)
     private void hookRenderOverlay(DrawContext context, Identifier texture,
-                                   float opacity, CallbackInfo ci) {
-        if (texture.getPath().equals(PUMPKIN_BLUR.getPath())) {
+                                   float opacity, CallbackInfo ci)
+    {
+        if (texture.getPath().equals(PUMPKIN_BLUR.getPath()))
+        {
             RenderOverlayEvent.Pumpkin renderOverlayEvent =
                     new RenderOverlayEvent.Pumpkin(context);
             EventBus.INSTANCE.dispatch(renderOverlayEvent);
-            if (renderOverlayEvent.isCanceled()) {
+            if (renderOverlayEvent.isCanceled())
+            {
                 ci.cancel();
             }
-        } else if (texture.getPath().equals(POWDER_SNOW_OUTLINE.getPath())) {
+        }
+        else if (texture.getPath().equals(POWDER_SNOW_OUTLINE.getPath()))
+        {
             RenderOverlayEvent.Frostbite renderOverlayEvent =
                     new RenderOverlayEvent.Frostbite(context);
             EventBus.INSTANCE.dispatch(renderOverlayEvent);
-            if (renderOverlayEvent.isCanceled()) {
+            if (renderOverlayEvent.isCanceled())
+            {
                 ci.cancel();
             }
         }
@@ -119,12 +131,15 @@ public class MixinInGameHud implements Globals {
             target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow" +
                     "(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)I"))
     private int hookRenderHeldItemTooltip(DrawContext instance, TextRenderer textRenderer,
-                                          Text text, int x, int y, int color) {
+                                          Text text, int x, int y, int color)
+    {
         RenderOverlayEvent.ItemName renderOverlayEvent =
                 new RenderOverlayEvent.ItemName(instance);
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
-        if (renderOverlayEvent.isCanceled()) {
-            if (renderOverlayEvent.isUpdateXY()) {
+        if (renderOverlayEvent.isCanceled())
+        {
+            if (renderOverlayEvent.isUpdateXY())
+            {
                 return instance.drawText(mc.textRenderer, text,
                         renderOverlayEvent.getX(), renderOverlayEvent.getY(), color, true);
             }

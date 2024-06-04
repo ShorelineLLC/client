@@ -10,18 +10,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ToastManager.class)
-public class MixinToastManager {
+public class MixinToastManager
+{
 
     /**
-     *
      * @param context
      * @param ci
      */
     @Inject(method = "draw", at = @At(value = "HEAD"), cancellable = true)
-    private void hookDraw(DrawContext context, CallbackInfo ci) {
+    private void hookDraw(DrawContext context, CallbackInfo ci)
+    {
         RenderToastEvent renderToastEvent = new RenderToastEvent();
         EventBus.INSTANCE.dispatch(renderToastEvent);
-        if (renderToastEvent.isCanceled()) {
+        if (renderToastEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

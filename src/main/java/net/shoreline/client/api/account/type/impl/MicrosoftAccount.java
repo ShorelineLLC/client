@@ -17,6 +17,7 @@ public final class MicrosoftAccount implements MinecraftAccount
 
     /**
      * Create a MicrosoftAccount instance using a previously saved access token
+     *
      * @param accessToken the access token
      * @throws RuntimeException if access token is null or empty
      */
@@ -32,7 +33,8 @@ public final class MicrosoftAccount implements MinecraftAccount
 
     /**
      * Creates a MicrosoftAccount instance using login credentials
-     * @param email the microsoft email
+     *
+     * @param email    the microsoft email
      * @param password the account password
      */
     public MicrosoftAccount(final String email, final String password)
