@@ -56,7 +56,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> userInfo = register(new BooleanConfig("UserInfo", "Displays your user information", true));
     Config<Boolean> directionConfig = register(new BooleanConfig("Direction", "Displays facing direction", true));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays player equipped armor and durability", true));
-    Config<Boolean> armorDurabilityConfig = register(new BooleanConfig("ArmorDurability", "Displays player equipped armor durability", true, () -> armorConfig.getValue()));
+    Config<Boolean> armorDurabilityConfig = register(new BooleanConfig("ArmorDurability", "Displays player equipped armor durability", false, () -> armorConfig.getValue()));
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
     Config<VanillaHud> itemNameConfig = register(new EnumConfig<>("ItemName", "Renders the Minecraft item name display", VanillaHud.HIDE, VanillaHud.values()));
     Config<Boolean> potionEffectsConfig = register(new BooleanConfig("PotionEffects", "Displays active potion effects", true));
@@ -216,9 +216,9 @@ public class HUDModule extends ToggleModule
                     rainbowOffset++;
                 }
             }
-            if (serverBrandConfig.getValue() && mc.getServer() != null)
+            if (serverBrandConfig.getValue())
             {
-                String brand = mc.getServer().getVersion();
+                String brand = mc.player.networkHandler.getBrand();
                 int width = RenderManager.textWidth(brand);
                 RenderManager.renderText(event.getContext(), brand,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,

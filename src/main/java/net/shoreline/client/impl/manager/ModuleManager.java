@@ -76,6 +76,7 @@ public final class ModuleManager
                 new FastLatencyModule(),
                 new FastProjectileModule(),
                 new InventorySyncModule(),
+                new ChorusInvincibilityModule(),
                 new PacketCancelerModule(),
                 new PacketFlyModule(),
                 new PhaseModule(),

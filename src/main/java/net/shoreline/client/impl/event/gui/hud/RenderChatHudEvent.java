@@ -10,7 +10,7 @@ public class RenderChatHudEvent extends Event
 {
     private final ChatHudLine chatHudLine;
     private double animation;
-    private BetterChatModule.AnimationMode animationMode;
+    private boolean animationMode;
 
     public RenderChatHudEvent(ChatHudLine chatHudLine)
     {
@@ -27,7 +27,7 @@ public class RenderChatHudEvent extends Event
         this.animation = animation;
     }
 
-    public void setAnimationMode(BetterChatModule.AnimationMode animationMode)
+    public void setSlide(boolean animationMode)
     {
         this.animationMode = animationMode;
     }
@@ -37,7 +37,7 @@ public class RenderChatHudEvent extends Event
         return chatHudLine;
     }
 
-    public BetterChatModule.AnimationMode getAnimationMode()
+    public boolean getAnimationMode()
     {
         return animationMode;
     }

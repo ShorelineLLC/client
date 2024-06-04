@@ -12,6 +12,7 @@ import net.minecraft.client.util.ChatMessages;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -107,7 +109,21 @@ public abstract class MixinChatHud implements IChatHud
     {
         RenderChatHudEvent renderChatHudEvent = new RenderChatHudEvent(current);
         EventBus.INSTANCE.dispatch(renderChatHudEvent);
-        return instance.drawTextWithShadow(textRenderer, text, (int) ((renderChatHudEvent.isCanceled() ? renderChatHudEvent.getAnimation() : 0)), y, color);
+        if (renderChatHudEvent.isCanceled())
+        {
+            if (renderChatHudEvent.getAnimationMode())
+            {
+                return instance.drawTextWithShadow(textRenderer, text, (int) renderChatHudEvent.getAnimation(), y, color);
+            }
+            else
+            {
+                float red = ColorHelper.Argb.getRed(color) / 255.0f;
+                float green = ColorHelper.Argb.getGreen(color) / 255.0f;
+                float blue = ColorHelper.Argb.getBlue(color) / 255.0f;
+                return instance.drawTextWithShadow(textRenderer, text, 0, y, new Color(red, green, blue, (float) MathHelper.clamp(renderChatHudEvent.getAnimation(), 0.0, 1.0)).getRGB());
+            }
+        }
+        return instance.drawTextWithShadow(textRenderer, text, 0, y, color);
     }
 
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/" +

@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 /**
  * @author linus
@@ -34,6 +35,9 @@ public interface AccessorMinecraftClient
      */
     @Accessor("attackCooldown")
     void hookSetAttackCooldown(int attackCooldown);
+
+    @Invoker("doItemUse")
+    void hookDoItemUse();
 
     @Accessor("session")
     @Final

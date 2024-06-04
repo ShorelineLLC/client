@@ -82,6 +82,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Target monsters", false));
     Config<Boolean> neutralsConfig = register(new BooleanConfig("Neutrals", "Target neutrals", false));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Target animals", false));
+    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Target shulker boxes", false));
     // BREAK SETTINGS
     Config<Float> breakSpeedConfig = register(new NumberConfig<>("BreakSpeed", "Speed to break crystals", 0.1f, 18.0f, 20.0f));
     Config<Float> attackDelayConfig = register(new NumberConfig<>("AttackDelay", "Added delays", 0.0f, 0.0f, 5.0f));

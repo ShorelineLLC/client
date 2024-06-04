@@ -73,6 +73,7 @@
     "gui.screen.MixinScreen",
     "gui.screen.MixinTitleScreen",
     "item.MixinFireworkRocketItem",
+    "item.MixinItem",
     "item.MixinItemStack",
     "item.MixinItemUsageContext",
     "item.MixinTridentItem",
