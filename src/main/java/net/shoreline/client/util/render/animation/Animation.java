@@ -2,7 +2,7 @@ package net.shoreline.client.util.render.animation;
 
 public class Animation
 {
-    private Easing easing;
+    private final Easing easing;
     private float length;
     private long last = 0L;
     private boolean state;

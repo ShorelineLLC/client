@@ -8,19 +8,23 @@ import net.shoreline.eventbus.Event;
  * @author linus
  * @since 1.0
  */
-public class ConsumeItemEvent extends Event {
+public class ConsumeItemEvent extends Event
+{
     //
     private final ItemStack activeItemStack;
 
-    public ConsumeItemEvent(ItemStack activeItemStack) {
+    public ConsumeItemEvent(ItemStack activeItemStack)
+    {
         this.activeItemStack = activeItemStack;
     }
 
-    public ItemStack getStack() {
+    public ItemStack getStack()
+    {
         return activeItemStack;
     }
 
-    public Item getItem() {
+    public Item getItem()
+    {
         return activeItemStack.getItem();
     }
 }

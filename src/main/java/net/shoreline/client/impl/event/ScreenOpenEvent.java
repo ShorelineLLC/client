@@ -7,15 +7,18 @@ import net.shoreline.eventbus.Event;
  * @author linus
  * @since 1.0
  */
-public class ScreenOpenEvent extends Event {
+public class ScreenOpenEvent extends Event
+{
     //
     private final Screen screen;
 
-    public ScreenOpenEvent(Screen screen) {
+    public ScreenOpenEvent(Screen screen)
+    {
         this.screen = screen;
     }
 
-    public Screen getScreen() {
+    public Screen getScreen()
+    {
         return screen;
     }
 }

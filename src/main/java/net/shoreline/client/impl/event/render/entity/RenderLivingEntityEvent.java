@@ -12,7 +12,8 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class RenderLivingEntityEvent extends Event {
+public class RenderLivingEntityEvent extends Event
+{
     //
     private final LivingEntity entity;
     private final EntityModel<?> model;
@@ -26,7 +27,8 @@ public class RenderLivingEntityEvent extends Event {
                                    MatrixStack matrices,
                                    VertexConsumer vertexConsumer,
                                    int light, int overlay, float red,
-                                   float green, float blue, float alpha) {
+                                   float green, float blue, float alpha)
+    {
         this.entity = entity;
         this.model = model;
         this.matrices = matrices;
@@ -39,43 +41,53 @@ public class RenderLivingEntityEvent extends Event {
         this.alpha = alpha;
     }
 
-    public LivingEntity getEntity() {
+    public LivingEntity getEntity()
+    {
         return entity;
     }
 
-    public EntityModel<?> getModel() {
+    public EntityModel<?> getModel()
+    {
         return model;
     }
 
-    public MatrixStack getMatrices() {
+    public MatrixStack getMatrices()
+    {
         return matrices;
     }
 
-    public VertexConsumer getVertexConsumerProvider() {
+    public VertexConsumer getVertexConsumerProvider()
+    {
         return vertexConsumer;
     }
 
-    public int getLight() {
+    public int getLight()
+    {
         return light;
     }
 
-    public int getOverlay() {
+    public int getOverlay()
+    {
         return overlay;
     }
 
-    public float getRed() {
+    public float getRed()
+    {
         return red;
     }
 
-    public float getGreen() {
+    public float getGreen()
+    {
         return green;
     }
 
-    public float getBlue() {
+    public float getBlue()
+    {
         return blue;
     }
 
-    public float getAlpha() {
+    public float getAlpha()
+    {
         return alpha;
     }
 }

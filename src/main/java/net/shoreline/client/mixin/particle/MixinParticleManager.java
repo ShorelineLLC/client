@@ -17,7 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(ParticleManager.class)
-public class MixinParticleManager {
+public class MixinParticleManager
+{
     /**
      * @param parameters
      * @param x
@@ -34,10 +35,12 @@ public class MixinParticleManager {
     private void hookAddParticle(ParticleEffect parameters, double x,
                                  double y, double z, double velocityX,
                                  double velocityY, double velocityZ,
-                                 CallbackInfoReturnable<Particle> cir) {
+                                 CallbackInfoReturnable<Particle> cir)
+    {
         ParticleEvent particleEvent = new ParticleEvent(parameters);
         EventBus.INSTANCE.dispatch(particleEvent);
-        if (particleEvent.isCanceled()) {
+        if (particleEvent.isCanceled())
+        {
             cir.setReturnValue(null);
             cir.cancel();
         }
@@ -52,11 +55,13 @@ public class MixinParticleManager {
     @Inject(method = "addEmitter(Lnet/minecraft/entity/Entity;Lnet/minecraft" +
             "/particle/ParticleEffect;I)V", at = @At(value = "HEAD"), cancellable = true)
     private void hookAddEmitter(Entity entity, ParticleEffect parameters,
-                                int maxAge, CallbackInfo ci) {
+                                int maxAge, CallbackInfo ci)
+    {
         ParticleEvent.Emitter particleEvent =
                 new ParticleEvent.Emitter(parameters);
         EventBus.INSTANCE.dispatch(particleEvent);
-        if (particleEvent.isCanceled()) {
+        if (particleEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

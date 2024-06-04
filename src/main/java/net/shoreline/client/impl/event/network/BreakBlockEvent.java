@@ -5,14 +5,17 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class BreakBlockEvent extends Event {
+public class BreakBlockEvent extends Event
+{
     private final BlockPos pos;
 
-    public BreakBlockEvent(BlockPos pos) {
+    public BreakBlockEvent(BlockPos pos)
+    {
         this.pos = pos;
     }
 
-    public BlockPos getPos() {
+    public BlockPos getPos()
+    {
         return pos;
     }
 }

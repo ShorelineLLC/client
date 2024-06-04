@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(EntityVelocityUpdateS2CPacket.class)
-public interface AccessorEntityVelocityUpdateS2CPacket {
+public interface AccessorEntityVelocityUpdateS2CPacket
+{
     @Accessor("velocityX")
     @Mutable
     void setVelocityX(int velocityX);

@@ -3,21 +3,25 @@ package net.shoreline.client.impl.event.gui.hud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.shoreline.eventbus.Event;
 
-public class ChatLineEvent extends Event {
+public class ChatLineEvent extends Event
+{
 
     private final ChatHudLine chatHudLine;
     private final double width;
 
-    public ChatLineEvent(ChatHudLine chatHudLine, double width) {
+    public ChatLineEvent(ChatHudLine chatHudLine, double width)
+    {
         this.chatHudLine = chatHudLine;
         this.width = width;
     }
 
-    public ChatHudLine getChatHudLine() {
+    public ChatHudLine getChatHudLine()
+    {
         return chatHudLine;
     }
 
-    public double getWidth() {
+    public double getWidth()
+    {
         return width;
     }
 }

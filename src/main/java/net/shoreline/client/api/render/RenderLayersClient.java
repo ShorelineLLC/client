@@ -6,16 +6,14 @@ import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
-import net.shoreline.client.impl.event.render.StoreBufferEvent;
 import net.shoreline.client.mixin.accessor.AccessorRenderPhase;
 import net.shoreline.client.util.Globals;
 import org.lwjgl.opengl.GL11;
 
-public class RenderLayersClient implements Globals {
+public class RenderLayersClient implements Globals
+{
 
-    public static final VertexFormat POSITION_COLOR_TEXTURE_OVERLAY = new VertexFormat((ImmutableMap) ImmutableMap.builder().put("Position", VertexFormats.POSITION_ELEMENT).put("Color", VertexFormats.COLOR_ELEMENT).put("UV0", VertexFormats.TEXTURE_ELEMENT).put("Padding", VertexFormats.PADDING_ELEMENT).put("UV1", VertexFormats.OVERLAY_ELEMENT).put("UV2", VertexFormats.LIGHT_ELEMENT).build());
+    public static final VertexFormat POSITION_COLOR_TEXTURE_OVERLAY = new VertexFormat((ImmutableMap) ImmutableMap.builder().put("Position", VertexFormats.POSITION_ELEMENT).put("Color", VertexFormats.COLOR_ELEMENT).put("UV0", VertexFormats.TEXTURE_ELEMENT).put("Normal", VertexFormats.NORMAL_ELEMENT).put("UV1", VertexFormats.OVERLAY_ELEMENT).put("UV2", VertexFormats.LIGHT_ELEMENT).put("Padding", VertexFormats.PADDING_ELEMENT).build());
     //
     public static final RenderLayer GLINT = RenderLayer.of("glint", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.MultiPhaseParameters.builder()
             .program(RenderPhase.GLINT_PROGRAM).texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, true, false))
@@ -25,29 +23,23 @@ public class RenderLayersClient implements Globals {
             RenderLayer.MultiPhaseParameters.builder().program(RenderPhase.ITEM_ENTITY_TRANSLUCENT_CULL_PROGRAM).texture(RenderPhase.BLOCK_ATLAS_TEXTURE).lightmap(new Lightmap())
                     .target(RenderPhase.ITEM_ENTITY_TARGET).writeMaskState(RenderPhase.ALL_MASK).build(true));
 
-    public RenderLayersClient() {
-        EventBus.INSTANCE.subscribe(this);
-    }
-
-    @EventListener
-    public void onStoreBuffer(StoreBufferEvent event) {
-        // initialize client layers here
-        event.getMap().put(GLINT, GLINT.getExpectedBufferSize());
-    }
-
-    protected static class DepthTest extends RenderPhase.DepthTest {
-        public DepthTest() {
+    protected static class DepthTest extends RenderPhase.DepthTest
+    {
+        public DepthTest()
+        {
             super("depth_test", GL11.GL_ALWAYS);
         }
 
         @Override
-        public void startDrawing() {
+        public void startDrawing()
+        {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glDepthFunc(GL11.GL_EQUAL);
         }
 
         @Override
-        public void endDrawing() {
+        public void endDrawing()
+        {
             GL11.glDisable(GL11.GL_DEPTH_TEST);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             GL11.glDepthFunc(GL11.GL_ALWAYS);
@@ -55,14 +47,18 @@ public class RenderLayersClient implements Globals {
         }
     }
 
-    protected static class Lightmap extends RenderPhase.Lightmap {
+    protected static class Lightmap extends RenderPhase.Lightmap
+    {
 
-        public Lightmap() {
+        public Lightmap()
+        {
             super(false);
-            ((AccessorRenderPhase) this).hookSetBeginAction(() -> {
+            ((AccessorRenderPhase) this).hookSetBeginAction(() ->
+            {
                 mc.gameRenderer.getLightmapTextureManager().enable();
             });
-            ((AccessorRenderPhase) this).hookSetEndAction(() -> {
+            ((AccessorRenderPhase) this).hookSetEndAction(() ->
+            {
                 mc.gameRenderer.getLightmapTextureManager().disable();
             });
         }

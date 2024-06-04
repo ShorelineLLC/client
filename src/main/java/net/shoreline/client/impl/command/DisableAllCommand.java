@@ -12,19 +12,25 @@ import net.shoreline.client.util.chat.ChatUtil;
  * @author Shoreline
  * @since 1.0
  */
-public class DisableAllCommand extends Command {
+public class DisableAllCommand extends Command
+{
     /**
      *
      */
-    public DisableAllCommand() {
+    public DisableAllCommand()
+    {
         super("DisableAll", "Disables all enabled modules", literal("disableall"));
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.executes(c -> {
-            for (Module module : Managers.MODULE.getModules()) {
-                if (module instanceof ToggleModule toggleModule && toggleModule.isEnabled()) {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
+        builder.executes(c ->
+        {
+            for (Module module : Managers.MODULE.getModules())
+            {
+                if (module instanceof ToggleModule toggleModule && toggleModule.isEnabled())
+                {
                     toggleModule.disable();
                 }
             }

@@ -10,8 +10,6 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
-import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.command.*;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
@@ -19,6 +17,8 @@ import net.shoreline.client.impl.event.gui.screen.SuggestChatEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -30,7 +30,8 @@ import java.util.function.Predicate;
  * @see Command
  * @since 1.0
  */
-public class CommandManager implements Globals {
+public class CommandManager implements Globals
+{
     //
     private final List<Command> commands = new ArrayList<>();
     // Command prefix, used to identify a command in the chat
@@ -42,7 +43,8 @@ public class CommandManager implements Globals {
     /**
      * Registers commands to the CommandManager
      */
-    public CommandManager() {
+    public CommandManager()
+    {
         EventBus.INSTANCE.subscribe(this);
         register(
                 new BindCommand(),
@@ -69,52 +71,64 @@ public class CommandManager implements Globals {
                 new YawCommand()
         );
         //
-        for (Module module : Managers.MODULE.getModules()) {
+        for (Module module : Managers.MODULE.getModules())
+        {
             register(new ModuleCommand(module));
         }
         Shoreline.info("Registered {} commands!", commands.size());
-        for (Command command : commands) {
+        for (Command command : commands)
+        {
             command.buildCommand(command.getCommandBuilder());
             dispatcher.register(command.getCommandBuilder());
         }
     }
 
     @EventListener
-    public void onChatMessage(ChatMessageEvent.Client event) {
+    public void onChatMessage(ChatMessageEvent.Client event)
+    {
         final String text = event.getMessage().trim();
-        if (text.startsWith(prefix)) {
+        if (text.startsWith(prefix))
+        {
             String literal = text.substring(1);
             event.cancel();
             mc.inGameHud.getChatHud().addToMessageHistory(text);
-            try {
+            try
+            {
                 dispatcher.execute(dispatcher.parse(literal, source));
-            } catch (Exception exception) {
+            }
+            catch (Exception exception)
+            {
                 // exception.printStackTrace();
             }
         }
     }
 
     @EventListener
-    public void onKeyboardInput(KeyboardInputEvent event) {
-        if (event.getAction() == 1 && event.getKeycode() == prefixKey && mc.currentScreen == null) {
+    public void onKeyboardInput(KeyboardInputEvent event)
+    {
+        if (event.getAction() == 1 && event.getKeycode() == prefixKey && mc.currentScreen == null)
+        {
             event.cancel();
             mc.setScreen(new ChatScreen(""));
         }
     }
 
     @EventListener
-    public void onChatSuggest(SuggestChatEvent event) {
+    public void onChatSuggest(SuggestChatEvent event)
+    {
         event.setPrefix(prefix);
         event.setDispatcher(dispatcher);
         event.setSource(source);
     }
 
     @SuppressWarnings("unchecked")
-    private LiteralArgumentBuilder<Object> redirectBuilder(String alias, LiteralCommandNode<?> destination) {
+    private LiteralArgumentBuilder<Object> redirectBuilder(String alias, LiteralCommandNode<?> destination)
+    {
         LiteralArgumentBuilder<Object> literalArgumentBuilder = LiteralArgumentBuilder.literal(alias.toLowerCase()).requires((Predicate<Object>) destination.getRequirement())
                 .forward((CommandNode<Object>) destination.getRedirect(), (RedirectModifier<Object>) destination.getRedirectModifier(), destination.isFork())
                 .executes((com.mojang.brigadier.Command<Object>) destination.getCommand());
-        for (CommandNode<?> child : destination.getChildren()) {
+        for (CommandNode<?> child : destination.getChildren())
+        {
             literalArgumentBuilder.then((CommandNode<Object>) child);
         }
         return literalArgumentBuilder;
@@ -123,8 +137,10 @@ public class CommandManager implements Globals {
     /**
      * @param commands
      */
-    private void register(Command... commands) {
-        for (Command command : commands) {
+    private void register(Command... commands)
+    {
+        for (Command command : commands)
+        {
             register(command);
         }
     }
@@ -132,27 +148,33 @@ public class CommandManager implements Globals {
     /**
      * @param command
      */
-    private void register(Command command) {
+    private void register(Command command)
+    {
         commands.add(command);
     }
 
     /**
      * @return
      */
-    public List<Command> getCommands() {
+    public List<Command> getCommands()
+    {
         return commands;
     }
 
-    public Command getCommand(String name) {
-        for (Command command : commands) {
-            if (command.getName().equalsIgnoreCase(name)) {
+    public Command getCommand(String name)
+    {
+        for (Command command : commands)
+        {
+            if (command.getName().equalsIgnoreCase(name))
+            {
                 return command;
             }
         }
         return null;
     }
 
-    public String getPrefix() {
+    public String getPrefix()
+    {
         return prefix;
     }
 
@@ -160,16 +182,19 @@ public class CommandManager implements Globals {
      * @param prefix
      * @param prefixKey
      */
-    public void setPrefix(String prefix, int prefixKey) {
+    public void setPrefix(String prefix, int prefixKey)
+    {
         this.prefix = prefix;
         this.prefixKey = prefixKey;
     }
 
-    public CommandDispatcher<CommandSource> getDispatcher() {
+    public CommandDispatcher<CommandSource> getDispatcher()
+    {
         return dispatcher;
     }
 
-    public CommandSource getSource() {
+    public CommandSource getSource()
+    {
         return source;
     }
 }

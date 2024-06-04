@@ -24,7 +24,6 @@ import net.minecraft.world.World;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
@@ -40,6 +39,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.world.FakePlayerEntity;
+import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -52,7 +52,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author linus
  * @since 1.0
  */
-public class NametagsModule extends ToggleModule {
+public class NametagsModule extends ToggleModule
+{
     private static NametagsModule INSTANCE;
 
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays the player's armor", true));
@@ -71,18 +72,22 @@ public class NametagsModule extends ToggleModule {
     Config<Boolean> itemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
 
-    public NametagsModule() {
+    public NametagsModule()
+    {
         super("Nametags", "Renders info on player nametags", ModuleCategory.RENDER);
         INSTANCE = this;
     }
 
-    public static NametagsModule getInstance() {
+    public static NametagsModule getInstance()
+    {
         return INSTANCE;
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event) {
-        if (mc.gameRenderer == null || mc.getCameraEntity() == null) {
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        if (mc.gameRenderer == null || mc.getCameraEntity() == null)
+        {
             return;
         }
         RenderBuffers.preRender();
@@ -90,12 +95,16 @@ public class NametagsModule extends ToggleModule {
         Camera camera = mc.gameRenderer.getCamera();
         Vec3d pos = camera.getPos();
 
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof PlayerEntity player) {
-                if (player == mc.player && !FreecamModule.getInstance().isEnabled()) {
+        for (Entity entity : mc.world.getEntities())
+        {
+            if (entity instanceof PlayerEntity player)
+            {
+                if (player == mc.player && !FreecamModule.getInstance().isEnabled())
+                {
                     continue;
                 }
-                if (!player.isAlive() || !invisiblesConfig.getValue() && player.isInvisible()) {
+                if (!player.isAlive() || !invisiblesConfig.getValue() && player.isInvisible())
+                {
                     continue;
                 }
                 String info = getNametagInfo(player);
@@ -109,16 +118,19 @@ public class NametagsModule extends ToggleModule {
                 double dy = (pos.getY() - interpolate.getY()) - ry;
                 double dz = (pos.getZ() - interpolate.getZ()) - rz;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                if (dist > 4096.0) {
+                if (dist > 4096.0)
+                {
                     continue;
                 }
                 float scaling = 0.0018f + scalingConfig.getValue() * (float) dist;
-                if (dist <= 8.0) {
+                if (dist <= 8.0)
+                {
                     scaling = 0.0245f;
                 }
                 renderInfo(info, hwidth, player, rx, ry, rz, camera, scaling);
             }
-            if (entity instanceof ItemEntity itemEntity && itemsConfig.getValue()) {
+            if (entity instanceof ItemEntity itemEntity && itemsConfig.getValue())
+            {
                 Vec3d itemPos = Interpolation.getRenderPosition(itemEntity, mc.getTickDelta());
                 double rx = itemEntity.getX() - itemPos.getX();
                 double ry = itemEntity.getY() - itemPos.getY();
@@ -127,7 +139,8 @@ public class NametagsModule extends ToggleModule {
                 String stackNametag = stack.getName().getString() + (stack.getCount() > 1 ? " x" + stack.getCount() : "");
                 RenderManager.renderSign(stackNametag, rx, ry, rz, -1);
             }
-            if (entity instanceof EnderPearlEntity pearlEntity && pearlsConfig.getValue()) {
+            if (entity instanceof EnderPearlEntity pearlEntity && pearlsConfig.getValue())
+            {
                 if (pearlEntity.getOwner() == null)
                 {
                     return;
@@ -149,14 +162,17 @@ public class NametagsModule extends ToggleModule {
     }
 
     @EventListener
-    public void onRenderLabel(RenderLabelEvent event) {
-        if (event.getEntity() instanceof PlayerEntity && event.getEntity() != mc.player) {
+    public void onRenderLabel(RenderLabelEvent event)
+    {
+        if (event.getEntity() instanceof PlayerEntity && event.getEntity() != mc.player)
+        {
             event.cancel();
         }
     }
 
     private void renderInfo(String info, float width, PlayerEntity entity,
-                            double x, double y, double z, Camera camera, float scaling) {
+                            double x, double y, double z, Camera camera, float scaling)
+    {
         final Vec3d pos = camera.getPos();
         MatrixStack matrices = new MatrixStack();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
@@ -167,7 +183,8 @@ public class NametagsModule extends ToggleModule {
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.scale(-scaling, -scaling, -1.0f);
-        if (backgroundConfig.getValue()) {
+        if (backgroundConfig.getValue())
+        {
             RenderManager.rect(matrices, -width - 1.0f, -1.0f, width * 2.0f + 2.0f,
                     mc.textRenderer.fontHeight + 1.0f, 0.0, 0x55000400);
         }
@@ -177,11 +194,13 @@ public class NametagsModule extends ToggleModule {
                     mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB(), 0.3);
         }
         int color = getNametagColor(entity);
-        RenderManager.post(() -> {
+        RenderManager.post(() ->
+        {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             GL11.glDepthFunc(GL11.GL_ALWAYS);
-            if (armorConfig.getValue()) {
+            if (armorConfig.getValue())
+            {
                 renderItems(matrices, entity);
             }
             drawText(matrices, info, -width, 0.0f, color);
@@ -190,7 +209,8 @@ public class NametagsModule extends ToggleModule {
         });
     }
 
-    private void drawText(MatrixStack matrices, String text, float x, float y, int color) {
+    private void drawText(MatrixStack matrices, String text, float x, float y, int color)
+    {
         if (FontModule.getInstance().isEnabled())
         {
             Fonts.CLIENT.drawStringWithShadow(matrices, text, x, y + 1.0f, color);
@@ -201,31 +221,38 @@ public class NametagsModule extends ToggleModule {
         }
     }
 
-    private void renderItems(MatrixStack matrixStack, PlayerEntity player) {
+    private void renderItems(MatrixStack matrixStack, PlayerEntity player)
+    {
         List<ItemStack> displayItems = new CopyOnWriteArrayList<>();
-        if (!player.getOffHandStack().isEmpty()) {
+        if (!player.getOffHandStack().isEmpty())
+        {
             displayItems.add(player.getOffHandStack());
         }
         player.getInventory().armor.forEach(armorStack ->
         {
-            if (!armorStack.isEmpty()) {
+            if (!armorStack.isEmpty())
+            {
                 displayItems.add(armorStack);
             }
         });
-        if (!player.getMainHandStack().isEmpty()) {
+        if (!player.getMainHandStack().isEmpty())
+        {
             displayItems.add(player.getMainHandStack());
         }
         Collections.reverse(displayItems);
         float n10 = 0;
         int n11 = 0;
-        for (ItemStack stack : displayItems) {
+        for (ItemStack stack : displayItems)
+        {
             n10 -= 8;
-            if (stack.getEnchantments().size() > n11) {
+            if (stack.getEnchantments().size() > n11)
+            {
                 n11 = stack.getEnchantments().size();
             }
         }
         float m2 = enchantOffset(n11);
-        for (ItemStack stack : displayItems) {
+        for (ItemStack stack : displayItems)
+        {
             // mc.getBufferBuilders().getEntityVertexConsumers().draw();
             matrixStack.push();
             matrixStack.translate(n10, m2, 0.0f);
@@ -240,10 +267,12 @@ public class NametagsModule extends ToggleModule {
             // int n4 = (n11 > 4) ? ((n11 - 4) * 8 / 2) : 0;
             // mc.getItemRenderer().renderInGui(matrixStack, mc.textRenderer, stack, n10, m2);
             matrixStack.scale(0.5f, 0.5f, 0.5f);
-            if (durabilityConfig.getValue()) {
+            if (durabilityConfig.getValue())
+            {
                 renderDurability(matrixStack, stack, n10 + 2.0f, m2 - 4.5f);
             }
-            if (enchantmentsConfig.getValue()) {
+            if (enchantmentsConfig.getValue())
+            {
                 renderEnchants(matrixStack, stack, n10 + 2.0f, m2);
             }
             matrixStack.scale(2.0f, 2.0f, 2.0f);
@@ -251,52 +280,67 @@ public class NametagsModule extends ToggleModule {
         }
         //
         ItemStack heldItem = player.getMainHandStack();
-        if (heldItem.isEmpty()) {
+        if (heldItem.isEmpty())
+        {
             return;
         }
         matrixStack.scale(0.5f, 0.5f, 0.5f);
-        if (itemNameConfig.getValue()) {
+        if (itemNameConfig.getValue())
+        {
             renderItemName(matrixStack, heldItem, 0, durabilityConfig.getValue() ? m2 - 9.0f : m2 - 4.5f);
         }
         matrixStack.scale(2.0f, 2.0f, 2.0f);
     }
 
     private void renderItem(ItemStack stack, ModelTransformationMode renderMode, int light, int overlay, MatrixStack matrices,
-                            VertexConsumerProvider vertexConsumers, World world, int seed) {
+                            VertexConsumerProvider vertexConsumers, World world, int seed)
+    {
         BakedModel bakedModel = mc.getItemRenderer().getModel(stack, world, null, seed);
-        if (stack.isEmpty()) {
+        if (stack.isEmpty())
+        {
             return;
         }
         boolean bl = renderMode == ModelTransformationMode.GUI || renderMode == ModelTransformationMode.GROUND || renderMode == ModelTransformationMode.FIXED;
-        if (bl) {
-            if (stack.isOf(Items.TRIDENT)) {
+        if (bl)
+        {
+            if (stack.isOf(Items.TRIDENT))
+            {
                 bakedModel = mc.getItemRenderer().getModels().getModelManager().getModel(ModelIdentifier.ofVanilla("trident", "inventory"));
-            } else if (stack.isOf(Items.SPYGLASS)) {
+            }
+            else if (stack.isOf(Items.SPYGLASS))
+            {
                 bakedModel = mc.getItemRenderer().getModels().getModelManager().getModel(ModelIdentifier.ofVanilla("spyglass", "inventory"));
             }
         }
         bakedModel.getTransformation().getTransformation(renderMode).apply(false, matrices);
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        if (bakedModel.isBuiltin() || stack.isOf(Items.TRIDENT) && !bl) {
+        if (bakedModel.isBuiltin() || stack.isOf(Items.TRIDENT) && !bl)
+        {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookGetBuiltinModelItemRenderer().render(stack, renderMode,
                     matrices, vertexConsumers, light, overlay);
-        } else {
+        }
+        else
+        {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookRenderBakedItemModel(bakedModel, stack, light,
                     overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayersClient.ITEM_ENTITY_TRANSLUCENT_CULL, stack.hasGlint()));
         }
     }
 
     public static VertexConsumer getItemGlintConsumer(VertexConsumerProvider vertexConsumers,
-                                                      RenderLayer layer, boolean glint) {
-        if (glint) {
+                                                      RenderLayer layer, boolean glint)
+    {
+        if (glint)
+        {
             return VertexConsumers.union(vertexConsumers.getBuffer(RenderLayersClient.GLINT), vertexConsumers.getBuffer(layer));
         }
         return vertexConsumers.getBuffer(layer);
     }
 
-    private void renderItemOverlay(MatrixStack matrixStack, ItemStack stack, int x, int y) {
+    private void renderItemOverlay(MatrixStack matrixStack, ItemStack stack, int x, int y)
+    {
         matrixStack.push();
-        if (stack.getCount() != 1) {
+        if (stack.getCount() != 1)
+        {
             String string = String.valueOf(stack.getCount());
             // this.matrices.translate(0.0f, 0.0f, 200.0f);
             drawText(matrixStack, string, x + 17 - mc.textRenderer.getWidth(string), y + 9.0f, -1);
@@ -313,8 +357,10 @@ public class NametagsModule extends ToggleModule {
         matrixStack.pop();
     }
 
-    private void renderDurability(MatrixStack matrixStack, ItemStack itemStack, float x, float y) {
-        if (!itemStack.isDamageable()) {
+    private void renderDurability(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
+    {
+        if (!itemStack.isDamageable())
+        {
             return;
         }
         int n = itemStack.getMaxDamage();
@@ -324,28 +370,38 @@ public class NametagsModule extends ToggleModule {
                 ColorUtil.hslToColor((float) (n - n2) / (float) n * 120.0f, 100.0f, 50.0f, 1.0f).getRGB());
     }
 
-    private void renderEnchants(MatrixStack matrixStack, ItemStack itemStack, float x, float y) {
-        if (itemStack.getItem() instanceof EnchantedGoldenAppleItem) {
+    private void renderEnchants(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
+    {
+        if (itemStack.getItem() instanceof EnchantedGoldenAppleItem)
+        {
             drawText(matrixStack, "God", x * 2, y * 2, 0xffc34e41);
             return;
         }
-        if (!itemStack.hasEnchantments()) {
+        if (!itemStack.hasEnchantments())
+        {
             return;
         }
         Map<Enchantment, Integer> enchants = EnchantmentHelper.get(itemStack);
 
         float n2 = 0;
-        for (Enchantment enchantment : enchants.keySet()) {
+        for (Enchantment enchantment : enchants.keySet())
+        {
             int lvl = enchants.get(enchantment);
             StringBuilder enchantString = new StringBuilder();
             String translatedName = enchantment.getName(lvl).getString();
-            if (translatedName.contains("Vanish")) {
+            if (translatedName.contains("Vanish"))
+            {
                 enchantString.append("Van");
-            } else if (translatedName.contains("Bind")) {
+            }
+            else if (translatedName.contains("Bind"))
+            {
                 enchantString.append("Bind");
-            } else {
+            }
+            else
+            {
                 int maxLen = lvl > 1 ? 2 : 3;
-                if (translatedName.length() > maxLen) {
+                if (translatedName.length() > maxLen)
+                {
                     translatedName = translatedName.substring(0, maxLen);
                 }
                 enchantString.append(translatedName);
@@ -356,8 +412,10 @@ public class NametagsModule extends ToggleModule {
         }
     }
 
-    private float enchantOffset(final int n) {
-        if (!enchantmentsConfig.getValue() || n <= 3) {
+    private float enchantOffset(final int n)
+    {
+        if (!enchantmentsConfig.getValue() || n <= 3)
+        {
             return -18.0f;
         }
         float n2 = -14.0f;
@@ -365,51 +423,74 @@ public class NametagsModule extends ToggleModule {
         return n2;
     }
 
-    private void renderItemName(MatrixStack matrixStack, ItemStack itemStack, float x, float y) {
+    private void renderItemName(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
+    {
         String itemName = itemStack.getName().getString();
         float width = mc.textRenderer.getWidth(itemName) / 4.0f;
         drawText(matrixStack, itemName, (x - width) * 2, y * 2, -1);
     }
 
-    private String getNametagInfo(PlayerEntity player) {
+    private String getNametagInfo(PlayerEntity player)
+    {
         final StringBuilder info = new StringBuilder(player.getName().getString());
         info.append(" ");
-        if (entityIdConfig.getValue()) {
+        if (entityIdConfig.getValue())
+        {
             info.append("ID: ");
             info.append(player.getId());
             info.append(" ");
         }
-        if (gamemodeConfig.getValue()) {
-            if (player.isCreative()) {
+        if (gamemodeConfig.getValue())
+        {
+            if (player.isCreative())
+            {
                 info.append("[C] ");
-            } else if (player.isSpectator()) {
+            }
+            else if (player.isSpectator())
+            {
                 info.append("[I] ");
-            } else {
+            }
+            else
+            {
                 info.append("[S] ");
             }
         }
-        if (pingConfig.getValue() && mc.getNetworkHandler() != null) {
+        if (pingConfig.getValue() && mc.getNetworkHandler() != null)
+        {
             PlayerListEntry playerEntry = mc.getNetworkHandler().getPlayerListEntry(player.getGameProfile().getId());
-            if (playerEntry != null) {
+            if (playerEntry != null)
+            {
                 info.append(playerEntry.getLatency());
                 info.append("ms ");
             }
         }
-        if (healthConfig.getValue()) {
+        if (healthConfig.getValue())
+        {
             double health = Math.ceil(player.getHealth() + player.getAbsorptionAmount());
 
             Formatting hcolor;
-            if (health > 18) {
+            if (health > 18)
+            {
                 hcolor = Formatting.GREEN;
-            } else if (health > 16) {
+            }
+            else if (health > 16)
+            {
                 hcolor = Formatting.DARK_GREEN;
-            } else if (health > 12) {
+            }
+            else if (health > 12)
+            {
                 hcolor = Formatting.YELLOW;
-            } else if (health > 8) {
+            }
+            else if (health > 8)
+            {
                 hcolor = Formatting.GOLD;
-            } else if (health > 4) {
+            }
+            else if (health > 4)
+            {
                 hcolor = Formatting.RED;
-            } else {
+            }
+            else
+            {
                 hcolor = Formatting.DARK_RED;
             }
             int phealth = (int) health;
@@ -417,25 +498,32 @@ public class NametagsModule extends ToggleModule {
             info.append(phealth);
             info.append(" ");
         }
-        if (totemsConfig.getValue() && player != mc.player) {
+        if (totemsConfig.getValue() && player != mc.player)
+        {
             int totems = Managers.TOTEM.getTotems(player);
-            if (totems > 0) {
+            if (totems > 0)
+            {
 
                 Formatting pcolor = Formatting.GREEN;
 
-                if (totems > 1) {
+                if (totems > 1)
+                {
                     pcolor = Formatting.DARK_GREEN;
                 }
-                if (totems > 2) {
+                if (totems > 2)
+                {
                     pcolor = Formatting.YELLOW;
                 }
-                if (totems > 3) {
+                if (totems > 3)
+                {
                     pcolor = Formatting.GOLD;
                 }
-                if (totems > 4) {
+                if (totems > 4)
+                {
                     pcolor = Formatting.RED;
                 }
-                if (totems > 5) {
+                if (totems > 5)
+                {
                     pcolor = Formatting.DARK_RED;
                 }
                 info.append(pcolor);
@@ -446,27 +534,34 @@ public class NametagsModule extends ToggleModule {
         return info.toString().trim();
     }
 
-    private int getNametagColor(PlayerEntity player) {
-        if (player == mc.player) {
+    private int getNametagColor(PlayerEntity player)
+    {
+        if (player == mc.player)
+        {
             return ColorsModule.getInstance().getRGB(255);
         }
-        if (Managers.SOCIAL.isFriend(player.getName())) {
+        if (Managers.SOCIAL.isFriend(player.getName()))
+        {
             return 0xff66ffff;
         }
-        if (player.isInvisible()) {
+        if (player.isInvisible())
+        {
             return 0xffff2500;
         }
         // fakeplayer
-        if (player instanceof FakePlayerEntity) {
+        if (player instanceof FakePlayerEntity)
+        {
             return 0xffef0147;
         }
-        if (player.isSneaking()) {
+        if (player.isSneaking())
+        {
             return 0xffff9900;
         }
         return 0xffffffff;
     }
 
-    public float getScaling() {
+    public float getScaling()
+    {
         return scalingConfig.getValue();
     }
 }

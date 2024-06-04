@@ -5,14 +5,17 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class EntityOutlineEvent extends Event {
+public class EntityOutlineEvent extends Event
+{
     private final Entity entity;
 
-    public EntityOutlineEvent(Entity entity) {
+    public EntityOutlineEvent(Entity entity)
+    {
         this.entity = entity;
     }
 
-    public Entity getEntity() {
+    public Entity getEntity()
+    {
         return entity;
     }
 }

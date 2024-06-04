@@ -8,7 +8,8 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class ChatKeyInputEvent extends Event {
+public class ChatKeyInputEvent extends Event
+{
     //
     private final int keycode;
     private String chatText;
@@ -17,20 +18,24 @@ public class ChatKeyInputEvent extends Event {
      * @param keycode
      * @param chatText
      */
-    public ChatKeyInputEvent(int keycode, String chatText) {
+    public ChatKeyInputEvent(int keycode, String chatText)
+    {
         this.keycode = keycode;
         this.chatText = chatText;
     }
 
-    public int getKeycode() {
+    public int getKeycode()
+    {
         return keycode;
     }
 
-    public String getChatText() {
+    public String getChatText()
+    {
         return chatText;
     }
 
-    public void setChatText(String chatText) {
+    public void setChatText(String chatText)
+    {
         this.chatText = chatText;
     }
 }

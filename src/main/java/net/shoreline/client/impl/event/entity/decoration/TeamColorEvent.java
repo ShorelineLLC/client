@@ -8,23 +8,28 @@ import net.shoreline.eventbus.Event;
  *
  */
 @Cancelable
-public class TeamColorEvent extends Event {
+public class TeamColorEvent extends Event
+{
     private final Entity entity;
     private int color;
 
-    public TeamColorEvent(Entity entity) {
+    public TeamColorEvent(Entity entity)
+    {
         this.entity = entity;
     }
 
-    public Entity getEntity() {
+    public Entity getEntity()
+    {
         return entity;
     }
 
-    public int getColor() {
+    public int getColor()
+    {
         return color;
     }
 
-    public void setColor(int color) {
+    public void setColor(int color)
+    {
         this.color = color;
     }
 }

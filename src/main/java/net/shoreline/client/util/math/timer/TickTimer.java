@@ -1,9 +1,9 @@
 package net.shoreline.client.util.math.timer;
 
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.eventbus.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.bus.EventBus;
-import net.shoreline.client.impl.event.TickEvent;
 
 /**
  * TODO: Test the accuracy of ticks
@@ -12,14 +12,16 @@ import net.shoreline.client.impl.event.TickEvent;
  * @see Timer
  * @since 1.0
  */
-public class TickTimer implements Timer {
+public class TickTimer implements Timer
+{
     //
     private long ticks;
 
     /**
      *
      */
-    public TickTimer() {
+    public TickTimer()
+    {
         ticks = 0;
         EventBus.INSTANCE.subscribe(this);
     }
@@ -28,8 +30,10 @@ public class TickTimer implements Timer {
      * @param event
      */
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() == StageEvent.EventStage.PRE) {
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.PRE)
+        {
             ++ticks;
         }
     }
@@ -43,7 +47,8 @@ public class TickTimer implements Timer {
      * the param time
      */
     @Override
-    public boolean passed(Number time) {
+    public boolean passed(Number time)
+    {
         return ticks >= time.longValue();
     }
 
@@ -51,7 +56,8 @@ public class TickTimer implements Timer {
      *
      */
     @Override
-    public void reset() {
+    public void reset()
+    {
         setElapsedTime(0);
     }
 
@@ -59,7 +65,8 @@ public class TickTimer implements Timer {
      * @return
      */
     @Override
-    public long getElapsedTime() {
+    public long getElapsedTime()
+    {
         return ticks;
     }
 
@@ -67,7 +74,8 @@ public class TickTimer implements Timer {
      * @param time
      */
     @Override
-    public void setElapsedTime(Number time) {
+    public void setElapsedTime(Number time)
+    {
         ticks = time.longValue();
     }
 }

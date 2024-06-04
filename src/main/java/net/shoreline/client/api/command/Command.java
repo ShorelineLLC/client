@@ -13,7 +13,8 @@ import net.shoreline.client.util.Globals;
  * @author linus
  * @since 1.0
  */
-public abstract class Command implements Globals {
+public abstract class Command implements Globals
+{
     //
     private final String name;
     private final String desc;
@@ -24,7 +25,8 @@ public abstract class Command implements Globals {
      * @param desc
      * @param builder
      */
-    public Command(String name, String desc, LiteralArgumentBuilder<CommandSource> builder) {
+    public Command(String name, String desc, LiteralArgumentBuilder<CommandSource> builder)
+    {
         this.name = name;
         this.desc = desc;
         this.builder = builder;
@@ -32,29 +34,36 @@ public abstract class Command implements Globals {
 
     public abstract void buildCommand(LiteralArgumentBuilder<CommandSource> builder);
 
-    protected static LiteralArgumentBuilder<CommandSource> literal(String name) {
+    protected static LiteralArgumentBuilder<CommandSource> literal(String name)
+    {
         return LiteralArgumentBuilder.literal(name);
     }
-    protected static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type) {
+
+    protected static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type)
+    {
         return RequiredArgumentBuilder.argument(name, type);
     }
 
-    protected static SuggestionProvider<CommandSource> suggest(String... suggestions) {
+    protected static SuggestionProvider<CommandSource> suggest(String... suggestions)
+    {
         return (context, builder) -> CommandSource.suggestMatching(Lists.newArrayList(suggestions), builder);
     }
 
     /**
      * @return
      */
-    public LiteralArgumentBuilder<CommandSource> getCommandBuilder() {
+    public LiteralArgumentBuilder<CommandSource> getCommandBuilder()
+    {
         return builder;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return desc;
     }
 
@@ -64,7 +73,8 @@ public abstract class Command implements Globals {
      *
      * @return
      */
-    public String getUsage() {
+    public String getUsage()
+    {
         return Managers.COMMAND.getDispatcher().getAllUsage(builder.build(), Managers.COMMAND.getSource(), false)[0];
     }
 }

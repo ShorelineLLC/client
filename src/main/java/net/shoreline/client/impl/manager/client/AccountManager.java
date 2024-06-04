@@ -53,7 +53,6 @@ public final class AccountManager implements Globals
     }
 
     /**
-     *
      * @param account
      */
     public void unregister(final MinecraftAccount account)
@@ -75,7 +74,8 @@ public final class AccountManager implements Globals
         return accounts;
     }
 
-    public boolean isEncrypted() {
+    public boolean isEncrypted()
+    {
         return configFile instanceof EncryptedAccountFile;
     }
 }

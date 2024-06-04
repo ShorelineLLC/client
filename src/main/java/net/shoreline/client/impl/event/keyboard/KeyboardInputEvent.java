@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.keyboard;
 
+import net.shoreline.client.mixin.MixinKeyboard;
 import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
-import net.shoreline.client.mixin.MixinKeyboard;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -13,7 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Cancelable
-public class KeyboardInputEvent extends Event {
+public class KeyboardInputEvent extends Event
+{
     // The inputted keycode in GLFW format
     private final int keycode;
 
@@ -21,11 +22,11 @@ public class KeyboardInputEvent extends Event {
     private final int action;
 
     /**
-     *
      * @param keycode
      * @param action
      */
-    public KeyboardInputEvent(int keycode, int action) {
+    public KeyboardInputEvent(int keycode, int action)
+    {
         this.keycode = keycode;
         this.action = action;
     }
@@ -36,16 +37,19 @@ public class KeyboardInputEvent extends Event {
      * @return The input key
      * @see #keycode
      */
-    public int getKeycode() {
+    public int getKeycode()
+    {
         return keycode;
     }
 
     /**
-     *  Returns the action performed on the {@link org.lwjgl.glfw.GLFW} key
+     * Returns the action performed on the {@link org.lwjgl.glfw.GLFW} key
+     *
      * @return The current action
      * @see #action
      */
-    public int getAction() {
+    public int getAction()
+    {
         return action;
     }
 }

@@ -13,21 +13,25 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HandledScreen.class)
-public class MixinHandledScreen {
+public class MixinHandledScreen
+{
 
     @Shadow
     @Nullable
     protected Slot focusedSlot;
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "HEAD"), cancellable = true)
-    private void hookDrawMouseoverTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (focusedSlot == null) {
+    private void hookDrawMouseoverTooltip(DrawContext context, int x, int y, CallbackInfo ci)
+    {
+        if (focusedSlot == null)
+        {
             return;
         }
         RenderTooltipEvent renderTooltipEvent =
                 new RenderTooltipEvent(context, focusedSlot.getStack(), x, y);
         EventBus.INSTANCE.dispatch(renderTooltipEvent);
-        if (renderTooltipEvent.isCanceled()) {
+        if (renderTooltipEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

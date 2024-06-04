@@ -13,13 +13,15 @@ import net.shoreline.client.util.render.animation.Animation;
  * @see Config
  * @since 1.0
  */
-public class CheckboxButton extends ConfigButton<Boolean> {
+public class CheckboxButton extends ConfigButton<Boolean>
+{
 
     /**
      * @param frame
      * @param config
      */
-    public CheckboxButton(CategoryFrame frame, ModuleButton moduleButton, Config<Boolean> config, float x, float y) {
+    public CheckboxButton(CategoryFrame frame, ModuleButton moduleButton, Config<Boolean> config, float x, float y)
+    {
         super(frame, moduleButton, config, x, y);
         config.getAnimation().setState(config.getValue());
     }
@@ -34,7 +36,8 @@ public class CheckboxButton extends ConfigButton<Boolean> {
      */
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX,
-                       float mouseY, float delta) {
+                       float mouseY, float delta)
+    {
         x = ix;
         y = iy;
         Animation checkboxAnimation = config.getAnimation();
@@ -50,9 +53,12 @@ public class CheckboxButton extends ConfigButton<Boolean> {
      * @param button
      */
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (isWithin(mouseX, mouseY)) {
-            if (button == 0) {
+    public void mouseClicked(double mouseX, double mouseY, int button)
+    {
+        if (isWithin(mouseX, mouseY))
+        {
+            if (button == 0)
+            {
                 boolean val = config.getValue();
                 config.setValue(!val);
             }
@@ -65,7 +71,8 @@ public class CheckboxButton extends ConfigButton<Boolean> {
      * @param button
      */
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    public void mouseReleased(double mouseX, double mouseY, int button)
+    {
 
     }
 
@@ -75,7 +82,8 @@ public class CheckboxButton extends ConfigButton<Boolean> {
      * @param modifiers
      */
     @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers)
+    {
 
     }
 

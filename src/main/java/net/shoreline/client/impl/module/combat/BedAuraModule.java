@@ -7,11 +7,13 @@ import net.shoreline.client.api.module.ToggleModule;
  * @author linus
  * @since 1.0
  */
-public class BedAuraModule extends ToggleModule {
+public class BedAuraModule extends ToggleModule
+{
     /**
      *
      */
-    public BedAuraModule() {
+    public BedAuraModule()
+    {
         super("BedAura", "Automatically places and explodes beds",
                 ModuleCategory.COMBAT);
     }

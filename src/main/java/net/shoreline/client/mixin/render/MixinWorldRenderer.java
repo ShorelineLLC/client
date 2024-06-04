@@ -25,7 +25,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(WorldRenderer.class)
-public class MixinWorldRenderer implements Globals {
+public class MixinWorldRenderer implements Globals
+{
 
     /**
      * @param matrices
@@ -43,7 +44,8 @@ public class MixinWorldRenderer implements Globals {
                             long limitTime, boolean renderBlockOutline,
                             Camera camera, GameRenderer gameRenderer,
                             LightmapTextureManager lightmapTextureManager,
-                            Matrix4f positionMatrix, CallbackInfo ci) {
+                            Matrix4f positionMatrix, CallbackInfo ci)
+    {
         Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
         matrices.translate(-pos.x, -pos.y, -pos.z);
 
@@ -57,31 +59,37 @@ public class MixinWorldRenderer implements Globals {
      * @param ci
      */
     @Inject(method = "renderWorldBorder", at = @At(value = "HEAD"), cancellable = true)
-    private void hookRenderWorldBorder(Camera camera, CallbackInfo ci) {
+    private void hookRenderWorldBorder(Camera camera, CallbackInfo ci)
+    {
         RenderWorldBorderEvent renderWorldBorderEvent =
                 new RenderWorldBorderEvent();
         EventBus.INSTANCE.dispatch(renderWorldBorderEvent);
-        if (renderWorldBorderEvent.isCanceled()) {
+        if (renderWorldBorderEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;isThirdPerson()Z"))
-    public boolean hookRender(Camera instance) {
+    public boolean hookRender(Camera instance)
+    {
         PerspectiveEvent perspectiveEvent = new PerspectiveEvent(instance);
         EventBus.INSTANCE.dispatch(perspectiveEvent);
 
-        if (perspectiveEvent.isCanceled()) {
+        if (perspectiveEvent.isCanceled())
+        {
             return true;
         }
         return instance.isThirdPerson();
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/PostEffectProcessor;render(F)V", ordinal = 0))
-    private void hookRender$1(PostEffectProcessor instance, float tickDelta) {
+    private void hookRender$1(PostEffectProcessor instance, float tickDelta)
+    {
         RenderShaderEvent renderOutlineShaderEvent = new RenderShaderEvent();
         EventBus.INSTANCE.dispatch(renderOutlineShaderEvent);
-        if (!renderOutlineShaderEvent.isCanceled()) {
+        if (!renderOutlineShaderEvent.isCanceled())
+        {
             instance.render(tickDelta);
         }
     }

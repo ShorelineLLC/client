@@ -13,7 +13,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
-public class HistoryCommand extends Command {
+public class HistoryCommand extends Command
+{
 
     public HistoryCommand()
     {

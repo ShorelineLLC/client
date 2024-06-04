@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(LightmapTextureManager.class)
-public interface AccessorLightmapTextureManager {
+public interface AccessorLightmapTextureManager
+{
     /**
      * @param dirty
      */

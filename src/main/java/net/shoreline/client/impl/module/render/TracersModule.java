@@ -10,13 +10,13 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
 
@@ -24,7 +24,8 @@ import java.awt.*;
  * @author linus
  * @since 1.0
  */
-public class TracersModule extends ToggleModule {
+public class TracersModule extends ToggleModule
+{
 
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render tracers to player", true));
     Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue()));
@@ -41,14 +42,17 @@ public class TracersModule extends ToggleModule {
     Config<Target> targetConfig = register(new EnumConfig<>("Target", "The body part of the entity to target", Target.FEET, Target.values()));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.5f, 10.0f));
 
-    public TracersModule() {
+    public TracersModule()
+    {
         super("Tracers", "Draws a tracer to all entities in render distance",
                 ModuleCategory.RENDER);
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event) {
-        if (mc.player == null) {
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        if (mc.player == null)
+        {
             return;
         }
         RenderBuffers.preRender();
@@ -59,12 +63,15 @@ public class TracersModule extends ToggleModule {
                 .rotateX(-(float) Math.toRadians(cameraPos.getPitch()))
                 .rotateY(-(float) Math.toRadians(cameraPos.getYaw()))
                 .add(mc.cameraEntity.getEyePos());
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity == null || !entity.isAlive() || entity == mc.player) {
+        for (Entity entity : mc.world.getEntities())
+        {
+            if (entity == null || !entity.isAlive() || entity == mc.player)
+            {
                 continue;
             }
             Color color = getTracerColor(entity);
-            if (color != null) {
+            if (color != null)
+            {
                 // Vec3d entityPos = Interpolation.getRenderPosition(entity, event.getTickDelta()).add(0.0, getTargetY(entity), 0.0);
                 // RenderManager.renderLine(event.getMatrices(), pos, entityPos, widthConfig.getValue(), color.getRGB());
             }
@@ -73,36 +80,52 @@ public class TracersModule extends ToggleModule {
         RenderBuffers.postRender();
     }
 
-    private Color getTracerColor(Entity entity) {
-        if (entity.isInvisible() && invisiblesConfig.getValue()) {
+    private Color getTracerColor(Entity entity)
+    {
+        if (entity.isInvisible() && invisiblesConfig.getValue())
+        {
             return invisiblesColorConfig.getValue();
-        } else if (entity instanceof PlayerEntity player && playersConfig.getValue()) {
-            if (Managers.SOCIAL.isFriend(player.getName())) {
+        }
+        else if (entity instanceof PlayerEntity player && playersConfig.getValue())
+        {
+            if (Managers.SOCIAL.isFriend(player.getName()))
+            {
                 return new Color(85, 200, 200, 255);
             }
             return playersColorConfig.getValue();
-        } else if (EntityUtil.isMonster(entity) && monstersConfig.getValue()) {
+        }
+        else if (EntityUtil.isMonster(entity) && monstersConfig.getValue())
+        {
             return monstersColorConfig.getValue();
-        } else if ((EntityUtil.isPassive(entity) || EntityUtil.isNeutral(entity))
-                && animalsConfig.getValue()) {
+        }
+        else if ((EntityUtil.isPassive(entity) || EntityUtil.isNeutral(entity))
+                && animalsConfig.getValue())
+        {
             return animalsColorConfig.getValue();
-        } else if (EntityUtil.isVehicle(entity) && vehiclesConfig.getValue()) {
+        }
+        else if (EntityUtil.isVehicle(entity) && vehiclesConfig.getValue())
+        {
             return vehiclesColorConfig.getValue();
-        } else if (entity instanceof ItemEntity && itemsConfig.getValue()) {
+        }
+        else if (entity instanceof ItemEntity && itemsConfig.getValue())
+        {
             return itemsColorConfig.getValue();
         }
         return null;
     }
 
-    private double getTargetY(Entity entity) {
-        return switch (targetConfig.getValue()) {
+    private double getTargetY(Entity entity)
+    {
+        return switch (targetConfig.getValue())
+        {
             case FEET -> 0.0;
             case TORSO -> entity.getHeight() / 2.0;
             case HEAD -> entity.getStandingEyeHeight();
         };
     }
 
-    public enum Target {
+    public enum Target
+    {
         FEET,
         TORSO,
         HEAD

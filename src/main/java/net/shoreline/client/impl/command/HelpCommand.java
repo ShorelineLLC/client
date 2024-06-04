@@ -11,12 +11,14 @@ import net.shoreline.client.util.chat.ChatUtil;
  * @author linus
  * @since 1.0
  */
-public class HelpCommand extends Command {
+public class HelpCommand extends Command
+{
 
     /**
      *
      */
-    public HelpCommand() {
+    public HelpCommand()
+    {
         super("Help", "Displays command functionality", literal("help"));
     }
 
@@ -24,21 +26,27 @@ public class HelpCommand extends Command {
      * @param command
      * @return
      */
-    private static String toHelpMessage(Command command) {
+    private static String toHelpMessage(Command command)
+    {
         return String.format("%s %s- %s", command.getName(),
                 command.getUsage(), command.getDescription());
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.then(argument("command", CommandArgumentType.command()).executes(c -> {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
+        builder.then(argument("command", CommandArgumentType.command()).executes(c ->
+        {
             final Command command = CommandArgumentType.getCommand(c, "command");
             ChatUtil.clientSendMessage(toHelpMessage(command));
             return 1;
-        })).executes(c -> {
+        })).executes(c ->
+        {
             ChatUtil.clientSendMessageRaw("§s[Commands Help]");
-            for (Command c1 : Managers.COMMAND.getCommands()) {
-                if (c1 instanceof ModuleCommand) {
+            for (Command c1 : Managers.COMMAND.getCommands())
+            {
+                if (c1 instanceof ModuleCommand)
+                {
                     continue;
                 }
                 ChatUtil.clientSendMessageRaw(toHelpMessage(c1));

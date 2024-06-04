@@ -20,7 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChatInputSuggestor.class)
-public abstract class MixinChatInputSuggestor {
+public abstract class MixinChatInputSuggestor
+{
 
     @Shadow
     private ParseResults<CommandSource> parse;
@@ -44,19 +45,25 @@ public abstract class MixinChatInputSuggestor {
 
     @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/" +
             "StringReader;canRead()Z", remap = false), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
-    private void hookRefresh(CallbackInfo ci, String string, StringReader stringReader) {
+    private void hookRefresh(CallbackInfo ci, String string, StringReader stringReader)
+    {
         SuggestChatEvent suggestChatEvent = new SuggestChatEvent();
         EventBus.INSTANCE.dispatch(suggestChatEvent);
-        if (stringReader.getString().startsWith(suggestChatEvent.getPrefix(), stringReader.getCursor())) {
+        if (stringReader.getString().startsWith(suggestChatEvent.getPrefix(), stringReader.getCursor()))
+        {
             stringReader.setCursor(stringReader.getCursor() + 1);
-            if (parse == null) {
+            if (parse == null)
+            {
                 parse = suggestChatEvent.getDispatcher().parse(stringReader, suggestChatEvent.getSource());
             }
             int cursor = textField.getCursor();
-            if (cursor >= 1 && (window == null || !completingSuggestions)) {
+            if (cursor >= 1 && (window == null || !completingSuggestions))
+            {
                 pendingSuggestions = suggestChatEvent.getDispatcher().getCompletionSuggestions(parse, cursor);
-                pendingSuggestions.thenRun(() -> {
-                    if (pendingSuggestions.isDone()) {
+                pendingSuggestions.thenRun(() ->
+                {
+                    if (pendingSuggestions.isDone())
+                    {
                         showCommandSuggestions();
                     }
                 });

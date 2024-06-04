@@ -10,27 +10,33 @@ import net.shoreline.client.impl.module.render.WaypointsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 
-public class WaypointCommand extends Command {
+public class WaypointCommand extends Command
+{
     /**
      *
      */
-    public WaypointCommand() {
+    public WaypointCommand()
+    {
         super("Waypoint", "Adds/Removes a waypoint", literal("waypoint"));
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
         builder.then(argument("add/del", StringArgumentType.string()).suggests(suggest("add", "del", "delete", "remove"))
                 .then(argument("waypoint", StringArgumentType.string())
                         .then(argument("x", DoubleArgumentType.doubleArg()).then(argument("y", DoubleArgumentType.doubleArg()).then(argument("z", DoubleArgumentType.doubleArg())
-                                .executes(c -> {
+                                .executes(c ->
+                                {
                                     String waypointName = StringArgumentType.getString(c, "waypoint");
                                     double x = DoubleArgumentType.getDouble(c, "x");
                                     double y = DoubleArgumentType.getDouble(c, "y");
                                     double z = DoubleArgumentType.getDouble(c, "z");
                                     final String action = StringArgumentType.getString(c, "add/del");
-                                    if (action.equalsIgnoreCase("add")) {
-                                        if (Managers.WAYPOINT.contains(waypointName)) {
+                                    if (action.equalsIgnoreCase("add"))
+                                    {
+                                        if (Managers.WAYPOINT.contains(waypointName))
+                                        {
                                             ChatUtil.error("Waypoint already exist!");
                                             return 0;
                                         }
@@ -40,11 +46,14 @@ public class WaypointCommand extends Command {
                                     }
                                     return 1;
                                 }))))
-                        .executes(c -> {
+                        .executes(c ->
+                        {
                             String waypointName = StringArgumentType.getString(c, "waypoint");
                             final String action = StringArgumentType.getString(c, "add/del");
-                            if (action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("del") || action.equalsIgnoreCase("delete")) {
-                                if (!Managers.WAYPOINT.contains(waypointName)) {
+                            if (action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("del") || action.equalsIgnoreCase("delete"))
+                            {
+                                if (!Managers.WAYPOINT.contains(waypointName))
+                                {
                                     ChatUtil.error("Waypoint does not exist!");
                                     return 0;
                                 }
@@ -52,12 +61,14 @@ public class WaypointCommand extends Command {
                                 Managers.WAYPOINT.remove(waypointName);
                             }
                             return 1;
-                        })).executes(c -> {
-                            ChatUtil.error("Must provide waypoint name!");
-                            return 1;
-                        })).executes(c -> {
-                            ChatUtil.error("Invalid usage! Usage: " + getUsage());
-                            return 1;
-                        });
+                        })).executes(c ->
+                {
+                    ChatUtil.error("Must provide waypoint name!");
+                    return 1;
+                })).executes(c ->
+        {
+            ChatUtil.error("Invalid usage! Usage: " + getUsage());
+            return 1;
+        });
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -23,6 +22,7 @@ import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.TickTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;

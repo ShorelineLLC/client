@@ -19,7 +19,8 @@ import java.util.List;
  * @since 1.0
  */
 @Mixin(Screen.class)
-public abstract class MixinScreen {
+public abstract class MixinScreen
+{
     //
     @Shadow
     public int width;
@@ -51,7 +52,8 @@ public abstract class MixinScreen {
      *
      */
     @Shadow
-    public void tick() {
+    public void tick()
+    {
 
     }
 
@@ -59,7 +61,8 @@ public abstract class MixinScreen {
      * @return
      */
     @Unique
-    public List<Drawable> getDrawables() {
+    public List<Drawable> getDrawables()
+    {
         return drawables;
     }
 }

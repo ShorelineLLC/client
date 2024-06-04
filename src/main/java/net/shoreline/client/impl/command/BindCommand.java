@@ -15,28 +15,35 @@ import org.lwjgl.glfw.GLFW;
  * @author linus
  * @since 1.0
  */
-public class BindCommand extends Command {
+public class BindCommand extends Command
+{
     /**
      *
      */
-    public BindCommand() {
+    public BindCommand()
+    {
         super("Bind", "Keybinds a module", literal("bind"));
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
         builder.then(argument("module", ModuleArgumentType.module())
                 .then(argument("key", StringArgumentType.string())
-                        .executes(c -> {
+                        .executes(c ->
+                        {
                             Module module = ModuleArgumentType.getModule(c, "module");
-                            if (module instanceof ToggleModule t) {
+                            if (module instanceof ToggleModule t)
+                            {
                                 final String key = StringArgumentType.getString(c, "key");
-                                if (key == null) {
+                                if (key == null)
+                                {
                                     ChatUtil.error("Invalid key!");
                                     return 0;
                                 }
                                 int keycode = KeyboardUtil.getKeyCode(key);
-                                if (keycode == GLFW.GLFW_KEY_UNKNOWN) {
+                                if (keycode == GLFW.GLFW_KEY_UNKNOWN)
+                                {
                                     ChatUtil.error("Failed to parse key!");
                                     return 0;
                                 }
@@ -45,12 +52,14 @@ public class BindCommand extends Command {
                             }
                             return 1;
                         }))
-                .executes(c -> {
+                .executes(c ->
+                {
                     ChatUtil.error("Must provide a module to keybind!");
                     return 1;
-                })).executes(c -> {
-                    ChatUtil.error("Invalid usage! Usage: " + getUsage());
-                    return 1;
-                });
+                })).executes(c ->
+        {
+            ChatUtil.error("Invalid usage! Usage: " + getUsage());
+            return 1;
+        });
     }
 }

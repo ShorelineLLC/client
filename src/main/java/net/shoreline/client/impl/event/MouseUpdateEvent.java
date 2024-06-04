@@ -4,21 +4,25 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class MouseUpdateEvent extends Event {
+public class MouseUpdateEvent extends Event
+{
 
     private final double cursorDeltaX;
     private final double cursorDeltaY;
 
-    public MouseUpdateEvent(double cursorDeltaX, double cursorDeltaY) {
+    public MouseUpdateEvent(double cursorDeltaX, double cursorDeltaY)
+    {
         this.cursorDeltaX = cursorDeltaX;
         this.cursorDeltaY = cursorDeltaY;
     }
 
-    public double getCursorDeltaX() {
+    public double getCursorDeltaX()
+    {
         return cursorDeltaX;
     }
 
-    public double getCursorDeltaY() {
+    public double getCursorDeltaY()
+    {
         return cursorDeltaY;
     }
 }

@@ -33,7 +33,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 03/28/24
  */
 @Mixin(TitleScreen.class)
-public abstract class MixinTitleScreen extends Screen {
+public abstract class MixinTitleScreen extends Screen
+{
 
     @Shadow
     @Nullable
@@ -63,16 +64,19 @@ public abstract class MixinTitleScreen extends Screen {
     @Final
     private boolean doBackgroundFade;
 
-    public MixinTitleScreen(Text title) {
+    public MixinTitleScreen(Text title)
+    {
         super(title);
     }
 
     @Inject(method = "render", at = @At("TAIL"))
-    public void hookRender(final DrawContext context, final int mouseX, final int mouseY, final float delta, final CallbackInfo info) {
-        float f = this.doBackgroundFade ? (float)(Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 1000.0f : 1.0f;
+    public void hookRender(final DrawContext context, final int mouseX, final int mouseY, final float delta, final CallbackInfo info)
+    {
+        float f = this.doBackgroundFade ? (float) (Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 1000.0f : 1.0f;
         float g = this.doBackgroundFade ? MathHelper.clamp(f - 1.0f, 0.0f, 1.0f) : 1.0f;
         int i = MathHelper.ceil(g * 255.0f) << 24;
-        if ((i & 0xFC000000) == 0) {
+        if ((i & 0xFC000000) == 0)
+        {
             return;
         }
         context.drawTextWithShadow(client.textRenderer,
@@ -84,31 +88,38 @@ public abstract class MixinTitleScreen extends Screen {
 
     // Autism
     @Inject(method = "init", at = @At(value = "HEAD"), cancellable = true)
-    private void hookInit(CallbackInfo ci) {
+    private void hookInit(CallbackInfo ci)
+    {
         ci.cancel();
-        if (this.splashText == null) {
+        if (this.splashText == null)
+        {
             this.splashText = this.client.getSplashTextLoader().get();
         }
         int i = this.textRenderer.getWidth(COPYRIGHT);
         int j = this.width - i - 2;
         int k = 24;
         int l = this.height / 4 + 48;
-        if (this.client.isDemo()) {
+        if (this.client.isDemo())
+        {
             this.initWidgetsDemo(l, 24);
-        } else {
+        }
+        else
+        {
             this.initWidgetsNormal(l, 24);
         }
-        TextIconButtonWidget textIconButtonWidget = this.addDrawableChild(AccessibilityOnboardingButtons.createLanguageButton(20, button -> this.client.setScreen(new LanguageOptionsScreen((Screen)this, this.client.options, this.client.getLanguageManager())), true));
+        TextIconButtonWidget textIconButtonWidget = this.addDrawableChild(AccessibilityOnboardingButtons.createLanguageButton(20, button -> this.client.setScreen(new LanguageOptionsScreen(this, this.client.options, this.client.getLanguageManager())), true));
         textIconButtonWidget.setPosition(this.width / 2 - 124, l + 72 + 24);
         this.addDrawableChild(ButtonWidget.builder(Text.translatable("menu.options"), button -> this.client.setScreen(new OptionsScreen(this, this.client.options))).dimensions(this.width / 2 - 100, l + 72 + 24, 98, 20).build());
         this.addDrawableChild(ButtonWidget.builder(Text.translatable("menu.quit"), button -> this.client.scheduleStop()).dimensions(this.width / 2 + 2, l + 72 + 24, 98, 20).build());
         TextIconButtonWidget textIconButtonWidget2 = this.addDrawableChild(AccessibilityOnboardingButtons.createAccessibilityButton(20, button -> this.client.setScreen(new AccessibilityOptionsScreen(this, this.client.options)), true));
         textIconButtonWidget2.setPosition(this.width / 2 + 104, l + 72 + 24);
         this.addDrawableChild(new PressableTextWidget(j, this.height - 10, i, 10, COPYRIGHT, button -> this.client.setScreen(new CreditsAndAttributionScreen(this)), this.textRenderer));
-        if (this.realmsNotificationGui == null) {
+        if (this.realmsNotificationGui == null)
+        {
             this.realmsNotificationGui = new RealmsNotificationsScreen();
         }
-        if (this.isRealmsNotificationsGuiDisplayed()) {
+        if (this.isRealmsNotificationsGuiDisplayed())
+        {
             this.realmsNotificationGui.init(this.client, this.width, this.height);
         }
     }
@@ -116,12 +127,13 @@ public abstract class MixinTitleScreen extends Screen {
     @Inject(method = "initWidgetsNormal", at = @At(
             target = "Lnet/minecraft/client/gui/screen/TitleScreen;addDrawableChild(Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;",
             value = "INVOKE", shift = At.Shift.AFTER, ordinal = 2))
-    public void hookInit(int y, int spacingY, CallbackInfo ci) {
+    public void hookInit(int y, int spacingY, CallbackInfo ci)
+    {
         // parameters from when the method initWidgetsNormal is called
-        final ButtonWidget widget = ButtonWidget.builder(Text.of("Account Manager"), (action) -> client.setScreen(new AccountSelectorScreen((Screen) (Object) this)))
-            .dimensions(this.width / 2 - 100, y + spacingY * 3, 200, 20)
-            .tooltip(Tooltip.of(Text.of("Allows you to switch your in-game account")))
-            .build();
+        final ButtonWidget widget = ButtonWidget.builder(Text.of("Account Manager"), (action) -> client.setScreen(new AccountSelectorScreen((Screen) this)))
+                .dimensions(this.width / 2 - 100, y + spacingY * 3, 200, 20)
+                .tooltip(Tooltip.of(Text.of("Allows you to switch your in-game account")))
+                .build();
         widget.active = true;
         addDrawableChild(widget);
     }

@@ -27,7 +27,8 @@ public final class EncryptedAccountFile extends AccountFile
 
     }
 
-    public void setEncryptionKey(String encryptionKey) {
+    public void setEncryptionKey(String encryptionKey)
+    {
         this.encryptionKey = encryptionKey;
     }
 }

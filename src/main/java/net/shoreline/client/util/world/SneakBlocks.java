@@ -10,12 +10,14 @@ import java.util.Set;
  * @author linus
  * @since 1.0
  */
-public class SneakBlocks {
+public class SneakBlocks
+{
     // Constant set containing the blocks that can only be placed on if the
     // player is holding shift
     private static final Set<Block> SNEAK_BLOCKS;
 
-    static {
+    static
+    {
         SNEAK_BLOCKS = Set.of(
                 Blocks.CHEST,
                 Blocks.ENDER_CHEST,
@@ -43,7 +45,8 @@ public class SneakBlocks {
      * @return <tt>true</tt> if the block state requires sneaking to be
      * placed on
      */
-    public static boolean isSneakBlock(BlockState state) {
+    public static boolean isSneakBlock(BlockState state)
+    {
         return isSneakBlock(state.getBlock());
     }
 
@@ -53,7 +56,8 @@ public class SneakBlocks {
      *
      * @return <tt>true</tt> if the block requires sneaking to be placed on
      */
-    public static boolean isSneakBlock(Block block) {
+    public static boolean isSneakBlock(Block block)
+    {
         return SNEAK_BLOCKS.contains(block);
     }
 }

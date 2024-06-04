@@ -13,7 +13,8 @@ import org.lwjgl.glfw.GLFW;
  * @see MacroManager
  * @since 1.0
  */
-public class Macro implements Identifiable, Serializable<Macro> {
+public class Macro implements Identifiable, Serializable<Macro>
+{
     //
     private final String name;
     // Runnable macro which represents the functionality of the keybind. This
@@ -27,7 +28,8 @@ public class Macro implements Identifiable, Serializable<Macro> {
      * @param keycode
      * @param macro
      */
-    public Macro(String name, int keycode, Runnable macro) {
+    public Macro(String name, int keycode, Runnable macro)
+    {
         this.name = name;
         this.keycode = keycode;
         this.macro = macro;
@@ -36,21 +38,24 @@ public class Macro implements Identifiable, Serializable<Macro> {
     /**
      * @see Runnable#run()
      */
-    public void runMacro() {
+    public void runMacro()
+    {
         macro.run();
     }
 
     /**
      * @return
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
     /**
      * @return
      */
-    public Runnable getRunnable() {
+    public Runnable getRunnable()
+    {
         return macro;
     }
 
@@ -61,14 +66,16 @@ public class Macro implements Identifiable, Serializable<Macro> {
      * @return The macro keycode
      * @see #keycode
      */
-    public int getKeycode() {
+    public int getKeycode()
+    {
         return keycode;
     }
 
     /**
      * @param keycode
      */
-    public void setKeycode(int keycode) {
+    public void setKeycode(int keycode)
+    {
         this.keycode = keycode;
     }
 
@@ -76,7 +83,8 @@ public class Macro implements Identifiable, Serializable<Macro> {
      * @return
      */
     @Override
-    public String getId() {
+    public String getId()
+    {
         return String.format("%s-macro", name.toLowerCase());
     }
 
@@ -88,8 +96,10 @@ public class Macro implements Identifiable, Serializable<Macro> {
      * @see #keycode
      * @see GLFW#glfwGetKeyScancode(int)
      */
-    public String getKeyName() {
-        if (keycode != GLFW.GLFW_KEY_UNKNOWN) {
+    public String getKeyName()
+    {
+        if (keycode != GLFW.GLFW_KEY_UNKNOWN)
+        {
             final String name = KeyboardUtil.getKeyName(keycode);
             return name != null ? name.toUpperCase() : "NONE";
         }
@@ -97,7 +107,8 @@ public class Macro implements Identifiable, Serializable<Macro> {
     }
 
     @Override
-    public JsonObject toJson() {
+    public JsonObject toJson()
+    {
         JsonObject obj = new JsonObject();
         obj.addProperty("id", getId());
         // obj.addProperty("key", getKeyName());
@@ -106,8 +117,10 @@ public class Macro implements Identifiable, Serializable<Macro> {
     }
 
     @Override
-    public Macro fromJson(JsonObject jsonObj) {
-        if (jsonObj.has("value")) {
+    public Macro fromJson(JsonObject jsonObj)
+    {
+        if (jsonObj.has("value"))
+        {
             JsonElement element = jsonObj.get("value");
             return new Macro(getId(), element.getAsInt(), getRunnable());
         }

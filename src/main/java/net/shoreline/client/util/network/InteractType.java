@@ -1,6 +1,7 @@
 package net.shoreline.client.util.network;
 
-public enum InteractType {
+public enum InteractType
+{
     INTERACT,
     ATTACK,
     INTERACT_AT

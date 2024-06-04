@@ -13,11 +13,13 @@ import org.jetbrains.annotations.Nullable;
  * @author linus
  * @since 1.0
  */
-public class SoundManager implements Globals {
+public class SoundManager implements Globals
+{
     //
     public static final WeightedSoundSet EMPTY_SOUND_SET;
 
-    static {
+    static
+    {
         EMPTY_SOUND_SET = new WeightedSoundSet(new Identifier("minecraft",
                 "intentionally_empty"), null);
     }
@@ -25,73 +27,88 @@ public class SoundManager implements Globals {
     /**
      * @param sound
      */
-    public void playSound(final SoundEvents sound) {
-        mc.getSoundManager().play(new SoundInstance() {
+    public void playSound(final SoundEvents sound)
+    {
+        mc.getSoundManager().play(new SoundInstance()
+        {
             @Override
-            public Identifier getId() {
+            public Identifier getId()
+            {
                 return sound.getId();
             }
 
             @Nullable
             @Override
-            public WeightedSoundSet getSoundSet(net.minecraft.client.sound.SoundManager soundManager) {
+            public WeightedSoundSet getSoundSet(net.minecraft.client.sound.SoundManager soundManager)
+            {
                 return EMPTY_SOUND_SET;
             }
 
             @Override
-            public Sound getSound() {
+            public Sound getSound()
+            {
                 return new Sound(sound.name(), ConstantFloatProvider.create(1.0f),
                         ConstantFloatProvider.create(1.0f), 1,
                         Sound.RegistrationType.SOUND_EVENT, false, false, 16);
             }
 
             @Override
-            public SoundCategory getCategory() {
+            public SoundCategory getCategory()
+            {
                 return SoundCategory.PLAYERS;
             }
 
             @Override
-            public boolean isRepeatable() {
+            public boolean isRepeatable()
+            {
                 return false;
             }
 
             @Override
-            public boolean isRelative() {
+            public boolean isRelative()
+            {
                 return false;
             }
 
             @Override
-            public int getRepeatDelay() {
+            public int getRepeatDelay()
+            {
                 return 0;
             }
 
             @Override
-            public float getVolume() {
+            public float getVolume()
+            {
                 return 1.0f;
             }
 
             @Override
-            public float getPitch() {
+            public float getPitch()
+            {
                 return 1.0f;
             }
 
             @Override
-            public double getX() {
+            public double getX()
+            {
                 return mc.player != null ? (float) mc.player.getX() : 0;
             }
 
             @Override
-            public double getY() {
+            public double getY()
+            {
                 return mc.player != null ? (float) mc.player.getY() : 0;
             }
 
             @Override
-            public double getZ() {
+            public double getZ()
+            {
                 return mc.player != null ? (float) mc.player.getZ() : 0;
             }
 
             @Override
-            public AttenuationType getAttenuationType() {
+            public AttenuationType getAttenuationType()
+            {
                 return AttenuationType.LINEAR;
             }
         });

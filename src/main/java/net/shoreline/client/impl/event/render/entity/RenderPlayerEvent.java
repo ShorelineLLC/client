@@ -1,9 +1,9 @@
 package net.shoreline.client.impl.event.render.entity;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.shoreline.client.mixin.render.entity.MixinPlayerEntityRenderer;
 import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
-import net.shoreline.client.mixin.render.entity.MixinPlayerEntityRenderer;
 
 /**
  * @author linus
@@ -11,7 +11,8 @@ import net.shoreline.client.mixin.render.entity.MixinPlayerEntityRenderer;
  * @since 1.0
  */
 @Cancelable
-public class RenderPlayerEvent extends Event {
+public class RenderPlayerEvent extends Event
+{
     //
     private final AbstractClientPlayerEntity entity;
     //
@@ -21,31 +22,37 @@ public class RenderPlayerEvent extends Event {
     /**
      * @param entity
      */
-    public RenderPlayerEvent(AbstractClientPlayerEntity entity) {
+    public RenderPlayerEvent(AbstractClientPlayerEntity entity)
+    {
         this.entity = entity;
     }
 
     /**
      * @return
      */
-    public AbstractClientPlayerEntity getEntity() {
+    public AbstractClientPlayerEntity getEntity()
+    {
         return entity;
     }
 
 
-    public float getYaw() {
+    public float getYaw()
+    {
         return yaw;
     }
 
-    public void setYaw(float yaw) {
+    public void setYaw(float yaw)
+    {
         this.yaw = yaw;
     }
 
-    public float getPitch() {
+    public float getPitch()
+    {
         return pitch;
     }
 
-    public void setPitch(float pitch) {
+    public void setPitch(float pitch)
+    {
         this.pitch = pitch;
     }
 }

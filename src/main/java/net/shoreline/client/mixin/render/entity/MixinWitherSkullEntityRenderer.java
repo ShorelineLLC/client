@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(WitherSkullEntityRenderer.class)
-public class MixinWitherSkullEntityRenderer {
+public class MixinWitherSkullEntityRenderer
+{
     /**
      * @param witherSkullEntity
      * @param f
@@ -32,11 +33,13 @@ public class MixinWitherSkullEntityRenderer {
     private void hookRender(WitherSkullEntity witherSkullEntity, float f,
                             float g, MatrixStack matrixStack,
                             VertexConsumerProvider vertexConsumerProvider,
-                            int i, CallbackInfo ci) {
+                            int i, CallbackInfo ci)
+    {
         RenderWitherSkullEvent renderWitherSkullEvent =
                 new RenderWitherSkullEvent();
         EventBus.INSTANCE.dispatch(renderWitherSkullEvent);
-        if (renderWitherSkullEvent.isCanceled()) {
+        if (renderWitherSkullEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.Set;
 
 @Mixin(GameOptions.class)
-public interface AccessorGameOptions {
+public interface AccessorGameOptions
+{
     /**
      * @return
      */

@@ -22,7 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(ClientPlayNetworkHandler.class)
-public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetworkHandler {
+public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetworkHandler
+{
     @Shadow
     public abstract ClientConnection getConnection();
 
@@ -32,12 +33,14 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
      */
     @Inject(method = "sendChatMessage", at = @At(value = "HEAD"),
             cancellable = true)
-    private void hookSendChatMessage(String content, CallbackInfo ci) {
+    private void hookSendChatMessage(String content, CallbackInfo ci)
+    {
         ChatMessageEvent.Server chatInputEvent =
                 new ChatMessageEvent.Server(content);
         EventBus.INSTANCE.dispatch(chatInputEvent);
         // prevent chat packet from sending
-        if (chatInputEvent.isCanceled()) {
+        if (chatInputEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -47,7 +50,8 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
      * @param ci
      */
     @Inject(method = "onGameJoin", at = @At(value = "TAIL"))
-    private void hookOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
+    private void hookOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci)
+    {
         GameJoinEvent gameJoinEvent = new GameJoinEvent();
         EventBus.INSTANCE.dispatch(gameJoinEvent);
     }
@@ -57,13 +61,15 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
      * @param ci
      */
     @Inject(method = "onInventory", at = @At(value = "TAIL"))
-    private void hookOnInventory(InventoryS2CPacket packet, CallbackInfo ci) {
+    private void hookOnInventory(InventoryS2CPacket packet, CallbackInfo ci)
+    {
         InventoryEvent inventoryEvent = new InventoryEvent(packet);
         EventBus.INSTANCE.dispatch(inventoryEvent);
     }
 
     @Override
-    public void sendQuietPacket(Packet<?> packet) {
+    public void sendQuietPacket(Packet<?> packet)
+    {
         ((AccessorClientConnection) getConnection()).hookSendInternal(packet, null, true);
     }
 }

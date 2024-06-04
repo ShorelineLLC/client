@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(ChunkSkyLightProvider.class)
-public class MixinChunkSkylightProvider {
+public class MixinChunkSkylightProvider
+{
     /**
      * @param blockPos
      * @param l
@@ -22,10 +23,12 @@ public class MixinChunkSkylightProvider {
      * @param ci
      */
     @Inject(method = "method_51531", at = @At(value = "HEAD"), cancellable = true)
-    private void hookRecalculateLevel(long blockPos, long l, int lightLevel, CallbackInfo ci) {
+    private void hookRecalculateLevel(long blockPos, long l, int lightLevel, CallbackInfo ci)
+    {
         RenderSkylightEvent renderSkylightEvent = new RenderSkylightEvent();
         EventBus.INSTANCE.dispatch(renderSkylightEvent);
-        if (renderSkylightEvent.isCanceled()) {
+        if (renderSkylightEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

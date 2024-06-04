@@ -11,25 +11,31 @@ import net.shoreline.client.util.chat.ChatUtil;
  * @author linus
  * @since 1.0
  */
-public class VClipCommand extends Command {
+public class VClipCommand extends Command
+{
     /**
      *
      */
-    public VClipCommand() {
+    public VClipCommand()
+    {
         super("VClip", "Vertically clips the player", literal("vclip"));
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.then(argument("distance", DoubleArgumentType.doubleArg()).executes(c -> {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
+        builder.then(argument("distance", DoubleArgumentType.doubleArg()).executes(c ->
+        {
             double dist = DoubleArgumentType.getDouble(c, "distance");
             double y = Managers.POSITION.getY();
-            if (Math.abs(y) != 256) {
+            if (Math.abs(y) != 256)
+            {
                 Managers.POSITION.setPositionY(y + dist);
                 ChatUtil.clientSendMessage("Vertically clipped §s" + dist + "§f blocks");
             }
             return 1;
-        })).executes(c -> {
+        })).executes(c ->
+        {
             ChatUtil.error("Must provide distance!");
             return 1;
         });

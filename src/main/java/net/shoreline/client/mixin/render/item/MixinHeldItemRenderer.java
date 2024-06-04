@@ -21,7 +21,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HeldItemRenderer.class)
-public class MixinHeldItemRenderer {
+public class MixinHeldItemRenderer
+{
 
     @Shadow
     @Final
@@ -32,7 +33,6 @@ public class MixinHeldItemRenderer {
     private MinecraftClient client;
 
     /**
-     *
      * @param matrices
      * @param vertexConsumers
      * @param light
@@ -40,11 +40,13 @@ public class MixinHeldItemRenderer {
      * @param ci
      */
     @Inject(method = "renderArmHoldingItem", at = @At(value = "HEAD"), cancellable = true)
-    private void hookRenderArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
+    private void hookRenderArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci)
+    {
         PlayerEntityRenderer playerEntityRenderer = (PlayerEntityRenderer) entityRenderDispatcher.getRenderer(client.player);
         RenderArmEvent renderArmEvent = new RenderArmEvent(matrices, vertexConsumers, light, equipProgress, swingProgress, arm, playerEntityRenderer);
         EventBus.INSTANCE.dispatch(renderArmEvent);
-        if (renderArmEvent.isCanceled()) {
+        if (renderArmEvent.isCanceled())
+        {
             ci.cancel();
         }
     }
@@ -71,7 +73,8 @@ public class MixinHeldItemRenderer {
     private void hookRenderFirstPersonItem(AbstractClientPlayerEntity player, float tickDelta,
                                            float pitch, Hand hand, float swingProgress,
                                            ItemStack item, float equipProgress, MatrixStack matrices,
-                                           VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+                                           VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci)
+    {
         RenderFirstPersonEvent renderFirstPersonEvent = new RenderFirstPersonEvent(hand, item, equipProgress, matrices);
         EventBus.INSTANCE.dispatch(renderFirstPersonEvent);
     }

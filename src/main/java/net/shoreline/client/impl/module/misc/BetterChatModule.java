@@ -6,11 +6,10 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
-import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
+import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatLineEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
@@ -18,6 +17,7 @@ import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
 import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.render.animation.TimeAnimation;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,10 +42,13 @@ public class BetterChatModule extends ToggleModule
     }
 
     @EventListener
-    public void onChatText(ChatMessageEvent event) {
-        if (timestampConfig.getValue() != Timestamp.OFF) {
+    public void onChatText(ChatMessageEvent event)
+    {
+        if (timestampConfig.getValue() != Timestamp.OFF)
+        {
             String time = new SimpleDateFormat("k:mm").format(new Date());
-            String text = switch (timestampConfig.getValue()) {
+            String text = switch (timestampConfig.getValue())
+            {
                 case NORMAL -> "<" + time + ">§r ";
                 case GRAY -> "§8<§7" + time + "§8>§r ";
                 case COLOR -> "§s<" + time + ">§r ";
@@ -57,14 +60,17 @@ public class BetterChatModule extends ToggleModule
     }
 
     @EventListener
-    public void onChatLine(ChatLineEvent event) {
+    public void onChatLine(ChatLineEvent event)
+    {
         animationMap.put(event.getChatHudLine(), new TimeAnimation(false, event.getWidth(), 0,
                 timeConfig.getValue(), Easing.LINEAR));
     }
 
     @EventListener
-    public void onChatLineRender(RenderChatHudEvent event) {
-        if (animationConfig.getValue() != AnimationMode.OFF) {
+    public void onChatLineRender(RenderChatHudEvent event)
+    {
+        if (animationConfig.getValue() != AnimationMode.OFF)
+        {
             TimeAnimation animation = null;
             if (event.getChatHudLine() != null)
             {
@@ -84,8 +90,10 @@ public class BetterChatModule extends ToggleModule
     }
 
     @EventListener
-    public void onSignatureIndicator(SignatureIndicatorEvent event) {
-        if (noSignatureConfig.getValue()) {
+    public void onSignatureIndicator(SignatureIndicatorEvent event)
+    {
+        if (noSignatureConfig.getValue())
+        {
             event.cancel();
         }
     }
@@ -108,7 +116,8 @@ public class BetterChatModule extends ToggleModule
         }
     }
 
-    public enum Timestamp {
+    public enum Timestamp
+    {
         NORMAL,
         GRAY,
         COLOR,

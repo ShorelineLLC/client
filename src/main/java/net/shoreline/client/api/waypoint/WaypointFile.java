@@ -16,7 +16,8 @@ import java.nio.file.Path;
  * @see Waypoint
  * @since 1.0
  */
-public class WaypointFile extends ConfigFile {
+public class WaypointFile extends ConfigFile
+{
     //
     private final String serverIp;
 
@@ -24,7 +25,8 @@ public class WaypointFile extends ConfigFile {
      * @param dir
      * @param serverIp
      */
-    public WaypointFile(Path dir, String serverIp) {
+    public WaypointFile(Path dir, String serverIp)
+    {
         super(dir, serverIp);
         this.serverIp = serverIp;
     }
@@ -33,15 +35,20 @@ public class WaypointFile extends ConfigFile {
      *
      */
     @Override
-    public void save() {
-        try {
+    public void save()
+    {
+        try
+        {
             Path filepath = getFilepath();
-            if (!Files.exists(filepath)) {
+            if (!Files.exists(filepath))
+            {
                 Files.createFile(filepath);
             }
             final JsonArray array = new JsonArray();
-            for (Waypoint point : Managers.WAYPOINT.getWaypoints()) {
-                if (point.getIp().equalsIgnoreCase(serverIp)) {
+            for (Waypoint point : Managers.WAYPOINT.getWaypoints())
+            {
+                if (point.getIp().equalsIgnoreCase(serverIp))
+                {
                     final JsonObject obj = new JsonObject();
                     obj.addProperty("tag", point.getName());
                     obj.addProperty("x", point.getX());
@@ -53,7 +60,8 @@ public class WaypointFile extends ConfigFile {
             write(filepath, serialize(array));
         }
         // error writing file
-        catch (IOException e) {
+        catch (IOException e)
+        {
             Shoreline.error("Could not save file for {}.json!", serverIp);
             e.printStackTrace();
         }
@@ -63,16 +71,21 @@ public class WaypointFile extends ConfigFile {
      *
      */
     @Override
-    public void load() {
-        try {
+    public void load()
+    {
+        try
+        {
             Path filepath = getFilepath();
-            if (Files.exists(filepath)) {
+            if (Files.exists(filepath))
+            {
                 final String content = read(filepath);
                 JsonArray array = parseArray(content);
-                if (array == null) {
+                if (array == null)
+                {
                     return;
                 }
-                for (JsonElement e : array.asList()) {
+                for (JsonElement e : array.asList())
+                {
                     JsonObject obj = e.getAsJsonObject();
                     JsonElement tag = obj.get("tag");
                     JsonElement x = obj.get("x");
@@ -84,7 +97,8 @@ public class WaypointFile extends ConfigFile {
             }
         }
         // error reading file
-        catch (IOException e) {
+        catch (IOException e)
+        {
             Shoreline.error("Could not read file for {}.json!", serverIp);
             e.printStackTrace();
         }

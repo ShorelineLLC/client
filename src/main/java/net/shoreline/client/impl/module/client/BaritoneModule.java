@@ -6,14 +6,14 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
 
@@ -21,7 +21,8 @@ import java.awt.*;
  * @author Shoreline
  * @since 1.0
  */
-public class BaritoneModule extends ConcurrentModule {
+public class BaritoneModule extends ConcurrentModule
+{
 
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Baritone block reach distance", 1.0f, 4.0f, 5.0f));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Allow baritone to place blocks", true));
@@ -53,13 +54,16 @@ public class BaritoneModule extends ConcurrentModule {
     /**
      *
      */
-    public BaritoneModule() {
+    public BaritoneModule()
+    {
         super("Baritone", "Configure baritone", ModuleCategory.CLIENT);
     }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() != StageEvent.EventStage.POST) {
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() != StageEvent.EventStage.POST)
+        {
             return;
         }
         BaritoneAPI.getSettings().blockReachDistance.value = rangeConfig.getValue();
@@ -92,8 +96,10 @@ public class BaritoneModule extends ConcurrentModule {
     }
 
     @EventListener
-    public void onChatText(ChatMessageEvent event) {
-        if (event.getText().getString().startsWith("[Baritone]")) {
+    public void onChatText(ChatMessageEvent event)
+    {
+        if (event.getText().getString().startsWith("[Baritone]"))
+        {
             event.cancel();
             event.setText(Text.of(ChatUtil.PREFIX + FormattingUtil.toString(event.getText())));
         }

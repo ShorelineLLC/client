@@ -7,7 +7,8 @@ import net.shoreline.client.util.network.InteractType;
  *
  */
 @IMixin
-public interface IPlayerInteractEntityC2SPacket {
+public interface IPlayerInteractEntityC2SPacket
+{
     /**
      * @return
      */

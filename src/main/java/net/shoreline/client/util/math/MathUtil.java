@@ -7,11 +7,12 @@ import java.math.RoundingMode;
  * @author linus
  * @since 1.0
  */
-public class MathUtil {
+public class MathUtil
+{
     private static final int EXP_INT_TABLE_MAX_INDEX = 750;
     private static final int EXP_INT_TABLE_LEN = EXP_INT_TABLE_MAX_INDEX * 2;
     private static final int EXP_FRAC_TABLE_LEN = 1025;
-    private static final double FACT[] = new double[]
+    private static final double[] FACT = new double[]
             {
                     1.0d,                        // 0
                     1.0d,                        // 1
@@ -36,7 +37,8 @@ public class MathUtil {
             };
 
     // ANCIENT TECHNOLOGY
-    public static double round(double value, int places) {
+    public static double round(double value, int places)
+    {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
@@ -49,15 +51,18 @@ public class MathUtil {
      * @param result placeholder where to put the result in extended precision
      * @return exp(p) in standard precision (equal to result[0] + result[1])
      */
-    private static double expint(int p, double[] result) {
-        final double xs[] = new double[2];
-        final double as[] = new double[2];
-        final double ys[] = new double[2];
+    private static double expint(int p, double[] result)
+    {
+        final double[] xs = new double[2];
+        final double[] as = new double[2];
+        final double[] ys = new double[2];
         xs[0] = 2.718281828459045;
         xs[1] = 1.4456468917292502E-16;
         split(1.0, ys);
-        while (p > 0) {
-            if ((p & 1) != 0) {
+        while (p > 0)
+        {
+            if ((p & 1) != 0)
+            {
                 quadMult(ys, xs, as);
                 ys[0] = as[0];
                 ys[1] = as[1];
@@ -67,7 +72,8 @@ public class MathUtil {
             xs[1] = as[1];
             p >>= 1;
         }
-        if (result != null) {
+        if (result != null)
+        {
             result[0] = ys[0];
             result[1] = ys[1];
             resplit(result);
@@ -80,14 +86,16 @@ public class MathUtil {
      * @param result
      * @return
      */
-    public static double slowexp(final double x, final double[] result) {
-        final double xs[] = new double[2];
-        final double ys[] = new double[2];
-        final double facts[] = new double[2];
-        final double as[] = new double[2];
+    public static double slowexp(final double x, final double[] result)
+    {
+        final double[] xs = new double[2];
+        final double[] ys = new double[2];
+        final double[] facts = new double[2];
+        final double[] as = new double[2];
         split(x, xs);
         ys[0] = ys[1] = 0.0;
-        for (int i = FACT.length - 1; i >= 0; i--) {
+        for (int i = FACT.length - 1; i >= 0; i--)
+        {
             splitMult(xs, ys, as);
             ys[0] = as[0];
             ys[1] = as[1];
@@ -97,7 +105,8 @@ public class MathUtil {
             ys[0] = as[0];
             ys[1] = as[1];
         }
-        if (result != null) {
+        if (result != null)
+        {
             result[0] = ys[0];
             result[1] = ys[1];
         }
@@ -111,10 +120,11 @@ public class MathUtil {
      */
     private static void quadMult(final double[] a,
                                  final double[] b,
-                                 final double[] result) {
-        final double xs[] = new double[2];
-        final double ys[] = new double[2];
-        final double zs[] = new double[2];
+                                 final double[] result)
+    {
+        final double[] xs = new double[2];
+        final double[] ys = new double[2];
+        final double[] zs = new double[2];
         split(a[0], xs);
         split(b[0], ys);
         splitMult(xs, ys, zs);
@@ -153,7 +163,8 @@ public class MathUtil {
      * @param b
      * @param ans
      */
-    private static void splitMult(double[] a, double[] b, double[] ans) {
+    private static void splitMult(double[] a, double[] b, double[] ans)
+    {
         ans[0] = a[0] * b[0];
         ans[1] = a[0] * b[1] + a[1] * b[0] + a[1] * b[1];
         resplit(ans);
@@ -166,12 +177,16 @@ public class MathUtil {
      * @param d     number to split
      * @param split placeholder where to place the result
      */
-    private static void split(final double d, final double[] split) {
-        if (d < 8e298 && d > -8e298) {
+    private static void split(final double d, final double[] split)
+    {
+        if (d < 8e298 && d > -8e298)
+        {
             final double a = d * 0x40000000L;
             split[0] = (d + a) - a;
             split[1] = d - split[0];
-        } else {
+        }
+        else
+        {
             final double a = d * 9.31322574615478515625E-10;
             split[0] = (d + a - d) * 0x40000000L;
             split[1] = d - split[0];
@@ -184,14 +199,18 @@ public class MathUtil {
      * @param a input/out array containing the split, changed
      *          on output
      */
-    private static void resplit(final double[] a) {
+    private static void resplit(final double[] a)
+    {
         final double c = a[0] + a[1];
         final double d = -(c - a[0] - a[1]);
-        if (c < 8e298 && c > -8e298) {
+        if (c < 8e298 && c > -8e298)
+        {
             double z = c * 0x40000000L;
             a[0] = (c + z) - z;
             a[1] = c - a[0] + d;
-        } else {
+        }
+        else
+        {
             double z = c * 9.31322574615478515625E-10;
             a[0] = (c + z - c) * 0x40000000L;
             a[1] = c - a[0] + d;
@@ -205,7 +224,8 @@ public class MathUtil {
      */
     private static void splitAdd(final double[] a,
                                  final double[] b,
-                                 final double[] ans) {
+                                 final double[] ans)
+    {
         ans[0] = a[0] + b[0];
         ans[1] = a[1] + b[1];
         resplit(ans);
@@ -216,20 +236,24 @@ public class MathUtil {
      * @param result
      */
     private static void splitReciprocal(final double[] in,
-                                        final double[] result) {
+                                        final double[] result)
+    {
         final double b = 1.0 / 4194304.0;
         final double a = 1.0 - b;
-        if (in[0] == 0.0) {
+        if (in[0] == 0.0)
+        {
             in[0] = in[1];
             in[1] = 0.0;
         }
         result[0] = a / in[0];
         result[1] = (b * in[0] - a * in[1]) / (in[0] * in[0] + in[0] * in[1]);
-        if (result[1] != result[1]) {
+        if (result[1] != result[1])
+        {
             result[1] = 0.0;
         }
         resplit(result);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++)
+        {
             double err = 1.0 - result[0] * in[0] - result[0] * in[1] -
                     result[1] * in[0] - result[1] * in[1];
             err *= result[0] + result[1];
@@ -243,25 +267,33 @@ public class MathUtil {
      * @param x The argument of the exponential function
      * @return exp(x)
      */
-    private static double exp(double x) {
+    private static double exp(double x)
+    {
         double intPartA;
         double intPartB;
         int intVal = (int) x;
-        if (x < 0.0) {
-            if (x < -746d) {
+        if (x < 0.0)
+        {
+            if (x < -746d)
+            {
                 return 0.0;
             }
-            if (intVal < -709) {
+            if (intVal < -709)
+            {
                 // This will produce a subnormal output
                 return exp(x + 40.19140625) / 285040095144011776.0;
             }
-            if (intVal == -709) {
+            if (intVal == -709)
+            {
                 // exp(1.494140625) is nearly a machine number
                 return exp(x + 1.494140625) / 4.455505956692756620;
             }
             intVal--;
-        } else {
-            if (intVal > 709) {
+        }
+        else
+        {
+            if (intVal > 709)
+            {
                 return Double.POSITIVE_INFINITY;
             }
         }
@@ -279,27 +311,32 @@ public class MathUtil {
         double tempA = intPartA * fracPartA;
         double tempB = intPartA * fracPartB + intPartB * fracPartA + intPartB * fracPartB;
         final double tempC = tempB + tempA;
-        if (tempC == Double.POSITIVE_INFINITY) {
+        if (tempC == Double.POSITIVE_INFINITY)
+        {
             return Double.POSITIVE_INFINITY;
         }
         return tempC * z + tempB + tempA;
     }
 
-    private static class ExpIntTable {
+    private static class ExpIntTable
+    {
         //
         private static final double[] EXP_INT_TABLE_A;
         private static final double[] EXP_INT_TABLE_B;
 
-        static {
+        static
+        {
             EXP_INT_TABLE_A = new double[EXP_INT_TABLE_LEN];
             EXP_INT_TABLE_B = new double[EXP_INT_TABLE_LEN];
-            final double tmp[] = new double[2];
-            final double recip[] = new double[2];
-            for (int i = 0; i < EXP_INT_TABLE_MAX_INDEX; i++) {
+            final double[] tmp = new double[2];
+            final double[] recip = new double[2];
+            for (int i = 0; i < EXP_INT_TABLE_MAX_INDEX; i++)
+            {
                 expint(i, tmp);
                 EXP_INT_TABLE_A[i + EXP_INT_TABLE_MAX_INDEX] = tmp[0];
                 EXP_INT_TABLE_B[i + EXP_INT_TABLE_MAX_INDEX] = tmp[1];
-                if (i != 0) {
+                if (i != 0)
+                {
                     // Negative integer powers
                     splitReciprocal(tmp, recip);
                     EXP_INT_TABLE_A[EXP_INT_TABLE_MAX_INDEX - i] = recip[0];
@@ -309,16 +346,19 @@ public class MathUtil {
         }
     }
 
-    private static class ExpFracTable {
+    private static class ExpFracTable
+    {
         private static final double[] EXP_FRAC_TABLE_A;
         private static final double[] EXP_FRAC_TABLE_B;
 
-        static {
+        static
+        {
             EXP_FRAC_TABLE_A = new double[EXP_FRAC_TABLE_LEN];
             EXP_FRAC_TABLE_B = new double[EXP_FRAC_TABLE_LEN];
-            final double tmp[] = new double[2];
+            final double[] tmp = new double[2];
             final double factor = 1d / (EXP_FRAC_TABLE_LEN - 1);
-            for (int i = 0; i < EXP_FRAC_TABLE_A.length; i++) {
+            for (int i = 0; i < EXP_FRAC_TABLE_A.length; i++)
+            {
                 slowexp(i * factor, tmp);
                 EXP_FRAC_TABLE_A[i] = tmp[0];
                 EXP_FRAC_TABLE_B[i] = tmp[1];

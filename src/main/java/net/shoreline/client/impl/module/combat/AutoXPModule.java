@@ -9,18 +9,19 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.TickTimer;
+import net.shoreline.eventbus.annotation.EventListener;
 
 /**
  * @author hockeyl8
  * @since 1.0
  */
-public class AutoXPModule extends RotationModule {
+public class AutoXPModule extends RotationModule
+{
 
     Config<Float> delayConfig = register(new NumberConfig<>("Delay", "Delay to throw xp in ticks.", 1.0f, 1.0f, 10.0f, NumberDisplay.DEFAULT));
     Config<Boolean> durabilityCheckConfig = register(new BooleanConfig("DurabilityCheck", "Check if your armor and held item durability is full then disables if it is.", true));
@@ -29,63 +30,77 @@ public class AutoXPModule extends RotationModule {
 
     private final TickTimer delayTimer = new TickTimer();
 
-    public AutoXPModule() {
+    public AutoXPModule()
+    {
         super("AutoXP", "Automatically throws xp silently.", ModuleCategory.COMBAT, 850);
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event) {
+    public void onPlayerTick(PlayerTickEvent event)
+    {
 
         if (mc.player == null || !delayTimer.passed(delayConfig.getValue())) return;
 
-        if (durabilityCheckConfig.getValue() && areItemsFullDura(mc.player)) {
+        if (durabilityCheckConfig.getValue() && areItemsFullDura(mc.player))
+        {
             disable();
             return;
         }
 
         int prev = mc.player.getInventory().selectedSlot;
         int slot = -1;
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 9; i++)
+        {
             ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() instanceof ExperienceBottleItem) {
+            if (stack.getItem() instanceof ExperienceBottleItem)
+            {
                 slot = i;
                 break;
             }
         }
-        if (slot == -1) {
+        if (slot == -1)
+        {
             disable();
             return;
         }
 
         Managers.INVENTORY.setSlot(slot);
-        if (rotateConfig.getValue()) {
+        if (rotateConfig.getValue())
+        {
             setRotation(mc.player.getYaw(), 90.0f);
             if (isRotationBlocked()) return;
         }
         Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
-        if (swingConfig.getValue()) {
+        if (swingConfig.getValue())
+        {
             mc.player.swingHand(Hand.MAIN_HAND);
         }
         Managers.INVENTORY.setSlot(prev);
         delayTimer.reset();
     }
 
-    private boolean areItemsFullDura(PlayerEntity player) {
-        if (!isItemFullDura(player.getMainHandStack()) || !isItemFullDura(player.getOffHandStack())) {
+    private boolean areItemsFullDura(PlayerEntity player)
+    {
+        if (!isItemFullDura(player.getMainHandStack()) || !isItemFullDura(player.getOffHandStack()))
+        {
             return false;
         }
 
-        for (ItemStack stack : player.getArmorItems()) {
-                if (!isItemFullDura(stack)) {
-                    return false;
-                }
+        for (ItemStack stack : player.getArmorItems())
+        {
+            if (!isItemFullDura(stack))
+            {
+                return false;
+            }
         }
 
         return true;
     }
 
-    private boolean isItemFullDura(ItemStack stack) {
-        if (stack.isEmpty()) {
+    private boolean isItemFullDura(ItemStack stack)
+    {
+        if (stack.isEmpty())
+        {
             return true;
         }
         int maxDura = stack.getMaxDamage();

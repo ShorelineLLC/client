@@ -29,9 +29,9 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -74,7 +74,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         surround.clear();
         placements.clear();
     }
@@ -115,7 +116,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        BlockPos pos = PlayerUtil.getRoundedBlockPos(target.getX(), target.getY(), target.getZ());
+        BlockPos pos = PositionUtil.getRoundedBlockPos(target.getX(), target.getY(), target.getZ());
         surround = getAutoTrapPositions(pos);
         placements = surround.stream().filter(blockPos -> mc.world.getBlockState(blockPos).isReplaceable()).toList();
 
@@ -175,7 +176,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         return true;
     }
 
-    private void place(BlockPos targetPos) {
+    private void place(BlockPos targetPos)
+    {
         List<Entity> box = mc.world.getOtherEntities(null, new Box(targetPos))
                 .stream().filter(e -> SurroundModule.getInstance().invalidEntity(e)).toList();
         if (!box.isEmpty())
@@ -332,10 +334,13 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 RenderSystem.recordRenderCall(() -> place(targetPos));
             }
         }
-        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet) {
-            for (int id : packet.getEntityIds()) {
+        else if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
                 Entity entity = mc.world.getEntityById(id);
-                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos())) {
+                if (entity instanceof EndCrystalEntity && surround.contains(entity.getBlockPos()))
+                {
                     blocksPlaced++;
                     RenderSystem.recordRenderCall(() -> place(entity.getBlockPos()));
                 }

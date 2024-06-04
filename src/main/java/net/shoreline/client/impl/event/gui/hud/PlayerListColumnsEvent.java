@@ -8,11 +8,13 @@ public class PlayerListColumnsEvent extends Event
 {
     private int tabHeight;
 
-    public void setTabHeight(int tabHeight) {
+    public void setTabHeight(int tabHeight)
+    {
         this.tabHeight = tabHeight;
     }
 
-    public int getTabHeight() {
+    public int getTabHeight()
+    {
         return tabHeight;
     }
 }

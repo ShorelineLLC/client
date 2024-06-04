@@ -10,18 +10,22 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class RenderFloatingItemEvent extends Event {
+public class RenderFloatingItemEvent extends Event
+{
     private final ItemStack floatingItem;
 
-    public RenderFloatingItemEvent(ItemStack floatingItem) {
+    public RenderFloatingItemEvent(ItemStack floatingItem)
+    {
         this.floatingItem = floatingItem;
     }
 
-    public Item getFloatingItem() {
+    public Item getFloatingItem()
+    {
         return floatingItem.getItem();
     }
 
-    public ItemStack getFloatingItemStack() {
+    public ItemStack getFloatingItemStack()
+    {
         return floatingItem;
     }
 }

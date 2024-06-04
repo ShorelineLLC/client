@@ -10,21 +10,24 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class VelocityMultiplierEvent extends Event {
+public class VelocityMultiplierEvent extends Event
+{
     //
     private final BlockState state;
 
     /**
      * @param state
      */
-    public VelocityMultiplierEvent(BlockState state) {
+    public VelocityMultiplierEvent(BlockState state)
+    {
         this.state = state;
     }
 
     /**
      * @return
      */
-    public Block getBlock() {
+    public Block getBlock()
+    {
         return state.getBlock();
     }
 }

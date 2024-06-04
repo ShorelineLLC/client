@@ -20,7 +20,8 @@ import net.shoreline.client.util.chat.ChatUtil;
  * @see ConcurrentModule
  * @since 1.0
  */
-public class Module extends ConfigContainer implements Globals {
+public class Module extends ConfigContainer implements Globals
+{
     //
     public static final String MODULE_ID_FORMAT = "%s-module";
     // Concise module description, displayed in the ClickGui to help users
@@ -36,7 +37,8 @@ public class Module extends ConfigContainer implements Globals {
      * @param desc     The module description
      * @param category The module category
      */
-    public Module(String name, String desc, ModuleCategory category) {
+    public Module(String name, String desc, ModuleCategory category)
+    {
         super(name);
         this.desc = desc;
         this.category = category;
@@ -45,7 +47,8 @@ public class Module extends ConfigContainer implements Globals {
     /**
      * @param message
      */
-    protected void sendModuleMessage(String message) {
+    protected void sendModuleMessage(String message)
+    {
         ChatUtil.clientSendMessageRaw("§s[%s]§f %s", name, message);
     }
 
@@ -53,7 +56,8 @@ public class Module extends ConfigContainer implements Globals {
      * @param message
      * @param params
      */
-    protected void sendModuleMessage(String message, Object... params) {
+    protected void sendModuleMessage(String message, Object... params)
+    {
         sendModuleMessage(String.format(message, params));
     }
 
@@ -61,14 +65,16 @@ public class Module extends ConfigContainer implements Globals {
      * @return
      */
     @Override
-    public String getId() {
+    public String getId()
+    {
         return String.format(MODULE_ID_FORMAT, name.toLowerCase());
     }
 
     /**
      * @return
      */
-    public String getDescription() {
+    public String getDescription()
+    {
         return desc;
     }
 
@@ -78,14 +84,16 @@ public class Module extends ConfigContainer implements Globals {
      * @return The category of the module
      * @see ModuleCategory
      */
-    public ModuleCategory getCategory() {
+    public ModuleCategory getCategory()
+    {
         return category;
     }
 
     /**
      * @return
      */
-    public String getModuleData() {
+    public String getModuleData()
+    {
         return "ARRAYLIST_INFO";
     }
 }

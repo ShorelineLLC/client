@@ -15,14 +15,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
-import net.shoreline.client.impl.imixin.IChatHudLine;
-import net.shoreline.client.impl.imixin.IChatHudLineVisible;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
 import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
 import net.shoreline.client.impl.imixin.IChatHud;
+import net.shoreline.client.impl.imixin.IChatHudLine;
+import net.shoreline.client.impl.imixin.IChatHudLineVisible;
+import net.shoreline.eventbus.bus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,20 +47,29 @@ public abstract class MixinChatHud implements IChatHud
     @Final
     private List<ChatHudLine.Visible> visibleMessages;
 
-    @Shadow public abstract void addMessage(Text message);
+    @Shadow
+    public abstract void addMessage(Text message);
 
-    @Shadow public abstract double getChatScale();
+    @Shadow
+    public abstract double getChatScale();
 
-    @Shadow public abstract int getWidth();
+    @Shadow
+    public abstract int getWidth();
 
-    @Shadow @Final private MinecraftClient client;
-    @Shadow private boolean hasUnreadNewMessages;
+    @Shadow
+    @Final
+    private MinecraftClient client;
+    @Shadow
+    private boolean hasUnreadNewMessages;
 
-    @Shadow public abstract void scroll(int scroll);
+    @Shadow
+    public abstract void scroll(int scroll);
 
-    @Shadow private int scrolledLines;
+    @Shadow
+    private int scrolledLines;
 
-    @Shadow protected abstract boolean isChatFocused();
+    @Shadow
+    protected abstract boolean isChatFocused();
 
     private ChatHudLine current = null;
     private int currentId;
@@ -120,25 +129,31 @@ public abstract class MixinChatHud implements IChatHud
      */
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void hookAddMessage(Text message, MessageSignatureData signature,
-                                int ticks, MessageIndicator indicator, boolean refresh, CallbackInfo ci) {
+                                int ticks, MessageIndicator indicator, boolean refresh, CallbackInfo ci)
+    {
         ci.cancel();
         visibleMessages.removeIf(msg -> ((IChatHudLineVisible) (Object) msg).getId() == currentId && currentId != 0);
-        for (int i = messages.size() - 1; i > -1; i--) {
-            if (((IChatHudLine) (Object) messages.get(i)).getId() == currentId && currentId != 0) {
+        for (int i = messages.size() - 1; i > -1; i--)
+        {
+            if (((IChatHudLine) (Object) messages.get(i)).getId() == currentId && currentId != 0)
+            {
                 messages.remove(i);
             }
         }
         ChatMessageEvent chatTextEvent = new ChatMessageEvent(message);
         EventBus.INSTANCE.dispatch(chatTextEvent);
-        int i = MathHelper.floor((double)this.getWidth() / this.getChatScale());
-        if (indicator != null && indicator.icon() != null) {
+        int i = MathHelper.floor((double) this.getWidth() / this.getChatScale());
+        if (indicator != null && indicator.icon() != null)
+        {
             i -= indicator.icon().width + 4 + 2;
         }
         List<OrderedText> list = ChatMessages.breakRenderedChatMessageLines(chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, i, this.client.textRenderer);
         boolean bl = this.isChatFocused();
-        for (int j = 0; j < list.size(); ++j) {
+        for (int j = 0; j < list.size(); ++j)
+        {
             OrderedText orderedText = list.get(j);
-            if (bl && this.scrolledLines > 0) {
+            if (bl && this.scrolledLines > 0)
+            {
                 this.hasUnreadNewMessages = true;
                 this.scroll(1);
             }
@@ -154,17 +169,20 @@ public abstract class MixinChatHud implements IChatHud
         boolean bl1 = chatLengthEvent.isCanceled();
         if (!bl1)
         {
-            while (this.visibleMessages.size() > 100) {
+            while (this.visibleMessages.size() > 100)
+            {
                 this.visibleMessages.remove(this.visibleMessages.size() - 1);
             }
         }
-        if (!refresh) {
+        if (!refresh)
+        {
             ChatHudLine chatHudLine = new ChatHudLine(ticks, chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, signature, indicator);
             ((IChatHudLine) (Object) chatHudLine).setId(currentId);
             this.messages.add(0, chatHudLine);
             if (!bl1)
             {
-                while (this.messages.size() > 100) {
+                while (this.messages.size() > 100)
+                {
                     this.messages.remove(this.messages.size() - 1);
                 }
             }
@@ -183,7 +201,8 @@ public abstract class MixinChatHud implements IChatHud
     }
 
     @Override
-    public void addMessage(Text message, int id) {
+    public void addMessage(Text message, int id)
+    {
         currentId = id;
         addMessage(message);
         currentId = 0;

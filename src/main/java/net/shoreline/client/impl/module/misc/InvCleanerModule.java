@@ -12,14 +12,14 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ItemListConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +30,8 @@ import java.util.List;
  * @author linus
  * @since 1.0
  */
-public class InvCleanerModule extends ToggleModule {
+public class InvCleanerModule extends ToggleModule
+{
     private static InvCleanerModule INSTANCE;
 
     //
@@ -43,30 +44,39 @@ public class InvCleanerModule extends ToggleModule {
     /**
      *
      */
-    public InvCleanerModule() {
+    public InvCleanerModule()
+    {
         super("InvCleaner", "Automatically cleans the player inventory",
                 ModuleCategory.MISCELLANEOUS);
     }
 
-    public static InvCleanerModule getInstance() {
-        if (INSTANCE == null) {
+    public static InvCleanerModule getInstance()
+    {
+        if (INSTANCE == null)
+        {
             INSTANCE = new InvCleanerModule();
         }
         return INSTANCE;
     }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() != StageEvent.EventStage.PRE) {
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
             return;
         }
-        for (Item item : blacklistConfig.getValue()) {
-            for (int i = 35; i >= (hotbarConfig.getValue() ? 0 : 9); i--) {
+        for (Item item : blacklistConfig.getValue())
+        {
+            for (int i = 35; i >= (hotbarConfig.getValue() ? 0 : 9); i--)
+            {
                 ItemStack stack = mc.player.getInventory().getStack(i);
-                if (stack.isEmpty()) {
+                if (stack.isEmpty())
+                {
                     continue;
                 }
-                if (stack.getItem() == item && invCleanTimer.passed(delayConfig.getValue() * 1000)) {
+                if (stack.getItem() == item && invCleanTimer.passed(delayConfig.getValue() * 1000))
+                {
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, i, 0, SlotActionType.PICKUP, mc.player);
                     mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, ScreenHandler.EMPTY_SPACE_SLOT_INDEX, 0, SlotActionType.PICKUP, mc.player);
                     invCleanTimer.reset();
@@ -76,59 +86,73 @@ public class InvCleanerModule extends ToggleModule {
         }
     }
 
-    public ConfigFile getBlacklistFile(Path clientDir) {
+    public ConfigFile getBlacklistFile(Path clientDir)
+    {
         return new InvCleanerFile(clientDir);
     }
 
     /**
      * @see ConfigFile
      */
-    public class InvCleanerFile extends ConfigFile {
+    public class InvCleanerFile extends ConfigFile
+    {
 
-        public InvCleanerFile(Path clientDir) {
+        public InvCleanerFile(Path clientDir)
+        {
             super(clientDir, "inv-cleaner");
         }
 
         @Override
-        public void save() {
-            try {
+        public void save()
+        {
+            try
+            {
                 Path filepath = getFilepath();
-                if (!Files.exists(filepath)) {
+                if (!Files.exists(filepath))
+                {
                     Files.createFile(filepath);
                 }
                 JsonObject json = new JsonObject();
                 //
                 JsonArray itemArray = new JsonArray();
-                for (Item item : blacklistConfig.getValue()) {
+                for (Item item : blacklistConfig.getValue())
+                {
                     itemArray.add(item.getTranslationKey());
                 }
                 json.add("items", itemArray);
                 write(filepath, serialize(json));
             }
             // error writing file
-            catch (IOException e) {
+            catch (IOException e)
+            {
                 Shoreline.error("Could not save file for inv cleaner!");
                 e.printStackTrace();
             }
         }
 
         @Override
-        public void load() {
-            try {
+        public void load()
+        {
+            try
+            {
                 Path filepath = getFilepath();
-                if (Files.exists(filepath)) {
+                if (Files.exists(filepath))
+                {
                     String content = read(filepath);
                     JsonObject object = parseObject(content);
-                    if (object != null && object.has("items")) {
+                    if (object != null && object.has("items"))
+                    {
                         JsonArray jsonArray = object.getAsJsonArray("items");
-                        for (JsonElement element : jsonArray) {
+                        for (JsonElement element : jsonArray)
+                        {
                             // blacklist.add(Registries.ITEM.get(new Identifier(element.getAsString())));
                         }
                     }
                 }
             }
             // error writing file
-            catch (IOException e) {
+            catch (IOException e)
+            {
                 Shoreline.error("Could not read file for inv cleaner!");
                 e.printStackTrace();
             }

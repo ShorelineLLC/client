@@ -3,10 +3,10 @@ package net.shoreline.client.impl.module.render;
 import net.minecraft.entity.player.PlayerEntity;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.render.entity.RenderEntityInvisibleEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 /**
  * @author xgraza
@@ -14,7 +14,7 @@ import net.shoreline.client.impl.event.render.entity.RenderEntityInvisibleEvent;
  */
 public final class TrueSightModule extends ToggleModule
 {
-    Config<Boolean> onlyPlayersConfig = register(new BooleanConfig("OnlyPlayers", "If to only reveal invisible players", true));
+    Config<Boolean> onlyPlayersConfig = register(new BooleanConfig("OnlyPlayers", "Only reveal invisible players", true));
 
     public TrueSightModule()
     {

@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * @since 1.0
  */
 @Mixin(Entity.class)
-public interface AccessorEntity {
+public interface AccessorEntity
+{
     /**
      *
      */
@@ -18,7 +19,6 @@ public interface AccessorEntity {
     void hookUnsetRemoved();
 
     /**
-     *
      * @param index
      * @param value
      */

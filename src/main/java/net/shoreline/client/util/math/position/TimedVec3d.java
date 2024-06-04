@@ -7,12 +7,14 @@ import net.minecraft.util.math.Vec3d;
  * @author linus
  * @since 1.0
  */
-public record TimedVec3d(Vec3d pos, long time) implements Position {
+public record TimedVec3d(Vec3d pos, long time) implements Position
+{
     /**
      * @param pos
      * @param time
      */
-    public TimedVec3d {
+    public TimedVec3d
+    {
 
     }
 
@@ -20,7 +22,8 @@ public record TimedVec3d(Vec3d pos, long time) implements Position {
      * Returns the X coordinate.
      */
     @Override
-    public double getX() {
+    public double getX()
+    {
         return pos.getX();
     }
 
@@ -28,7 +31,8 @@ public record TimedVec3d(Vec3d pos, long time) implements Position {
      * Returns the Y coordinate.
      */
     @Override
-    public double getY() {
+    public double getY()
+    {
         return pos.getY();
     }
 
@@ -36,7 +40,8 @@ public record TimedVec3d(Vec3d pos, long time) implements Position {
      * Returns the Z coordinate.
      */
     @Override
-    public double getZ() {
+    public double getZ()
+    {
         return pos.getZ();
     }
 }

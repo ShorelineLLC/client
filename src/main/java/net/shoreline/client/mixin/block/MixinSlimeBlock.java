@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(SlimeBlock.class)
-public class MixinSlimeBlock implements Globals {
+public class MixinSlimeBlock implements Globals
+{
     /**
      * @param world
      * @param pos
@@ -30,11 +31,13 @@ public class MixinSlimeBlock implements Globals {
     @Inject(method = "onSteppedOn", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookOnSteppedOn(World world, BlockPos pos, BlockState state,
-                                 Entity entity, CallbackInfo ci) {
+                                 Entity entity, CallbackInfo ci)
+    {
         SteppedOnSlimeBlockEvent steppedOnSlimeBlockEvent =
                 new SteppedOnSlimeBlockEvent();
         EventBus.INSTANCE.dispatch(steppedOnSlimeBlockEvent);
-        if (steppedOnSlimeBlockEvent.isCanceled() && entity == mc.player) {
+        if (steppedOnSlimeBlockEvent.isCanceled() && entity == mc.player)
+        {
             ci.cancel();
         }
     }

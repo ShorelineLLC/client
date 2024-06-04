@@ -12,25 +12,31 @@ import net.shoreline.client.util.Globals;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-public class PlayerArgumentType implements ArgumentType<String>, Globals {
+public class PlayerArgumentType implements ArgumentType<String>, Globals
+{
 
-    public static PlayerArgumentType player() {
+    public static PlayerArgumentType player()
+    {
         return new PlayerArgumentType();
     }
 
-    public static String getPlayer(final CommandContext<?> context, final String name) {
+    public static String getPlayer(final CommandContext<?> context, final String name)
+    {
         return context.getArgument(name, String.class);
     }
 
     @Override
-    public String parse(StringReader reader) throws CommandSyntaxException {
+    public String parse(StringReader reader) throws CommandSyntaxException
+    {
         return reader.readString();
     }
 
     @Override
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+    {
         Collection<PlayerListEntry> playerListEntries = mc.player.networkHandler.getPlayerList();
-        for (PlayerListEntry playerListEntry : playerListEntries) {
+        for (PlayerListEntry playerListEntry : playerListEntries)
+        {
             builder.suggest(playerListEntry.getProfile().getName());
         }
         return builder.buildFuture();

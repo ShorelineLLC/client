@@ -22,12 +22,16 @@ public interface FontRenderer extends Globals
     };
 
     void draw(final Matrix4f matrix4f, final String text, final double x, final double y, final int color, final boolean shadow);
+
     void draw(final Matrix4f matrix4f, final GlyphVisitor visitor, final String text, final double x, final double y, final int color, final boolean shadow);
+
     void draw(final Matrix4f matrix4f, final GlyphVisitor visitor, final VertexConsumerProvider vertexConsumers, final String text, final double x, final double y, final int color, final boolean shadow);
 
     int drawGlyph(final FontRenderer fontRenderer, final char c, final double x, final double y, final int color, final boolean shadow);
+
     int getStringWidth(final String text);
 
     Glyph getGlyph(final char c);
+
     Glyph[] getGlyphMap();
 }

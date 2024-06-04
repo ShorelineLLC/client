@@ -7,21 +7,24 @@ import net.shoreline.eventbus.Event;
  * @author linus
  * @since 1.0
  */
-public class MovementSlowdownEvent extends Event {
+public class MovementSlowdownEvent extends Event
+{
     //
     public final Input input;
 
     /**
      * @param input
      */
-    public MovementSlowdownEvent(Input input) {
+    public MovementSlowdownEvent(Input input)
+    {
         this.input = input;
     }
 
     /**
      * @return
      */
-    public Input getInput() {
+    public Input getInput()
+    {
         return input;
     }
 }

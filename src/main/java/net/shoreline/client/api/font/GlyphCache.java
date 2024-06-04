@@ -149,7 +149,8 @@ public class GlyphCache implements Globals
             ColorModel colorModel = bufferedImage.getColorModel();
             int nbands = raster.getNumBands();
             int dataType = raster.getDataBuffer().getDataType();
-            Object dataBuffer = switch (dataType) {
+            Object dataBuffer = switch (dataType)
+            {
                 case DataBuffer.TYPE_BYTE -> new byte[nbands];
                 case DataBuffer.TYPE_USHORT -> new short[nbands];
                 case DataBuffer.TYPE_INT -> new int[nbands];

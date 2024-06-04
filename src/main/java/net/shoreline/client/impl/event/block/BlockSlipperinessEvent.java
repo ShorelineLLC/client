@@ -9,7 +9,8 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class BlockSlipperinessEvent extends Event {
+public class BlockSlipperinessEvent extends Event
+{
     //
     private final Block block;
     private float slipperiness;
@@ -18,7 +19,8 @@ public class BlockSlipperinessEvent extends Event {
      * @param block
      * @param slipperiness
      */
-    public BlockSlipperinessEvent(Block block, float slipperiness) {
+    public BlockSlipperinessEvent(Block block, float slipperiness)
+    {
         this.block = block;
         this.slipperiness = slipperiness;
     }
@@ -26,21 +28,24 @@ public class BlockSlipperinessEvent extends Event {
     /**
      * @return
      */
-    public Block getBlock() {
+    public Block getBlock()
+    {
         return block;
     }
 
     /**
      * @return
      */
-    public float getSlipperiness() {
+    public float getSlipperiness()
+    {
         return slipperiness;
     }
 
     /**
      * @param slipperiness
      */
-    public void setSlipperiness(float slipperiness) {
+    public void setSlipperiness(float slipperiness)
+    {
         this.slipperiness = slipperiness;
     }
 }

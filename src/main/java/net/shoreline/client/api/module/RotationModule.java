@@ -8,7 +8,8 @@ import net.shoreline.client.init.Managers;
  * @see net.shoreline.client.impl.manager.player.rotation.RotationManager
  * @since 1.0
  */
-public class RotationModule extends ToggleModule {
+public class RotationModule extends ToggleModule
+{
 
     private final int rotationPriority;
 
@@ -17,7 +18,8 @@ public class RotationModule extends ToggleModule {
      * @param desc     The module description
      * @param category The module category
      */
-    public RotationModule(String name, String desc, ModuleCategory category) {
+    public RotationModule(String name, String desc, ModuleCategory category)
+    {
         super(name, desc, category);
         this.rotationPriority = 100;
     }
@@ -27,7 +29,8 @@ public class RotationModule extends ToggleModule {
      * @param desc     The module description
      * @param category The module category
      */
-    public RotationModule(String name, String desc, ModuleCategory category, int rotationPriority) {
+    public RotationModule(String name, String desc, ModuleCategory category, int rotationPriority)
+    {
         super(name, desc, category);
         this.rotationPriority = rotationPriority;
     }
@@ -37,24 +40,29 @@ public class RotationModule extends ToggleModule {
         Managers.ROTATION.setRotation(new Rotation(getRotationPriority(), yaw, pitch));
     }
 
-    protected void setRotationSilent(float yaw, float pitch) {
+    protected void setRotationSilent(float yaw, float pitch)
+    {
         Managers.ROTATION.setRotationSilent(yaw, pitch, true);
     }
 
     /**
      * Sets client look yaw and pitch
+     *
      * @param yaw
      * @param pitch
      */
-    protected void setRotationClient(float yaw, float pitch) {
+    protected void setRotationClient(float yaw, float pitch)
+    {
         Managers.ROTATION.setRotationClient(yaw, pitch);
     }
 
-    protected boolean isRotationBlocked() {
+    protected boolean isRotationBlocked()
+    {
         return Managers.ROTATION.isRotationBlocked(getRotationPriority());
     }
 
-    protected int getRotationPriority() {
+    protected int getRotationPriority()
+    {
         return rotationPriority;
     }
 }

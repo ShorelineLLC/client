@@ -2,7 +2,7 @@ package net.shoreline.client.util.render.animation;
 
 public class TimeAnimation
 {
-    private Easing easing;
+    private final Easing easing;
     private double start;
     private double target;
     private float length;

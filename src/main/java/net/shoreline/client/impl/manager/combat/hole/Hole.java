@@ -13,7 +13,8 @@ import java.util.List;
  * @author linus
  * @since 1.0
  */
-public class Hole implements Position {
+public class Hole implements Position
+{
     //
     private final List<BlockPos> holeOffsets;
     //
@@ -25,7 +26,8 @@ public class Hole implements Position {
      * @param safety
      * @param holeOffsets
      */
-    public Hole(BlockPos origin, HoleType safety, BlockPos... holeOffsets) {
+    public Hole(BlockPos origin, HoleType safety, BlockPos... holeOffsets)
+    {
         this.origin = origin;
         this.safety = safety;
         this.holeOffsets = Lists.newArrayList(holeOffsets);
@@ -37,39 +39,48 @@ public class Hole implements Position {
      * @param entity
      * @return
      */
-    public double squaredDistanceTo(Entity entity) {
+    public double squaredDistanceTo(Entity entity)
+    {
         return entity.getEyePos().squaredDistanceTo(getCenter());
     }
 
-    public boolean isStandard() {
+    public boolean isStandard()
+    {
         return holeOffsets.size() == 5;
     }
 
-    public boolean isDouble() {
+    public boolean isDouble()
+    {
         return holeOffsets.size() == 8;
     }
 
-    public boolean isDoubleX() {
+    public boolean isDoubleX()
+    {
         return isDouble() && holeOffsets.contains(origin.add(2, 0, 0));
     }
 
-    public boolean isDoubleZ() {
+    public boolean isDoubleZ()
+    {
         return isDouble() && holeOffsets.contains(origin.add(0, 0, 2));
     }
 
-    public boolean isQuad() {
+    public boolean isQuad()
+    {
         return holeOffsets.size() == 12;
     }
 
-    public HoleType getSafety() {
+    public HoleType getSafety()
+    {
         return safety;
     }
 
-    public BlockPos getPos() {
+    public BlockPos getPos()
+    {
         return origin;
     }
 
-    public List<BlockPos> getHoleOffsets() {
+    public List<BlockPos> getHoleOffsets()
+    {
         return holeOffsets;
     }
 
@@ -77,23 +88,32 @@ public class Hole implements Position {
      * @param off
      * @return
      */
-    public boolean addHoleOffsets(BlockPos... off) {
+    public boolean addHoleOffsets(BlockPos... off)
+    {
         return holeOffsets.addAll(Arrays.asList(off));
     }
 
     /**
      * @return
      */
-    public Vec3d getCenter() {
+    public Vec3d getCenter()
+    {
         BlockPos center;
         // This shit stupid
-        if (isDoubleX()) {
+        if (isDoubleX())
+        {
             center = origin.add(1, 0, 0);
-        } else if (isDoubleZ()) {
+        }
+        else if (isDoubleZ())
+        {
             center = origin.add(0, 0, -1);
-        } else if (isQuad()) {
+        }
+        else if (isQuad())
+        {
             center = origin.add(1, 0, -1);
-        } else {
+        }
+        else
+        {
             return origin.toCenterPos();
         }
         return Vec3d.of(center);
@@ -103,7 +123,8 @@ public class Hole implements Position {
      * Returns the X coordinate.
      */
     @Override
-    public double getX() {
+    public double getX()
+    {
         return origin.getX();
     }
 
@@ -111,7 +132,8 @@ public class Hole implements Position {
      * Returns the Y coordinate.
      */
     @Override
-    public double getY() {
+    public double getY()
+    {
         return origin.getY();
     }
 
@@ -119,7 +141,8 @@ public class Hole implements Position {
      * Returns the Z coordinate.
      */
     @Override
-    public double getZ() {
+    public double getZ()
+    {
         return origin.getZ();
     }
 }

@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -181,7 +180,8 @@ public final class AutoTotemModule extends ToggleModule
             {
                 long serverLatency = System.currentTimeMillis() - replaceTime;
                 sendModuleMessage("Failed to replace totem in %sms!", serverLatency);
-            } else
+            }
+            else
             {
                 sendModuleMessage("Failed to replace totem! Possible reasons: %s", String.join(", ", failureReasonsSet));
             }

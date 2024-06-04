@@ -12,7 +12,8 @@ import java.util.Optional;
  *
  */
 @Mixin(UpdateBeaconC2SPacket.class)
-public interface AccessorUpdateBeaconC2SPacket {
+public interface AccessorUpdateBeaconC2SPacket
+{
     /**
      * @param primaryEffectId
      */

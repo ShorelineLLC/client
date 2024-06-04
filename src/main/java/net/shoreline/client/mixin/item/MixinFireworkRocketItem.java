@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
 @Mixin(FireworkRocketItem.class)
-public class MixinFireworkRocketItem {
+public class MixinFireworkRocketItem
+{
     /**
      * @param world
      * @param user
@@ -24,7 +25,8 @@ public class MixinFireworkRocketItem {
      */
     @Inject(method = "use", at = @At(value = "HEAD"))
     private void hookUse(World world, PlayerEntity user, Hand hand,
-                         CallbackInfoReturnable<TypedActionResult<ItemStack>> cir) {
+                         CallbackInfoReturnable<TypedActionResult<ItemStack>> cir)
+    {
         FireworkUseEvent fireworkUseEvent = new FireworkUseEvent();
         EventBus.INSTANCE.dispatch(fireworkUseEvent);
     }

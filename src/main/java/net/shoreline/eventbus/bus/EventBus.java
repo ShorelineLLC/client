@@ -62,7 +62,7 @@ public final class EventBus
         private final Object b;
         private final Object c;
         private final int d;
-        private stop_decompiling e;
+        private final stop_decompiling e;
 
         private stop_decompiling(Object a,
                                  Object b,

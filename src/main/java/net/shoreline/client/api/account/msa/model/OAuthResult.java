@@ -8,27 +8,33 @@ public final class OAuthResult
 {
     private String sfttTag, postUrl, cookie;
 
-    public String getSfttTag() {
+    public String getSfttTag()
+    {
         return sfttTag;
     }
 
-    public void setSfttTag(String sfttTag) {
+    public void setSfttTag(String sfttTag)
+    {
         this.sfttTag = sfttTag;
     }
 
-    public String getPostUrl() {
+    public String getPostUrl()
+    {
         return postUrl;
     }
 
-    public void setPostUrl(String postUrl) {
+    public void setPostUrl(String postUrl)
+    {
         this.postUrl = postUrl;
     }
 
-    public String getCookie() {
+    public String getCookie()
+    {
         return cookie;
     }
 
-    public void setCookie(String cookie) {
+    public void setCookie(String cookie)
+    {
         this.cookie = cookie;
     }
 }

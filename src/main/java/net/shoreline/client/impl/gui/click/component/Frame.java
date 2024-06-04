@@ -6,7 +6,8 @@ import net.minecraft.client.gui.DrawContext;
  * @author linus
  * @since 1.0
  */
-public class Frame extends Component implements Interactable {
+public class Frame extends Component implements Interactable
+{
     //
     protected float px, py, fheight;
 
@@ -16,7 +17,8 @@ public class Frame extends Component implements Interactable {
      * @param width
      * @param height
      */
-    public Frame(float x, float y, float width, float height) {
+    public Frame(float x, float y, float width, float height)
+    {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -30,7 +32,8 @@ public class Frame extends Component implements Interactable {
      * @param delta
      */
     @Override
-    public void render(DrawContext context, float mouseX, float mouseY, float delta) {
+    public void render(DrawContext context, float mouseX, float mouseY, float delta)
+    {
         // fill(matrices, x, y, width, height, 0xe5000000);
     }
 
@@ -40,7 +43,8 @@ public class Frame extends Component implements Interactable {
      * @param button
      */
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public void mouseClicked(double mouseX, double mouseY, int button)
+    {
 
     }
 
@@ -50,7 +54,8 @@ public class Frame extends Component implements Interactable {
      * @param button
      */
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    public void mouseReleased(double mouseX, double mouseY, int button)
+    {
 
     }
 
@@ -60,7 +65,8 @@ public class Frame extends Component implements Interactable {
      * @param modifiers
      */
     @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers)
+    {
 
     }
 }

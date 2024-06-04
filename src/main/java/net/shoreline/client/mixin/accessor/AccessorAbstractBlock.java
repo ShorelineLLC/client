@@ -6,7 +6,8 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(AbstractBlock.class)
-public interface AccessorAbstractBlock {
+public interface AccessorAbstractBlock
+{
     /**
      * @param slipperiness
      */

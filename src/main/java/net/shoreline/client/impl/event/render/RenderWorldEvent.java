@@ -7,7 +7,8 @@ import net.shoreline.eventbus.Event;
  * @author linus
  * @since 1.0
  */
-public class RenderWorldEvent extends Event {
+public class RenderWorldEvent extends Event
+{
     //
     private final MatrixStack matrices;
     private final float tickDelta;
@@ -15,7 +16,8 @@ public class RenderWorldEvent extends Event {
     /**
      * @param matrices
      */
-    public RenderWorldEvent(MatrixStack matrices, float tickDelta) {
+    public RenderWorldEvent(MatrixStack matrices, float tickDelta)
+    {
         this.matrices = matrices;
         this.tickDelta = tickDelta;
     }
@@ -23,24 +25,28 @@ public class RenderWorldEvent extends Event {
     /**
      * @return
      */
-    public MatrixStack getMatrices() {
+    public MatrixStack getMatrices()
+    {
         return matrices;
     }
 
     /**
      * @return
      */
-    public float getTickDelta() {
+    public float getTickDelta()
+    {
         return tickDelta;
     }
 
-    public static class Game extends RenderWorldEvent {
+    public static class Game extends RenderWorldEvent
+    {
 
         /**
          * @param matrices
          * @param tickDelta
          */
-        public Game(MatrixStack matrices, float tickDelta) {
+        public Game(MatrixStack matrices, float tickDelta)
+        {
             super(matrices, tickDelta);
         }
     }

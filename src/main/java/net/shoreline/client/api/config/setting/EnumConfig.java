@@ -11,7 +11,8 @@ import java.util.function.Supplier;
  * @author linus
  * @since 1.0
  */
-public class EnumConfig<T extends Enum<?>> extends Config<T> {
+public class EnumConfig<T extends Enum<?>> extends Config<T>
+{
     // Array containing all values of the Enum type.
     private final T[] values;
 
@@ -19,13 +20,15 @@ public class EnumConfig<T extends Enum<?>> extends Config<T> {
     // current "Mode" in dropdown menu.
     private int index;
 
-    public EnumConfig(String name, String desc, T val, T[] values) {
+    public EnumConfig(String name, String desc, T val, T[] values)
+    {
         super(name, desc, val);
         this.values = values;
     }
 
     public EnumConfig(String name, String desc, T val, T[] values,
-                      Supplier<Boolean> visible) {
+                      Supplier<Boolean> visible)
+    {
         super(name, desc, val, visible);
         this.values = values;
     }
@@ -33,11 +36,13 @@ public class EnumConfig<T extends Enum<?>> extends Config<T> {
     /**
      * @return
      */
-    public String getValueName() {
+    public String getValueName()
+    {
         return getValue().name();
     }
 
-    public T[] getValues() {
+    public T[] getValues()
+    {
         return values;
     }
 
@@ -48,7 +53,8 @@ public class EnumConfig<T extends Enum<?>> extends Config<T> {
      *
      * @return The next Enum value
      */
-    public T getNextValue() {
+    public T getNextValue()
+    {
         index = index + 1 > values.length - 1 ? 0 : index + 1;
         return values[index];
     }
@@ -60,7 +66,8 @@ public class EnumConfig<T extends Enum<?>> extends Config<T> {
      *
      * @return The next Enum value
      */
-    public T getPreviousValue() {
+    public T getPreviousValue()
+    {
         index = index - 1 < 0 ? values.length - 1 : index - 1;
         return values[index];
     }
@@ -69,7 +76,8 @@ public class EnumConfig<T extends Enum<?>> extends Config<T> {
      * @return
      */
     @Override
-    public JsonObject toJson() {
+    public JsonObject toJson()
+    {
         JsonObject configObj = super.toJson();
         configObj.addProperty("value", getValueName());
         return configObj;
@@ -79,14 +87,19 @@ public class EnumConfig<T extends Enum<?>> extends Config<T> {
      * @param jsonObj The data as a json object
      */
     @Override
-    public T fromJson(JsonObject jsonObj) {
-        if (jsonObj.has("value")) {
+    public T fromJson(JsonObject jsonObj)
+    {
+        if (jsonObj.has("value"))
+        {
             JsonElement element = jsonObj.get("value");
 
-            try {
+            try
+            {
                 return (T) (Enum<?>) Enum.valueOf((Class<Enum>) getValue().getClass(),
                         element.getAsString());
-            } catch (IllegalArgumentException e) {
+            }
+            catch (IllegalArgumentException e)
+            {
                 return null;
             }
         }

@@ -4,14 +4,17 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class FovEvent extends Event {
+public class FovEvent extends Event
+{
     private double fov;
 
-    public double getFov() {
+    public double getFov()
+    {
         return fov;
     }
 
-    public void setFov(double fov) {
+    public void setFov(double fov)
+    {
         this.fov = fov;
     }
 }

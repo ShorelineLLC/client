@@ -4,6 +4,7 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class ChatLengthEvent extends Event {
+public class ChatLengthEvent extends Event
+{
 
 }

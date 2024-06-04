@@ -5,15 +5,18 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class BiomeEffectsEvent extends Event {
+public class BiomeEffectsEvent extends Event
+{
 
     private BiomeParticleConfig particleConfig;
 
-    public BiomeParticleConfig getParticleConfig() {
+    public BiomeParticleConfig getParticleConfig()
+    {
         return particleConfig;
     }
 
-    public void setParticleConfig(BiomeParticleConfig particleConfig) {
+    public void setParticleConfig(BiomeParticleConfig particleConfig)
+    {
         this.particleConfig = particleConfig;
     }
 }

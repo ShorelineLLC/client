@@ -16,7 +16,8 @@ import static org.apache.logging.log4j.core.util.IOUtils.EOF;
  * @author linus
  * @since 1.0
  */
-public abstract class ConfigFile {
+public abstract class ConfigFile
+{
     //
     protected static final Gson GSON = new GsonBuilder()
             .setLenient() // leniency to allow for .cfg files
@@ -30,14 +31,18 @@ public abstract class ConfigFile {
     /**
      * @param path
      */
-    public ConfigFile(Path dir, String path) {
+    public ConfigFile(Path dir, String path)
+    {
         // create directory
-        if (!Files.exists(dir)) {
-            try {
+        if (!Files.exists(dir))
+        {
+            try
+            {
                 Files.createDirectory(dir);
             }
             // create dir error
-            catch (IOException e) {
+            catch (IOException e)
+            {
                 Shoreline.error("Could not create {} dir", dir);
                 e.printStackTrace();
             }
@@ -51,11 +56,13 @@ public abstract class ConfigFile {
      * @return
      * @throws IOException
      */
-    protected String read(Path path) throws IOException {
+    protected String read(Path path) throws IOException
+    {
         StringBuilder content = new StringBuilder();
         InputStream in = Files.newInputStream(path);
         int b;
-        while ((b = in.read()) != EOF) {
+        while ((b = in.read()) != EOF)
+        {
             content.append((char) b);
         }
         in.close();
@@ -66,7 +73,8 @@ public abstract class ConfigFile {
      * @param obj
      * @return
      */
-    protected String serialize(Object obj) {
+    protected String serialize(Object obj)
+    {
         return GSON.toJson(obj);
     }
 
@@ -74,7 +82,8 @@ public abstract class ConfigFile {
      * @param json
      * @return
      */
-    protected JsonObject parseObject(String json) {
+    protected JsonObject parseObject(String json)
+    {
         return parse(json, JsonObject.class);
     }
 
@@ -82,7 +91,8 @@ public abstract class ConfigFile {
      * @param json
      * @return
      */
-    protected JsonArray parseArray(String json) {
+    protected JsonArray parseArray(String json)
+    {
         return parse(json, JsonArray.class);
     }
 
@@ -92,10 +102,14 @@ public abstract class ConfigFile {
      * @param <T>
      * @return
      */
-    protected <T> T parse(String json, Class<T> type) {
-        try {
+    protected <T> T parse(String json, Class<T> type)
+    {
+        try
+        {
             return GSON.fromJson(json, type);
-        } catch (JsonSyntaxException e) {
+        }
+        catch (JsonSyntaxException e)
+        {
             Shoreline.error("Invalid json syntax!");
             e.printStackTrace();
         }
@@ -107,14 +121,16 @@ public abstract class ConfigFile {
      * @param content
      * @throws IOException
      */
-    protected void write(Path path, String content) throws IOException {
+    protected void write(Path path, String content) throws IOException
+    {
         OutputStream out = Files.newOutputStream(path);
         byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
         out.write(bytes, 0, bytes.length);
         out.close();
     }
 
-    public String getFileName() {
+    public String getFileName()
+    {
         return fileName;
     }
 
@@ -125,7 +141,8 @@ public abstract class ConfigFile {
      * @return The path to the file
      * @see #filepath
      */
-    public Path getFilepath() {
+    public Path getFilepath()
+    {
         return filepath;
     }
 
@@ -144,7 +161,8 @@ public abstract class ConfigFile {
      * @param fileName
      * @return
      */
-    private String toJsonPath(String fileName) {
+    private String toJsonPath(String fileName)
+    {
         return String.format("%s.json", fileName).toLowerCase();
     }
 }

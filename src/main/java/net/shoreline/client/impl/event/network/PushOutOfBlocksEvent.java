@@ -8,6 +8,7 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class PushOutOfBlocksEvent extends Event {
+public class PushOutOfBlocksEvent extends Event
+{
 
 }

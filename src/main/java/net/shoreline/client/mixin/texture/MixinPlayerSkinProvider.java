@@ -7,7 +7,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(PlayerSkinProvider.FileCache.class)
-public class MixinPlayerSkinProvider {
+public class MixinPlayerSkinProvider
+{
 
     @Shadow
     @Final

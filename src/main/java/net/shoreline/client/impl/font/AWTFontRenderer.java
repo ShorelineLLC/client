@@ -7,9 +7,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.font.Glyph;
 import net.shoreline.client.api.font.GlyphCache;
 import net.shoreline.client.impl.module.client.ColorsModule;
@@ -19,7 +17,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +128,8 @@ public final class AWTFontRenderer implements Closeable, Globals
         float yOffset = 0;
         boolean formatting = false;
         int lineStart = 0;
-        synchronized (cache) {
+        synchronized (cache)
+        {
             for (int i = 0; i < chars.length; i++)
             {
                 char c = chars[i];
@@ -183,7 +181,9 @@ public final class AWTFontRenderer implements Closeable, Globals
                 try
                 {
                     RenderSystem.setShaderTexture(0, identifier);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     continue;
                 }
 
@@ -269,7 +269,7 @@ public final class AWTFontRenderer implements Closeable, Globals
         char[] c = stripControlCodes(text).toCharArray();
         if (c.length == 0)
         {
-            c = new char[] {' '};
+            c = new char[]{' '};
         }
         float currentLine = 0;
         float previous = 0;
@@ -340,7 +340,7 @@ public final class AWTFontRenderer implements Closeable, Globals
         float g = (color >> 8) & 0xff;
         float b = (color) & 0xff;
         float a = (color & 0xff000000) != 0xff000000 ? 255.0f : (color >> 24) & 0xff;
-        return new int[] {(int) r, (int) g, (int) b, (int) a};
+        return new int[]{(int) r, (int) g, (int) b, (int) a};
     }
 
     private int getColorFromCode(char code)
@@ -369,5 +369,7 @@ public final class AWTFontRenderer implements Closeable, Globals
         };
     }
 
-    public record CharLocation(float x, float y, float r, float g, float b, Glyph glyph) {}
+    public record CharLocation(float x, float y, float r, float g, float b, Glyph glyph)
+    {
+    }
 }

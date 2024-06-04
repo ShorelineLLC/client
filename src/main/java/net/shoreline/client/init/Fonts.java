@@ -5,7 +5,8 @@ import net.shoreline.client.impl.font.AWTFontRenderer;
 import net.shoreline.client.impl.font.VanillaTextRenderer;
 import net.shoreline.loader.Loader;
 
-public class Fonts {
+public class Fonts
+{
     //
     public static final VanillaTextRenderer VANILLA = new VanillaTextRenderer();
     public static AWTFontRenderer CLIENT;
@@ -23,7 +24,8 @@ public class Fonts {
         initialized = true;
     }
 
-    public static boolean isInitialized() {
+    public static boolean isInitialized()
+    {
         return initialized;
     }
 }

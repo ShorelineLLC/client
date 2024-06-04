@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(ItemEntityRenderer.class)
-public class MixinItemEntityRenderer {
+public class MixinItemEntityRenderer
+{
     /**
      * @param itemEntity
      * @param f
@@ -33,10 +34,12 @@ public class MixinItemEntityRenderer {
     private void hookRender(ItemEntity itemEntity, float f, float g,
                             MatrixStack matrixStack,
                             VertexConsumerProvider vertexConsumerProvider,
-                            int i, CallbackInfo ci) {
+                            int i, CallbackInfo ci)
+    {
         RenderItemEvent renderItemEvent = new RenderItemEvent(itemEntity);
         EventBus.INSTANCE.dispatch(renderItemEvent);
-        if (renderItemEvent.isCanceled()) {
+        if (renderItemEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

@@ -6,14 +6,17 @@ import net.shoreline.eventbus.Event;
 import java.awt.*;
 
 @Cancelable
-public class AmbientColorEvent extends Event {
+public class AmbientColorEvent extends Event
+{
     private Color color;
 
-    public Color getColor() {
+    public Color getColor()
+    {
         return color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(Color color)
+    {
         this.color = color;
     }
 }

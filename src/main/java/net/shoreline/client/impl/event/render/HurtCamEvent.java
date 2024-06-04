@@ -8,6 +8,7 @@ import net.shoreline.eventbus.Event;
  * @since 1.0
  */
 @Cancelable
-public class HurtCamEvent extends Event {
+public class HurtCamEvent extends Event
+{
 
 }

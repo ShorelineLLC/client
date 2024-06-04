@@ -9,8 +9,6 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
@@ -18,6 +16,8 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;
 
@@ -25,7 +25,8 @@ import java.text.DecimalFormat;
  * @author linus
  * @since 1.0
  */
-public class EntitySpeedModule extends ToggleModule {
+public class EntitySpeedModule extends ToggleModule
+{
 
     //
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed of the entity while moving", 0.1f, 0.5f, 4.0f));
@@ -37,22 +38,27 @@ public class EntitySpeedModule extends ToggleModule {
     /**
      *
      */
-    public EntitySpeedModule() {
+    public EntitySpeedModule()
+    {
         super("EntitySpeed", "Increases riding entity speeds", ModuleCategory.MOVEMENT);
     }
 
     @Override
-    public String getModuleData() {
+    public String getModuleData()
+    {
         DecimalFormat decimal = new DecimalFormat("0.0");
         return decimal.format(speedConfig.getValue());
     }
 
     @EventListener
-    public void onTick(TickEvent event) {
-        if (event.getStage() != StageEvent.EventStage.PRE) {
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
             return;
         }
-        if (mc.player.isRiding() && mc.player.getControllingVehicle() != null) {
+        if (mc.player.isRiding() && mc.player.getControllingVehicle() != null)
+        {
             double d = Math.cos(Math.toRadians(mc.player.getYaw() + 90.0f));
             double d2 = Math.sin(Math.toRadians(mc.player.getYaw() + 90.0f));
             BlockPos pos1 = BlockPos.ofFloored(mc.player.getX() + (2.0 * d),
@@ -61,36 +67,44 @@ public class EntitySpeedModule extends ToggleModule {
                     mc.player.getY() - 2.0, mc.player.getZ() + (2.0 * d2));
             if (antiStuckConfig.getValue() && !mc.player.getControllingVehicle().isOnGround()
                     && !mc.world.getBlockState(pos1).blocksMovement()
-                    && !mc.world.getBlockState(pos2).blocksMovement()) {
+                    && !mc.world.getBlockState(pos2).blocksMovement())
+            {
                 entityJumpTimer.reset();
                 return;
             }
             BlockPos pos3 = BlockPos.ofFloored(mc.player.getX() + (2.0 * d),
                     mc.player.getY(), mc.player.getZ() + (2.0 * d2));
-            if (antiStuckConfig.getValue() && mc.world.getBlockState(pos3).blocksMovement()) {
+            if (antiStuckConfig.getValue() && mc.world.getBlockState(pos3).blocksMovement())
+            {
                 entityJumpTimer.reset();
                 return;
             }
             BlockPos pos4 = BlockPos.ofFloored(mc.player.getX() + d,
                     mc.player.getY() + 1.0, mc.player.getZ() + d2);
-            if (antiStuckConfig.getValue() && mc.world.getBlockState(pos4).blocksMovement()) {
+            if (antiStuckConfig.getValue() && mc.world.getBlockState(pos4).blocksMovement())
+            {
                 entityJumpTimer.reset();
                 return;
             }
-            if (mc.player.input.jumping) {
+            if (mc.player.input.jumping)
+            {
                 entityJumpTimer.reset();
             }
-            if (entityJumpTimer.passed(10000) || !antiStuckConfig.getValue()) {
+            if (entityJumpTimer.passed(10000) || !antiStuckConfig.getValue())
+            {
                 if (!mc.player.getControllingVehicle().isTouchingWater() || mc.player.input.jumping
-                        || !entityJumpTimer.passed(1000)) {
-                    if (mc.player.getControllingVehicle().isOnGround()) {
+                        || !entityJumpTimer.passed(1000))
+                {
+                    if (mc.player.getControllingVehicle().isOnGround())
+                    {
                         mc.player.getControllingVehicle().setVelocity(mc.player.getVelocity().x,
                                 0.4, mc.player.getVelocity().z);
                     }
                     mc.player.getControllingVehicle().setVelocity(mc.player.getVelocity().x,
                             -0.4, mc.player.getVelocity().z);
                 }
-                if (strictConfig.getValue()) {
+                if (strictConfig.getValue())
+                {
                     Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.interact(
                             mc.player.getControllingVehicle(), false, Hand.MAIN_HAND));
                 }
@@ -101,26 +115,34 @@ public class EntitySpeedModule extends ToggleModule {
     }
 
     @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event) {
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
         if (mc.player == null || !mc.player.isRiding() || mc.options.sneakKey.isPressed()
-                || mc.player.getControllingVehicle() == null) {
+                || mc.player.getControllingVehicle() == null)
+        {
             return;
         }
-        if (strictConfig.getValue()) {
-            if (event.getPacket() instanceof EntityPassengersSetS2CPacket) {
+        if (strictConfig.getValue())
+        {
+            if (event.getPacket() instanceof EntityPassengersSetS2CPacket)
+            {
                 event.cancel();
-            } else if (event.getPacket() instanceof PlayerPositionLookS2CPacket) {
+            }
+            else if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
+            {
                 event.cancel();
             }
         }
     }
 
-    private void handleEntityMotion(float entitySpeed, double d, double d2) {
+    private void handleEntityMotion(float entitySpeed, double d, double d2)
+    {
         Vec3d motion = mc.player.getControllingVehicle().getVelocity();
         //
         float forward = mc.player.input.movementForward;
         float strafe = mc.player.input.movementSideways;
-        if (forward == 0 && strafe == 0) {
+        if (forward == 0 && strafe == 0)
+        {
             mc.player.getControllingVehicle().setVelocity(0.0, motion.y, 0.0);
             return;
         }

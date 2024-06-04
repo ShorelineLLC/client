@@ -9,7 +9,6 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -21,12 +20,14 @@ import net.shoreline.client.util.network.InteractType;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.eventbus.annotation.EventListener;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class CriticalsModule extends ToggleModule {
+public class CriticalsModule extends ToggleModule
+{
     private static CriticalsModule INSTANCE;
 
     //
@@ -37,12 +38,14 @@ public class CriticalsModule extends ToggleModule {
     /**
      *
      */
-    public CriticalsModule() {
+    public CriticalsModule()
+    {
         super("Criticals", "Modifies attacks to always land critical hits", ModuleCategory.COMBAT);
         INSTANCE = this;
     }
 
-    public static CriticalsModule getInstance() {
+    public static CriticalsModule getInstance()
+    {
         return INSTANCE;
     }
 
@@ -50,7 +53,8 @@ public class CriticalsModule extends ToggleModule {
      * @return
      */
     @Override
-    public String getModuleData() {
+    public String getModuleData()
+    {
         return EnumFormatter.formatEnum(modeConfig.getValue());
     }
 
@@ -58,30 +62,38 @@ public class CriticalsModule extends ToggleModule {
      * @param event
      */
     @EventListener
-    public void onPacketOutbound(PacketEvent.Outbound event) {
+    public void onPacketOutbound(PacketEvent.Outbound event)
+    {
         // Custom aura crit handling
-        if (mc.player == null || mc.world == null) {
+        if (mc.player == null || mc.world == null)
+        {
             return;
         }
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet
-                && packet.getType() == InteractType.ATTACK) {
+                && packet.getType() == InteractType.ATTACK)
+        {
             if (mc.player.isRiding()
                     || mc.player.isFallFlying()
                     || mc.player.isTouchingWater()
                     || mc.player.isInLava()
                     || mc.player.isHoldingOntoLadder()
                     || mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                    || InventoryUtil.isHolding32k()) {
+                    || InventoryUtil.isHolding32k())
+            {
                 return;
             }
             // Attacked entity
             final Entity e = packet.getEntity();
-            if (e == null || !e.isAlive() || !(e instanceof LivingEntity)) {
+            if (e == null || !e.isAlive() || !(e instanceof LivingEntity))
+            {
                 return;
             }
-            if (EntityUtil.isVehicle(e)) {
-                if (modeConfig.getValue() == CritMode.PACKET) {
-                    for (int i = 0; i < 5; ++i) {
+            if (EntityUtil.isVehicle(e))
+            {
+                if (modeConfig.getValue() == CritMode.PACKET)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
                         Managers.NETWORK.sendQuietPacket(PlayerInteractEntityC2SPacket.attack(e,
                                 Managers.POSITION.isSneaking()));
                         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -93,7 +105,8 @@ public class CriticalsModule extends ToggleModule {
         }
     }
 
-    public void attackSpoofJump(Entity e) {
+    public void attackSpoofJump(Entity e)
+    {
         double x = Managers.POSITION.getX();
         double y = Managers.POSITION.getY();
         double z = Managers.POSITION.getZ();
@@ -104,9 +117,12 @@ public class CriticalsModule extends ToggleModule {
             yaw = Managers.ROTATION.getRotationYaw();
             pitch = Managers.ROTATION.getRotationPitch();
         }
-        switch (modeConfig.getValue()) {
-            case VANILLA -> {
-                if (mc.player.isOnGround() && !mc.player.input.jumping) {
+        switch (modeConfig.getValue())
+        {
+            case VANILLA ->
+            {
+                if (mc.player.isOnGround() && !mc.player.input.jumping)
+                {
                     double d = 1.0e-7 + 1.0e-7 * (1.0 + RANDOM.nextInt(RANDOM.nextBoolean() ? 34 : 43));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                             x, y + 0.1016f + d * 3.0f, z, false));
@@ -117,8 +133,10 @@ public class CriticalsModule extends ToggleModule {
                     mc.player.addCritParticles(e);
                 }
             }
-            case PACKET -> {
-                if (mc.player.isOnGround() && !mc.player.input.jumping) {
+            case PACKET ->
+            {
+                if (mc.player.isOnGround() && !mc.player.input.jumping)
+                {
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                             x, y + 0.05f, z, false));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
@@ -130,8 +148,10 @@ public class CriticalsModule extends ToggleModule {
                     mc.player.addCritParticles(e);
                 }
             }
-            case PACKET_STRICT -> {
-                if (attackTimer.passed(500) && mc.player.isOnGround() && !mc.player.input.jumping) {
+            case PACKET_STRICT ->
+            {
+                if (attackTimer.passed(500) && mc.player.isOnGround() && !mc.player.input.jumping)
+                {
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                             x, y + 0.11f, z, false));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
@@ -142,8 +162,10 @@ public class CriticalsModule extends ToggleModule {
                     mc.player.addCritParticles(e);
                 }
             }
-            case GRIM -> {
-                if (!mc.player.isOnGround()) {
+            case GRIM ->
+            {
+                if (!mc.player.isOnGround())
+                {
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
                             x, y - 0.000001, z, yaw, pitch, false));
                 }
@@ -154,18 +176,21 @@ public class CriticalsModule extends ToggleModule {
 //                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
 //                        x, y + 0.001150000001304f, z, mc.player.getYaw(), mc.player.getPitch(), false));
             }
-            case LOW_HOP -> {
+            case LOW_HOP ->
+            {
                 // mc.player.jump();
                 Managers.MOVEMENT.setMotionY(0.3425);
             }
         }
     }
 
-    public boolean isGrim() {
+    public boolean isGrim()
+    {
         return modeConfig.getValue() == CritMode.GRIM;
     }
 
-    public enum CritMode {
+    public enum CritMode
+    {
         PACKET,
         PACKET_STRICT,
         VANILLA,

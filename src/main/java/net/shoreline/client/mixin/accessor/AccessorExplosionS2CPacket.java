@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(ExplosionS2CPacket.class)
-public interface AccessorExplosionS2CPacket {
+public interface AccessorExplosionS2CPacket
+{
     /**
      * @param playerVelocityX
      */

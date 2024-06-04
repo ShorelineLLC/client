@@ -2,29 +2,32 @@ package net.shoreline.client.impl.event.network;
 
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
+import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
-import net.shoreline.client.init.Managers;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class PacketEvent extends Event {
+public class PacketEvent extends Event
+{
     //
     private final Packet<?> packet;
 
     /**
      * @param packet
      */
-    public PacketEvent(Packet<?> packet) {
+    public PacketEvent(Packet<?> packet)
+    {
         this.packet = packet;
     }
 
     /**
      * @return
      */
-    public Packet<?> getPacket() {
+    public Packet<?> getPacket()
+    {
         return packet;
     }
 
@@ -32,19 +35,22 @@ public class PacketEvent extends Event {
      *
      */
     @Cancelable
-    public static class Inbound extends PacketEvent {
+    public static class Inbound extends PacketEvent
+    {
 
         private final PacketListener packetListener;
 
         /**
          * @param packet
          */
-        public Inbound(PacketListener packetListener, Packet<?> packet) {
+        public Inbound(PacketListener packetListener, Packet<?> packet)
+        {
             super(packet);
             this.packetListener = packetListener;
         }
 
-        public PacketListener getPacketListener() {
+        public PacketListener getPacketListener()
+        {
             return packetListener;
         }
     }
@@ -53,14 +59,16 @@ public class PacketEvent extends Event {
      *
      */
     @Cancelable
-    public static class Outbound extends PacketEvent {
+    public static class Outbound extends PacketEvent
+    {
         //
         private final boolean cached;
 
         /**
          * @param packet
          */
-        public Outbound(Packet<?> packet) {
+        public Outbound(Packet<?> packet)
+        {
             super(packet);
             this.cached = Managers.NETWORK.isCached(packet);
         }
@@ -68,7 +76,8 @@ public class PacketEvent extends Event {
         /**
          * @return
          */
-        public boolean isClientPacket() {
+        public boolean isClientPacket()
+        {
             return cached;
         }
     }

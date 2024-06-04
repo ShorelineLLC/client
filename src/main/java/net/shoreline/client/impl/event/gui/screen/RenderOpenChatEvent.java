@@ -4,15 +4,18 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class RenderOpenChatEvent extends Event {
+public class RenderOpenChatEvent extends Event
+{
 
     private float animation;
 
-    public void setAnimation(float animation) {
+    public void setAnimation(float animation)
+    {
         this.animation = animation;
     }
 
-    public float getAnimation() {
+    public float getAnimation()
+    {
         return animation;
     }
 }

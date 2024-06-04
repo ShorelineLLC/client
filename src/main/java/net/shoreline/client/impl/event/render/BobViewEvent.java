@@ -5,30 +5,36 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class BobViewEvent extends Event {
+public class BobViewEvent extends Event
+{
 
     private final MatrixStack matrixStack;
     private final float tickDelta;
     private float y;
 
-    public BobViewEvent(MatrixStack matrixStack, float tickDelta) {
+    public BobViewEvent(MatrixStack matrixStack, float tickDelta)
+    {
         this.matrixStack = matrixStack;
         this.tickDelta = tickDelta;
     }
 
-    public float getY() {
+    public float getY()
+    {
         return y;
     }
 
-    public void setY(float y) {
+    public void setY(float y)
+    {
         this.y = y;
     }
 
-    public MatrixStack getMatrixStack() {
+    public MatrixStack getMatrixStack()
+    {
         return matrixStack;
     }
 
-    public float getTickDelta() {
+    public float getTickDelta()
+    {
         return tickDelta;
     }
 }

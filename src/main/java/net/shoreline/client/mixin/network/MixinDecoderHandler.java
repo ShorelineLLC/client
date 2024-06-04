@@ -16,7 +16,8 @@ import java.util.List;
  * @see DecoderHandler
  */
 @Mixin(DecoderHandler.class)
-public class MixinDecoderHandler {
+public class MixinDecoderHandler
+{
     /**
      * @param ctx
      * @param buf
@@ -25,10 +26,12 @@ public class MixinDecoderHandler {
      */
     @Inject(method = "decode", at = @At(value = "INVOKE", target = "Lnet/minecraft/" +
             "network/NetworkState;getId()Ljava/lang/String;", shift = At.Shift.AFTER), cancellable = true)
-    private void hookDecode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> objects, CallbackInfo ci) {
+    private void hookDecode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> objects, CallbackInfo ci)
+    {
         DecodePacketEvent decodePacketEvent = new DecodePacketEvent();
         EventBus.INSTANCE.dispatch(decodePacketEvent);
-        if (decodePacketEvent.isCanceled()) {
+        if (decodePacketEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

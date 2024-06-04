@@ -11,54 +11,68 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class ModuleConfigFile extends ConfigFile {
+public class ModuleConfigFile extends ConfigFile
+{
 
     /**
      * @param dir
      * @param path
      */
-    public ModuleConfigFile(Path dir, String path) {
+    public ModuleConfigFile(Path dir, String path)
+    {
         super(dir, path);
     }
 
     @Override
-    public void save() {
-        try {
+    public void save()
+    {
+        try
+        {
             Path filepath = getFilepath();
-            if (!Files.exists(filepath)) {
+            if (!Files.exists(filepath))
+            {
                 Files.createFile(filepath);
             }
             final JsonObject out = new JsonObject();
             final JsonArray array = new JsonArray();
-            for (Module module : Managers.MODULE.getModules()) {
+            for (Module module : Managers.MODULE.getModules())
+            {
                 array.add(module.toJson());
             }
             out.add("configs", array);
             write(filepath, serialize(out));
         }
         // error writing file
-        catch (IOException e) {
+        catch (IOException e)
+        {
             // Shoreline.error("Could not save file for {}!", getFilepath());
             e.printStackTrace();
         }
     }
 
     @Override
-    public void load() {
-        try {
+    public void load()
+    {
+        try
+        {
             Path filepath = getFilepath();
-            if (Files.exists(filepath)) {
+            if (Files.exists(filepath))
+            {
                 String content = read(filepath);
                 JsonObject in = parseObject(content);
-                if (!in.has("configs")) {
+                if (!in.has("configs"))
+                {
                     return;
                 }
                 JsonArray array = in.getAsJsonArray("configs");
-                for (JsonElement element : array.asList()) {
+                for (JsonElement element : array.asList())
+                {
                     JsonObject object = element.getAsJsonObject();
-                    if (object.has("id")) {
+                    if (object.has("id"))
+                    {
                         Module module = Managers.MODULE.getModuleById(object.get("id").getAsString());
-                        if (module == null) {
+                        if (module == null)
+                        {
                             return;
                         }
                         module.fromJson(object);
@@ -67,7 +81,8 @@ public class ModuleConfigFile extends ConfigFile {
             }
         }
         // error writing file
-        catch (IOException e) {
+        catch (IOException e)
+        {
             // Shoreline.error("Could not read file for {}!", getFilepath());
             e.printStackTrace();
         }

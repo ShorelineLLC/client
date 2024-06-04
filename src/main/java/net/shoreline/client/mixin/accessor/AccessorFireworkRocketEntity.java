@@ -7,7 +7,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(FireworkRocketEntity.class)
-public interface AccessorFireworkRocketEntity {
+public interface AccessorFireworkRocketEntity
+{
     /**
      * @return
      */

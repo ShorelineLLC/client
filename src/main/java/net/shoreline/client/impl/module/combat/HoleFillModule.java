@@ -12,7 +12,6 @@ import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ObsidianPlacerModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -27,6 +26,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -38,7 +38,8 @@ import java.util.Map;
  * @author linus
  * @since 1.0
  */
-public class HoleFillModule extends ObsidianPlacerModule {
+public class HoleFillModule extends ObsidianPlacerModule
+{
     //
     Config<Boolean> obsidianConfig = register(new BooleanConfig("Obsidian", "Fills obsidian holes", true));
     Config<Boolean> doublesConfig = register(new BooleanConfig("Doubles", "Fills double holes", false));
@@ -62,70 +63,90 @@ public class HoleFillModule extends ObsidianPlacerModule {
     /**
      *
      */
-    public HoleFillModule() {
+    public HoleFillModule()
+    {
         super("HoleFill", "Fills in nearby holes with blocks", ModuleCategory.COMBAT);
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         fadeList.clear();
         fills.clear();
     }
 
     @EventListener
-    public void onDisconnect(DisconnectEvent event) {
+    public void onDisconnect(DisconnectEvent event)
+    {
         disable();
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event) {
+    public void onPlayerTick(PlayerTickEvent event)
+    {
         //
         int blocksPlaced = 0;
-        if (shiftDelayConfig.getValue() > 0 && shiftDelay < shiftDelayConfig.getValue()) {
+        if (shiftDelayConfig.getValue() > 0 && shiftDelay < shiftDelayConfig.getValue())
+        {
             shiftDelay++;
             return;
         }
         List<BlockPos> holes = new ArrayList<>();
-        for (Hole hole : Managers.HOLE.getHoles()) {
-            if (hole.isQuad() || hole.isDouble() && !doublesConfig.getValue() || hole.getSafety() == HoleType.OBSIDIAN && !obsidianConfig.getValue()) {
+        for (Hole hole : Managers.HOLE.getHoles())
+        {
+            if (hole.isQuad() || hole.isDouble() && !doublesConfig.getValue() || hole.getSafety() == HoleType.OBSIDIAN && !obsidianConfig.getValue())
+            {
                 continue;
             }
-            if (hole.squaredDistanceTo(mc.player) > ((NumberConfig) rangeConfig).getValueSq()) {
+            if (hole.squaredDistanceTo(mc.player) > ((NumberConfig) rangeConfig).getValueSq())
+            {
                 continue;
             }
             if (mc.world.getOtherEntities(null, new Box(hole.getPos()))
-                    .stream().anyMatch(e -> SurroundModule.getInstance().invalidEntity(e))) {
+                    .stream().anyMatch(e -> SurroundModule.getInstance().invalidEntity(e)))
+            {
                 continue;
             }
-            if (autoConfig.getValue()) {
-                for (PlayerEntity entity : mc.world.getPlayers()) {
-                    if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getName())) {
+            if (autoConfig.getValue())
+            {
+                for (PlayerEntity entity : mc.world.getPlayers())
+                {
+                    if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getName()))
+                    {
                         continue;
                     }
                     double dist = mc.player.distanceTo(entity);
-                    if (dist > enemyRangeConfig.getValue()) {
+                    if (dist > enemyRangeConfig.getValue())
+                    {
                         continue;
                     }
                     if (entity.getY() >= hole.getY() &&
-                            hole.squaredDistanceTo(entity) > ((NumberConfig) targetRangeConfig).getValueSq()) {
+                            hole.squaredDistanceTo(entity) > ((NumberConfig) targetRangeConfig).getValueSq())
+                    {
                         continue;
                     }
                     holes.add(hole.getPos());
                     break;
                 }
-            } else {
+            }
+            else
+            {
                 holes.add(hole.getPos());
             }
         }
         fills = holes;
-        if (fills.isEmpty()) {
-            if (autoDisableConfig.getValue()) {
+        if (fills.isEmpty())
+        {
+            if (autoDisableConfig.getValue())
+            {
                 disable();
             }
             return;
         }
-        while (blocksPlaced < shiftTicksConfig.getValue()) {
-            if (blocksPlaced >= fills.size()) {
+        while (blocksPlaced < shiftTicksConfig.getValue())
+        {
+            if (blocksPlaced >= fills.size())
+            {
                 break;
             }
             BlockPos targetPos = fills.get(blocksPlaced);
@@ -137,7 +158,8 @@ public class HoleFillModule extends ObsidianPlacerModule {
         }
     }
 
-    private void attack(Entity entity) {
+    private void attack(Entity entity)
+    {
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
@@ -152,10 +174,13 @@ public class HoleFillModule extends ObsidianPlacerModule {
         attackPlace(targetPos, slot);
     }
 
-    private void attackPlace(BlockPos targetPos, int slot) {
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay())) {
+    private void attackPlace(BlockPos targetPos, int slot)
+    {
+        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
+        {
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-            for (Entity entity : entities) {
+            for (Entity entity : entities)
+            {
                 attack(entity);
             }
             attackTimer.reset();

@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(RenderTickCounter.class)
-public class MixinRenderTickCounter {
+public class MixinRenderTickCounter
+{
     @Shadow
     private float lastFrameDuration;
     @Shadow
@@ -32,10 +33,12 @@ public class MixinRenderTickCounter {
     @Inject(method = "beginRenderTick", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookBeginRenderTick(long timeMillis,
-                                     CallbackInfoReturnable<Integer> cir) {
+                                     CallbackInfoReturnable<Integer> cir)
+    {
         TickCounterEvent tickCounterEvent = new TickCounterEvent();
         EventBus.INSTANCE.dispatch(tickCounterEvent);
-        if (tickCounterEvent.isCanceled()) {
+        if (tickCounterEvent.isCanceled())
+        {
             lastFrameDuration = ((timeMillis - prevTimeMillis) / tickTime) * tickCounterEvent.getTicks();
             prevTimeMillis = timeMillis;
             tickDelta += lastFrameDuration;

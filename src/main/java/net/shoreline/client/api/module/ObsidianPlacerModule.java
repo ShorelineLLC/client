@@ -14,17 +14,20 @@ import java.util.List;
  */
 public class ObsidianPlacerModule extends BlockPlacerModule
 {
-    private static final List<Block> RESISTANT_BLOCKS = new LinkedList<>() {{
-       add(Blocks.OBSIDIAN);
-       add(Blocks.CRYING_OBSIDIAN);
-       add(Blocks.ENDER_CHEST);
+    private static final List<Block> RESISTANT_BLOCKS = new LinkedList<>()
+    {{
+        add(Blocks.OBSIDIAN);
+        add(Blocks.CRYING_OBSIDIAN);
+        add(Blocks.ENDER_CHEST);
     }};
 
-    public ObsidianPlacerModule(String name, String desc, ModuleCategory category) {
+    public ObsidianPlacerModule(String name, String desc, ModuleCategory category)
+    {
         super(name, desc, category);
     }
 
-    public ObsidianPlacerModule(String name, String desc, ModuleCategory category, int rotationPriority) {
+    public ObsidianPlacerModule(String name, String desc, ModuleCategory category, int rotationPriority)
+    {
         super(name, desc, category, rotationPriority);
     }
 

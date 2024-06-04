@@ -2,6 +2,7 @@ package net.shoreline.client.impl.event.network;
 
 import net.shoreline.eventbus.Event;
 
-public class PlayerTickEvent extends Event {
+public class PlayerTickEvent extends Event
+{
 
 }

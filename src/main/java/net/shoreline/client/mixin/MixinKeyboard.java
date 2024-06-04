@@ -17,7 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(Keyboard.class)
-public class MixinKeyboard {
+public class MixinKeyboard
+{
     // @see Keyboard#client
     @Shadow
     @Final
@@ -33,12 +34,15 @@ public class MixinKeyboard {
      */
     @Inject(method = "onKey", at = @At(value = "HEAD"), cancellable = true)
     private void hookOnKey(long window, int key, int scancode, int action,
-                           int modifiers, CallbackInfo ci) {
-        if (client.getWindow().getHandle() == window) {
+                           int modifiers, CallbackInfo ci)
+    {
+        if (client.getWindow().getHandle() == window)
+        {
             KeyboardInputEvent keyboardInputEvent = new KeyboardInputEvent(key, action);
             EventBus.INSTANCE.dispatch(keyboardInputEvent);
             // prevent keyboard input
-            if (keyboardInputEvent.isCanceled()) {
+            if (keyboardInputEvent.isCanceled())
+            {
                 ci.cancel();
             }
         }

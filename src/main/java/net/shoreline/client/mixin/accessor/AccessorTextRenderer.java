@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * @since 1.0
  */
 @Mixin(TextRenderer.class)
-public interface AccessorTextRenderer {
+public interface AccessorTextRenderer
+{
     /**
      * @return
      */

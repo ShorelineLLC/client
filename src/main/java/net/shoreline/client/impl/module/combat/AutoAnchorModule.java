@@ -16,7 +16,6 @@ import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.BlockPlacerModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
@@ -26,11 +25,13 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoAnchorModule extends BlockPlacerModule {
+public class AutoAnchorModule extends BlockPlacerModule
+{
 
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when exploding anchors", true));
@@ -52,30 +53,39 @@ public class AutoAnchorModule extends BlockPlacerModule {
     private BlockPos anchorPos;
     private final Timer explodeTimer = new CacheTimer();
 
-    public AutoAnchorModule() {
+    public AutoAnchorModule()
+    {
         super("AutoAnchor", "Automatically places and explodes respawn anchors", ModuleCategory.COMBAT);
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         anchorPos = null;
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event) {
+    public void onPlayerTick(PlayerTickEvent event)
+    {
         ArrayList<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         List<BlockPos> blocks = getSphere(mc.player.getPos());
         anchorPos = calculateAnchorExplosion(blocks, entities);
-        if (anchorPos != null) {
-            if (rotateConfig.getValue()) {
+        if (anchorPos != null)
+        {
+            if (rotateConfig.getValue())
+            {
                 float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), anchorPos.toCenterPos());
                 setRotation(rotations[0], rotations[1]);
             }
-            if (explodeTimer.passed(1000.0f - explodeSpeedConfig.getValue() * 50.0f)) {
+            if (explodeTimer.passed(1000.0f - explodeSpeedConfig.getValue() * 50.0f))
+            {
                 BlockState state = mc.world.getBlockState(anchorPos);
-                if (state.getBlock() instanceof RespawnAnchorBlock) {
+                if (state.getBlock() instanceof RespawnAnchorBlock)
+                {
                     setAnchor(anchorPos);
-                } else {
+                }
+                else
+                {
                     placeAnchor(anchorPos);
                 }
                 explodeTimer.reset();
@@ -83,25 +93,32 @@ public class AutoAnchorModule extends BlockPlacerModule {
         }
     }
 
-    private void setAnchor(BlockPos pos) {
+    private void setAnchor(BlockPos pos)
+    {
         int slot = getBlockItemSlot(Blocks.GLOWSTONE);
-        if (slot == -1) {
+        if (slot == -1)
+        {
             return;
         }
         Managers.INVENTORY.setSlot(slot);
         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(),
                 strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(pos) : Direction.UP, pos, true));
-        if (swingConfig.getValue()) {
+        if (swingConfig.getValue())
+        {
             mc.player.swingHand(Hand.MAIN_HAND);
-        } else {
+        }
+        else
+        {
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
         Managers.INVENTORY.syncToClient();
     }
 
-    private void placeAnchor(BlockPos pos) {
+    private void placeAnchor(BlockPos pos)
+    {
         int slot = getBlockItemSlot(Blocks.RESPAWN_ANCHOR);
-        if (slot == -1) {
+        if (slot == -1)
+        {
             return;
         }
         Managers.INVENTORY.setSlot(slot);
@@ -123,55 +140,69 @@ public class AutoAnchorModule extends BlockPlacerModule {
     }
 
     // Most of the below code is stolen from the ca
-    private BlockPos calculateAnchorExplosion(List<BlockPos> placeBlocks, List<Entity> entities) {
-        if (placeBlocks.isEmpty() || entities.isEmpty()) {
+    private BlockPos calculateAnchorExplosion(List<BlockPos> placeBlocks, List<Entity> entities)
+    {
+        if (placeBlocks.isEmpty() || entities.isEmpty())
+        {
             return null;
         }
         BlockPos data = null;
         double dmg = 0.0f;
-        for (BlockPos pos : placeBlocks) {
+        for (BlockPos pos : placeBlocks)
+        {
             BlockState state = mc.world.getBlockState(pos);
-            if (!rangeCheck(pos) || !state.isReplaceable() && !(state.getBlock() instanceof RespawnAnchorBlock)) {
+            if (!rangeCheck(pos) || !state.isReplaceable() && !(state.getBlock() instanceof RespawnAnchorBlock))
+            {
                 continue;
             }
             double selfDamage = ExplosionUtil.getDamageTo(mc.player,
                     pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f); // Anchor explosions power = 10
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
-            if (unsafeToPlayer) {
+            if (unsafeToPlayer)
+            {
                 continue;
             }
-            for (Entity entity : entities) {
+            for (Entity entity : entities)
+            {
                 if (entity == null || !entity.isAlive() || entity == mc.player
                         || !isValidTarget(entity)
-                        || Managers.SOCIAL.isFriend(entity.getName())) {
+                        || Managers.SOCIAL.isFriend(entity.getName()))
+                {
                     continue;
                 }
                 double blockDist = pos.getSquaredDistance(entity.getPos());
-                if (blockDist > 144.0f) {
+                if (blockDist > 144.0f)
+                {
                     continue;
                 }
                 double dist = mc.player.squaredDistanceTo(entity);
-                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue()) {
+                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
+                {
                     continue;
                 }
                 double damage = ExplosionUtil.getDamageTo(entity,
                         pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f);
-                if (data == null || damage > dmg) {
+                if (data == null || damage > dmg)
+                {
                     data = pos;
                     dmg = damage;
                 }
             }
         }
-        if (data == null || dmg < minDamageConfig.getValue()) {
+        if (data == null || dmg < minDamageConfig.getValue())
+        {
             return null;
         }
         return data;
     }
 
-    private boolean playerDamageCheck(double playerDamage) {
-        if (!mc.player.isCreative()) {
+    private boolean playerDamageCheck(double playerDamage)
+    {
+        if (!mc.player.isCreative())
+        {
             float health = mc.player.getHealth() + mc.player.getAbsorptionAmount();
-            if (safetyConfig.getValue() && playerDamage >= health + 0.5f) {
+            if (safetyConfig.getValue() && playerDamage >= health + 0.5f)
+            {
                 return true;
             }
             return playerDamage > maxLocalDamageConfig.getValue();
@@ -179,17 +210,22 @@ public class AutoAnchorModule extends BlockPlacerModule {
         return false;
     }
 
-    private boolean rangeCheck(BlockPos pos) {
+    private boolean rangeCheck(BlockPos pos)
+    {
         double dist = mc.player.getEyePos().squaredDistanceTo(pos.toCenterPos());
         return dist > ((NumberConfig) rangeConfig).getValueSq();
     }
 
-    private List<BlockPos> getSphere(Vec3d origin) {
+    private List<BlockPos> getSphere(Vec3d origin)
+    {
         List<BlockPos> sphere = new ArrayList<>();
         double rad = Math.ceil(rangeConfig.getValue());
-        for (double x = -rad; x <= rad; ++x) {
-            for (double y = -rad; y <= rad; ++y) {
-                for (double z = -rad; z <= rad; ++z) {
+        for (double x = -rad; x <= rad; ++x)
+        {
+            for (double y = -rad; y <= rad; ++y)
+            {
+                for (double z = -rad; z <= rad; ++z)
+                {
                     Vec3i pos = new Vec3i((int) (origin.getX() + x),
                             (int) (origin.getY() + y), (int) (origin.getZ() + z));
                     final BlockPos p = new BlockPos(pos);
@@ -200,7 +236,8 @@ public class AutoAnchorModule extends BlockPlacerModule {
         return sphere;
     }
 
-    private boolean isValidTarget(Entity e) {
+    private boolean isValidTarget(Entity e)
+    {
         return e instanceof PlayerEntity && playersConfig.getValue()
                 || EntityUtil.isMonster(e) && monstersConfig.getValue()
                 || EntityUtil.isNeutral(e) && neutralsConfig.getValue()

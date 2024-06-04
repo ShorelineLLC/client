@@ -13,12 +13,12 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.collection.DefaultedList;
-import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.bus.EventBus;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,8 @@ import java.util.ArrayList;
  * @author xgraza & linus
  * @since 1.0
  */
-public class InventoryManager implements Globals {
+public class InventoryManager implements Globals
+{
 
     // The serverside selected hotbar slot.
     private int slot;
@@ -34,15 +35,19 @@ public class InventoryManager implements Globals {
     /**
      *
      */
-    public InventoryManager() {
+    public InventoryManager()
+    {
         EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener
-    public void onPacketOutBound(final PacketEvent.Outbound event) {
-        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet) {
+    public void onPacketOutBound(final PacketEvent.Outbound event)
+    {
+        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet)
+        {
             final int packetSlot = packet.getSelectedSlot();
-            if (!PlayerInventory.isValidHotbarIndex(packetSlot) || slot == packetSlot) {
+            if (!PlayerInventory.isValidHotbarIndex(packetSlot) || slot == packetSlot)
+            {
                 event.setCanceled(true);
                 return;
             }
@@ -51,40 +56,49 @@ public class InventoryManager implements Globals {
     }
 
     @EventListener
-    public void onPacketInbound(final PacketEvent.Inbound event) {
-        if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket packet) {
+    public void onPacketInbound(final PacketEvent.Inbound event)
+    {
+        if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket packet)
+        {
             slot = packet.getSlot();
         }
     }
 
     @EventListener
-    public void onItemDesync(ItemDesyncEvent event) {
+    public void onItemDesync(ItemDesyncEvent event)
+    {
         event.setCanceled(isDesynced());
         event.setStack(getServerItem());
     }
 
     /**
      * Sets the server slot via a {@link UpdateSelectedSlotC2SPacket}
+     *
      * @param barSlot the player hotbar slot 0-8
-     * @see InventoryManager#setSlotForced(int)
      * @apiNote Method will not do anything if the slot provided is already the server slot
+     * @see InventoryManager#setSlotForced(int)
      */
-    public void setSlot(final int barSlot) {
-        if (slot != barSlot && PlayerInventory.isValidHotbarIndex(barSlot)) {
+    public void setSlot(final int barSlot)
+    {
+        if (slot != barSlot && PlayerInventory.isValidHotbarIndex(barSlot))
+        {
             setSlotForced(barSlot);
         }
     }
 
     /**
      * Sets the server & client slot
+     *
      * @param barSlot the player hotbar slot 0-8
      * @apiNote Method will not do anything if the slot provided is already the server slot
      * @see InventoryManager#setSlotForced(int)
      * @see InventoryManager#setSlot(int)
      */
-    public void setClientSlot(final int barSlot) {
+    public void setClientSlot(final int barSlot)
+    {
         if (mc.player.getInventory().selectedSlot != barSlot
-                && PlayerInventory.isValidHotbarIndex(barSlot)) {
+                && PlayerInventory.isValidHotbarIndex(barSlot))
+        {
             mc.player.getInventory().selectedSlot = barSlot;
             setSlotForced(barSlot);
         }
@@ -92,17 +106,21 @@ public class InventoryManager implements Globals {
 
     /**
      * Sends a {@link UpdateSelectedSlotC2SPacket} without any slot checks
+     *
      * @param barSlot the player hotbar slot 0-8
      */
-    public void setSlotForced(final int barSlot) {
+    public void setSlotForced(final int barSlot)
+    {
         Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(barSlot));
     }
 
     /**
      * Syncs the server slot to the client slot
      */
-    public void syncToClient() {
-        if (isDesynced()) {
+    public void syncToClient()
+    {
+        if (isDesynced())
+        {
             setSlotForced(mc.player.getInventory().selectedSlot);
         }
     }
@@ -113,32 +131,39 @@ public class InventoryManager implements Globals {
     }
 
     //
-    public void closeScreen() {
+    public void closeScreen()
+    {
         Managers.NETWORK.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
     }
 
     /**
      * @param slot
      */
-    public int pickupSlot(final int slot) {
+    public int pickupSlot(final int slot)
+    {
         return click(slot, 0, SlotActionType.PICKUP);
     }
 
-    public void quickMove(final int slot) {
+    public void quickMove(final int slot)
+    {
         click(slot, 0, SlotActionType.QUICK_MOVE);
     }
 
     /**
      * @param slot
      */
-    public void throwSlot(final int slot) {
+    public void throwSlot(final int slot)
+    {
         click(slot, 0, SlotActionType.THROW);
     }
 
-    public int findEmptySlot() {
-        for (int i = 9; i < 36; i++) {
+    public int findEmptySlot()
+    {
+        for (int i = 9; i < 36; i++)
+        {
             ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.isEmpty()) {
+            if (stack.isEmpty())
+            {
                 return i;
             }
         }
@@ -150,20 +175,24 @@ public class InventoryManager implements Globals {
      * @param button
      * @param type
      */
-    private int click(int slot, int button, SlotActionType type) {
-        if (slot < 0) {
+    private int click(int slot, int button, SlotActionType type)
+    {
+        if (slot < 0)
+        {
             return -1;
         }
         ScreenHandler screenHandler = mc.player.currentScreenHandler;
         DefaultedList<Slot> defaultedList = screenHandler.slots;
         int i = defaultedList.size();
         ArrayList<ItemStack> list = Lists.newArrayListWithCapacity(i);
-        for (Slot slot1 : defaultedList) {
+        for (Slot slot1 : defaultedList)
+        {
             list.add(slot1.getStack().copy());
         }
         screenHandler.onSlotClick(slot, button, type, mc.player);
         Int2ObjectOpenHashMap<ItemStack> int2ObjectMap = new Int2ObjectOpenHashMap<>();
-        for (int j = 0; j < i; ++j) {
+        for (int j = 0; j < i; ++j)
+        {
             ItemStack itemStack2;
             ItemStack itemStack = list.get(j);
             if (ItemStack.areEqual(itemStack, itemStack2 = defaultedList.get(j).getStack())) continue;
@@ -177,12 +206,15 @@ public class InventoryManager implements Globals {
      * @param item
      * @return
      */
-    public int count(Item item) {
+    public int count(Item item)
+    {
         ItemStack offhandStack = mc.player.getOffHandStack();
         int itemCount = offhandStack.getItem() == item ? offhandStack.getCount() : 0;
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 36; i++)
+        {
             ItemStack slot = mc.player.getInventory().getStack(i);
-            if (slot.getItem() == item) {
+            if (slot.getItem() == item)
+            {
                 itemCount += slot.getCount();
             }
         }
@@ -192,19 +224,23 @@ public class InventoryManager implements Globals {
     /**
      * @return
      */
-    public int getServerSlot() {
+    public int getServerSlot()
+    {
         return slot;
     }
 
-    public int getClientSlot() {
+    public int getClientSlot()
+    {
         return mc.player.getInventory().selectedSlot;
     }
 
     /**
      * @return
      */
-    public ItemStack getServerItem() {
-        if (mc.player != null && getServerSlot() != -1) {
+    public ItemStack getServerItem()
+    {
+        if (mc.player != null && getServerSlot() != -1)
+        {
             return mc.player.getInventory().getStack(getServerSlot());
         }
         return null;

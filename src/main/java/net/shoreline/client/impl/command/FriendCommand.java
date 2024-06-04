@@ -12,30 +12,39 @@ import net.shoreline.client.util.chat.ChatUtil;
  * @author linus
  * @since 1.0
  */
-public class FriendCommand extends Command {
+public class FriendCommand extends Command
+{
 
     /**
      *
      */
-    public FriendCommand() {
+    public FriendCommand()
+    {
         super("Friend", "Adds/Removes a friend from the player list", literal("friend"));
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder) {
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    {
         builder.then(argument("add/del", StringArgumentType.string()).suggests(suggest("add", "del", "delete", "remove"))
-                .then(argument("friend_name", PlayerArgumentType.player()).executes(c -> {
+                .then(argument("friend_name", PlayerArgumentType.player()).executes(c ->
+                {
                     String playerName = PlayerArgumentType.getPlayer(c, "friend_name");
                     final String action = StringArgumentType.getString(c, "add/del");
-                    if (action.equalsIgnoreCase("add")) {
-                        if (Managers.SOCIAL.isFriend(playerName)) {
+                    if (action.equalsIgnoreCase("add"))
+                    {
+                        if (Managers.SOCIAL.isFriend(playerName))
+                        {
                             ChatUtil.error("Player is already friended!");
                             return 0;
                         }
                         ChatUtil.clientSendMessage("Added friend with name §s" + playerName);
                         Managers.SOCIAL.addFriend(playerName);
-                    } else if (action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("del") || action.equalsIgnoreCase("delete")) {
-                        if (!Managers.SOCIAL.isFriend(playerName)) {
+                    }
+                    else if (action.equalsIgnoreCase("remove") || action.equalsIgnoreCase("del") || action.equalsIgnoreCase("delete"))
+                    {
+                        if (!Managers.SOCIAL.isFriend(playerName))
+                        {
                             ChatUtil.error("Player is not friended!");
                             return 0;
                         }
@@ -43,12 +52,14 @@ public class FriendCommand extends Command {
                         Managers.SOCIAL.remove(playerName);
                     }
                     return 1;
-                })).executes(c -> {
+                })).executes(c ->
+                {
                     ChatUtil.error("Must provide player to friend!");
                     return 1;
-                })).executes(c -> {
-                    ChatUtil.error("Invalid usage! Usage: " + getUsage());
-                    return 1;
-                });
+                })).executes(c ->
+        {
+            ChatUtil.error("Invalid usage! Usage: " + getUsage());
+            return 1;
+        });
     }
 }

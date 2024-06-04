@@ -10,11 +10,13 @@ import net.shoreline.client.util.Globals;
  * @author linus
  * @since 1.0
  */
-public class MovementUtil implements Globals {
+public class MovementUtil implements Globals
+{
     /**
      * @return
      */
-    public static boolean isInputtingMovement() {
+    public static boolean isInputtingMovement()
+    {
         return mc.player.input.pressingForward
                 || mc.player.input.pressingBack
                 || mc.player.input.pressingLeft
@@ -24,7 +26,8 @@ public class MovementUtil implements Globals {
     /**
      * @return
      */
-    public static boolean isMovingInput() {
+    public static boolean isMovingInput()
+    {
         return mc.player.input.movementForward != 0.0f
                 || mc.player.input.movementSideways != 0.0f;
     }
@@ -32,7 +35,8 @@ public class MovementUtil implements Globals {
     /**
      * @return
      */
-    public static boolean isMoving() {
+    public static boolean isMoving()
+    {
         double d = mc.player.getX() - mc.player.lastX;
         double e = mc.player.getY() - mc.player.lastBaseY;
         double f = mc.player.getZ() - mc.player.lastZ;
@@ -60,40 +64,63 @@ public class MovementUtil implements Globals {
             fallDist = -1.5f;
         }
 
-        while(moveX != 0.0 && mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(moveX, fallDist, 0.0))) {
-            if (moveX < offset && moveX >= -offset) {
+        while (moveX != 0.0 && mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(moveX, fallDist, 0.0)))
+        {
+            if (moveX < offset && moveX >= -offset)
+            {
                 moveX = 0.0;
-            } else if (moveX > 0.0) {
+            }
+            else if (moveX > 0.0)
+            {
                 moveX -= offset;
-            } else {
+            }
+            else
+            {
                 moveX += offset;
             }
         }
 
-        while(moveZ != 0.0 && mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(0.0, fallDist, moveZ))) {
-            if (moveZ < offset && moveZ >= -offset) {
+        while (moveZ != 0.0 && mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(0.0, fallDist, moveZ)))
+        {
+            if (moveZ < offset && moveZ >= -offset)
+            {
                 moveZ = 0.0;
-            } else if (moveZ > 0.0) {
+            }
+            else if (moveZ > 0.0)
+            {
                 moveZ -= offset;
-            } else {
+            }
+            else
+            {
                 moveZ += offset;
             }
         }
 
-        while(moveX != 0.0 && moveZ != 0.0 && mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(moveX, fallDist, moveZ))) {
-            if (moveX < offset && moveX >= -offset) {
+        while (moveX != 0.0 && moveZ != 0.0 && mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(moveX, fallDist, moveZ)))
+        {
+            if (moveX < offset && moveX >= -offset)
+            {
                 moveX = 0.0;
-            } else if (moveX > 0.0) {
+            }
+            else if (moveX > 0.0)
+            {
                 moveX -= offset;
-            } else {
+            }
+            else
+            {
                 moveX += offset;
             }
 
-            if (moveZ < offset && moveZ >= -offset) {
+            if (moveZ < offset && moveZ >= -offset)
+            {
                 moveZ = 0.0;
-            } else if (moveZ > 0.0) {
+            }
+            else if (moveZ > 0.0)
+            {
                 moveZ -= offset;
-            } else {
+            }
+            else
+            {
                 moveZ += offset;
             }
         }
@@ -107,9 +134,12 @@ public class MovementUtil implements Globals {
         if (input.movementForward < 0.0f) rotationYaw += 180.0f;
 
         float forward = 1.0f;
-        if (input.movementForward < 0.0f) {
+        if (input.movementForward < 0.0f)
+        {
             forward = -0.5f;
-        } else if (input.movementForward > 0.0f) {
+        }
+        else if (input.movementForward > 0.0f)
+        {
             forward = 0.5f;
         }
 

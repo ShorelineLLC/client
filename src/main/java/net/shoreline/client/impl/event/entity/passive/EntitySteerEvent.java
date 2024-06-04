@@ -4,6 +4,7 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class EntitySteerEvent extends Event {
+public class EntitySteerEvent extends Event
+{
 
 }

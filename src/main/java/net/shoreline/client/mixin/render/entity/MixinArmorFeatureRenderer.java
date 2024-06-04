@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(ArmorFeatureRenderer.class)
-public class MixinArmorFeatureRenderer {
+public class MixinArmorFeatureRenderer
+{
     /**
      * @param matrices
      * @param vertexConsumers
@@ -33,10 +34,12 @@ public class MixinArmorFeatureRenderer {
     private void hookRenderArmor(MatrixStack matrices,
                                  VertexConsumerProvider vertexConsumers,
                                  LivingEntity entity, EquipmentSlot armorSlot,
-                                 int light, BipedEntityModel<?> model, CallbackInfo ci) {
+                                 int light, BipedEntityModel<?> model, CallbackInfo ci)
+    {
         RenderArmorEvent renderArmorEvent = new RenderArmorEvent(entity);
         EventBus.INSTANCE.dispatch(renderArmorEvent);
-        if (renderArmorEvent.isCanceled()) {
+        if (renderArmorEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

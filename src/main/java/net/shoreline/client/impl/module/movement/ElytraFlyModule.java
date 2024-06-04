@@ -115,7 +115,8 @@ public class ElytraFlyModule extends RotationModule
         {
             Managers.TICK.setClientTick(1.0f);
         }
-        if (accelerationConfig.getValue()) {
+        if (accelerationConfig.getValue())
+        {
             if (!MovementUtil.isInputtingMovement() || mc.player.horizontalCollision)
             {
                 speed = 0.0f;
@@ -151,7 +152,8 @@ public class ElytraFlyModule extends RotationModule
         if (modeConfig.getValue() == FlyMode.BOUNCE && bounceTimer.passed(3))
         {
             boolean fallFlying = event.isFallFlying();
-            if (previousFallFlying && !fallFlying) {
+            if (previousFallFlying && !fallFlying)
+            {
                 event.cancel();
                 event.setFallFlying(recastElytra());
             }
@@ -193,9 +195,12 @@ public class ElytraFlyModule extends RotationModule
                 float forward = mc.player.input.movementForward;
                 float strafe = mc.player.input.movementSideways;
                 float yaw = mc.player.getYaw();
-                if (forward == 0.0f && strafe == 0.0f) {
+                if (forward == 0.0f && strafe == 0.0f)
+                {
                     Managers.MOVEMENT.setMotionXZ(0.0, 0.0);
-                } else {
+                }
+                else
+                {
                     pitch = 12;
                     double rx = Math.cos(Math.toRadians(yaw + 90.0f));
                     double rz = Math.sin(Math.toRadians(yaw + 90.0f));
@@ -205,16 +210,20 @@ public class ElytraFlyModule extends RotationModule
                 }
                 Managers.MOVEMENT.setMotionY(0.0);
                 pitch = 0;
-                if (mc.options.jumpKey.isPressed()) {
+                if (mc.options.jumpKey.isPressed())
+                {
                     pitch = -51;
                     Managers.MOVEMENT.setMotionY(vspeedConfig.getValue());
-                } else if (mc.options.sneakKey.isPressed()) {
+                }
+                else if (mc.options.sneakKey.isPressed())
+                {
                     Managers.MOVEMENT.setMotionY(-vspeedConfig.getValue());
                 }
             }
             case BOOST ->
             {
-                if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava()) {
+                if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava())
+                {
                     return;
                 }
                 event.cancel();
@@ -228,13 +237,16 @@ public class ElytraFlyModule extends RotationModule
 
                 Vec3d postMotion = mc.player.getVelocity();
                 double speed = Math.hypot(postMotion.x, postMotion.z);
-                if (speed > maxSpeedConfig.getValue()) {
+                if (speed > maxSpeedConfig.getValue())
+                {
                     Managers.MOVEMENT.setMotionXZ(postMotion.x * maxSpeedConfig.getValue() / speed,
                             postMotion.z * maxSpeedConfig.getValue() / speed);
                 }
             }
-            case FACTORIZE -> {
-                if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava()) {
+            case FACTORIZE ->
+            {
+                if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava())
+                {
                     return;
                 }
                 event.cancel();
@@ -243,7 +255,8 @@ public class ElytraFlyModule extends RotationModule
                 Vec3d motion = mc.player.getVelocity();
                 Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
                 float yaw = mc.player.getYaw() * 0.017453292f;
-                if (boost) {
+                if (boost)
+                {
                     double sin = -MathHelper.sin(yaw);
                     double cos = MathHelper.cos(yaw);
                     double motionX = sin * speedConfig.getValue() / 20.0f;
@@ -283,7 +296,8 @@ public class ElytraFlyModule extends RotationModule
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event) {
+    public void onPlayerTick(PlayerTickEvent event)
+    {
         if (modeConfig.getValue() == FlyMode.BOUNCE)
         {
             mc.player.setPitch(pitchConfig.getValue());
@@ -309,8 +323,10 @@ public class ElytraFlyModule extends RotationModule
     }
 
     @EventListener
-    public void onJumpDelay(JumpDelayEvent event) {
-        if (modeConfig.getValue() != FlyMode.BOUNCE) {
+    public void onJumpDelay(JumpDelayEvent event)
+    {
+        if (modeConfig.getValue() != FlyMode.BOUNCE)
+        {
             return;
         }
         event.cancel();
@@ -360,11 +376,14 @@ public class ElytraFlyModule extends RotationModule
     }
 
     // @author hockeyl8
-    private boolean isBoostedByRocket() {
-        for (Entity entity : mc.world.getEntities()) {
+    private boolean isBoostedByRocket()
+    {
+        for (Entity entity : mc.world.getEntities())
+        {
             if (entity instanceof FireworkRocketEntity rocket
                     && ((AccessorFireworkRocketEntity) rocket).hookWasShotByEntity()
-                    && ((AccessorFireworkRocketEntity) rocket).hookGetShooter() == mc.player) {
+                    && ((AccessorFireworkRocketEntity) rocket).hookGetShooter() == mc.player)
+            {
                 return true;
             }
         }
@@ -379,10 +398,12 @@ public class ElytraFlyModule extends RotationModule
         return new Vec3d(d4, 0.0, d5);
     }
 
-    private Vec3d glideElytraVanilla(float pitch) {
+    private Vec3d glideElytraVanilla(float pitch)
+    {
         double d = 0.08;
         boolean bl = mc.player.getVelocity().y <= 0.0;
-        if (bl && mc.player.hasStatusEffect(StatusEffects.SLOW_FALLING)) {
+        if (bl && mc.player.hasStatusEffect(StatusEffects.SLOW_FALLING))
+        {
             d = 0.01;
         }
         Vec3d vec3d4 = mc.player.getVelocity();
@@ -400,7 +421,8 @@ public class ElytraFlyModule extends RotationModule
         //    m = vec3d4.y * -0.1 * l;
         //    vec3d4 = vec3d4.add(vec3d5.x * m / i, m, vec3d5.z * m / i);
         // }
-        if (f < 0.0f && i > 0.0) {
+        if (f < 0.0f && i > 0.0)
+        {
             m = j * (double) (-MathHelper.sin(f)) * 0.04;
             vec3d4 = vec3d4.add(-vec3d5.x * m / i, m * 3.2, -vec3d5.z * m / i);
         }
@@ -411,17 +433,19 @@ public class ElytraFlyModule extends RotationModule
         return vec3d4.multiply(0.9900000095367432, 0.9800000190734863, 0.9900000095367432);
     }
 
-    protected final Vec3d getRotationVector(float pitch, float yaw) {
+    protected final Vec3d getRotationVector(float pitch, float yaw)
+    {
         float f = pitch * 0.017453292f;
         float g = -yaw * 0.017453292f;
         float h = MathHelper.cos(g);
         float i = MathHelper.sin(g);
         float j = MathHelper.cos(f);
         float k = MathHelper.sin(f);
-        return new Vec3d((double) (i * j), (double) (-k), (double) (h * j));
+        return new Vec3d(i * j, -k, h * j);
     }
 
-    public boolean recastElytra() {
+    public boolean recastElytra()
+    {
         if (checkElytra() && checkFallFlying())
         {
             Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
@@ -454,7 +478,8 @@ public class ElytraFlyModule extends RotationModule
         return false;
     }
 
-    public enum FlyMode {
+    public enum FlyMode
+    {
         CONTROL,
         BOOST,
         FACTORIZE,

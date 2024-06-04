@@ -7,24 +7,29 @@ import net.shoreline.eventbus.Event;
 import java.util.UUID;
 
 @Cancelable
-public class PlayerListNameEvent extends Event {
+public class PlayerListNameEvent extends Event
+{
     private Text playerName;
     private final UUID id;
 
-    public PlayerListNameEvent(Text playerName, UUID id) {
+    public PlayerListNameEvent(Text playerName, UUID id)
+    {
         this.playerName = playerName;
         this.id = id;
     }
 
-    public void setPlayerName(Text playerName) {
+    public void setPlayerName(Text playerName)
+    {
         this.playerName = playerName;
     }
 
-    public Text getPlayerName() {
+    public Text getPlayerName()
+    {
         return playerName;
     }
 
-    public UUID getId() {
+    public UUID getId()
+    {
         return id;
     }
 }

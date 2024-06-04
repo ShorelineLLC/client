@@ -13,22 +13,27 @@ import net.shoreline.client.init.Managers;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-public class ModuleArgumentType implements ArgumentType<Module> {
+public class ModuleArgumentType implements ArgumentType<Module>
+{
 
-    public static ModuleArgumentType module() {
+    public static ModuleArgumentType module()
+    {
         return new ModuleArgumentType();
     }
 
-    public static Module getModule(final CommandContext<?> context, final String name) {
+    public static Module getModule(final CommandContext<?> context, final String name)
+    {
         return context.getArgument(name, Module.class);
     }
 
     @Override
-    public Module parse(StringReader reader) throws CommandSyntaxException {
+    public Module parse(StringReader reader) throws CommandSyntaxException
+    {
         String string = reader.readString();
         String id = String.format(Module.MODULE_ID_FORMAT, string.toLowerCase());
         Module module = Managers.MODULE.getModuleById(id);
-        if (module == null) {
+        if (module == null)
+        {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException().createWithContext(reader, null);
         }
         return module;
@@ -36,12 +41,14 @@ public class ModuleArgumentType implements ArgumentType<Module> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context,
-                                                              final SuggestionsBuilder builder) {
+                                                              final SuggestionsBuilder builder)
+    {
         return CommandSource.suggestMatching(Managers.MODULE.getModules().stream().map(Module::getName), builder);
     }
 
     @Override
-    public Collection<String> getExamples() {
+    public Collection<String> getExamples()
+    {
         return Managers.MODULE.getModules().stream().map(Module::getName).limit(10).toList();
     }
 }

@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @since 1.0
  */
 @Mixin(FireworkRocketEntityRenderer.class)
-public class MixinFireworkRocketEntityRenderer {
+public class MixinFireworkRocketEntityRenderer
+{
     /**
      * @param fireworkRocketEntity
      * @param f
@@ -34,11 +35,13 @@ public class MixinFireworkRocketEntityRenderer {
     private void hookRender(FireworkRocketEntity fireworkRocketEntity,
                             float f, float g, MatrixStack matrixStack,
                             VertexConsumerProvider vertexConsumerProvider,
-                            int i, CallbackInfo ci) {
+                            int i, CallbackInfo ci)
+    {
         RenderFireworkRocketEvent renderFireworkRocketEvent =
                 new RenderFireworkRocketEvent();
         EventBus.INSTANCE.dispatch(renderFireworkRocketEvent);
-        if (renderFireworkRocketEvent.isCanceled()) {
+        if (renderFireworkRocketEvent.isCanceled())
+        {
             ci.cancel();
         }
     }

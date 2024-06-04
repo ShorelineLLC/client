@@ -19,7 +19,6 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
@@ -35,6 +34,7 @@ import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.string.EnumFormatter;
+import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
 
 import java.awt.*;
@@ -46,7 +46,8 @@ import java.util.stream.Stream;
  * @author linus & hockeyl8
  * @since 1.0
  */
-public class HUDModule extends ToggleModule {
+public class HUDModule extends ToggleModule
+{
 
     //
     // private static final HudScreen HUD_SCREEN = new HudScreen();
@@ -84,15 +85,18 @@ public class HUDModule extends ToggleModule {
     private boolean renderingUp;
     private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
 
-    public HUDModule() {
+    public HUDModule()
+    {
         super("HUD", "Displays the HUD (heads up display) screen.",
                 ModuleCategory.CLIENT);
     }
 
-    private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule) {
+    private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule)
+    {
         final Animation anim = toggleModule.getAnimation();
         float factor = (float) anim.getFactor();
-        if (factor <= 0.01f || toggleModule.isHidden()) {
+        if (factor <= 0.01f || toggleModule.isHidden())
+        {
             return;
         }
         String text = getFormattedModule(toggleModule);
@@ -100,24 +104,31 @@ public class HUDModule extends ToggleModule {
         RenderManager.renderText(event.getContext(), text,
                 mc.getWindow().getScaledWidth() - width * factor - 1.0f,
                 renderingUp ? topRight : bottomRight, getHudColor(rainbowOffset));
-        if (renderingUp) {
+        if (renderingUp)
+        {
             topRight += 9.0f;
-        } else {
+        }
+        else
+        {
             bottomRight -= 9.0f;
         }
         rainbowOffset++;
     }
 
     @EventListener
-    public void onRenderOpenChat(RenderOpenChatEvent event) {
+    public void onRenderOpenChat(RenderOpenChatEvent event)
+    {
         event.cancel();
         event.setAnimation((float) chatOpenAnimation.getFactor());
     }
 
     @EventListener
-    public void onRenderOverlayPost(RenderOverlayEvent.Post event) {
-        if (mc.player != null && mc.world != null) {
-            if (mc.getDebugHud().shouldShowDebugHud()) {
+    public void onRenderOverlayPost(RenderOverlayEvent.Post event)
+    {
+        if (mc.player != null && mc.world != null)
+        {
+            if (mc.getDebugHud().shouldShowDebugHud())
+            {
                 return;
             }
             Window res = mc.getWindow();
@@ -133,10 +144,12 @@ public class HUDModule extends ToggleModule {
             bottomLeft -= (float) (14.0f * chatOpenAnimation.getFactor());
             bottomRight -= (float) (14.0f * chatOpenAnimation.getFactor());
             if (potionHudConfig.getValue() == VanillaHud.MOVE
-                    && !mc.player.getStatusEffects().isEmpty()) {
+                    && !mc.player.getStatusEffects().isEmpty())
+            {
                 topRight += 27.0f;
             }
-            if (watermarkConfig.getValue()) {
+            if (watermarkConfig.getValue())
+            {
                 RenderManager.renderText(event.getContext(), String.format("%s %s (%s%s)",
                         ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER,
                         ShorelineMod.MOD_BUILD_NUMBER, !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""), 2.0f, topLeft, getHudColor(rainbowOffset));
@@ -156,23 +169,29 @@ public class HUDModule extends ToggleModule {
                 topLeft += 9.0F;
             }
 
-            if (arraylistConfig.getValue()) {
+            if (arraylistConfig.getValue())
+            {
                 List<Module> modules = Managers.MODULE.getModules();
 
                 Stream<ToggleModule> moduleStream = modules.stream()
                         .filter(ToggleModule.class::isInstance)
                         .map(ToggleModule.class::cast);
 
-                moduleStream = switch (orderingConfig.getValue()) {
+                moduleStream = switch (orderingConfig.getValue())
+                {
                     case ALPHABETICAL -> StreamUtils.sortCached(moduleStream, Module::getName);
-                    case LENGTH -> StreamUtils.sortCached(moduleStream, m -> -RenderManager.textWidth(getFormattedModule(m)));
+                    case LENGTH ->
+                            StreamUtils.sortCached(moduleStream, m -> -RenderManager.textWidth(getFormattedModule(m)));
                 };
                 moduleStream.forEach(t -> arrayListRenderModule(event, t));
             }
-            if (potionEffectsConfig.getValue()) {
-                for (StatusEffectInstance e : mc.player.getStatusEffects()) {
+            if (potionEffectsConfig.getValue())
+            {
+                for (StatusEffectInstance e : mc.player.getStatusEffects())
+                {
                     final StatusEffect effect = e.getEffectType();
-                    if (effect == StatusEffects.NIGHT_VISION) {
+                    if (effect == StatusEffects.NIGHT_VISION)
+                    {
                         continue;
                     }
                     boolean amplifier = e.getAmplifier() + 1 > 1 && !e.isInfinite();
@@ -185,28 +204,36 @@ public class HUDModule extends ToggleModule {
                     RenderManager.renderText(event.getContext(), text,
                             res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
                             potionColorsConfig.getValue() ? effect.getColor() : getHudColor(rainbowOffset));
-                    if (renderingUp) {
+                    if (renderingUp)
+                    {
                         bottomRight -= 9.0f;
-                    } else {
+                    }
+                    else
+                    {
                         topRight += 9.0f;
                     }
                     rainbowOffset++;
                 }
             }
-            if (serverBrandConfig.getValue() && mc.getServer() != null) {
+            if (serverBrandConfig.getValue() && mc.getServer() != null)
+            {
                 String brand = mc.getServer().getVersion();
                 int width = RenderManager.textWidth(brand);
                 RenderManager.renderText(event.getContext(), brand,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
                         getHudColor(rainbowOffset));
-                if (renderingUp) {
+                if (renderingUp)
+                {
                     bottomRight -= 9.0f;
-                } else {
+                }
+                else
+                {
                     topRight += 9.0f;
                 }
                 rainbowOffset++;
             }
-            if (speedConfig.getValue()) {
+            if (speedConfig.getValue())
+            {
                 double x = mc.player.getX() - mc.player.prevX;
                 // double y = mc.player.getY() - mc.player.prevY;
                 double z = mc.player.getZ() - mc.player.prevZ;
@@ -220,14 +247,18 @@ public class HUDModule extends ToggleModule {
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
                         getHudColor(rainbowOffset));
-                if (renderingUp) {
+                if (renderingUp)
+                {
                     bottomRight -= 9.0f;
-                } else {
+                }
+                else
+                {
                     topRight += 9.0f;
                 }
                 rainbowOffset++;
             }
-            if (durabilityConfig.getValue() && mc.player.getMainHandStack().isDamageable()) {
+            if (durabilityConfig.getValue() && mc.player.getMainHandStack().isDamageable())
+            {
                 int n = mc.player.getMainHandStack().getMaxDamage();
                 int n2 = mc.player.getMainHandStack().getDamage();
                 String text1 = "Durability ";
@@ -241,28 +272,36 @@ public class HUDModule extends ToggleModule {
                 RenderManager.renderText(event.getContext(), text2,
                         res.getScaledWidth() - width2 - 1.0f, renderingUp ? bottomRight : topRight,
                         color.getRGB());
-                if (renderingUp) {
+                if (renderingUp)
+                {
                     bottomRight -= 9.0f;
-                } else {
+                }
+                else
+                {
                     topRight += 9.0f;
                 }
                 rainbowOffset++;
             }
-            if (pingConfig.getValue() && !mc.isInSingleplayer()) {
+            if (pingConfig.getValue() && !mc.isInSingleplayer())
+            {
                 int latency = FastLatencyModule.getInstance().isEnabled() ? (int) FastLatencyModule.getInstance().getLatency() : Managers.NETWORK.getClientLatency();
                 String text = String.format("Ping §f%dms", latency);
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
                         getHudColor(rainbowOffset));
-                if (renderingUp) {
+                if (renderingUp)
+                {
                     bottomRight -= 9.0f;
-                } else {
+                }
+                else
+                {
                     topRight += 9.0f;
                 }
                 rainbowOffset++;
             }
-            if (tpsConfig.getValue()) {
+            if (tpsConfig.getValue())
+            {
                 float curr = Managers.TICK.getTpsCurrent();
                 float avg = Managers.TICK.getTpsAverage();
                 String text = String.format("TPS §f%s §7[§f%s§7]",
@@ -272,14 +311,18 @@ public class HUDModule extends ToggleModule {
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
                         getHudColor(rainbowOffset));
-                if (renderingUp) {
+                if (renderingUp)
+                {
                     bottomRight -= 9.0f;
-                } else {
+                }
+                else
+                {
                     topRight += 9.0f;
                 }
                 rainbowOffset++;
             }
-            if (fpsConfig.getValue()) {
+            if (fpsConfig.getValue())
+            {
                 String text = String.format("FPS §f%d", mc.getCurrentFps());
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
@@ -288,7 +331,8 @@ public class HUDModule extends ToggleModule {
                 // bottomRight -= 9.0f;
                 rainbowOffset++;
             }
-            if (coordsConfig.getValue()) {
+            if (coordsConfig.getValue())
+            {
                 double x = mc.player.getX();
                 double y = mc.player.getY();
                 double z = mc.player.getZ();
@@ -305,7 +349,8 @@ public class HUDModule extends ToggleModule {
                 bottomLeft -= 9.0f;
                 rainbowOffset++;
             }
-            if (directionConfig.getValue()) {
+            if (directionConfig.getValue())
+            {
                 final Direction direction = mc.player.getHorizontalFacing();
                 String dir = EnumFormatter.formatDirection(direction);
                 String axis = EnumFormatter.formatAxis(direction.getAxis());
@@ -317,24 +362,33 @@ public class HUDModule extends ToggleModule {
                 // bottomLeft -= 9.0f;
                 rainbowOffset++;
             }
-            if (armorConfig.getValue()) {
+            if (armorConfig.getValue())
+            {
                 final Entity riding = mc.player.getVehicle();
                 //
                 int x = res.getScaledWidth() / 2 + 15;
                 int y = res.getScaledHeight();
                 int n1 = mc.player.getMaxAir();
                 int n2 = Math.min(mc.player.getAir(), n1);
-                if (mc.player.isSubmergedIn(FluidTags.WATER) || n2 < n1) {
+                if (mc.player.isSubmergedIn(FluidTags.WATER) || n2 < n1)
+                {
                     y -= 65;
-                } else if (riding instanceof LivingEntity entity) {
+                }
+                else if (riding instanceof LivingEntity entity)
+                {
                     y -= 45 + (int) Math.ceil((entity.getMaxHealth() - 1.0f) / 20.0f) * 10;
-                } else if (riding != null) {
+                }
+                else if (riding != null)
+                {
                     y -= 45;
-                } else {
+                }
+                else
+                {
                     y -= mc.player.isCreative() ?
                             (mc.player.isRiding() ? 45 : 38) : 55;
                 }
-                for (int i = 3; i >= 0; --i) {
+                for (int i = 3; i >= 0; --i)
+                {
                     ItemStack armor = mc.player.getInventory().armor.get(i);
                     event.getContext().drawItem(armor, x, y);
                     event.getContext().drawItemInSlot(mc.textRenderer, armor, x, y);
@@ -345,35 +399,46 @@ public class HUDModule extends ToggleModule {
     }
 
     @EventListener
-    public void onChatOpen(ScreenOpenEvent event) {
-        if (event.getScreen() == null && chatOpenAnimation.getState()) {
+    public void onChatOpen(ScreenOpenEvent event)
+    {
+        if (event.getScreen() == null && chatOpenAnimation.getState())
+        {
             chatOpenAnimation.setState(false);
-        } else if (event.getScreen() instanceof ChatScreen) {
+        }
+        else if (event.getScreen() instanceof ChatScreen)
+        {
             chatOpenAnimation.setState(true);
         }
     }
 
     @EventListener
-    public void onRenderOverlayStatusEffect(RenderOverlayEvent.StatusEffect event) {
-        if (potionHudConfig.getValue() == VanillaHud.HIDE) {
+    public void onRenderOverlayStatusEffect(RenderOverlayEvent.StatusEffect event)
+    {
+        if (potionHudConfig.getValue() == VanillaHud.HIDE)
+        {
             event.cancel();
         }
     }
 
     @EventListener
-    public void onRenderOverlayItemName(RenderOverlayEvent.ItemName event) {
-        if (itemNameConfig.getValue() != VanillaHud.KEEP) {
+    public void onRenderOverlayItemName(RenderOverlayEvent.ItemName event)
+    {
+        if (itemNameConfig.getValue() != VanillaHud.KEEP)
+        {
             event.cancel();
         }
-        if (itemNameConfig.getValue() == VanillaHud.MOVE) {
+        if (itemNameConfig.getValue() == VanillaHud.MOVE)
+        {
             final Window window = mc.getWindow();
             int x = window.getScaledWidth() / 2 - 90;
             int y = window.getScaledHeight() - 49;
             boolean armor = !mc.player.getInventory().armor.isEmpty();
-            if (mc.player.getAbsorptionAmount() > 0.0f) {
+            if (mc.player.getAbsorptionAmount() > 0.0f)
+            {
                 y -= 9;
             }
-            if (armor) {
+            if (armor)
+            {
                 y -= 9;
             }
             event.setX(x);
@@ -381,8 +446,10 @@ public class HUDModule extends ToggleModule {
         }
     }
 
-    private int getHudColor(int rainbowOffset) {
-        return switch (rainbowModeConfig.getValue()) {
+    private int getHudColor(int rainbowOffset)
+    {
+        return switch (rainbowModeConfig.getValue())
+        {
             case OFF -> ColorsModule.getInstance().getRGB();
             case STATIC -> rainbow(1L);
             case GRADIENT -> rainbow(rainbowOffset);
@@ -390,16 +457,19 @@ public class HUDModule extends ToggleModule {
         };
     }
 
-    private String getFormattedModule(final Module module) {
+    private String getFormattedModule(final Module module)
+    {
         final String metadata = module.getModuleData();
-        if (!metadata.equals("ARRAYLIST_INFO")) {
+        if (!metadata.equals("ARRAYLIST_INFO"))
+        {
             return String.format("%s §7[§f%s§7]", module.getName(),
                     module.getModuleData());
         }
         return module.getName();
     }
 
-    private int rainbow(long offset) {
+    private int rainbow(long offset)
+    {
         float hue = (float) (((double) System.currentTimeMillis() * (rainbowSpeedConfig.getValue() / 10)
                 + (double) (offset * 500L)) % (30000 / (rainbowDifferenceConfig.getValue() / 100))
                 / (30000 / (rainbowDifferenceConfig.getValue() / 20.0f)));
@@ -407,7 +477,8 @@ public class HUDModule extends ToggleModule {
                 rainbowBrightnessConfig.getValue() / 100.0f);
     }
 
-    public static int alpha(long offset) {
+    public static int alpha(long offset)
+    {
         offset = (offset * 2) + 10;
         float[] hsb = new float[3];
         Color color = ColorsModule.getInstance().getColor();
@@ -418,27 +489,32 @@ public class HUDModule extends ToggleModule {
         return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
     }
 
-    public float getChatAnimation() {
+    public float getChatAnimation()
+    {
         return (float) chatOpenAnimation.getFactor();
     }
 
-    public enum VanillaHud {
+    public enum VanillaHud
+    {
         MOVE,
         HIDE,
         KEEP
     }
 
-    public enum Ordering {
+    public enum Ordering
+    {
         LENGTH,
         ALPHABETICAL
     }
 
-    public enum Rendering {
+    public enum Rendering
+    {
         UP,
         DOWN
     }
 
-    public enum RainbowMode {
+    public enum RainbowMode
+    {
         OFF,
         GRADIENT,
         STATIC

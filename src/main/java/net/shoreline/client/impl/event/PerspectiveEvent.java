@@ -5,15 +5,18 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class PerspectiveEvent extends Event {
+public class PerspectiveEvent extends Event
+{
 
     public Camera camera;
 
-    public PerspectiveEvent(Camera camera) {
+    public PerspectiveEvent(Camera camera)
+    {
         this.camera = camera;
     }
 
-    public Camera getCamera() {
+    public Camera getCamera()
+    {
         return camera;
     }
 

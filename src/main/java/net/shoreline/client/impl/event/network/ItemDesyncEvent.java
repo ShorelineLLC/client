@@ -5,17 +5,19 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.Event;
 
 @Cancelable
-public class ItemDesyncEvent extends Event {
+public class ItemDesyncEvent extends Event
+{
 
     private ItemStack stack;
 
 
-
-    public void setStack(ItemStack stack) {
+    public void setStack(ItemStack stack)
+    {
         this.stack = stack;
     }
 
-    public ItemStack getServerItem() {
+    public ItemStack getServerItem()
+    {
         return stack;
     }
 }

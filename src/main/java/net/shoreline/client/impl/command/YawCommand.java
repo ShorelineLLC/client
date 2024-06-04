@@ -16,7 +16,8 @@ public class YawCommand extends Command
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
-        builder.then(argument("yaw", FloatArgumentType.floatArg()).executes(c -> {
+        builder.then(argument("yaw", FloatArgumentType.floatArg()).executes(c ->
+        {
             float yaw = FloatArgumentType.getFloat(c, "yaw");
             mc.player.setYaw(yaw);
             mc.player.setHeadYaw(yaw);

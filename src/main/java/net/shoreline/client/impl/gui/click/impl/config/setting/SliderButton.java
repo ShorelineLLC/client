@@ -18,7 +18,8 @@ import java.math.RoundingMode;
  * @author linus
  * @since 1.0
  */
-public class SliderButton<T extends Number> extends ConfigButton<T> {
+public class SliderButton<T extends Number> extends ConfigButton<T>
+{
     // Slider rounding scale
     private final int scale;
 
@@ -26,7 +27,8 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
      * @param frame
      * @param config
      */
-    public SliderButton(CategoryFrame frame, ModuleButton moduleButton, Config<T> config, float x, float y) {
+    public SliderButton(CategoryFrame frame, ModuleButton moduleButton, Config<T> config, float x, float y)
+    {
         super(frame, moduleButton, config, x, y);
         //
         final String sval = String.valueOf(config.getValue());
@@ -43,26 +45,33 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
      */
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX,
-                       float mouseY, float delta) {
+                       float mouseY, float delta)
+    {
         x = ix;
         y = iy;
         //
         Number min = ((NumberConfig<T>) config).getMin();
         Number max = ((NumberConfig<T>) config).getMax();
-        if (isWithin(mouseX, mouseY) && ClickGuiScreen.MOUSE_LEFT_HOLD) {
+        if (isWithin(mouseX, mouseY) && ClickGuiScreen.MOUSE_LEFT_HOLD)
+        {
             float fillv = (mouseX - ix) / width;
-            if (config.getValue() instanceof Integer) {
+            if (config.getValue() instanceof Integer)
+            {
                 float val = min.floatValue() + fillv * (max.intValue() - min.intValue());
                 int bval = (int) MathHelper.clamp(val, min.intValue(), max.intValue());
                 ((NumberConfig<Integer>) config).setValue(bval);
-            } else if (config.getValue() instanceof Float) {
+            }
+            else if (config.getValue() instanceof Float)
+            {
                 float val = min.floatValue() + fillv * (max.floatValue() - min.floatValue());
                 float bval = MathHelper.clamp(val, min.floatValue(),
                         max.floatValue());
                 BigDecimal bigDecimal = new BigDecimal(bval);
                 bval = bigDecimal.setScale(scale, RoundingMode.HALF_UP).floatValue();
                 ((NumberConfig<Float>) config).setValue(bval);
-            } else if (config.getValue() instanceof Double) {
+            }
+            else if (config.getValue() instanceof Double)
+            {
                 double val = min.doubleValue() + fillv * (max.doubleValue() - min.doubleValue());
                 double bval = MathHelper.clamp(val, min.doubleValue(),
                         max.doubleValue());
@@ -73,9 +82,12 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
             float lower = ix + 1.0f;
             float upper = ix + width - 1.0f;
             // out of bounds
-            if (mouseX < lower) {
+            if (mouseX < lower)
+            {
                 config.setValue((T) min);
-            } else if (mouseX > upper) {
+            }
+            else if (mouseX > upper)
+            {
                 config.setValue((T) max);
             }
         }
@@ -100,7 +112,8 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
      * @param button
      */
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public void mouseClicked(double mouseX, double mouseY, int button)
+    {
 
     }
 
@@ -110,7 +123,8 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
      * @param button
      */
     @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
+    public void mouseReleased(double mouseX, double mouseY, int button)
+    {
 
     }
 
@@ -120,7 +134,8 @@ public class SliderButton<T extends Number> extends ConfigButton<T> {
      * @param modifiers
      */
     @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers)
+    {
 
     }
 }

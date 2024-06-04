@@ -11,14 +11,16 @@ import net.shoreline.client.mixin.gui.screen.MixinDisconnectedScreen;
  * @see MixinDisconnectedScreen
  * @since 1.0
  */
-public class AutoReconnectModule extends ToggleModule {
+public class AutoReconnectModule extends ToggleModule
+{
     //
     Config<Integer> delayConfig = register(new NumberConfig<>("Delay", "The delay between reconnects to a server", 0, 5, 100));
 
     /**
      *
      */
-    public AutoReconnectModule() {
+    public AutoReconnectModule()
+    {
         super("AutoReconnect", "Automatically reconnects to a server " +
                 "immediately after disconnecting", ModuleCategory.MISCELLANEOUS);
     }
@@ -26,7 +28,8 @@ public class AutoReconnectModule extends ToggleModule {
     /**
      * @return
      */
-    public int getDelay() {
+    public int getDelay()
+    {
         return delayConfig.getValue();
     }
 }

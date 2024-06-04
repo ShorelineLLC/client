@@ -4,14 +4,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.imixin.IChatHud;
-import net.shoreline.client.mixin.accessor.AccessorChatHud;
 import net.shoreline.client.util.Globals;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class ChatUtil implements Globals {
+public class ChatUtil implements Globals
+{
     //
     public static final String PREFIX = "§s[Shoreline] §r";
 
@@ -21,11 +21,13 @@ public class ChatUtil implements Globals {
      *
      * @param message The message
      */
-    public static void clientSendMessage(String message) {
+    public static void clientSendMessage(String message)
+    {
         clientSendMessage(message, 0);
     }
 
-    public static void clientSendMessage(String message, int id) {
+    public static void clientSendMessage(String message, int id)
+    {
         ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(PREFIX + message), id);
     }
 
@@ -33,18 +35,21 @@ public class ChatUtil implements Globals {
      * @param message
      * @param params
      */
-    public static void clientSendMessage(String message, Object... params) {
+    public static void clientSendMessage(String message, Object... params)
+    {
         clientSendMessage(String.format(message, params));
     }
 
     /**
      * @param message
      */
-    public static void clientSendMessageRaw(String message) {
+    public static void clientSendMessageRaw(String message)
+    {
         clientSendMessageRaw(message, 0);
     }
 
-    public static void clientSendMessageRaw(String message, int id) {
+    public static void clientSendMessageRaw(String message, int id)
+    {
         ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(message), id);
     }
 
@@ -52,7 +57,8 @@ public class ChatUtil implements Globals {
      * @param message
      * @param params
      */
-    public static void clientSendMessageRaw(String message, Object... params) {
+    public static void clientSendMessageRaw(String message, Object... params)
+    {
         clientSendMessageRaw(String.format(message, params));
     }
 
@@ -62,8 +68,10 @@ public class ChatUtil implements Globals {
      *
      * @param message The message
      */
-    public static void serverSendMessage(String message) {
-        if (mc.player != null) {
+    public static void serverSendMessage(String message)
+    {
+        if (mc.player != null)
+        {
             mc.player.networkHandler.sendChatMessage(message);
         }
     }
@@ -72,8 +80,10 @@ public class ChatUtil implements Globals {
      * @param player
      * @param message
      */
-    public static void serverSendMessage(PlayerEntity player, String message) {
-        if (mc.player != null) {
+    public static void serverSendMessage(PlayerEntity player, String message)
+    {
+        if (mc.player != null)
+        {
             String reply = "/msg " + player.getName().getString() + " ";
             mc.player.networkHandler.sendChatMessage(reply + message);
         }
@@ -85,14 +95,16 @@ public class ChatUtil implements Globals {
      * @param params
      */
     public static void serverSendMessage(PlayerEntity player, String message,
-                                         Object... params) {
+                                         Object... params)
+    {
         serverSendMessage(player, String.format(message, params));
     }
 
     /**
      * @param message
      */
-    public static void error(String message) {
+    public static void error(String message)
+    {
         clientSendMessage(Formatting.RED + message);
     }
 
@@ -100,7 +112,8 @@ public class ChatUtil implements Globals {
      * @param message
      * @param params
      */
-    public static void error(String message, Object... params) {
+    public static void error(String message, Object... params)
+    {
         clientSendMessage(Formatting.RED + message, params);
     }
 }

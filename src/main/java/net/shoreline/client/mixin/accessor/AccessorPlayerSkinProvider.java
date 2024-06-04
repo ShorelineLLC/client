@@ -9,7 +9,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * @since 1.0
  */
 @Mixin(PlayerSkinProvider.class)
-public interface AccessorPlayerSkinProvider {
+public interface AccessorPlayerSkinProvider
+{
     /**
      * @return
      */

@@ -9,7 +9,8 @@ import net.shoreline.client.api.module.ToggleModule;
  * @author linus
  * @since 1.0
  */
-public class FontModule extends ToggleModule {
+public class FontModule extends ToggleModule
+{
     private static FontModule INSTANCE;
 
     //
@@ -18,19 +19,22 @@ public class FontModule extends ToggleModule {
     /**
      *
      */
-    public FontModule() {
+    public FontModule()
+    {
         super("Font", "Changes the client text to custom font rendering", ModuleCategory.CLIENT);
         INSTANCE = this;
     }
 
-    public static FontModule getInstance() {
+    public static FontModule getInstance()
+    {
         return INSTANCE;
     }
 
     /**
      * @return
      */
-    public boolean getShadow() {
+    public boolean getShadow()
+    {
         return shadowConfig.getValue();
     }
 }

@@ -11,7 +11,8 @@ import net.shoreline.client.util.Globals;
  * @author linus
  * @since 1.0
  */
-public class Interpolation implements Globals {
+public class Interpolation implements Globals
+{
     /**
      * Gets the interpolated {@link Vec3d} position of an entity (i.e. position
      * based on render ticks)
@@ -20,7 +21,8 @@ public class Interpolation implements Globals {
      * @param tickDelta The render time
      * @return The interpolated vector of an entity
      */
-    public static Vec3d getRenderPosition(Entity entity, float tickDelta) {
+    public static Vec3d getRenderPosition(Entity entity, float tickDelta)
+    {
         return new Vec3d(entity.getX() - MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
                 entity.getY() - MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY()),
                 entity.getZ() - MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ()));
@@ -31,7 +33,8 @@ public class Interpolation implements Globals {
      * @param tickDelta
      * @return
      */
-    public static Vec3d getInterpolatedPosition(Entity entity, float tickDelta) {
+    public static Vec3d getInterpolatedPosition(Entity entity, float tickDelta)
+    {
         return new Vec3d(entity.prevX + ((entity.getX() - entity.prevX) * tickDelta),
                 entity.prevY + ((entity.getY() - entity.prevY) * tickDelta),
                 entity.prevZ + ((entity.getZ() - entity.prevZ) * tickDelta));
@@ -43,7 +46,8 @@ public class Interpolation implements Globals {
      * @param factor
      * @return
      */
-    public static float interpolateFloat(float prev, float value, float factor) {
+    public static float interpolateFloat(float prev, float value, float factor)
+    {
         return prev + ((value - prev) * factor);
     }
 
@@ -53,16 +57,18 @@ public class Interpolation implements Globals {
      * @param factor
      * @return
      */
-    public static double interpolateDouble(double prev, double value, double factor) {
+    public static double interpolateDouble(double prev, double value, double factor)
+    {
         return prev + ((value - prev) * factor);
     }
-    
+
     /**
      * @param prevBox
      * @param box
      * @return
      */
-    public static Box getInterpolatedBox(Box prevBox, Box box) {
+    public static Box getInterpolatedBox(Box prevBox, Box box)
+    {
 
         double delta = mc.isPaused() ? 1f : mc.getTickDelta();
 
@@ -78,9 +84,10 @@ public class Interpolation implements Globals {
      * @param entity
      * @return
      */
-    public static Box getInterpolatedEntityBox(Entity entity){
+    public static Box getInterpolatedEntityBox(Entity entity)
+    {
         Box box = entity.getBoundingBox();
-        Box prevBox = entity.getBoundingBox().offset( entity.prevX - entity.getX(), entity.prevY - entity.getY(), entity.prevZ - entity.getZ());
+        Box prevBox = entity.getBoundingBox().offset(entity.prevX - entity.getX(), entity.prevY - entity.getY(), entity.prevZ - entity.getZ());
 
         return getInterpolatedBox(prevBox, box);
     }

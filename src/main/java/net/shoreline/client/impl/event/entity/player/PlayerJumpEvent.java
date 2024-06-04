@@ -4,6 +4,7 @@ import net.shoreline.eventbus.Cancelable;
 import net.shoreline.eventbus.StageEvent;
 
 @Cancelable
-public class PlayerJumpEvent extends StageEvent {
+public class PlayerJumpEvent extends StageEvent
+{
 
 }

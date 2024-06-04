@@ -19,23 +19,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @since 1.0
  */
 @Mixin(Camera.class)
-public abstract class MixinCamera {
-    @Shadow private float lastTickDelta;
+public abstract class MixinCamera
+{
+    @Shadow
+    private float lastTickDelta;
 
-    @Shadow protected abstract void setPos(double x, double y, double z);
+    @Shadow
+    protected abstract void setPos(double x, double y, double z);
 
-    @Shadow protected abstract void setRotation(float yaw, float pitch);
+    @Shadow
+    protected abstract void setRotation(float yaw, float pitch);
 
     /**
      * @param cir
      */
     @Inject(method = "getSubmersionType", at = @At(value = "HEAD"),
             cancellable = true)
-    private void hookGetSubmersionType(CallbackInfoReturnable<CameraSubmersionType> cir) {
+    private void hookGetSubmersionType(CallbackInfoReturnable<CameraSubmersionType> cir)
+    {
         RenderOverlayEvent.Water renderOverlayEvent =
                 new RenderOverlayEvent.Water(null);
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
-        if (renderOverlayEvent.isCanceled()) {
+        if (renderOverlayEvent.isCanceled())
+        {
             cir.setReturnValue(CameraSubmersionType.NONE);
             cir.cancel();
         }
@@ -47,18 +53,21 @@ public abstract class MixinCamera {
      */
     @Inject(method = "clipToSpace", at = @At(value = "HEAD"), cancellable = true)
     private void hookClipToSpace(double desiredCameraDistance,
-                                 CallbackInfoReturnable<Double> cir) {
+                                 CallbackInfoReturnable<Double> cir)
+    {
         CameraClipEvent cameraClipEvent =
                 new CameraClipEvent(desiredCameraDistance);
         EventBus.INSTANCE.dispatch(cameraClipEvent);
-        if (cameraClipEvent.isCanceled()) {
+        if (cameraClipEvent.isCanceled())
+        {
             cir.setReturnValue(cameraClipEvent.getDistance());
             cir.cancel();
         }
     }
 
     @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V"))
-    private void hookUpdatePosition(Camera instance, double x, double y, double z) {
+    private void hookUpdatePosition(Camera instance, double x, double y, double z)
+    {
         CameraPositionEvent cameraPositionEvent = new CameraPositionEvent(x, y, z, lastTickDelta);
         EventBus.INSTANCE.dispatch(cameraPositionEvent);
         setPos(cameraPositionEvent.getX(), cameraPositionEvent.getY(), cameraPositionEvent.getZ());
@@ -66,7 +75,8 @@ public abstract class MixinCamera {
     }
 
     @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V"))
-    private void hookUpdateRotation(Camera instance, float yaw, float pitch) {
+    private void hookUpdateRotation(Camera instance, float yaw, float pitch)
+    {
         CameraRotationEvent cameraRotationEvent = new CameraRotationEvent(yaw, pitch, lastTickDelta);
         EventBus.INSTANCE.dispatch(cameraRotationEvent);
         setRotation(cameraRotationEvent.getYaw(), cameraRotationEvent.getPitch());

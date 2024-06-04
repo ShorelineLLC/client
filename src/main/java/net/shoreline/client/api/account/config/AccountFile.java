@@ -83,7 +83,8 @@ public class AccountFile extends ConfigFile
         }
     }
 
-    protected String saveAs() {
+    protected String saveAs()
+    {
         final JsonArray array = new JsonArray();
         for (final MinecraftAccount account : Managers.ACCOUNT.getAccounts())
         {
@@ -115,10 +116,12 @@ public class AccountFile extends ConfigFile
             }
 
             MinecraftAccount account = null;
-            if (object.has("email") && object.has("password")) {
+            if (object.has("email") && object.has("password"))
+            {
                 account = new MicrosoftAccount(object.get("email").getAsString(),
                         object.get("password").getAsString());
-                if (object.has("username")) {
+                if (object.has("username"))
+                {
                     ((MicrosoftAccount) account).setUsername(object.get("username").getAsString());
                 }
             }

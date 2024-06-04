@@ -12,7 +12,7 @@ import net.shoreline.client.util.Globals;
 import org.lwjgl.opengl.GL30C;
 
 // Thanks ladysnake!
-public class ShaderManager implements Globals 
+public class ShaderManager implements Globals
 {
     private ShaderFramebuffer framebuffer;
 
@@ -25,7 +25,8 @@ public class ShaderManager implements Globals
         {
             framebuffer = new ShaderFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
             filledShaderEffect1 = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));
-            filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"), effect -> {
+            filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"), effect ->
+            {
                 PostEffectProcessor postEffectProcessor = effect.getShaderEffect();
                 if (postEffectProcessor == null)
                 {

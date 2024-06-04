@@ -9,7 +9,6 @@ import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
@@ -19,6 +18,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;
 import java.util.UUID;
@@ -27,7 +27,8 @@ import java.util.UUID;
  * @author linus
  * @since 1.0
  */
-public class WaypointsModule extends ToggleModule {
+public class WaypointsModule extends ToggleModule
+{
     private static WaypointsModule INSTANCE;
 
     Config<Boolean> logoutsConfig = register(new BooleanConfig("LogoutPoints", "Marks the position of player logouts", false));
@@ -35,37 +36,49 @@ public class WaypointsModule extends ToggleModule {
     Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Shows the coordinates of the waypoint", true));
     DecimalFormat format = new DecimalFormat("0.0");
 
-    public WaypointsModule() {
+    public WaypointsModule()
+    {
         super("Waypoints", "Renders a waypoint at marked locations", ModuleCategory.RENDER);
         INSTANCE = this;
     }
 
-    public static WaypointsModule getInstance() {
+    public static WaypointsModule getInstance()
+    {
         return INSTANCE;
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable()
+    {
         Managers.WAYPOINT.clear();
     }
 
     @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event) {
-        if (mc.world == null) {
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (mc.world == null || mc.player == null)
+        {
             return;
         }
-        if (event.getPacket() instanceof PlayerListS2CPacket packet && packet.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER) && logoutsConfig.getValue()) {
-            for (PlayerListS2CPacket.Entry entry : packet.getPlayerAdditionEntries()) {
+        if (event.getPacket() instanceof PlayerListS2CPacket packet && packet.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER) && logoutsConfig.getValue())
+        {
+            for (PlayerListS2CPacket.Entry entry : packet.getPlayerAdditionEntries())
+            {
                 GameProfile profile = entry.profile();
-                if (profile == null || profile.getName() == null) {
+                if (profile == null || profile.getName() == null)
+                {
                     continue;
                 }
                 Managers.WAYPOINT.removeContains(profile.getName());
             }
-        } else if (event.getPacket() instanceof PlayerRemoveS2CPacket packet && logoutsConfig.getValue()) {
-            for (UUID id : packet.profileIds()) {
+        }
+        else if (event.getPacket() instanceof PlayerRemoveS2CPacket packet && logoutsConfig.getValue())
+        {
+            for (UUID id : packet.profileIds())
+            {
                 PlayerEntity player = mc.world.getPlayerByUuid(id);
-                if (player == null) {
+                if (player == null)
+                {
                     continue;
                 }
                 String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
@@ -77,8 +90,10 @@ public class WaypointsModule extends ToggleModule {
     }
 
     @EventListener
-    public void onRemoveEntity(ScreenOpenEvent event) {
-        if (event.getScreen() instanceof DeathScreen && deathsConfig.getValue()) {
+    public void onRemoveEntity(ScreenOpenEvent event)
+    {
+        if (event.getScreen() instanceof DeathScreen && deathsConfig.getValue())
+        {
             String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
             Managers.WAYPOINT.removeContains("Last Death");
             Managers.WAYPOINT.register(new Waypoint(String.format("§7Last Death" + (coordsConfig.getValue() ? " XYZ %s %s %s" : ""), format.format(mc.player.getX()), format.format(mc.player.getY()), format.format(mc.player.getZ())), serverIp,
@@ -87,12 +102,16 @@ public class WaypointsModule extends ToggleModule {
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event) {
-        if (mc.player == null) {
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        if (mc.player == null)
+        {
             return;
         }
-        for (Waypoint waypoint : Managers.WAYPOINT.getWaypoints()) {
-            if (!waypoint.getIp().equalsIgnoreCase(Managers.NETWORK.getServerIp())) {
+        for (Waypoint waypoint : Managers.WAYPOINT.getWaypoints())
+        {
+            if (!waypoint.getIp().equalsIgnoreCase(Managers.NETWORK.getServerIp()))
+            {
                 continue;
             }
             Box waypointBox = EntityDimensions.fixed(0.6f, 2.2f).getBoxAt(waypoint.getPos());
@@ -102,7 +121,8 @@ public class WaypointsModule extends ToggleModule {
         }
     }
 
-    public boolean getCoords() {
+    public boolean getCoords()
+    {
         return coordsConfig.getValue();
     }
 }
