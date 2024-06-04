@@ -19,6 +19,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.chunk.light.RenderSkylightEvent;
 import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
+import net.shoreline.client.impl.event.entity.UpdateServerPositionEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
@@ -40,6 +41,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class NoRenderModule extends ToggleModule
 {
     Config<Boolean> hurtCamConfig = register(new BooleanConfig("NoHurtCam", "Prevents the hurt camera shake effect from rendering", true));
+    Config<Boolean> interpolationConfig = register(new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false));
     Config<Boolean> antiCrashConfig = register(new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Prevents armor pieces from rendering", false));
     Config<Boolean> fireOverlayConfig = register(new BooleanConfig("Overlay-Fire", "Prevents the fire Hud overlay from rendering", true));
@@ -54,13 +56,12 @@ public class NoRenderModule extends ToggleModule
     Config<Boolean> skylightConfig = register(new BooleanConfig("Skylight", "Prevents skylight from rendering", true));
     Config<Boolean> witherSkullsConfig = register(new BooleanConfig("WitherSkulls", "Prevents flying wither skulls from rendering", false));
     Config<Boolean> tileEntitiesConfig = register(new BooleanConfig("TileEntities", "Prevents special tile entity properties from rendering (i.e. enchantment table books or cutting table saws)", false));
+    Config<Boolean> fireEntityConfig = register(new BooleanConfig("FireEntities", "Prevents fire from rendering on entities", false));
     Config<Boolean> fireworksConfig = register(new BooleanConfig("Fireworks", "Prevents firework particles from rendering", true));
     Config<Boolean> explosionsConfig = register(new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true));
     Config<Boolean> campfiresConfig = register(new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false));
     Config<Boolean> totemConfig = register(new BooleanConfig("Totems", "Prevents totem particles from rendering", false));
-    Config<Boolean> fireEntityConfig = register(new BooleanConfig("FireEntities", "Prevents fire from rendering on entities", false));
     Config<Boolean> worldBorderConfig = register(new BooleanConfig("WorldBorder", "Prevents world border from rendering", false));
-    Config<Boolean> interpolationConfig = register(new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false));
     Config<FogRender> fogConfig = register(new EnumConfig<>("Fog", "Prevents fog from rendering in the world", FogRender.OFF, FogRender.values()));
     Config<ItemRender> itemsConfig = register(new EnumConfig<>("Items", "Prevents dropped items from rendering", ItemRender.OFF, ItemRender.values()));
     Config<Boolean> guiToastConfig = register(new BooleanConfig("GuiToast", "Prevents advancements from rendering", true));
@@ -332,6 +333,17 @@ public class NoRenderModule extends ToggleModule
         if (fireEntityConfig.getValue())
         {
             event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onUpdateServerPosition(UpdateServerPositionEvent event)
+    {
+        if (interpolationConfig.getValue())
+        {
+            event.getLivingEntity().setPos(event.getX(), event.getY(), event.getZ());
+            event.getLivingEntity().setYaw(event.getYaw());
+            event.getLivingEntity().setPitch(event.getPitch());
         }
     }
 

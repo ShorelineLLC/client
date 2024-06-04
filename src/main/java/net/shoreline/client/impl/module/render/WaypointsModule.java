@@ -58,6 +58,12 @@ public class WaypointsModule extends ToggleModule
     }
 
     @EventListener
+    public void onDisconnect(DisconnectEvent event)
+    {
+        entries.clear();
+    }
+
+    @EventListener
     public void onTick(TickEvent event)
     {
         if (event.getStage() != StageEvent.EventStage.PRE || !logoutsConfig.getValue())

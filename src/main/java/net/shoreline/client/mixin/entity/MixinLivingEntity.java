@@ -44,12 +44,6 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     protected abstract float getJumpVelocity();
 
     @Shadow
-    public abstract boolean isDead();
-
-    @Shadow
-    public int deathTime;
-
-    @Shadow
     private int jumpingCooldown;
 
     @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
@@ -165,5 +159,12 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
             PlayerDamageEvent playerDamageEvent = new PlayerDamageEvent((LivingEntity) (Object) this);
             EventBus.INSTANCE.dispatch(playerDamageEvent);
         }
+    }
+
+    @Inject(method = "updateTrackedPositionAndAngles", at = @At(value = "HEAD"))
+    private void hookUpdateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, CallbackInfo ci)
+    {
+        UpdateServerPositionEvent updateServerPositionEvent = new UpdateServerPositionEvent((LivingEntity) (Object) this, x, y, z, yaw, pitch);
+        EventBus.INSTANCE.dispatch(updateServerPositionEvent);
     }
 }

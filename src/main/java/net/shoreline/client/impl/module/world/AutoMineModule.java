@@ -112,15 +112,6 @@ public class AutoMineModule extends RotationModule
     }
 
     @EventListener
-    public void onDeath(EntityDeathEvent event)
-    {
-        if (event.getEntity() == mc.player)
-        {
-            Managers.INVENTORY.syncToClient();
-        }
-    }
-
-    @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
         if (mc.player.isCreative() || mc.player.isSpectator())

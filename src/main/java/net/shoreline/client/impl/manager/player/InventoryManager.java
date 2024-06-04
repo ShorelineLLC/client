@@ -13,6 +13,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.collection.DefaultedList;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
@@ -69,6 +70,15 @@ public class InventoryManager implements Globals
     {
         event.setCanceled(isDesynced());
         event.setStack(getServerItem());
+    }
+
+    @EventListener
+    public void onDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() == mc.player)
+        {
+            syncToClient();
+        }
     }
 
     /**

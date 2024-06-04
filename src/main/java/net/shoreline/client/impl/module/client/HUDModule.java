@@ -56,6 +56,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> userInfo = register(new BooleanConfig("UserInfo", "Displays your user information", true));
     Config<Boolean> directionConfig = register(new BooleanConfig("Direction", "Displays facing direction", true));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays player equipped armor and durability", true));
+    Config<Boolean> armorDurabilityConfig = register(new BooleanConfig("ArmorDurability", "Displays player equipped armor durability", true, () -> armorConfig.getValue()));
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
     Config<VanillaHud> itemNameConfig = register(new EnumConfig<>("ItemName", "Renders the Minecraft item name display", VanillaHud.HIDE, VanillaHud.values()));
     Config<Boolean> potionEffectsConfig = register(new BooleanConfig("PotionEffects", "Displays active potion effects", true));
@@ -390,8 +391,16 @@ public class HUDModule extends ToggleModule
                 for (int i = 3; i >= 0; --i)
                 {
                     ItemStack armor = mc.player.getInventory().armor.get(i);
+                    int f = armor.getMaxDamage();
+                    int f2 = armor.getDamage();
                     event.getContext().drawItem(armor, x, y);
                     event.getContext().drawItemInSlot(mc.textRenderer, armor, x, y);
+                    if (armorDurabilityConfig.getValue() && !armor.isEmpty())
+                    {
+                        event.getContext().getMatrices().scale(0.65f, 0.65f, 1.0f);
+                        RenderManager.renderText(event.getContext(), Math.round(((f - f2) / (float) f) * 100.0f) + "%", (x + 2.0f) * 1.53846154f, (y - 5.0f) * 1.53846154f, ColorUtil.hslToColor((float) (f - f2) / (float) f * 120.0f, 100.0f, 50.0f, 1.0f).getRGB());
+                        event.getContext().getMatrices().scale(1.53846154f, 1.53846154f, 1.0f);
+                    }
                     x += 18;
                 }
             }
