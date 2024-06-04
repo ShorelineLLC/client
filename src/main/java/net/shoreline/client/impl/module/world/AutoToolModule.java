@@ -1,13 +1,16 @@
 package net.shoreline.client.impl.module.world;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
+import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
@@ -52,6 +55,18 @@ public final class AutoToolModule extends ToggleModule
 
     public int getBestToolNoFallback(final BlockState state)
     {
+        if (state.getBlock() == Blocks.COBWEB)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                final ItemStack stack = mc.player.getInventory().getStack(i);
+                if (stack.isEmpty() || !(stack.getItem() instanceof SwordItem))
+                {
+                    continue;
+                }
+                return i;
+            }
+        }
         int slot = -1;
         float bestTool = 0.0f;
         for (int i = 0; i < 9; i++)

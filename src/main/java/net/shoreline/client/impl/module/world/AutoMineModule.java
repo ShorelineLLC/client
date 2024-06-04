@@ -134,7 +134,7 @@ public class AutoMineModule extends RotationModule
             miningData = miningQueue.getFirst();
             miningDataLast = miningQueue.getLast();
         }
-        if (autoConfig.getValue())
+        if (autoConfig.getValue() && !manualOverride)
         {
             if (mc.player.isCrawling() && crawlingConfig.getValue() != AntiCrawling.OFF && getCrawlingMine() != null)
             {
@@ -174,7 +174,7 @@ public class AutoMineModule extends RotationModule
                     {
                         return;
                     }
-                    if (doubleBreakConfig.getValue() && !manualOverride && (miningData == null || (mc.world.getBlockState(miningData.getPos()).isReplaceable() && mc.world.getBlockState(miningDataLast.getPos()).isReplaceable())))
+                    if (doubleBreakConfig.getValue() && (miningData == null || (mc.world.getBlockState(miningData.getPos()).isAir() && mc.world.getBlockState(miningDataLast.getPos()).isAir())))
                     {
                         final AutoMineCalc cityBlockPos = cityPositions.peek();
                         if (cityBlockPos != null)
@@ -205,7 +205,7 @@ public class AutoMineModule extends RotationModule
                             }
                         }
                     }
-                    else if (!manualOverride && (miningData == null || mc.world.getBlockState(miningData.getPos()).isReplaceable()))
+                    else if (miningData == null || mc.world.getBlockState(miningData.getPos()).isAir())
                     {
                         final AutoMineCalc cityBlockPos = cityPositions.poll();
                         if (cityBlockPos != null)
@@ -236,7 +236,7 @@ public class AutoMineModule extends RotationModule
         }
         for (MiningData data : miningQueue)
         {
-            if (isDataPacketMine(data) && (data.getState().isReplaceable() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
+            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
                 miningQueue.remove(data);
@@ -269,7 +269,7 @@ public class AutoMineModule extends RotationModule
             miningQueue.remove(miningData2);
             return;
         }
-        if (miningData2.getState().isReplaceable())
+        if (miningData2.getState().isAir())
         {
             // Once we broke the block that overrode that the auto city, we can allow the module
             // to auto mine "city" blocks
@@ -319,12 +319,16 @@ public class AutoMineModule extends RotationModule
     @EventListener
     public void onAttackBlock(final AttackBlockEvent event)
     {
-        // Do not try to break unbreakable blocks
-        if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir() || mc.player.isCreative() || mc.player.isSpectator())
+        if (mc.player.isCreative() || mc.player.isSpectator())
         {
             return;
         }
         event.cancel();
+        // Do not try to break unbreakable blocks
+        if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir())
+        {
+            return;
+        }
         int queueSize = miningQueue.size();
         if (queueSize == 0)
         {

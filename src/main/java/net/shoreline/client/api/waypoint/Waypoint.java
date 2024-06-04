@@ -1,10 +1,13 @@
 package net.shoreline.client.api.waypoint;
 
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigContainer;
 import net.shoreline.client.api.config.setting.NumberConfig;
+import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 
@@ -12,10 +15,11 @@ import net.shoreline.client.util.math.timer.Timer;
  * @author linus
  * @since 1.0
  */
-public class Waypoint extends ConfigContainer implements Position
+public class Waypoint extends ConfigContainer implements Position, Globals
 {
     //
     private final String ip;
+    private final RegistryKey<World> dimension;
     //
     private final Config<Double> xConfig = register(new NumberConfig<>("X", "X " +
             "position of waypoint.", 0.0D, 0.0D, Double.MAX_VALUE));
@@ -40,6 +44,7 @@ public class Waypoint extends ConfigContainer implements Position
         yConfig.setValue(y);
         zConfig.setValue(z);
         this.timer = new CacheTimer();
+        this.dimension = mc.world.getRegistryKey();
     }
 
     /**
@@ -80,5 +85,10 @@ public class Waypoint extends ConfigContainer implements Position
     public Vec3d getPos()
     {
         return new Vec3d(getX(), getY(), getZ());
+    }
+
+    public RegistryKey<World> getDimension()
+    {
+        return dimension;
     }
 }

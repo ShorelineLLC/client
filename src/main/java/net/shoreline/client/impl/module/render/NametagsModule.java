@@ -11,11 +11,13 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.Tameable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.RotationAxis;
@@ -32,6 +34,7 @@ import net.shoreline.client.api.render.RenderLayersClient;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
+import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.init.Fonts;
@@ -44,6 +47,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -69,8 +73,12 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Renders nametags on invisible players", true));
     Config<Boolean> backgroundConfig = register(new BooleanConfig("Background", "Renders a background behind the nametag", true));
     Config<Boolean> borderedConfig = register(new BooleanConfig("Border", "Renders a border around the nametag", false));
-    Config<Boolean> itemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
+    Config<Boolean> tamedConfig = register(new BooleanConfig("TamedMobs", "Renders nametags on tamed mobs", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
+    Config<Boolean> itemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
+    Config<Boolean> soundsConfig = register(new BooleanConfig("Sounds", "Renders nametags on sounds", false));
+
+    private final Map<SoundRender, Long> sounds = new HashMap<>();
 
     public NametagsModule()
     {
@@ -81,6 +89,12 @@ public class NametagsModule extends ToggleModule
     public static NametagsModule getInstance()
     {
         return INSTANCE;
+    }
+
+    @Override
+    public void onDisable()
+    {
+        sounds.clear();
     }
 
     @EventListener
@@ -129,6 +143,18 @@ public class NametagsModule extends ToggleModule
                 }
                 renderInfo(info, hwidth, player, rx, ry, rz, camera, scaling);
             }
+            if (entity instanceof Tameable tameable && tameable.getOwnerUuid() != null && tamedConfig.getValue())
+            {
+                String lookup = Managers.LOOKUP.getNameFromUUID(tameable.getOwnerUuid());
+                if (lookup != null)
+                {
+                    Vec3d itemPos = Interpolation.getRenderPosition(entity, mc.getTickDelta());
+                    double rx = entity.getX() - itemPos.getX();
+                    double ry = (entity.getY() + entity.getHeight() + 0.43f) - itemPos.getY();
+                    double rz = entity.getZ() - itemPos.getZ();
+                    RenderManager.renderSign(lookup, rx, ry, rz, -1);
+                }
+            }
             if (entity instanceof ItemEntity itemEntity && itemsConfig.getValue())
             {
                 Vec3d itemPos = Interpolation.getRenderPosition(itemEntity, mc.getTickDelta());
@@ -156,6 +182,16 @@ public class NametagsModule extends ToggleModule
                 }
             }
         }
+        if (soundsConfig.getValue())
+        {
+            sounds.entrySet().removeIf(e -> System.currentTimeMillis() - e.getValue() > 1000);
+            for (Map.Entry<SoundRender, Long> entry : sounds.entrySet())
+            {
+                SoundEvent soundEvent = entry.getKey().soundEvent();
+                Vec3d renderPos = entry.getKey().pos();
+                RenderManager.renderSign(soundEvent.getId().toShortTranslationKey(), renderPos.x, renderPos.y, renderPos.z, -1);
+            }
+        }
 
         RenderSystem.enableBlend();
         RenderBuffers.postRender();
@@ -169,6 +205,14 @@ public class NametagsModule extends ToggleModule
             event.cancel();
         }
     }
+
+    @EventListener
+    public void onPlaySound(PlaySoundEvent event)
+    {
+        sounds.put(new SoundRender(event.getPos(), event.getSoundEvent()), System.currentTimeMillis());
+    }
+
+    private record SoundRender(Vec3d pos, SoundEvent soundEvent) {}
 
     private void renderInfo(String info, float width, PlayerEntity entity,
                             double x, double y, double z, Camera camera, float scaling)
