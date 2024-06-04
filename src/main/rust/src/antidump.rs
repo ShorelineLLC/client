@@ -20,7 +20,7 @@ mod platform
 
     // amazing code
     // we will be adding more checks later
-    pub fn is_debugger_present() -> bool
+    pub unsafe fn is_debugger_present() -> bool
     {
         if IsDebuggerPresent() != 0
         {
