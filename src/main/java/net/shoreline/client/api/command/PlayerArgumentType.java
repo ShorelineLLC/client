@@ -34,10 +34,19 @@ public class PlayerArgumentType implements ArgumentType<String>, Globals
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
     {
+        String[] literal = context.getInput().split(" ");
         Collection<PlayerListEntry> playerListEntries = mc.player.networkHandler.getPlayerList();
         for (PlayerListEntry playerListEntry : playerListEntries)
         {
-            builder.suggest(playerListEntry.getProfile().getName());
+            String playerName = playerListEntry.getProfile().getName();
+            for (String string : literal)
+            {
+                if (string.isBlank() || playerName.toLowerCase().startsWith(string.toLowerCase()))
+                {
+                    builder.suggest(playerName);
+                    break;
+                }
+            }
         }
         return builder.buildFuture();
     }
