@@ -4,6 +4,10 @@ uniform sampler2D DiffuseSampler;
 in vec2 texCoord;
 out vec4 fragColor;
 
+uniform mat4 ProjMat;
+uniform vec2 InSize;
+uniform vec2 OutSize;
+
 uniform vec2 texelSize;
 uniform vec4 color;
 uniform float radius;

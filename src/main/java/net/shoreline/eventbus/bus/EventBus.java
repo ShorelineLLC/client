@@ -22,6 +22,13 @@ public final class EventBus
             if (event.getClass().equals(current.c))
             {
                 dispatch_internal(current.a, current.b, new Object[] { event });
+//                try
+//                {
+//                    ((Method) current.a).invoke(current.b, event);
+//                } catch (Throwable t)
+//                {
+//                    t.printStackTrace();
+//                }
             }
 
             current = current.e;

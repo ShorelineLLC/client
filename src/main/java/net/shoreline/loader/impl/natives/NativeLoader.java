@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.stream.Collectors;
 
 public final class NativeLoader
@@ -29,8 +30,11 @@ public final class NativeLoader
             buffer[i] = nativesInputStream.readByte();
         }
 
-        File tmpdir = new File(System.getProperty("java.io.tmpdir"));
-        File natives = new File(tmpdir, "shoreline." + type.getExt());
+        File natives = Files.createTempFile(
+                null,
+                "." + type.getExt()
+        ).toFile();
+
         natives.deleteOnExit();
 
         FileOutputStream fos = new FileOutputStream(natives);

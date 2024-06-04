@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import ladysnake.satin.api.managed.ManagedShaderEffect;
+import ladysnake.satin.impl.ResettableManagedShaderEffect;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;

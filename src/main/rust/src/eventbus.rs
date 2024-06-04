@@ -195,6 +195,7 @@ pub unsafe extern "system" fn unsubscribe(env: JNIEnv,
 }
 
 pub static mut INVOKE: Option<JMethodID> = None;
+static L_JAVA_LANG_OBJECT: String = String::from(obfstr!("Ljava/lang/Object;"));
 
 #[export_name = "Java_net_shoreline_eventbus_bus_EventBus_dispatch_1internal"]
 pub unsafe extern "system" fn dispatch_internal(env: JNIEnv<'static>,
@@ -222,7 +223,7 @@ pub unsafe extern "system" fn dispatch_internal(env: JNIEnv<'static>,
             let invoked = env.call_method_unchecked(
                 method,
                 *invoke,
-                JavaType::Object(String::from(obfstr!("Ljava/lang/Object;"))),
+                JavaType::Object(L_JAVA_LANG_OBJECT),
                 &[instance.into(), event.into()]
             );
 

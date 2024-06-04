@@ -65,13 +65,18 @@ public class MixinClientConnection {
             "Lnet/minecraft/network/packet/Packet;)V", at = @At(value = "HEAD"),
             cancellable = true)
     private void hookChannelRead0(ChannelHandlerContext channelHandlerContext,
-                                  Packet<?> packet, CallbackInfo ci) {
-        PacketEvent.Inbound packetInboundEvent =
-                new PacketEvent.Inbound(packetListener, packet);
-        EventBus.INSTANCE.dispatch(packetInboundEvent);
-        // prevent client from receiving packet from server
-        if (packetInboundEvent.isCanceled()) {
-            ci.cancel();
+                                  Packet<?> packet, CallbackInfo ci)
+    {
+        PacketListener ownedPacketListener = packetListener;
+        if (packet != null && ownedPacketListener != null && ownedPacketListener.accepts(packet)) // Josu fix
+        {
+            PacketEvent.Inbound packetInboundEvent =
+                    new PacketEvent.Inbound(packetListener, packet);
+            EventBus.INSTANCE.dispatch(packetInboundEvent);
+            // prevent client from receiving packet from server
+            if (packetInboundEvent.isCanceled()) {
+                ci.cancel();
+            }
         }
     }
 

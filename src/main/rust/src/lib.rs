@@ -15,8 +15,7 @@ use std::ffi::{CStr};
 use hardware_id::get_id;
 use jni::signature::JavaType;
 use jni::signature::Primitive::Int;
-use winapi::um::debugapi::IsDebuggerPresent;
-use crate::antidump::{inside_vm, is_debugger_present, run_antidump_checks};
+use crate::antidump::{run_antidump_checks};
 use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
 
 static mut USER_INFO: Option<GlobalRef> = None;
