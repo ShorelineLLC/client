@@ -1,5 +1,3 @@
-use std::arch::x86_64::{CpuidResult, __cpuid, _rdtsc};
-use std::ptr::null;
 use obfstr::obfstr;
 
 pub unsafe fn run_antidump_checks() -> String

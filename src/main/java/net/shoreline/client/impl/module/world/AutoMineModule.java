@@ -142,7 +142,6 @@ public class AutoMineModule extends RotationModule
                 miningQueue.clear();
                 manualOverride = true;
                 MiningData data = new AutoMiningData(crawlingMine, Direction.UP);
-                startMining(data);
                 queueMiningData(data);
             }
             else
@@ -196,13 +195,11 @@ public class AutoMineModule extends RotationModule
                                 miningQueue.clear();
                                 MiningData data = new AutoMiningData(cityBlockPos.pos(),
                                         strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos.pos()) : Direction.UP);
-                                startMining(data);
                                 queueMiningData(data);
                                 if (cityBlockPos2 != null && !mc.world.isAir(cityBlockPos2.pos()))
                                 {
                                     MiningData data2 = new AutoMiningData(cityBlockPos2.pos(),
                                             strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos2.pos()) : Direction.UP);
-                                    startMining(data2);
                                     queueMiningData(data2);
                                 }
                             }
@@ -226,7 +223,6 @@ public class AutoMineModule extends RotationModule
                             {
                                 MiningData data = new AutoMiningData(cityBlockPos.pos(),
                                         strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(cityBlockPos.pos()) : Direction.UP);
-                                startMining(data);
                                 queueMiningData(data);
                             }
                         }
@@ -450,7 +446,6 @@ public class AutoMineModule extends RotationModule
             return;
         }
         MiningData miningData = new MiningData(pos, direction);
-        startMining(miningData);
         queueMiningData(miningData);
     }
 
@@ -460,6 +455,7 @@ public class AutoMineModule extends RotationModule
         {
             return;
         }
+        startMining(data);
         miningQueue.addFirst(data);
     }
 
