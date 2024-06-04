@@ -68,6 +68,7 @@ public final class ModuleManager
                 // Exploit
                 new AntiHungerModule(),
                 new ChorusControlModule(),
+                new ChorusInvincibilityModule(),
                 new ClientSpoofModule(),
                 new CrasherModule(),
                 new DisablerModule(),
@@ -76,7 +77,6 @@ public final class ModuleManager
                 new FastLatencyModule(),
                 new FastProjectileModule(),
                 new InventorySyncModule(),
-                new ChorusInvincibilityModule(),
                 new PacketCancelerModule(),
                 new PacketFlyModule(),
                 new PhaseModule(),
