@@ -2,8 +2,8 @@ package net.shoreline.client.impl.event.render;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * @author linus

@@ -8,7 +8,7 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.PerspectiveEvent;
 import net.shoreline.client.impl.event.render.RenderWorldBorderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;

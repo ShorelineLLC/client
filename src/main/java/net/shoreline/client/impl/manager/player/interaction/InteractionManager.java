@@ -14,7 +14,7 @@ import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.SneakBlocks;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 
 import java.util.HashSet;
 import java.util.Set;

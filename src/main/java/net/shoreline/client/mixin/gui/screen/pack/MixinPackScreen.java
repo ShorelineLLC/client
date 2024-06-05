@@ -2,7 +2,7 @@ package net.shoreline.client.mixin.gui.screen.pack;
 
 import net.minecraft.client.gui.screen.pack.PackScreen;
 import net.shoreline.client.impl.event.gui.screen.pack.RefreshPacksEvent;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

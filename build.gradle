@@ -80,6 +80,7 @@ tasks.register('loaderJar', Jar) {
     from(zipTree(tasks.remapJar.archivePath))
 
     exclude 'net/shoreline/client/**'
+    exclude 'net/shoreline/eventbus/dev/**'
     exclude 'assets/shoreline/font/**'
     exclude 'assets/shoreline/shaders/**'
     exclude 'mixins.shoreline.json'

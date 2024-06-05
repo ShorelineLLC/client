@@ -9,7 +9,7 @@ import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 
 import java.util.HashSet;
 import java.util.Set;

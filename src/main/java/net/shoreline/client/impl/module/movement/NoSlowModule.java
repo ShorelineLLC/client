@@ -26,7 +26,7 @@ import net.shoreline.client.impl.event.entity.VelocityMultiplierEvent;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.lwjgl.glfw.GLFW;
 

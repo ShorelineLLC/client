@@ -23,7 +23,7 @@ import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
 import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.impl.imixin.IChatHudLineVisible;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.network;
 
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.Event;
 
 @Cancelable
 public class MountJumpStrengthEvent extends Event

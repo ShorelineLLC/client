@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.event.network;
 
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 
 public class PlayerUpdateEvent extends StageEvent
 {

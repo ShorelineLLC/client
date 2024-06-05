@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.gui.chat;
 
 import net.minecraft.util.StringHelper;
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.Event;
 import org.apache.commons.lang3.StringUtils;
 
 /**

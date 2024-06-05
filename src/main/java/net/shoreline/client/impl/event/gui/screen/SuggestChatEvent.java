@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.gui.screen;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class SuggestChatEvent extends Event
 {

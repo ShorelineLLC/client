@@ -19,7 +19,7 @@ import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;

@@ -31,7 +31,7 @@ import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
 import net.shoreline.client.impl.event.render.entity.RenderWitherSkullEvent;
 import net.shoreline.client.impl.event.toast.RenderToastEvent;
 import net.shoreline.client.impl.event.world.BlindnessEvent;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**

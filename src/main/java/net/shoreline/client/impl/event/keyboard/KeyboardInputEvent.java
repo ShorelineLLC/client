@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.keyboard;
 
 import net.shoreline.client.mixin.MixinKeyboard;
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.Event;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**

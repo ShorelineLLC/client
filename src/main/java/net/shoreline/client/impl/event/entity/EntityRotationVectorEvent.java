@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public final class EntityRotationVectorEvent extends Event
 {

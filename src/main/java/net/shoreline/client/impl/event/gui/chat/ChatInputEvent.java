@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.event.gui.chat;
 
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * @author linus

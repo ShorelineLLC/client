@@ -5,7 +5,7 @@ import net.shoreline.client.impl.event.render.ReloadShaderEvent;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 
 public class EventManager
 {

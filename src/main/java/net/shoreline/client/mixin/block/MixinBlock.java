@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.block;
 
 import net.minecraft.block.Block;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.block.BlockSlipperinessEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -17,7 +17,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.item.TridentPullbackEvent;
 import net.shoreline.client.impl.event.item.TridentWaterEvent;
 import net.shoreline.client.util.Globals;

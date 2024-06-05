@@ -4,8 +4,8 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * @author linus

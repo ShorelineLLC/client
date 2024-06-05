@@ -9,7 +9,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;

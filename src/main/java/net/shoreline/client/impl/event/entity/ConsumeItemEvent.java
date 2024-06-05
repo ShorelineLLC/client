@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.entity;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * @author linus

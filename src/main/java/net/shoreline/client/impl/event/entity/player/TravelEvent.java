@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.entity.player;
 
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.StageEvent;
 
 @Cancelable
 public class TravelEvent extends StageEvent

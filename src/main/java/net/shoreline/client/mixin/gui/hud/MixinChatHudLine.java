@@ -7,7 +7,7 @@ import net.minecraft.text.Text;
 import net.shoreline.client.impl.event.gui.hud.ChatLineEvent;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

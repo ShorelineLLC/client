@@ -3,7 +3,7 @@ package net.shoreline.client.mixin.entity.mob;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.PigEntity;
 import net.shoreline.client.impl.event.entity.mob.PigAIEvent;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

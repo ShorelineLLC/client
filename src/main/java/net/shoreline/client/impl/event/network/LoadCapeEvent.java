@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.network;
 
 import com.mojang.authlib.GameProfile;
 import net.shoreline.client.impl.manager.client.cape.CapeManager;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class LoadCapeEvent extends Event
 {

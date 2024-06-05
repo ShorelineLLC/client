@@ -12,7 +12,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.chat.ChatUtil;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;

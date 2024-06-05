@@ -3,7 +3,7 @@ package net.shoreline.client.impl.event.render.item;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class RenderFirstPersonEvent extends Event
 {

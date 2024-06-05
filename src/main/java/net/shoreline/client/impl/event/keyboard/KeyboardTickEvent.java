@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.keyboard;
 
 import net.minecraft.client.input.Input;
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.StageEvent;
 
 @Cancelable
 public class KeyboardTickEvent extends StageEvent

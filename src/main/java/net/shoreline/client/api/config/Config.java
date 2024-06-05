@@ -7,8 +7,8 @@ import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
-import net.shoreline.eventbus.StageEvent;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.event.StageEvent;
+import net.shoreline.eventbus.EventBus;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 import java.util.function.Supplier;

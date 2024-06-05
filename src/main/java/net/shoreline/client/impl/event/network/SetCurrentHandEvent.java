@@ -4,7 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.shoreline.client.mixin.network.MixinClientPlayerEntity;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * @author linus

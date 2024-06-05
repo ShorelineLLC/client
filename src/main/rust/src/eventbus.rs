@@ -1,239 +1,472 @@
+use std::ffi::CStr;
 use jni::JNIEnv;
-use jni::objects::{JMethodID, JObject, JValue};
+use jni::objects::{GlobalRef, JClass, JMethodID, JObject, JString, JValue};
 use jni::signature::JavaType;
+use jni::signature::Primitive::Void;
 use jni::sys::{JNI_FALSE};
 use obfstr::obfstr;
+use crate::log;
 
-#[export_name = "Java_net_shoreline_eventbus_bus_EventBus_init"]
-pub unsafe extern "system" fn init(env: JNIEnv,
-                                   caller_instance: JObject)
+static mut INVOKER_CACHE: Option<GlobalRef> = None;
+
+pub unsafe fn init_internal(env: &JNIEnv)
 {
-    let head_invoker = env.new_object(
-        obfstr!("net/shoreline/eventbus/bus/EventBus$stop_decompiling"),
-        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;I)V"),
-        &[JObject::null().into(), JObject::null().into(), JObject::null().into(), JValue::Int(0)]
+    let concurrent_hash_map = env.new_object(
+        obfstr!("java/util/concurrent/ConcurrentHashMap"),
+        obfstr!("()V"),
+        &[]
+    ).unwrap();
+
+    INVOKER_CACHE = Some(
+        env.new_global_ref(concurrent_hash_map).unwrap()
+    );
+
+    let event_bus_instance = env.get_static_field(
+        env.find_class(obfstr!("net/shoreline/eventbus/EventBus")).unwrap(),
+        obfstr!("INSTANCE"),
+        obfstr!("Lnet/shoreline/eventbus/EventBus;")
+    ).unwrap().l().unwrap();
+
+    let concurrent_hash_map = env.new_object(
+        obfstr!("java/util/concurrent/ConcurrentHashMap"),
+        obfstr!("()V"),
+        &[]
     ).unwrap();
 
     env.set_field(
-        caller_instance,
-        obfstr!("a"),
-        obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;"),
-        head_invoker.into()
+        event_bus_instance,
+        obfstr!("stop_decompiling_0"),
+        obfstr!("Ljava/lang/Object;"),
+        concurrent_hash_map.into()
     ).unwrap();
+
+    if is_in_dev_environment(&env)
+    {
+        env.call_static_method(
+            env.find_class(obfstr!("net/shoreline/eventbus/dev/DevEventBusLoader")).unwrap(),
+            obfstr!("load"),
+            obfstr!("()V"),
+            &[]
+        ).unwrap().v().unwrap();
+    }
 }
 
-#[export_name = "Java_net_shoreline_eventbus_bus_EventBus_subscribe"]
+static mut LOOKUP: Option<GlobalRef> = None;
+
+#[export_name = "Java_net_shoreline_eventbus_EventBus_subscribe"]
 pub unsafe extern "system" fn subscribe(env: JNIEnv,
                                         caller_instance: JObject,
                                         subscriber: JObject)
 {
-    let methods = env.call_method(
-        env.get_object_class(subscriber).unwrap(),
-        obfstr!("getDeclaredMethods0"),
-        obfstr!("(Z)[Ljava/lang/reflect/Method;"),
-        &[JNI_FALSE.into()],
-    ).unwrap().l().unwrap();
-
-    let length = env.get_array_length(*methods).unwrap();
-
-    for i in 0..length
+    if LOOKUP.is_none()
     {
-        let method_obj = env.get_object_array_element(*methods, i).unwrap();
+        let lookup = env.call_static_method(
+            env.find_class(obfstr!("java/lang/invoke/MethodHandles")).unwrap(),
+            obfstr!("lookup"),
+            obfstr!("()Ljava/lang/invoke/MethodHandles$Lookup;"),
+            &[]
+        ).unwrap().l().unwrap();
 
-        env.call_method(
-            method_obj,
-            obfstr!("trySetAccessible"),
-            obfstr!("()Z"),
-            &[],
-        ).unwrap().z().unwrap();
+        LOOKUP = Some(
+            env.new_global_ref(lookup).unwrap()
+        );
+    }
 
-        let event_listener = env.find_class(
-            obfstr!("net/shoreline/eventbus/annotation/EventListener"),
-        ).unwrap();
+    match LOOKUP.as_ref()
+    {
+        Some(lookup) => {
+            let subscriber_class = env.get_object_class(subscriber).unwrap();
 
-        if env.call_method(
-            method_obj,
-            obfstr!("isAnnotationPresent"),
-            obfstr!("(Ljava/lang/Class;)Z"),
-            &[event_listener.into()],
-        ).unwrap().z().unwrap()
-        {
-            let declared_annotation = env.call_method(
-                method_obj,
-                obfstr!("getDeclaredAnnotation"),
-                obfstr!("(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;"),
-                &[event_listener.into()],
+            let methods = env.call_method(
+                subscriber_class,
+                obfstr!("getDeclaredMethods0"),
+                obfstr!("(Z)[Ljava/lang/reflect/Method;"),
+                &[JNI_FALSE.into()],
             ).unwrap().l().unwrap();
 
-            let priority = env.call_method(
-                declared_annotation,
-                obfstr!("priority"),
-                obfstr!("()I"),
-                &[],
-            ).unwrap().i().unwrap();
+            let length = env.get_array_length(*methods).unwrap();
 
-            let parameters = env.call_method(
-                method_obj,
-                obfstr!("getParameterTypes"),
-                obfstr!("()[Ljava/lang/Class;"),
-                &[],
-            ).unwrap().l().unwrap();
-
-            let event_type = env.get_object_array_element(*parameters, 0).unwrap();
-
-            let invoker = env.new_object(
-                obfstr!("net/shoreline/eventbus/bus/EventBus$stop_decompiling"),
-                obfstr!("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;I)V"),
-                &[method_obj.into(), subscriber.into(), event_type.into(), priority.into()]
-            ).unwrap();
-
-            let mut prev = env.get_field(
-                caller_instance,
-                obfstr!("a"),
-                obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;")
-            ).unwrap().l().unwrap();
-
-            let mut current = env.get_field(
-                prev,
-                obfstr!("e"),
-                obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;")
-            ).unwrap().l().unwrap();
-
-            while !env.is_same_object(current, JObject::null()).unwrap()
+            for i in 0..length
             {
-                let current_priority = env.get_field(
-                    current,
-                    obfstr!("d"),
-                    obfstr!("I")
-                ).unwrap().i().unwrap();
-                
-                if priority > current_priority
+                let method_obj = env.get_object_array_element(*methods, i).unwrap();
+
+                env.call_method(
+                    method_obj,
+                    obfstr!("trySetAccessible"),
+                    obfstr!("()Z"),
+                    &[],
+                ).unwrap().z().unwrap();
+
+                let event_listener = env.find_class(
+                    obfstr!("net/shoreline/eventbus/annotation/EventListener"),
+                ).unwrap();
+
+                if env.call_method(
+                    method_obj,
+                    obfstr!("isAnnotationPresent"),
+                    obfstr!("(Ljava/lang/Class;)Z"),
+                    &[event_listener.into()],
+                ).unwrap().z().unwrap()
                 {
-                    break;
+                    let declared_annotation = env.call_method(
+                        method_obj,
+                        obfstr!("getDeclaredAnnotation"),
+                        obfstr!("(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;"),
+                        &[event_listener.into()],
+                    ).unwrap().l().unwrap();
+
+                    let priority_int = env.call_method(
+                        declared_annotation,
+                        obfstr!("priority"),
+                        obfstr!("()I"),
+                        &[],
+                    ).unwrap().i().unwrap();
+
+                    let parameters = env.call_method(
+                        method_obj,
+                        obfstr!("getParameterTypes"),
+                        obfstr!("()[Ljava/lang/Class;"),
+                        &[],
+                    ).unwrap().l().unwrap();
+
+                    let event_type = env.get_object_array_element(*parameters, 0).unwrap();
+
+                    let invoker_cache = INVOKER_CACHE.as_mut().unwrap().as_obj();
+
+                    let invoker_obj = if env.call_method(
+                        invoker_cache,
+                        obfstr!("contains"),
+                        obfstr!("(Ljava/lang/Object;)Z"),
+                        &[method_obj.into()]
+                    ).unwrap().z().unwrap()
+                    {
+                        env.call_method(
+                            invoker_cache,
+                            obfstr!("get"),
+                            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[method_obj.into()]
+                        ).unwrap().l().unwrap()
+                    } else
+                    {
+                        let method_type = env.call_static_method(
+                            env.find_class(obfstr!("java/lang/invoke/MethodType")).unwrap(),
+                            obfstr!("methodType"),
+                            obfstr!("(Ljava/lang/Class;)Ljava/lang/invoke/MethodType;"),
+                            &[env.find_class(obfstr!("net/shoreline/eventbus/EventBus$stop_decompiling_0")).unwrap().into()]
+                        ).unwrap().l().unwrap();
+
+                        let subscriber_class_array = env.new_object_array(
+                            1,
+                            obfstr!("java/lang/Class"),
+                            subscriber_class
+                        ).unwrap();
+
+                        let appended_parameter_types = env.call_method(
+                            method_type,
+                            obfstr!("appendParameterTypes"),
+                            obfstr!("([Ljava/lang/Class;)Ljava/lang/invoke/MethodType;"),
+                            &[subscriber_class_array.into()]
+                        ).unwrap().l().unwrap();
+
+                        let void_class = env.get_static_field(
+                            env.find_class(obfstr!("java/lang/Void")).unwrap(),
+                            obfstr!("TYPE"),
+                            obfstr!("Ljava/lang/Class;")
+                        ).unwrap().l().unwrap();
+
+                        let void_obj_method_type = env.call_static_method(
+                            env.find_class(obfstr!("java/lang/invoke/MethodType")).unwrap(),
+                            obfstr!("methodType"),
+                            obfstr!("(Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/invoke/MethodType;"),
+                            &[
+                                void_class.into(),
+                                env.find_class(obfstr!("java/lang/Object")).unwrap().into()
+                            ]
+                        ).unwrap().l().unwrap();
+
+                        let unreflect = env.call_method(
+                            lookup,
+                            obfstr!("unreflect"),
+                            obfstr!("(Ljava/lang/reflect/Method;)Ljava/lang/invoke/MethodHandle;"),
+                            &[method_obj.into()]
+                        ).unwrap().l().unwrap();
+
+                        let dynamic_method_type = env.call_static_method(
+                            env.find_class(obfstr!("java/lang/invoke/MethodType")).unwrap(),
+                            obfstr!("methodType"),
+                            obfstr!("(Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/invoke/MethodType;"),
+                            &[
+                                void_class.into(),
+                                event_type.into()
+                            ]
+                        ).unwrap().l().unwrap();
+
+                        let call_site = env.call_static_method(
+                            env.find_class(obfstr!("java/lang/invoke/LambdaMetafactory")).unwrap(),
+                            obfstr!("metafactory"),
+                            obfstr!(
+                            "(Ljava/lang/invoke/MethodHandles$Lookup;\
+                            Ljava/lang/String;\
+                            Ljava/lang/invoke/MethodType;\
+                            Ljava/lang/invoke/MethodType;\
+                            Ljava/lang/invoke/MethodHandle;\
+                            Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+                        ),
+                            &[
+                                lookup.into(),
+                                env.new_string(obfstr!("stop_decompiling_0")).unwrap().into(),
+                                appended_parameter_types.into(),
+                                void_obj_method_type.into(),
+                                unreflect.into(),
+                                dynamic_method_type.into()
+                            ]
+                        ).unwrap().l().unwrap();
+
+                        let method_handle = env.call_method(
+                            call_site,
+                            obfstr!("getTarget"),
+                            obfstr!("()Ljava/lang/invoke/MethodHandle;"),
+                            &[]
+                        ).unwrap().l().unwrap();
+
+                        let subscriber_arg_array = env.new_object_array(
+                            1,
+                            obfstr!("java/lang/Object"),
+                            subscriber
+                        ).unwrap();
+
+                        let invoker_impl = env.call_method(
+                            method_handle,
+                            obfstr!("invokeWithArguments"),
+                            obfstr!("([Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[subscriber_arg_array.into()]
+                        ).unwrap().l().unwrap();
+
+                        env.call_method(
+                            invoker_cache,
+                            obfstr!("put"),
+                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[method_obj.into(), invoker_impl.into()]
+                        ).unwrap().l().unwrap();
+
+                        invoker_impl
+                    };
+
+                    let priority = env.call_static_method(
+                        env.find_class(obfstr!("java/lang/Integer")).unwrap(),
+                        obfstr!("valueOf"),
+                        obfstr!("(I)Ljava/lang/Integer;"),
+                        &[priority_int.into()]
+                    ).unwrap().l().unwrap();
+
+                    let invoker = env.new_object(
+                        obfstr!("net/shoreline/eventbus/EventBus$stop_decompiling_1"),
+                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V"),
+                        &[invoker_obj.into(), subscriber.into(), priority.into()]
+                    ).unwrap();
+
+                    let event_map = env.get_field(
+                        caller_instance,
+                        obfstr!("stop_decompiling_0"),
+                        obfstr!("Ljava/lang/Object;")
+                    ).unwrap().l().unwrap();
+
+                    let mut prev = env.call_method(
+                        event_map,
+                        obfstr!("get"),
+                        obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                        &[event_type.into()]
+                    ).unwrap().l().unwrap();
+
+                    let mut current = env.get_field(
+                        prev,
+                        obfstr!("stop_decompiling_0"),
+                        obfstr!("Ljava/lang/Object;")
+                    ).unwrap().l().unwrap();
+
+                    while !env.is_same_object(current, JObject::null()).unwrap()
+                    {
+                        let current_priority = env.get_field(
+                            current,
+                            obfstr!("stop_decompiling_3"),
+                            obfstr!("Ljava/lang/Object;")
+                        ).unwrap().l().unwrap();
+
+                        let current_priority_int = env.call_method(
+                            current_priority,
+                            obfstr!("intValue"),
+                            obfstr!("()I"),
+                            &[]
+                        ).unwrap().i().unwrap();
+
+                        if priority_int > current_priority_int
+                        {
+                            break;
+                        }
+
+                        prev = current;
+
+                        let next = env.get_field(
+                            current,
+                            obfstr!("stop_decompiling_0"),
+                            obfstr!("Ljava/lang/Object;")
+                        ).unwrap().l().unwrap();
+
+                        current = next;
+                    }
+
+                    env.set_field(
+                        prev,
+                        obfstr!("stop_decompiling_0"),
+                        obfstr!("Ljava/lang/Object;"),
+                        invoker.into()
+                    ).unwrap();
+
+                    env.set_field(
+                        invoker,
+                        obfstr!("stop_decompiling_0"),
+                        obfstr!("Ljava/lang/Object;"),
+                        current.into()
+                    ).unwrap();
                 }
-
-                prev = current;
-
-                let next = env.get_field(
-                    current,
-                    obfstr!("e"),
-                    obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;")
-                ).unwrap().l().unwrap();
-
-                current = next;
             }
-
-            env.set_field(
-                prev,
-                obfstr!("e"),
-                obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;"),
-                invoker.into()
-            ).unwrap();
-
-            env.set_field(
-                invoker,
-                obfstr!("e"),
-                obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;"),
-                current.into()
-            ).unwrap();
         }
+        None => panic!("unable to complete native method subscribe")
     }
 }
 
-#[export_name = "Java_net_shoreline_eventbus_bus_EventBus_unsubscribe"]
+#[export_name = "Java_net_shoreline_eventbus_EventBus_unsubscribe"]
 pub unsafe extern "system" fn unsubscribe(env: JNIEnv,
                                           caller_instance: JObject,
                                           subscriber: JObject)
 {
-    let mut prev = env.get_field(
+    let event_map = env.get_field(
         caller_instance,
-        obfstr!("a"),
-        obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;")
+        obfstr!("stop_decompiling_0"),
+        obfstr!("Ljava/lang/Object;")
     ).unwrap().l().unwrap();
 
-    let mut tmp = env.get_field(
-        prev,
-        obfstr!("e"),
-        obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;")
+    let entry_set = env.call_method(
+        event_map,
+        obfstr!("entrySet"),
+        obfstr!("()Ljava/util/Set;"),
+        &[]
     ).unwrap().l().unwrap();
 
-    while !env.is_same_object(tmp, JObject::null()).unwrap()
+    let iterator = env.call_method(
+        entry_set,
+        obfstr!("iterator"),
+        obfstr!("()Ljava/util/Iterator;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    while env.call_method(
+        iterator,
+        obfstr!("hasNext"),
+        obfstr!("()Z"),
+        &[]
+    ).unwrap().z().unwrap()
     {
-        let tmp_instance = env.get_field(
-            tmp,
-            obfstr!("b"),
+        let entry = env.call_method(
+            iterator,
+            obfstr!("next"),
+            obfstr!("()Ljava/lang/Object;"),
+            &[]
+        ).unwrap().l().unwrap();
+
+        let mut prev = env.call_method(
+            entry,
+            "getValue",
+            "()Ljava/lang/Object;",
+            &[]
+        ).unwrap().l().unwrap();
+
+        let mut tmp = env.get_field(
+            prev,
+            obfstr!("stop_decompiling_0"),
             obfstr!("Ljava/lang/Object;")
         ).unwrap().l().unwrap();
 
-        if env.is_same_object(tmp_instance, subscriber).unwrap()
+        while !env.is_same_object(tmp, JObject::null()).unwrap()
         {
-            let tmp_next = env.get_field(
+            let tmp_instance = env.get_field(
                 tmp,
-                obfstr!("e"),
-                obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;")
+                obfstr!("stop_decompiling_2"),
+                obfstr!("Ljava/lang/Object;")
             ).unwrap().l().unwrap();
 
-            env.set_field(
-                prev,
-                obfstr!("e"),
-                obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;"),
-                tmp_next.into()
-            ).unwrap();
-        } else
-        {
-            prev = tmp;
+            if env.is_same_object(tmp_instance, subscriber).unwrap()
+            {
+                let tmp_next = env.get_field(
+                    tmp,
+                    obfstr!("stop_decompiling_0"),
+                    obfstr!("Ljava/lang/Object;")
+                ).unwrap().l().unwrap();
+
+                env.set_field(
+                    prev,
+                    obfstr!("stop_decompiling_0"),
+                    obfstr!("Ljava/lang/Object;"),
+                    tmp_next.into()
+                ).unwrap();
+            } else
+            {
+                prev = tmp;
+            }
+
+            let tmp_next = env.get_field(
+                tmp,
+                obfstr!("stop_decompiling_0"),
+                obfstr!("Ljava/lang/Object;")
+            ).unwrap().l().unwrap();
+
+            tmp = tmp_next;
         }
-
-        let tmp_next = env.get_field(
-            tmp,
-            obfstr!("e"),
-            obfstr!("Lnet/shoreline/eventbus/bus/EventBus$stop_decompiling;")
-        ).unwrap().l().unwrap();
-
-        tmp = tmp_next;
     }
 }
 
-pub static mut INVOKE: Option<JMethodID> = None;
-
-#[export_name = "Java_net_shoreline_eventbus_bus_EventBus_dispatch_1internal"]
-pub unsafe extern "system" fn dispatch_internal(env: JNIEnv<'static>,
-                                                _caller_instance: JObject,
-                                                method: JObject,
-                                                instance: JObject,
-                                                event: JObject)
+pub fn cache_event_class(env: &JNIEnv,
+                         event_clazz: JClass)
 {
-    if !INVOKE.is_some()
-    {
-        let method_class = env.find_class("java/lang/reflect/Method").unwrap();
+    let event_bus_instance = env.get_static_field(
+        env.find_class(obfstr!("net/shoreline/eventbus/EventBus")).unwrap(),
+        obfstr!("INSTANCE"),
+        obfstr!("Lnet/shoreline/eventbus/EventBus;")
+    ).unwrap().l().unwrap();
 
-        let method_id = env.get_method_id(
-            method_class,
-            obfstr!("invoke"),
-            obfstr!("(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;")
-        ).unwrap();
+    let event_map = env.get_field(
+        event_bus_instance,
+        obfstr!("stop_decompiling_0"),
+        obfstr!("Ljava/lang/Object;")
+    ).unwrap().l().unwrap();
 
-        INVOKE = Some(method_id);
-    }
+    let new_null_head_invoker = env.new_object(
+        obfstr!("net/shoreline/eventbus/EventBus$stop_decompiling_1"),
+        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V"),
+        &[JObject::null().into(), JObject::null().into(), JObject::null().into()]
+    ).unwrap();
 
-    match INVOKE.as_ref()
-    {
-        Some(invoke) => {
-            let invoked = env.call_method_unchecked(
-                method,
-                *invoke,
-                JavaType::Object(String::from(obfstr!("Ljava/lang/Object;"))),
-                &[instance.into(), event.into()]
-            );
+    env.call_method(
+        event_map,
+        obfstr!("put"),
+        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+        &[event_clazz.into(), new_null_head_invoker.into()]
+    ).unwrap().l().unwrap();
+}
 
-            if env.exception_check().unwrap()
-            {
-                env.exception_describe().unwrap();
-                env.exception_clear().unwrap();
-            }
+fn is_in_dev_environment(env: &JNIEnv) -> bool
+{
+    let fabric_loader_instance = env.call_static_method(
+        env.find_class(obfstr!("net/fabricmc/loader/api/FabricLoader")).unwrap(),
+        obfstr!("getInstance"),
+        obfstr!("()Lnet/fabricmc/loader/api/FabricLoader;"),
+        &[]
+    ).unwrap().l().unwrap();
 
-            invoked.unwrap().l().unwrap();
-        }
-        None => panic!("unable to complete native method dispatch_internal")
-    }
+    return env.call_method(
+        fabric_loader_instance,
+        obfstr!("isDevelopmentEnvironment"),
+        obfstr!("()Z"),
+        &[]
+    ).unwrap().z().unwrap();
 }

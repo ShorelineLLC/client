@@ -20,7 +20,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.LinkedHashSet;

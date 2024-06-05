@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.world;
 
 import net.minecraft.util.math.ChunkPos;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus

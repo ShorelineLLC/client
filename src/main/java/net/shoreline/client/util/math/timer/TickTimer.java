@@ -1,9 +1,9 @@
 package net.shoreline.client.util.math.timer;
 
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 
 /**
  * TODO: Test the accuracy of ticks

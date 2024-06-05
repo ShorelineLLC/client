@@ -1,4 +1,6 @@
-package net.shoreline.eventbus;
+package net.shoreline.eventbus.event;
+
+import net.shoreline.eventbus.annotation.Cancelable;
 
 public class Event
 {

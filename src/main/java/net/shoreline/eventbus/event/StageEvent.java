@@ -1,4 +1,4 @@
-package net.shoreline.eventbus;
+package net.shoreline.eventbus.event;
 
 public class StageEvent extends Event
 {

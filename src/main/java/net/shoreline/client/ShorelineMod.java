@@ -19,6 +19,7 @@ import java.util.Map;
  * @author linus
  * @since 1.0
  */
+
 public class ShorelineMod implements ClientModInitializer
 {
     public static final String MOD_NAME = "Shoreline";

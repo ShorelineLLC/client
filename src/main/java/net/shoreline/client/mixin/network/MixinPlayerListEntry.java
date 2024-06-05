@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.network.CapesEvent;
 import net.shoreline.client.impl.event.network.LoadCapeEvent;
 import net.shoreline.client.util.Globals;

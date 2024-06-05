@@ -3,7 +3,7 @@ package net.shoreline.client.mixin.gui.screen.slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.ShulkerBoxSlot;
 import net.shoreline.client.impl.event.gui.screen.slot.ShulkerNestedEvent;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

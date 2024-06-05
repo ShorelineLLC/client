@@ -5,7 +5,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.render.AmbientColorEvent;
 import net.shoreline.client.impl.event.render.LightmapGammaEvent;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

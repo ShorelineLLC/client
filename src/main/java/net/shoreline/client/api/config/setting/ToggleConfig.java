@@ -3,7 +3,7 @@ package net.shoreline.client.api.config.setting;
 import net.shoreline.client.api.config.ConfigContainer;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 
 /**
  * @author linus

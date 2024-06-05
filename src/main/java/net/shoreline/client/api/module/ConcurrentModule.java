@@ -1,6 +1,6 @@
 package net.shoreline.client.api.module;
 
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 
 /**
  * {@link Module} implementation that runs concurrently and cannot be disabled

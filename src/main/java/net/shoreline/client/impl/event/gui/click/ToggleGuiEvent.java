@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.gui.click;
 
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * @author linus

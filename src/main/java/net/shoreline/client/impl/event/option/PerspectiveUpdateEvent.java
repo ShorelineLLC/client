@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.option;
 
 import net.minecraft.client.option.Perspective;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class PerspectiveUpdateEvent extends Event
 {

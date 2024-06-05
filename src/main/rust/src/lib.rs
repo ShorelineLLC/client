@@ -15,7 +15,6 @@ use std::ffi::{CStr};
 use hardware_id::get_id;
 use jni::signature::JavaType;
 use jni::signature::Primitive::Int;
-use crate::antidump::{run_antidump_checks};
 use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
 
 static mut USER_INFO: Option<GlobalRef> = None;
@@ -152,6 +151,9 @@ pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
             USER_INFO = Some(
                 env.new_global_ref(read_line).unwrap()
             );
+
+            // User is authed, load our event bus
+            eventbus::init_internal(&env)
         }
         401 => {
             error_message(
@@ -787,6 +789,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                         obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
                         &[clazz.into()]
                     ).unwrap().l().unwrap();
+                }
+
+                // Cache event classes into the event bus
+                if class_name.starts_with("net/shoreline/client/impl/event")
+                {
+                    eventbus::cache_event_class(&env, clazz);
                 }
             }
         }

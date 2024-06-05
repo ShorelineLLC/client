@@ -4,7 +4,7 @@ import net.minecraft.text.CharacterVisitor;
 import net.minecraft.text.Style;
 import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Formatting;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.ClientColorEvent;
 import net.shoreline.client.impl.event.text.TextVisitEvent;
 import net.shoreline.client.util.Globals;

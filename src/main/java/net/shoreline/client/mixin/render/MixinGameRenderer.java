@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.network.ReachEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.world.UpdateCrosshairTargetEvent;

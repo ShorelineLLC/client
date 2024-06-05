@@ -7,7 +7,7 @@ import net.minecraft.client.option.Perspective;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.event.option.PerspectiveUpdateEvent;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;

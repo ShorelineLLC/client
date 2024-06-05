@@ -12,7 +12,7 @@ import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.client.impl.event.entity.decoration.TeamColorEvent;
 import net.shoreline.client.impl.event.entity.player.PushEntityEvent;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

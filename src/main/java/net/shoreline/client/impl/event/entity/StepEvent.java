@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.event.entity;
 
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class StepEvent extends Event
 {

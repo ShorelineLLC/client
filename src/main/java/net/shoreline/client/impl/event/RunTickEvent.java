@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event;
 
 import net.shoreline.client.mixin.MixinMinecraftClient;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * The main game loop event, this "tick" runs while the

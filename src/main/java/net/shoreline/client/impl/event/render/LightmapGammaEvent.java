@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.event.render;
 
 import net.shoreline.client.mixin.render.MixinLightmapTextureManager;
-import net.shoreline.eventbus.Cancelable;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
+import net.shoreline.eventbus.event.Event;
 
 /**
  * @author linus

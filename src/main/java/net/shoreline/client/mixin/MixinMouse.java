@@ -2,7 +2,7 @@ package net.shoreline.client.mixin;
 
 import net.minecraft.client.Mouse;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.MouseClickEvent;
 import net.shoreline.client.impl.event.MouseUpdateEvent;
 import org.spongepowered.asm.mixin.Mixin;

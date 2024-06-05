@@ -10,7 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.render.item.RenderArmEvent;
 import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
 import org.spongepowered.asm.mixin.Final;

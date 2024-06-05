@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.item;
 
 import net.minecraft.item.ItemStack;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class FinishUsingEvent extends Event
 {

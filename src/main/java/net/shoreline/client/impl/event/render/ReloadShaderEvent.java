@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.event.render;
 
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class ReloadShaderEvent extends Event
 {

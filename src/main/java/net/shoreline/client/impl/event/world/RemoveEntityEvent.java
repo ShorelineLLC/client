@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event.world;
 
 import net.minecraft.entity.Entity;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.event.Event;
 
 public class RemoveEntityEvent extends Event implements Globals
 {

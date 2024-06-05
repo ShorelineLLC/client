@@ -16,9 +16,9 @@ import net.shoreline.client.impl.imixin.IClientPlayerEntity;
 import net.shoreline.client.impl.module.client.RotationsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.bus.EventBus;
+import net.shoreline.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;

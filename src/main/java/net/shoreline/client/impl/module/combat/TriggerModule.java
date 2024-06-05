@@ -14,7 +14,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.eventbus.StageEvent;
+import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
