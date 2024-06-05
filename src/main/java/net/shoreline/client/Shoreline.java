@@ -26,8 +26,6 @@ public class Shoreline
     // game instance is shutdown.
     public static ShutdownHook SHUTDOWN;
     public static Executor EXECUTOR;
-    //
-    public static RenderLayersClient RENDER_LAYERS;
 
     /**
      * Called during {@link ShorelineMod#onInitializeClient()}
@@ -45,7 +43,6 @@ public class Shoreline
         info("Starting postInit ...");
         CONFIG = new ClientConfiguration();
         Managers.postInit();
-        RENDER_LAYERS = new RenderLayersClient();
         SHUTDOWN = new ShutdownHook();
         Runtime.getRuntime().addShutdownHook(SHUTDOWN);
         // load configs AFTER everything has been initialized

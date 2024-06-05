@@ -2,12 +2,16 @@ package net.shoreline.client.impl.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.shoreline.client.api.command.BlockArgumentType;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.ConfigArgumentType;
 import net.shoreline.client.api.command.ItemArgumentType;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BlockListConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.ItemListConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
@@ -18,6 +22,7 @@ import net.shoreline.client.util.KeyboardUtil;
 import net.shoreline.client.util.chat.ChatUtil;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,7 +71,8 @@ public class ModuleCommand extends Command
                                     String action = StringArgumentType.getString(c, "value");
                                     Item value = ItemArgumentType.getItem(c, "item");
                                     return addDeleteItem(config, action, value);
-                                }))).executes(c ->
+                                })))
+                .executes(c ->
                 {
                     ChatUtil.error("Must provide a value!");
                     return 1;
@@ -97,6 +103,25 @@ public class ModuleCommand extends Command
                 ChatUtil.clientSendMessage("Removed §c" + value.getName().getString() + "§f from §7" + config.getName());
             }
         }
+        else if (config instanceof BlockListConfig<?> blockListConfig)
+        {
+            if (!(value instanceof BlockItem blockItem))
+            {
+                ChatUtil.error("Not a block item!");
+                return 0;
+            }
+            List<Block> list = blockListConfig.getValue();
+            if (action.equalsIgnoreCase("add"))
+            {
+                list.add(blockItem.getBlock());
+                ChatUtil.clientSendMessage("Added §s" + blockItem.getBlock().getName().getString() + "§f to §7" + config.getName());
+            }
+            else if (action.equalsIgnoreCase("del") || action.equalsIgnoreCase("remove"))
+            {
+                list.remove(blockItem.getBlock());
+                ChatUtil.clientSendMessage("Removed §c" + blockItem.getBlock().getName().getString() + "§f from §7" + config.getName());
+            }
+        }
         return 1;
     }
 
@@ -112,17 +137,30 @@ public class ModuleCommand extends Command
                     ChatUtil.error("There are no items in the list!");
                     return 1;
                 }
-                StringBuilder listString = new StringBuilder();
-                for (int i = 0; i < list.size(); i++)
+                List<String> listString = new ArrayList<>();
+                for (Item item : list)
                 {
-                    Item item = list.get(i);
-                    listString.append(item.getName().getString());
-                    if (i <= list.size() - 1)
-                    {
-                        listString.append(", ");
-                    }
+                    listString.add(item.getName().getString());
                 }
-                ChatUtil.clientSendMessage("§7" + config.getName() + "§f: " + listString);
+                ChatUtil.clientSendMessage("§7" + config.getName() + "§f: " + String.join(", ", listString));
+            }
+        }
+        else if (config instanceof BlockListConfig)
+        {
+            List<Block> list = ((List<Block>) config.getValue());
+            if (action.equalsIgnoreCase("list"))
+            {
+                if (list.isEmpty())
+                {
+                    ChatUtil.error("There are no blocks in the list!");
+                    return 1;
+                }
+                List<String> listString = new ArrayList<>();
+                for (Block block : list)
+                {
+                    listString.add(block.getName().getString());
+                }
+                ChatUtil.clientSendMessage("§7" + config.getName() + "§f: " + String.join(", ", listString));
             }
         }
         return 1;

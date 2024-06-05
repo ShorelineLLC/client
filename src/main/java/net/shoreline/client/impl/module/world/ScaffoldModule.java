@@ -1,46 +1,64 @@
 package net.shoreline.client.impl.module.world;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
+import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
-import net.shoreline.client.util.player.RayCastUtil;
 import net.shoreline.client.util.player.RotationUtil;
+import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.START_SPRINTING;
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.STOP_SPRINTING;
 
 /**
- * @author xgraza
- * @since 05/15/24
+ * @author xgraza, Shoreline
+ * @since 1.0
  */
 public final class ScaffoldModule extends RotationModule
 {
-    Config<Mode> modeConfig = register(new EnumConfig<>("Mode", "", Mode.VANILLA, Mode.values()));
-    Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "", false));
-    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true));
+    Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
+    Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT));
+    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist"));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim interactions", false));
+    Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "Keeps the same y-level", false));
+    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimConfig.getValue()));
+    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
 
+    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
     private boolean stoppedServerSprint;
+    private BlockData blockData;
     private float[] lastAngles;
     private int groundPosY;
 
     public ScaffoldModule()
     {
-        super("Scaffold", "", ModuleCategory.WORLD);
+        super("Scaffold", "Places blocks at the players feet", ModuleCategory.WORLD, 790);
     }
 
     @Override
@@ -63,22 +81,22 @@ public final class ScaffoldModule extends RotationModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
-        final BlockData blockData = getBlockData();
+        blockData = getBlockData();
         if (blockData == null)
         {
             return;
         }
         calcRotations(blockData);
-        if (blockData.getAngles() == null && modeConfig.getValue() != Mode.VANILLA)
+        if (blockData.getAngles() == null)
         {
-            if (modeConfig.getValue() != Mode.GRIM && lastAngles != null)
+            if (!grimConfig.getValue() && lastAngles != null)
             {
                 setRotation(lastAngles[0], lastAngles[1]);
             }
             return;
         }
 
-        if (modeConfig.getValue() == Mode.NCP && !stoppedServerSprint && mc.player.isSprinting())
+        if (!grimConfig.getValue() && !stoppedServerSprint && mc.player.isSprinting())
         {
             stoppedServerSprint = true;
             Managers.NETWORK.sendQuietPacket(new ClientCommandC2SPacket(
@@ -86,23 +104,22 @@ public final class ScaffoldModule extends RotationModule
         }
 
         int slot = -1;
+        for (int i = 0; i < 9; ++i)
         {
-            for (int i = 0; i < 9; ++i)
+            final ItemStack itemStack = mc.player.getInventory().getStack(i);
+            if (!itemStack.isEmpty() && itemStack.getItem() instanceof BlockItem blockItem
+                    && validScaffoldBlock(blockItem.getBlock()))
             {
-                final ItemStack itemStack = mc.player.getInventory().getStack(i);
-                if (!itemStack.isEmpty() && itemStack.getItem() instanceof BlockItem)
-                {
-                    slot = i;
-                    break;
-                }
-            }
-            if (slot == -1)
-            {
-                return;
+                slot = i;
+                break;
             }
         }
+        if (slot == -1)
+        {
+            return;
+        }
 
-        if (modeConfig.getValue() == Mode.NCP && Managers.INVENTORY.getServerSlot() != slot)
+        if (!grimConfig.getValue() && Managers.INVENTORY.getServerSlot() != slot)
         {
             Managers.INVENTORY.setSlot(slot);
         }
@@ -116,7 +133,7 @@ public final class ScaffoldModule extends RotationModule
             lastAngles = rotations;
             if (state)
             {
-                if (modeConfig.getValue() == Mode.GRIM)
+                if (grimConfig.getValue())
                 {
                     Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], true);
                 }
@@ -127,7 +144,7 @@ public final class ScaffoldModule extends RotationModule
             }
             else
             {
-                if (modeConfig.getValue() == Mode.GRIM)
+                if (grimConfig.getValue())
                 {
                     Managers.ROTATION.setRotationSilentSync(true);
                 }
@@ -159,40 +176,47 @@ public final class ScaffoldModule extends RotationModule
         }
     }
 
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        if (renderConfig.getValue())
+        {
+            RenderBuffers.preRender();
+            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
+            {
+                set.getValue().setState(false);
+                int boxAlpha = (int) (80 * set.getValue().getFactor());
+                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
+                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
+            }
+            RenderBuffers.postRender();
+
+            if (blockData == null || blockData.getHitResult() == null)
+            {
+                return;
+            }
+
+            if (renderConfig.getValue())
+            {
+                Animation animation = new Animation(true, fadeTimeConfig.getValue());
+                fadeList.put(blockData.getHitResult().getBlockPos().offset(blockData.getHitResult().getSide()), animation);
+            }
+
+            fadeList.entrySet().removeIf(e ->
+                    e.getValue().getFactor() == 0.0);
+        }
+    }
+
     private void calcRotations(final BlockData blockData)
     {
         final BlockPos pos = blockData.getHitResult().getBlockPos();
         final Direction side = blockData.getHitResult().getSide();
         final Vec3d basicHitVec = pos.toCenterPos()
                 .add(side.getOffsetX() * 0.5f, side.getOffsetY() * 0.5f, side.getOffsetZ() * 0.5f);
-
-        switch (modeConfig.getValue())
-        {
-            case VANILLA -> blockData.setAngles(RotationUtil.getRotationsTo(mc.player.getEyePos(), basicHitVec));
-            //case NCP -> blockData.setAngles(new float[] { mc.player.getYaw() - 180, 86 });
-            case NCP, GRIM ->
-            {
-                float yaw = mc.player.getYaw() - 180;
-                float pitch = 75.0f;
-                for (float offsetYaw = -55.0f; offsetYaw <= 55.0f; offsetYaw += 0.5f)
-                {
-                    for (float offsetPitch = 0.0f; offsetPitch <= 15.0f; offsetPitch += 0.5f)
-                    {
-                        final float[] angles = {yaw + offsetYaw, pitch + offsetPitch};
-                        final HitResult hitResult = RayCastUtil.rayCast(4.0, angles);
-                        if (hitResult instanceof BlockHitResult blockHitResult
-                                && blockHitResult.getBlockPos().equals(pos)
-                                && blockHitResult.getSide().equals(side))
-                        {
-                            blockData.setHitResult(blockHitResult);
-                            blockData.setAngles(angles);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
+        blockData.setAngles(RotationUtil.getRotationsTo(mc.player.getEyePos(), basicHitVec));
         blockData.setHitResult(new BlockHitResult(basicHitVec, side, pos, false));
     }
 
@@ -235,6 +259,16 @@ public final class ScaffoldModule extends RotationModule
         return null;
     }
 
+    private boolean validScaffoldBlock(Block block)
+    {
+        return switch (selectionConfig.getValue())
+        {
+            case WHITELIST -> ((BlockListConfig<?>) whitelistConfig).contains(block);
+            case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
+            case ALL -> true;
+        };
+    }
+
     private static class BlockData
     {
         private BlockHitResult hitResult;
@@ -272,8 +306,10 @@ public final class ScaffoldModule extends RotationModule
         }
     }
 
-    private enum Mode
+    public enum Selection
     {
-        VANILLA, NCP, GRIM
+        WHITELIST,
+        BLACKLIST,
+        ALL
     }
 }

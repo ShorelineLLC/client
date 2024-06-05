@@ -46,6 +46,10 @@ public final class EventBus
      */
     public void dispatch(Event event)
     {
+        if (this.stop_decompiling_0 == null)
+        {
+            return;
+        }
 
         stop_decompiling_1 head = (stop_decompiling_1) ((Map) this.stop_decompiling_0).get(event.getClass());
         stop_decompiling_1 current = (stop_decompiling_1) head.stop_decompiling_0;
