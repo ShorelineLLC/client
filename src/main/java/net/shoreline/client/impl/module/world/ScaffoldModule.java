@@ -3,16 +3,17 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.*;
+import net.shoreline.client.api.config.setting.BlockListConfig;
+import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -152,7 +153,7 @@ public final class ScaffoldModule extends RotationModule
         });
         if (result)
         {
-            if (towerConfig.getValue() && mc.options.jumpKey.isPressed())
+            if (!grimConfig.getValue() && towerConfig.getValue() && mc.options.jumpKey.isPressed())
             {
                 final Vec3d velocity = mc.player.getVelocity();
                 final double velocityY = velocity.y;

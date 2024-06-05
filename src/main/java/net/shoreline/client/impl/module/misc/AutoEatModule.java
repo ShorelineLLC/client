@@ -22,8 +22,6 @@ public class AutoEatModule extends ToggleModule
 {
     //
     Config<Float> hungerConfig = register(new NumberConfig<>("Hunger", "The minimum hunger level before eating", 1.0f, 19.0f, 20.0f));
-    //
-    private int prevSlot;
 
     /**
      *
@@ -35,30 +33,14 @@ public class AutoEatModule extends ToggleModule
     }
 
     @Override
-    public void onEnable()
-    {
-        prevSlot = -1;
-    }
-
-    @Override
     public void onDisable()
     {
-        KeyBinding.setKeyPressed(((AccessorKeyBinding) mc.options.useKey).getBoundKey(), false);
+        mc.options.useKey.setPressed(false);
     }
 
     @EventListener
     public void onTick(TickEvent event)
     {
-        if (!mc.player.isUsingItem())
-        {
-            if (prevSlot != -1)
-            {
-                Managers.INVENTORY.setClientSlot(prevSlot);
-                prevSlot = -1;
-            }
-            KeyBinding.setKeyPressed(((AccessorKeyBinding) mc.options.useKey).getBoundKey(), false);
-            return;
-        }
         //
         HungerManager hungerManager = mc.player.getHungerManager();
         if (hungerManager.getFoodLevel() <= hungerConfig.getValue())
@@ -74,10 +56,13 @@ public class AutoEatModule extends ToggleModule
             }
             else
             {
-                prevSlot = mc.player.getInventory().selectedSlot;
                 Managers.INVENTORY.setClientSlot(slot);
             }
-            KeyBinding.setKeyPressed(((AccessorKeyBinding) mc.options.useKey).getBoundKey(), true);
+            mc.options.useKey.setPressed(true);
+        }
+        else
+        {
+            mc.options.useKey.setPressed(false);
         }
     }
 
