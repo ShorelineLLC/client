@@ -186,7 +186,10 @@ public abstract class Component implements Drawable, Globals
         float j = (float) ColorHelper.Argb.getBlue(color) / 255.0f;
         BufferBuilder buffer = RenderManager.BUFFER;
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        if (RenderSystem.getShader() != GameRenderer.getPositionColorProgram())
+        {
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        }
         buffer.begin(VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION_COLOR);
         buffer.vertex(matrix4f, (float) x1, (float) y1, (float) z)

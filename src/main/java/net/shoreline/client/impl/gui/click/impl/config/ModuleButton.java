@@ -128,7 +128,8 @@ public class ModuleButton extends Button
         }
 
         int unfilledColor = ClickGuiModule.getInstance().fixTransparency(0x33000000);
-        rectGradient(context, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : unfilledColor, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : unfilledColor);
+
+        rect(context, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : unfilledColor);
 
         int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
         int grayText = ClickGuiModule.getInstance().fixTransparency(0xFFAAAAAA);
@@ -154,7 +155,7 @@ public class ModuleButton extends Button
 
             if (canScissor)
             {
-                enableScissor((int) x, (int) (off - 1.0f), (int) (x + width), (int) (off + 2.0f + (fheight * settingsAnimation.getFactor())));
+                enableScissor((int) x, (int) (off - 1.0f), (int) (x + width), (int) (off + 3.0f + (fheight * settingsAnimation.getFactor())));
             }
             for (ConfigButton<?> configButton : configComponents)
             {
@@ -171,7 +172,7 @@ public class ModuleButton extends Button
             {
                 fill(context, ix, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.getInstance().getColor(scaledTime));
                 fill(context, ix + width - 1.0f, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.getInstance().getColor(scaledTime));
-                fillGradient(context, ix, off + 1.0f, ix + width, off + 2.0f, ClickGuiModule.getInstance().getColor(scaledTime), ClickGuiModule.getInstance().getColor(scaledTime));
+                fill(context, ix, off + 1.0f, width, 1.0f, 0.0, ClickGuiModule.getInstance().getColor(scaledTime));
             }
             if (canScissor)
             {

@@ -44,7 +44,7 @@ public class DropdownButton extends ConfigButton<Enum<?>>
         x = ix;
         y = iy;
         String val = EnumFormatter.formatEnum(config.getValue());
-        rectGradient(context, ClickGuiModule.getInstance().getColor(), ClickGuiModule.getInstance().getColor());
+        rect(context, ClickGuiModule.getInstance().getColor());
 
         int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);

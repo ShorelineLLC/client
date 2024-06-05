@@ -1,7 +1,6 @@
 package net.shoreline.eventbus;
 
 import net.shoreline.eventbus.event.Event;
-import net.shoreline.loader.Loader;
 
 import java.util.Map;
 

@@ -94,7 +94,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         // slider fill
         float fill = (config.getValue().floatValue() - min.floatValue())
                 / (max.floatValue() - min.floatValue());
-        fillGradient(context, ix, iy, ix + (fill * width), iy + height, ClickGuiModule.getInstance().getColor(), ClickGuiModule.getInstance().getColor());
+        fill(context, ix, iy, (fill * width), height, 0.0, ClickGuiModule.getInstance().getColor());
 
         int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
