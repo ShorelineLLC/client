@@ -291,6 +291,11 @@ public class FreecamModule extends ToggleModule
         return position;
     }
 
+    public Vec3d getLastCameraPosition()
+    {
+        return lastPosition;
+    }
+
     public float[] getCameraRotations()
     {
         return new float[]{yaw, pitch};

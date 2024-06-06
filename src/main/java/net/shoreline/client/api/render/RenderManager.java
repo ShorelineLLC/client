@@ -13,8 +13,7 @@ import net.shoreline.client.util.Globals;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import static net.shoreline.client.api.render.RenderBuffers.LINES;
-import static net.shoreline.client.api.render.RenderBuffers.QUADS;
+import static net.shoreline.client.api.render.RenderBuffers.*;
 
 /**
  * @author linus
@@ -86,11 +85,12 @@ public class RenderManager implements Globals
      * @param y2
      * @param z2
      */
-    public static void drawBox(MatrixStack matrices, double x1, double y1,
-                               double z1, double x2, double y2, double z2, int color)
+    public static void drawBox(MatrixStack matrices, float x1, float y1,
+                               float z1, float x2, float y2, float z2, int color)
     {
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-        QUADS.begin(matrix4f);
+        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
+        matrices.translate(-pos.x, -pos.y, -pos.z);
+        QUADS.begin(matrices);
         QUADS.color(color);
 
         QUADS.vertex(x1, y1, z1).vertex(x2, y1, z1).vertex(x2, y1, z2).vertex(x1, y1, z2);
@@ -138,7 +138,7 @@ public class RenderManager implements Globals
      */
     public static void drawBoundingBox(MatrixStack matrices, Box box, int color)
     {
-        drawBoundingBox(matrices, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
+        drawBoundingBox(matrices, (float) box.minX, (float) box.minY, (float) box.minZ, (float) box.maxX, (float) box.maxY, (float) box.maxZ, color);
     }
 
     /**
@@ -150,11 +150,12 @@ public class RenderManager implements Globals
      * @param y2
      * @param z2
      */
-    public static void drawBoundingBox(MatrixStack matrices, double x1, double y1,
-                                       double z1, double x2, double y2, double z2, int color)
+    public static void drawBoundingBox(MatrixStack matrices, float x1, float y1,
+                                       float z1, float x2, float y2, float z2, int color)
     {
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-        LINES.begin(matrix4f);
+        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
+        matrices.translate(-pos.x, -pos.y, -pos.z);
+        LINES.begin(matrices);
         LINES.color(color);
 
         LINES.vertex(x1, y1, z1).vertex(x2, y1, z1);
@@ -184,7 +185,7 @@ public class RenderManager implements Globals
     public static void renderLine(MatrixStack matrices, Vec3d s,
                                   Vec3d d, float width, int color)
     {
-        renderLine(matrices, s.x, s.y, s.z, d.x, d.y, d.z, width, color);
+        renderLine(matrices, (float) s.x, (float) s.y, (float) s.z, (float) d.x, (float) d.y, (float) d.z, width, color);
     }
 
     /**
@@ -219,12 +220,14 @@ public class RenderManager implements Globals
     public static void drawLine(MatrixStack matrices, double x1, double y1,
                                 double z1, double x2, double y2, double z2, int color)
     {
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-        LINES.begin(matrix4f);
+        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
+        matrices.translate(-pos.x, -pos.y, -pos.z);
+        LINES.begin(matrices);
         LINES.color(color);
         LINES.vertex(x1, y1, z1);
         LINES.vertex(x2, y2, z2);
         LINES.end();
+
     }
 
     /**

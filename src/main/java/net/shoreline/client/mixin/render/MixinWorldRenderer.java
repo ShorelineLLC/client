@@ -46,9 +46,6 @@ public class MixinWorldRenderer implements Globals
                             LightmapTextureManager lightmapTextureManager,
                             Matrix4f positionMatrix, CallbackInfo ci)
     {
-        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
-        matrices.translate(-pos.x, -pos.y, -pos.z);
-
         final RenderWorldEvent renderWorldEvent =
                 new RenderWorldEvent(matrices, tickDelta);
         EventBus.INSTANCE.dispatch(renderWorldEvent);

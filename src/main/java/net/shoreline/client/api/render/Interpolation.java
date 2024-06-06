@@ -13,6 +13,13 @@ import net.shoreline.client.util.Globals;
  */
 public class Interpolation implements Globals
 {
+    public static Vec3d getRenderPosition(Vec3d pos, Vec3d lastPos, float tickDelta)
+    {
+        return new Vec3d(pos.x - MathHelper.lerp(tickDelta, lastPos.x, pos.x),
+                pos.y - MathHelper.lerp(tickDelta, lastPos.y, pos.y),
+                pos.z - MathHelper.lerp(tickDelta, lastPos.z, pos.z));
+    }
+
     /**
      * Gets the interpolated {@link Vec3d} position of an entity (i.e. position
      * based on render ticks)
