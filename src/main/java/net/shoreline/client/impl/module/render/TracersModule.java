@@ -1,9 +1,10 @@
 package net.shoreline.client.impl.module.render;
 
-import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -12,7 +13,9 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.EntityUtil;
@@ -26,58 +29,90 @@ import java.awt.*;
  */
 public class TracersModule extends ToggleModule
 {
-
+    Config<Target> targetConfig = register(new EnumConfig<>("Target", "The body part of the entity to target", Target.FEET, Target.values()));
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.5f, 10.0f));
+    Config<Boolean> offscreenConfig = register(new BooleanConfig("Offscreen", "Render tracers to entities not visible on the screen", false));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render tracers to player", true));
     Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue()));
-    Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render tracers to invisible entities", true));
+    Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render tracers to invisible entities", false));
     Config<Color> invisiblesColorConfig = register(new ColorConfig("InvisiblesColor", "The render color for invisibles", new Color(200, 100, 0), false, () -> invisiblesConfig.getValue()));
-    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render tracers to monsters", true));
+    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render tracers to monsters", false));
     Config<Color> monstersColorConfig = register(new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue()));
-    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render tracers to animals", true));
+    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render tracers to animals", false));
     Config<Color> animalsColorConfig = register(new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue()));
     Config<Boolean> vehiclesConfig = register(new BooleanConfig("Vehicles", "Render tracers to vehicles", false));
     Config<Color> vehiclesColorConfig = register(new ColorConfig("VehiclesColor", "The render color for vehicles", new Color(200, 100, 0), false, () -> vehiclesConfig.getValue()));
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render tracers to items", false));
     Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(255, 255, 255), false, () -> itemsConfig.getValue()));
-    Config<Target> targetConfig = register(new EnumConfig<>("Target", "The body part of the entity to target", Target.FEET, Target.values()));
-    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.5f, 10.0f));
 
     public TracersModule()
     {
-        super("Tracers", "Draws a tracer to all entities in render distance",
-                ModuleCategory.RENDER);
+        super("Tracers", "Draws a tracer to all entities in render distance", ModuleCategory.RENDER);
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event)
+    public void onRenderWorld(RenderWorldEvent.Game event)
     {
         if (mc.player == null)
         {
             return;
         }
+        PlayerEntity playerEntity = (PlayerEntity) mc.getCameraEntity();
+        float f = playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed;
+        float g = -(playerEntity.horizontalSpeed + f * event.getTickDelta());
+        float h = MathHelper.lerp(event.getTickDelta(), playerEntity.prevStrideDistance, playerEntity.strideDistance);
+        if (mc.options.getBobView().getValue())
+        {
+            event.getMatrices().translate(-MathHelper.sin(g * (float)Math.PI) * h * 0.5f, Math.abs(MathHelper.cos(g * (float)Math.PI) * h), 0.0f);
+            event.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float)Math.PI) * h * -3.0f));
+            event.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * -5.0f));
+        }
         RenderBuffers.preRender();
-        boolean prevBobView = mc.options.getBobView().getValue();
-        mc.options.getBobView().setValue(false);
-        Camera cameraPos = mc.gameRenderer.getCamera();
+        Entity player = mc.getCameraEntity();
+        Vec3d playerPos = Interpolation.getRenderPosition(player, event.getTickDelta());
+        double x1 = player.getX() - playerPos.getX();
+        double y1 = player.getY() - playerPos.getY() + player.getEyeHeight(player.getPose());
+        double z1 = player.getZ() - playerPos.getZ();
+        float pitch = player.getPitch();
+        float yaw = player.getYaw();
+        if (FreecamModule.getInstance().isEnabled())
+        {
+            Vec3d pos1 = FreecamModule.getInstance().getCameraPosition();
+            Vec3d pos2 = Interpolation.getRenderPosition(pos1, FreecamModule.getInstance().getLastCameraPosition(), event.getTickDelta());
+            float rotations[] = FreecamModule.getInstance().getCameraRotations();
+            x1 = pos1.x - pos2.x;
+            y1 = pos1.y - pos2.y;
+            z1 = pos1.z - pos2.z;
+            yaw = rotations[0];
+            pitch = rotations[1];
+        }
         Vec3d pos = new Vec3d(0.0, 0.0, 1.0)
-                .rotateX(-(float) Math.toRadians(cameraPos.getPitch()))
-                .rotateY(-(float) Math.toRadians(cameraPos.getYaw()))
-                .add(mc.cameraEntity.getEyePos());
+                .rotateX(-(float) Math.toRadians(pitch))
+                .rotateY(-(float) Math.toRadians(yaw))
+                .add(new Vec3d(x1, y1, z1));
         for (Entity entity : mc.world.getEntities())
         {
-            if (entity == null || !entity.isAlive() || entity == mc.player)
+            if (entity == null || !entity.isAlive() || entity == mc.player || offscreenConfig.getValue() && !RenderManager.isFrustumVisible(entity.getBoundingBox()))
             {
                 continue;
             }
             Color color = getTracerColor(entity);
             if (color != null)
             {
-                // Vec3d entityPos = Interpolation.getRenderPosition(entity, event.getTickDelta()).add(0.0, getTargetY(entity), 0.0);
-                // RenderManager.renderLine(event.getMatrices(), pos, entityPos, widthConfig.getValue(), color.getRGB());
+                Vec3d entityPos = Interpolation.getRenderPosition(entity, event.getTickDelta());
+                double x2 = entity.getX() - entityPos.getX();
+                double y2 = entity.getY() - entityPos.getY();
+                double z2 = entity.getZ() - entityPos.getZ();
+                RenderManager.renderLine(event.getMatrices(), pos, new Vec3d(x2, y2, z2).add(0.0, getTargetY(entity), 0.0), widthConfig.getValue(), color.getRGB());
             }
         }
-        mc.options.getBobView().setValue(prevBobView);
         RenderBuffers.postRender();
+        if (mc.options.getBobView().getValue())
+        {
+            event.getMatrices().translate(MathHelper.sin(g * (float)Math.PI) * h * 0.5f, -Math.abs(MathHelper.cos(g * (float)Math.PI) * h), 0.0f);
+            event.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float)Math.PI) * h * 3.0f));
+            event.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * 5.0f));
+        }
     }
 
     private Color getTracerColor(Entity entity)
@@ -120,7 +155,7 @@ public class TracersModule extends ToggleModule
         {
             case FEET -> 0.0;
             case TORSO -> entity.getHeight() / 2.0;
-            case HEAD -> entity.getStandingEyeHeight();
+            case HEAD -> entity.getEyeHeight(entity.getPose());
         };
     }
 
