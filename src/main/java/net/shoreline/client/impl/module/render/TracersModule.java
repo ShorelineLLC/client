@@ -53,11 +53,10 @@ public class TracersModule extends ToggleModule
     @EventListener
     public void onRenderWorld(RenderWorldEvent.Game event)
     {
-        if (mc.player == null)
+        if (mc.player == null || mc.getCameraEntity() == null || !(mc.getCameraEntity() instanceof PlayerEntity playerEntity))
         {
             return;
         }
-        PlayerEntity playerEntity = (PlayerEntity) mc.getCameraEntity();
         float f = playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed;
         float g = -(playerEntity.horizontalSpeed + f * event.getTickDelta());
         float h = MathHelper.lerp(event.getTickDelta(), playerEntity.prevStrideDistance, playerEntity.strideDistance);
@@ -68,13 +67,12 @@ public class TracersModule extends ToggleModule
             event.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * -5.0f));
         }
         RenderBuffers.preRender();
-        Entity player = mc.getCameraEntity();
-        Vec3d playerPos = Interpolation.getRenderPosition(player, event.getTickDelta());
-        double x1 = player.getX() - playerPos.getX();
-        double y1 = player.getY() - playerPos.getY() + player.getEyeHeight(player.getPose());
-        double z1 = player.getZ() - playerPos.getZ();
-        float pitch = player.getPitch();
-        float yaw = player.getYaw();
+        Vec3d playerPos = Interpolation.getRenderPosition(playerEntity, event.getTickDelta());
+        double x1 = playerEntity.getX() - playerPos.getX();
+        double y1 = playerEntity.getY() - playerPos.getY() + playerEntity.getEyeHeight(playerEntity.getPose());
+        double z1 = playerEntity.getZ() - playerPos.getZ();
+        float pitch = playerEntity.getPitch();
+        float yaw = playerEntity.getYaw();
         if (FreecamModule.getInstance().isEnabled())
         {
             Vec3d pos1 = FreecamModule.getInstance().getCameraPosition();
@@ -125,7 +123,7 @@ public class TracersModule extends ToggleModule
         {
             if (Managers.SOCIAL.isFriend(player.getName()))
             {
-                return new Color(85, 200, 200, 255);
+                return new Color(0xff66ffff);
             }
             return playersColorConfig.getValue();
         }
