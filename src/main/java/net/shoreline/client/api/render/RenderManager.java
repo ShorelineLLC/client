@@ -67,7 +67,7 @@ public class RenderManager implements Globals
      */
     public static void drawBox(MatrixStack matrices, Box box, int color)
     {
-        drawBox(matrices, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
+        drawBox(matrices, (float) box.minX, (float) box.minY, (float) box.minZ, (float) box.maxX, (float) box.maxY, (float) box.maxZ, color);
     }
 
     /**

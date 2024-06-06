@@ -4,13 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.shoreline.client.api.config.Config;
 
+import java.util.function.Supplier;
+
 /**
  * @author linus
  * @since 1.0
  */
 public class StringConfig extends Config<String>
 {
-
     /**
      * Initializes the config with a default value. This constructor should
      * not be used to initialize a configuration, instead use the explicit
@@ -24,6 +25,11 @@ public class StringConfig extends Config<String>
     public StringConfig(String name, String desc, String value)
     {
         super(name, desc, value);
+    }
+
+    public StringConfig(String name, String desc, String value, Supplier<Boolean> visible)
+    {
+        super(name, desc, value, visible);
     }
 
     /**

@@ -110,13 +110,6 @@ public class CriticalsModule extends ToggleModule
         double x = Managers.POSITION.getX();
         double y = Managers.POSITION.getY();
         double z = Managers.POSITION.getZ();
-        float yaw = mc.player.getYaw();
-        float pitch = mc.player.getPitch();
-        if (Managers.ROTATION.isRotating())
-        {
-            yaw = Managers.ROTATION.getRotationYaw();
-            pitch = Managers.ROTATION.getRotationPitch();
-        }
         switch (modeConfig.getValue())
         {
             case VANILLA ->
@@ -166,6 +159,13 @@ public class CriticalsModule extends ToggleModule
             {
                 if (!mc.player.isOnGround())
                 {
+                    float yaw = mc.player.getYaw();
+                    float pitch = mc.player.getPitch();
+                    if (Managers.ROTATION.isRotating())
+                    {
+                        yaw = Managers.ROTATION.getRotationYaw();
+                        pitch = Managers.ROTATION.getRotationPitch();
+                    }
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
                             x, y - 0.000001, z, yaw, pitch, false));
                 }

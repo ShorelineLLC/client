@@ -175,8 +175,8 @@ public final class ModuleManager
                 new MultitaskModule(),
                 new NoGlitchBlocksModule(),
                 new ScaffoldModule(),
-                new SpeedmineModule()
-                // new WallhackModule()
+                new SpeedmineModule(),
+                new XRayModule()
         );
         if (ShorelineMod.isBaritonePresent())
         {

@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
@@ -43,11 +44,13 @@ import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.
 public final class ScaffoldModule extends RotationModule
 {
     Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
-    Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT));
-    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist"));
+    Config<List<Item>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT, Blocks.OBSIDIAN));
+    Config<List<Item>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim interactions", false));
+    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to scaffold blocks before placing", false));
     Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "Keeps the same y-level", false));
     Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimConfig.getValue()));
+    Config<BlockPicker> pickerConfig = register(new EnumConfig<>("BlockSelection", "How to pick a block from the hotbar", BlockPicker.NORMAL, BlockPicker.values()));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
 
@@ -82,6 +85,11 @@ public final class ScaffoldModule extends RotationModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
+        int slot = getBlockSlot();
+        if (slot == -1)
+        {
+            return;
+        }
         blockData = getBlockData();
         if (blockData == null)
         {
@@ -90,7 +98,7 @@ public final class ScaffoldModule extends RotationModule
         calcRotations(blockData);
         if (blockData.getAngles() == null)
         {
-            if (!grimConfig.getValue() && lastAngles != null)
+            if (!grimConfig.getValue() && rotateConfig.getValue() && lastAngles != null)
             {
                 setRotation(lastAngles[0], lastAngles[1]);
             }
@@ -104,50 +112,37 @@ public final class ScaffoldModule extends RotationModule
                     mc.player, STOP_SPRINTING));
         }
 
-        int slot = -1;
-        for (int i = 0; i < 9; ++i)
-        {
-            final ItemStack itemStack = mc.player.getInventory().getStack(i);
-            if (!itemStack.isEmpty() && itemStack.getItem() instanceof BlockItem blockItem
-                    && validScaffoldBlock(blockItem.getBlock()))
-            {
-                slot = i;
-                break;
-            }
-        }
-        if (slot == -1)
-        {
-            return;
-        }
-
         if (!grimConfig.getValue() && Managers.INVENTORY.getServerSlot() != slot)
         {
             Managers.INVENTORY.setSlot(slot);
         }
         boolean result = Managers.INTERACT.placeBlock(blockData.getHitResult(), slot, false, false, (state, angles) ->
         {
-            final float[] rotations = blockData.getAngles();
-            if (rotations == null)
+            if (rotateConfig.getValue())
             {
-                return;
-            }
-            lastAngles = rotations;
-            if (state)
-            {
-                if (grimConfig.getValue())
+                final float[] rotations = blockData.getAngles();
+                if (rotations == null)
                 {
-                    Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], true);
+                    return;
+                }
+                lastAngles = rotations;
+                if (state)
+                {
+                    if (grimConfig.getValue())
+                    {
+                        Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], true);
+                    }
+                    else
+                    {
+                        setRotation(rotations[0], rotations[1]);
+                    }
                 }
                 else
                 {
-                    setRotation(rotations[0], rotations[1]);
-                }
-            }
-            else
-            {
-                if (grimConfig.getValue())
-                {
-                    Managers.ROTATION.setRotationSilentSync(true);
+                    if (grimConfig.getValue())
+                    {
+                        Managers.ROTATION.setRotationSilentSync(true);
+                    }
                 }
             }
         });
@@ -260,6 +255,37 @@ public final class ScaffoldModule extends RotationModule
         return null;
     }
 
+    private int getBlockSlot()
+    {
+        final ItemStack serverStack = Managers.INVENTORY.getServerItem();
+        if (!serverStack.isEmpty() && serverStack.getItem() instanceof BlockItem blockItem && validScaffoldBlock(blockItem.getBlock()))
+        {
+            return Managers.INVENTORY.getServerSlot();
+        }
+
+        int blockSlot = -1;
+        int count = 0;
+        for (int i = 0; i < 9; ++i)
+        {
+            final ItemStack itemStack = mc.player.getInventory().getStack(i);
+            if (!itemStack.isEmpty() && itemStack.getItem() instanceof BlockItem blockItem && validScaffoldBlock(blockItem.getBlock()))
+            {
+                if (pickerConfig.getValue() == BlockPicker.NORMAL)
+                {
+                    return i;
+                }
+
+                if (blockSlot == -1 || itemStack.getCount() > count)
+                {
+                    blockSlot = i;
+                    count = itemStack.getCount();
+                }
+            }
+        }
+
+        return blockSlot;
+    }
+
     private boolean validScaffoldBlock(Block block)
     {
         return switch (selectionConfig.getValue())
@@ -312,5 +338,11 @@ public final class ScaffoldModule extends RotationModule
         WHITELIST,
         BLACKLIST,
         ALL
+    }
+
+    private enum BlockPicker
+    {
+        NORMAL,
+        GREATEST
     }
 }

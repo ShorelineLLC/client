@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.shoreline.client.api.command.BlockArgumentType;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.ConfigArgumentType;
 import net.shoreline.client.api.command.ItemArgumentType;
@@ -91,6 +90,11 @@ public class ModuleCommand extends Command
     {
         if (config instanceof ItemListConfig)
         {
+            if (config instanceof BlockListConfig<?> && !(value instanceof BlockItem))
+            {
+                ChatUtil.error("Not a block item!");
+                return 0;
+            }
             List<Item> list = ((List<Item>) config.getValue());
             if (action.equalsIgnoreCase("add"))
             {
@@ -101,25 +105,6 @@ public class ModuleCommand extends Command
             {
                 list.remove(value);
                 ChatUtil.clientSendMessage("Removed §c" + value.getName().getString() + "§f from §7" + config.getName());
-            }
-        }
-        else if (config instanceof BlockListConfig<?> blockListConfig)
-        {
-            if (!(value instanceof BlockItem blockItem))
-            {
-                ChatUtil.error("Not a block item!");
-                return 0;
-            }
-            List<Block> list = blockListConfig.getValue();
-            if (action.equalsIgnoreCase("add"))
-            {
-                list.add(blockItem.getBlock());
-                ChatUtil.clientSendMessage("Added §s" + blockItem.getBlock().getName().getString() + "§f to §7" + config.getName());
-            }
-            else if (action.equalsIgnoreCase("del") || action.equalsIgnoreCase("remove"))
-            {
-                list.remove(blockItem.getBlock());
-                ChatUtil.clientSendMessage("Removed §c" + blockItem.getBlock().getName().getString() + "§f from §7" + config.getName());
             }
         }
         return 1;
@@ -141,24 +126,6 @@ public class ModuleCommand extends Command
                 for (Item item : list)
                 {
                     listString.add(item.getName().getString());
-                }
-                ChatUtil.clientSendMessage("§7" + config.getName() + "§f: " + String.join(", ", listString));
-            }
-        }
-        else if (config instanceof BlockListConfig)
-        {
-            List<Block> list = ((List<Block>) config.getValue());
-            if (action.equalsIgnoreCase("list"))
-            {
-                if (list.isEmpty())
-                {
-                    ChatUtil.error("There are no blocks in the list!");
-                    return 1;
-                }
-                List<String> listString = new ArrayList<>();
-                for (Block block : list)
-                {
-                    listString.add(block.getName().getString());
                 }
                 ChatUtil.clientSendMessage("§7" + config.getName() + "§f: " + String.join(", ", listString));
             }

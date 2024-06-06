@@ -14,7 +14,6 @@ import net.shoreline.client.util.chat.ChatUtil;
  */
 public class FriendCommand extends Command
 {
-
     /**
      *
      */
@@ -26,7 +25,8 @@ public class FriendCommand extends Command
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
-        builder.then(argument("add/del", StringArgumentType.string()).suggests(suggest("add", "del", "delete", "remove"))
+        builder.then(argument("add/del", StringArgumentType.string())
+                .suggests(suggest("add", "del", "delete", "remove", "list"))
                 .then(argument("friend_name", PlayerArgumentType.player()).executes(c ->
                 {
                     String playerName = PlayerArgumentType.getPlayer(c, "friend_name");
@@ -54,6 +54,17 @@ public class FriendCommand extends Command
                     return 1;
                 })).executes(c ->
                 {
+                    final String action = StringArgumentType.getString(c, "add/del");
+                    if (action.equalsIgnoreCase("list"))
+                    {
+                        if (Managers.SOCIAL.getFriends().isEmpty())
+                        {
+                            ChatUtil.error("No friends in list!");
+                            return 0;
+                        }
+                        ChatUtil.clientSendMessage("§7Friends: §f" + String.join(", ", Managers.SOCIAL.getFriends()));
+                        return 1;
+                    }
                     ChatUtil.error("Must provide player to friend!");
                     return 1;
                 })).executes(c ->

@@ -25,6 +25,12 @@ public class ItemListConfig<T extends List<Item>> extends Config<T>
         super(name, desc, (T) List.of(values));
     }
 
+    @SuppressWarnings("unchecked")
+    public ItemListConfig(String name, String desc, T values)
+    {
+        super(name, desc, values);
+    }
+
     /**
      * @param obj
      * @return
