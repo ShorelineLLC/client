@@ -136,7 +136,7 @@ public final class ModuleManager
                 new YawModule(),
                 // Render
                 new BlockHighlightModule(),
-                // new BreadcrumbsModule(),
+                new BreadcrumbsModule(),
                 new BreakHighlightModule(),
                 new ChamsModule(),
                 new ESPModule(),
