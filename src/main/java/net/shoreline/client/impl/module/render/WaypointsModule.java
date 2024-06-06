@@ -11,6 +11,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.api.waypoint.Waypoint;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
@@ -117,6 +118,7 @@ public class WaypointsModule extends ToggleModule
         {
             return;
         }
+        RenderBuffers.preRender();
         for (Waypoint waypoint : Managers.WAYPOINT.getWaypoints())
         {
             if (!waypoint.getIp().equalsIgnoreCase(Managers.NETWORK.getServerIp()) || mc.world.getRegistryKey() != waypoint.getDimension())
@@ -128,6 +130,7 @@ public class WaypointsModule extends ToggleModule
             RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, ColorsModule.getInstance().getRGB(255));
             RenderManager.renderSign(waypoint.getName(), waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
         }
+        RenderBuffers.postRender();
     }
 
     public boolean getCoords()
