@@ -43,7 +43,6 @@ public class SpeedmineModule extends RotationModule
 
     Config<SpeedmineMode> modeConfig = register(new EnumConfig<>("Mode", "The mining mode for speedmine", SpeedmineMode.PACKET, SpeedmineMode.values()));
     Config<Float> mineSpeedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.0f, 0.7f, 0.9f, () -> modeConfig.getValue() == SpeedmineMode.DAMAGE));
-    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instantly removes the mining block", false, () -> modeConfig.getValue() == SpeedmineMode.PACKET));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Range for mine", 1.0f, 4.5f, 6.0f, () -> modeConfig.getValue() == SpeedmineMode.PACKET));
     Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values(), () -> modeConfig.getValue() == SpeedmineMode.PACKET));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true, () -> modeConfig.getValue() == SpeedmineMode.PACKET));
@@ -53,7 +52,6 @@ public class SpeedmineModule extends RotationModule
     private Direction direction;
     private float damage;
     private float lastDamage;
-    private boolean switchBack;
 
     public SpeedmineModule()
     {
@@ -212,17 +210,10 @@ public class SpeedmineModule extends RotationModule
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
                     mining, direction));
-            if (grimConfig.getValue())
-            {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, mining, direction));
-            }
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, mining, direction));
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, mining, direction));
-            if (instantConfig.getValue())
-            {
-                mc.world.removeBlock(mining, false);
-            }
             if (grimConfig.getValue())
             {
                 Managers.INVENTORY.syncToClient();

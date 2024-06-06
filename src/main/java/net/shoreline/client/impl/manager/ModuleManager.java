@@ -83,7 +83,7 @@ public final class ModuleManager
                 new PortalGodModeModule(),
                 new ReachModule(),
                 // Misc
-                // new AntiAFKModule(),
+                new AntiAFKModule(),
                 new AntiAimModule(),
                 // new AntiBookBanModule(),
                 new AntiSpamModule(),

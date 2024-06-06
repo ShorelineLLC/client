@@ -235,7 +235,7 @@ public class RotationManager implements Globals
             return;
         }
         mc.player.setYaw(yaw);
-        mc.player.setPitch(pitch);
+        mc.player.setPitch(MathHelper.clamp(pitch, -90.0f, 90.0f));
     }
 
     public void setRotationSilent(float yaw, float pitch, final boolean grim)

@@ -23,6 +23,10 @@ public class NoAccelModule extends ToggleModule
     @EventListener
     public void onPlayerMove(PlayerMoveEvent event)
     {
+        if (SpeedModule.getInstance().isEnabled() || FlightModule.getInstance().isEnabled())
+        {
+            return;
+        }
         if (!mc.player.isOnGround() && !airConfig.getValue() || mc.player.getVelocity().y < 0.0 && !downwardsConfig.getValue() || !MovementUtil.isInputtingMovement())
         {
             return;

@@ -63,7 +63,7 @@ public class AutoArmorModule extends ToggleModule
         chestplate.clear();
         leggings.clear();
         boots.clear();
-        for (int j = 9; j < 45; j++)
+        for (int j = 0; j < 36; j++)
         {
             ItemStack stack = mc.player.getInventory().getStack(j);
             if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor))
