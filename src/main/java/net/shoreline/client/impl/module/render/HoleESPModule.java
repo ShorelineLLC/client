@@ -35,10 +35,10 @@ public class HoleESPModule extends ToggleModule
     Config<Boolean> quadConfig = register(new BooleanConfig("Quad", "Displays quad holes where the player can stand in the middle of four blocks to block explosion damage", false));
     Config<Boolean> voidConfig = register(new BooleanConfig("Void", "Displays void holes in the world", false));
     Config<Boolean> fadeConfig = register(new BooleanConfig("Fade", "Fades the opacity of holes based on distance", false));
-    Config<Color> obsidianConfig = register(new ColorConfig("ObsidianColor", "The color for rendering obsidian holes", new Color(255, 0, 0, 100), () -> obsidianCheckConfig.getValue()));
-    Config<Color> mixedConfig = register(new ColorConfig("Obsidian-BedrockColor", "The color for rendering mixed holes", new Color(255, 255, 0, 100), () -> obsidianBedrockConfig.getValue()));
-    Config<Color> bedrockConfig = register(new ColorConfig("BedrockColor", "The color for rendering bedrock holes", new Color(0, 255, 0, 100)));
-    Config<Color> voidColorConfig = register(new ColorConfig("VoidColor", "The color for rendering bedrock holes", new Color(255, 0, 0, 160), () -> voidConfig.getValue()));
+    Config<Color> obsidianConfig = register(new ColorConfig("ObsidianColor", "The color for rendering obsidian holes", new Color(255, 0, 0, 80), () -> obsidianCheckConfig.getValue()));
+    Config<Color> mixedConfig = register(new ColorConfig("Obsidian-BedrockColor", "The color for rendering mixed holes", new Color(255, 255, 0, 80), () -> obsidianBedrockConfig.getValue()));
+    Config<Color> bedrockConfig = register(new ColorConfig("BedrockColor", "The color for rendering bedrock holes", new Color(0, 255, 0, 80)));
+    Config<Color> voidColorConfig = register(new ColorConfig("VoidColor", "The color for rendering bedrock holes", new Color(255, 0, 0, 140), () -> voidConfig.getValue()));
 
     public HoleESPModule()
     {

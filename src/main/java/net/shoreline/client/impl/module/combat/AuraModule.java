@@ -297,7 +297,7 @@ public class AuraModule extends RotationModule
             }
             RenderBuffers.preRender();
             RenderManager.renderBox(event.getMatrices(),
-                    Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.getInstance().getRGB(60 + attackDelay));
+                    Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.getInstance().getRGB(40 + attackDelay));
             RenderManager.renderBoundingBox(event.getMatrices(),
                     Interpolation.getInterpolatedEntityBox(entityTarget), 1.5f, ColorsModule.getInstance().getRGB(145));
             RenderBuffers.postRender();

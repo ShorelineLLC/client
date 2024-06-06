@@ -399,7 +399,7 @@ public class AutoMineModule extends RotationModule
         {
             MiningData data = set.getKey();
             set.getValue().setState(false);
-            int boxAlpha = (int) (80 * set.getValue().getFactor());
+            int boxAlpha = (int) (60 * set.getValue().getFactor());
             int lineAlpha = (int) (145 * set.getValue().getFactor());
             int boxColor = data.getBlockDamage() >= 0.95f ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
             int lineColor = data.getBlockDamage() >= 0.95f ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);

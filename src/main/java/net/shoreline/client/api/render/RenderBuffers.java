@@ -101,6 +101,7 @@ public class RenderBuffers
 
         public void color(int color)
         {
+            this.buffer.unfixColor();
             this.buffer.fixedColor(
                     ColorHelper.Argb.getRed(color),
                     ColorHelper.Argb.getGreen(color),

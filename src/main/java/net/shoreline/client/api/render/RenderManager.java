@@ -220,6 +220,7 @@ public class RenderManager implements Globals
     public static void drawLine(MatrixStack matrices, double x1, double y1,
                                 double z1, double x2, double y2, double z2, int color)
     {
+        matrices.push();
         Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
         matrices.translate(-pos.x, -pos.y, -pos.z);
         LINES.begin(matrices);
@@ -227,7 +228,7 @@ public class RenderManager implements Globals
         LINES.vertex(x1, y1, z1);
         LINES.vertex(x2, y2, z2);
         LINES.end();
-
+        matrices.pop();
     }
 
     /**

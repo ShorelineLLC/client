@@ -324,7 +324,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 set.getValue().setState(false);
-                int boxAlpha = (int) (80 * set.getValue().getFactor());
+                int boxAlpha = (int) (60 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
                 Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
                 Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
