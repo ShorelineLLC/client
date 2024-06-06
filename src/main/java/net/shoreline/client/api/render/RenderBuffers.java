@@ -24,7 +24,7 @@ public class RenderBuffers
     {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        RenderSystem.enableCull();
+        RenderSystem.disableCull();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableDepthTest();
@@ -38,7 +38,7 @@ public class RenderBuffers
 
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
-        RenderSystem.disableCull();
+        RenderSystem.enableCull();
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         isSetup = false;
 
