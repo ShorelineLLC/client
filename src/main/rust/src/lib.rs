@@ -9,22 +9,30 @@ use jni::{JNIEnv, JavaVM};
 use obfstr::obfstr;
 use jni::sys::{JNI_VERSION_1_8};
 use std::os::raw::{c_void, c_int};
-use jni::strings::{JNIString};
-use jni::objects::{JObject, JValue, JString, JClass, GlobalRef};
+use jni::objects::{JObject, JString, JClass, GlobalRef};
 use std::ffi::{CStr};
+use std::io::Cursor;
+use std::sync::Arc;
 use hardware_id::get_id;
-use jni::signature::JavaType;
-use jni::signature::Primitive::Int;
+use lazy_static::lazy_static;
+use reqwest::Client;
+use tokio::runtime::Runtime;
+use zip::ZipArchive;
 use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
 
-static mut USER_INFO: Option<GlobalRef> = None;
+lazy_static! {
+    static ref CLIENT: Arc<Client> = Arc::new(Client::builder().cookie_store(true).build().unwrap());
+}
 
-static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
+static mut USER_INFO: Option<GlobalRef> = None;
 
 static mut MIXIN_CONFIG: Option<GlobalRef> = None;
 static mut MIXIN_REFMAP: Option<GlobalRef> = None;
 
+static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
+
 static mut RESOURCES_MAP: Option<GlobalRef> = None;
+
 
 #[no_mangle]
 pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
@@ -54,128 +62,62 @@ pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
 
     let hwid = encrypt(&raw_hwid);
 
-    let url_string = JNIString::from(
-        obfstr!("https://api.shorelineclient.net/auth")
-    );
+    let runtime = Runtime::new().unwrap();
 
-    let url = env.new_object(
-        obfstr!("java/net/URL"),
-        obfstr!("(Ljava/lang/String;)V"),
-        &[env.new_string(url_string).unwrap().into()]
-    ).unwrap();
+    let client = Arc::clone(&CLIENT);
 
-    let url_connection = env.call_method(
-        url,
-        obfstr!("openConnection"),
-        obfstr!("()Ljava/net/URLConnection;"),
-        &[]
-    ).unwrap().l().unwrap();
+    runtime.block_on(async {
+        let response = client
+            .get(obfstr!("https://api.shorelineclient.net/loader/auth"))
+            .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
+            .header(obfstr!("Hardware-ID"), hwid)
+            .send()
+            .await;
 
-    let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
-    let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
+        match response
+        {
+            Ok(res) => {
+                let http_response_code = res.status().as_u16();
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[user_agent.into(), user_agent_value.into()]
-    ).unwrap().v().unwrap();
+                match http_response_code
+                {
+                    200 => {
+                        let body = res.text().await.unwrap();
+                        USER_INFO = Some(env.new_global_ref(env.new_string(body).unwrap()).unwrap());
 
-    let hwid_req = env.new_string(obfstr!("HWID")).unwrap();
-    let hwid_req_value = env.new_string(hwid).unwrap();
+                        // User is authed, load our event bus
+                        eventbus::init_internal(&env);
+                    }
+                    401 => {
+                        error_message(
+                            obfstr!("Invalid user credentials.\n\nPurchase your own version of Shoreline at shorelineclient.net!")
+                        );
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[hwid_req.into(), hwid_req_value.into()]
-    ).unwrap().v().unwrap();
+                        crash(&env, crash_clazz);
+                    }
+                    _ => {
+                        let msg = format!(
+                            "{}{}{}",
+                            obfstr!("Internal server error "),
+                            http_response_code,
+                            obfstr!(".\n\nPlease contact Shoreline support!")
+                        );
 
-    let get_response_code = env.get_method_id(
-        obfstr!("java/net/HttpURLConnection"),
-        obfstr!("getResponseCode"),
-        obfstr!("()I")
-    ).unwrap();
+                        error_message(&msg);
 
-    let http_response = env.call_method_unchecked(
-        url_connection,
-        get_response_code,
-        JavaType::Primitive(Int),
-        &[]
-    );
+                        crash(&env, crash_clazz);
+                    }
+                }
+            }
+            Err(_) => {
+                error_message(
+                    obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
+                );
 
-    let http_response_code = match http_response
-    {
-        Ok(code) => code.i().unwrap(),
-        Err(_) => {
-            -1
+                crash(&env, crash_clazz);
+            }
         }
-    };
-
-    match http_response_code
-    {
-        -1 => {
-            error_message(
-                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
-            );
-
-            crash(&env, crash_clazz);
-        }
-        200 => {
-            let input_stream = env.call_method(
-                url_connection,
-                obfstr!("getInputStream"),
-                obfstr!("()Ljava/io/InputStream;"),
-                &[]
-            ).unwrap().l().unwrap();
-
-            let input_stream_reader = env.new_object(
-                obfstr!("java/io/InputStreamReader"),
-                obfstr!("(Ljava/io/InputStream;)V"),
-                &[input_stream.into()]
-            ).unwrap();
-
-            let buffered_reader = env.new_object(
-                obfstr!("java/io/BufferedReader"),
-                obfstr!("(Ljava/io/Reader;)V"),
-                &[input_stream_reader.into()]
-            ).unwrap();
-
-            let read_line = env.call_method(
-                buffered_reader,
-                obfstr!("readLine"),
-                obfstr!("()Ljava/lang/String;"),
-                &[]
-            ).unwrap().l().unwrap();
-
-            USER_INFO = Some(
-                env.new_global_ref(read_line).unwrap()
-            );
-
-            // User is authed, load our event bus
-            eventbus::init_internal(&env)
-        }
-        401 => {
-            error_message(
-                obfstr!("Invalid user credentials.\n\nPurchase your own version of Shoreline at shorelineclient.net!")
-            );
-
-            crash(&env, crash_clazz);
-        }
-
-        _ => {
-            let msg = format!(
-                "{}{}{}",
-                obfstr!("Internal server error "),
-                http_response_code,
-                obfstr!(".\n\nPlease contact Shoreline support!")
-            );
-
-            error_message(&msg);
-
-            crash(&env, crash_clazz);
-        }
-    }
+    });
 
     return JNI_VERSION_1_8
 }
@@ -224,7 +166,9 @@ pub unsafe extern "system" fn stop_decompiling_1<'a>(env: JNIEnv<'a>,
     {
         Some(config_ref) => config_ref.as_obj(),
         None => {
-            error_message(obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 1"));
+            error_message(
+                obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 1")
+            );
 
             crash(&env, caller_class);
 
@@ -245,7 +189,9 @@ pub unsafe extern "system" fn stop_decompiling_2<'a>(env: JNIEnv<'a>,
     {
         Some(refmap_ptr) => refmap_ptr.as_obj().clone(),
         None => {
-            error_message(obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 2"));
+            error_message(
+                obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 2")
+            );
 
             crash(&env, caller_class);
 
@@ -341,163 +287,84 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
     let encrypted_bytes = encrypt(bytes_to_string_internal);
 
-    let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
-    let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
+    let rt = Runtime::new().unwrap();
 
-    let url_string = JNIString::from(
-        obfstr!("https://api.shorelineclient.net/hashcheck")
-    );
+    let client = Arc::clone(&CLIENT);
 
-    let url = env.new_object(
-        obfstr!("java/net/URL"),
-        obfstr!("(Ljava/lang/String;)V"),
-        &[env.new_string(url_string).unwrap().into()]
-    ).unwrap();
+    let temporary_token: Option<String> = rt.block_on(async {
 
-    let url_connection = env.call_method(
-        url,
-        obfstr!("openConnection"),
-        obfstr!("()Ljava/net/URLConnection;"),
-        &[]
-    ).unwrap().l().unwrap();
+        let response = client
+            .get(obfstr!("https://api.shorelineclient.net/loader/integrity"))
+            .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
+            .header(obfstr!("Loader-Hash"), encrypted_bytes)
+            .send()
+            .await;
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[user_agent.into(), user_agent_value.into()]
-    ).unwrap().v().unwrap();
+        return match response
+        {
+            Ok(res) => {
+                let http_response_code = res.status().as_u16();
 
-    let user_type = env.new_string(obfstr!("User-Type")).unwrap();
-    let user_type_value = JString::from(env.get_object_array_element(*information_array, 3).unwrap());
+                match http_response_code
+                {
+                    200 => {
+                        Some(res.text().await.unwrap())
+                    }
+                    406 => {
+                        // The jar has been tampered with
+                        error_message(
+                            obfstr!("We know what you did")
+                        );
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[user_type.into(), user_type_value.into()]
-    ).unwrap().v().unwrap();
+                        let message = env.new_string(obfstr!("Loader has been tampered with")).unwrap();
 
-    let hash_req = env.new_string(obfstr!("hash")).unwrap();
-    let hash_req_value = env.new_string(encrypted_bytes).unwrap();
+                        env.set_object_array_element(*information_array, 0, message).unwrap();
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[hash_req.into(), hash_req_value.into()]
-    ).unwrap().v().unwrap();
+                        env.call_static_method(
+                            caller_class,
+                            obfstr!("stop_decompiling_7"),
+                            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+                            &[information_array.into()]
+                        ).unwrap().l().unwrap();
 
-    let get_response_code = env.get_method_id(
-        obfstr!("java/net/HttpURLConnection"),
-        obfstr!("getResponseCode"),
-        obfstr!("()I")
-    ).unwrap();
+                        crash(&env, caller_class);
 
-    let http_response = env.call_method_unchecked(
-        url_connection,
-        get_response_code,
-        JavaType::Primitive(Int),
-        &[]
-    );
+                        None
+                    }
+                    _ => {
+                        let msg = format!(
+                            "{}{}{}",
+                            obfstr!("Internal server error "),
+                            http_response_code,
+                            obfstr!(".\n\nPlease contact Shoreline support!")
+                        );
 
-    let http_response_code = match http_response
+                        error_message(&msg);
+
+                        crash(&env, caller_class);
+
+                        None
+                    }
+                }
+            }
+            Err(_) => {
+                error_message(
+                    obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
+                );
+
+                crash(&env, caller_class);
+
+                None
+            }
+        }
+    });
+
+    if temporary_token.is_none()
     {
-        Ok(code) => code.i().unwrap(),
-        Err(_) => {
-            -1
-        }
-    };
+        return JObject::null();
+    }
 
-    let temporary_token = match http_response_code
-    {
-        -1 => {
-            error_message(
-                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
-            );
-
-            crash(&env, caller_class);
-
-            return JObject::null();
-        }
-        200 => {
-            let input_stream = env.call_method(
-                url_connection,
-                obfstr!("getInputStream"),
-                obfstr!("()Ljava/io/InputStream;"),
-                &[]
-            ).unwrap().l().unwrap();
-
-            let input_stream_reader = env.new_object(
-                obfstr!("java/io/InputStreamReader"),
-                obfstr!("(Ljava/io/InputStream;)V"),
-                &[input_stream.into()]
-            ).unwrap();
-
-            let buffered_reader = env.new_object(
-                obfstr!("java/io/BufferedReader"),
-                obfstr!("(Ljava/io/Reader;)V"),
-                &[input_stream_reader.into()]
-            ).unwrap();
-
-            let read_line = env.call_method(
-                buffered_reader,
-                obfstr!("readLine"),
-                obfstr!("()Ljava/lang/String;"),
-                &[]
-            ).unwrap().l().unwrap();
-
-            let read_line_ptr = env.get_string_utf_chars(JString::from(read_line)).unwrap();
-            CStr::from_ptr(read_line_ptr).to_str().unwrap()
-        }
-        401 => {
-            // Happens if the request properties aren't set correctly
-            // But we just did them here, so there's no way this would happen
-            error_message(
-                obfstr!("Something seemingly impossible happened.\n\nPlease report this to a Shoreline developer!")
-            );
-
-            crash(&env, caller_class);
-
-            return JObject::null();
-        }
-        406 => {
-            // The jar has been tampered with
-            error_message(
-                obfstr!("We know what you did")
-            );
-
-            let message = env.new_string(obfstr!("Loader has been tampered with")).unwrap();
-
-            env.set_object_array_element(*information_array, 0, message).unwrap();
-
-            env.call_static_method(
-                caller_class,
-                obfstr!("stop_decompiling_7"),
-                obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-                &[information_array.into()]
-            ).unwrap().l().unwrap();
-
-            crash(&env, caller_class);
-
-            return JObject::null();
-        }
-
-        _ => {
-            let msg = format!(
-                "{}{}{}",
-                obfstr!("Internal server error "),
-                http_response_code,
-                obfstr!(".\n\nPlease contact Shoreline support!")
-            );
-
-            error_message(&msg);
-
-            crash(&env, caller_class);
-
-            return JObject::null();
-        }
-    };
+    let temporary_token = temporary_token.unwrap();
 
     // A queue of all classes that need to be defined
     let mut class_queue = VecDeque::new();
@@ -526,229 +393,206 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
     RESOURCES_MAP = env.new_global_ref(resources_map).ok();
 
-    let url_string = JNIString::from(
-        obfstr!("https://api.shorelineclient.net/assets/client.jar")
-    );
+    rt.block_on(async {
+        let response = client
+            .get(obfstr!("https://api.shorelineclient.net/loader/download"))
+            .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
+            .header(obfstr!("Download-Token"), temporary_token)
+            .send()
+            .await;
 
-    let url = env.new_object(
-        obfstr!("java/net/URL"),
-        obfstr!("(Ljava/lang/String;)V"),
-        &[env.new_string(url_string).unwrap().into()]
-    ).unwrap();
+        match response
+        {
+            Ok(res) => {
+                let http_response_code = res.status().as_u16();
 
-    let url_connection = env.call_method(
-        url,
-        obfstr!("openConnection"),
-        obfstr!("()Ljava/net/URLConnection;"),
-        &[]
-    ).unwrap().l().unwrap();
+                match http_response_code {
+                    200 => {
+                        let bytes = res.bytes().await;
+                        let bytes = match bytes {
+                            Ok(content) => {
+                                content
+                            }
+                            Err(_) => {
+                                error_message(
+                                    obfstr!("Failed to load Shoreline.\n\nPlease contact Shoreline support!\n\nError code: 32")
+                                );
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[user_agent.into(), user_agent_value.into()]
-    ).unwrap().v().unwrap();
+                                crash(&env, caller_class);
 
-    let token_req = env.new_string(obfstr!("token")).unwrap();
-    let token_req_value = env.new_string(temporary_token).unwrap();
+                                return;
+                            }
+                        };
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[token_req.into(), token_req_value.into()]
-    ).unwrap().v().unwrap();
+                        let archive = ZipArchive::new(Cursor::new(bytes));
+                        let mut archive = match archive {
+                            Ok(zip) => {
+                                zip
+                            }
+                            Err(_) => {
+                                error_message(
+                                    obfstr!("Failed to load Shoreline.\n\nPlease contact Shoreline support!\n\nError code: 33")
+                                );
 
-    let get_response_code = env.get_method_id(
-        obfstr!("java/net/HttpURLConnection"),
-        obfstr!("getResponseCode"),
-        obfstr!("()I")
-    ).unwrap();
+                                crash(&env, caller_class);
 
-    let http_response = env.call_method_unchecked(
-        url_connection,
-        get_response_code,
-        JavaType::Primitive(Int),
-        &[]
-    );
+                                return;
+                            }
+                        };
 
-    let http_response_code = match http_response
-    {
-        Ok(code) => code.i().unwrap(),
-        Err(_) => {
-            -1
-        }
-    };
-
-    match http_response_code
-    {
-        -1 => {
-            error_message(
-                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
-            );
-
-            crash(&env, caller_class);
-        }
-        200 => {
-            let input_stream = env.call_method(
-                url_connection,
-                obfstr!("getInputStream"),
-                obfstr!("()Ljava/io/InputStream;"),
-                &[]
-            ).unwrap();
-
-            let zip_input_stream = env.new_object(
-                obfstr!("java/util/zip/ZipInputStream"),
-                obfstr!("(Ljava/io/InputStream;)V"),
-                &[input_stream.into()]
-            ).unwrap();
-
-            let mut zip_entry: Option<JValue> = env.call_method(
-                zip_input_stream,
-                obfstr!("getNextEntry"),
-                obfstr!("()Ljava/util/zip/ZipEntry;"),
-                &[]
-            ).ok();
-
-            let null = JObject::null();
-
-            while !env.is_same_object(zip_entry.unwrap().l().unwrap(), null).unwrap()
-            {
-                let jvm_name = JString::from(env.call_method(
-                    zip_entry.unwrap().l().unwrap(),
-                    obfstr!("getName"),
-                    obfstr!("()Ljava/lang/String;"),
-                    &[]
-                ).unwrap().l().unwrap());
-
-                let jvm_bytes = env.call_static_method(
-                    env.find_class(obfstr!("org/apache/commons/io/IOUtils")).unwrap(),
-                    obfstr!("toByteArray"),
-                    obfstr!("(Ljava/io/InputStream;)[B"),
-                    &[JValue::from(zip_input_stream)]
-                ).unwrap().l().unwrap();
-
-                let name_ptr = env.get_string_utf_chars(jvm_name).unwrap();
-                let name = CStr::from_ptr(name_ptr).to_str().unwrap();
-
-                if name.ends_with(obfstr!(".class"))
-                {
-                    let dependents = get_immediate_dependents(&env, jvm_bytes);
-
-                    if dependents.iter().any(|s| s.starts_with(obfstr!("net/minecraft/")))
-                    {
-                        env.call_method(
-                            class_map,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap().l().unwrap();
-
-                        env.call_method(
-                            mc_class_dependents,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap();
-                    } else if is_mixin_class(&env, jvm_bytes)
-                    {
-                        env.call_method(
-                            class_map,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap().l().unwrap();
-
-                        if is_mixin_accessor(&env, jvm_bytes)
+                        for i in 0..archive.len()
                         {
-                            class_queue.push_back((jvm_name, jvm_bytes));
+                            let file = archive.by_index(i);
+                            let mut file = match file {
+                                Ok(zip) => {
+                                    zip
+                                }
+                                Err(_) => {
+                                    error_message(
+                                        obfstr!("Failed to load Shoreline.\n\nPlease contact Shoreline support!\n\nError code: 34")
+                                    );
+
+                                    crash(&env, caller_class);
+
+                                    return;
+                                }
+                            };
+
+                            let name = file.name().to_string();
+
+                            let mut buffer = Vec::new();
+                            let copy = std::io::copy(&mut file, &mut buffer);
+                            match copy {
+                                Ok(_) => {
+
+                                }
+                                Err(_) => {
+                                    error_message(
+                                        obfstr!("Failed to load Shoreline.\n\nPlease contact Shoreline support!\n\nError code: 35")
+                                    );
+
+                                    crash(&env, caller_class);
+
+                                    return;
+                                }
+                            }
+
+                            let jvm_name = env.new_string(name.clone()).unwrap();
+                            let jvm_bytes = JObject::from(env.byte_array_from_slice(&buffer).unwrap());
+
+                            if name.ends_with(obfstr!(".class"))
+                            {
+                                let dependents = get_immediate_dependents(&env, jvm_bytes);
+
+                                if dependents.iter().any(|s| s.starts_with(obfstr!("net/minecraft/")))
+                                {
+                                    env.call_method(
+                                        class_map,
+                                        obfstr!("put"),
+                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                        &[jvm_name.into(), jvm_bytes.into()]
+                                    ).unwrap().l().unwrap();
+
+                                    env.call_method(
+                                        mc_class_dependents,
+                                        obfstr!("put"),
+                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                        &[jvm_name.into(), jvm_bytes.into()]
+                                    ).unwrap();
+                                } else if is_mixin_class(&env, jvm_bytes)
+                                {
+                                    env.call_method(
+                                        class_map,
+                                        obfstr!("put"),
+                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                        &[jvm_name.into(), jvm_bytes.into()]
+                                    ).unwrap().l().unwrap();
+
+                                    if is_mixin_accessor(&env, jvm_bytes)
+                                    {
+                                        class_queue.push_back((jvm_name, jvm_bytes));
+                                    }
+                                } else if is_imixin_class(&env, jvm_bytes)
+                                {
+                                    env.call_method(
+                                        class_map,
+                                        obfstr!("put"),
+                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                        &[jvm_name.into(), jvm_bytes.into()]
+                                    ).unwrap().l().unwrap();
+
+                                    class_queue.push_back((jvm_name, jvm_bytes));
+                                } else
+                                {
+                                    // Cache it if it is mentioned in a Mixin
+                                    if name.contains(obfstr!("net/shoreline/client/impl/event/"))
+                                        // Other exclusions
+                                        || name.contains(obfstr!("net/shoreline/client/util/Globals"))
+                                        || name.contains(obfstr!("net/shoreline/client/util/network/InteractType"))
+                                        || name.contains(obfstr!("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture"))
+
+                                        || name.contains("net/shoreline/client/api/render/RenderLayersClient")
+                                    {
+                                        env.call_method(
+                                            class_map,
+                                            obfstr!("put"),
+                                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                            &[jvm_name.into(), jvm_bytes.into()]
+                                        ).unwrap().l().unwrap();
+                                    }
+
+                                    // Define it!
+                                    class_queue.push_back((jvm_name, jvm_bytes));
+                                }
+                            } else if name.starts_with(obfstr!("assets/"))
+                            {
+                                env.call_method(
+                                    resources_map,
+                                    obfstr!("put"),
+                                    obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                                    &[jvm_name.into(), jvm_bytes.into()]
+                                ).unwrap();
+                            } else if name.eq(obfstr!("mixins.shoreline.json"))
+                            {
+                                MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
+                            } else if name.eq(obfstr!("shoreline-refmap.json"))
+                            {
+                                MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
+                            }
                         }
-                    } else if is_imixin_class(&env, jvm_bytes)
-                    {
-                        env.call_method(
-                            class_map,
-                            obfstr!("put"),
-                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[jvm_name.into(), jvm_bytes.into()]
-                        ).unwrap().l().unwrap();
-
-                        class_queue.push_back((jvm_name, jvm_bytes));
-                    } else
-                    {
-                        // Cache it if it is mentioned in a Mixin
-                        if name.contains(obfstr!("net/shoreline/client/impl/event/"))
-                            // Other exclusions
-                            || name.contains(obfstr!("net/shoreline/client/util/Globals"))
-                            || name.contains(obfstr!("net/shoreline/client/util/network/InteractType"))
-                            || name.contains(obfstr!("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture"))
-
-                            || name.contains("net/shoreline/client/api/render/RenderLayersClient")
-                        {
-                            env.call_method(
-                                class_map,
-                                obfstr!("put"),
-                                obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                &[jvm_name.into(), jvm_bytes.into()]
-                            ).unwrap().l().unwrap();
-                        }
-
-                        // Define it!
-                        class_queue.push_back((jvm_name, jvm_bytes));
                     }
-                } else if name.starts_with(obfstr!("assets/"))
-                {
-                    env.call_method(
-                        resources_map,
-                        obfstr!("put"),
-                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                        &[jvm_name.into(), jvm_bytes.into()]
-                    ).unwrap();
-                } else if name.eq(obfstr!("mixins.shoreline.json"))
-                {
-                    MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
-                } else if name.eq(obfstr!("shoreline-refmap.json"))
-                {
-                    MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
+                    401 => {
+                        // Either the token is expired, or it's incorrect
+                        // Probably doesn't mean anyone is trying to crack
+                        error_message(
+                            obfstr!("Error: INVALID\n\nIf this issue persists, please contact Shoreline support.")
+                        );
+
+                        crash(&env, caller_class);
+                    }
+                    _ => {
+                        let msg = format!(
+                            "{}{}{}",
+                            obfstr!("Internal server error "),
+                            http_response_code,
+                            obfstr!(".\n\nPlease contact Shoreline support!")
+                        );
+
+                        error_message(&msg);
+
+                        crash(&env, caller_class);
+                    }
                 }
+            }
+            Err(_) => {
+                error_message(
+                    obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
+                );
 
-                zip_entry = env.call_method(
-                    zip_input_stream,
-                    obfstr!("getNextEntry"),
-                    obfstr!("()Ljava/util/zip/ZipEntry;"),
-                    &[]
-                ).ok();
-
-                env.release_string_utf_chars(jvm_name, name_ptr).unwrap();
+                crash(&env, caller_class);
             }
         }
-        401 => {
-            // Either the token is expired, or it's incorrect
-            // Probably doesn't mean anyone is trying to crack
-            error_message(
-                obfstr!("Error: INVALID\n\nIf this issue persists, please contact Shoreline support.")
-            );
-
-            crash(&env, caller_class);
-
-            return JObject::null();
-        }
-
-        _ => {
-            let msg = format!(
-                "{}{}{}",
-                obfstr!("Internal server error "),
-                http_response_code,
-                obfstr!(".\n\nPlease contact Shoreline support!")
-            );
-
-            error_message(&msg);
-
-            crash(&env, caller_class);
-
-            return JObject::null();
-        }
-    };
+    });
 
     let mut dependency_map = HashMap::new();
     let mut bytes_map = HashMap::new();
@@ -929,118 +773,62 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      loader_version: JObject<'a>) -> JObject<'a>
 {
-    let url_string = JNIString::from(
-        obfstr!("https://api.shorelineclient.net/versioncheck")
-    );
+    let loader_version_utf_chars = env.get_string_utf_chars(JString::from(loader_version)).unwrap();
+    let loader_version_cstr = CStr::from_ptr(loader_version_utf_chars).to_str().unwrap();
 
-    let url = env.new_object(
-        obfstr!("java/net/URL"),
-        obfstr!("(Ljava/lang/String;)V"),
-        &[env.new_string(url_string).unwrap().into()]
-    ).unwrap();
+    let client = Arc::clone(&CLIENT);
 
-    let url_connection = env.call_method(
-        url,
-        obfstr!("openConnection"),
-        obfstr!("()Ljava/net/URLConnection;"),
-        &[]
-    ).unwrap().l().unwrap();
+    let rt = Runtime::new().unwrap();
 
-    let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
-    let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
+    rt.block_on(async {
 
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[user_agent.into(), user_agent_value.into()]
-    ).unwrap().v().unwrap();
+        let response = client
+            .get(obfstr!("https://api.shorelineclient.net/loader/version"))
+            .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
+            .header(obfstr!("Current-Version"), loader_version_cstr)
+            .send()
+            .await;
 
-    let get_response_code = env.get_method_id(
-        obfstr!("java/net/HttpURLConnection"),
-        obfstr!("getResponseCode"),
-        obfstr!("()I")
-    ).unwrap();
+        match response
+        {
+            Ok(res) => {
+                let http_response_code = res.status().as_u16();
 
-    let http_response = env.call_method_unchecked(
-        url_connection,
-        get_response_code,
-        JavaType::Primitive(Int),
-        &[]
-    );
+                match http_response_code
+                {
+                    200 => {
+                        return;
+                    }
+                    409 => {
+                        error_message(
+                            obfstr!("Your Shoreline loader is out of date!\n\nPlease install the latest version via the installer.")
+                        );
 
-    let http_response_code = match http_response
-    {
-        Ok(code) => code.i().unwrap(),
-        Err(_) => {
-            -1
-        }
-    };
+                        crash(&env, caller_class);
+                    }
+                    _ => {
+                        let msg = format!(
+                            "{}{}{}",
+                            obfstr!("Internal server error "),
+                            http_response_code,
+                            obfstr!(".\n\nPlease contact Shoreline support!")
+                        );
 
-    match http_response_code
-    {
-        -1 => {
-            error_message(
-                obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
-            );
+                        error_message(&msg);
 
-            crash(&env, caller_class);
-        }
-        200 => {
-            let input_stream = env.call_method(
-                url_connection,
-                obfstr!("getInputStream"),
-                obfstr!("()Ljava/io/InputStream;"),
-                &[]
-            ).unwrap().l().unwrap();
-
-            let input_stream_reader = env.new_object(
-                obfstr!("java/io/InputStreamReader"),
-                obfstr!("(Ljava/io/InputStream;)V"),
-                &[input_stream.into()]
-            ).unwrap();
-
-            let buffered_reader = env.new_object(
-                obfstr!("java/io/BufferedReader"),
-                obfstr!("(Ljava/io/Reader;)V"),
-                &[input_stream_reader.into()]
-            ).unwrap();
-
-            let read_line = JString::from(env.call_method(
-                buffered_reader,
-                obfstr!("readLine"),
-                obfstr!("()Ljava/lang/String;"),
-                &[]
-            ).unwrap().l().unwrap());
-
-            let server_ver_ptr = env.get_string_utf_chars(read_line).unwrap();
-            let server_ver = CStr::from_ptr(server_ver_ptr).to_str().unwrap();
-
-            let loader_ver_ptr = env.get_string_utf_chars(JString::from(loader_version)).unwrap();
-            let loader_ver = CStr::from_ptr(loader_ver_ptr).to_str().unwrap();
-
-            if !server_ver.eq(loader_ver)
-            {
+                        crash(&env, caller_class);
+                    }
+                }
+            }
+            Err(_) => {
                 error_message(
-                    obfstr!("Your Shoreline loader is out of date!\n\nPlease install the latest version via the installer.")
+                    obfstr!("Failed to connect to Shoreline servers.\n\nPlease contact Shoreline support!")
                 );
 
                 crash(&env, caller_class);
             }
         }
-        _ => {
-            let msg = format!(
-                "{}{}{}",
-                obfstr!("Internal server error "),
-                http_response_code,
-                obfstr!(".\n\nPlease contact Shoreline support!")
-            );
-
-            error_message(&msg);
-
-            crash(&env, caller_class);
-        }
-    }
+    });
 
     return JObject::null();
 }
@@ -1124,9 +912,9 @@ pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
 }
 
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_19"]
-pub unsafe extern "system" fn stop_decompiling_9<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     information_array: JObject<'a>) -> JObject<'a>
+pub unsafe extern "system" fn stop_decompiling_9<'a>(_env: JNIEnv<'a>,
+                                                     _caller_class: JClass<'a>,
+                                                     _information_array: JObject<'a>) -> JObject<'a>
 {
     // let antidump_check_result = run_antidump_checks();
     //

@@ -1,11 +1,7 @@
-use std::ffi::CStr;
 use jni::JNIEnv;
-use jni::objects::{GlobalRef, JClass, JMethodID, JObject, JString, JValue};
-use jni::signature::JavaType;
-use jni::signature::Primitive::Void;
+use jni::objects::{GlobalRef, JClass, JObject};
 use jni::sys::{JNI_FALSE};
 use obfstr::obfstr;
-use crate::log;
 
 static mut INVOKER_CACHE: Option<GlobalRef> = None;
 

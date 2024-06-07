@@ -16,7 +16,7 @@ import java.lang.reflect.Constructor;
 
 public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 {
-    public static final String VERSION = "b0.0.3";
+    public static final String VERSION = "b0.1.0";
     private static final Logger LOGGER = LogManager.getLogger("Shoreline");
 
     private static final UserContext context = UserContext.none();
@@ -63,19 +63,20 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 
         if (FabricLoader.getInstance().isDevelopmentEnvironment())
         {
-            Loader.LOGGER.info("Dev workspace detected, loading natives...");
+            Loader.info("Dev workspace detected, loading natives...");
 
             try
             {
                 NativeLoader.load();
             } catch (Throwable t)
             {
-                Loader.LOGGER.error("Failed to load native libraries", t);
+                Loader.error("Failed to load native libraries", t);
+                NativeLoader.crashNotNatively();
             }
 
             NativeLoader.setUserCredentials();
 
-            Loader.LOGGER.info("Native library successfully loaded, starting Shoreline...");
+            Loader.info("Native library successfully loaded, starting Shoreline...");
         }
     }
 

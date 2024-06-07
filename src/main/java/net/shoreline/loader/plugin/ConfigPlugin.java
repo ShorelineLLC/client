@@ -12,10 +12,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +29,7 @@ public final class ConfigPlugin implements IMixinConfigPlugin
         } catch (Throwable t)
         {
             Loader.error("Encountered an error loading Shoreline natives.", t);
-            throw new RuntimeException(t);
+            NativeLoader.crashNotNatively();
         }
 
         NativeLoader.setUserCredentials();

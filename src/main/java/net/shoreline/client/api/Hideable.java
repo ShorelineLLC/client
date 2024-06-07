@@ -1,7 +1,6 @@
 package net.shoreline.client.api;
 
-public interface Hideable
-{
+public interface Hideable {
     /**
      * @return
      */

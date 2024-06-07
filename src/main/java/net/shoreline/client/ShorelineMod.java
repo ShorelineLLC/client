@@ -9,6 +9,7 @@ import net.minecraft.resource.NamespaceResourceManager;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
+import net.shoreline.loader.impl.natives.NativeLoader;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class ShorelineMod implements ClientModInitializer
 
     public ShorelineMod()
     {
-
+        
     }
 
     /**
