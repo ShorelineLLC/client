@@ -1,17 +1,18 @@
 package net.shoreline.client.impl.module.world;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.math.BlockPos;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BlockListConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.InteractBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ import java.util.List;
 public class AntiInteractModule extends ToggleModule
 {
     //
-    List<Block> blacklist = Arrays.asList(Blocks.ENDER_CHEST, Blocks.ANVIL);
+    Config<List<Item>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.ENDER_CHEST, Blocks.ANVIL));
 
     public AntiInteractModule()
     {
@@ -33,7 +34,7 @@ public class AntiInteractModule extends ToggleModule
     {
         BlockPos pos = event.getHitResult().getBlockPos();
         BlockState state = mc.world.getBlockState(pos);
-        if (blacklist.contains(state.getBlock()))
+        if (((BlockListConfig<?>) blacklistConfig).contains(state.getBlock()))
         {
             event.cancel();
             // Managers.NETWORK.sendSequencedPacket(sequence -> new PlayerInteractBlockC2SPacket(
@@ -52,7 +53,7 @@ public class AntiInteractModule extends ToggleModule
         {
             BlockPos pos = packet.getBlockHitResult().getBlockPos();
             BlockState state = mc.world.getBlockState(pos);
-            if (blacklist.contains(state.getBlock()))
+            if (((BlockListConfig<?>) blacklistConfig).contains(state.getBlock()))
             {
                 event.cancel();
             }

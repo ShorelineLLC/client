@@ -1,10 +1,11 @@
 package net.shoreline.client.impl.module.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -20,6 +21,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+import org.joml.Matrix4f;
 
 import java.awt.*;
 
@@ -51,21 +53,17 @@ public class TracersModule extends ToggleModule
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent.Game event)
+    public void onRenderWorld(RenderWorldEvent event)
     {
-        if (mc.player == null || mc.getCameraEntity() == null || !(mc.getCameraEntity() instanceof PlayerEntity playerEntity))
+        if (mc.player == null || mc.getCameraEntity() == null || !(mc.getCameraEntity() instanceof PlayerEntity playerEntity) || mc.options.hudHidden)
         {
             return;
         }
-        float f = playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed;
-        float g = -(playerEntity.horizontalSpeed + f * event.getTickDelta());
-        float h = MathHelper.lerp(event.getTickDelta(), playerEntity.prevStrideDistance, playerEntity.strideDistance);
-        if (mc.options.getBobView().getValue())
-        {
-            event.getMatrices().translate(-MathHelper.sin(g * (float)Math.PI) * h * 0.5f, Math.abs(MathHelper.cos(g * (float)Math.PI) * h), 0.0f);
-            event.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float)Math.PI) * h * -3.0f));
-            event.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * -5.0f));
-        }
+        MatrixStack matrixStack = new MatrixStack();
+        double d = mc.options.getFov().getValue();
+        matrixStack.multiplyPositionMatrix(mc.gameRenderer.getBasicProjectionMatrix(d));
+        Matrix4f prevProjectionMatrix = RenderSystem.getProjectionMatrix();
+        RenderSystem.setProjectionMatrix(matrixStack.peek().getPositionMatrix(), VertexSorter.BY_DISTANCE);
         RenderBuffers.preRender();
         Vec3d playerPos = Interpolation.getRenderPosition(playerEntity, event.getTickDelta());
         double x1 = playerEntity.getX() - playerPos.getX();
@@ -90,7 +88,7 @@ public class TracersModule extends ToggleModule
                 .add(new Vec3d(x1, y1, z1));
         for (Entity entity : mc.world.getEntities())
         {
-            if (entity == null || !entity.isAlive() || entity == mc.player || offscreenConfig.getValue() && !RenderManager.isFrustumVisible(entity.getBoundingBox()))
+            if (entity == null || !entity.isAlive() || entity == mc.player || !offscreenConfig.getValue() && !RenderManager.isFrustumVisible(entity.getBoundingBox()))
             {
                 continue;
             }
@@ -105,12 +103,7 @@ public class TracersModule extends ToggleModule
             }
         }
         RenderBuffers.postRender();
-        if (mc.options.getBobView().getValue())
-        {
-            event.getMatrices().translate(MathHelper.sin(g * (float)Math.PI) * h * 0.5f, -Math.abs(MathHelper.cos(g * (float)Math.PI) * h), 0.0f);
-            event.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float)Math.PI) * h * 3.0f));
-            event.getMatrices().multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * 5.0f));
-        }
+        RenderSystem.setProjectionMatrix(prevProjectionMatrix, VertexSorter.BY_DISTANCE);
     }
 
     private Color getTracerColor(Entity entity)

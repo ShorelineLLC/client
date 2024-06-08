@@ -12,14 +12,12 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
-import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
@@ -35,13 +33,15 @@ import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.client.util.world.ExplosionUtil;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 // Do not look at this code
 
@@ -64,7 +64,7 @@ public class AutoMineModule extends RotationModule
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
-    Config<AntiCrawling> crawlingConfig = register(new EnumConfig<>("AntiCrawl", "Attempts to prevent player from crawling", AntiCrawling.OFF, AntiCrawling.values()));
+    Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to prevent player from crawling", false));
     Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
     Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
@@ -127,7 +127,7 @@ public class AutoMineModule extends RotationModule
         }
         if (autoConfig.getValue() && !manualOverride)
         {
-            if (mc.player.isCrawling() && crawlingConfig.getValue() != AntiCrawling.OFF && getCrawlingMine() != null)
+            if (mc.player.isCrawling() && crawlingConfig.getValue() && getCrawlingMine() != null)
             {
                 BlockPos crawlingMine = getCrawlingMine();
                 miningQueue.clear();
@@ -504,22 +504,9 @@ public class AutoMineModule extends RotationModule
     private BlockPos getCrawlingMine()
     {
         BlockPos crawlingPos = mc.player.getBlockPos();
-        switch (crawlingConfig.getValue())
+        if (!BlastResistantBlocks.isUnbreakable(crawlingPos.up()) && !mc.world.isAir(crawlingPos.up()))
         {
-            case UP ->
-            {
-                if (!BlastResistantBlocks.isUnbreakable(crawlingPos.up()) && !mc.world.isAir(crawlingPos.up()))
-                {
-                    return crawlingPos.up();
-                }
-            }
-            case DOWN ->
-            {
-                if (!BlastResistantBlocks.isUnbreakable(crawlingPos.down()) && !mc.world.isAir(crawlingPos.down()))
-                {
-                    return crawlingPos.down();
-                }
-            }
+            return crawlingPos.up();
         }
         return null;
     }
@@ -767,12 +754,5 @@ public class AutoMineModule extends RotationModule
         {
             return lastDamage;
         }
-    }
-
-    private enum AntiCrawling
-    {
-        UP,
-        DOWN,
-        OFF
     }
 }
