@@ -3,13 +3,11 @@ use fltk::app::App;
 use fltk::dialog::alert_default;
 use jni::JNIEnv;
 use jni::objects::{JClass, JObject, JString, JValue};
-use jni::signature::JavaType;
-use jni::signature::Primitive::Void;
-use jni::strings::JNIString;
-use jni::sys::JNI_TRUE;
 use obfstr::obfstr;
-use serde_json::json;
+use reqwest::Client;
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use tokio::runtime::Runtime;
 
 pub unsafe fn crash<'a>(env: &JNIEnv<'a>,
                         class_to_rape: JClass)
@@ -337,12 +335,57 @@ pub fn encrypt(str: &str) -> String
     hex::encode(hasher.finalize())
 }
 
-pub fn alert_webhook(env: &JNIEnv,
-                     msg: &str,
-                     hwid: &str,
-                     username: &str,
-                     mods: &str)
+pub unsafe fn alert_webhook<'a>(env: &JNIEnv<'a>,
+                                information_array: JObject<'a>)
 {
+    let client = Client::new();
+
+    let rt = Runtime::new().unwrap();
+
+    rt.block_on(async {
+        alert_webhook_async(env, information_array, &client)
+            .await;
+    });
+}
+
+pub async unsafe fn alert_webhook_async<'a>(env: &JNIEnv<'a>,
+                                            information_array: JObject<'a>,
+                                            client: &Client)
+{
+    let content = get_json(env, information_array);
+
+    let response = client
+        .post(obfstr!("https://discord.com/api/webhooks/1242060862689247322/C4DKSYjrhVOQkW2R8Q7Bg9Kdtu7M78_Lq1ud1R4A3gN6oUTTUEs8_m5arX9YGnkUOMFd"))
+        .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
+        .header(obfstr!("Content-Type"), obfstr!("application/json"))
+        .json(&content)
+        .send()
+        .await;
+
+    match response
+    {
+        Ok(_) => {}
+        Err(_) => {}
+    }
+}
+
+unsafe fn get_json<'a>(env: &JNIEnv<'a>,
+                       param_array: JObject<'a>) -> Value
+{
+    let msg = env.get_object_array_element(*param_array, 0).unwrap();
+    let hwid = env.get_object_array_element(*param_array, 1).unwrap();
+    let username = env.get_object_array_element(*param_array, 2).unwrap();
+    let mods = env.get_object_array_element(*param_array, 4).unwrap(); // skip index 3, its usertype
+
+    let msg_ptr = env.get_string_utf_chars(JString::from(msg)).unwrap();
+    let hwid_ptr = env.get_string_utf_chars(JString::from(hwid)).unwrap();
+    let username_ptr = env.get_string_utf_chars(JString::from(username)).unwrap();
+    let mods_ptr = env.get_string_utf_chars(JString::from(mods)).unwrap();
+
+    let msg = CStr::from_ptr(msg_ptr).to_str().unwrap();
+    let hwid = CStr::from_ptr(hwid_ptr).to_str().unwrap();
+    let username = CStr::from_ptr(username_ptr).to_str().unwrap();
+    let mods = CStr::from_ptr(mods_ptr).to_str().unwrap();
 
     let mut content = json!({
         obfstr!("content"): obfstr!("@everyone"),
@@ -387,138 +430,5 @@ pub fn alert_webhook(env: &JNIEnv,
 
     content[obfstr!("embeds")].as_array_mut().unwrap().push(embed);
 
-    let url_string = JNIString::from(
-        obfstr!("https://discord.com/api/webhooks/1242060862689247322/C4DKSYjrhVOQkW2R8Q7Bg9Kdtu7M78_Lq1ud1R4A3gN6oUTTUEs8_m5arX9YGnkUOMFd")
-    );
-
-    let url = env.new_object(
-        obfstr!("java/net/URL"),
-        obfstr!("(Ljava/lang/String;)V"),
-        &[env.new_string(url_string).unwrap().into()]
-    ).unwrap();
-
-    let url_connection = env.call_method(
-        url,
-        obfstr!("openConnection"),
-        obfstr!("()Ljava/net/URLConnection;"),
-        &[]
-    ).unwrap().l().unwrap();
-
-    let user_agent = env.new_string(obfstr!("User-Agent")).unwrap();
-    let user_agent_value = env.new_string(obfstr!("shoreline-client")).unwrap();
-
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[user_agent.into(), user_agent_value.into()]
-    ).unwrap().v().unwrap();
-
-    let content_type = env.new_string(obfstr!("Content-Type")).unwrap();
-    let content_type_value = env.new_string(obfstr!("application/json")).unwrap();
-
-    env.call_method(
-        url_connection,
-        obfstr!("addRequestProperty"),
-        obfstr!("(Ljava/lang/String;Ljava/lang/String;)V"),
-        &[content_type.into(), content_type_value.into()]
-    ).unwrap().v().unwrap();
-
-    env.call_method(
-        url_connection,
-        obfstr!("setDoOutput"),
-        obfstr!("(Z)V"),
-        &[JNI_TRUE.into()]
-    ).unwrap().v().unwrap();
-
-    env.call_method(
-        url_connection,
-        obfstr!("setDoInput"),
-        obfstr!("(Z)V"),
-        &[JNI_TRUE.into()]
-    ).unwrap().v().unwrap();
-
-    let set_request_method = env.get_method_id(
-        obfstr!("java/net/HttpURLConnection"),
-        obfstr!("setRequestMethod"),
-        obfstr!("(Ljava/lang/String;)V")
-    ).unwrap();
-
-    env.call_method_unchecked(
-        url_connection,
-        set_request_method,
-        JavaType::Primitive(Void),
-        &[env.new_string(obfstr!("POST")).unwrap().into()]
-    ).unwrap().v().unwrap();
-
-    let output_stream = env.call_method(
-        url_connection,
-        obfstr!("getOutputStream"),
-        obfstr!("()Ljava/io/OutputStream;"),
-        &[]
-    ).unwrap().l().unwrap();
-
-    let content_string = content.to_string();
-
-    let message_bytes = content_string.as_bytes();
-
-    let java_byte_array = env.byte_array_from_slice(message_bytes).unwrap();
-
-    env.call_method(
-        output_stream,
-        obfstr!("write"),
-        obfstr!("([B)V"),
-        &[JValue::from(java_byte_array)]
-    ).unwrap().v().unwrap();
-
-    env.call_method(
-        output_stream,
-        obfstr!("flush"),
-        obfstr!("()V"),
-        &[]
-    ).unwrap().v().unwrap();
-
-    env.call_method(
-        output_stream,
-        obfstr!("close"),
-        obfstr!("()V"),
-        &[]
-    ).unwrap().v().unwrap();
-
-    let input_stream: Option<JValue> = env.call_method(
-        url_connection,
-        obfstr!("getInputStream"),
-        obfstr!("()Ljava/io/InputStream;"),
-        &[]
-    ).ok();
-
-    if env.exception_check().unwrap()
-    {
-        // Something went wrong with the alerting, we will just clear the exception
-        env.exception_clear().unwrap();
-    }
-
-    if input_stream.is_some() {
-        env.call_method(
-            input_stream.unwrap().l().unwrap(),
-            obfstr!("close"),
-            obfstr!("()V"),
-            &[]
-        ).unwrap().v().unwrap();
-    }
-
-    let disconnect = env.get_method_id(
-        obfstr!("java/net/HttpURLConnection"),
-        obfstr!("disconnect"),
-        obfstr!("()V")
-    );
-
-    let disconnect = disconnect.unwrap();
-
-    env.call_method_unchecked(
-        url_connection,
-        disconnect,
-        JavaType::Primitive(Void),
-        &[]
-    ).unwrap().v().unwrap();
+    return content;
 }

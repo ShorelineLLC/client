@@ -19,7 +19,7 @@ public final class NativeLoader
     public static void load() throws Throwable
     {
         OSType type = getOS();
-        URL url = new URL("https://api.shorelineclient.net/loader/natives");
+        URL url = new URL("https://api.shorelineclient.net/natives");
 
         URLConnection urlConnection = url.openConnection();
         urlConnection.addRequestProperty("User-Agent", "shoreline-client");
