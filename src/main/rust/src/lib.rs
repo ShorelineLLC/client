@@ -68,7 +68,7 @@ pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
 
     runtime.block_on(async {
         let response = client
-            .get(obfstr!("https://api.shorelineclient.net/loader/auth"))
+            .get(obfstr!("https://api.shorelineclient.net/auth"))
             .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
             .header(obfstr!("Hardware-ID"), hwid)
             .send()
@@ -294,7 +294,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     let temporary_token: Option<String> = rt.block_on(async {
 
         let response = client
-            .get(obfstr!("https://api.shorelineclient.net/loader/integrity"))
+            .get(obfstr!("https://api.shorelineclient.net/integrity"))
             .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
             .header(obfstr!("Loader-Hash"), encrypted_bytes)
             .send()
@@ -395,7 +395,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
     rt.block_on(async {
         let response = client
-            .get(obfstr!("https://api.shorelineclient.net/loader/download"))
+            .get(obfstr!("https://api.shorelineclient.net/download"))
             .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
             .header(obfstr!("Download-Token"), temporary_token)
             .send()
@@ -783,7 +783,7 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
     rt.block_on(async {
 
         let response = client
-            .get(obfstr!("https://api.shorelineclient.net/loader/version"))
+            .get(obfstr!("https://api.shorelineclient.net/version"))
             .header(obfstr!("User-Agent"), obfstr!("shoreline-client"))
             .header(obfstr!("Current-Version"), loader_version_cstr)
             .send()
