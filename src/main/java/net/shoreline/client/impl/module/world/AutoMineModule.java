@@ -231,6 +231,7 @@ public class AutoMineModule extends RotationModule
             if (data.getState().isAir())
             {
                 data.resetBreakTime();
+                continue;
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
             {

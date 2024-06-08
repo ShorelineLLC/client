@@ -7,7 +7,8 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.gui.screen.MouseDraggedEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-public class BetterInvModule extends ToggleModule {
+public class BetterInvModule extends ToggleModule
+{
 
     Config<Boolean> dragItemMoveConfig = register(new BooleanConfig("DragItemMove", "Allows you to hold down shift and drag move items.", true));
 
@@ -17,7 +18,7 @@ public class BetterInvModule extends ToggleModule {
     }
 
     @EventListener
-    public void mouseDragged(MouseDraggedEvent event)
+    public void onMouseDragged(MouseDraggedEvent event)
     {
         if (dragItemMoveConfig.getValue())
         {

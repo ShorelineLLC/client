@@ -54,15 +54,20 @@ public abstract class MixinHandledScreen
     }
 
     @Inject(method = "mouseDragged", at = @At("TAIL"))
-    private void onMouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> cir)
+    private void hookMouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> cir)
     {
-        MouseDraggedEvent mouseDraggedEvent =
-                new MouseDraggedEvent();
+        MouseDraggedEvent mouseDraggedEvent = new MouseDraggedEvent();
         EventBus.INSTANCE.dispatch(mouseDraggedEvent);
         if (button != GLFW_MOUSE_BUTTON_LEFT
                 || doubleClicking
-                || !mouseDraggedEvent.isCanceled()) return;
+                || !mouseDraggedEvent.isCanceled())
+        {
+            return;
+        }
         Slot slot = getSlotAt(mouseX, mouseY);
-        if (slot != null && slot.hasStack() && hasShiftDown()) onMouseClick(slot, slot.id, button, SlotActionType.QUICK_MOVE);
+        if (slot != null && slot.hasStack() && hasShiftDown())
+        {
+            onMouseClick(slot, slot.id, button, SlotActionType.QUICK_MOVE);
+        }
     }
 }
