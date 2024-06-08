@@ -23,6 +23,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class AutoXPModule extends RotationModule
 {
 
+    Config<Boolean> multiTaskConfig = register(new BooleanConfig("MultiTask", "Allows you to throw xp while using items", false));
     Config<Float> delayConfig = register(new NumberConfig<>("Delay", "Delay to throw xp in ticks.", 1.0f, 1.0f, 10.0f, NumberDisplay.DEFAULT));
     Config<Boolean> durabilityCheckConfig = register(new BooleanConfig("DurabilityCheck", "Check if your armor and held item durability is full then disables if it is.", true));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates the player while throwing xp.", false));
@@ -40,6 +41,8 @@ public class AutoXPModule extends RotationModule
     {
 
         if (mc.player == null || !delayTimer.passed(delayConfig.getValue())) return;
+
+        if (mc.player.isUsingItem() && !multiTaskConfig.getValue()) return;
 
         if (durabilityCheckConfig.getValue() && areItemsFullDura(mc.player))
         {

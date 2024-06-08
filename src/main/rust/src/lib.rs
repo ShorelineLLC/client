@@ -12,16 +12,15 @@ use std::os::raw::{c_void, c_int};
 use jni::objects::{JObject, JString, JClass, GlobalRef};
 use std::ffi::{CStr};
 use std::io::Cursor;
-use std::sync::Arc;
 use hardware_id::get_id;
 use lazy_static::lazy_static;
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use zip::ZipArchive;
-use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook};
+use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook, alert_webhook_async};
 
 lazy_static! {
-    static ref CLIENT: Arc<Client> = Arc::new(Client::builder().cookie_store(true).build().unwrap());
+    static ref CLIENT: Client = Client::builder().cookie_store(true).build().unwrap();
 }
 
 static mut USER_INFO: Option<GlobalRef> = None;
@@ -64,7 +63,7 @@ pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
 
     let runtime = Runtime::new().unwrap();
 
-    let client = Arc::clone(&CLIENT);
+    let client = &CLIENT;
 
     runtime.block_on(async {
         let response = client
@@ -289,7 +288,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
     let rt = Runtime::new().unwrap();
 
-    let client = Arc::clone(&CLIENT);
+    let client = &CLIENT;
 
     let temporary_token: Option<String> = rt.block_on(async {
 
@@ -320,12 +319,11 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
                         env.set_object_array_element(*information_array, 0, message).unwrap();
 
-                        env.call_static_method(
-                            caller_class,
-                            obfstr!("stop_decompiling_7"),
-                            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
-                            &[information_array.into()]
-                        ).unwrap().l().unwrap();
+                        alert_webhook_async(
+                            &env,
+                            information_array,
+                            client
+                        ).await;
 
                         crash(&env, caller_class);
 
@@ -776,7 +774,7 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
     let loader_version_utf_chars = env.get_string_utf_chars(JString::from(loader_version)).unwrap();
     let loader_version_cstr = CStr::from_ptr(loader_version_utf_chars).to_str().unwrap();
 
-    let client = Arc::clone(&CLIENT);
+    let client = &CLIENT;
 
     let rt = Runtime::new().unwrap();
 
@@ -842,27 +840,9 @@ pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      param_array: JObject<'a>) -> JObject<'a>
 {
-    let msg = env.get_object_array_element(*param_array, 0).unwrap();
-    let hwid = env.get_object_array_element(*param_array, 1).unwrap();
-    let username = env.get_object_array_element(*param_array, 2).unwrap();
-    let mods = env.get_object_array_element(*param_array, 4).unwrap(); // skip index 3, its usertype
-
-    let msg_ptr = env.get_string_utf_chars(JString::from(msg)).unwrap();
-    let hwid_ptr = env.get_string_utf_chars(JString::from(hwid)).unwrap();
-    let username_ptr = env.get_string_utf_chars(JString::from(username)).unwrap();
-    let mods_ptr = env.get_string_utf_chars(JString::from(mods)).unwrap();
-
-    let msg_cstr = CStr::from_ptr(msg_ptr).to_str().unwrap();
-    let hwid_cstr = CStr::from_ptr(hwid_ptr).to_str().unwrap();
-    let username_cstr = CStr::from_ptr(username_ptr).to_str().unwrap();
-    let mods_cstr = CStr::from_ptr(mods_ptr).to_str().unwrap();
-
     alert_webhook(
         &env,
-        msg_cstr,
-        hwid_cstr,
-        username_cstr,
-        mods_cstr
+        param_array
     );
 
     crash(&env, caller_class);
