@@ -80,6 +80,7 @@ public final class ScaffoldModule extends RotationModule
         groundPosY = -1;
         stoppedServerSprint = false;
         lastAngles = null;
+        fadeList.clear();
     }
 
     @EventListener

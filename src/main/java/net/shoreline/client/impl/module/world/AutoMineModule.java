@@ -5,6 +5,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
@@ -28,8 +29,6 @@ import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.FirstOutQueue;
 import net.shoreline.client.util.math.position.PositionUtil;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
@@ -180,7 +179,7 @@ public class AutoMineModule extends RotationModule
                                 stopMining(miningData);
                                 if (!miningData.hasAttemptedBreak())
                                 {
-                                    miningData.setAttemptedBreak();
+                                    miningData.setAttemptedBreak(true);
                                 }
                             }
                             else if (!mc.world.isAir(cityBlockPos.pos()) && !isBlockDelayGrim())
@@ -209,7 +208,7 @@ public class AutoMineModule extends RotationModule
                                 stopMining(miningData);
                                 if (!miningData.hasAttemptedBreak())
                                 {
-                                    miningData.setAttemptedBreak();
+                                    miningData.setAttemptedBreak(true);
                                 }
                             }
                             else if (!mc.world.isAir(cityBlockPos.pos()) && !isBlockDelayGrim())
@@ -229,16 +228,19 @@ public class AutoMineModule extends RotationModule
         }
         for (MiningData data : miningQueue)
         {
-            if (data.isResetting())
+            if (data.getState().isAir())
             {
-                startMining(data);
-                data.clearReset();
+                data.resetBreakTime();
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
                 miningQueue.remove(data);
                 continue;
+            }
+            if (data.getBlockDamage() == 0.0f && !instantConfig.getValue())
+            {
+                startMining(data);
             }
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
@@ -254,7 +256,7 @@ public class AutoMineModule extends RotationModule
                     Managers.INVENTORY.setSlot(data.getSlot());
                     if (!data.hasAttemptedBreak())
                     {
-                        data.setAttemptedBreak();
+                        data.setAttemptedBreak(true);
                     }
                 }
             }
@@ -291,7 +293,6 @@ public class AutoMineModule extends RotationModule
             {
                 miningData2.resetDamage();
             }
-            miningData2.resetBreakTime();
             return;
         }
         // Something went wrong, remove and remine
@@ -309,7 +310,7 @@ public class AutoMineModule extends RotationModule
             stopMining(miningData2);
             if (!miningData2.hasAttemptedBreak())
             {
-                miningData2.setAttemptedBreak();
+                miningData2.setAttemptedBreak(true);
             }
         }
     }
@@ -374,6 +375,22 @@ public class AutoMineModule extends RotationModule
             for (MiningData data : miningQueue)
             {
                 data.resetDamage();
+            }
+        }
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
+        {
+            for (MiningData data : miningQueue)
+            {
+                if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()))
+                {
+                    data.setAttemptedBreak(false);
+                    return;
+                }
             }
         }
     }
@@ -560,9 +577,6 @@ public class AutoMineModule extends RotationModule
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-
         }
         data.setStarted();
     }
@@ -682,14 +696,13 @@ public class AutoMineModule extends RotationModule
     {
 
         private boolean attemptedBreak;
-        private final Timer attemptBreakTimer = new CacheTimer();
+        private long breakTime;
         private final BlockPos pos;
         private final Direction direction;
         private float lastDamage;
         private float blockDamage;
         private boolean instantRemine;
         private boolean started;
-        private boolean resetting;
 
         public MiningData(BlockPos pos, Direction direction)
         {
@@ -697,15 +710,18 @@ public class AutoMineModule extends RotationModule
             this.direction = direction;
         }
 
-        public void setAttemptedBreak()
+        public void setAttemptedBreak(boolean attemptedBreak)
         {
-            this.attemptedBreak = true;
-            resetBreakTime();
+            this.attemptedBreak = attemptedBreak;
+            if (attemptedBreak)
+            {
+                resetBreakTime();
+            }
         }
 
         public void resetBreakTime()
         {
-            attemptBreakTimer.reset();
+            breakTime = System.currentTimeMillis();
         }
 
         public boolean hasAttemptedBreak()
@@ -715,7 +731,7 @@ public class AutoMineModule extends RotationModule
 
         public boolean passedAttemptedBreakTime(long time)
         {
-            return attemptBreakTimer.passed(time);
+            return System.currentTimeMillis() - breakTime >= time;
         }
 
         public boolean isInstantRemine()
@@ -740,21 +756,10 @@ public class AutoMineModule extends RotationModule
             this.blockDamage = blockDamage;
         }
 
-        public void clearReset()
-        {
-            resetting = false;
-        }
-
-        public boolean isResetting()
-        {
-            return resetting;
-        }
-
         public void resetDamage()
         {
             instantRemine = false;
             started = false;
-            resetting = true;
             blockDamage = 0.0f;
         }
 
