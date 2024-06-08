@@ -95,6 +95,7 @@ public final class ModuleManager
                 new AutoRespawnModule(),
                 new BeaconSelectorModule(),
                 new BetterChatModule(),
+                new BetterInvModule(),
                 new ChatNotifierModule(),
                 new ChestSwapModule(),
                 // new ChestStealerModule(),
