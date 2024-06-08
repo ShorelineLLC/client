@@ -133,9 +133,9 @@ public class SpeedmineModule extends RotationModule
             }
             if (swapConfig.getValue() != Swap.OFF)
             {
-                Managers.INVENTORY.setSlot(slot);
+                swapTo(slot);
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, mining, direction));
-                Managers.INVENTORY.syncToClient();
+                swapSync(slot);
             }
             damage = 0.0f;
             mining = null;
@@ -218,6 +218,25 @@ public class SpeedmineModule extends RotationModule
             {
                 Managers.INVENTORY.syncToClient();
             }
+        }
+    }
+
+    private void swapTo(int slot)
+    {
+        switch (swapConfig.getValue())
+        {
+            case NORMAL -> Managers.INVENTORY.setClientSlot(slot);
+            case SILENT -> Managers.INVENTORY.setSlot(slot);
+            case SILENT_ALT -> Managers.INVENTORY.setSlotAlt(slot);
+        }
+    }
+
+    private void swapSync(int slot)
+    {
+        switch (swapConfig.getValue())
+        {
+            case SILENT -> Managers.INVENTORY.syncToClient();
+            case SILENT_ALT -> Managers.INVENTORY.setSlotAlt(slot);
         }
     }
 
@@ -331,6 +350,7 @@ public class SpeedmineModule extends RotationModule
     {
         NORMAL,
         SILENT,
+        SILENT_ALT,
         OFF
     }
 }

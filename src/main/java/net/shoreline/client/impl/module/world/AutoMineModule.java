@@ -12,6 +12,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
+import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
@@ -60,6 +61,7 @@ public class AutoMineModule extends RotationModule
     Config<Boolean> doubleBreakConfig = register(new BooleanConfig("DoubleBreak", "Allows you to mine two blocks at once", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.1f, 4.0f, 6.0f));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
+    Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values()));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true));
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
@@ -227,6 +229,11 @@ public class AutoMineModule extends RotationModule
         }
         for (MiningData data : miningQueue)
         {
+            if (data.isResetting())
+            {
+                startMining(data);
+                data.clearReset();
+            }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
@@ -553,6 +560,9 @@ public class AutoMineModule extends RotationModule
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+
         }
         data.setStarted();
     }
@@ -600,20 +610,40 @@ public class AutoMineModule extends RotationModule
         }
         // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
         // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
-        boolean canSwap = data.getSlot() != -1;
+        int slot = data.getSlot();
+        boolean canSwap = slot != -1;
         if (canSwap)
         {
-            Managers.INVENTORY.setSlot(data.getSlot());
+            swapTo(slot);
         }
         stopMiningInternal(data);
         lastBreak = System.currentTimeMillis();
         if (canSwap)
         {
-            Managers.INVENTORY.syncToClient();
+            swapSync(slot);
         }
         if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync(true);
+        }
+    }
+
+    private void swapTo(int slot)
+    {
+        switch (swapConfig.getValue())
+        {
+            case NORMAL -> Managers.INVENTORY.setClientSlot(slot);
+            case SILENT -> Managers.INVENTORY.setSlot(slot);
+            case SILENT_ALT -> Managers.INVENTORY.setSlotAlt(slot);
+        }
+    }
+
+    private void swapSync(int slot)
+    {
+        switch (swapConfig.getValue())
+        {
+            case SILENT -> Managers.INVENTORY.syncToClient();
+            case SILENT_ALT -> Managers.INVENTORY.setSlotAlt(slot);
         }
     }
 
@@ -659,6 +689,7 @@ public class AutoMineModule extends RotationModule
         private float blockDamage;
         private boolean instantRemine;
         private boolean started;
+        private boolean resetting;
 
         public MiningData(BlockPos pos, Direction direction)
         {
@@ -709,9 +740,21 @@ public class AutoMineModule extends RotationModule
             this.blockDamage = blockDamage;
         }
 
+        public void clearReset()
+        {
+            resetting = false;
+        }
+
+        public boolean isResetting()
+        {
+            return resetting;
+        }
+
         public void resetDamage()
         {
             instantRemine = false;
+            started = false;
+            resetting = true;
             blockDamage = 0.0f;
         }
 
@@ -754,5 +797,13 @@ public class AutoMineModule extends RotationModule
         {
             return lastDamage;
         }
+    }
+
+    public enum Swap
+    {
+        NORMAL,
+        SILENT,
+        SILENT_ALT,
+        OFF
     }
 }

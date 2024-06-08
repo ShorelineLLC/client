@@ -97,6 +97,20 @@ public class InventoryManager implements Globals
     }
 
     /**
+     * Sets the server slot via a click slot
+     *
+     * @param barSlot the player hotbar slot 0-8
+     */
+    public void setSlotAlt(final int barSlot)
+    {
+        if (PlayerInventory.isValidHotbarIndex(barSlot))
+        {
+            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
+                    barSlot + 36, slot, SlotActionType.SWAP, mc.player);
+        }
+    }
+
+    /**
      * Sets the server & client slot
      *
      * @param barSlot the player hotbar slot 0-8
