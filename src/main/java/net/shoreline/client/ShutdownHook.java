@@ -27,5 +27,6 @@ public class ShutdownHook extends Thread
     {
         Shoreline.info("Saving configurations and shutting down!");
         Shoreline.CONFIG.saveClient();
+        Shoreline.CONFIG.saveClickGui();
     }
 }

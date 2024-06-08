@@ -298,4 +298,9 @@ public class ClickGuiScreen extends Screen implements Globals
     {
         this.closeOnEscape = closeOnEscape;
     }
+
+    public List<CategoryFrame> getCategoryFrames()
+    {
+        return frames;
+    }
 }

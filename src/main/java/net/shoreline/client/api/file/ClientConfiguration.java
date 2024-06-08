@@ -8,6 +8,7 @@ import net.shoreline.client.api.module.file.ModuleFile;
 import net.shoreline.client.api.social.SocialFile;
 import net.shoreline.client.api.social.SocialRelation;
 import net.shoreline.client.api.waypoint.WaypointFile;
+import net.shoreline.client.impl.gui.click.ClickGuiFile;
 import net.shoreline.client.impl.module.misc.InvCleanerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -32,6 +33,9 @@ public class ClientConfiguration implements Globals
     // Main client directory. This folder will contain all locally saved
     // configurations for the client.
     private Path clientDir;
+    //
+    private ModuleConfigFile file;
+    private final ClickGuiFile clickGuiFile;
 
     /**
      *
@@ -101,9 +105,10 @@ public class ClientConfiguration implements Globals
         {
             files.add(new SocialFile(clientDir, relation));
         }
+        this.clickGuiFile = new ClickGuiFile(clientDir);
     }
 
-    /**
+    /**\
      *
      */
     public void saveClient()
@@ -131,14 +136,24 @@ public class ClientConfiguration implements Globals
 
     public void saveModuleConfiguration(String configFile)
     {
-        ModuleConfigFile file = new ModuleConfigFile(clientDir.resolve("Configs"), configFile);
+        file = new ModuleConfigFile(clientDir.resolve("Configs"), configFile);
         file.save();
     }
 
     public void loadModuleConfiguration(String configFile)
     {
-        ModuleConfigFile file = new ModuleConfigFile(clientDir.resolve("Configs"), configFile);
+        file = new ModuleConfigFile(clientDir.resolve("Configs"), configFile);
         file.load();
+    }
+
+    public void saveClickGui()
+    {
+        clickGuiFile.save();
+    }
+
+    public void loadClickGui()
+    {
+        clickGuiFile.load();
     }
 
     public Set<ConfigFile> getFiles()

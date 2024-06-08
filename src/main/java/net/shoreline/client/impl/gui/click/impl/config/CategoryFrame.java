@@ -1,7 +1,11 @@
 package net.shoreline.client.impl.gui.click.impl.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.Serializable;
+import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderManager;
@@ -29,7 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @see Config
  * @since 1.0
  */
-public class CategoryFrame extends Frame
+public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
 {
     //
     private final String name;
@@ -65,8 +69,7 @@ public class CategoryFrame extends Frame
                 moduleButtons.add(new ModuleButton(module, this, x, y));
             }
         }
-        categoryAnimation.setState(true);
-        open = true;
+        setOpen(true);
     }
 
     /**
@@ -176,7 +179,7 @@ public class CategoryFrame extends Frame
             open = !open;
             categoryAnimation.setState(open);
         }
-        if (open)
+        if (isOpen())
         {
             for (ModuleButton button : moduleButtons)
             {
@@ -195,7 +198,7 @@ public class CategoryFrame extends Frame
     {
         super.mouseReleased(mouseX, mouseY, mouseButton);
         drag = false;
-        if (open)
+        if (isOpen())
         {
             for (ModuleButton button : moduleButtons)
             {
@@ -213,13 +216,38 @@ public class CategoryFrame extends Frame
     public void keyPressed(int keyCode, int scanCode, int modifiers)
     {
         super.keyPressed(keyCode, scanCode, modifiers);
-        if (open)
+        if (isOpen())
         {
             for (ModuleButton button : moduleButtons)
             {
                 button.keyPressed(keyCode, scanCode, modifiers);
             }
         }
+    }
+
+    @Override
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("category", category.name());
+        obj.addProperty("x", getX());
+        obj.addProperty("y", getY());
+        obj.addProperty("open", isOpen());
+        return obj;
+    }
+
+    @Override
+    public CategoryFrame fromJson(JsonObject jsonObj)
+    {
+        if (jsonObj.has("x") && jsonObj.has("y") && jsonObj.has("open"))
+        {
+            JsonElement xElement = jsonObj.get("x");
+            JsonElement yElement = jsonObj.get("y");
+            JsonElement openElement = jsonObj.get("open");
+            setPos(xElement.getAsFloat(), yElement.getAsFloat());
+            setOpen(openElement.getAsBoolean());
+        }
+        return null;
     }
 
     /**
@@ -249,6 +277,17 @@ public class CategoryFrame extends Frame
     public ModuleCategory getCategory()
     {
         return category;
+    }
+
+    public boolean isOpen()
+    {
+        return open && categoryAnimation.getFactor() > 0.1f;
+    }
+
+    public void setOpen(boolean open)
+    {
+        this.open = open;
+        categoryAnimation.setState(open);
     }
 
     /**

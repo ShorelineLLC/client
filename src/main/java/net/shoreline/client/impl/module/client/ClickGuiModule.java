@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.client;
 
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -63,6 +64,7 @@ public class ClickGuiModule extends ToggleModule
         if (CLICK_GUI_SCREEN == null)
         {
             CLICK_GUI_SCREEN = new ClickGuiScreen(this);
+            Shoreline.CONFIG.loadClickGui();
         }
         openCloseAnimation.setState(true);
         transparencyAnimation.setState(true);
@@ -78,6 +80,10 @@ public class ClickGuiModule extends ToggleModule
         {
             toggle();
             return;
+        }
+        if (CLICK_GUI_SCREEN != null)
+        {
+            Shoreline.CONFIG.saveClickGui();
         }
         mc.player.closeScreen();
         openCloseAnimation.setState(false);
