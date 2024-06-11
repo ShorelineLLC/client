@@ -48,6 +48,7 @@ public final class ScaffoldModule extends RotationModule
     Config<List<Item>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim interactions", false));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to scaffold blocks before placing", false));
+    Config<Boolean> rotateHoldConfig = register(new BooleanConfig("RotateHold", "Holds rotations to scaffold blocks", false, () -> rotateConfig.getValue()));
     Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "Keeps the same y-level", false));
     Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimConfig.getValue()));
     Config<BlockPicker> pickerConfig = register(new EnumConfig<>("BlockSelection", "How to pick a block from the hotbar", BlockPicker.NORMAL, BlockPicker.values()));
@@ -57,6 +58,7 @@ public final class ScaffoldModule extends RotationModule
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
     private boolean stoppedServerSprint;
     private BlockData blockData;
+    private BlockData renderData;
     private float[] lastAngles;
     private int groundPosY;
 
@@ -80,6 +82,8 @@ public final class ScaffoldModule extends RotationModule
         groundPosY = -1;
         stoppedServerSprint = false;
         lastAngles = null;
+        blockData = null;
+        renderData = null;
         fadeList.clear();
     }
 
@@ -89,9 +93,12 @@ public final class ScaffoldModule extends RotationModule
         int slot = getBlockSlot();
         if (slot == -1)
         {
+            blockData = null;
+            renderData = null;
             return;
         }
-        blockData = getBlockData();
+        renderData = getBlockData(false);
+        blockData = getBlockData(rotateHoldConfig.getValue());
         if (blockData == null)
         {
             return;
@@ -191,7 +198,7 @@ public final class ScaffoldModule extends RotationModule
             }
             RenderBuffers.postRender();
 
-            if (blockData == null || blockData.getHitResult() == null)
+            if (renderData == null || renderData.getHitResult() == null)
             {
                 return;
             }
@@ -199,7 +206,7 @@ public final class ScaffoldModule extends RotationModule
             if (renderConfig.getValue())
             {
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
-                fadeList.put(blockData.getHitResult().getBlockPos().offset(blockData.getHitResult().getSide()), animation);
+                fadeList.put(renderData.getBlockPos(), animation);
             }
 
             fadeList.entrySet().removeIf(e ->
@@ -217,7 +224,7 @@ public final class ScaffoldModule extends RotationModule
         blockData.setHitResult(new BlockHitResult(basicHitVec, side, pos, false));
     }
 
-    private BlockData getBlockData()
+    private BlockData getBlockData(boolean hold)
     {
         int posY = (int) Math.floor(mc.player.getY()) - 1;
         if (keepYConfig.getValue())
@@ -230,6 +237,10 @@ public final class ScaffoldModule extends RotationModule
         }
         final BlockPos pos = PositionUtil.getRoundedBlockPos(
                 mc.player.getX(), posY, mc.player.getZ());
+        if (!hold && !mc.world.getBlockState(pos).isReplaceable())
+        {
+            return null;
+        }
         for (final Direction direction : Direction.values())
         {
             final BlockPos neighbor = pos.offset(direction);
@@ -311,6 +322,11 @@ public final class ScaffoldModule extends RotationModule
         public BlockHitResult getHitResult()
         {
             return hitResult;
+        }
+
+        public BlockPos getBlockPos()
+        {
+            return hitResult.getBlockPos().offset(hitResult.getSide());
         }
 
         public void setHitResult(BlockHitResult hitResult)
