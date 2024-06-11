@@ -103,6 +103,46 @@ public class RenderManager implements Globals
         QUADS.end();
     }
 
+    public static void renderSide(MatrixStack matrices, float x1, float y1,
+                                  float z1, float x2, float y2, float z2, Direction direction, int color)
+    {
+        matrices.push();
+        drawSide(matrices, x1, y1, z1, x2, y2, z2, direction, color);
+        matrices.pop();
+    }
+
+    public static void renderSide(MatrixStack matrices, double x1, double y1,
+                                double z1, double x2, double y2, double z2, Direction direction, int color)
+    {
+        matrices.push();
+        drawSide(matrices, (float) x1, (float) y1, (float) z1, (float) x2, (float) y2, (float) z2, direction, color);
+        matrices.pop();
+    }
+
+    public static void drawSide(MatrixStack matrices, float x1, float y1,
+                                float z1, float x2, float y2, float z2, Direction direction, int color)
+    {
+        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
+        matrices.translate(-pos.x, -pos.y, -pos.z);
+
+        QUADS.begin(matrices);
+        QUADS.color(color);
+        if (direction.getAxis().isVertical())
+        {
+            QUADS.vertex(x1, y1, z1).vertex(x2, y1, z1).vertex(x2, y1, z2).vertex(x1, y1, z2);
+        }
+        else if (direction == Direction.NORTH || direction == Direction.SOUTH)
+        {
+            QUADS.vertex(x1, y1, z1).vertex(x1, y2, z1).vertex(x2, y2, z1).vertex(x2, y1, z1);
+        }
+        else
+        {
+            QUADS.vertex(x1, y1, z1).vertex(x1, y1, z2).vertex(x1, y2, z2).vertex(x1, y2, z1);
+        }
+
+        QUADS.end();
+    }
+
     /**
      * @param p
      * @param width

@@ -160,6 +160,7 @@ public final class ModuleManager
                 new SkyboxModule(),
                 new TooltipsModule(),
                 new TracersModule(),
+                new TrajectoriesModule(),
                 new TrueSightModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
