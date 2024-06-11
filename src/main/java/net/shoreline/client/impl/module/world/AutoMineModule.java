@@ -38,10 +38,8 @@ import net.shoreline.eventbus.event.StageEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
 
 // Do not look at this code
 
@@ -72,6 +70,7 @@ public class AutoMineModule extends RotationModule
     //
     private final Map<MiningData, Animation> fadeList = new HashMap<>();
     private FirstOutQueue<MiningData> miningQueue = new FirstOutQueue<>(2);
+    private final List<BlockPos> packetMines = new ArrayList<>();
     private long lastBreak;
     private boolean manualOverride;
 
@@ -118,6 +117,10 @@ public class AutoMineModule extends RotationModule
         if (mc.player.isCreative() || mc.player.isSpectator())
         {
             return;
+        }
+        if (doubleBreakConfig.getValue())
+        {
+            clearMiningFloor();
         }
         MiningData miningData = null;
         MiningData miningDataLast = null;
@@ -231,7 +234,6 @@ public class AutoMineModule extends RotationModule
             if (data.getState().isAir())
             {
                 data.resetBreakTime();
-                continue;
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
             {
@@ -573,6 +575,7 @@ public class AutoMineModule extends RotationModule
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            packetMines.add(data.getPos());
         }
         else
         {
@@ -592,6 +595,19 @@ public class AutoMineModule extends RotationModule
             }
         }
         return false;
+    }
+
+    public void clearMiningFloor()
+    {
+        for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
+        {
+            if (packetMines.contains(pos.down()))
+            {
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos.down(), Direction.UP));
+                packetMines.remove(pos.down());
+                miningQueue.removeIf(d -> d.getPos().equals(pos.down()));
+            }
+        }
     }
 
     private void abortMining(MiningData data)

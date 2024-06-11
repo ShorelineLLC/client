@@ -163,6 +163,7 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
                         {
                             if (val)
                             {
+                                cfg.disable();
                                 cfg.enable();
                             }
                             else
