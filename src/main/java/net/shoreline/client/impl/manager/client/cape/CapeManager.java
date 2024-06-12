@@ -7,6 +7,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.shoreline.client.impl.event.network.LoadCapeEvent;
 import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.io.InputStream;
@@ -22,6 +23,11 @@ public class CapeManager implements Globals
     // TODO: this is a workaround to a rare crash, possibly save to FS like real Optifine?
     // im open to better solutions because this could get pretty bad pretty quick
     private static final Map<UUID, Identifier> CAPE_TEXTURE_CACHE = new HashMap<>();
+
+    public CapeManager()
+    {
+        EventBus.INSTANCE.subscribe(this);
+    }
 
     @EventListener
     public void onLoadCape(LoadCapeEvent event)
