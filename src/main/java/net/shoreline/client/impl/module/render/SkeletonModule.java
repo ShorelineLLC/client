@@ -18,6 +18,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -40,6 +41,8 @@ public class SkeletonModule extends ToggleModule
     public void onRenderWorld(RenderWorldEvent.Game event)
     {
         MatrixStack matrixStack = event.getMatrices();
+        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
+        matrixStack.translate(-pos.x, -pos.y, -pos.z);
         float g = event.getTickDelta();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableBlend();
@@ -104,6 +107,10 @@ public class SkeletonModule extends ToggleModule
                 // RenderSystem.lineWidth(2.0f);
                 Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
                 Color skeletonColor = ColorsModule.getInstance().getColor();
+                if (Managers.SOCIAL.isFriend(playerEntity.getName()))
+                {
+                    skeletonColor = new Color(0xff66ffff);
+                }
                 bufferBuilder.vertex(matrix4f, 0, sneaking ? 0.6f : 0.7f,
                         sneaking ? 0.23f : 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
                 bufferBuilder.vertex(matrix4f, 0, sneaking ? 1.05f : 1.4f,

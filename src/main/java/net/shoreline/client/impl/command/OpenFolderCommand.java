@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
+import net.shoreline.client.util.DesktopUtil;
 import net.shoreline.client.util.chat.ChatUtil;
 
 import java.awt.*;
@@ -15,10 +16,6 @@ import java.io.IOException;
  */
 public class OpenFolderCommand extends Command
 {
-
-    /**
-     *
-     */
     public OpenFolderCommand()
     {
         super("OpenFolder", "Opens the client configurations folder", literal("openfolder"));
@@ -31,9 +28,9 @@ public class OpenFolderCommand extends Command
         {
             try
             {
-                Desktop.getDesktop().open(Shoreline.CONFIG.getClientDirectory().toFile());
+                DesktopUtil.open(Shoreline.CONFIG.getClientDirectory().toFile());
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
                 ChatUtil.error("Failed to open client folder!");

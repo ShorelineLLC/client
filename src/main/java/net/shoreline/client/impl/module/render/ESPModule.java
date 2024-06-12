@@ -14,6 +14,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.EntityOutlineEvent;
 import net.shoreline.client.impl.event.entity.decoration.TeamColorEvent;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -103,8 +104,12 @@ public class ESPModule extends ToggleModule
 
     public Color getESPColor(Entity entity)
     {
-        if (entity instanceof PlayerEntity)
+        if (entity instanceof PlayerEntity player)
         {
+            if (Managers.SOCIAL.isFriend(player.getName()))
+            {
+                return new Color(0xff66ffff);
+            }
             return playersColorConfig.getValue();
         }
         if (EntityUtil.isMonster(entity))

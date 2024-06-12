@@ -8,10 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.TridentEntity;
-import net.minecraft.entity.projectile.thrown.EggEntity;
-import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
-import net.minecraft.entity.projectile.thrown.PotionEntity;
-import net.minecraft.entity.projectile.thrown.SnowballEntity;
+import net.minecraft.entity.projectile.thrown.*;
 import net.minecraft.item.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -211,7 +208,7 @@ public class TrajectoriesModule extends ToggleModule
 
     private boolean isThrowableEntity(Entity entity)
     {
-        return entity instanceof ExperienceBottleEntity || entity instanceof ExperienceOrbEntity || entity instanceof PotionEntity || entity instanceof ArrowEntity
+        return entity instanceof ExperienceBottleEntity || entity instanceof EnderPearlEntity || entity instanceof ExperienceOrbEntity || entity instanceof PotionEntity || entity instanceof ArrowEntity
                 || entity instanceof TridentEntity || entity instanceof SnowballEntity || entity instanceof EggEntity;
     }
 }

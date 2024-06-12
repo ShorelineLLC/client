@@ -5,7 +5,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-// Exploit
+// HUGE Exploit
 public class NoBobModule extends ToggleModule
 {
     public NoBobModule()

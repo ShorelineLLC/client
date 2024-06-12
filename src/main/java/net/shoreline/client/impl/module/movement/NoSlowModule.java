@@ -88,12 +88,6 @@ public class NoSlowModule extends ToggleModule
     }
 
     @EventListener
-    public void onGameJoin(GameJoinEvent event)
-    {
-        onEnable();
-    }
-
-    @EventListener
     public void onSetCurrentHand(SetCurrentHandEvent event)
     {
         if (airStrictConfig.getValue() && !sneaking && checkSlowed())
