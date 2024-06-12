@@ -8,8 +8,8 @@ import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,6 +48,15 @@ public class NetworkManager implements Globals
     public void onDisconnect(DisconnectEvent event)
     {
         PACKET_CACHE.clear();
+    }
+
+    public void connect(final ServerAddress address, final ServerInfo info)
+    {
+        if (mc.getNetworkHandler() == null)
+        {
+            return;
+        }
+        mc.getNetworkHandler().getConnection().connect(address.getAddress(), address.getPort(), new ClientLoginNetworkHandler(mc.getNetworkHandler().getConnection(), mc, info, null, false, null, null));
     }
 
     /**

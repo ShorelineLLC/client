@@ -49,6 +49,7 @@ public class CommandManager implements Globals
         register(
                 new BindCommand(),
                 new ConfigCommand(),
+                new ConnectCommand(),
                 new DisableAllCommand(),
                 new DrawnCommand(),
                 new FriendCommand(),
@@ -63,6 +64,7 @@ public class CommandManager implements Globals
                 new OpenFolderCommand(),
                 new PrefixCommand(),
                 new ResetCommand(),
+                new ResetGuiCommand(),
                 new ReloadSoundCommand(),
                 new ToggleCommand(),
                 new VanishCommand(),
