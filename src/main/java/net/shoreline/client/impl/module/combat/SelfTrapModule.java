@@ -27,6 +27,8 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -51,10 +53,12 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
+    Config<Float> entityDelayConfig = register(new NumberConfig<>("EntityDelay", "The delay to place when placing on entities", 0.0f, 2.0f, 5.0f));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after placing the blocks", true));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where trap is placing blocks", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
 
+    private final Timer invalidTimer = new CacheTimer();
     private List<BlockPos> surround = new ArrayList<>();
     private List<BlockPos> placements = new ArrayList<>();
     private final Map<BlockPos, Long> packets = new HashMap<>();
@@ -254,11 +258,16 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
             List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream()
                     .filter(e -> invalidEntity(e)).toList();
-            if (!invalid.isEmpty())
+            boolean onlyCrystal = invalid.stream().allMatch(e -> e instanceof EndCrystalEntity);
+            boolean canPlaceOnCrystal = onlyCrystal && attackConfig.getValue() && invalidTimer.passed(entityDelayConfig.getValue() * 50.0f);
+            if (invalid.isEmpty() || canPlaceOnCrystal)
             {
-                continue;
+                placements.add(surroundPos);
+                if (canPlaceOnCrystal)
+                {
+                    invalidTimer.reset();
+                }
             }
-            placements.add(surroundPos);
         }
         return placements;
     }
