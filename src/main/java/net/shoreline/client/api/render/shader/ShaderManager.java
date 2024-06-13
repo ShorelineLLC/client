@@ -23,19 +23,24 @@ public class ShaderManager implements Globals
     {
         if (framebuffer == null && filledShaderEffect == null && filledShaderEffect1 == null)
         {
-            framebuffer = new ShaderFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
-            filledShaderEffect1 = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));
-            filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"), effect ->
-            {
-                PostEffectProcessor postEffectProcessor = effect.getShaderEffect();
-                if (postEffectProcessor == null)
-                {
-                    return;
-                }
-                ((IPostEffectProcessor) postEffectProcessor).overwriteBuffer("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-                ((IPostEffectProcessor) postEffectProcessor).overwriteBuffer("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            });
+            reloadShadersInternal();
         }
+    }
+
+    public void reloadShadersInternal()
+    {
+        framebuffer = new ShaderFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
+        filledShaderEffect1 = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));
+        filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"), effect ->
+        {
+            PostEffectProcessor postEffectProcessor = effect.getShaderEffect();
+            if (postEffectProcessor == null)
+            {
+                return;
+            }
+            ((IPostEffectProcessor) postEffectProcessor).overwriteBuffer("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
+            ((IPostEffectProcessor) postEffectProcessor).overwriteBuffer("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
+        });
     }
 
     public void applyShader(ManagedShaderEffect shaderEffect, Runnable setup, Runnable runnable)
