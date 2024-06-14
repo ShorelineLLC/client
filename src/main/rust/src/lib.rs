@@ -25,7 +25,7 @@ lazy_static! {
 
 static mut USER_INFO: Option<GlobalRef> = None;
 
-static mut MIXIN_CONFIG: Option<GlobalRef> = None;
+static mut MIXIN_LIST: Option<GlobalRef> = None;
 static mut MIXIN_REFMAP: Option<GlobalRef> = None;
 
 static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
@@ -154,14 +154,14 @@ pub extern "system" fn stop_decompiling_0<'a>(env: JNIEnv<'a>,
 }
 
 /**
- * Return the mixin config
+ * Return the list of mixins
  */
 #[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_11"]
 pub unsafe extern "system" fn stop_decompiling_1<'a>(env: JNIEnv<'a>,
                                                      caller_class: JClass<'a>,
                                                      _unused_obscure: JObject<'a>) -> JObject<'a>
 {
-    return match MIXIN_CONFIG.as_ref().take()
+    return match MIXIN_LIST.as_ref().take()
     {
         Some(config_ref) => config_ref.as_obj(),
         None => {
@@ -202,8 +202,8 @@ pub unsafe extern "system" fn stop_decompiling_2<'a>(env: JNIEnv<'a>,
 pub fn log(env: &JNIEnv, msg: &str)
 {
     let logger = env.get_static_field(
-        env.find_class("net/shoreline/loader/Loader").unwrap(),
-        "LOGGER",
+        env.find_class("net/shoreline/loader/e").unwrap(),
+        "a",
         "Lorg/apache/logging/log4j/Logger;"
     ).unwrap().l().unwrap();
 
@@ -367,6 +367,10 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     // A queue of all classes that need to be defined
     let mut class_queue = VecDeque::new();
 
+    // A queue of all classes that need their bytecode cached on the java side
+    // Will be added to the class_map below
+    let mut cache_queue = VecDeque::new();
+
     // All mc extending classes that cannot be defined yet
     let mc_class_dependents = env.new_object(
         obfstr!("java/util/HashMap"),
@@ -390,6 +394,14 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     ).unwrap();
 
     RESOURCES_MAP = env.new_global_ref(resources_map).ok();
+
+    let mixin_list = env.new_object(
+        obfstr!("java/util/HashSet"),
+        obfstr!("()V"),
+        &[]
+    ).unwrap();
+
+    MIXIN_LIST = env.new_global_ref(mixin_list).ok();
 
     rt.block_on(async {
         let response = client
@@ -480,16 +492,21 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
                             if name.ends_with(obfstr!(".class"))
                             {
+                                if is_mixin_class(&env, jvm_bytes)
+                                {
+                                    env.call_method(
+                                        mixin_list,
+                                        obfstr!("add"),
+                                        obfstr!("(Ljava/lang/Object;)Z"),
+                                        &[jvm_name.into()]
+                                    ).unwrap().z().unwrap();
+                                }
+
                                 let dependents = get_immediate_dependents(&env, jvm_bytes);
 
                                 if dependents.iter().any(|s| s.starts_with(obfstr!("net/minecraft/")))
                                 {
-                                    env.call_method(
-                                        class_map,
-                                        obfstr!("put"),
-                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                        &[jvm_name.into(), jvm_bytes.into()]
-                                    ).unwrap().l().unwrap();
+                                    cache_queue.push_back((jvm_name, jvm_bytes));
 
                                     env.call_method(
                                         mc_class_dependents,
@@ -499,12 +516,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                     ).unwrap();
                                 } else if is_mixin_class(&env, jvm_bytes)
                                 {
-                                    env.call_method(
-                                        class_map,
-                                        obfstr!("put"),
-                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                        &[jvm_name.into(), jvm_bytes.into()]
-                                    ).unwrap().l().unwrap();
+                                    cache_queue.push_back((jvm_name, jvm_bytes));
 
                                     if is_mixin_accessor(&env, jvm_bytes)
                                     {
@@ -512,31 +524,18 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                     }
                                 } else if is_imixin_class(&env, jvm_bytes)
                                 {
-                                    env.call_method(
-                                        class_map,
-                                        obfstr!("put"),
-                                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                        &[jvm_name.into(), jvm_bytes.into()]
-                                    ).unwrap().l().unwrap();
-
+                                    cache_queue.push_back((jvm_name, jvm_bytes));
                                     class_queue.push_back((jvm_name, jvm_bytes));
                                 } else
                                 {
                                     // Cache it if it is mentioned in a Mixin
-                                    if name.contains(obfstr!("net/shoreline/client/impl/event/"))
-                                        // Other exclusions
-                                        || name.contains(obfstr!("net/shoreline/client/util/Globals"))
-                                        || name.contains(obfstr!("net/shoreline/client/util/network/InteractType"))
-                                        || name.contains(obfstr!("net/shoreline/client/impl/manager/client/cape/CapeManager$CapeTexture"))
+                                    if name.contains(obfstr!("net/shoreline/client/nT")) // Globals
+                                        || name.contains(obfstr!("net/shoreline/client/it")) // InteractType
+                                        || name.contains(obfstr!("net/shoreline/client/ct")) // CapeManager$CapeTexture
 
-                                        || name.contains("net/shoreline/client/api/render/RenderLayersClient")
+                                        || name.contains("net/shoreline/client/lc") // RenderLayersClient
                                     {
-                                        env.call_method(
-                                            class_map,
-                                            obfstr!("put"),
-                                            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
-                                            &[jvm_name.into(), jvm_bytes.into()]
-                                        ).unwrap().l().unwrap();
+                                        cache_queue.push_back((jvm_name, jvm_bytes));
                                     }
 
                                     // Define it!
@@ -550,9 +549,6 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                     obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
                                     &[jvm_name.into(), jvm_bytes.into()]
                                 ).unwrap();
-                            } else if name.eq(obfstr!("mixins.shoreline.json"))
-                            {
-                                MIXIN_CONFIG = env.new_global_ref(jvm_bytes).ok();
                             } else if name.eq(obfstr!("shoreline-refmap.json"))
                             {
                                 MIXIN_REFMAP = env.new_global_ref(jvm_bytes).ok();
@@ -606,6 +602,13 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         bytes_map.insert(rs_name.clone(), bytes);
     }
 
+    let mut event_extending_classes: Vec<String> = Vec::new();
+
+    // Event.class
+    event_extending_classes.push(obfstr!("net/shoreline/loader/b").to_string());
+    // StageEvent.class
+    event_extending_classes.push(obfstr!("net/shoreline/loader/c").to_string());
+
     while !dependency_map.is_empty()
     {
         let mut defined_this_iteration = Vec::new();
@@ -618,8 +621,24 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
                 let dependents = get_immediate_dependents(&env, bytes);
 
+                let mut is_event_class: bool = false;
+                for event_extending_class in event_extending_classes.iter()
+                {
+                    if dependents.iter().any(|s| s.starts_with(event_extending_class))
+                    {
+                        cache_queue.push_back((env.new_string(class_name).unwrap(), bytes));
+                        is_event_class = true;
+                    }
+                }
+
                 let clazz = define_class(&env, class_name, bytes);
                 defined_this_iteration.push(class_name.clone());
+
+                if is_event_class
+                {
+                    event_extending_classes.push(class_name.clone().replace(obfstr!(".class"), obfstr!("")));
+                    eventbus::cache_event_class(&env, clazz);
+                }
 
                 // Can't do enums since the JVM uses reflection to find their value
                 if !dependents.iter().any(|s| s.starts_with(obfstr!("java/lang/Enum")))
@@ -650,6 +669,16 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
         {
             dependencies.retain(|dep| !defined_this_iteration.contains(dep));
         }
+    }
+
+    for (name, bytes) in cache_queue.iter()
+    {
+        env.call_method(
+            class_map,
+            obfstr!("put"),
+            obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+            &[(*name).into(), (*bytes).into()]
+        ).unwrap().l().unwrap();
     }
 
     return class_map;

@@ -1,9 +1,5 @@
 package net.shoreline.loader.plugin;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.impl.ClientLoader;
@@ -12,9 +8,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class ConfigPlugin implements IMixinConfigPlugin
 {
@@ -61,19 +56,16 @@ public final class ConfigPlugin implements IMixinConfigPlugin
     @Override
     public List<String> getMixins()
     {
-        List<String> mixins = new ArrayList<>();
+        HashSet<?> mixinSet = (HashSet<?>) Natives.stop_decompiling_1(this);
 
-        String mixinConfig = new String((byte[]) Natives.stop_decompiling_1(this));
-
-        JsonObject configObj = JsonParser.parseString(mixinConfig).getAsJsonObject();
-        JsonArray clientMixins = configObj.getAsJsonArray("client");
-
-        for (JsonElement mixin : clientMixins)
-        {
-            mixins.add(mixin.getAsString());
-        }
-
-        return mixins;
+        return mixinSet.stream()
+                .map(obj ->
+                {
+                    String mixin = (String) obj;
+                    mixin = mixin.replace("/", ".");
+                    mixin = mixin.substring("net.shoreline.client.".length());
+                    return  mixin.substring(0, mixin.length() - ".class".length());
+                }).toList();
     }
 
     @Override

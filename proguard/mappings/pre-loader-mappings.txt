@@ -1,0 +1,7 @@
+net.shoreline.client.ShorelineMod -> net.shoreline.client.bs:
+    void onInitializeClient() -> a
+net.shoreline.loader.asm.ClassScanner -> net.shoreline.loader.f:
+    int access -> a
+    java.lang.String superName -> b
+    java.lang.String[] interfaces -> c
+    java.util.List descs -> d

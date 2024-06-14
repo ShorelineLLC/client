@@ -1,0 +1,39 @@
+-dontskipnonpubliclibraryclassmembers
+-dontshrink
+-dontoptimize
+-allowaccessmodification
+-overloadaggressively
+-useuniqueclassmembernames
+-repackageclasses net.shoreline.client
+-keepattributes *Annotation*,LineNumberTable
+-keepparameternames
+-adaptclassstrings
+-adaptresourcefilecontents shoreline-refmap.json
+-dontnote
+-dontwarn
+
+-keepclassmembers class * extends java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+-keepclassmembers,allowshrinking class net.shoreline.client.mixin** {
+    @org.spongepowered.asm.mixin.Shadow
+    <fields>;
+    @org.spongepowered.asm.mixin.Shadow
+    <methods>;
+}
+
+-keepclassmembers,allowshrinking enum  * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# Keep - Native method names. Keep all native class/method names.
+-keepclasseswithmembers,includedescriptorclasses,allowshrinking class * {
+    native <methods>;
+}

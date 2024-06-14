@@ -28,8 +28,7 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
 
         try
         {
-            Class<?> clientMod = Class.forName("net.shoreline.client.ShorelineMod");
-
+            Class<?> shorelineMod = Class.forName("net.shoreline.client.ShorelineMod");
             /*
              * Do not use this constructor! It is purely for obscurity. Hackers will think we
              * are getting the constructor and using that to create a new instance of ShorelineMod
@@ -39,7 +38,7 @@ public final class Loader implements ClientModInitializer, PreLaunchEntrypoint
              * the constructor. This makes it very confusing for crackers trying to make a new instance
              * of the main mod.
              */
-            Constructor<?> constructor = clientMod.getDeclaredConstructor();
+            Constructor<?> constructor = shorelineMod.getDeclaredConstructor();
             constructor.setAccessible(true);
 
             /*

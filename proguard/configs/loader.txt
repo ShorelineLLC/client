@@ -1,0 +1,72 @@
+-dontskipnonpubliclibraryclassmembers
+-dontshrink
+-dontoptimize
+-allowaccessmodification
+-overloadaggressively
+-useuniqueclassmembernames
+-repackageclasses net.shoreline.loader
+-keepattributes *Annotation*
+-adaptresourcefilecontents fabric.mod.json,mixins.shoreline.plugin.json
+-adaptclassstrings
+-dontnote
+-dontwarn
+
+-keepclassmembers class * extends java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+-keep,allowshrinking class net.shoreline.loader.asm.ClassScanner {
+    <fields>;
+    <methods>;
+}
+
+-keepclassmembers,allowshrinking class net.shoreline.loader.plugin.ConfigPlugin {
+    <fields>;
+    <methods>;
+}
+
+-keepclassmembers,allowshrinking class net.shoreline.loader.impl.classloading.ShorelineMixinService {
+    <methods>;
+}
+
+-keepclassmembers,allowshrinking class net.shoreline.loader.Loader {
+    *** onInitializeClient(...);
+    *** onPreLaunch(...);
+}
+
+-keep,allowshrinking class net.shoreline.eventbus.annotation.EventListener {
+    <fields>;
+    <methods>;
+}
+
+-keep,allowshrinking class net.shoreline.eventbus.EventBus {
+    <fields>;
+}
+
+-keep,allowshrinking class net.shoreline.eventbus.EventBus$stop_decompiling_0 {
+    <methods>;
+}
+
+-keep,allowshrinking class net.shoreline.eventbus.EventBus$stop_decompiling_1 {
+    <fields>;
+    <methods>;
+}
+
+-keepclassmembers,allowshrinking enum  * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keepclassmembers,allowshrinking class net.shoreline.loader.impl.classloading.ShorelineResourcePack {
+    <methods>;
+}
+
+# Keep - Native method names. Keep all native class/method names.
+-keepclasseswithmembers,includedescriptorclasses,allowshrinking class * {
+    native <methods>;
+}

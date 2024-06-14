@@ -1,27 +1,14 @@
 package net.shoreline.client;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.LifecycledResourceManagerImpl;
-import net.minecraft.resource.NamespaceResourceManager;
-import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
-import net.shoreline.loader.impl.natives.NativeLoader;
-
-import java.lang.reflect.Field;
-import java.util.Map;
 
 /**
- * Fabric {@link ModInitializer}.
- *
  * @author linus
  * @since 1.0
  */
 
-public class ShorelineMod implements ClientModInitializer
+public class ShorelineMod
 {
     public static final String MOD_NAME = "Shoreline";
     public static final String MOD_VER = BuildConfig.VERSION;
@@ -38,7 +25,6 @@ public class ShorelineMod implements ClientModInitializer
      * However, some things (like resources) may still be uninitialized.
      * Proceed with mild caution.
      */
-    @Override
     public void onInitializeClient()
     {
         if (!FabricLoader.getInstance().isDevelopmentEnvironment())

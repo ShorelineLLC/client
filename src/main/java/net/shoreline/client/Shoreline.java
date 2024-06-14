@@ -2,7 +2,6 @@ package net.shoreline.client;
 
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.file.ClientConfiguration;
-import net.shoreline.client.api.render.RenderLayersClient;
 import net.shoreline.client.init.Managers;
 import net.shoreline.loader.Loader;
 

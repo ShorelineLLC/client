@@ -1,3 +1,8 @@
+import java.nio.file.Files
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+import java.util.jar.JarOutputStream
+
 plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'com.github.gmazzo.buildconfig' version '5.3.5'
@@ -77,36 +82,184 @@ jar {
 
 tasks.register('loaderJar', Jar) {
     dependsOn remapJar
-    from(zipTree(tasks.remapJar.archivePath))
 
-    exclude 'net/shoreline/client/**'
-    exclude 'net/shoreline/eventbus/dev/**'
-    exclude 'assets/shoreline/font/**'
-    exclude 'assets/shoreline/shaders/**'
-    exclude 'mixins.shoreline.json'
-    exclude 'shoreline-refmap.json'
+    outputs.upToDateWhen { false }
 
-    archiveBaseName = "loader"
+    // Rename mixins.shoreline.json to mixins.shoreline.plugin.json automatically on build
+    def tempDir = new File("${buildDir}/tmp", "tempLoaderJar")
+
+    if (tempDir.exists())
+    {
+        Files.walk(tempDir.toPath())
+                .sorted(Comparator.reverseOrder())
+                .map(java.nio.file.Path::toFile)
+                .forEach(File::delete)
+
+        tempDir.delete()
+    }
+
+    tempDir.mkdirs()
+
+    doFirst {
+        copy {
+            from zipTree(tasks.remapJar.archivePath)
+            into tempDir
+        }
+
+        File fabricModFile = new File(tempDir, 'fabric.mod.json')
+        if (fabricModFile.exists())
+        {
+            def text = fabricModFile.text
+            text = text.replaceAll('mixins.shoreline.json', 'mixins.shoreline.plugin.json')
+            fabricModFile.text = text
+        }
+    }
+
+    from(tempDir) {
+        exclude 'net/shoreline/client/**'
+        exclude 'net/shoreline/eventbus/dev/**'
+        exclude 'assets/shoreline/font/**'
+        exclude 'assets/shoreline/shaders/**'
+        exclude 'mixins.shoreline.json'
+        exclude 'shoreline-refmap.json'
+    }
+
+    archiveBaseName = "loader-raw"
     archiveClassifier = ""
     archiveVersion = ""
 }
 
 tasks.register('clientJar', Jar) {
     dependsOn remapJar
+
+    outputs.upToDateWhen { false }
+
     from(zipTree(tasks.remapJar.archivePath))
 
     include 'net/shoreline/client/**'
     include 'assets/**'
     exclude 'assets/shoreline/nice_try.txt'
-    include 'mixins.shoreline.json'
     include 'shoreline-refmap.json'
 
-    archiveBaseName = "client"
+    archiveBaseName = "client-raw"
     archiveClassifier = ""
     archiveVersion = ""
 }
 
-build.dependsOn(loaderJar, clientJar)
+tasks.register('remapLoader', Exec) {
+    outputs.upToDateWhen { false }
+
+    commandLine 'java', '-jar', 'proguard/proguard.jar',
+            '@proguard/configs/loader.txt',
+            '-injars', tasks.loaderJar.archiveFile.get().asFile,
+            '-outjars', "${buildDir}/libs/loader-remapped.jar",
+            '-libraryjars', "proguard/libs/java/java.base.jmod",
+            '-libraryjars', "${buildDir}/libs/client-raw.jar",
+            '-printmapping', "proguard/mappings/loader-mappings.txt",
+            '-applymapping', "proguard/mappings/pre-loader-mappings.txt"
+
+    dependsOn tasks.loaderJar
+}
+
+tasks.register('remapClient', Exec) {
+    outputs.upToDateWhen { false }
+    // Proguard can't remap resource files where fully qualified class names are
+    // seperated by slashes and not periods (amazing)
+
+    // So we are replacing all the slashes in the refmap with periods so proguard
+    // can remap the mixin refmap correctly, then we will change the periods back
+    // to slashes after proguard obfuscates
+    def tempDir = new File("${buildDir}/tmp", "tempRemapClient")
+
+    if (tempDir.exists())
+    {
+        Files.walk(tempDir.toPath())
+                .sorted(Comparator.reverseOrder())
+                .map(java.nio.file.Path::toFile)
+                .forEach(File::delete)
+
+        tempDir.delete()
+    }
+
+    tempDir.mkdirs()
+
+    doFirst {
+        copy {
+            from zipTree(tasks.clientJar.archivePath)
+            into tempDir
+        }
+
+        File shorelineRefmap = new File(tempDir, 'shoreline-refmap.json')
+        if (shorelineRefmap.exists())
+        {
+            def text = shorelineRefmap.text
+            text = text.replaceAll('/', '.')
+            shorelineRefmap.text = text
+        }
+    }
+
+    // combine the loader mappings and the pre-client mappings
+
+    def combinedMappings = file("${buildDir}/tmp/combined-mappings.txt")
+
+    if (combinedMappings.exists())
+    {
+        combinedMappings.delete()
+    }
+
+    combinedMappings.createNewFile()
+
+    def preClientMappings = file('proguard/mappings/pre-client-mappings.txt')
+    def loaderMappings = file('proguard/mappings/loader-mappings.txt')
+
+    combinedMappings.text = preClientMappings.text + System.lineSeparator() + loaderMappings.text
+
+    commandLine 'java', '-jar', 'proguard/proguard.jar',
+            '@proguard/configs/client.txt',
+            '-injars', tempDir,
+            '-outjars', "${buildDir}/tmp/temp-client-remap.jar",
+            '-libraryjars', "proguard/libs/java/java.base.jmod",
+            '-libraryjars', "proguard/libs/mc",
+            '-libraryjars', "${buildDir}/libs/loader-raw.jar",
+            '-printmapping', "proguard/mappings/client-mappings.txt",
+            '-applymapping', combinedMappings
+
+    // Replace all the periods to slashes in the refmap, and copy over to build/libs/
+    doLast {
+        def remapJar = new File("${buildDir}/tmp/temp-client-remap.jar")
+        def finalClientJar = new File("${buildDir}/libs/client-remapped.jar")
+
+        JarFile jarFile = new JarFile(remapJar)
+        JarOutputStream jos = new JarOutputStream(new FileOutputStream(finalClientJar))
+
+        jarFile.entries().each { JarEntry entry ->
+            InputStream is = jarFile.getInputStream(entry)
+            JarEntry newEntry = new JarEntry(entry.name)
+
+            jos.putNextEntry(newEntry)
+
+            if (entry.name == 'shoreline-refmap.json')
+            {
+                def text = is.text
+                text = text.replaceAll('\\.', '/')
+                jos.write(text.bytes)
+            } else
+            {
+                jos.write(is.bytes)
+            }
+
+            jos.closeEntry()
+            is.close()
+        }
+
+        jos.close()
+        jarFile.close()
+    }
+
+    dependsOn tasks.remapLoader
+}
+
+build.dependsOn(loaderJar, clientJar, remapLoader, remapClient)
 
 def execute(String cmd) {
     try {

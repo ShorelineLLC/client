@@ -66,11 +66,13 @@ public final class EventBus
     public native void unsubscribe(Object subscriber);
 
     @FunctionalInterface
-    public interface stop_decompiling_0
+    private interface stop_decompiling_0
     {
         /**
          * invoke(Event event)
          */
+
+
         void stop_decompiling_0(Object object);
     }
 

@@ -114,7 +114,7 @@ pub unsafe fn is_mixin_class<'a>(env: &JNIEnv<'a>,
                                  jvm_bytes: JObject) -> bool
 {
     let class_scanner = env.new_object(
-        obfstr!("net/shoreline/loader/asm/ClassScanner"),
+        obfstr!("net/shoreline/loader/f"), // ClassScanner
         obfstr!("()V"),
         &[]
     ).unwrap();
@@ -134,7 +134,7 @@ pub unsafe fn is_mixin_class<'a>(env: &JNIEnv<'a>,
 
     let descs = env.get_field(
         class_scanner,
-        obfstr!("descs"),
+        obfstr!("d"), // descs
         obfstr!("Ljava/util/List;")
     ).unwrap().l().unwrap();
 
@@ -175,7 +175,7 @@ pub unsafe fn is_mixin_accessor<'a>(env: &JNIEnv<'a>,
                                     jvm_bytes: JObject) -> bool
 {
     let class_scanner = env.new_object(
-        obfstr!("net/shoreline/loader/asm/ClassScanner"),
+        obfstr!("net/shoreline/loader/f"), // ClassScanner
         obfstr!("()V"),
         &[]
     ).unwrap();
@@ -195,7 +195,7 @@ pub unsafe fn is_mixin_accessor<'a>(env: &JNIEnv<'a>,
 
     let access = env.get_field(
         class_scanner,
-        obfstr!("access"),
+        obfstr!("a"), // access
         obfstr!("I")
     ).unwrap().i().unwrap();
 
@@ -208,7 +208,7 @@ pub unsafe fn is_imixin_class<'a>(env: &JNIEnv<'a>,
                                   jvm_bytes: JObject) -> bool
 {
     let class_scanner = env.new_object(
-        obfstr!("net/shoreline/loader/asm/ClassScanner"),
+        obfstr!("net/shoreline/loader/f"), // ClassScanner
         obfstr!("()V"),
         &[]
     ).unwrap();
@@ -228,7 +228,7 @@ pub unsafe fn is_imixin_class<'a>(env: &JNIEnv<'a>,
 
     let descs = env.get_field(
         class_scanner,
-        obfstr!("descs"),
+        obfstr!("d"), // descs
         obfstr!("Ljava/util/List;")
     ).unwrap().l().unwrap();
 
@@ -256,7 +256,7 @@ pub unsafe fn is_imixin_class<'a>(env: &JNIEnv<'a>,
         let desc_ptr = env.get_string_utf_chars(JString::from(desc)).unwrap();
         let desc_cstr = CStr::from_ptr(desc_ptr).to_str().unwrap();
 
-        if desc_cstr.eq(obfstr!("Lnet/shoreline/client/impl/imixin/IMixin;"))
+        if desc_cstr.eq(obfstr!("Lnet/shoreline/client/im;")) // IMixin
         {
             return true;
         }
@@ -269,7 +269,7 @@ pub fn get_immediate_dependents<'a>(env: &JNIEnv<'a>,
                                     jvm_bytes: JObject) -> Vec<String>
 {
     let class_scanner = env.new_object(
-        obfstr!("net/shoreline/loader/asm/ClassScanner"),
+        obfstr!("net/shoreline/loader/f"), // ClassScanner
         obfstr!("()V"),
         &[]
     ).unwrap();
@@ -289,13 +289,13 @@ pub fn get_immediate_dependents<'a>(env: &JNIEnv<'a>,
 
     let super_name = env.get_field(
         class_scanner,
-        obfstr!("superName"),
+        obfstr!("b"), // SuperName
         obfstr!("Ljava/lang/String;")
     ).unwrap().l().unwrap();
 
     let interfaces = env.get_field(
         class_scanner,
-        obfstr!("interfaces"),
+        obfstr!("c"), // Interfaces
         obfstr!("[Ljava/lang/String;")
     ).unwrap().l().unwrap();
 

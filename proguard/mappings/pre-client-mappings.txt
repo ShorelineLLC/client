@@ -1,0 +1,7 @@
+net.shoreline.client.ShorelineMod -> net.shoreline.client.bs:
+    void onInitializeClient() -> a
+net.shoreline.client.api.render.RenderLayersClient -> net.shoreline.client.lc:
+net.shoreline.client.impl.manager.client.cape.CapeManager$CapeTexture -> net.shoreline.client.ct:
+net.shoreline.client.impl.imixin.IMixin -> net.shoreline.client.im:
+net.shoreline.client.util.network.InteractType -> net.shoreline.client.it:
+net.shoreline.client.util.Globals -> net.shoreline.client.nT:

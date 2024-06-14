@@ -11,7 +11,7 @@ public final class ClassPresenceChecker extends Measure
         {
             try
             {
-                Class.forName("net.shoreline.client.Shoreline");
+                Class.forName("net.shoreline.client.ShorelineMod");
             } catch (Throwable t)
             {
                 break crash_block;
