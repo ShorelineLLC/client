@@ -61,6 +61,12 @@ public class ShadersModule extends ToggleModule
     }
 
     @EventListener
+    public void onRefreshPacks(RefreshPacksEvent event)
+    {
+        Managers.SHADER.reloadShadersInternal();
+    }
+
+    @EventListener
     public void onRenderShader(RenderShaderEvent event)
     {
         event.cancel();

@@ -51,3 +51,4 @@ accessible field net/minecraft/client/render/entity/model/LlamaEntityModel right
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftFrontLeg Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel rightChest Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftChest Lnet/minecraft/client/model/ModelPart;
+accessible field net/minecraft/entity/TrackedPosition pos Lnet/minecraft/util/math/Vec3d;

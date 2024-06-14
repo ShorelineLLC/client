@@ -52,7 +52,6 @@ public final class ModuleManager
                 new AutoTrapModule(),
                 new AutoWebModule(),
                 new AutoXPModule(),
-                // new BacktrackModule(),
                 new BlockLagModule(),
                 new BowAimModule(),
                 new ClickCrystalModule(),
@@ -67,6 +66,7 @@ public final class ModuleManager
                 new TriggerModule(),
                 // Exploit
                 new AntiHungerModule(),
+                // new BacktrackModule(),
                 new ChorusControlModule(),
                 new ChorusInvincibilityModule(),
                 new ClientSpoofModule(),
@@ -155,6 +155,7 @@ public final class ModuleManager
                 new NoWeatherModule(),
                 new ParticlesModule(),
                 new PhaseESPModule(),
+                // new SearchModule(),
                 new ShadersModule(),
                 new SkeletonModule(),
                 new SkyboxModule(),
