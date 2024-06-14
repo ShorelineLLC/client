@@ -80,6 +80,14 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
+tasks.register('buildClientOnly') {
+    doFirst {
+        tasks.remapLoader.enabled = false
+    }
+
+    finalizedBy 'build'
+}
+
 tasks.register('loaderJar', Jar) {
     dependsOn remapJar
 
