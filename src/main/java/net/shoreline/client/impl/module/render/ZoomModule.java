@@ -1,7 +1,9 @@
 package net.shoreline.client.impl.module.render;
 
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.MacroConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
@@ -13,14 +15,14 @@ import org.lwjgl.glfw.GLFW;
 
 public class ZoomModule extends ToggleModule
 {
-
+    Config<Integer> zoomConfig = register(new NumberConfig<>("Zoom", "The zoom value", 10, 30, 50));
+    Config<Boolean> smoothCameraConfig = register(new BooleanConfig("SmoothCamera", "Adds motion reduction to the camera", true));
     Config<Macro> zoomKeyConfig = register(new MacroConfig("ZoomKey", "The zoom key bind", new Macro(getId(), GLFW.GLFW_KEY_C, null)));
 
     private boolean flag;
     private boolean flag1 = true;
     private boolean isPressed;
-    public static int defaultFov = 100;
-    public static int targetFov = 30;
+    private int defaultFov = 100;
 
     public ZoomModule()
     {
@@ -48,9 +50,9 @@ public class ZoomModule extends ToggleModule
                     defaultFov = mc.options.getFov().getValue();
                     flag1 = false;
                 }
-                mc.options.smoothCameraEnabled = true;
+                mc.options.smoothCameraEnabled = smoothCameraConfig.getValue();
                 mc.options.hudHidden = true;
-                mc.options.getFov().setValue(targetFov);
+                mc.options.getFov().setValue(zoomConfig.getValue());
                 flag = true;
             }
             else if (flag)

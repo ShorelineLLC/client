@@ -1,12 +1,14 @@
 package net.shoreline.client.impl.module.world;
 
-import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.BreakBlockEvent;
-import net.shoreline.client.impl.event.world.SetBlockStateEvent;
+import net.shoreline.client.impl.event.network.InteractBlockEvent;
+import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
@@ -27,11 +29,13 @@ public class NoGlitchBlocksModule extends ToggleModule
      * @param event
      */
     @EventListener
-    public void onSetBlockState(SetBlockStateEvent event)
+    public void onInteractBlock(InteractBlockEvent event)
     {
-        if (placeConfig.getValue() && event.getFlags() != (Block.NOTIFY_ALL | Block.FORCE_STATE) && !mc.isInSingleplayer())
+        if (placeConfig.getValue() && mc.player.getStackInHand(event.getHand()).getItem() instanceof BlockItem && !mc.isInSingleplayer())
         {
             event.cancel();
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(event.getHand(), event.getHitResult(), id));
+            mc.player.swingHand(event.getHand());
         }
     }
 

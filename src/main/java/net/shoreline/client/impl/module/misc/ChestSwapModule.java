@@ -35,9 +35,9 @@ public class ChestSwapModule extends ToggleModule
             int elytraSlot = getElytraSlot();
             if (elytraSlot != -1)
             {
-                Managers.INVENTORY.pickupSlot(elytraSlot);
+                Managers.INVENTORY.pickupSlot(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot);
                 Managers.INVENTORY.pickupSlot(6);
-                Managers.INVENTORY.pickupSlot(elytraSlot);
+                Managers.INVENTORY.pickupSlot(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot);
             }
         }
         else
@@ -45,9 +45,9 @@ public class ChestSwapModule extends ToggleModule
             int chestplateSlot = getChestplateSlot();
             if (chestplateSlot != -1)
             {
-                Managers.INVENTORY.pickupSlot(chestplateSlot);
+                Managers.INVENTORY.pickupSlot(chestplateSlot < 9 ? chestplateSlot + 36 : chestplateSlot);
                 Managers.INVENTORY.pickupSlot(6);
-                Managers.INVENTORY.pickupSlot(chestplateSlot);
+                Managers.INVENTORY.pickupSlot(chestplateSlot < 9 ? chestplateSlot + 36 : chestplateSlot);
             }
         }
         disable();
