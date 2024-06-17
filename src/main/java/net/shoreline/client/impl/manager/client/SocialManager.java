@@ -2,6 +2,7 @@ package net.shoreline.client.impl.manager.client;
 
 import net.minecraft.text.Text;
 import net.shoreline.client.api.social.SocialRelation;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.util.Globals;
 
 import java.util.*;
@@ -41,11 +42,19 @@ public class SocialManager implements Globals
      */
     public boolean isFriend(String name)
     {
+        if (!SocialsModule.getInstance().isFriendsEnabled())
+        {
+            return false;
+        }
         return isRelation(name, SocialRelation.FRIEND);
     }
 
     public boolean isFriend(Text name)
     {
+        if (!SocialsModule.getInstance().isFriendsEnabled())
+        {
+            return false;
+        }
         return name != null && isRelation(name.getString(), SocialRelation.FRIEND);
     }
 

@@ -41,6 +41,7 @@ public final class ModuleManager
                 new FontModule(),
                 new HUDModule(),
                 new RotationsModule(),
+                new SocialsModule(),
                 // Combat
                 new AuraModule(),
                 // new AutoAnchorModule(),

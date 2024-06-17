@@ -1,8 +1,11 @@
 package net.shoreline.client.impl.module.world;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -11,10 +14,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.ColorConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
+import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // Do not look at this code
 
@@ -52,6 +53,9 @@ public class AutoMineModule extends RotationModule
 
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows mining while using items", false));
     Config<Boolean> autoConfig = register(new BooleanConfig("Auto", "Automatically mines nearby players feet", false));
+    Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks mine", Selection.ALL, Selection.values(), () -> autoConfig.getValue()));
+    Config<List<Item>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.OBSIDIAN, Blocks.ENDER_CHEST));
+    Config<List<Item>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
     Config<Boolean> autoRemineConfig = register(new BooleanConfig("AutoRemine", "Automatically remines mined blocks", true, () -> autoConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Only mines on visible faces", false, () -> autoConfig.getValue()));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for targets", 1.0f, 5.0f, 10.0f, () -> autoConfig.getValue()));
@@ -163,7 +167,7 @@ public class AutoMineModule extends RotationModule
                 if (playerTarget != null)
                 {
                     PriorityQueue<AutoMineCalc> miningPositions = getMiningPosition(playerTarget);
-                    PriorityQueue<AutoMineCalc> miningPositionsNoAir = getNoAir(miningPositions);
+                    PriorityQueue<AutoMineCalc> miningPositionsNoAir = miningPositions.stream().filter(c -> !mc.world.isAir(c.pos())).collect(Collectors.toCollection(PriorityQueue::new));
                     PriorityQueue<AutoMineCalc> cityPositions = autoRemineConfig.getValue() ? miningPositions : miningPositionsNoAir;
                     if (cityPositions.isEmpty())
                     {
@@ -481,21 +485,6 @@ public class AutoMineModule extends RotationModule
         miningQueue.addFirst(data);
     }
 
-    // LOL
-    private PriorityQueue<AutoMineCalc> getNoAir(PriorityQueue<AutoMineCalc> calcs)
-    {
-        PriorityQueue<AutoMineCalc> noAir = new PriorityQueue<>();
-        for (AutoMineCalc calc : calcs)
-        {
-            if (mc.world.isAir(calc.pos()))
-            {
-                continue;
-            }
-            noAir.add(calc);
-        }
-        return noAir;
-    }
-
     private PriorityQueue<AutoMineCalc> getMiningPosition(PlayerEntity entity)
     {
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
@@ -507,7 +496,8 @@ public class AutoMineModule extends RotationModule
             {
                 continue;
             }
-            if (!mc.world.getBlockState(blockPos).isReplaceable())
+            BlockState state = mc.world.getBlockState(blockPos);
+            if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
                 miningPositions.add(new AutoMineCalc(blockPos, Double.MAX_VALUE));
             }
@@ -522,7 +512,11 @@ public class AutoMineModule extends RotationModule
             }
             // Check surrounding positions
             double damage = ExplosionUtil.getDamageTo(entity, blockPos.toCenterPos().subtract(0.0, -0.5, 0.0), AutoCrystalModule.getInstance().getIgnoreTerrain());
-            miningPositions.add(new AutoMineCalc(blockPos, damage));
+            BlockState state = mc.world.getBlockState(blockPos);
+            if (validAutoMineBlock(state.getBlock()))
+            {
+                miningPositions.add(new AutoMineCalc(blockPos, damage));
+            }
         }
         miningPositions.removeIf(c -> BlastResistantBlocks.isUnbreakable(c.pos()));
         return miningPositions;
@@ -700,6 +694,16 @@ public class AutoMineModule extends RotationModule
         return miningQueue.size() == 2 && data == miningQueue.getLast();
     }
 
+    private boolean validAutoMineBlock(Block block)
+    {
+        return switch (selectionConfig.getValue())
+        {
+            case WHITELIST -> ((BlockListConfig<?>) whitelistConfig).contains(block);
+            case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
+            case ALL -> true;
+        };
+    }
+
     public static class AutoMiningData extends MiningData
     {
 
@@ -827,5 +831,12 @@ public class AutoMineModule extends RotationModule
         SILENT,
         SILENT_ALT,
         OFF
+    }
+
+    public enum Selection
+    {
+        WHITELIST,
+        BLACKLIST,
+        ALL
     }
 }
