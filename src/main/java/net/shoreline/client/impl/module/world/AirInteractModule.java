@@ -19,20 +19,20 @@ import net.shoreline.eventbus.annotation.EventListener;
  * @author xgraza
  * @since 04/13/24
  */
-public final class BlockInteractModule extends ToggleModule
+public final class AirInteractModule extends ToggleModule
 {
-    public static BlockInteractModule INSTANCE;
+    public static AirInteractModule INSTANCE;
 
-    Config<Float> range = register(new NumberConfig<>("Range", "", 1.0f, 4.0f, 10.0f, NumberDisplay.DEFAULT));
+    Config<Float> range = register(new NumberConfig<>("Range", "", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
     Config<Boolean> fluids = register(new BooleanConfig("Fluids", "", false));
 
-    public BlockInteractModule()
+    public AirInteractModule()
     {
-        super("BlockInteract", "Allows you to place blocks in the air", ModuleCategory.WORLD);
+        super("AirInteract", "Allows you to place blocks in the air", ModuleCategory.WORLD);
         INSTANCE = this;
     }
 
-    public static BlockInteractModule getInstance()
+    public static AirInteractModule getInstance()
     {
         return INSTANCE;
     }

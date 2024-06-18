@@ -2,10 +2,10 @@ package net.shoreline.client.impl.module.client;
 
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
 
-public class SocialsModule extends ToggleModule
+public class SocialsModule extends ConcurrentModule
 {
     private static SocialsModule INSTANCE;
 

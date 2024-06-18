@@ -8,7 +8,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
-import net.shoreline.client.impl.module.world.BlockInteractModule;
+import net.shoreline.client.impl.module.world.AirInteractModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.player.MovementUtil;
@@ -44,7 +44,7 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, grim, strictDirection);
-        if (BlockInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
+        if (AirInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
         {
             // TODO: this should be not like this
             direction = Direction.UP;
@@ -72,7 +72,7 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, grim, strictDirection);
-        if (BlockInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
+        if (AirInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
         {
             // TODO: this should be not like this
             direction = Direction.UP;
