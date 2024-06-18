@@ -74,10 +74,10 @@ public class HUDModule extends ToggleModule
     Config<Rendering> renderingConfig = register(new EnumConfig<>("Rendering", "The rendering mode of the HUD", Rendering.UP, Rendering.values()));
     // Rainbow settings
     Config<RainbowMode> rainbowModeConfig = register(new EnumConfig<>("Rainbow", "The rendering mode for rainbow", RainbowMode.OFF, RainbowMode.values()));
-    Config<Float> rainbowSpeedConfig = register(new NumberConfig<>("Rainbow-Speed", "The speed for the rainbow color cycling", 0.1f, 50.0f, 100.0f));
-    Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100));
-    Config<Integer> rainbowBrightnessConfig = register(new NumberConfig<>("Rainbow-Brightness", "The brightness of rainbow colors", 0, 100, 100));
-    Config<Float> rainbowDifferenceConfig = register(new NumberConfig<>("Rainbow-Difference", "The difference offset for rainbow colors", 0.1f, 40.0f, 100.0f));
+    Config<Float> rainbowSpeedConfig = register(new NumberConfig<>("Rainbow-Speed", "The speed for the rainbow color cycling", 0.1f, 50.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
+    Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.ALPHA));
+    Config<Integer> rainbowBrightnessConfig = register(new NumberConfig<>("Rainbow-Brightness", "The brightness of rainbow colors", 0, 100, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.ALPHA));
+    Config<Float> rainbowDifferenceConfig = register(new NumberConfig<>("Rainbow-Difference", "The difference offset for rainbow colors", 0.1f, 40.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
     //
     private final DecimalFormat decimal = new DecimalFormat("0.0");
 
@@ -379,14 +379,9 @@ public class HUDModule extends ToggleModule
                 {
                     y -= 45 + (int) Math.ceil((entity.getMaxHealth() - 1.0f) / 20.0f) * 10;
                 }
-                else if (riding != null)
-                {
-                    y -= 45;
-                }
                 else
                 {
-                    y -= mc.player.isCreative() ?
-                            (mc.player.isRiding() ? 45 : 38) : 55;
+                    y -= 55;
                 }
                 for (int i = 3; i >= 0; --i)
                 {
@@ -462,7 +457,7 @@ public class HUDModule extends ToggleModule
             case OFF -> ColorsModule.getInstance().getRGB();
             case STATIC -> rainbow(1L);
             case GRADIENT -> rainbow(rainbowOffset);
-            // case ALPHA -> alpha(rainbowOffset);
+            case ALPHA -> alpha(rainbowOffset);
         };
     }
 
@@ -486,16 +481,16 @@ public class HUDModule extends ToggleModule
                 rainbowBrightnessConfig.getValue() / 100.0f);
     }
 
-    public static int alpha(long offset)
+    public int alpha(long offset)
     {
-        offset = (offset * 2) + 10;
         float[] hsb = new float[3];
         Color color = ColorsModule.getInstance().getColor();
         Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsb);
-        float brightness = Math.abs(((float) (System.currentTimeMillis() % 2000L) / 1000 + 50.0f / (float) offset * 2) % 2 - 1);
-        brightness = 0.5f + 0.5f * brightness;
-        hsb[2] = brightness % 2;
-        return Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+        float b = (float) (((double) System.currentTimeMillis() * (rainbowSpeedConfig.getValue() / 10)
+                + (double) (offset * 500L)) % (30000 / (rainbowDifferenceConfig.getValue() / 100))
+                / (30000 / (rainbowDifferenceConfig.getValue() / 20.0f)));
+        float brightness = hsb[2] * Math.abs(b % 1.0f - 0.55f) + 0.45f;
+        return Color.HSBtoRGB(hsb[0], hsb[1], brightness);
     }
 
     public float getChatAnimation()
@@ -526,7 +521,7 @@ public class HUDModule extends ToggleModule
     {
         OFF,
         GRADIENT,
-        STATIC
-        // ALPHA
+        STATIC,
+        ALPHA
     }
 }

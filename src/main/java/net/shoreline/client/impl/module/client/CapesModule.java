@@ -24,7 +24,7 @@ public final class CapesModule extends ToggleModule
     @EventListener
     public void onCapes(CapesEvent event)
     {
-        if (!optifineConfig.getValue() || clientConfig.getValue() == Capes.OFF)
+        if (!optifineConfig.getValue() && clientConfig.getValue() == Capes.OFF)
         {
             return;
         }
