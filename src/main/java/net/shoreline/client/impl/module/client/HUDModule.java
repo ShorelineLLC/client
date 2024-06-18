@@ -379,6 +379,10 @@ public class HUDModule extends ToggleModule
                 {
                     y -= 45 + (int) Math.ceil((entity.getMaxHealth() - 1.0f) / 20.0f) * 10;
                 }
+                else if (mc.player.isCreative())
+                {
+                    y -= 45;
+                }
                 else
                 {
                     y -= 55;
