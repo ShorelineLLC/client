@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.event.network;
 
+import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.manager.client.cape.CapeType;
 import net.shoreline.eventbus.annotation.Cancelable;
 import net.shoreline.eventbus.event.Event;
@@ -7,16 +8,15 @@ import net.shoreline.eventbus.event.Event;
 @Cancelable
 public class CapesEvent extends Event
 {
+    private Identifier texture;
 
-    private CapeType capeType;
-
-    public void setCapeType(CapeType capeType)
+    public void setTexture(Identifier texture)
     {
-        this.capeType = capeType;
+        this.texture = texture;
     }
 
-    public CapeType getCapeType()
+    public Identifier getTexture()
     {
-        return capeType;
+        return texture;
     }
 }

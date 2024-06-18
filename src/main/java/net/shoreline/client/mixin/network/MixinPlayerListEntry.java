@@ -58,8 +58,13 @@ public class MixinPlayerListEntry implements Globals
             {
                 return;
             }
+            Identifier identifier = capeTexture;
+            if (capesEvent.getTexture() != null)
+            {
+                identifier = capesEvent.getTexture();
+            }
             SkinTextures t = cir.getReturnValue();
-            SkinTextures customCapeTexture = new SkinTextures(t.texture(), t.textureUrl(), capeTexture, capeTexture, t.model(), t.secure());
+            SkinTextures customCapeTexture = new SkinTextures(t.texture(), t.textureUrl(), identifier, identifier, t.model(), t.secure());
             cir.setReturnValue(customCapeTexture);
         }
     }
