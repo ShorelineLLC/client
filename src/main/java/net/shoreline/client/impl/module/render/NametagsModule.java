@@ -299,7 +299,7 @@ public class NametagsModule extends ToggleModule
             boolean armor = stack.getItem() instanceof ArmorItem;
             if (armorConfig.getValue() && armor || itemsConfig.getValue() && !armor)
             {
-                float y = !armor ? -18.5f : m2;
+                float y = !armor && !enchantmentsConfig.getValue() ? -18.5f : m2;
                 matrixStack.push();
                 matrixStack.translate(n10, y, 0.0f);
                 matrixStack.translate(8.0f, 8.0f, 0.0f);
