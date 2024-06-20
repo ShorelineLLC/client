@@ -112,7 +112,7 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
         final JsonArray array = new JsonArray();
         for (Config<?> config : getConfigs())
         {
-            if (config.getValue() instanceof Macro)
+            if (config.getName().equalsIgnoreCase("Keybind"))
             {
                 continue;
             }
@@ -207,6 +207,11 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
                     else if (config instanceof StringConfig cfg)
                     {
                         String val = cfg.fromJson(configObj);
+                        cfg.setValue(val);
+                    }
+                    else if (config instanceof MacroConfig cfg)
+                    {
+                        Macro val = cfg.fromJson(configObj);
                         cfg.setValue(val);
                     }
                 }

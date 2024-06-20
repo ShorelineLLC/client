@@ -41,9 +41,7 @@ public class FreecamModule extends ToggleModule
     private static FreecamModule INSTANCE;
 
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The move speed of the camera", 0.1f, 4.0f, 10.0f));
-    Config<Macro> controlConfig = register(new MacroConfig("ControlKey", "", new Macro(getId() + "-control", GLFW.GLFW_KEY_LEFT_ALT, () ->
-    {
-    })));
+    Config<Macro> controlConfig = register(new MacroConfig("ControlKey", "", new Macro(getId() + "-control", GLFW.GLFW_KEY_LEFT_ALT, () -> {})));
     Config<Boolean> toggleControlConfig = register(new BooleanConfig("ToggleControl", "Allows toggling control key instead of holding", false));
     Config<Interact> interactConfig = register(new EnumConfig<>("Interact", "The interaction type of the camera", Interact.CAMERA, Interact.values()));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate to the point of interaction", false));

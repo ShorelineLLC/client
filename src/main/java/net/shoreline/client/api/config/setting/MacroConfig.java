@@ -1,5 +1,7 @@
 package net.shoreline.client.api.config.setting;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.init.Managers;
@@ -19,11 +21,30 @@ public class MacroConfig extends Config<Macro>
      */
     public void setValue(int keycode)
     {
-        getValue().setKeycode(keycode);
+        value.setKeycode(keycode);
         if (Managers.isInitialized())
         {
             Managers.MACRO.setMacro(getValue(), keycode);
         }
+    }
+
+    @Override
+    public Macro fromJson(JsonObject jsonObj)
+    {
+        if (jsonObj.has("value"))
+        {
+            JsonElement element = jsonObj.get("value");
+            return new Macro(getMacroId(), element.getAsInt(), getRunnable());
+        }
+        return null;
+    }
+
+    @Override
+    public JsonObject toJson()
+    {
+        JsonObject object = super.toJson();
+        object.addProperty("value", getKeycode());
+        return object;
     }
 
     public String getMacroId()

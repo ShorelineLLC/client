@@ -17,7 +17,7 @@ public class ZoomModule extends ToggleModule
 {
     Config<Integer> zoomConfig = register(new NumberConfig<>("Zoom", "The zoom value", 10, 30, 50));
     Config<Boolean> smoothCameraConfig = register(new BooleanConfig("SmoothCamera", "Adds motion reduction to the camera", true));
-    Config<Macro> zoomKeyConfig = register(new MacroConfig("ZoomKey", "The zoom key bind", new Macro(getId(), GLFW.GLFW_KEY_C, null)));
+    Config<Macro> zoomKeyConfig = register(new MacroConfig("ZoomKey", "The zoom key bind", new Macro(getId() + "-zoomkey", GLFW.GLFW_KEY_C, () -> {})));
 
     private boolean flag;
     private boolean flag1 = true;
