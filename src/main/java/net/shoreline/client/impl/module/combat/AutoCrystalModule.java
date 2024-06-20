@@ -36,7 +36,6 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
-import net.shoreline.client.impl.event.world.PlaySoundEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.EvictingQueue;
@@ -347,7 +346,7 @@ public class AutoCrystalModule extends RotationModule
                 }
 
                 set.getValue().setState(false);
-                int boxAlpha = (int) (60 * set.getValue().getFactor());
+                int boxAlpha = (int) (40 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
                 Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
                 Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
@@ -909,16 +908,16 @@ public class AutoCrystalModule extends RotationModule
         {
             return true;
         }
-        Vec3d raytrace = Vec3d.of(pos).add(0.0, raytraceConfig.getValue() ? 2.70000004768372 : 1.0, 0.0);
+        Vec3d raytrace = Vec3d.of(pos).add(0.5, 2.70000004768372, 0.5);
         BlockHitResult result = mc.world.raycast(new RaycastContext(
                 mc.player.getEyePos(), raytrace,
                 RaycastContext.ShapeType.COLLIDER,
                 RaycastContext.FluidHandling.NONE, mc.player));
         float maxDist = breakRangeConfig.getValue() * breakRangeConfig.getValue();
-        if (result != null && result.getType() == HitResult.Type.BLOCK && result.getBlockPos() != pos)
+        if (result != null && result.getType() == HitResult.Type.BLOCK && !result.getBlockPos().equals(pos))
         {
             maxDist = breakWallRangeConfig.getValue() * breakWallRangeConfig.getValue();
-            if (dist > placeWallRangeConfig.getValue() * placeWallRangeConfig.getValue())
+            if (!raytraceConfig.getValue() || dist > placeWallRangeConfig.getValue() * placeWallRangeConfig.getValue())
             {
                 return true;
             }

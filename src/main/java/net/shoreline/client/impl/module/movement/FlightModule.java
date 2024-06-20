@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.movement;
 
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -7,14 +9,15 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
+import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus & hockeyl8
@@ -33,8 +36,7 @@ public class FlightModule extends ToggleModule
     Config<Float> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "Max speed to acceleratee to", 1.0f, 5.0f, 10.0f, () -> accelerateConfig.getValue()));
 
     private double speed;
-    private final Timer antiKickTimer = new CacheTimer();
-    private final Timer antiKick2Timer = new CacheTimer();
+    private int antiKickTicks;
 
     public FlightModule()
     {
@@ -56,8 +58,6 @@ public class FlightModule extends ToggleModule
     @Override
     public void onEnable()
     {
-        antiKickTimer.reset();
-        antiKick2Timer.reset();
         if (modeConfig.getValue() == FlightMode.VANILLA)
         {
             enableVanillaFly();
@@ -75,8 +75,15 @@ public class FlightModule extends ToggleModule
     }
 
     @EventListener
+    public void onGameJoin(GameJoinEvent event)
+    {
+        onEnable();
+    }
+
+    @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
+        antiKickTicks++;
         if (accelerateConfig.getValue())
         {
             if (!MovementUtil.isInputtingMovement() || mc.player.horizontalCollision)
@@ -102,15 +109,14 @@ public class FlightModule extends ToggleModule
             mc.player.getAbilities().setFlySpeed(0.05f);
         }
         // Vanilla fly kick checks every 80 ticks
-        if (antiKickTimer.passed(3900) && antiKickConfig.getValue())
+        if (antiKickConfig.getValue())
         {
-            Managers.MOVEMENT.setMotionY(-0.04);
-            antiKickTimer.reset();
-        }
-        else if (antiKick2Timer.passed(4000) && antiKickConfig.getValue())
-        {
-            Managers.MOVEMENT.setMotionY(0.04);
-            antiKick2Timer.reset();
+            double y = mc.player.getY();
+            if (antiKickTicks == 68)
+            {
+                Managers.POSITION.setPositionClient(mc.player.getX(), y - 0.08, mc.player.getZ());
+                antiKickTicks = 0;
+            }
         }
         else if (modeConfig.getValue() == FlightMode.NORMAL)
         {

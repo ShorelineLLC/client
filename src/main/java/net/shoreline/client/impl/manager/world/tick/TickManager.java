@@ -104,7 +104,7 @@ public class TickManager implements Globals
                 {
                     avg += t;
                 }
-                avg /= ticksCopy.size();
+                avg /= Math.max(ticksCopy.size(), 1.0f);
             }
         }
         catch (NullPointerException e)
@@ -123,7 +123,7 @@ public class TickManager implements Globals
         {
             if (!ticks.isEmpty())
             {
-                return ticks.getFirst();
+                return Math.min(100.0f, ticks.getFirst());
             }
         }
         catch (NoSuchElementException ignored)

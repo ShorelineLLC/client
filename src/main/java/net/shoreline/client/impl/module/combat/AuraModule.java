@@ -13,6 +13,7 @@ import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -288,12 +289,12 @@ public class AuraModule extends RotationModule
             if (attackDelayConfig.getValue())
             {
                 float animFactor = 1.0f - mc.player.getAttackCooldownProgress(0.0f);
-                attackDelay = (int) (100.0 * animFactor);
+                attackDelay = (int) (70.0 * animFactor);
             }
             else
             {
                 float animFactor = 1.0f - MathHelper.clamp(attackTimer.getElapsedTime() / (1000f - delay), 0.0f, 1.0f);
-                attackDelay = (int) (100.0 * animFactor);
+                attackDelay = (int) (70.0 * animFactor);
             }
             RenderBuffers.preRender();
             RenderManager.renderBox(event.getMatrices(),
@@ -328,10 +329,8 @@ public class AuraModule extends RotationModule
             setRotationSilent(silentRotations[0], silentRotations[1]);
         }
 
-        PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity,
-                Managers.POSITION.isSneaking());
+        PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking());
         Managers.NETWORK.sendPacket(packet);
-        postAttackTarget(entity);
         if (swingConfig.getValue())
         {
             mc.player.swingHand(Hand.MAIN_HAND);
@@ -340,6 +339,7 @@ public class AuraModule extends RotationModule
         {
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
+        postAttackTarget(entity);
 
         if (silentRotateConfig.getValue())
         {
@@ -571,7 +571,7 @@ public class AuraModule extends RotationModule
                 pos, entityPos,
                 RaycastContext.ShapeType.COLLIDER,
                 RaycastContext.FluidHandling.NONE, mc.player));
-        if (result != null && dist > wallRangeConfig.getValue())
+        if (result != null && !result.getBlockPos().equals(BlockPos.ofFloored(entityPos)) && dist > wallRangeConfig.getValue())
         {
             return false;
         }

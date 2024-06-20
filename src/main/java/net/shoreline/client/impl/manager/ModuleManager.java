@@ -83,6 +83,7 @@ public final class ModuleManager
                 new PacketFlyModule(),
                 new PhaseModule(),
                 new PortalGodModeModule(),
+                new RaytraceResolverModule(),
                 new ReachModule(),
                 // Misc
                 new AntiAFKModule(),
@@ -108,6 +109,7 @@ public final class ModuleManager
                 new NoSoundLagModule(),
                 new PacketLoggerModule(),
                 new ShulkerceptionModule(),
+                // new SkinGrabberModule(),
                 new TimerModule(),
                 new TrueDurabilityModule(),
                 new UnfocusedFPSModule(),

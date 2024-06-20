@@ -138,9 +138,9 @@ public class FastFallModule extends ToggleModule
     private boolean isNearestBlockWithinHeight(double height)
     {
         Box bb = mc.player.getBoundingBox();
-        for (double i = 0; i < height + 0.5; i += 0.01)
+        for (double i = 0.0; i < height + 0.5; i += 0.01)
         {
-            if (!mc.world.isSpaceEmpty(mc.player, bb.offset(0, -i, 0)))
+            if (!mc.world.isSpaceEmpty(mc.player, bb.offset(0.0, -i, 0.0)))
             {
                 return true;
             }
