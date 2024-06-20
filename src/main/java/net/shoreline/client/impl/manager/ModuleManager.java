@@ -177,6 +177,7 @@ public final class ModuleManager
                 new AutoMineModule(),
                 new AutoToolModule(),
                 new AvoidModule(),
+                new BorderInteractModule(),
                 new FastDropModule(),
                 new FastPlaceModule(),
                 new MultitaskModule(),

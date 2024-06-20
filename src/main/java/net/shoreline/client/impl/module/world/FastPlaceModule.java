@@ -14,6 +14,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.InteractBorderEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
@@ -31,7 +32,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class FastPlaceModule extends ToggleModule
 {
-
     //
     Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of items to apply fast placements", Selection.WHITELIST, Selection.values()));
     Config<Integer> delayConfig = register(new NumberConfig<>("Delay", "Fast place click delay", 0, 1, 4));

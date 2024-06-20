@@ -15,6 +15,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
+import net.minecraft.world.border.WorldBorder;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.util.Globals;
@@ -100,6 +101,18 @@ public abstract class MixinClientPlayerInteractionManager implements Globals
             cir.setReturnValue(ActionResult.SUCCESS);
             cir.cancel();
         }
+    }
+
+    @Redirect(method = "interactBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/BlockPos;)Z"))
+    private boolean hookInteractBlock$2(WorldBorder worldBorder, BlockPos pos)
+    {
+        InteractBorderEvent interactBorderEvent = new InteractBorderEvent();
+        EventBus.INSTANCE.dispatch(interactBorderEvent);
+        if (interactBorderEvent.isCanceled())
+        {
+            return true;
+        }
+        return worldBorder.contains(pos);
     }
 
     /**

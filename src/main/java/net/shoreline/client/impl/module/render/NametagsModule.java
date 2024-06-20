@@ -14,6 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.Tameable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -61,6 +62,7 @@ public class NametagsModule extends ToggleModule
     private static NametagsModule INSTANCE;
 
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays the player's armor", true));
+    Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Displays the player's held items", true));
     Config<Boolean> enchantmentsConfig = register(new BooleanConfig("Enchantments", "Displays a list of the item's enchantments", true));
     Config<Boolean> durabilityConfig = register(new BooleanConfig("Durability", "Displays item durability", true));
     Config<Boolean> itemNameConfig = register(new BooleanConfig("ItemName", "Displays the player's current held item name", false));
@@ -75,7 +77,7 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> borderedConfig = register(new BooleanConfig("Border", "Renders a border around the nametag", false));
     Config<Boolean> tamedConfig = register(new BooleanConfig("TamedMobs", "Renders nametags on tamed mobs", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
-    Config<Boolean> itemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
+    Config<Boolean> droppedItemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
     Config<Boolean> soundsConfig = register(new BooleanConfig("Sounds", "Renders nametags on sounds", false));
 
     private final Map<SoundRender, Long> sounds = new HashMap<>();
@@ -143,7 +145,7 @@ public class NametagsModule extends ToggleModule
                 }
                 renderInfo(info, hwidth, player, rx, ry, rz, camera, scaling);
             }
-            if (entity instanceof Tameable tameable && tameable.getOwnerUuid() != null && tamedConfig.getValue())
+            else if (entity instanceof Tameable tameable && tameable.getOwnerUuid() != null && tamedConfig.getValue())
             {
                 String lookup = Managers.LOOKUP.getNameFromUUID(tameable.getOwnerUuid());
                 if (lookup != null)
@@ -155,7 +157,7 @@ public class NametagsModule extends ToggleModule
                     RenderManager.renderSign(lookup, rx, ry, rz, -1);
                 }
             }
-            if (entity instanceof ItemEntity itemEntity && itemsConfig.getValue())
+            else if (entity instanceof ItemEntity itemEntity && droppedItemsConfig.getValue())
             {
                 Vec3d itemPos = Interpolation.getRenderPosition(itemEntity, mc.getTickDelta());
                 double rx = itemEntity.getX() - itemPos.getX();
@@ -165,7 +167,7 @@ public class NametagsModule extends ToggleModule
                 String stackNametag = stack.getName().getString() + (stack.getCount() > 1 ? " x" + stack.getCount() : "");
                 RenderManager.renderSign(stackNametag, rx, ry, rz, -1);
             }
-            if (entity instanceof EnderPearlEntity pearlEntity && pearlsConfig.getValue())
+            else if (entity instanceof EnderPearlEntity pearlEntity && pearlsConfig.getValue())
             {
                 if (pearlEntity.getOwner() == null)
                 {
@@ -294,10 +296,12 @@ public class NametagsModule extends ToggleModule
         float m2 = enchantOffset(n11);
         for (ItemStack stack : displayItems)
         {
-            if (armorConfig.getValue())
+            boolean armor = stack.getItem() instanceof ArmorItem;
+            if (armorConfig.getValue() && armor || itemsConfig.getValue() && !armor)
             {
+                float y = !armor ? -18.5f : m2;
                 matrixStack.push();
-                matrixStack.translate(n10, m2, 0.0f);
+                matrixStack.translate(n10, y, 0.0f);
                 matrixStack.translate(8.0f, 8.0f, 0.0f);
                 matrixStack.scale(16.0f, 16.0f, 0.0f);
                 matrixStack.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 0.0f));
@@ -305,7 +309,7 @@ public class NametagsModule extends ToggleModule
                         matrixStack, mc.getBufferBuilders().getEntityVertexConsumers(), mc.world, 0);
                 mc.getBufferBuilders().getEntityVertexConsumers().draw();
                 matrixStack.pop();
-                renderItemOverlay(matrixStack, stack, (int) n10, (int) m2);
+                renderItemOverlay(matrixStack, stack, (int) n10, (int) y);
             }
             // int n4 = (n11 > 4) ? ((n11 - 4) * 8 / 2) : 0;
             // mc.getItemRenderer().renderInGui(matrixStack, mc.textRenderer, stack, n10, m2);
