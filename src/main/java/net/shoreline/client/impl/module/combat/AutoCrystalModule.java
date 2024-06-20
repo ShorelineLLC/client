@@ -227,10 +227,23 @@ public class AutoCrystalModule extends RotationModule
         renderPos = null;
         ArrayList<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         List<BlockPos> blocks = getSphere(mc.player.getPos());
-        attackCrystal = calculateAttackCrystal(entities);
         if (placeConfig.getValue())
         {
             placeCrystal = calculatePlaceCrystal(blocks, entities);
+        }
+        attackCrystal = calculateAttackCrystal(entities);
+        if (attackCrystal == null && placeCrystal != null)
+        {
+            EndCrystalEntity crystalEntity = intersectingCrystalCheck(placeCrystal.getDamageData());
+            if (crystalEntity != null)
+            {
+                double self = ExplosionUtil.getDamageTo(mc.player, crystalEntity.getPos());
+                if (!safetyConfig.getValue() || !playerDamageCheck(self))
+                {
+                    attackCrystal = new DamageData<>(crystalEntity, placeCrystal.getAttackTarget(),
+                            placeCrystal.getDamage(), self, crystalEntity.getBlockPos().down());
+                }
+            }
         }
         float breakDelay = getBreakDelay();
         if (breakDelayConfig.getValue())
@@ -1102,7 +1115,6 @@ public class AutoCrystalModule extends RotationModule
                 entities.remove(entity);
             }
             else if (entity instanceof EndCrystalEntity entity1
-                    // && !intersectingCrystalCheck(entity1) // TODO: More advanced check for intersecting crystals
                     && entity1.getBoundingBox().intersects(box) || attackPackets.containsKey(entity.getId()) && entity.age < ticksExistedConfig.getValue())
             {
                 entities.remove(entity);
@@ -1111,13 +1123,10 @@ public class AutoCrystalModule extends RotationModule
         return entities;
     }
 
-    private boolean intersectingCrystalCheck(EndCrystalEntity entity)
+    private EndCrystalEntity intersectingCrystalCheck(BlockPos pos)
     {
-        // if (entity.age < ticksExistedConfig.getValue())
-        // {
-        //    return false;
-        // }
-        return attackRangeCheck(entity);
+        return (EndCrystalEntity) mc.world.getOtherEntities(null, new Box(pos)).stream()
+                .filter(e -> e instanceof EndCrystalEntity).min(Comparator.comparingDouble(e -> mc.player.distanceTo(e))).orElse(null);
     }
 
     private List<BlockPos> getSphere(Vec3d origin)
