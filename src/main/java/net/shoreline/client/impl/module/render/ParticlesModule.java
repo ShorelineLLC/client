@@ -55,9 +55,21 @@ public class ParticlesModule extends ToggleModule
             float r = color.getRed() / 255.0f;
             float g = color.getGreen() / 255.0f;
             float b = color.getBlue() / 255.0f;
-            event.setColor(new Color(MathHelper.clamp(r + RANDOM.nextFloat() * 0.1f, 0.0f, 1.0f),
-                    MathHelper.clamp(g + RANDOM.nextFloat() * 0.1f, 0.0f, 1.0f),
-                    MathHelper.clamp(b + RANDOM.nextFloat() * 0.1f, 0.0f, 1.0f)));
+            if (RANDOM.nextInt(4) == 0)
+            {
+                float r2 = (color.getRed() * 0.7f) / 255.0f;
+                float g2 = (color.getGreen() * 0.7f) / 255.0f;
+                float b2 = (color.getBlue() * 0.7f) / 255.0f;
+                event.setColor(new Color(MathHelper.clamp(r2, 0.0f, 1.0f),
+                        MathHelper.clamp(g2, 0.0f, 1.0f),
+                        MathHelper.clamp(b2, 0.0f, 1.0f)));
+            }
+            else
+            {
+                event.setColor(new Color(MathHelper.clamp(r + RANDOM.nextFloat() * 0.1f, 0.0f, 1.0f),
+                        MathHelper.clamp(g + RANDOM.nextFloat() * 0.1f, 0.0f, 1.0f),
+                        MathHelper.clamp(b + RANDOM.nextFloat() * 0.1f, 0.0f, 1.0f)));
+            }
         }
     }
 
