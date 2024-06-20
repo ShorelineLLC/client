@@ -243,10 +243,7 @@ public class NametagsModule extends ToggleModule
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             GL11.glDepthFunc(GL11.GL_ALWAYS);
-            if (armorConfig.getValue())
-            {
-                renderItems(matrices, entity);
-            }
+            renderItems(matrices, entity);
             drawText(matrices, info, -width, 0.0f, color);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             RenderSystem.disableBlend();
@@ -297,17 +294,19 @@ public class NametagsModule extends ToggleModule
         float m2 = enchantOffset(n11);
         for (ItemStack stack : displayItems)
         {
-            // mc.getBufferBuilders().getEntityVertexConsumers().draw();
-            matrixStack.push();
-            matrixStack.translate(n10, m2, 0.0f);
-            matrixStack.translate(8.0f, 8.0f, 0.0f);
-            matrixStack.scale(16.0f, 16.0f, 0.0f);
-            matrixStack.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 0.0f));
-            renderItem(stack, ModelTransformationMode.GUI, 0xffffff, OverlayTexture.field_32955,
-                    matrixStack, mc.getBufferBuilders().getEntityVertexConsumers(), mc.world, 0);
-            mc.getBufferBuilders().getEntityVertexConsumers().draw();
-            matrixStack.pop();
-            renderItemOverlay(matrixStack, stack, (int) n10, (int) m2);
+            if (armorConfig.getValue())
+            {
+                matrixStack.push();
+                matrixStack.translate(n10, m2, 0.0f);
+                matrixStack.translate(8.0f, 8.0f, 0.0f);
+                matrixStack.scale(16.0f, 16.0f, 0.0f);
+                matrixStack.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 0.0f));
+                renderItem(stack, ModelTransformationMode.GUI, 0xffffff, OverlayTexture.field_32955,
+                        matrixStack, mc.getBufferBuilders().getEntityVertexConsumers(), mc.world, 0);
+                mc.getBufferBuilders().getEntityVertexConsumers().draw();
+                matrixStack.pop();
+                renderItemOverlay(matrixStack, stack, (int) n10, (int) m2);
+            }
             // int n4 = (n11 > 4) ? ((n11 - 4) * 8 / 2) : 0;
             // mc.getItemRenderer().renderInGui(matrixStack, mc.textRenderer, stack, n10, m2);
             matrixStack.scale(0.5f, 0.5f, 0.5f);
@@ -460,7 +459,7 @@ public class NametagsModule extends ToggleModule
     {
         if (!enchantmentsConfig.getValue() || n <= 3)
         {
-            return -18.0f;
+            return armorConfig.getValue() ? -18.0f : -3.5f;
         }
         float n2 = -14.0f;
         n2 -= (n - 3) * 4.5f;
