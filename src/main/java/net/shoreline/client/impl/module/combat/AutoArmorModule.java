@@ -144,12 +144,12 @@ public class AutoArmorModule extends ToggleModule
         ItemStack stack = mc.player.getInventory().getArmorStack(armorSlot);
         //
         armorSlot = 8 - armorSlot;
-        Managers.INVENTORY.pickupSlot(slot);
+        Managers.INVENTORY.pickupSlot(slot < 9 ? slot + 36 : slot);
         boolean rt = !stack.isEmpty();
         Managers.INVENTORY.pickupSlot(armorSlot);
         if (rt)
         {
-            Managers.INVENTORY.pickupSlot(slot);
+            Managers.INVENTORY.pickupSlot(slot < 9 ? slot + 36 : slot);
         }
     }
 

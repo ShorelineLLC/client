@@ -12,4 +12,5 @@ public class AutoTunnelModule extends ToggleModule {
     public AutoTunnelModule() {
         super("AutoTunnel", "Automatically mines a tunnel", ModuleCategory.WORLD);
     }
+
 }
