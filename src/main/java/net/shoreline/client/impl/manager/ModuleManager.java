@@ -58,6 +58,7 @@ public final class ModuleManager
                 new ClickCrystalModule(),
                 new CriticalsModule(),
                 new HoleFillModule(),
+                new KeepSprintModule(),
                 new NoHitDelayModule(),
                 new ReplenishModule(),
                 new SelfBowModule(),

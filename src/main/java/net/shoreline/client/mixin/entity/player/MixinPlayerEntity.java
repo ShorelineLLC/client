@@ -1,11 +1,13 @@
 package net.shoreline.client.mixin.entity.player;
 
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.shoreline.client.impl.event.entity.player.SprintResetEvent;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.entity.player.PlayerJumpEvent;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -120,5 +123,33 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
         PlayerJumpEvent playerJumpEvent = new PlayerJumpEvent();
         playerJumpEvent.setStage(StageEvent.EventStage.POST);
         EventBus.INSTANCE.dispatch(playerJumpEvent);
+    }
+
+    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
+    private void hookAttack(PlayerEntity playerEntity, Vec3d movementInput)
+    {
+        if (playerEntity instanceof ClientPlayerEntity)
+        {
+            SprintResetEvent sprintResetEvent = new SprintResetEvent();
+            EventBus.INSTANCE.dispatch(sprintResetEvent);
+            if (!sprintResetEvent.isCanceled())
+            {
+                mc.player.setVelocity(mc.player.getVelocity().multiply(0.6, 1.0, 0.6));
+            }
+        }
+    }
+
+    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V"))
+    private void hookAttack$1(PlayerEntity instance, boolean b)
+    {
+        if (instance instanceof ClientPlayerEntity)
+        {
+            SprintResetEvent sprintResetEvent = new SprintResetEvent();
+            EventBus.INSTANCE.dispatch(sprintResetEvent);
+            if (!sprintResetEvent.isCanceled())
+            {
+                mc.player.setSprinting(false);
+            }
+        }
     }
 }
