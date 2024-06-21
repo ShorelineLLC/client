@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
@@ -29,6 +30,7 @@ public class HoleESPModule extends ToggleModule
     //
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Range to display holes", 3.0f, 5.0f, 25.0f));
     Config<Float> heightConfig = register(new NumberConfig<>("Size", "Render height of holes", -1.0f, 1.00f, 1.0f));
+    Config<Boolean> ignoreSelfConfig = register(new BooleanConfig("IgnoreSelf", "Ignores the hole the player is standing in", false));
     Config<Boolean> obsidianCheckConfig = register(new BooleanConfig("Obsidian", "Displays obsidian holes", true));
     Config<Boolean> obsidianBedrockConfig = register(new BooleanConfig("Obsidian-Bedrock", "Displays mixed obsidian and bedrock holes", true));
     Config<Boolean> doubleConfig = register(new BooleanConfig("Double", "Displays double holes where the player can stand in the middle of two blocks to block explosion damage", false));
@@ -66,6 +68,22 @@ public class HoleESPModule extends ToggleModule
                     || hole.getSafety() == HoleType.VOID && !voidConfig.getValue()
                     || hole.getSafety() == HoleType.OBSIDIAN && !obsidianCheckConfig.getValue()
                     || hole.getSafety() == HoleType.OBSIDIAN_BEDROCK && !obsidianBedrockConfig.getValue())
+            {
+                continue;
+            }
+            boolean standing = false;
+            if (ignoreSelfConfig.getValue())
+            {
+                for (BlockPos pos : hole.getHoleOffsets())
+                {
+                    if (mc.player.getBlockPos().equals(pos))
+                    {
+                        standing = true;
+                        break;
+                    }
+                }
+            }
+            if (standing)
             {
                 continue;
             }
