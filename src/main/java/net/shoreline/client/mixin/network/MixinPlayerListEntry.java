@@ -55,19 +55,19 @@ public class MixinPlayerListEntry implements Globals
     @Inject(method = "getSkinTextures", at = @At("TAIL"), cancellable = true)
     private void hookGetSkinTextures(CallbackInfoReturnable<SkinTextures> cir)
     {
-        if (capeTexture != null)
+        CapesEvent capesEvent = new CapesEvent(profile);
+        EventBus.INSTANCE.dispatch(capesEvent);
+        if (!capesEvent.isCanceled())
         {
-            CapesEvent capesEvent = new CapesEvent(profile);
-            EventBus.INSTANCE.dispatch(capesEvent);
-            if (!capesEvent.isCanceled())
-            {
-                return;
-            }
-            Identifier identifier = capeTexture;
-            if (capesEvent.getTexture() != null)
-            {
-                identifier = capesEvent.getTexture();
-            }
+            return;
+        }
+        Identifier identifier = capeTexture;
+        if (capesEvent.getTexture() != null)
+        {
+            identifier = capesEvent.getTexture();
+        }
+        if (identifier != null)
+        {
             SkinTextures t = cir.getReturnValue();
             SkinTextures customCapeTexture = new SkinTextures(t.texture(), t.textureUrl(), identifier, identifier, t.model(), t.secure());
             cir.setReturnValue(customCapeTexture);

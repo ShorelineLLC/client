@@ -18,22 +18,14 @@ import java.nio.file.Path;
  */
 public class WaypointFile extends ConfigFile
 {
-    //
-    private final String serverIp;
-
     /**
      * @param dir
-     * @param serverIp
      */
-    public WaypointFile(Path dir, String serverIp)
+    public WaypointFile(Path dir)
     {
-        super(dir, serverIp);
-        this.serverIp = serverIp;
+        super(dir, "waypoints");
     }
 
-    /**
-     *
-     */
     @Override
     public void save()
     {
@@ -47,14 +39,9 @@ public class WaypointFile extends ConfigFile
             final JsonArray array = new JsonArray();
             for (Waypoint point : Managers.WAYPOINT.getWaypoints())
             {
-                if (point.getIp().equalsIgnoreCase(serverIp))
+                if (point instanceof UserWaypoint)
                 {
-                    final JsonObject obj = new JsonObject();
-                    obj.addProperty("tag", point.getName());
-                    obj.addProperty("x", point.getX());
-                    obj.addProperty("y", point.getY());
-                    obj.addProperty("z", point.getZ());
-                    array.add(obj);
+                    array.add(point.toJson());
                 }
             }
             write(filepath, serialize(array));
@@ -62,14 +49,11 @@ public class WaypointFile extends ConfigFile
         // error writing file
         catch (IOException e)
         {
-            Shoreline.error("Could not save file for {}.json!", serverIp);
+            Shoreline.error("Could not save file for waypoints.json!");
             e.printStackTrace();
         }
     }
 
-    /**
-     *
-     */
     @Override
     public void load()
     {
@@ -87,19 +71,25 @@ public class WaypointFile extends ConfigFile
                 for (JsonElement e : array.asList())
                 {
                     JsonObject obj = e.getAsJsonObject();
+                    if (!obj.has("tag") || !obj.has("dimension") || !obj.has("ip"))
+                    {
+                        continue;
+                    }
                     JsonElement tag = obj.get("tag");
+                    JsonElement ip = obj.get("ip");
+                    JsonElement dimension = obj.get("dimension");
                     JsonElement x = obj.get("x");
                     JsonElement y = obj.get("y");
                     JsonElement z = obj.get("z");
-                    Managers.WAYPOINT.register(new Waypoint(tag.getAsString(),
-                            serverIp, x.getAsDouble(), y.getAsDouble(), z.getAsDouble()));
+                    Managers.WAYPOINT.register(new UserWaypoint(tag.getAsString(),
+                            ip.getAsString(), dimension.getAsInt(), x.getAsDouble(), y.getAsDouble(), z.getAsDouble()));
                 }
             }
         }
         // error reading file
         catch (IOException e)
         {
-            Shoreline.error("Could not read file for {}.json!", serverIp);
+            Shoreline.error("Could not read file for waypoints.json!");
             e.printStackTrace();
         }
     }

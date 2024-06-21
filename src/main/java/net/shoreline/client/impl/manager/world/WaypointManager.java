@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.manager.world;
 
+import net.shoreline.client.api.waypoint.UserWaypoint;
 import net.shoreline.client.api.waypoint.Waypoint;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class WaypointManager
 
     public void clear()
     {
-        waypoints.clear();
+        waypoints.removeIf(w -> !(w instanceof UserWaypoint));
     }
 
     /**

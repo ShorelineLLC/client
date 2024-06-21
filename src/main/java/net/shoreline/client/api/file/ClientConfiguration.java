@@ -101,6 +101,7 @@ public class ClientConfiguration implements Globals
             files.add(new ModuleFile(clientDir.resolve("Modules"), module));
         }
         files.add(InvCleanerModule.getInstance().getBlacklistFile(clientDir));
+        files.add(new WaypointFile(clientDir));
         for (SocialRelation relation : SocialRelation.values())
         {
             files.add(new SocialFile(clientDir, relation));
@@ -108,15 +109,11 @@ public class ClientConfiguration implements Globals
         this.clickGuiFile = new ClickGuiFile(clientDir);
     }
 
-    /**\
+    /**
      *
      */
     public void saveClient()
     {
-        for (String ip : Managers.WAYPOINT.getIps())
-        {
-            files.add(new WaypointFile(clientDir.resolve("Waypoints"), ip));
-        }
         for (ConfigFile file : files)
         {
             file.save();

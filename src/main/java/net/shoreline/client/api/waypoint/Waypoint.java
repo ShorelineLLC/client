@@ -1,9 +1,9 @@
 package net.shoreline.client.api.waypoint;
 
-import net.minecraft.registry.RegistryKey;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigContainer;
 import net.shoreline.client.api.config.setting.NumberConfig;
@@ -19,7 +19,7 @@ public class Waypoint extends ConfigContainer implements Position, Globals
 {
     //
     private final String ip;
-    private final RegistryKey<World> dimension;
+    private final int dimension;
     //
     private final Config<Double> xConfig = register(new NumberConfig<>("X", "X " +
             "position of waypoint.", 0.0D, 0.0D, Double.MAX_VALUE));
@@ -36,15 +36,15 @@ public class Waypoint extends ConfigContainer implements Position, Globals
      * @param y
      * @param z
      */
-    public Waypoint(String name, String ip, double x, double y, double z)
+    public Waypoint(String name, String ip, int dimension, double x, double y, double z)
     {
         super(name);
         this.ip = ip;
+        this.dimension = dimension;
         xConfig.setValue(x);
         yConfig.setValue(y);
         zConfig.setValue(z);
         this.timer = new CacheTimer();
-        this.dimension = mc.world.getRegistryKey();
     }
 
     /**
@@ -59,6 +59,19 @@ public class Waypoint extends ConfigContainer implements Position, Globals
     public String getIp()
     {
         return ip;
+    }
+
+    @Override
+    public JsonObject toJson()
+    {
+        final JsonObject obj = new JsonObject();
+        obj.addProperty("tag", getName());
+        obj.addProperty("ip", getIp());
+        obj.addProperty("dimension", getDimension());
+        obj.addProperty("x", getX());
+        obj.addProperty("y", getY());
+        obj.addProperty("z", getZ());
+        return obj;
     }
 
     @Override
@@ -87,7 +100,7 @@ public class Waypoint extends ConfigContainer implements Position, Globals
         return new Vec3d(getX(), getY(), getZ());
     }
 
-    public RegistryKey<World> getDimension()
+    public int getDimension()
     {
         return dimension;
     }
