@@ -36,8 +36,10 @@ public class ConfigCommand extends Command
                     }
                     else if (action.equalsIgnoreCase("load"))
                     {
-                        Shoreline.CONFIG.loadModuleConfiguration(name);
-                        ChatUtil.clientSendMessage("Loaded config: §s" + name);
+                        if (Shoreline.CONFIG.loadModuleConfiguration(name))
+                        {
+                            ChatUtil.clientSendMessage("Loaded config: §s" + name);
+                        }
                     }
                     return 1;
                 })).executes(c ->

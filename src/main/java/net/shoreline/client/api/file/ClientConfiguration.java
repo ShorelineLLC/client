@@ -12,6 +12,7 @@ import net.shoreline.client.impl.gui.click.ClickGuiFile;
 import net.shoreline.client.impl.module.misc.InvCleanerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.chat.ChatUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -137,10 +138,17 @@ public class ClientConfiguration implements Globals
         file.save();
     }
 
-    public void loadModuleConfiguration(String configFile)
+    public boolean loadModuleConfiguration(String configFile)
     {
-        file = new ModuleConfigFile(clientDir.resolve("Configs"), configFile);
+        Path configDir = clientDir.resolve("Configs");
+        file = new ModuleConfigFile(configDir, configFile);
+        if (!Files.exists(configDir.resolve(configFile + ".json")))
+        {
+            ChatUtil.error("Could not find config file: " + configFile);
+            return false;
+        }
         file.load();
+        return true;
     }
 
     public void saveClickGui()
