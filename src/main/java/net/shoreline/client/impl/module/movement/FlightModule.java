@@ -1,19 +1,20 @@
 package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.math.Box;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -36,7 +37,8 @@ public class FlightModule extends ToggleModule
     Config<Float> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "Max speed to acceleratee to", 1.0f, 5.0f, 10.0f, () -> accelerateConfig.getValue()));
 
     private double speed;
-    private int antiKickTicks;
+    private double lastY;
+    private int floatingTicks;
 
     public FlightModule()
     {
@@ -75,15 +77,21 @@ public class FlightModule extends ToggleModule
     }
 
     @EventListener
-    public void onGameJoin(GameJoinEvent event)
+    public void onTick(TickEvent event)
     {
-        onEnable();
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
+        if (mc.player.getY() >= lastY - 0.04)
+        {
+            floatingTicks++;
+        }
     }
 
     @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
-        antiKickTicks++;
         if (accelerateConfig.getValue())
         {
             if (!MovementUtil.isInputtingMovement() || mc.player.horizontalCollision)
@@ -102,23 +110,14 @@ public class FlightModule extends ToggleModule
         }
         if (modeConfig.getValue().equals(FlightMode.VANILLA))
         {
+            enableVanillaFly();
             mc.player.getAbilities().setFlySpeed((float) (speed * 0.05f));
         }
         else
         {
             mc.player.getAbilities().setFlySpeed(0.05f);
         }
-        // Vanilla fly kick checks every 80 ticks
-        if (antiKickConfig.getValue())
-        {
-            double y = mc.player.getY();
-            if (antiKickTicks == 68)
-            {
-                Managers.POSITION.setPositionClient(mc.player.getX(), y - 0.08, mc.player.getZ());
-                antiKickTicks = 0;
-            }
-        }
-        else if (modeConfig.getValue() == FlightMode.NORMAL)
+        if (modeConfig.getValue() == FlightMode.NORMAL)
         {
             Managers.MOVEMENT.setMotionY(0.0);
             if (mc.options.jumpKey.isPressed())
@@ -129,9 +128,6 @@ public class FlightModule extends ToggleModule
             {
                 Managers.MOVEMENT.setMotionY(-vspeedConfig.getValue());
             }
-        }
-        if (modeConfig.getValue() == FlightMode.NORMAL)
-        {
             speed = Math.max(speed, 0.2873f);
             float forward = mc.player.input.movementForward;
             float strafe = mc.player.input.movementSideways;
@@ -145,6 +141,37 @@ public class FlightModule extends ToggleModule
             double rz = Math.sin(Math.toRadians(yaw + 90.0f));
             Managers.MOVEMENT.setMotionXZ((forward * speed * rx) + (strafe * speed * rz),
                     (forward * speed * rz) - (strafe * speed * rx));
+        }
+    }
+
+    @EventListener
+    public void onPacketOutbound(PacketEvent.Outbound event)
+    {
+        if (event.getPacket() instanceof PlayerMoveC2SPacket packet && antiKickConfig.getValue())
+        {
+            // Vanilla fly kick checks every 80 ticks
+            if (packet.changesPosition())
+            {
+                if (floatingTicks >= 70)
+                {
+                    ((AccessorPlayerMoveC2SPacket) packet).hookSetY(lastY - 0.04);
+                    floatingTicks = 0;
+                }
+                else
+                {
+                    lastY = packet.getY(mc.player.getY());
+                }
+            }
+            else
+            {
+                if (floatingTicks >= 70)
+                {
+                    event.cancel();
+                    Managers.NETWORK.sendQuietPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04,
+                            mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround()));
+                    floatingTicks = 0;
+                }
+            }
         }
     }
 

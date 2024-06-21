@@ -42,6 +42,12 @@ public class PositionManager implements Globals
         setPosition(vec3d.getX(), vec3d.getY(), vec3d.getZ());
     }
 
+    public void setPositionAndRotation(double x, double y, double z, float yaw, float pitch)
+    {
+        setPositionClient(x, y, z);
+        Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(x, y, z, yaw, pitch, isOnGround()));
+    }
+
     /**
      * @param x
      * @param y
@@ -50,8 +56,7 @@ public class PositionManager implements Globals
     public void setPosition(double x, double y, double z)
     {
         setPositionClient(x, y, z);
-        Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                x, y, z, isOnGround()));
+        Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(x, y, z, isOnGround()));
     }
 
     /**
