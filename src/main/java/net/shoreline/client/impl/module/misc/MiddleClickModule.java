@@ -89,10 +89,9 @@ public class MiddleClickModule extends ToggleModule
                 }
                 if (slot != -1)
                 {
-                    int prev = mc.player.getInventory().selectedSlot;
-                    Managers.INVENTORY.setClientSlot(slot);
+                    Managers.INVENTORY.setSlot(slot);
                     mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                    Managers.INVENTORY.setClientSlot(prev);
+                    Managers.INVENTORY.syncToClient();
                 }
             }
         }

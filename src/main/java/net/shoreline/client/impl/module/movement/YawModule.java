@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.LlamaEntity;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -52,6 +53,8 @@ public class YawModule extends ToggleModule
         if (lockConfig.getValue())
         {
             event.cancel();
+            float f = (float) event.getCursorDeltaY() * 0.15f;
+            mc.player.setPitch(MathHelper.clamp(mc.player.getPitch() + f, -90.0f, 90.0f));
         }
     }
 }

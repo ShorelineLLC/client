@@ -11,11 +11,9 @@ import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
