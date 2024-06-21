@@ -12,18 +12,10 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 // Optifine capes
 public class CapeManager implements Globals
 {
-
-    // TODO: this is a workaround to a rare crash, possibly save to FS like real Optifine?
-    // im open to better solutions because this could get pretty bad pretty quick
-    private static final Map<UUID, Identifier> CAPE_TEXTURE_CACHE = new HashMap<>();
-
     public CapeManager()
     {
         EventBus.INSTANCE.subscribe(this);
@@ -42,13 +34,6 @@ public class CapeManager implements Globals
      */
     public void loadPlayerCape(GameProfile profile, CapeTexture texture)
     {
-
-        if (CAPE_TEXTURE_CACHE.containsKey(profile.getId()))
-        {
-            texture.callback(CAPE_TEXTURE_CACHE.get(profile.getId()));
-            return;
-        }
-
         Util.getMainWorkerExecutor().execute(() ->
         {
             String uuid = profile.getId().toString();
@@ -63,8 +48,6 @@ public class CapeManager implements Globals
                 Identifier identifier = mc.getTextureManager().registerDynamicTexture("of-capes-" + uuid, t);
                 texture.callback(identifier);
                 stream.close();
-
-                CAPE_TEXTURE_CACHE.put(profile.getId(), identifier);
             }
             catch (Exception ignored)
             {
