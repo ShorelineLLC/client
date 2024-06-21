@@ -8,7 +8,9 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.network.CapesEvent;
 import net.shoreline.client.impl.event.network.LoadCapeEvent;
 import net.shoreline.client.util.Globals;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,6 +21,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinPlayerListEntry implements Globals
 {
 
+    @Shadow
+    @Final
+    private GameProfile profile;
     @Unique
     private Identifier capeTexture;
     @Unique
@@ -52,7 +57,7 @@ public class MixinPlayerListEntry implements Globals
     {
         if (capeTexture != null)
         {
-            CapesEvent capesEvent = new CapesEvent();
+            CapesEvent capesEvent = new CapesEvent(profile);
             EventBus.INSTANCE.dispatch(capesEvent);
             if (!capesEvent.isCanceled())
             {

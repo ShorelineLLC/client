@@ -35,7 +35,7 @@ public class ColorButton extends ConfigButton<Color>
     {
         super(frame, moduleButton, config, x, y);
         float[] hsb = ((ColorConfig) config).getHsb();
-        selectedColor = new float[]{hsb[0], hsb[1], 1.0f - hsb[2], hsb[3]};
+        selectedColor = new float[] {hsb[0], hsb[1], 1.0f - hsb[2], hsb[3]};
     }
 
     @Override

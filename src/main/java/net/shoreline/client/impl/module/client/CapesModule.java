@@ -29,10 +29,13 @@ public final class CapesModule extends ToggleModule
             return;
         }
         event.cancel();
-        switch (clientConfig.getValue())
+        if (event.getGameProfile().getName().equalsIgnoreCase(mc.player.getGameProfile().getName()))
         {
-            case WHITE -> event.setTexture(new Identifier("shoreline", "cape/cape_white.png"));
-            case BLACK -> event.setTexture(new Identifier("shoreline", "cape/cape_black.png"));
+            switch (clientConfig.getValue())
+            {
+                case WHITE -> event.setTexture(new Identifier("shoreline", "cape/cape_white.png"));
+                case BLACK -> event.setTexture(new Identifier("shoreline", "cape/cape_black.png"));
+            }
         }
     }
 

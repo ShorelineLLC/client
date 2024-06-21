@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ElytraItem;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.config.Config;
@@ -41,7 +43,7 @@ public class FastSwimModule extends ToggleModule
             return;
         }
         event.cancel();
-        if (mc.player.isFallFlying() && elytraConfig.getValue())
+        if (mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() instanceof ElytraItem && elytraConfig.getValue())
         {
             event.setX(event.getX() * elytraSpeedConfig.getValue());
             event.setZ(event.getZ() * elytraSpeedConfig.getValue());
