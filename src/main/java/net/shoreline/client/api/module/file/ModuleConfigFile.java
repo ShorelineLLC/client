@@ -3,6 +3,9 @@ package net.shoreline.client.api.module.file;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.shoreline.client.BuildConfig;
+import net.shoreline.client.Shoreline;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.init.Managers;
@@ -34,6 +37,7 @@ public class ModuleConfigFile extends ConfigFile
                 Files.createFile(filepath);
             }
             final JsonObject out = new JsonObject();
+            out.addProperty("version", ShorelineMod.MOD_NAME + " " + ShorelineMod.MOD_VER + " (" + ShorelineMod.MOD_BUILD_NUMBER + "-" + BuildConfig.HASH + ")");
             final JsonArray array = new JsonArray();
             for (Module module : Managers.MODULE.getModules())
             {
