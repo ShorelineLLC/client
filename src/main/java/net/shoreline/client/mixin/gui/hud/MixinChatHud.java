@@ -117,10 +117,12 @@ public abstract class MixinChatHud implements IChatHud
             }
             else
             {
-                float red = ColorHelper.Argb.getRed(color) / 255.0f;
-                float green = ColorHelper.Argb.getGreen(color) / 255.0f;
-                float blue = ColorHelper.Argb.getBlue(color) / 255.0f;
-                return instance.drawTextWithShadow(textRenderer, text, 0, y, new Color(red, green, blue, (float) MathHelper.clamp(renderChatHudEvent.getAnimation(), 0.0, 1.0)).getRGB());
+                float alpha = (float) MathHelper.clamp(renderChatHudEvent.getAnimation(), 0.0f, 1.0f);
+
+                float colorAlpha = (color >> 24) & 0xFF;
+                alpha = Math.max(0.0f, Math.min(1.0f, alpha));
+                int colorAlphaInt = Math.max(10, (int) (colorAlpha * alpha));
+                return instance.drawTextWithShadow(textRenderer, text, 0, y, alpha == 1.0f ? color : (colorAlphaInt << 24) | (color & 0xFFFFFF));
             }
         }
         return instance.drawTextWithShadow(textRenderer, text, 0, y, color);

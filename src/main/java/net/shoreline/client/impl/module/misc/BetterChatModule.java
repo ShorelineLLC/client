@@ -83,7 +83,14 @@ public class BetterChatModule extends ToggleModule
             {
                 animation.setState(true);
                 event.cancel();
-                event.setAnimation(animation.getCurrent());
+                if (animationConfig.getValue() == AnimationMode.SLIDE)
+                {
+                    event.setAnimation(animation.getCurrent());
+                }
+                else
+                {
+                    event.setAnimation(animation.getFactor());
+                }
                 event.setSlide(animationConfig.getValue() == AnimationMode.SLIDE);
             }
         }
