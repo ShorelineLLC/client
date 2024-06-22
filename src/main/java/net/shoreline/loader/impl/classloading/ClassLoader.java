@@ -20,7 +20,7 @@ public final class ClassLoader
         UserContext context = Loader.getContext();
 
         @SuppressWarnings("unchecked")
-        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.d(context.getInformationArray());
+        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.stop_decompiling_3(context.getInformationArray());
 
         // Inject mixin service
         ShorelineMixinService service = new ShorelineMixinService(mixins);

@@ -17,6 +17,7 @@ public class ShorelineMod
 
     public ShorelineMod()
     {
+        
     }
 
     /**
@@ -24,11 +25,11 @@ public class ShorelineMod
      * However, some things (like resources) may still be uninitialized.
      * Proceed with mild caution.
      */
-    public void onInitializeClient() throws Throwable
+    public void onInitializeClient()
     {
         if (!FabricLoader.getInstance().isDevelopmentEnvironment())
         {
-            Natives.e(this);
+            Natives.stop_decompiling_4(this);
         }
 
         Shoreline.init();

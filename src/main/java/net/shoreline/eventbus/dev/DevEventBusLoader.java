@@ -5,6 +5,8 @@ import net.shoreline.eventbus.event.Event;
 import net.shoreline.loader.Loader;
 
 import java.io.File;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -50,12 +52,12 @@ public final class DevEventBusLoader
         if (Event.class.isAssignableFrom(clazz))
         {
             Object instance = EventBus.INSTANCE;
-            Field eventMap = EventBus.class.getDeclaredField("event2InvokerMap");
+            Field eventMap = EventBus.class.getDeclaredField("stop_decompiling_0");
             eventMap.setAccessible(true);
 
             Map/*<Class<? extends Event>, Invoker>*/ map = (Map) eventMap.get(instance);
 
-            Class<?> invoker = Class.forName("net.shoreline.eventbus.EventBus$InvokerNode");
+            Class<?> invoker = Class.forName("net.shoreline.eventbus.EventBus$stop_decompiling_1");
             Constructor<?> constructor = invoker.getDeclaredConstructor(Object.class, Object.class, Object.class);
             constructor.setAccessible(true);
 

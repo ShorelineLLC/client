@@ -34,7 +34,7 @@ public final class EventBus
      * This might not be efficient but its definitely obscure, and since the core security measure of this client
      * is the event bus, we can't have people figuring out how to recreate it.
      */
-    private Object event2InvokerMap;
+    private Object stop_decompiling_0;
 
     private EventBus()
     {
@@ -43,22 +43,21 @@ public final class EventBus
     /**
      * Iterate through the linked list for the event and invoke any entries matching the event type
      */
-    @SuppressWarnings({"rawtypes"})
     public void dispatch(Event event)
     {
-        if (this.event2InvokerMap == null)
+        if (this.stop_decompiling_0 == null)
         {
             return;
         }
 
-        InvokerNode head = (InvokerNode) ((Map) this.event2InvokerMap).get(event.getClass());
-        InvokerNode current = (InvokerNode) head.next;
+        stop_decompiling_1 head = (stop_decompiling_1) ((Map) this.stop_decompiling_0).get(event.getClass());
+        stop_decompiling_1 current = (stop_decompiling_1) head.stop_decompiling_0;
 
         while (current != null)
         {
-            ((Invoker) current.invoker).invoke(event);
+            ((stop_decompiling_0) current.stop_decompiling_1).stop_decompiling_0(event);
 
-            current = (InvokerNode) current.next;
+            current = (stop_decompiling_1) current.stop_decompiling_0;
         }
     }
 
@@ -66,28 +65,50 @@ public final class EventBus
 
     public native void unsubscribe(Object subscriber);
 
-    @SuppressWarnings({"unused", "FieldCanBeLocal"}) // Used natively
-    public final static class InvokerNode
+    @FunctionalInterface
+    private interface stop_decompiling_0
     {
-        private final /* InvokerNode */ Object next;
-        private final /* Invoker */ Object invoker;
-        private final Object subscriber;
-        private final /* Integer */ Object priority;
+        /**
+         * invoke(Event event)
+         */
 
-        private InvokerNode(Object invoker,
-                            Object subscriber,
-                            Object priority)
-        {
-            this.next = null;
-            this.invoker = invoker;
-            this.subscriber = subscriber;
-            this.priority = priority;
-        }
+
+        void stop_decompiling_0(Object object);
     }
 
-    @FunctionalInterface
-    public interface Invoker
+    /**
+     * Linked list entry node for Invokers
+     */
+    private static final class stop_decompiling_1
     {
-        void invoke(Object event);
+        /**
+         * Next linked list entry (stop_decompiling_1)
+         */
+        private final Object stop_decompiling_0;
+
+        /**
+         * Invoker (stop_decompiling_0)
+         */
+        private final Object stop_decompiling_1;
+
+        /**
+         * The subscriber instance
+         */
+        private final Object stop_decompiling_2;
+
+        /**
+         * Priority (int) probably boxed as Integer
+         */
+        private final Object stop_decompiling_3;
+
+        private stop_decompiling_1(Object stop_decompiling_0,
+                                   Object stop_decompiling_1,
+                                   Object stop_decompiling_2)
+        {
+            this.stop_decompiling_0 = null;
+            this.stop_decompiling_1 = stop_decompiling_0;
+            this.stop_decompiling_2 = stop_decompiling_1;
+            this.stop_decompiling_3 = stop_decompiling_2;
+        }
     }
 }

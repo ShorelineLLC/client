@@ -1,5 +1,6 @@
 package net.shoreline.loader.impl.antidump.measures;
 
+import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
 import net.shoreline.loader.asm.ClassScanner;
 import net.shoreline.loader.context.UserContext;
@@ -9,6 +10,7 @@ import net.shoreline.loader.impl.classloading.ClassLoader;
 import net.shoreline.loader.impl.classloading.ShorelineMixinService;
 import net.shoreline.loader.impl.classloading.ShorelineResourcePack;
 import net.shoreline.loader.impl.natives.NativeLoader;
+import net.shoreline.loader.plugin.ConfigPlugin;
 
 import java.util.Set;
 
@@ -38,7 +40,10 @@ public final class ClassReflectionDisabler extends Measure
 
                 ClientLoader.class,
 
+                ConfigPlugin.class,
+
+                Loader.class,
                 Natives.class
-        ).forEach(Natives::i);
+        ).forEach(Natives::stop_decompiling_8);
     }
 }

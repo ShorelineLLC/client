@@ -25,34 +25,45 @@
     <methods>;
 }
 
--keep,allowshrinking class net.shoreline.loader.Loader {
-    *** onInitializeClient(...);
-    *** onPreLaunch(...);
-    *** onLoad(...);
-    *** getRefMapperConfig(...);
-    *** shouldApplyMixin(...);
-    *** acceptTargets(...);
-    *** getMixins(...);
-    *** preApply(...);
-    *** postApply(...);
+-keepclassmembers,allowshrinking class net.shoreline.loader.plugin.ConfigPlugin {
+    <fields>;
+    <methods>;
 }
 
 -keepclassmembers,allowshrinking class net.shoreline.loader.impl.classloading.ShorelineMixinService {
     <methods>;
 }
 
--keepclassmembers,allowshrinking class net.shoreline.loader.ModLoader {
+-keepclassmembers,allowshrinking class net.shoreline.loader.Loader {
     *** onInitializeClient(...);
     *** onPreLaunch(...);
 }
 
--keepclassmembers,allowshrinking class net.shoreline.loader.impl.classloading.ShorelineResourcePack {
+-keep,allowshrinking class net.shoreline.eventbus.annotation.EventListener {
+    <fields>;
+    <methods>;
+}
+
+-keep,allowshrinking class net.shoreline.eventbus.EventBus {
+    <fields>;
+}
+
+-keep,allowshrinking class net.shoreline.eventbus.EventBus$stop_decompiling_0 {
+    <methods>;
+}
+
+-keep,allowshrinking class net.shoreline.eventbus.EventBus$stop_decompiling_1 {
+    <fields>;
     <methods>;
 }
 
 -keepclassmembers,allowshrinking enum  * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
+}
+
+-keepclassmembers,allowshrinking class net.shoreline.loader.impl.classloading.ShorelineResourcePack {
+    <methods>;
 }
 
 # Keep - Native method names. Keep all native class/method names.
