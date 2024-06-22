@@ -44,7 +44,6 @@ import net.shoreline.eventbus.annotation.EventListener;
  */
 public class ElytraFlyModule extends RotationModule
 {
-    private static ElytraFlyModule INSTANCE;
 
     Config<FlyMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for elytra flight", FlyMode.CONTROL, FlyMode.values()));
     Config<Float> pitchConfig = register(new NumberConfig<>("Pitch", "The pitch for bounce recast", 0.0f, 75.0f, 90.0f, () -> modeConfig.getValue() == FlyMode.BOUNCE));
@@ -71,16 +70,10 @@ public class ElytraFlyModule extends RotationModule
     public ElytraFlyModule()
     {
         super("ElytraFly", "Allows you to fly freely using an elytra", ModuleCategory.MOVEMENT);
-        INSTANCE = this;
         if (ShorelineMod.isBaritonePresent())
         {
             register(baritoneConfig);
         }
-    }
-
-    public static ElytraFlyModule getInstance()
-    {
-        return INSTANCE;
     }
 
     @Override
@@ -383,7 +376,7 @@ public class ElytraFlyModule extends RotationModule
     }
 
     // @author hockeyl8
-    public boolean isBoostedByRocket()
+    private boolean isBoostedByRocket()
     {
         for (Entity entity : mc.world.getEntities())
         {
