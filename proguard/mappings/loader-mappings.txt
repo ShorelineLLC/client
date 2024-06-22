@@ -1,73 +1,68 @@
-net.shoreline.eventbus.EventBus -> net.shoreline.eventbus.EventBus:
-    net.shoreline.eventbus.EventBus INSTANCE -> INSTANCE
-    java.lang.Object stop_decompiling_0 -> stop_decompiling_0
+net.shoreline.eventbus.EventBus -> net.shoreline.loader.e:
+    net.shoreline.eventbus.EventBus INSTANCE -> a
+    java.lang.Object event2InvokerMap -> a
     void <init>() -> <init>
     void dispatch(net.shoreline.eventbus.event.Event) -> a
-    void subscribe(java.lang.Object) -> subscribe
-    void unsubscribe(java.lang.Object) -> unsubscribe
+    void subscribe(java.lang.Object) -> a
+    void unsubscribe(java.lang.Object) -> b
     void <clinit>() -> <clinit>
-net.shoreline.eventbus.EventBus$stop_decompiling_0 -> net.shoreline.eventbus.EventBus$stop_decompiling_0:
-    void stop_decompiling_0(java.lang.Object) -> stop_decompiling_0
-net.shoreline.eventbus.EventBus$stop_decompiling_1 -> net.shoreline.eventbus.EventBus$stop_decompiling_1:
-    java.lang.Object stop_decompiling_0 -> stop_decompiling_0
-    java.lang.Object stop_decompiling_1 -> stop_decompiling_1
-    java.lang.Object stop_decompiling_2 -> stop_decompiling_2
-    java.lang.Object stop_decompiling_3 -> stop_decompiling_3
+net.shoreline.eventbus.EventBus$Invoker -> net.shoreline.loader.i:
+    void invoke(java.lang.Object) -> a
+net.shoreline.eventbus.EventBus$InvokerNode -> net.shoreline.loader.n:
+    java.lang.Object next -> a
+    java.lang.Object invoker -> b
+    java.lang.Object subscriber -> c
+    java.lang.Object priority -> d
     void <init>(java.lang.Object,java.lang.Object,java.lang.Object) -> <init>
-net.shoreline.eventbus.annotation.Cancelable -> net.shoreline.loader.a:
-net.shoreline.eventbus.annotation.EventListener -> net.shoreline.eventbus.annotation.EventListener:
-    int priority() -> priority
-    boolean receiveCanceled() -> receiveCanceled
-net.shoreline.eventbus.event.Event -> net.shoreline.loader.b:
-    boolean cancelable -> a
-    boolean canceled -> b
-    void <init>() -> <init>
-    boolean isCancelable() -> a
-    boolean isCanceled() -> b
-    void setCanceled(boolean) -> a
-    void cancel() -> a
-net.shoreline.eventbus.event.StageEvent -> net.shoreline.loader.c:
-    net.shoreline.eventbus.event.StageEvent$EventStage stage -> a
-    void <init>() -> <init>
-    net.shoreline.eventbus.event.StageEvent$EventStage getStage() -> a
-    void setStage(net.shoreline.eventbus.event.StageEvent$EventStage) -> a
-net.shoreline.eventbus.event.StageEvent$EventStage -> net.shoreline.loader.d:
-    net.shoreline.eventbus.event.StageEvent$EventStage PRE -> b
-    net.shoreline.eventbus.event.StageEvent$EventStage POST -> c
-    net.shoreline.eventbus.event.StageEvent$EventStage[] $VALUES -> a
-    net.shoreline.eventbus.event.StageEvent$EventStage[] values() -> values
-    net.shoreline.eventbus.event.StageEvent$EventStage valueOf(java.lang.String) -> valueOf
-    void <init>(java.lang.String,int) -> <init>
-    net.shoreline.eventbus.event.StageEvent$EventStage[] $values() -> a
-    void <clinit>() -> <clinit>
-net.shoreline.loader.Loader -> net.shoreline.loader.e:
-    java.lang.String VERSION -> a
+net.shoreline.loader.Loader -> net.shoreline.loader.give up:
     org.apache.logging.log4j.Logger LOGGER -> a
+    java.lang.String VERSION -> a
     net.shoreline.loader.context.UserContext context -> a
+    net.shoreline.loader.Loader$Impl impl -> a
     void <init>() -> <init>
     void onInitializeClient() -> onInitializeClient
     void onPreLaunch() -> onPreLaunch
-    net.shoreline.loader.context.UserContext getContext() -> a
-    java.io.InputStream getResource(java.lang.String) -> a
+    void onLoad(java.lang.String) -> onLoad
+    java.lang.String getRefMapperConfig() -> getRefMapperConfig
+    boolean shouldApplyMixin(java.lang.String,java.lang.String) -> shouldApplyMixin
+    void acceptTargets(java.util.Set,java.util.Set) -> acceptTargets
+    java.util.List getMixins() -> getMixins
+    void preApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> preApply
+    void postApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> postApply
+    void loadNatives() -> a
+    java.lang.String getExt() -> a
+    void crashNotNatively() -> b
     void info(java.lang.String) -> a
     void info(java.lang.String,java.lang.Object[]) -> a
     void error(java.lang.String) -> b
     void error(java.lang.String,java.lang.Object[]) -> b
+    net.shoreline.loader.context.UserContext getContext() -> a
+    java.io.InputStream getResource(java.lang.String) -> a
     void <clinit>() -> <clinit>
+net.shoreline.loader.Loader$Impl -> net.shoreline.loader.a:
+    void <init>() -> <init>
+    void initializeClient() -> c
+    void preLaunch() -> d
+    void load() -> e
+    java.lang.String getRefmapConfig() -> b
+    boolean shouldApplyMixin() -> a
+    java.util.List getMixinSet() -> a
+    java.lang.String lambda$getMixinSet$0(java.lang.Object) -> a
 net.shoreline.loader.Natives -> net.shoreline.loader.Natives:
     void <init>() -> <init>
-    java.lang.Object stop_decompiling_0(java.lang.Object) -> stop_decompiling_0
-    java.lang.Object stop_decompiling_1(java.lang.Object) -> stop_decompiling_1
-    java.lang.Object stop_decompiling_2(java.lang.Object) -> stop_decompiling_2
-    java.lang.Object stop_decompiling_3(java.lang.Object) -> stop_decompiling_3
-    java.lang.Object stop_decompiling_4(java.lang.Object) -> stop_decompiling_4
-    java.lang.Object stop_decompiling_5(java.lang.Object) -> stop_decompiling_5
-    java.lang.Object stop_decompiling_6(java.lang.Object) -> stop_decompiling_6
-    java.lang.Object stop_decompiling_7(java.lang.Object) -> stop_decompiling_7
-    java.lang.Object stop_decompiling_8(java.lang.Object) -> stop_decompiling_8
-    java.lang.Object stop_decompiling_9(java.lang.Object) -> stop_decompiling_9
-    java.lang.Object stop_decompiling_10(java.lang.Object) -> stop_decompiling_10
-    java.lang.Object stop_decompiling_11(java.lang.Object) -> stop_decompiling_11
+    java.lang.Object a(java.lang.Object) -> a
+    java.lang.Object b(java.lang.Object) -> b
+    java.lang.Object c(java.lang.Object) -> c
+    java.lang.Object d(java.lang.Object) -> d
+    java.lang.Object e(java.lang.Object) -> e
+    java.lang.Object f(java.lang.Object) -> f
+    java.lang.Object g(java.lang.Object) -> g
+    java.lang.Object h(java.lang.Object) -> h
+    java.lang.Object i(java.lang.Object) -> i
+    java.lang.Object j(java.lang.Object) -> j
+    java.lang.Object k(java.lang.Object) -> k
+    java.lang.Object l(java.lang.Object) -> l
+    java.lang.Object m(java.lang.Object) -> m
 net.shoreline.loader.asm.ClassScanner -> net.shoreline.loader.f:
     int access -> a
     java.lang.String superName -> b
@@ -76,54 +71,57 @@ net.shoreline.loader.asm.ClassScanner -> net.shoreline.loader.f:
     void <init>() -> <init>
     void visit(int,int,java.lang.String,java.lang.String,java.lang.String,java.lang.String[]) -> visit
     org.objectweb.asm.AnnotationVisitor visitAnnotation(java.lang.String,boolean) -> visitAnnotation
-net.shoreline.loader.context.UserContext -> net.shoreline.loader.g:
+net.shoreline.loader.context.UserContext -> net.shoreline.loader.b:
     java.lang.String hwid -> c
     java.lang.String username -> d
     java.lang.String uid -> e
     java.lang.String usertype -> f
     java.util.List runningMods -> a
     void <init>(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.util.List) -> <init>
-    java.lang.String hwid() -> a
-    java.lang.String username() -> b
-    java.lang.String uid() -> c
-    java.lang.String usertype() -> d
-    java.util.List runningMods() -> a
+    java.lang.String hwid() -> c
+    java.lang.String username() -> d
+    java.lang.String uid() -> e
+    java.lang.String usertype() -> f
+    java.util.List runningMods() -> b
     net.shoreline.loader.context.UserContext setHwid(java.lang.String) -> a
     net.shoreline.loader.context.UserContext setUsername(java.lang.String) -> b
     net.shoreline.loader.context.UserContext setUid(java.lang.String) -> c
     net.shoreline.loader.context.UserContext setUserType(java.lang.String) -> d
     void setRunningMods(java.util.List) -> a
-    boolean isNone() -> c
+    boolean isNone() -> b
     void alert(java.lang.String) -> c
     java.lang.String[] getInformationArray() -> a
     net.shoreline.loader.context.UserContext none() -> b
-net.shoreline.loader.impl.ClientLoader -> net.shoreline.loader.h:
+net.shoreline.loader.impl.ClientLoader -> net.shoreline.loader.c:
     void <init>() -> <init>
-    void loadClient() -> b
-net.shoreline.loader.impl.antidump.Measure -> net.shoreline.loader.i:
+    void loadClient() -> f
+    void setUserCredentials() -> g
+    boolean lambda$setUserCredentials$1(java.lang.String) -> a
+    java.lang.String lambda$setUserCredentials$0(net.fabricmc.loader.api.ModContainer) -> a
+net.shoreline.loader.impl.antidump.Measure -> net.shoreline.loader.d:
     void <init>() -> <init>
-    void execute() -> c
-    void runAllMeasures() -> d
-net.shoreline.loader.impl.antidump.measures.AntiClassSaveDebug -> net.shoreline.loader.j:
+    void execute() -> h
+    void runAllMeasures() -> i
+net.shoreline.loader.impl.antidump.measures.AntiClassSaveDebug -> net.shoreline.loader.g:
     void <init>() -> <init>
-    void execute() -> c
-net.shoreline.loader.impl.antidump.measures.AntiVirtualMachine -> net.shoreline.loader.k:
+    void execute() -> h
+net.shoreline.loader.impl.antidump.measures.AntiVirtualMachine -> net.shoreline.loader.h:
     void <init>() -> <init>
-    void execute() -> c
-net.shoreline.loader.impl.antidump.measures.ClassPresenceChecker -> net.shoreline.loader.l:
+    void execute() -> h
+net.shoreline.loader.impl.antidump.measures.ClassPresenceChecker -> net.shoreline.loader.j:
     void <init>() -> <init>
-    void execute() -> c
-net.shoreline.loader.impl.antidump.measures.ClassReflectionDisabler -> net.shoreline.loader.m:
+    void execute() -> h
+net.shoreline.loader.impl.antidump.measures.ClassReflectionDisabler -> net.shoreline.loader.k:
     void <init>() -> <init>
-    void execute() -> c
-net.shoreline.loader.impl.antidump.measures.LaunchArgumentChecker -> net.shoreline.loader.n:
+    void execute() -> h
+net.shoreline.loader.impl.antidump.measures.LaunchArgumentChecker -> net.shoreline.loader.l:
     void <init>() -> <init>
-    void execute() -> c
+    void execute() -> h
 net.shoreline.loader.impl.classloading.ClassLoader -> net.shoreline.loader.o:
     void <init>() -> <init>
-    void loadAllClasses() -> e
+    void loadAllClasses() -> j
     net.shoreline.loader.impl.classloading.ShorelineResourcePack transformPack(net.minecraft.class_3262) -> a
-net.shoreline.loader.impl.classloading.ShorelineMixinService -> net.shoreline.loader.p:
+net.shoreline.loader.impl.classloading.ShorelineMixinService -> net.shoreline.loader.m:
     java.util.Map mixins -> a
     void <init>(java.util.Map) -> <init>
     byte[] getClassBytes(java.lang.String,boolean) -> getClassBytes
@@ -142,15 +140,11 @@ net.shoreline.loader.impl.classloading.ShorelineResourcePack -> net.shoreline.lo
     net.fabricmc.fabric.api.resource.ModResourcePack createOverlay(java.lang.String) -> createOverlay
     void close() -> close
     java.io.InputStream lambda$open$0(byte[]) -> lambda$open$0
-net.shoreline.loader.impl.natives.NativeLoader -> net.shoreline.loader.r:
+net.shoreline.loader.impl.natives.NativeLoader -> net.shoreline.loader.p:
     void <init>() -> <init>
-    void load() -> f
-    void setUserCredentials() -> g
-    void crashNotNatively() -> h
+    void load() -> e
     net.shoreline.loader.impl.natives.NativeLoader$OSType getOS() -> a
-    boolean lambda$setUserCredentials$1(java.lang.String) -> a
-    java.lang.String lambda$setUserCredentials$0(net.fabricmc.loader.api.ModContainer) -> a
-net.shoreline.loader.impl.natives.NativeLoader$OSType -> net.shoreline.loader.s:
+net.shoreline.loader.impl.natives.NativeLoader$OSType -> net.shoreline.loader.r:
     net.shoreline.loader.impl.natives.NativeLoader$OSType WINDOWS -> a
     net.shoreline.loader.impl.natives.NativeLoader$OSType MAC -> b
     net.shoreline.loader.impl.natives.NativeLoader$OSType LINUX -> c
@@ -160,16 +154,6 @@ net.shoreline.loader.impl.natives.NativeLoader$OSType -> net.shoreline.loader.s:
     net.shoreline.loader.impl.natives.NativeLoader$OSType[] values() -> values
     net.shoreline.loader.impl.natives.NativeLoader$OSType valueOf(java.lang.String) -> valueOf
     void <init>(java.lang.String,int,java.lang.String) -> <init>
-    java.lang.String getExt() -> e
+    java.lang.String getExt() -> a
     net.shoreline.loader.impl.natives.NativeLoader$OSType[] $values() -> a
     void <clinit>() -> <clinit>
-net.shoreline.loader.plugin.ConfigPlugin -> net.shoreline.loader.t:
-    void <init>() -> <init>
-    void onLoad(java.lang.String) -> onLoad
-    java.lang.String getRefMapperConfig() -> getRefMapperConfig
-    boolean shouldApplyMixin(java.lang.String,java.lang.String) -> shouldApplyMixin
-    void acceptTargets(java.util.Set,java.util.Set) -> acceptTargets
-    java.util.List getMixins() -> getMixins
-    void preApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> preApply
-    void postApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> postApply
-    java.lang.String lambda$getMixins$0(java.lang.Object) -> lambda$getMixins$0

@@ -12,12 +12,16 @@ use std::os::raw::{c_void, c_int};
 use jni::objects::{JObject, JString, JClass, GlobalRef};
 use std::ffi::{CStr};
 use std::io::Cursor;
+use aes::Aes128;
+use block_padding::Pkcs7;
+use cbc::cipher::{BlockDecryptMut, KeyIvInit};
+use cbc::Decryptor;
 use hardware_id::get_id;
 use lazy_static::lazy_static;
 use reqwest::Client;
 use tokio::runtime::Runtime;
 use zip::ZipArchive;
-use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook, alert_webhook_async};
+use crate::utils::{define_class, encrypt, get_immediate_dependents, is_imixin_class, is_mixin_accessor, is_mixin_class, error_message, crash, alert_webhook, alert_webhook_async, define_class_internal};
 
 lazy_static! {
     static ref CLIENT: Client = Client::builder().cookie_store(true).build().unwrap();
@@ -29,15 +33,38 @@ static mut MIXIN_LIST: Option<GlobalRef> = None;
 static mut MIXIN_REFMAP: Option<GlobalRef> = None;
 
 static mut LATE_LOADING_CLASSES: Option<GlobalRef> = None;
+static mut LOADER_CLASS_BYTECODE: Option<GlobalRef> = None;
 
 static mut RESOURCES_MAP: Option<GlobalRef> = None;
 
+static mut IS_OBFUSCATED_ENVIRONMENT: bool = false;
 
 #[no_mangle]
 pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
                                          _reserved: &mut c_void) -> c_int
 {
     let env = vm.get_env().unwrap();
+
+    match env.find_class(obfstr!("net/shoreline/loader/Loader"))
+    {
+        Ok(_) => {}
+        Err(_) => {
+            if env.exception_check().unwrap()
+            {
+                env.exception_clear().unwrap();
+            }
+            IS_OBFUSCATED_ENVIRONMENT = true;
+        }
+    }
+
+    if IS_OBFUSCATED_ENVIRONMENT
+    {
+        // decrypt loader classes
+        let caller_class = env.find_class(
+            obfstr!("net/shoreline/loader/give up")
+        ).unwrap();
+        decrypt_all_classes(&env, caller_class);
+    }
 
     let crash_clazz = env.find_class(
         obfstr!("java/lang/System")
@@ -121,16 +148,256 @@ pub unsafe extern "system" fn JNI_OnLoad(vm: JavaVM,
     return JNI_VERSION_1_8
 }
 
+type Aes128CbcDec = Decryptor<Aes128>;
+
+const IV_KEY: [i8; 16] = [-2, 4, -45, -51, 15, -1, -121, -91, -27, -42, 55, -48, 69, 106, 8, -41];
+const ENCRYPTION_KEY: [i8; 16] = [16, 110, 1, -8, 44, 103, 18, 0, 84, 37, -111, -112, -2, 39, 120, 54];
+
+#[export_name = "Java_net_shoreline_loader_Loader_a"]
+pub unsafe extern "system" fn decrypt_loader_classes<'a>(_env: JNIEnv<'a>,
+                                                         _caller_class: JClass<'a>)
+{
+
+}
+
+pub unsafe fn decrypt_all_classes<'a>(env: &JNIEnv,
+                                      caller_class: JClass<'a>)
+{
+    let mut class_queue = VecDeque::new();
+
+    let class_bytecode = env.new_object(
+        obfstr!("java/util/HashMap"),
+        obfstr!("()V"),
+        &[]
+    ).unwrap();
+
+    LOADER_CLASS_BYTECODE = env.new_global_ref(class_bytecode).ok();
+
+    let class_loader = env.call_method(
+        caller_class,
+        obfstr!("getClassLoader"),
+        obfstr!("()Ljava/lang/ClassLoader;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+        "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+
+    let mut count = 0;
+    let mut input_stream;
+
+    loop
+    {
+        let resource_name = "assets/shoreline/".to_owned() + &alphabet[count] + obfstr!(".shoreline");
+        count += 1;
+
+        let formatted_name;
+        if resource_name.eq("assets/shoreline/s.shoreline")
+        {
+            formatted_name = "net/shoreline/loader/Natives.class".to_owned();
+        } else
+        {
+            let raw_name = resource_name.replace("assets/shoreline/", "");
+            formatted_name = "net/shoreline/loader/".to_owned() + raw_name.replace(".shoreline", ".class").as_str();
+        }
+
+        let java_name = env.new_string(resource_name).unwrap();
+
+        input_stream = env.call_method(
+            class_loader,
+            obfstr!("getResourceAsStream"),
+            obfstr!("(Ljava/lang/String;)Ljava/io/InputStream;"),
+            &[java_name.into()]
+        ).unwrap().l().unwrap();
+
+        if input_stream.is_null()
+        {
+            break;
+        }
+
+        let available = env.call_method(
+            input_stream,
+            obfstr!("available"),
+            obfstr!("()I"),
+            &[]
+        ).unwrap().i().unwrap();
+
+        let mut buffer = vec![0; available as usize];
+
+        let baos = env.new_object(
+            obfstr!("java/io/ByteArrayOutputStream"),
+            obfstr!("()V"),
+            &[]
+        ).unwrap();
+
+        let java_buffer = env.new_byte_array(buffer.len() as i32).unwrap();
+
+        loop
+        {
+            let len = env.call_method(
+                input_stream,
+                obfstr!("read"),
+                obfstr!("([B)I"),
+                &[java_buffer.into()]
+            ).unwrap().i().unwrap();
+
+            if len == -1
+            {
+                break;
+            }
+
+            env.call_method(
+                baos,
+                obfstr!("write"),
+                obfstr!("([BII)V"),
+                &[java_buffer.into(), 0.into(), len.into()]
+            ).unwrap().v().unwrap();
+        }
+
+        let bytes = env.call_method(
+            baos,
+            obfstr!("toByteArray"),
+            obfstr!("()[B"),
+            &[]
+        ).unwrap().l().unwrap();
+
+        let iv_length = 16; // Length of IV_KEY
+        let bytecode_len = env.get_array_length(*bytes).unwrap();
+
+        let iv_key = env.call_static_method(
+            obfstr!("java/util/Arrays"),
+            obfstr!("copyOfRange"),
+            obfstr!("([BII)[B"),
+            &[(*bytes).into(), 0.into(), iv_length.into()],
+        ).unwrap().l().unwrap();
+
+        let iv_spec = env.new_object(
+            obfstr!("javax/crypto/spec/IvParameterSpec"),
+            obfstr!("([B)V"),
+            &[iv_key.into()]
+        ).unwrap();
+
+        let encryption_key = env.byte_array_from_slice(&[16, 110, 1, 248, 44, 103, 18, 0, 84, 37, 145, 144, 254, 39, 120, 54]).unwrap();
+
+        let secret_key_spec = env.new_object(
+            obfstr!("javax/crypto/spec/SecretKeySpec"),
+            obfstr!("([BLjava/lang/String;)V"),
+            &[encryption_key.into(), env.new_string(obfstr!("AES")).unwrap().into()],
+        ).unwrap();
+
+        let encrypted_bytecode = env.call_static_method(
+            obfstr!("java/util/Arrays"),
+            obfstr!("copyOfRange"),
+            obfstr!("([BII)[B"),
+            &[(*bytes).into(), iv_length.into(), bytecode_len.into()],
+        ).unwrap().l().unwrap();
+
+        let cipher = env.call_static_method(
+            obfstr!("javax/crypto/Cipher"),
+            obfstr!("getInstance"),
+            obfstr!("(Ljava/lang/String;)Ljavax/crypto/Cipher;"),
+            &[env.new_string(obfstr!("AES/CBC/PKCS5Padding")).unwrap().into()],
+        ).unwrap().l().unwrap();
+
+        env.call_method(
+            cipher,
+            obfstr!("init"),
+            obfstr!("(ILjava/security/Key;Ljava/security/spec/AlgorithmParameterSpec;)V"),
+            &[2.into(), secret_key_spec.into(), iv_spec.into()],
+        ).unwrap();
+
+        // Decrypt the bytecode
+        let decrypted = env.call_method(
+            cipher,
+            "doFinal",
+            "([B)[B",
+            &[encrypted_bytecode.into()],
+        ).unwrap().l().unwrap();
+
+        // Define ClassScanner (f) first, so we can use get_immediate_dependants to
+        // figure out class circularity issues
+        if formatted_name.eq(obfstr!("net/shoreline/loader/f.class"))
+        {
+            define_class(&env, obfstr!("net/shoreline/loader/f.class"), decrypted);
+        } else
+        {
+            class_queue.push_back((formatted_name, decrypted));
+        }
+    }
+
+    let mut defined_classes = Vec::new();
+    let mut dependency_map = HashMap::new();
+    let mut bytes_map = HashMap::new();
+
+    for (name, bytes) in class_queue.iter()
+    {
+        let mut dependencies = get_immediate_dependents(&env, *bytes);
+
+        dependencies.retain(|s| s.starts_with(obfstr!("net/shoreline/loader/")));
+
+        dependency_map.insert(name.clone(), dependencies);
+        bytes_map.insert(name.clone(), bytes);
+    }
+
+    while !dependency_map.is_empty()
+    {
+        let mut defined_this_iteration = Vec::new();
+
+        for (class_name, dependencies) in dependency_map.iter()
+        {
+            if dependencies.is_empty()
+            {
+                let bytes = *bytes_map.remove(class_name).unwrap();
+                let clazz = define_class(&env, class_name, bytes);
+                defined_classes.push(clazz);
+                defined_this_iteration.push(class_name.clone());
+
+                // Cache loader code for mixins
+                if class_name.eq("net/shoreline/loader/e.class") // EventBus.class
+                    || class_name.eq("net/shoreline/loader/o.class") // ClassLoader.class (for loading resources)
+                    || class_name.eq("net/shoreline/loader/q.class") // ShorelineResourcePack.class (for loading resources)
+                {
+                    env.call_method(
+                        class_bytecode,
+                        obfstr!("put"),
+                        obfstr!("(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+                        &[env.new_string(class_name).unwrap().into(), bytes.into()]
+                    ).unwrap();
+                }
+            }
+        }
+
+        for defined_class in defined_this_iteration.iter()
+        {
+            dependency_map.remove(defined_class);
+        }
+
+        for dependencies in dependency_map.values_mut()
+        {
+            dependencies.retain(|dep| !defined_this_iteration.contains(dep));
+        }
+    }
+
+    for clazz in defined_classes
+    {
+        // Add it to the reflection filter map
+        env.call_static_method(
+            caller_class,
+            obfstr!("i"),
+            obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
+            &[clazz.into()]
+        ).unwrap().l().unwrap();
+    }
+}
+
+
 /**
  * Create and return a new class instance without calling <init>
- *
- * Also, wow. Turns out native methods with underscores in them need to have a '1' appended
- * after the underscore, or it's not recognized as the correct function signature. What the fuck.
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_10"]
-pub extern "system" fn stop_decompiling_0<'a>(env: JNIEnv<'a>,
-                                              _caller_class: JClass<'a>,
-                                              class_ctor_instance: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_a"]
+pub extern "system" fn create_raw_instance<'a>(env: JNIEnv<'a>,
+                                               _caller_class: JClass<'a>,
+                                               class_ctor_instance: JObject<'a>) -> JObject<'a>
 {
     let declaring_class = env.call_method(
         class_ctor_instance,
@@ -156,10 +423,10 @@ pub extern "system" fn stop_decompiling_0<'a>(env: JNIEnv<'a>,
 /**
  * Return the list of mixins
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_11"]
-pub unsafe extern "system" fn stop_decompiling_1<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_b"]
+pub unsafe extern "system" fn get_mixins<'a>(env: JNIEnv<'a>,
+                                             caller_class: JClass<'a>,
+                                             _unused_obscure: JObject<'a>) -> JObject<'a>
 {
     return match MIXIN_LIST.as_ref().take()
     {
@@ -179,10 +446,10 @@ pub unsafe extern "system" fn stop_decompiling_1<'a>(env: JNIEnv<'a>,
 /**
  * Return the mixin refmap
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_12"]
-pub unsafe extern "system" fn stop_decompiling_2<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_c"]
+pub unsafe extern "system" fn get_refmap<'a>(env: JNIEnv<'a>,
+                                             caller_class: JClass<'a>,
+                                             _unused_obscure: JObject<'a>) -> JObject<'a>
 {
     return match MIXIN_REFMAP.as_ref().take()
     {
@@ -202,7 +469,7 @@ pub unsafe extern "system" fn stop_decompiling_2<'a>(env: JNIEnv<'a>,
 pub fn log(env: &JNIEnv, msg: &str)
 {
     let logger = env.get_static_field(
-        env.find_class("net/shoreline/loader/e").unwrap(),
+        env.find_class("net/shoreline/loader/give up").unwrap(),
         "a",
         "Lorg/apache/logging/log4j/Logger;"
     ).unwrap().l().unwrap();
@@ -220,14 +487,14 @@ pub fn log(env: &JNIEnv, msg: &str)
 /**
  * Download and store all client classes & resources
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_13"]
-pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     information_array: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_d"]
+pub unsafe extern "system" fn download_client<'a>(env: JNIEnv<'a>,
+                                                  caller_class: JClass<'a>,
+                                                  information_array: JObject<'a>) -> JObject<'a>
 {
     // Get the loader hash and verify with the server
     let protection_domain = env.call_method(
-        caller_class,
+        env.find_class(obfstr!("net/shoreline/loader/give up")).unwrap(),
         obfstr!("getProtectionDomain"),
         obfstr!("()Ljava/security/ProtectionDomain;"),
         &[]
@@ -532,8 +799,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
                                     if name.contains(obfstr!("net/shoreline/client/nT")) // Globals
                                         || name.contains(obfstr!("net/shoreline/client/it")) // InteractType
                                         || name.contains(obfstr!("net/shoreline/client/ct")) // CapeManager$CapeTexture
-
-                                        || name.contains("net/shoreline/client/lc") // RenderLayersClient
+                                        || name.contains(obfstr!("net/shoreline/client/lc")) // RenderLayersClient
                                     {
                                         cache_queue.push_back((jvm_name, jvm_bytes));
                                     }
@@ -605,9 +871,7 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
     let mut event_extending_classes: Vec<String> = Vec::new();
 
     // Event.class
-    event_extending_classes.push(obfstr!("net/shoreline/loader/b").to_string());
-    // StageEvent.class
-    event_extending_classes.push(obfstr!("net/shoreline/loader/c").to_string());
+    event_extending_classes.push(obfstr!("net/shoreline/client/fR").to_string());
 
     while !dependency_map.is_empty()
     {
@@ -618,6 +882,12 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
             if dependencies.is_empty()
             {
                 let bytes = *bytes_map.remove(class_name).unwrap();
+
+                if class_name.starts_with(obfstr!("net/shoreline/client/fR")) // Event.class
+                    || class_name.starts_with(obfstr!("net/shoreline/client/es")) // StageEvent$EventStage.class
+                {
+                    cache_queue.push_back((env.new_string(class_name).unwrap(), bytes))
+                }
 
                 let dependents = get_immediate_dependents(&env, bytes);
 
@@ -642,20 +912,16 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 
                 // Can't do enums since the JVM uses reflection to find their value
                 if !dependents.iter().any(|s| s.starts_with(obfstr!("java/lang/Enum")))
+                    && !class_name.starts_with("net/shoreline/client/el")
+                    // Can't do EventListener because we call methods from it natively which requires reflection
                 {
                     // Add it to the reflection filter map
                     env.call_static_method(
                         caller_class,
-                        obfstr!("stop_decompiling_8"),
+                        obfstr!("i"),
                         obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
                         &[clazz.into()]
                     ).unwrap().l().unwrap();
-                }
-
-                // Cache event classes into the event bus
-                if class_name.starts_with("net/shoreline/client/impl/event")
-                {
-                    eventbus::cache_event_class(&env, clazz);
                 }
             }
         }
@@ -687,10 +953,10 @@ pub unsafe extern "system" fn stop_decompiling_3<'a>(env: JNIEnv<'a>,
 /**
  * Define all late-loading MC extending classes
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_14"]
-pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_e"]
+pub unsafe extern "system" fn define_late_loading_classes<'a>(env: JNIEnv<'a>,
+                                                              caller_class: JClass<'a>,
+                                                              _unused_obscure: JObject<'a>) -> JObject<'a>
 {
     return match LATE_LOADING_CLASSES.as_ref().take()
     {
@@ -750,7 +1016,7 @@ pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
                         // Add it to the reflection filter map
                         env.call_static_method(
                             caller_class,
-                            obfstr!("stop_decompiling_8"),
+                            obfstr!("i"),
                             obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
                             &[clazz.into()]
                         ).unwrap().l().unwrap();
@@ -774,10 +1040,10 @@ pub unsafe extern "system" fn stop_decompiling_4<'a>(env: JNIEnv<'a>,
 /**
  * Return the user information retrieved earlier
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_15"]
-pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     _unused_obscure: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_f"]
+pub unsafe extern "system" fn get_user_information<'a>(env: JNIEnv<'a>,
+                                                       caller_class: JClass<'a>,
+                                                       _unused_obscure: JObject<'a>) -> JObject<'a>
 {
     return match USER_INFO.as_ref().take()
     {
@@ -795,10 +1061,10 @@ pub unsafe extern "system" fn stop_decompiling_5<'a>(env: JNIEnv<'a>,
 /**
  * Confirm with the server that the loader versions match
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_16"]
-pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     loader_version: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_g"]
+pub unsafe extern "system" fn version_check<'a>(env: JNIEnv<'a>,
+                                                caller_class: JClass<'a>,
+                                                loader_version: JObject<'a>) -> JObject<'a>
 {
     let loader_version_utf_chars = env.get_string_utf_chars(JString::from(loader_version)).unwrap();
     let loader_version_cstr = CStr::from_ptr(loader_version_utf_chars).to_str().unwrap();
@@ -864,10 +1130,10 @@ pub unsafe extern "system" fn stop_decompiling_6<'a>(env: JNIEnv<'a>,
  * Alerts the webhook and crashes
  */
 
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_17"]
-pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     param_array: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_h"]
+pub unsafe extern "system" fn alert_webhook_and_crash<'a>(env: JNIEnv<'a>,
+                                                          caller_class: JClass<'a>,
+                                                          param_array: JObject<'a>) -> JObject<'a>
 {
     alert_webhook(
         &env,
@@ -883,8 +1149,8 @@ pub unsafe extern "system" fn stop_decompiling_7<'a>(env: JNIEnv<'a>,
  * Adds the class to the reflection filter map
  */
 
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_18"]
-pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
+#[export_name = "Java_net_shoreline_loader_Natives_i"]
+pub unsafe extern "system" fn disable_reflection<'a>(env: JNIEnv<'a>,
                                                      _caller_class: JClass<'a>,
                                                      class: JObject<'a>) -> JObject<'a>
 {
@@ -897,18 +1163,12 @@ pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
         &[wildcard.into()]
     ).unwrap().l().unwrap();
 
-    let res = env.call_static_method(
+    env.call_static_method(
         env.find_class(obfstr!("jdk/internal/reflect/Reflection")).unwrap(),
         obfstr!("registerFieldsToFilter"),
         obfstr!("(Ljava/lang/Class;Ljava/util/Set;)V"),
         &[class.into(), set.into()]
-    );
-
-    if env.exception_check().unwrap() {
-        env.exception_describe().unwrap();
-    }
-
-    res.unwrap().v().unwrap();
+    ).unwrap().v().unwrap();
 
     env.call_static_method(
         env.find_class(obfstr!("jdk/internal/reflect/Reflection")).unwrap(),
@@ -920,10 +1180,14 @@ pub unsafe extern "system" fn stop_decompiling_8<'a>(env: JNIEnv<'a>,
     return JObject::null();
 }
 
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_19"]
-pub unsafe extern "system" fn stop_decompiling_9<'a>(_env: JNIEnv<'a>,
-                                                     _caller_class: JClass<'a>,
-                                                     _information_array: JObject<'a>) -> JObject<'a>
+/**
+ * Run antidump checks
+ */
+
+#[export_name = "Java_net_shoreline_loader_Natives_j"]
+pub unsafe extern "system" fn run_anti_dump<'a>(_env: JNIEnv<'a>,
+                                                _caller_class: JClass<'a>,
+                                                _information_array: JObject<'a>) -> JObject<'a>
 {
     // let antidump_check_result = run_antidump_checks();
     //
@@ -939,7 +1203,7 @@ pub unsafe extern "system" fn stop_decompiling_9<'a>(_env: JNIEnv<'a>,
     //
     //     env.call_static_method(
     //         caller_class,
-    //         obfstr!("stop_decompiling_7"),
+    //         obfstr!("h"),
     //         obfstr!("(Ljava/lang/Object;)Ljava/lang/Object;"),
     //         &[information_array.into()]
     //     ).unwrap().l().unwrap();
@@ -950,10 +1214,13 @@ pub unsafe extern "system" fn stop_decompiling_9<'a>(_env: JNIEnv<'a>,
     return JObject::null();
 }
 
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_110"]
-pub unsafe extern "system" fn stop_decompiling_10<'a>(env: JNIEnv<'a>,
-                                                     caller_class: JClass<'a>,
-                                                     resource_name: JObject<'a>) -> JObject<'a>
+/**
+ * Gets a resource from native memory
+ */
+#[export_name = "Java_net_shoreline_loader_Natives_k"]
+pub unsafe extern "system" fn get_resource<'a>(env: JNIEnv<'a>,
+                                               caller_class: JClass<'a>,
+                                               resource_name: JObject<'a>) -> JObject<'a>
 {
     return match RESOURCES_MAP.as_mut()
     {
@@ -978,10 +1245,10 @@ pub unsafe extern "system" fn stop_decompiling_10<'a>(env: JNIEnv<'a>,
 /**
  * Check for Fabric API
  */
-#[export_name = "Java_net_shoreline_loader_Natives_stop_1decompiling_111"]
-pub unsafe extern "system" fn stop_decompiling_11<'a>(env: JNIEnv<'a>,
-                                                      caller_class: JClass<'a>,
-                                                      _unused_obscure: JObject<'a>) -> JObject<'a>
+#[export_name = "Java_net_shoreline_loader_Natives_l"]
+pub unsafe extern "system" fn check_fabric_api_presence<'a>(env: JNIEnv<'a>,
+                                                            caller_class: JClass<'a>,
+                                                            _unused_obscure: JObject<'a>) -> JObject<'a>
 {
     let fabric_api_class = env.find_class(
         obfstr!("net/fabricmc/fabric/api/resource/ModResourcePack")
@@ -1001,4 +1268,24 @@ pub unsafe extern "system" fn stop_decompiling_11<'a>(env: JNIEnv<'a>,
     fabric_api_class.unwrap();
 
     return JObject::null();
+}
+
+#[export_name = "Java_net_shoreline_loader_Natives_m"]
+pub unsafe extern "system" fn return_loader_bytecode_4_mixins<'a>(env: JNIEnv<'a>,
+                                                                  caller_class: JClass<'a>,
+                                                                  _unused_obscure: JObject<'a>) -> JObject<'a>
+{
+   return match LOADER_CLASS_BYTECODE.as_ref().take()
+    {
+        Some(bytecode) => bytecode.as_obj(),
+        None => {
+            error_message(
+                obfstr!("An internal error has occurred.\n\nPlease report this to a Shoreline developer!\n\nError code: 17")
+            );
+
+            crash(&env, caller_class);
+
+            JObject::null()
+        }
+    }
 }

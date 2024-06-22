@@ -5,3 +5,20 @@ net.shoreline.loader.asm.ClassScanner -> net.shoreline.loader.f:
     java.lang.String superName -> b
     java.lang.String[] interfaces -> c
     java.util.List descs -> d
+net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
+net.shoreline.eventbus.EventBus -> net.shoreline.loader.e:
+    net.shoreline.eventbus.EventBus INSTANCE -> a
+    java.lang.Object event2InvokerMap -> a
+    void dispatch(net.shoreline.eventbus.event.Event) -> a
+    void subscribe(java.lang.Object) -> a
+    void unsubscribe(java.lang.Object) -> b
+net.shoreline.eventbus.EventBus$Invoker -> net.shoreline.loader.i:
+    void invoke(java.lang.Object) -> a
+net.shoreline.eventbus.EventBus$InvokerNode -> net.shoreline.loader.n:
+    java.lang.Object next -> a
+    java.lang.Object invoker -> b
+    java.lang.Object subscriber -> c
+    java.lang.Object priority -> d
+net.shoreline.loader.Loader -> net.shoreline.loader.give up:
+net.shoreline.loader.impl.classloading.ClassLoader -> net.shoreline.loader.o:
+net.shoreline.loader.impl.classloading.ShorelineResourcePack -> net.shoreline.loader.q:

@@ -8,6 +8,7 @@ use reqwest::Client;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use tokio::runtime::Runtime;
+use crate::log;
 
 pub unsafe fn crash<'a>(env: &JNIEnv<'a>,
                         class_to_rape: JClass)
@@ -55,6 +56,28 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
                                name: &str,
                                jvm_bytes: JObject) -> JClass<'a>
 {
+    let current_thread = env.call_static_method(
+        obfstr!("java/lang/Thread"),
+        obfstr!("currentThread"),
+        obfstr!("()Ljava/lang/Thread;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    let context_classloader = env.call_method(
+        current_thread,
+        obfstr!("getContextClassLoader"),
+        obfstr!("()Ljava/lang/ClassLoader;"),
+        &[]
+    ).unwrap().l().unwrap();
+
+    define_class_internal(env, name, jvm_bytes, context_classloader)
+}
+
+pub unsafe fn define_class_internal<'a>(env: &JNIEnv<'a>,
+                                        name: &str,
+                                        jvm_bytes: JObject,
+                                        class_loader: JObject<'a>) -> JClass<'a>
+{
     let crash_clazz = env.find_class(
         obfstr!("java/lang/System")
     ).unwrap();
@@ -74,28 +97,16 @@ pub unsafe fn define_class<'a>(env: &JNIEnv<'a>,
         vec.push(*bytes.offset(i) as u8);
     }
 
-    let current_thread = env.call_static_method(
-        obfstr!("java/lang/Thread"),
-        obfstr!("currentThread"),
-        obfstr!("()Ljava/lang/Thread;"),
-        &[]
-    ).unwrap().l().unwrap();
-
-    let context_classloader = env.call_method(
-        current_thread,
-        obfstr!("getContextClassLoader"),
-        obfstr!("()Ljava/lang/ClassLoader;"),
-        &[]
-    ).unwrap().l().unwrap();
-
     let clazz = env.define_class(
         name.replace(obfstr!(".class"), obfstr!("")),
-        context_classloader,
+        class_loader,
         vec.as_ref()
     );
 
     if env.exception_check().unwrap()
     {
+        env.exception_describe().unwrap();
+
         env.exception_clear().unwrap();
 
         error_message(

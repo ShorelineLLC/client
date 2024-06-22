@@ -120,7 +120,7 @@ public final class UserContext
     {
         String[] information = getInformationArray();
         information[0] = message;
-        Natives.stop_decompiling_7(information);
+        Natives.h(information);
     }
 
     public String[] getInformationArray()

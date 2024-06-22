@@ -13,6 +13,6 @@ public final class AntiVirtualMachine extends Measure
         UserContext context = Loader.getContext();
         
         // Internal VM checks
-        Natives.stop_decompiling_9(context.getInformationArray());
+        Natives.j(context.getInformationArray());
     }
 }
