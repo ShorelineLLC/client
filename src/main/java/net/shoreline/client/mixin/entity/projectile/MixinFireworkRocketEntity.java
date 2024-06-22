@@ -24,6 +24,8 @@ public class MixinFireworkRocketEntity implements Globals
     @Shadow
     private int life;
 
+    @Shadow private int lifeTime;
+
     /**
      * @param ci
      */
@@ -34,7 +36,7 @@ public class MixinFireworkRocketEntity implements Globals
         FireworkRocketEntity rocketEntity = ((FireworkRocketEntity) (Object) this);
         RemoveFireworkEvent removeFireworkEvent = new RemoveFireworkEvent(rocketEntity);
         EventBus.INSTANCE.dispatch(removeFireworkEvent);
-        if (removeFireworkEvent.isCanceled())
+        if (removeFireworkEvent.isCanceled() && life == lifeTime)
         {
             ci.cancel();
             if (life == 0 && !rocketEntity.isSilent())
