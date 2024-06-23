@@ -24,6 +24,8 @@ public class MixinFireworkRocketEntity implements Globals
     @Shadow
     private int life;
 
+    @Shadow private int lifeTime;
+
     /**
      * @param ci
      */
@@ -31,6 +33,10 @@ public class MixinFireworkRocketEntity implements Globals
             "FireworkRocketEntity;updateRotation()V", shift = At.Shift.AFTER), cancellable = true)
     private void hookTickPre(CallbackInfo ci)
     {
+        if (life <= lifeTime)
+        {
+            return;
+        }
         FireworkRocketEntity rocketEntity = ((FireworkRocketEntity) (Object) this);
         RemoveFireworkEvent removeFireworkEvent = new RemoveFireworkEvent(rocketEntity);
         EventBus.INSTANCE.dispatch(removeFireworkEvent);
