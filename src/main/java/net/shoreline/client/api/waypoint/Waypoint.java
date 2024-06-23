@@ -15,7 +15,7 @@ import net.shoreline.client.util.math.timer.Timer;
  * @author linus
  * @since 1.0
  */
-public class Waypoint extends ConfigContainer implements Position, Globals
+public class Waypoint extends ConfigContainer implements Globals
 {
     //
     private final String ip;
@@ -74,19 +74,16 @@ public class Waypoint extends ConfigContainer implements Position, Globals
         return obj;
     }
 
-    @Override
     public double getX()
     {
         return xConfig.getValue();
     }
 
-    @Override
     public double getY()
     {
         return yConfig.getValue();
     }
 
-    @Override
     public double getZ()
     {
         return zConfig.getValue();

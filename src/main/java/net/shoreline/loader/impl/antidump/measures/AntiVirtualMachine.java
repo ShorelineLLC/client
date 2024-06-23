@@ -2,7 +2,7 @@ package net.shoreline.loader.impl.antidump.measures;
 
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
-import net.shoreline.loader.context.UserContext;
+import net.shoreline.loader.impl.context.UserContext;
 import net.shoreline.loader.impl.antidump.Measure;
 
 public final class AntiVirtualMachine extends Measure
@@ -13,6 +13,6 @@ public final class AntiVirtualMachine extends Measure
         UserContext context = Loader.getContext();
         
         // Internal VM checks
-        Natives.stop_decompiling_9(context.getInformationArray());
+        Natives.j(context.getInformationArray());
     }
 }

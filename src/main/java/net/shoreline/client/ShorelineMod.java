@@ -29,7 +29,7 @@ public class ShorelineMod
     {
         if (!FabricLoader.getInstance().isDevelopmentEnvironment())
         {
-            Natives.stop_decompiling_4(this);
+            Natives.e(this);
         }
 
         Shoreline.init();

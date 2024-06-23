@@ -125,9 +125,10 @@ tasks.register('loaderJar', Jar) {
 
     from(tempDir) {
         exclude 'net/shoreline/client/**'
+        exclude 'net/shoreline/eventbus/annotation/**'
         exclude 'net/shoreline/eventbus/dev/**'
-        exclude 'assets/shoreline/font/**'
-        exclude 'assets/shoreline/shaders/**'
+        exclude 'net/shoreline/eventbus/event/**'
+        exclude 'assets/**'
         exclude 'mixins.shoreline.json'
         exclude 'shoreline-refmap.json'
     }
@@ -145,8 +146,9 @@ tasks.register('clientJar', Jar) {
     from(zipTree(tasks.remapJar.archivePath))
 
     include 'net/shoreline/client/**'
+    include 'net/shoreline/eventbus/annotation/**'
+    include 'net/shoreline/eventbus/event/**'
     include 'assets/**'
-    exclude 'assets/shoreline/nice_try.txt'
     include 'shoreline-refmap.json'
 
     archiveBaseName = "client-raw"

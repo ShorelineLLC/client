@@ -12,7 +12,7 @@ public final class Natives
      * @param p0 Class instance to create (Class<?>)
      * @return New instance of p0
      */
-    public static native Object stop_decompiling_0(Object p0);
+    public static native Object a(Object p0);
 
     /**
      * Grabs the mixin config from native memory and returns it
@@ -20,7 +20,7 @@ public final class Natives
      * @param p0 Null parameter
      * @return Mixin config as a byte[]
      */
-    public static native Object stop_decompiling_1(Object p0);
+    public static native Object b(Object p0);
 
     /**
      * Grabs the mixin refmap from native memory and returns it
@@ -28,7 +28,7 @@ public final class Natives
      * @param p0 Null parameter
      * @return Refmap as a byte[]
      */
-    public static native Object stop_decompiling_2(Object p0);
+    public static native Object c(Object p0);
 
     /**
      * Downloads the client resources, assigns the mixin config & refmap in native memory
@@ -41,7 +41,7 @@ public final class Natives
      *           [3] = The usertype of the user (Used to retrieve the correct client jar from the server)
      * @return A <String, byte[]> map of mixin bytecode
      */
-    public static native Object stop_decompiling_3(Object p0);
+    public static native Object d(Object p0);
 
     /**
      * Loads any late-loading classes that need to be initialized. AKA, any classes that extend MC classes.
@@ -49,7 +49,7 @@ public final class Natives
      * @param p0 Null parameter
      * @return Null
      */
-    public static native Object stop_decompiling_4(Object p0);
+    public static native Object e(Object p0);
 
     /**
      * Attempts to connect to the webserver and authorize the user
@@ -57,7 +57,7 @@ public final class Natives
      * @param p0 Null parameter
      * @return String value of the username and UID of the user, seperated by ":"
      */
-    public static native Object stop_decompiling_5(Object p0);
+    public static native Object f(Object p0);
 
     /**
      * Checks with the server to ensure the loader is on its most recent version
@@ -66,7 +66,7 @@ public final class Natives
      * @param p0 The current loader version
      * @return Null
      */
-    public static native Object stop_decompiling_6(Object p0);
+    public static native Object g(Object p0);
 
     /**
      * Alerts the webhook with the loaded user context, then crashes the client
@@ -78,7 +78,7 @@ public final class Natives
      *           [3] = The usertype of the user
      * @return Null
      */
-    public static native Object stop_decompiling_7(Object p0);
+    public static native Object h(Object p0);
 
     /**
      * Adds the given set of classes to jdk/internal/reflect/Reflection field & method filter map
@@ -86,7 +86,7 @@ public final class Natives
      * @param p0 A set of classes
      * @return Null
      */
-    public static native Object stop_decompiling_8(Object p0);
+    public static native Object i(Object p0);
 
     /**
      * Internal antidump checks, will crash & alert if fail
@@ -94,7 +94,7 @@ public final class Natives
      * @param p0 User information array for alerting (see above)
      * @return Null
      */
-    public static native Object stop_decompiling_9(Object p0);
+    public static native Object j(Object p0);
 
     /**
      * Gets a resource from the native memory
@@ -102,7 +102,7 @@ public final class Natives
      * @param p0 Name of the resource
      * @return A byte array of its contents
      */
-    public static native Object stop_decompiling_10(Object p0);
+    public static native Object k(Object p0);
 
     /**
      * Check for Fabric API
@@ -110,5 +110,10 @@ public final class Natives
      * @param p0 Unused obscure
      * @return Null
      */
-    public static native Object stop_decompiling_11(Object p0);
+    public static native Object l(Object p0);
+
+    /**
+     * Gets loader class bytes to cache for mixins
+     */
+    public static native Object m(Object p0);
 }

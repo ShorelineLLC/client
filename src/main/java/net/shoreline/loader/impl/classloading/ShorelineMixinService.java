@@ -12,8 +12,11 @@ public final class ShorelineMixinService extends MixinServiceKnot
 {
     private final Map<String, byte[]> mixins;
 
+    @SuppressWarnings("unchecked")
     ShorelineMixinService(Map<String, byte[]> mixins)
     {
+        // Add all loader class bytecode necessary
+        mixins.putAll((Map<String, byte[]>) Natives.m(mixins));
         this.mixins = mixins;
     }
 
@@ -34,10 +37,12 @@ public final class ShorelineMixinService extends MixinServiceKnot
     {
         if (name.equals("shoreline-refmap.json"))
         {
-            byte[] refmap = (byte[]) Natives.stop_decompiling_2(name);
+            byte[] refmap = (byte[]) Natives.c(name);
             return new ByteArrayInputStream(refmap);
         }
 
         return super.getResourceAsStream(name);
     }
+
+
 }

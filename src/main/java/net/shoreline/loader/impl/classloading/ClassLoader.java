@@ -4,7 +4,7 @@ import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
 import net.minecraft.resource.ResourcePack;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.Natives;
-import net.shoreline.loader.context.UserContext;
+import net.shoreline.loader.impl.context.UserContext;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfig;
 import org.spongepowered.asm.mixin.transformer.Config;
 import org.spongepowered.asm.service.MixinService;
@@ -20,7 +20,7 @@ public final class ClassLoader
         UserContext context = Loader.getContext();
 
         @SuppressWarnings("unchecked")
-        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.stop_decompiling_3(context.getInformationArray());
+        Map<String, byte[]> mixins = (Map<String, byte[]>) Natives.d(context.getInformationArray());
 
         // Inject mixin service
         ShorelineMixinService service = new ShorelineMixinService(mixins);

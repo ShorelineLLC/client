@@ -15,7 +15,6 @@ public abstract class Measure
                 new AntiClassSaveDebug(),
                 new AntiVirtualMachine(),
                 new ClassPresenceChecker(),
-                new ClassReflectionDisabler(),
                 new LaunchArgumentChecker()
         );
 

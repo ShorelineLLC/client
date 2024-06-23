@@ -48,7 +48,7 @@ public final class ShorelineResourcePack implements ResourcePack, ModResourcePac
         if (!FabricLoader.getInstance().isDevelopmentEnvironment())
         {
             String formattedName = String.format("assets/shoreline/%s", id.getPath());
-            byte[] content = (byte[]) Natives.stop_decompiling_10(formattedName);
+            byte[] content = (byte[]) Natives.k(formattedName);
 
             if (content == null)
             {
