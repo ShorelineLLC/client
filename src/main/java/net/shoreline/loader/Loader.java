@@ -13,11 +13,12 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import sun.misc.Unsafe;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -98,33 +99,31 @@ public final class Loader implements
 
     public static void loadNatives() throws Throwable
     {
-//        String ext = getExt();
-//        URL url = new URL("https://api.shorelineclient.net/natives");
-//
-//        URLConnection urlConnection = url.openConnection();
-//        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
-//        urlConnection.addRequestProperty("Library-Type", ext);
-//
-//        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
-//        byte[] buffer = new byte[urlConnection.getContentLength()];
-//        for (int i = 0; i < buffer.length; i++)
-//        {
-//            buffer[i] = nativesInputStream.readByte();
-//        }
-//
-//        File natives = Files.createTempFile(
-//                null,
-//                "." + ext
-//        ).toFile();
-//
-//        natives.deleteOnExit();
-//
-//        FileOutputStream fos = new FileOutputStream(natives);
-//        fos.write(buffer);
-//        fos.flush();
-//        fos.close();
+        String ext = getExt();
+        URL url = new URL("https://api.shorelineclient.net/natives");
 
-        File natives = new File("C:\\Users\\user2\\Desktop\\shoreline\\src\\main\\rust\\target\\debug\\shoreline_loader.dll");
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
+        urlConnection.addRequestProperty("Library-Type", ext);
+
+        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
+        byte[] buffer = new byte[urlConnection.getContentLength()];
+        for (int i = 0; i < buffer.length; i++)
+        {
+            buffer[i] = nativesInputStream.readByte();
+        }
+
+        File natives = Files.createTempFile(
+                null,
+                "." + ext
+        ).toFile();
+
+        natives.deleteOnExit();
+
+        FileOutputStream fos = new FileOutputStream(natives);
+        fos.write(buffer);
+        fos.flush();
+        fos.close();
 
         System.load(natives.getAbsolutePath());
     }
