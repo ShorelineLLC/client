@@ -1,0 +1,24 @@
+# Eclipse.
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+# .idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+# Gradle.
+build
+.gradle
+# Other.
+eclipse
+run
+# Mac
+*.DS_Store
+# Rust
+target/
+*.lock

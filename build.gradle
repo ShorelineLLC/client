@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group = 'net.shoreline'
+version = '0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "io.javalin:javalin:6.1.4"
+    implementation "org.slf4j:slf4j-simple:2.0.12"
+    implementation 'com.mysql:mysql-connector-j:8.4.0'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+    implementation 'org.ow2.asm:asm:9.7'
+    implementation 'org.ow2.asm:asm-tree:9.7'
+}
+
+application {
+    mainClassName = 'net.shoreline.server.ServerMain'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'net.shoreline.server.ServerMain'
+        )
+    }
+}
+
+shadowJar {
+    manifest {
+        attributes(
+                'Main-Class': 'net.shoreline.server.ServerMain'
+        )
+    }
+
+    archiveBaseName = "shorelineserver"
+    archiveClassifier = ""
+    archiveVersion = ""
+}
