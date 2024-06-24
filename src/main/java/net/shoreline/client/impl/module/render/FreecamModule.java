@@ -20,6 +20,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.camera.CameraPositionEvent;
 import net.shoreline.client.impl.event.camera.CameraRotationEvent;
 import net.shoreline.client.impl.event.camera.EntityCameraPositionEvent;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.entity.EntityRotationVectorEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
@@ -83,6 +84,15 @@ public class FreecamModule extends ToggleModule
     {
         if (mc.player == null) return;
         mc.player.input = new KeyboardInput(mc.options);
+    }
+
+    @EventListener
+    public void onDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() == mc.player)
+        {
+            disable();
+        }
     }
 
     @EventListener

@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.TippedArrowItem;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.screen.slot.SlotActionType;
@@ -29,15 +30,12 @@ public class SelfBowModule extends RotationModule
 {
     private static SelfBowModule INSTANCE;
 
-    //
+    private int pullTicks;
     private final Set<StatusEffectInstance> arrows = new HashSet<>();
 
-    /**
-     *
-     */
     public SelfBowModule()
     {
-        super("SelfBow", "Shoots player with beneficial tipped arrows", ModuleCategory.COMBAT);
+        super("SelfBow", "Shoots player with beneficial tipped arrows", ModuleCategory.COMBAT, 755);
         INSTANCE = this;
     }
 
@@ -58,7 +56,7 @@ public class SelfBowModule extends RotationModule
     {
         int arrowSlot = -1;
         StatusEffectInstance statusEffect = null;
-        for (int i = 9; i < 36; i++)
+        for (int i = 0; i < 36; i++)
         {
             ItemStack stack = mc.player.getInventory().getStack(i);
             if (stack.isEmpty() || !(stack.getItem() instanceof TippedArrowItem))
@@ -91,24 +89,40 @@ public class SelfBowModule extends RotationModule
                 break;
             }
         }
+        float pullTime = BowItem.getPullProgress(pullTicks);
         if (mc.player.getMainHandStack().getItem() != Items.BOW || bowSlot == -1 || arrowSlot == -1)
         {
             disable();
             return;
         }
         setRotation(mc.player.getYaw(), -90.0f);
-        mc.interactionManager.clickSlot(0, arrowSlot, 9, SlotActionType.SWAP, mc.player);
-        float pullTime = BowItem.getPullProgress(mc.player.getItemUseTime());
+        if (arrowSlot != 9)
+        {
+            if (mc.player.currentScreenHandler.getCursorStack().getItem() != Items.TIPPED_ARROW)
+            {
+                mc.interactionManager.clickSlot(0, arrowSlot < 9 ? arrowSlot + 36 : arrowSlot, 0, SlotActionType.PICKUP, mc.player);
+            }
+            if (mc.player.currentScreenHandler.getCursorStack().getItem() == Items.TIPPED_ARROW)
+            {
+                mc.interactionManager.clickSlot(0, 9, 0, SlotActionType.PICKUP, mc.player);
+            }
+            if (!mc.player.currentScreenHandler.getCursorStack().isEmpty())
+            {
+                mc.interactionManager.clickSlot(0, arrowSlot < 9 ? arrowSlot + 36 : arrowSlot, 0, SlotActionType.PICKUP, mc.player);
+            }
+        }
         if (pullTime >= 0.15f)
         {
             arrows.add(statusEffect);
             mc.options.useKey.setPressed(false);
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
             mc.player.stopUsingItem();
+            pullTicks = 0;
         }
         else
         {
             mc.options.useKey.setPressed(true);
+            pullTicks++;
         }
     }
 }

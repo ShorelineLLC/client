@@ -202,7 +202,7 @@ public class VelocityModule extends ToggleModule
     {
         if (cancelVelocity)
         {
-            if (modeConfig.getValue() == VelocityMode.GRIM && Managers.ANTICHEAT.hasPassed(100))
+            if (modeConfig.getValue() == VelocityMode.GRIM)
             {
                 // Fixes issue with rotations
                 float yaw = Managers.ROTATION.getServerYaw();
@@ -215,7 +215,7 @@ public class VelocityModule extends ToggleModule
                 Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(),
                         mc.player.getY(), mc.player.getZ(), yaw, pitch, mc.player.isOnGround()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-                        mc.player.isCrawling() ? mc.player.getBlockPos() : mc.player.getBlockPos().up(), Direction.DOWN));
+                        mc.player.getBlockPos(), Direction.DOWN));
             }
             cancelVelocity = false;
         }

@@ -17,8 +17,6 @@ public class ViewModelModule extends ToggleModule
 {
 
     // Config<Boolean> eatingConfig = register(new BooleanConfig("Eating", "Modifies eating transformations", true);
-    // Config<Boolean> customFovConfig = register(new BooleanConfig("CustomFov", "Change field of view", false);
-    // Config<Float> fovConfig = register(new NumberConfig<>("FOV", "Field of view", 10.0f, 120.0f, 180.0f);
     Config<Float> positionXConfig = register(new NumberConfig<>("X", "Translation in x-direction", -3.0f, 0.0f, 3.0f));
     Config<Float> positionYConfig = register(new NumberConfig<>("Y", "Translation in y-direction", -3.0f, 0.0f, 3.0f));
     Config<Float> positionZConfig = register(new NumberConfig<>("Z", "Translation in z-direction", -3.0f, 0.0f, 3.0f));

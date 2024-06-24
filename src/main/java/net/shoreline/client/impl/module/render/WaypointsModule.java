@@ -123,9 +123,4 @@ public class WaypointsModule extends ToggleModule
         }
         RenderBuffers.postRender();
     }
-
-    public boolean getCoords()
-    {
-        return coordsConfig.getValue();
-    }
 }
