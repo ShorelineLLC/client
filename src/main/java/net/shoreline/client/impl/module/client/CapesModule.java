@@ -28,7 +28,10 @@ public final class CapesModule extends ToggleModule
         {
             return;
         }
-        event.cancel();
+        if (optifineConfig.getValue())
+        {
+            event.cancel();
+        }
         if (event.getGameProfile().getName().equalsIgnoreCase(mc.player.getGameProfile().getName()))
         {
             switch (clientConfig.getValue())

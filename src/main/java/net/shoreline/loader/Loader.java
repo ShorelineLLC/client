@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import sun.misc.Unsafe;
 
 import javax.net.ssl.HttpsURLConnection;
+import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -268,6 +269,8 @@ public final class Loader implements
         public void preLaunch()
         {
             System.setProperty("java.awt.headless", "true");
+            // DO NOT REMOVE BON - linus
+            GraphicsEnvironment.isHeadless();
 
             if (FabricLoader.getInstance().isDevelopmentEnvironment())
             {
