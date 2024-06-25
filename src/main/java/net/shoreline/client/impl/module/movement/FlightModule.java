@@ -11,6 +11,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 import net.shoreline.client.util.player.MovementUtil;
@@ -105,6 +106,10 @@ public class FlightModule extends ToggleModule
         else
         {
             speed = speedConfig.getValue();
+        }
+        if (DisablerModule.getInstance().grimFireworkCheck())
+        {
+            return;
         }
         if (modeConfig.getValue().equals(FlightMode.VANILLA))
         {

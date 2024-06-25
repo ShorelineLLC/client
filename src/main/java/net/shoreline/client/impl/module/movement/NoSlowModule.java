@@ -24,6 +24,7 @@ import net.shoreline.client.impl.event.block.SteppedOnSlimeBlockEvent;
 import net.shoreline.client.impl.event.entity.SlowMovementEvent;
 import net.shoreline.client.impl.event.entity.VelocityMultiplierEvent;
 import net.shoreline.client.impl.event.network.*;
+import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
 import net.shoreline.eventbus.event.StageEvent;
@@ -309,6 +310,10 @@ public class NoSlowModule extends ToggleModule
 //        if ((offHandStack.isFood() || offHandStack.getItem() == Items.BOW || offHandStack.getItem() == Items.CROSSBOW || offHandStack.getItem() == Items.SHIELD) && grimConfig.getValue()) {
 //            return false;
 //        }
+        if (DisablerModule.getInstance().grimFireworkCheck2())
+        {
+            return true;
+        }
         return !mc.player.isRiding() && !mc.player.isSneaking() && (mc.player.isUsingItem() && itemsConfig.getValue() || mc.player.isBlocking() && shieldsConfig.getValue() && !grimConfig.getValue());
     }
 

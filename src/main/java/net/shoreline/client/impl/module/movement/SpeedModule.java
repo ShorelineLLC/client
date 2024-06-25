@@ -20,6 +20,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.MathUtil;
@@ -146,6 +147,7 @@ public class SpeedModule extends ToggleModule
         if (mc.player != null && mc.world != null)
         {
             if (!MovementUtil.isInputtingMovement()
+                    || DisablerModule.getInstance().grimFireworkCheck()
                     || FlightModule.getInstance().isEnabled()
                     || LongJumpModule.getInstance().isEnabled()
                     //      || Modules.ELYTRA_FLY.isEnabled()
