@@ -59,7 +59,10 @@ public class ReplenishModule extends ToggleModule
             }
             else
             {
-                hotbar[i] = stack.getItem();
+                if (stack.isStackable())
+                {
+                    hotbar[i] = stack.getItem();
+                }
                 double stackPercent = ((float) stack.getCount() / stack.getMaxCount()) * 100.0f;
                 if (stackPercent <= percentConfig.getValue())
                 {
@@ -76,6 +79,10 @@ public class ReplenishModule extends ToggleModule
 
     private void replenishItem(Item item, int hotbarSlot)
     {
+        if (item.getMaxCount() <= 1)
+        {
+            return;
+        }
         int total = 0;
         while (total < item.getMaxCount())
         {
@@ -91,6 +98,10 @@ public class ReplenishModule extends ToggleModule
 
     private void replenishStack(ItemStack stack, int hotbarSlot)
     {
+        if (!stack.isStackable())
+        {
+            return;
+        }
         int total = stack.getCount();
         while (total < stack.getMaxCount())
         {
@@ -106,10 +117,6 @@ public class ReplenishModule extends ToggleModule
 
     private ReplenishData searchReplenishItem(Item item)
     {
-        if (item instanceof BlockItem blockItem && blockItem.getBlock() == Blocks.SHULKER_BOX)
-        {
-            return null;
-        }
         for (int i = 9; i < 36; i++)
         {
             ItemStack stack1 = mc.player.getInventory().getStack(i);
