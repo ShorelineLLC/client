@@ -1,6 +1,9 @@
 package net.shoreline.client.impl.module.movement;
 
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -11,6 +14,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.event.network.ServerTickEvent;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
@@ -20,7 +24,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 /**
- * @author linus & hockeyl8
+ * @author linus
  * @since 1.0
  */
 public class FlightModule extends ToggleModule
@@ -36,8 +40,11 @@ public class FlightModule extends ToggleModule
     Config<Float> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "Max speed to acceleratee to", 1.0f, 5.0f, 10.0f, () -> accelerateConfig.getValue()));
 
     private double speed;
+    // antikick bs
     private double lastY;
+    private boolean floating;
     private int floatingTicks;
+    private boolean modifyY;
 
     public FlightModule()
     {
@@ -73,18 +80,21 @@ public class FlightModule extends ToggleModule
         {
             disableVanillaFly();
         }
+        modifyY = false;
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onServerTick(TickEvent event)
     {
-        if (event.getStage() != StageEvent.EventStage.PRE)
-        {
-            return;
-        }
-        if (mc.player.getY() >= lastY - 0.04)
+        if (floating && event.getStage() == StageEvent.EventStage.POST)
         {
             floatingTicks++;
+            if (floatingTicks >= 20)
+            {
+                modifyY = true;
+                floatingTicks = 0;
+                floating = false;
+            }
         }
     }
 
@@ -118,7 +128,7 @@ public class FlightModule extends ToggleModule
         }
         else
         {
-            mc.player.getAbilities().setFlySpeed(0.05f);
+            disableVanillaFly();
         }
         if (modeConfig.getValue() == FlightMode.NORMAL)
         {
@@ -150,48 +160,58 @@ public class FlightModule extends ToggleModule
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
         if (event.getPacket() instanceof PlayerMoveC2SPacket packet && antiKickConfig.getValue())
         {
+            double packetY = packet.getY(Double.NaN);
             // Vanilla fly kick checks every 80 ticks
-            if (packet.changesPosition())
+            if (!Double.isNaN(packetY))
             {
-                if (floatingTicks >= 70)
+                if (modifyY)
                 {
                     ((AccessorPlayerMoveC2SPacket) packet).hookSetY(lastY - 0.04);
-                    floatingTicks = 0;
+                    modifyY = false;
                 }
                 else
                 {
-                    lastY = packet.getY(mc.player.getY());
+                    floating = floatingCheck(packet);
+                    lastY = packetY;
                 }
             }
             else
             {
-                if (floatingTicks >= 70)
+                if (modifyY)
                 {
+                    PlayerMoveC2SPacket packet1;
+                    if (packet.changesLook())
+                    {
+                        packet1 = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround());
+                    }
+                    else
+                    {
+                        packet1 = new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), packet.isOnGround());
+                    }
                     event.cancel();
-                    Managers.NETWORK.sendQuietPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04,
-                            mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround()));
-                    floatingTicks = 0;
+                    Managers.NETWORK.sendQuietPacket(packet1);
+                    modifyY = false;
                 }
             }
         }
     }
 
-    @EventListener
-    public void onConfigUpdate(ConfigUpdateEvent event)
+    private boolean floatingCheck(PlayerMoveC2SPacket packet)
     {
-        if (event.getConfig() == modeConfig && event.getStage() == StageEvent.EventStage.POST)
-        {
-            if (modeConfig.getValue() == FlightMode.VANILLA)
-            {
-                enableVanillaFly();
-            }
-            else
-            {
-                disableVanillaFly();
-            }
-        }
+        double e = MathHelper.clamp(packet.getY(mc.player.getY()), -2.0E7, 2.0E7);
+        double s = e - lastY;
+        return s >= -0.03125 && !mc.player.groundCollision && isEntityOnAir(mc.player);
+    }
+
+    private boolean isEntityOnAir(Entity entity)
+    {
+        return entity.getWorld().getStatesInBox(entity.getBoundingBox().expand(0.0625).stretch(0.0, -0.55, 0.0)).allMatch(AbstractBlock.AbstractBlockState::isAir);
     }
 
     private void enableVanillaFly()

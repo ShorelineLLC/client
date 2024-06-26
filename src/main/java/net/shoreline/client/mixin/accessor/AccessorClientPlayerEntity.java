@@ -29,4 +29,7 @@ public interface AccessorClientPlayerEntity
      */
     @Accessor("lastZ")
     double getLastZ();
+
+    @Accessor("ticksSinceLastPositionPacketSent")
+    void hookSetTicksSinceLastPositionPacketSent(int ticksSinceLastPositionPacketSent);
 }
