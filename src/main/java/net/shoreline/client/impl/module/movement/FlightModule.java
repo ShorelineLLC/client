@@ -34,7 +34,7 @@ public class FlightModule extends ToggleModule
     Config<FlightMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for vanilla flight", FlightMode.NORMAL, FlightMode.values()));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f));
     Config<Float> vspeedConfig = register(new NumberConfig<>("VerticalSpeed", "The vertical flight speed", 0.1f, 1.0f, 5.0f));
-    Config<Boolean> antiKickConfig = register(new BooleanConfig("AntiKick", "Prevents vanilla flight detection", true));
+    Config<AntiKick> antiKickConfig = register(new EnumConfig<>("AntiKick", "Prevents vanilla flight detection", AntiKick.NORMAL, AntiKick.values()));
     Config<Boolean> accelerateConfig = register(new BooleanConfig("Accelerate", "Accelerate as you fly", false));
     Config<Float> accelerateSpeedConfig = register(new NumberConfig<>("AccelerateSpeed", "Speed to accelerate as", 0.01f, 0.2f, 1.0f, () -> accelerateConfig.getValue()));
     Config<Float> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "Max speed to acceleratee to", 1.0f, 5.0f, 10.0f, () -> accelerateConfig.getValue()));
@@ -91,7 +91,14 @@ public class FlightModule extends ToggleModule
             floatingTicks++;
             if (floatingTicks >= 20)
             {
-                modifyY = true;
+                if (antiKickConfig.getValue() == AntiKick.PACKET)
+                {
+                    modifyY = true;
+                }
+                else if (antiKickConfig.getValue() == AntiKick.NORMAL)
+                {
+                    mc.player.setPosition(mc.player.getX(), mc.player.getY() - 0.0313, mc.player.getZ());
+                }
                 floatingTicks = 0;
                 floating = false;
             }
@@ -133,7 +140,7 @@ public class FlightModule extends ToggleModule
         if (modeConfig.getValue() == FlightMode.NORMAL)
         {
             Managers.MOVEMENT.setMotionY(0.0);
-            if (mc.options.jumpKey.isPressed())
+            if (mc.options.jumpKey.isPressed() && floatingTicks < 20)
             {
                 Managers.MOVEMENT.setMotionY(vspeedConfig.getValue());
             }
@@ -164,7 +171,7 @@ public class FlightModule extends ToggleModule
         {
             return;
         }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket packet && antiKickConfig.getValue())
+        if (event.getPacket() instanceof PlayerMoveC2SPacket packet && antiKickConfig.getValue() != AntiKick.OFF)
         {
             double packetY = packet.getY(Double.NaN);
             // Vanilla fly kick checks every 80 ticks
@@ -234,5 +241,12 @@ public class FlightModule extends ToggleModule
     {
         NORMAL,
         VANILLA
+    }
+
+    public enum AntiKick
+    {
+        NORMAL,
+        PACKET,
+        OFF
     }
 }
