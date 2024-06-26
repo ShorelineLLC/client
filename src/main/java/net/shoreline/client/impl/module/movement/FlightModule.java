@@ -84,28 +84,6 @@ public class FlightModule extends ToggleModule
     }
 
     @EventListener
-    public void onServerTick(TickEvent event)
-    {
-        if (floating && event.getStage() == StageEvent.EventStage.POST)
-        {
-            floatingTicks++;
-            if (floatingTicks >= 20)
-            {
-                if (antiKickConfig.getValue() == AntiKick.PACKET)
-                {
-                    modifyY = true;
-                }
-                else if (antiKickConfig.getValue() == AntiKick.NORMAL)
-                {
-                    mc.player.setPosition(mc.player.getX(), mc.player.getY() - 0.0313, mc.player.getZ());
-                }
-                floatingTicks = 0;
-                floating = false;
-            }
-        }
-    }
-
-    @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
         if (accelerateConfig.getValue())
@@ -137,10 +115,34 @@ public class FlightModule extends ToggleModule
         {
             disableVanillaFly();
         }
+        boolean stopVerticalMovement = false;
+        if (floating)
+        {
+            floatingTicks++;
+            if (floatingTicks >= 20)
+            {
+                if (antiKickConfig.getValue() == AntiKick.PACKET)
+                {
+                    modifyY = true;
+                }
+                else if (antiKickConfig.getValue() == AntiKick.NORMAL)
+                {
+                    mc.player.setPosition(mc.player.getX(), mc.player.getY() - 0.0313, mc.player.getZ());
+                    if (modeConfig.getValue() == FlightMode.VANILLA)
+                    {
+                        disableVanillaFly();
+                        Managers.MOVEMENT.setMotionY(0.0);
+                    }
+                }
+                floatingTicks = 0;
+                floating = false;
+                stopVerticalMovement = true;
+            }
+        }
         if (modeConfig.getValue() == FlightMode.NORMAL)
         {
             Managers.MOVEMENT.setMotionY(0.0);
-            if (mc.options.jumpKey.isPressed() && floatingTicks < 20)
+            if (mc.options.jumpKey.isPressed() && !stopVerticalMovement)
             {
                 Managers.MOVEMENT.setMotionY(vspeedConfig.getValue());
             }
