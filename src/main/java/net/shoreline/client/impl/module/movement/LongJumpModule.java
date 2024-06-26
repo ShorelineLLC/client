@@ -16,6 +16,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.MovementUtil;
@@ -93,8 +94,11 @@ public class LongJumpModule extends ToggleModule
     {
         if (modeConfig.getValue() == JumpMode.NORMAL)
         {
-            if (mc.player == null || mc.world == null || FlightModule.getInstance().isEnabled()
-                    || PacketFlyModule.getInstance().isEnabled() || !MovementUtil.isInputtingMovement())
+            if (mc.player == null || mc.world == null
+                    || FlightModule.getInstance().isEnabled()
+                    || DisablerModule.getInstance().grimFireworkCheck()
+                    || PacketFlyModule.getInstance().isEnabled()
+                    || !MovementUtil.isInputtingMovement())
             {
                 return;
             }

@@ -7,12 +7,9 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.shoreline.client.impl.event.entity.player.SprintResetEvent;
+import net.shoreline.client.impl.event.entity.player.*;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.EventBus;
-import net.shoreline.client.impl.event.entity.player.PlayerJumpEvent;
-import net.shoreline.client.impl.event.entity.player.PushFluidsEvent;
-import net.shoreline.client.impl.event.entity.player.TravelEvent;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -150,6 +147,17 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
             {
                 mc.player.setSprinting(false);
             }
+        }
+    }
+
+    @Inject(method = "clipAtLedge", at = @At(value = "HEAD"), cancellable = true)
+    private void hookClipAtLedge(CallbackInfoReturnable<Boolean> cir)
+    {
+        LedgeClipEvent ledgeClipEvent = new LedgeClipEvent();
+        EventBus.INSTANCE.dispatch(ledgeClipEvent);
+        if (ledgeClipEvent.isCanceled())
+        {
+            cir.setReturnValue(ledgeClipEvent.isClipped());
         }
     }
 }
