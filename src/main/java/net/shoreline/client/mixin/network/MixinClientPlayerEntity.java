@@ -351,6 +351,17 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         EventBus.INSTANCE.dispatch(swingEvent);
     }
 
+    @Inject(method = "dismountVehicle", at = @At(value = "HEAD"), cancellable = true)
+    private void hookDismountVehicle(CallbackInfo ci)
+    {
+        DismountVehicleEvent dismountVehicleEvent = new DismountVehicleEvent();
+        EventBus.INSTANCE.dispatch(dismountVehicleEvent);
+        if (dismountVehicleEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
     @Override
     public float getLastSpoofedYaw()
     {

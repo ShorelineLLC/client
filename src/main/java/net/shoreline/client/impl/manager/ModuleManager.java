@@ -118,6 +118,7 @@ public final class ModuleManager
                 // Movement
                 new AntiLevitationModule(),
                 new AutoWalkModule(),
+                // new BoatFlyModule(),
                 new ElytraFlyModule(),
                 new EntityControlModule(),
                 new EntitySpeedModule(),

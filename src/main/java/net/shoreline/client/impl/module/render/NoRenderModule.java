@@ -18,6 +18,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.chunk.light.RenderSkylightEvent;
+import net.shoreline.client.impl.event.entity.ItemTickEvent;
 import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
 import net.shoreline.client.impl.event.entity.UpdateServerPositionEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
@@ -344,6 +345,15 @@ public class NoRenderModule extends ToggleModule
             event.getLivingEntity().setPos(event.getX(), event.getY(), event.getZ());
             event.getLivingEntity().setYaw(event.getYaw());
             event.getLivingEntity().setPitch(event.getPitch());
+        }
+    }
+
+    @EventListener
+    public void onItemTick(ItemTickEvent event)
+    {
+        if (itemsConfig.getValue() != ItemRender.OFF)
+        {
+            event.cancel();
         }
     }
 

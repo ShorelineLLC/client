@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
@@ -135,10 +134,6 @@ public class ReplenishModule extends ToggleModule
 
     private ReplenishData searchReplenishStack(ItemStack stack)
     {
-        if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == Blocks.SHULKER_BOX)
-        {
-            return null;
-        }
         for (int i = 9; i < 36; i++)
         {
             ItemStack stack1 = mc.player.getInventory().getStack(i);

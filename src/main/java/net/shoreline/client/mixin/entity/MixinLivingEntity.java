@@ -167,4 +167,15 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
         UpdateServerPositionEvent updateServerPositionEvent = new UpdateServerPositionEvent((LivingEntity) (Object) this, x, y, z, yaw, pitch);
         EventBus.INSTANCE.dispatch(updateServerPositionEvent);
     }
+
+    @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
+    private void hookTravel(Vec3d movementInput, CallbackInfo ci)
+    {
+        EntityTravelEvent entityTravelEvent = new EntityTravelEvent((LivingEntity) (Object) this);
+        EventBus.INSTANCE.dispatch(entityTravelEvent);
+        if (entityTravelEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
 }
