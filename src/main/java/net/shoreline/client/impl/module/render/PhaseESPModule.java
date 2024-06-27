@@ -54,7 +54,7 @@ public class PhaseESPModule extends ToggleModule
                 continue;
             }
 
-            Color color = getPhaseColor(blockPos.down());
+            Color color = getPhaseColor(blockPos);
             if (color == null)
             {
                 continue;
@@ -83,25 +83,25 @@ public class PhaseESPModule extends ToggleModule
         double y = playerPos.getY();
         double z = playerPos.getZ();
         BlockPos currentPos = playerPos.offset(Direction.WEST).offset(Direction.NORTH);
-        Color color1 = getPhaseColor(currentPos.down());
+        Color color1 = getPhaseColor(currentPos);
         if (color1 != null && dx <= 0.35 && dz <= 0.35)
         {
             RenderManager.drawLine(event.getMatrices(), x, y, z, x, y + 1.0, z, color1.getRGB());
         }
         currentPos = playerPos.offset(Direction.WEST).offset(Direction.SOUTH);
-        Color color2 = getPhaseColor(currentPos.down());
+        Color color2 = getPhaseColor(currentPos);
         if (color2 != null && dx <= 0.35 && dz >= 0.65)
         {
             RenderManager.drawLine(event.getMatrices(), x, y, z + 1.0, x, y + 1.0, z + 1.0, color2.getRGB());
         }
         currentPos = playerPos.offset(Direction.EAST).offset(Direction.NORTH);
-        Color color3 = getPhaseColor(currentPos.down());
+        Color color3 = getPhaseColor(currentPos);
         if (color3 != null && dx >= 0.65 && dz <= 0.35)
         {
             RenderManager.drawLine(event.getMatrices(), x + 1.0, y, z, x + 1.0, y + 1.0, z, color3.getRGB());
         }
         currentPos = playerPos.offset(Direction.EAST).offset(Direction.SOUTH);
-        Color color4 = getPhaseColor(currentPos.down());
+        Color color4 = getPhaseColor(currentPos);
         if (color4 != null && dx >= 0.65 && dz >= 0.65)
         {
             RenderManager.drawLine(event.getMatrices(), x + 1.0, y, z + 1.0, x + 1.0, y + 1.0, z + 1.0, color4.getRGB());
@@ -111,7 +111,12 @@ public class PhaseESPModule extends ToggleModule
 
     private Color getPhaseColor(BlockPos blockPos)
     {
-        BlockState state = mc.world.getBlockState(blockPos);
+        BlockState state1 = mc.world.getBlockState(blockPos);
+        if (state1.isAir())
+        {
+            return null;
+        }
+        BlockState state = mc.world.getBlockState(blockPos.down());
         Color color = null;
         if (state.isReplaceable())
         {
