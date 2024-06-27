@@ -39,9 +39,6 @@ public class PhaseESPModule extends ToggleModule
         }
         RenderBuffers.preRender();
         BlockPos playerPos = mc.player.getBlockPos();
-        Vec3d pos = mc.player.getPos();
-        double dx = pos.getX() - playerPos.getX();
-        double dz = pos.getZ() - playerPos.getZ();
         for (Direction direction : Direction.values())
         {
             if (!direction.getAxis().isHorizontal())
@@ -53,6 +50,7 @@ public class PhaseESPModule extends ToggleModule
             {
                 continue;
             }
+            Vec3d pos = mc.player.getPos();
 
             Color color = getPhaseColor(blockPos.down());
             if (color == null)
@@ -62,6 +60,8 @@ public class PhaseESPModule extends ToggleModule
             double x = blockPos.getX();
             double y = blockPos.getY();
             double z = blockPos.getZ();
+            double dx = pos.getX() - playerPos.getX();
+            double dz = pos.getZ() - playerPos.getZ();
             if (direction == Direction.EAST && dx >= 0.65)
             {
                 RenderManager.drawLine(event.getMatrices(), x, y, z, x, y, z + 1.0, color.getRGB());
@@ -83,6 +83,9 @@ public class PhaseESPModule extends ToggleModule
         double y = playerPos.getY();
         double z = playerPos.getZ();
         BlockPos currentPos = playerPos.offset(Direction.WEST).offset(Direction.NORTH);
+        Vec3d pos = mc.player.getPos();
+        double dx = pos.getX() - playerPos.getX();
+        double dz = pos.getZ() - playerPos.getZ();
         Color color1 = getPhaseColor(currentPos.down());
         if (color1 != null && dx <= 0.35 && dz <= 0.35)
         {
