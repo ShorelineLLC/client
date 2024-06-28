@@ -1,14 +1,10 @@
 package net.shoreline.client.api.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4d;
 import org.joml.Matrix4f;
-import org.joml.Vector4d;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -70,7 +66,7 @@ public class RenderBuffers
         public final BufferBuilder buffer = new BufferBuilder(2048);
         private final VertexFormat.DrawMode drawMode;
         private final VertexFormat vertexFormat;
-        private Matrix4d positionMatrix;
+        private Matrix4f positionMatrix;
 
         public Buffer(VertexFormat.DrawMode drawMode, VertexFormat vertexFormat)
         {
@@ -80,9 +76,7 @@ public class RenderBuffers
 
         public void begin(MatrixStack stack)
         {
-            this.positionMatrix = toMatrix4d(stack.peek().getPositionMatrix());
-            Vec3d pos = MinecraftClient.getInstance().getBlockEntityRenderDispatcher().camera.getPos();
-            positionMatrix.translate(-pos.x, -pos.y, -pos.z);
+            this.positionMatrix = stack.peek().getPositionMatrix();
             if (!buffer.isBuilding()) buffer.begin(drawMode, vertexFormat);
         }
 
@@ -96,8 +90,12 @@ public class RenderBuffers
 
         public Buffer vertex(double x, double y, double z)
         {
-            Vector4d vector4d = positionMatrix.transform(new Vector4d(x, y, z, 1.0));
-            this.buffer.vertex(vector4d.x(), vector4d.y(), vector4d.z()).next();
+            return vertex((float) x, (float) y, (float) z);
+        }
+
+        public Buffer vertex(float x, float y, float z)
+        {
+            this.buffer.vertex(positionMatrix, x, y, z).next();
             return this;
         }
 
@@ -110,14 +108,6 @@ public class RenderBuffers
                     ColorHelper.Argb.getBlue(color),
                     ColorHelper.Argb.getAlpha(color)
             );
-        }
-
-        public Matrix4d toMatrix4d(Matrix4f matrix4f)
-        {
-            return new Matrix4d(matrix4f.m00(), matrix4f.m01(), matrix4f.m02(), matrix4f.m03(),
-                    matrix4f.m10(), matrix4f.m11(), matrix4f.m12(), matrix4f.m13(),
-                    matrix4f.m20(), matrix4f.m21(), matrix4f.m22(), matrix4f.m23(),
-                    matrix4f.m30(), matrix4f.m31(), matrix4f.m32(), matrix4f.m33());
         }
 
         public void draw()

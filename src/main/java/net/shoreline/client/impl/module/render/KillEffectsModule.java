@@ -103,10 +103,6 @@ public class KillEffectsModule extends ToggleModule
     private void addExplosionParticle(double x, double y, double z, double velocityX, double velocityY, double velocityZ)
     {
         FireworksSparkParticle.Explosion explosion = (FireworksSparkParticle.Explosion) mc.particleManager.addParticle(ParticleTypes.FIREWORK, x, y, z, velocityX, velocityY, velocityZ);
-        if (explosion == null)
-        {
-            return;
-        }
         explosion.setTrail(false);
         explosion.setFlicker(false);
         explosion.setColor(ColorsModule.getInstance().getRGB());
