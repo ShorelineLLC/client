@@ -147,6 +147,7 @@ public final class ModuleManager
                 new BreadcrumbsModule(),
                 new BreakHighlightModule(),
                 new ChamsModule(),
+                new CrystalModelModule(),
                 new ESPModule(),
                 new ExtraTabModule(),
                 new FreecamModule(),
