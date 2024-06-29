@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
@@ -32,6 +33,8 @@ import org.joml.Quaternionf;
 
 import java.awt.*;
 
+import static net.minecraft.client.render.item.ItemRenderer.ITEM_ENCHANTMENT_GLINT;
+
 /**
  * @author linus
  * @since 1.0
@@ -40,6 +43,7 @@ public class ChamsModule extends ToggleModule
 {
 
     Config<ChamsMode> modeConfig = register(new EnumConfig<>("Mode", "The rendering mode for the chams", ChamsMode.NORMAL, ChamsMode.values()));
+    Config<Boolean> shineConfig = register(new BooleanConfig("Shine", "Adds enchantment glint", false));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render chams on first-person hands", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render chams on the player", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render chams on other players", true));
@@ -88,14 +92,25 @@ public class ChamsModule extends ToggleModule
             return;
         }
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        if (shineConfig.getValue())
+        {
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+        }
+        else
+        {
+            RenderSystem.defaultBlendFunc();
+        }
         RenderSystem.disableCull();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexConsumer = tessellator.getBuffer();
         // BufferBuilder vertexConsumer = (BufferBuilder) event.vertexConsumerProvider.getBuffer(event.layer);
-        RenderSystem.setShader(GameRenderer::getPositionProgram);
+        if (shineConfig.getValue())
+        {
+            RenderSystem.setShaderTexture(0, ITEM_ENCHANTMENT_GLINT);
+        }
+        RenderSystem.setShader(shineConfig.getValue() ? GameRenderer::getPositionTexProgram : GameRenderer::getPositionProgram);
         RenderSystem.lineWidth(2.0f);
-        vertexConsumer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+        vertexConsumer.begin(VertexFormat.DrawMode.QUADS, shineConfig.getValue() ? VertexFormats.POSITION_TEXTURE : VertexFormats.POSITION);
         Color color = colorConfig.getValue();
         float n;
         Direction direction;
@@ -286,17 +301,27 @@ public class ChamsModule extends ToggleModule
             return;
         }
         RenderSystem.enableBlend();
-        // RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-        RenderSystem.defaultBlendFunc();
+        if (shineConfig.getValue())
+        {
+            RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+        }
+        else
+        {
+            RenderSystem.defaultBlendFunc();
+        }
         RenderSystem.disableCull();
         event.matrixStack.push();
         float h = EndCrystalEntityRenderer.getYOffset(event.endCrystalEntity, event.g);
         float j = ((float) event.endCrystalEntity.endCrystalAge + event.g) * 3.0f;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexConsumer = tessellator.getBuffer();
-        RenderSystem.setShader(GameRenderer::getPositionProgram);
+        if (shineConfig.getValue())
+        {
+            RenderSystem.setShaderTexture(0, ITEM_ENCHANTMENT_GLINT);
+        }
+        RenderSystem.setShader(shineConfig.getValue() ? GameRenderer::getPositionTexProgram : GameRenderer::getPositionProgram);
         RenderSystem.lineWidth(2.0f);
-        vertexConsumer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+        vertexConsumer.begin(VertexFormat.DrawMode.QUADS, shineConfig.getValue() ? VertexFormats.POSITION_TEXTURE : VertexFormats.POSITION);
         event.matrixStack.push();
         Color color = colorConfig.getValue();
         RenderSystem.setShaderColor(color.getRed() / 255.0f, color.getGreen() / 255.0f,
@@ -332,14 +357,24 @@ public class ChamsModule extends ToggleModule
         if (handsConfig.getValue())
         {
             RenderSystem.enableBlend();
-            // RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
-            RenderSystem.defaultBlendFunc();
+            if (shineConfig.getValue())
+            {
+                RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE);
+            }
+            else
+            {
+                RenderSystem.defaultBlendFunc();
+            }
             RenderSystem.disableCull();
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexConsumer = tessellator.getBuffer();
-            RenderSystem.setShader(GameRenderer::getPositionProgram);
+            if (shineConfig.getValue())
+            {
+                RenderSystem.setShaderTexture(0, ITEM_ENCHANTMENT_GLINT);
+            }
+            RenderSystem.setShader(shineConfig.getValue() ? GameRenderer::getPositionTexProgram : GameRenderer::getPositionProgram);
             RenderSystem.lineWidth(2.0f);
-            vertexConsumer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+            vertexConsumer.begin(VertexFormat.DrawMode.QUADS, shineConfig.getValue() ? VertexFormats.POSITION_TEXTURE : VertexFormats.POSITION);
             event.matrices.push();
             Color color = colorConfig.getValue();
             RenderSystem.setShaderColor(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f,
