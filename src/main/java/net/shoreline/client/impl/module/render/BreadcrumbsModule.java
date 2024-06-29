@@ -15,8 +15,6 @@ import net.shoreline.eventbus.annotation.EventListener;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static net.shoreline.client.api.render.RenderBuffers.LINES;
-
 /**
  * @author linus
  * @since 1.0
@@ -54,26 +52,26 @@ public class BreadcrumbsModule extends ToggleModule
     {
         event.getMatrices().push();
         RenderBuffers.preRender();
-        LINES.begin(event.getMatrices());
+        RenderBuffers.LINES.begin(event.getMatrices());
         for (int i = 0; i < positions.size(); i++)
         {
             if (fadeConfig.getValue() && !infiniteConfig.getValue())
             {
-                LINES.color(ColorsModule.getInstance().getRGB((int) (((float) i / positions.size()) * 255.0f)));
+                RenderBuffers.LINES.color(ColorsModule.getInstance().getRGB((int) (((float) i / positions.size()) * 255.0f)));
             }
             else
             {
-                LINES.color(ColorsModule.getInstance().getRGB());
+                RenderBuffers.LINES.color(ColorsModule.getInstance().getRGB());
             }
             if (i > 1)
             {
                 Vec3d vec3d = positions.get(i - 1).pos();
-                LINES.vertex(vec3d.x, vec3d.y, vec3d.z);
+                RenderBuffers.LINES.vertex(vec3d.x, vec3d.y, vec3d.z);
             }
             Vec3d vec3d = positions.get(i).pos();
-            LINES.vertex(vec3d.x, vec3d.y, vec3d.z);
+            RenderBuffers.LINES.vertex(vec3d.x, vec3d.y, vec3d.z);
         }
-        LINES.end();
+        RenderBuffers.LINES.end();
         RenderBuffers.postRender();
         event.getMatrices().pop();
     }
