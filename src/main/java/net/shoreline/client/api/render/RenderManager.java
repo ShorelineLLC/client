@@ -13,7 +13,8 @@ import net.shoreline.client.util.Globals;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import static net.shoreline.client.api.render.RenderBuffers.*;
+import static net.shoreline.client.api.render.RenderBuffers.LINES;
+import static net.shoreline.client.api.render.RenderBuffers.QUADS;
 
 /**
  * @author linus
@@ -66,7 +67,7 @@ public class RenderManager implements Globals
      */
     public static void drawBox(MatrixStack matrices, Box box, int color)
     {
-        drawBox(matrices, (float) box.minX, (float) box.minY, (float) box.minZ, (float) box.maxX, (float) box.maxY, (float) box.maxZ, color);
+        drawBox(matrices, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
     }
 
     /**
@@ -85,11 +86,11 @@ public class RenderManager implements Globals
      * @param y2
      * @param z2
      */
-    public static void drawBox(MatrixStack matrices, float x1, float y1,
-                               float z1, float x2, float y2, float z2, int color)
+    public static void drawBox(MatrixStack matrices, double x1, double y1,
+                               double z1, double x2, double y2, double z2, int color)
     {
-        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
-        matrices.translate(-pos.x, -pos.y, -pos.z);
+
+
         QUADS.begin(matrices);
         QUADS.color(color);
 
@@ -112,18 +113,18 @@ public class RenderManager implements Globals
     }
 
     public static void renderSide(MatrixStack matrices, double x1, double y1,
-                                double z1, double x2, double y2, double z2, Direction direction, int color)
+                                  double z1, double x2, double y2, double z2, Direction direction, int color)
     {
         matrices.push();
-        drawSide(matrices, (float) x1, (float) y1, (float) z1, (float) x2, (float) y2, (float) z2, direction, color);
+        drawSide(matrices, x1, y1, z1, x2, y2, z2, direction, color);
         matrices.pop();
     }
 
-    public static void drawSide(MatrixStack matrices, float x1, float y1,
-                                float z1, float x2, float y2, float z2, Direction direction, int color)
+    public static void drawSide(MatrixStack matrices, double x1, double y1,
+                                double z1, double x2, double y2, double z2, Direction direction, int color)
     {
-        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
-        matrices.translate(-pos.x, -pos.y, -pos.z);
+
+
 
         QUADS.begin(matrices);
         QUADS.color(color);
@@ -178,7 +179,7 @@ public class RenderManager implements Globals
      */
     public static void drawBoundingBox(MatrixStack matrices, Box box, int color)
     {
-        drawBoundingBox(matrices, (float) box.minX, (float) box.minY, (float) box.minZ, (float) box.maxX, (float) box.maxY, (float) box.maxZ, color);
+        drawBoundingBox(matrices, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
     }
 
     /**
@@ -190,11 +191,9 @@ public class RenderManager implements Globals
      * @param y2
      * @param z2
      */
-    public static void drawBoundingBox(MatrixStack matrices, float x1, float y1,
-                                       float z1, float x2, float y2, float z2, int color)
+    public static void drawBoundingBox(MatrixStack matrices, double x1, double y1,
+                                       double z1, double x2, double y2, double z2, int color)
     {
-        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
-        matrices.translate(-pos.x, -pos.y, -pos.z);
         LINES.begin(matrices);
         LINES.color(color);
 
@@ -225,7 +224,7 @@ public class RenderManager implements Globals
     public static void renderLine(MatrixStack matrices, Vec3d s,
                                   Vec3d d, float width, int color)
     {
-        renderLine(matrices, (float) s.x, (float) s.y, (float) s.z, (float) d.x, (float) d.y, (float) d.z, width, color);
+        renderLine(matrices, s.x, s.y, s.z, d.x, d.y, d.z, width, color);
     }
 
     /**
@@ -261,8 +260,8 @@ public class RenderManager implements Globals
                                 double z1, double x2, double y2, double z2, int color)
     {
         matrices.push();
-        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
-        matrices.translate(-pos.x, -pos.y, -pos.z);
+
+
         LINES.begin(matrices);
         LINES.color(color);
         LINES.vertex(x1, y1, z1);
@@ -300,7 +299,7 @@ public class RenderManager implements Globals
         Camera camera = mc.gameRenderer.getCamera();
         final Vec3d pos = camera.getPos();
         double dist = Math.sqrt(pos.squaredDistanceTo(x, y, z));
-        float scaling = 0.0018f + NametagsModule.getInstance().getScaling() * (float) dist;
+        float scaling = (float) (0.0018f + NametagsModule.getInstance().getScaling() * dist);
         if (dist <= 8.0)
         {
             scaling = 0.0245f;
@@ -400,10 +399,10 @@ public class RenderManager implements Globals
             y1 = y2;
             y2 = i;
         }
-        float f = (float) ColorHelper.Argb.getAlpha(color) / 255.0f;
-        float g = (float) ColorHelper.Argb.getRed(color) / 255.0f;
-        float h = (float) ColorHelper.Argb.getGreen(color) / 255.0f;
-        float j = (float) ColorHelper.Argb.getBlue(color) / 255.0f;
+        float f = ColorHelper.Argb.getAlpha(color) / 255.0f;
+        float g = ColorHelper.Argb.getRed(color) / 255.0f;
+        float h = ColorHelper.Argb.getGreen(color) / 255.0f;
+        float j = ColorHelper.Argb.getBlue(color) / 255.0f;
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         BUFFER.begin(VertexFormat.DrawMode.QUADS,
@@ -429,14 +428,14 @@ public class RenderManager implements Globals
                                         int endColor,
                                         boolean sideways)
     {
-        float f = (float) (startColor >> 24 & 255) / 255.0F;
-        float f1 = (float) (startColor >> 16 & 255) / 255.0F;
-        float f2 = (float) (startColor >> 8 & 255) / 255.0F;
-        float f3 = (float) (startColor & 255) / 255.0F;
-        float f4 = (float) (endColor >> 24 & 255) / 255.0F;
-        float f5 = (float) (endColor >> 16 & 255) / 255.0F;
-        float f6 = (float) (endColor >> 8 & 255) / 255.0F;
-        float f7 = (float) (endColor & 255) / 255.0F;
+        float f = (startColor >> 24 & 255) / 255.0F;
+        float f1 = (startColor >> 16 & 255) / 255.0F;
+        float f2 = (startColor >> 8 & 255) / 255.0F;
+        float f3 = (startColor & 255) / 255.0F;
+        float f4 = (endColor >> 24 & 255) / 255.0F;
+        float f5 = (endColor >> 16 & 255) / 255.0F;
+        float f6 = (endColor >> 8 & 255) / 255.0F;
+        float f7 = (endColor & 255) / 255.0F;
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
 

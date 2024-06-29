@@ -53,8 +53,6 @@ public class BreadcrumbsModule extends ToggleModule
     public void onRenderWorld(RenderWorldEvent event)
     {
         event.getMatrices().push();
-        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
-        event.getMatrices().translate(-pos.x, -pos.y, -pos.z);
         RenderBuffers.preRender();
         LINES.begin(event.getMatrices());
         for (int i = 0; i < positions.size(); i++)
