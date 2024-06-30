@@ -32,11 +32,21 @@ public class ShorelineMod
             Natives.e(this);
         }
 
+        if (isMeteorPresent())
+        {
+            System.exit(0);
+            return;
+        }
         Shoreline.init();
     }
 
     public static boolean isBaritonePresent()
     {
         return FabricLoader.getInstance().getModContainer("baritone").isPresent();
+    }
+
+    public static boolean isMeteorPresent()
+    {
+        return FabricLoader.getInstance().getModContainer("autoplay").isPresent() || FabricLoader.getInstance().getModContainer("meteor").isPresent();
     }
 }
