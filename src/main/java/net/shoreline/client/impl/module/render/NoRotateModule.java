@@ -41,8 +41,11 @@ public class NoRotateModule extends ToggleModule
             pitch = packet.getPitch();
             ((AccessorPlayerPositionLookS2CPacket) packet).setYaw(mc.player.getYaw());
             ((AccessorPlayerPositionLookS2CPacket) packet).setPitch(mc.player.getPitch());
-            packet.getFlags().remove(PositionFlag.X_ROT);
-            packet.getFlags().remove(PositionFlag.Y_ROT);
+            if (!mc.isInSingleplayer())
+            {
+                packet.getFlags().remove(PositionFlag.X_ROT);
+                packet.getFlags().remove(PositionFlag.Y_ROT);
+            }
             cancelRotate = true;
         }
     }
