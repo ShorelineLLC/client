@@ -158,7 +158,7 @@ public class NetworkManager implements Globals
 
     public boolean isCrystalPvpCC()
     {
-        return getServerIp().equalsIgnoreCase("us.crystalpvp.cc") || getServerIp().equalsIgnoreCase("crystalpvp.cc");
+        return getServerIp().contains("crystalpvp.cc");
     }
 
     public boolean isGrimCC()

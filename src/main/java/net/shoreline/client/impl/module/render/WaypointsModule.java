@@ -14,6 +14,7 @@ import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.api.waypoint.Waypoint;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
+import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
@@ -56,6 +57,12 @@ public class WaypointsModule extends ToggleModule
     }
 
     @EventListener
+    public void onDisconnect(DisconnectEvent event)
+    {
+        Managers.WAYPOINT.clear();
+    }
+
+    @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
         if (mc.world == null || !logoutsConfig.getValue())
@@ -72,7 +79,7 @@ public class WaypointsModule extends ToggleModule
                 {
                     continue;
                 }
-                Managers.WAYPOINT.register(new Waypoint(player.getGameProfile().getName() + "'s Logout", serverIp, DimensionUtil.getDimension(), player.getX(), player.getY(), player.getZ()));
+                Managers.WAYPOINT.register(new Waypoint(player.getGameProfile().getName() + "'s Logout", serverIp, DimensionUtil.getDimension(), player.prevX, player.prevY, player.prevZ));
             }
         }
         else if (event.getPacket() instanceof PlayerListS2CPacket packet)

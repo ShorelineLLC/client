@@ -47,6 +47,6 @@ public class ShorelineMod
 
     public static boolean isMeteorPresent()
     {
-        return FabricLoader.getInstance().getModContainer("autoplay").isPresent() || FabricLoader.getInstance().getModContainer("meteor").isPresent();
+        return FabricLoader.getInstance().getModContainer("meteor-client").isPresent();
     }
 }
