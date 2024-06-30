@@ -49,7 +49,7 @@ public class ChamsModule extends ToggleModule
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render chams on other players", true));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render chams on monsters", true));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render chams on animals", true));
-    Config<Boolean> otherConfig = register(new BooleanConfig("Others", "Render chams on crystals", true));
+    Config<Boolean> crystalsConfig = register(new BooleanConfig("Crystals", "Render chams on crystals", true));
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render chams on invisible entities", true));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the chams", new Color(255, 0, 0, 60)));
 
@@ -296,7 +296,7 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderCrystal(RenderCrystalEvent event)
     {
-        if (!otherConfig.getValue())
+        if (!crystalsConfig.getValue())
         {
             return;
         }
@@ -311,8 +311,8 @@ public class ChamsModule extends ToggleModule
         }
         RenderSystem.disableCull();
         event.matrixStack.push();
-        float h = EndCrystalEntityRenderer.getYOffset(event.endCrystalEntity, event.g);
-        float j = ((float) event.endCrystalEntity.endCrystalAge + event.g) * 3.0f;
+        float h = CrystalModelModule.getInstance().isEnabled() && !CrystalModelModule.getInstance().getBounce() ? -1.0f : EndCrystalEntityRenderer.getYOffset(event.endCrystalEntity, event.g);
+        float j = (float) ((event.endCrystalEntity.endCrystalAge + event.g) * (CrystalModelModule.getInstance().isEnabled() ? CrystalModelModule.getInstance().getSpin() : 1.0f)) * 3.0f;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexConsumer = tessellator.getBuffer();
         if (shineConfig.getValue())
@@ -326,6 +326,11 @@ public class ChamsModule extends ToggleModule
         Color color = colorConfig.getValue();
         RenderSystem.setShaderColor(color.getRed() / 255.0f, color.getGreen() / 255.0f,
                 color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
+        float scale = CrystalModelModule.getInstance().getScale();
+        if (CrystalModelModule.getInstance().isEnabled()) 
+        {
+            event.matrixStack.scale(scale, scale, scale);
+        }
         event.matrixStack.scale(2.0f, 2.0f, 2.0f);
         event.matrixStack.translate(0.0f, -0.5f, 0.0f);
         int k = OverlayTexture.DEFAULT_UV;
@@ -342,6 +347,10 @@ public class ChamsModule extends ToggleModule
         event.matrixStack.multiply(new Quaternionf().setAngleAxis(1.0471976f, SINE_45_DEGREES, 0.0f, SINE_45_DEGREES));
         event.matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(j));
         event.core.render(event.matrixStack, vertexConsumer, event.i, k);
+        if (CrystalModelModule.getInstance().isEnabled())
+        {
+            event.matrixStack.scale(1.0f / scale, 1.0f / scale, 1.0f / scale);
+        }
         event.matrixStack.pop();
         event.matrixStack.pop();
         tessellator.draw();

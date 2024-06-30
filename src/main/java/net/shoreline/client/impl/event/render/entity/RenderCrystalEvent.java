@@ -17,6 +17,10 @@ public class RenderCrystalEvent extends Event
     public final int i;
     public final ModelPart core;
     public final ModelPart frame;
+    //
+    public float spin = 1.0f;
+    public float scale = 1.0f;
+    public boolean bounce = true;
 
     /**
      * @param endCrystalEntity
@@ -38,4 +42,35 @@ public class RenderCrystalEvent extends Event
         this.core = core;
         this.frame = frame;
     }
+
+    public float getSpin()
+    {
+        return spin;
+    }
+
+    public float getScale()
+    {
+        return scale;
+    }
+
+    public boolean getBounce()
+    {
+        return bounce;
+    }
+
+    public void setSpin(float spin)
+    {
+        this.spin = spin;
+    }
+
+    public void setScale(float scale)
+    {
+        this.scale = scale;
+    }
+
+    public void setBounce(boolean bounce)
+    {
+        this.bounce = bounce;
+    }
 }
+

@@ -58,10 +58,7 @@ public class ReplenishModule extends ToggleModule
             }
             else
             {
-                if (stack.isStackable())
-                {
-                    hotbar[i] = stack.getItem();
-                }
+                hotbar[i] = stack.getItem();
                 double stackPercent = ((float) stack.getCount() / stack.getMaxCount()) * 100.0f;
                 if (stackPercent <= percentConfig.getValue())
                 {
@@ -78,10 +75,6 @@ public class ReplenishModule extends ToggleModule
 
     private void replenishItem(Item item, int hotbarSlot)
     {
-        if (item.getMaxCount() <= 1)
-        {
-            return;
-        }
         int total = 0;
         while (total < item.getMaxCount())
         {
@@ -97,10 +90,6 @@ public class ReplenishModule extends ToggleModule
 
     private void replenishStack(ItemStack stack, int hotbarSlot)
     {
-        if (!stack.isStackable())
-        {
-            return;
-        }
         int total = stack.getCount();
         while (total < stack.getMaxCount())
         {
@@ -123,7 +112,7 @@ public class ReplenishModule extends ToggleModule
             {
                 continue;
             }
-            if (item != stack1.getItem())
+            if (item != stack1.getItem() || item.getMaxCount() <= 1)
             {
                 continue;
             }
@@ -146,7 +135,7 @@ public class ReplenishModule extends ToggleModule
             {
                 continue;
             }
-            if (stack.getItem() != stack1.getItem())
+            if (stack.getItem() != stack1.getItem() || !stack.isStackable())
             {
                 continue;
             }

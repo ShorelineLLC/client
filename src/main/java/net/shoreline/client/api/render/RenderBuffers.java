@@ -65,6 +65,14 @@ public class RenderBuffers
         }
     }
 
+    private static Matrix4d toMatrix4d(Matrix4f matrix4f)
+    {
+        return new Matrix4d(matrix4f.m00(), matrix4f.m01(), matrix4f.m02(), matrix4f.m03(),
+                matrix4f.m10(), matrix4f.m11(), matrix4f.m12(), matrix4f.m13(),
+                matrix4f.m20(), matrix4f.m21(), matrix4f.m22(), matrix4f.m23(),
+                matrix4f.m30(), matrix4f.m31(), matrix4f.m32(), matrix4f.m33());
+    }
+
     public static class Buffer
     {
         public final BufferBuilder buffer = new BufferBuilder(2048);
@@ -110,14 +118,6 @@ public class RenderBuffers
                     ColorHelper.Argb.getBlue(color),
                     ColorHelper.Argb.getAlpha(color)
             );
-        }
-
-        public Matrix4d toMatrix4d(Matrix4f matrix4f)
-        {
-            return new Matrix4d(matrix4f.m00(), matrix4f.m01(), matrix4f.m02(), matrix4f.m03(),
-                    matrix4f.m10(), matrix4f.m11(), matrix4f.m12(), matrix4f.m13(),
-                    matrix4f.m20(), matrix4f.m21(), matrix4f.m22(), matrix4f.m23(),
-                    matrix4f.m30(), matrix4f.m31(), matrix4f.m32(), matrix4f.m33());
         }
 
         public void draw()

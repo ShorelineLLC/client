@@ -10,18 +10,14 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.impl.event.network.ServerTickEvent;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus
@@ -104,6 +100,10 @@ public class FlightModule extends ToggleModule
         }
         if (DisablerModule.getInstance().grimFireworkCheck())
         {
+            if (modeConfig.getValue() == FlightMode.VANILLA)
+            {
+                disableVanillaFly();
+            }
             return;
         }
         if (modeConfig.getValue().equals(FlightMode.VANILLA))
@@ -132,11 +132,11 @@ public class FlightModule extends ToggleModule
                     {
                         disableVanillaFly();
                         Managers.MOVEMENT.setMotionY(0.0);
+                        stopVerticalMovement = true;
                     }
                 }
                 floatingTicks = 0;
                 floating = false;
-                stopVerticalMovement = true;
             }
         }
         if (modeConfig.getValue() == FlightMode.NORMAL)
@@ -197,11 +197,11 @@ public class FlightModule extends ToggleModule
                     PlayerMoveC2SPacket packet1;
                     if (packet.changesLook())
                     {
-                        packet1 = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround());
+                        packet1 = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround());
                     }
                     else
                     {
-                        packet1 = new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), packet.isOnGround());
+                        packet1 = new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), packet.isOnGround());
                     }
                     event.cancel();
                     Managers.NETWORK.sendQuietPacket(packet1);
