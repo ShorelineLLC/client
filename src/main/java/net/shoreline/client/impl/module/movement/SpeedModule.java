@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -144,11 +145,12 @@ public class SpeedModule extends ToggleModule
     @EventListener
     public void onPlayerMove(PlayerMoveEvent event)
     {
-        if (mc.player != null && mc.world != null)
+        if (mc.player != null && mc.world != null && event.getType() == MovementType.SELF)
         {
             if (!MovementUtil.isInputtingMovement()
                     || FlightModule.getInstance().isEnabled()
                     || LongJumpModule.getInstance().isEnabled()
+                    || DisablerModule.getInstance().grimFireworkCheck()
                     //      || Modules.ELYTRA_FLY.isEnabled()
                     || mc.player.isRiding()
                     || mc.player.isFallFlying()
@@ -530,7 +532,7 @@ public class SpeedModule extends ToggleModule
             }
             else if (speedModeConfig.getValue() == Speed.VANILLA)
             {
-                Vec2f motion = handleVanillaMotion(speedConfig.getValue() / 10.0f);
+                Vec2f motion = handleStrafeMotion(speedConfig.getValue() / 10.0f);
                 event.setX(motion.x);
                 event.setZ(motion.y);
             }

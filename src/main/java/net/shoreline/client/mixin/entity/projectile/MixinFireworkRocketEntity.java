@@ -1,9 +1,13 @@
 package net.shoreline.client.mixin.entity.projectile;
 
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.event.entity.projectile.FireworkVelocityEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.entity.projectile.RemoveFireworkEvent;
 import net.shoreline.client.util.Globals;
@@ -11,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -24,7 +29,22 @@ public class MixinFireworkRocketEntity implements Globals
     @Shadow
     private int life;
 
-    @Shadow private int lifeTime;
+    @Shadow
+    private int lifeTime;
+
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
+    private void hookSetVelocity(LivingEntity entity, Vec3d velocity)
+    {
+        if (entity instanceof ClientPlayerEntity)
+        {
+            FireworkVelocityEvent fireworkVelocityEvent = new FireworkVelocityEvent();
+            EventBus.INSTANCE.dispatch(fireworkVelocityEvent);
+            if (!fireworkVelocityEvent.isCanceled())
+            {
+                entity.setVelocity(velocity);
+            }
+        }
+    }
 
     /**
      * @param ci
