@@ -100,6 +100,7 @@ public class ChamsModule extends ToggleModule
         {
             RenderSystem.defaultBlendFunc();
         }
+        RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexConsumer = tessellator.getBuffer();
@@ -191,6 +192,7 @@ public class ChamsModule extends ToggleModule
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
+        RenderSystem.enableDepthTest();
         if (!event.entity.isSpectator())
         {
             for (Object featureRenderer : event.features)
@@ -309,6 +311,7 @@ public class ChamsModule extends ToggleModule
         {
             RenderSystem.defaultBlendFunc();
         }
+        RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         event.matrixStack.push();
         float h = CrystalModelModule.getInstance().isEnabled() && !CrystalModelModule.getInstance().getBounce() ? -1.0f : EndCrystalEntityRenderer.getYOffset(event.endCrystalEntity, event.g);
@@ -357,6 +360,7 @@ public class ChamsModule extends ToggleModule
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.disableBlend();
         RenderSystem.enableCull();
+        RenderSystem.enableDepthTest();
         event.cancel();
     }
 
@@ -375,6 +379,7 @@ public class ChamsModule extends ToggleModule
                 RenderSystem.defaultBlendFunc();
             }
             RenderSystem.disableCull();
+            RenderSystem.disableDepthTest();
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder vertexConsumer = tessellator.getBuffer();
             if (shineConfig.getValue())
@@ -428,6 +433,7 @@ public class ChamsModule extends ToggleModule
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             RenderSystem.disableBlend();
             RenderSystem.enableCull();
+            RenderSystem.enableDepthTest();
             event.matrices.pop();
             event.cancel();
         }
