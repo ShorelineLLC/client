@@ -7,7 +7,6 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.CapesEvent;
-import net.shoreline.client.impl.manager.client.cape.CapeType;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public final class CapesModule extends ToggleModule
@@ -28,10 +27,8 @@ public final class CapesModule extends ToggleModule
         {
             return;
         }
-        if (optifineConfig.getValue())
-        {
-            event.cancel();
-        }
+        event.cancel();
+        event.setShowOptifine(optifineConfig.getValue());
         if (event.getGameProfile().getName().equalsIgnoreCase(mc.player.getGameProfile().getName()))
         {
             switch (clientConfig.getValue())

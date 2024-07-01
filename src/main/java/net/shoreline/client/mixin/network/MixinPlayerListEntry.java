@@ -61,7 +61,7 @@ public class MixinPlayerListEntry implements Globals
         {
             return;
         }
-        Identifier identifier = capeTexture;
+        Identifier identifier = capesEvent.getShowOptifine() ? capeTexture : null;
         if (capesEvent.getTexture() != null)
         {
             identifier = capesEvent.getTexture();

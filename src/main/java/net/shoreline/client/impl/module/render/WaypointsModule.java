@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
@@ -13,6 +14,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.api.waypoint.Waypoint;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -21,6 +23,7 @@ import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.DimensionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.text.DecimalFormat;
 import java.util.UUID;
@@ -63,6 +66,18 @@ public class WaypointsModule extends ToggleModule
     }
 
     @EventListener
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.POST && mc.getNetworkHandler() != null)
+        {
+            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList())
+            {
+                Managers.WAYPOINT.removeContains(entry.getProfile().getName());
+            }
+        }
+    }
+
+    @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
         if (mc.world == null || !logoutsConfig.getValue())
@@ -80,17 +95,6 @@ public class WaypointsModule extends ToggleModule
                     continue;
                 }
                 Managers.WAYPOINT.register(new Waypoint(player.getGameProfile().getName() + "'s Logout", serverIp, DimensionUtil.getDimension(), player.prevX, player.prevY, player.prevZ));
-            }
-        }
-        else if (event.getPacket() instanceof PlayerListS2CPacket packet)
-        {
-            for (PlayerListS2CPacket.Entry entry : packet.getPlayerAdditionEntries())
-            {
-                if (entry.profile() == null)
-                {
-                    continue;
-                }
-                Managers.WAYPOINT.removeContains(entry.profile().getName());
             }
         }
     }

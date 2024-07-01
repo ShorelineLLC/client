@@ -11,6 +11,7 @@ public class CapesEvent extends Event
 {
     private final GameProfile gameProfile;
     private Identifier texture;
+    private boolean optifine;
 
     public CapesEvent(GameProfile gameProfile)
     {
@@ -30,5 +31,15 @@ public class CapesEvent extends Event
     public Identifier getTexture()
     {
         return texture;
+    }
+
+    public void setShowOptifine(boolean optifine)
+    {
+        this.optifine = optifine;
+    }
+
+    public boolean getShowOptifine()
+    {
+        return optifine;
     }
 }
