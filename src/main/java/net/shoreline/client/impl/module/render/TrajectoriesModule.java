@@ -146,15 +146,15 @@ public class TrajectoriesModule extends ToggleModule
                     Direction side = result.getSide();
                     if (side == Direction.NORTH || side == Direction.SOUTH)
                     {
-                        RenderManager.renderSide(event.getMatrices(), x - 0.6f, y - 0.6f, z, x + 0.6f, y + 0.6f, z, side, ColorsModule.getInstance().getRGB(50));
+                        RenderManager.renderSide(event.getMatrices(), x - 0.6f, y - 0.6f, z, x + 0.6f, y + 0.6f, z, side, ColorsModule.getInstance().getRGB(80));
                     }
                     else if (side == Direction.WEST || side == Direction.EAST)
                     {
-                        RenderManager.renderSide(event.getMatrices(), x, y - 0.6f, z - 0.6f, x, y + 0.6f, z + 0.6f, side, ColorsModule.getInstance().getRGB(50));
+                        RenderManager.renderSide(event.getMatrices(), x, y - 0.6f, z - 0.6f, x, y + 0.6f, z + 0.6f, side, ColorsModule.getInstance().getRGB(80));
                     }
                     else
                     {
-                        RenderManager.renderSide(event.getMatrices(), x - 0.6f, y, z - 0.6f, x + 0.6f, y, z + 0.6f, side, ColorsModule.getInstance().getRGB(50));
+                        RenderManager.renderSide(event.getMatrices(), x - 0.6f, y, z - 0.6f, x + 0.6f, y, z + 0.6f, side, ColorsModule.getInstance().getRGB(80));
                     }
                 }
 
