@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.init.Fonts;
@@ -89,8 +90,6 @@ public class RenderManager implements Globals
     public static void drawBox(MatrixStack matrices, double x1, double y1,
                                double z1, double x2, double y2, double z2, int color)
     {
-
-
         QUADS.begin(matrices);
         QUADS.color(color);
 
@@ -123,9 +122,6 @@ public class RenderManager implements Globals
     public static void drawSide(MatrixStack matrices, double x1, double y1,
                                 double z1, double x2, double y2, double z2, Direction direction, int color)
     {
-
-
-
         QUADS.begin(matrices);
         QUADS.color(color);
         if (direction.getAxis().isVertical())
@@ -197,21 +193,13 @@ public class RenderManager implements Globals
         LINES.begin(matrices);
         LINES.color(color);
 
-        LINES.vertex(x1, y1, z1).vertex(x2, y1, z1);
-        LINES.vertex(x2, y1, z1).vertex(x2, y1, z2);
-        LINES.vertex(x2, y1, z2).vertex(x1, y1, z2);
-        LINES.vertex(x1, y1, z2).vertex(x1, y1, z1);
-
-        LINES.vertex(x1, y1, z1).vertex(x1, y2, z1);
-        LINES.vertex(x2, y1, z1).vertex(x2, y2, z1);
-        LINES.vertex(x2, y1, z2).vertex(x2, y2, z2);
-        LINES.vertex(x1, y1, z2).vertex(x1, y2, z2);
-
-        LINES.vertex(x1, y2, z1).vertex(x2, y2, z1);
-        LINES.vertex(x2, y2, z1).vertex(x2, y2, z2);
-        LINES.vertex(x2, y2, z2).vertex(x1, y2, z2);
-        LINES.vertex(x1, y2, z2).vertex(x1, y2, z1);
-
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        double dz = z2 - z1;
+        VoxelShapes.cuboid(0.0, 0.0, 0.0, dx, dy, dz).forEachEdge((minX, minY, minZ, maxX, maxY, maxZ) ->
+        {
+            LINES.vertexLine(minX + x1, minY + y1, minZ + z1, maxX + x1, maxY + y1, maxZ + z1);
+        });
         LINES.end();
     }
 
@@ -264,8 +252,7 @@ public class RenderManager implements Globals
 
         LINES.begin(matrices);
         LINES.color(color);
-        LINES.vertex(x1, y1, z1);
-        LINES.vertex(x2, y2, z2);
+        LINES.vertexLine(x1, y1, z1, x2, y2, z2);
         LINES.end();
         matrices.pop();
     }

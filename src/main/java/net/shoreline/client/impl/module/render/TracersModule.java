@@ -32,7 +32,7 @@ import java.awt.*;
 public class TracersModule extends ToggleModule
 {
     Config<Target> targetConfig = register(new EnumConfig<>("Target", "The body part of the entity to target", Target.FEET, Target.values()));
-    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.5f, 10.0f));
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.0f, 5.0f));
     Config<Boolean> offscreenConfig = register(new BooleanConfig("Offscreen", "Render tracers to entities not visible on the screen", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render tracers to player", true));
     Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue()));

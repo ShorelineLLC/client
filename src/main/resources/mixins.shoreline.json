@@ -58,6 +58,7 @@
     "entity.player.MixinPlayerInventory",
     "entity.projectile.MixinFireworkRocketEntity",
     "gl.MixinPostEffectProcessor",
+    "gl.MixinVertexBuffer",
     "gui.hud.MixinBossBarHud",
     "gui.hud.MixinChatHud",
     "gui.hud.MixinChatHudLine",

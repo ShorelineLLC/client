@@ -12,6 +12,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.BoxRender;
@@ -34,6 +35,7 @@ public class BlockHighlightModule extends ToggleModule
 
     Config<BoxRender> boxModeConfig = register(new EnumConfig<>("BoxMode", "Box rendering mode", BoxRender.OUTLINE, BoxRender.values()));
     Config<Boolean> entitiesConfig = register(new BooleanConfig("Debug-Entities", "Highlights entity bounding boxes for debug purposes", false));
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the highlight", 1.0f, 1.0f, 5.0f));
     private double distance;
 
     public BlockHighlightModule()
@@ -93,10 +95,10 @@ public class BlockHighlightModule extends ToggleModule
                     RenderManager.renderBox(event.getMatrices(), render,
                             ColorsModule.getInstance().getRGB(60));
                     RenderManager.renderBoundingBox(event.getMatrices(),
-                            render, 2.5f, ColorsModule.getInstance().getRGB(145));
+                            render, widthConfig.getValue(), ColorsModule.getInstance().getRGB(145));
                 }
                 case OUTLINE -> RenderManager.renderBoundingBox(event.getMatrices(),
-                        render, 2.5f, ColorsModule.getInstance().getRGB(145));
+                        render, widthConfig.getValue(), ColorsModule.getInstance().getRGB(145));
             }
         }
         RenderBuffers.postRender();

@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -25,6 +26,7 @@ public class BreadcrumbsModule extends ToggleModule
     Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Renders breadcrumbs for all positions since toggle", true));
     Config<Float> maxTimeConfig = register(new NumberConfig<>("MaxPosition", "The maximum time for a given position", 1.0f, 2.0f, 20.0f));
     Config<Boolean> fadeConfig = register(new BooleanConfig("Fade", "Fades the line render", false, () -> !infiniteConfig.getValue()));
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the path", 1.0f, 1.0f, 5.0f));
 
     public BreadcrumbsModule()
     {
@@ -52,6 +54,7 @@ public class BreadcrumbsModule extends ToggleModule
     {
         event.getMatrices().push();
         RenderBuffers.preRender();
+        RenderSystem.lineWidth(widthConfig.getValue());
         RenderBuffers.LINES.begin(event.getMatrices());
         for (int i = 0; i < positions.size(); i++)
         {
@@ -66,10 +69,9 @@ public class BreadcrumbsModule extends ToggleModule
             if (i > 1)
             {
                 Vec3d vec3d = positions.get(i - 1).pos();
-                RenderBuffers.LINES.vertex(vec3d.x, vec3d.y, vec3d.z);
+                Vec3d vec3d2 = positions.get(i).pos();
+                RenderBuffers.LINES.vertexLine(vec3d.x, vec3d.y, vec3d.z, vec3d2.x, vec3d2.y, vec3d2.z);
             }
-            Vec3d vec3d = positions.get(i).pos();
-            RenderBuffers.LINES.vertex(vec3d.x, vec3d.y, vec3d.z);
         }
         RenderBuffers.LINES.end();
         RenderBuffers.postRender();

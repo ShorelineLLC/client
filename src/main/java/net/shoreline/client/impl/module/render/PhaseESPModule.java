@@ -7,6 +7,7 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -20,6 +21,7 @@ import java.awt.*;
 public class PhaseESPModule extends ToggleModule
 {
 
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the render", 1.0f, 1.0f, 5.0f));
     Config<Boolean> safeConfig = register(new BooleanConfig("Safe", "Highlights safe phase blocks", false));
     Config<Color> unsafeConfig = register(new ColorConfig("UnsafeColor", "The color for rendering unsafe phase blocks", new Color(255, 0, 0), false, false));
     Config<Color> obsidianConfig = register(new ColorConfig("ObsidianColor", "The color for rendering obsidian phase blocks", new Color(255, 255, 0), false, false, () -> safeConfig.getValue()));
@@ -64,19 +66,19 @@ public class PhaseESPModule extends ToggleModule
             double z = blockPos.getZ();
             if (direction == Direction.EAST && dx >= 0.65)
             {
-                RenderManager.drawLine(event.getMatrices(), x, y, z, x, y, z + 1.0, color.getRGB());
+                RenderManager.renderLine(event.getMatrices(), x, y, z, x, y, z + 1.0, widthConfig.getValue(), color.getRGB());
             }
             else if (direction == Direction.WEST && dx <= 0.35)
             {
-                RenderManager.drawLine(event.getMatrices(), x + 1.0, y, z, x + 1.0, y, z + 1.0, color.getRGB());
+                RenderManager.renderLine(event.getMatrices(), x + 1.0, y, z, x + 1.0, y, z + 1.0, widthConfig.getValue(), color.getRGB());
             }
             else if (direction == Direction.SOUTH && dz >= 0.65)
             {
-                RenderManager.drawLine(event.getMatrices(), x, y, z, x + 1.0, y, z, color.getRGB());
+                RenderManager.renderLine(event.getMatrices(), x, y, z, x + 1.0, y, z, widthConfig.getValue(), color.getRGB());
             }
             else if (direction == Direction.NORTH && dz <= 0.35)
             {
-                RenderManager.drawLine(event.getMatrices(), x, y, z + 1.0, x + 1.0, y, z + 1.0, color.getRGB());
+                RenderManager.renderLine(event.getMatrices(), x, y, z + 1.0, x + 1.0, y, z + 1.0, widthConfig.getValue(), color.getRGB());
             }
         }
         double x = playerPos.getX();
@@ -86,25 +88,25 @@ public class PhaseESPModule extends ToggleModule
         Color color1 = getPhaseColor(currentPos);
         if (color1 != null && dx <= 0.35 && dz <= 0.35)
         {
-            RenderManager.drawLine(event.getMatrices(), x, y, z, x, y + 1.0, z, color1.getRGB());
+            RenderManager.renderLine(event.getMatrices(), x, y, z, x, y + 1.0, z, widthConfig.getValue(), color1.getRGB());
         }
         currentPos = playerPos.offset(Direction.WEST).offset(Direction.SOUTH);
         Color color2 = getPhaseColor(currentPos);
         if (color2 != null && dx <= 0.35 && dz >= 0.65)
         {
-            RenderManager.drawLine(event.getMatrices(), x, y, z + 1.0, x, y + 1.0, z + 1.0, color2.getRGB());
+            RenderManager.renderLine(event.getMatrices(), x, y, z + 1.0, x, y + 1.0, z + 1.0, widthConfig.getValue(), color2.getRGB());
         }
         currentPos = playerPos.offset(Direction.EAST).offset(Direction.NORTH);
         Color color3 = getPhaseColor(currentPos);
         if (color3 != null && dx >= 0.65 && dz <= 0.35)
         {
-            RenderManager.drawLine(event.getMatrices(), x + 1.0, y, z, x + 1.0, y + 1.0, z, color3.getRGB());
+            RenderManager.renderLine(event.getMatrices(), x + 1.0, y, z, x + 1.0, y + 1.0, z, widthConfig.getValue(), color3.getRGB());
         }
         currentPos = playerPos.offset(Direction.EAST).offset(Direction.SOUTH);
         Color color4 = getPhaseColor(currentPos);
         if (color4 != null && dx >= 0.65 && dz >= 0.65)
         {
-            RenderManager.drawLine(event.getMatrices(), x + 1.0, y, z + 1.0, x + 1.0, y + 1.0, z + 1.0, color4.getRGB());
+            RenderManager.renderLine(event.getMatrices(), x + 1.0, y, z + 1.0, x + 1.0, y + 1.0, z + 1.0, widthConfig.getValue(), color4.getRGB());
         }
         RenderBuffers.postRender();
     }
