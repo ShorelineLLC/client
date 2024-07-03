@@ -150,7 +150,8 @@ public class SearchModule extends ToggleModule
     {
         if (event.getConfig() == blocksConfig && event.getStage() == StageEvent.EventStage.POST)
         {
-            blocks.entrySet().removeIf(e -> !blocksConfig.getValue().contains(e.getValue().getBlock()));
+            disable();
+            enable();
         }
     }
 

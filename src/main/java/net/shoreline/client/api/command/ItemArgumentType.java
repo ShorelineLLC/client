@@ -7,7 +7,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
@@ -31,12 +33,12 @@ public class ItemArgumentType implements ArgumentType<Object>
     {
         String string = reader.readString();
         Item item = Registries.ITEM.get(new Identifier("minecraft", string));
-        if (item != null)
+        if (item != Items.AIR)
         {
             return item;
         }
         Block block = Registries.BLOCK.get(new Identifier("minecraft", string));
-        if (block != null)
+        if (block != Blocks.AIR)
         {
             return block;
         }

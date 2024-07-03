@@ -7,6 +7,9 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
+import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,36 @@ public class ItemListConfig<T extends List<Item>> extends Config<T>
     public ItemListConfig(String name, String desc, T values)
     {
         super(name, desc, values);
+    }
+
+    public void add(Item item)
+    {
+        ConfigUpdateEvent configUpdateEvent = new ConfigUpdateEvent(this);
+        configUpdateEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+        getValue().add(item);
+        configUpdateEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+    }
+
+    public void remove(Item item)
+    {
+        ConfigUpdateEvent configUpdateEvent = new ConfigUpdateEvent(this);
+        configUpdateEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+        getValue().remove(item);
+        configUpdateEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+    }
+
+    public void clear()
+    {
+        ConfigUpdateEvent configUpdateEvent = new ConfigUpdateEvent(this);
+        configUpdateEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+        getValue().clear();
+        configUpdateEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
     }
 
     /**

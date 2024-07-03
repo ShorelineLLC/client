@@ -5,7 +5,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
 import net.minecraft.item.Item;
-import net.shoreline.client.api.command.BlockArgumentType;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.ConfigArgumentType;
 import net.shoreline.client.api.command.ItemArgumentType;
@@ -62,6 +61,19 @@ public class ModuleCommand extends Command
                                 ChatUtil.clientSendMessage("§7%s§f was reset to default value", config.getName());
                                 return 1;
                             }
+                            else if (value.equalsIgnoreCase("clear"))
+                            {
+                                if (config instanceof ItemListConfig)
+                                {
+                                    ((ItemListConfig) config).clear();
+                                }
+                                else if (config instanceof BlockListConfig)
+                                {
+                                    ((BlockListConfig) config).clear();
+                                }
+                                ChatUtil.clientSendMessage("§7%s§f was cleared", config.getName());
+                                return 1;
+                            }
                             return updateValue(config, value);
                         })
                         .then(argument("item", ItemArgumentType.item())
@@ -96,15 +108,14 @@ public class ModuleCommand extends Command
                 ChatUtil.error("Not an item!");
                 return 0;
             }
-            List<Item> list = ((List<Item>) config.getValue());
             if (action.equalsIgnoreCase("add"))
             {
-                list.add(item);
+                ((ItemListConfig) config).add(item);
                 ChatUtil.clientSendMessage("Added §s" + item.getName().getString() + "§f to §7" + config.getName());
             }
             else if (action.equalsIgnoreCase("del") || action.equalsIgnoreCase("remove"))
             {
-                list.remove(item);
+                ((ItemListConfig) config).remove(item);
                 ChatUtil.clientSendMessage("Removed §c" + item.getName().getString() + "§f from §7" + config.getName());
             }
         }
@@ -119,15 +130,14 @@ public class ModuleCommand extends Command
                 ChatUtil.error("Not a block!");
                 return 0;
             }
-            List<Block> list = (List<Block>) config.getValue();
             if (action.equalsIgnoreCase("add"))
             {
-                list.add(block);
+                ((BlockListConfig) config).add(block);
                 ChatUtil.clientSendMessage("Added §s" + block.getName().getString() + "§f to §7" + config.getName());
             }
             else if (action.equalsIgnoreCase("del") || action.equalsIgnoreCase("remove"))
             {
-                list.remove(block);
+                ((BlockListConfig) config).remove(block);
                 ChatUtil.clientSendMessage("Removed §c" + block.getName().getString() + "§f from §7" + config.getName());
             }
         }

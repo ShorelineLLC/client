@@ -4,9 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
+import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,36 @@ public class BlockListConfig<T extends List<Block>> extends Config<T>
     public BlockListConfig(String name, String desc, Block... values)
     {
         super(name, desc, (T) List.of(values));
+    }
+
+    public void add(Block block)
+    {
+        ConfigUpdateEvent configUpdateEvent = new ConfigUpdateEvent(this);
+        configUpdateEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+        getValue().add(block);
+        configUpdateEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+    }
+
+    public void remove(Block block)
+    {
+        ConfigUpdateEvent configUpdateEvent = new ConfigUpdateEvent(this);
+        configUpdateEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+        getValue().remove(block);
+        configUpdateEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+    }
+
+    public void clear()
+    {
+        ConfigUpdateEvent configUpdateEvent = new ConfigUpdateEvent(this);
+        configUpdateEvent.setStage(StageEvent.EventStage.PRE);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
+        getValue().clear();
+        configUpdateEvent.setStage(StageEvent.EventStage.POST);
+        EventBus.INSTANCE.dispatch(configUpdateEvent);
     }
 
     /**
