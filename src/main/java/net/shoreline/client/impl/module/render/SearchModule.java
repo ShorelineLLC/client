@@ -8,6 +8,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.ColorHelper;
@@ -58,6 +59,7 @@ public class SearchModule extends ToggleModule
     Config<Boolean> softReloadConfig = register(new BooleanConfig("SoftReload", "Reloads without clearing the renders", false));
 
     private final Map<BlockPos, BlockState> blocks = new ConcurrentHashMap<>();
+    private boolean warnedLag;
 
     public SearchModule()
     {
@@ -94,6 +96,11 @@ public class SearchModule extends ToggleModule
             }
         }
         RenderUtil.reloadRenders(softReloadConfig.getValue());
+        if (!warnedLag)
+        {
+            sendModuleMessage(Formatting.RED + "This module may cause lag when loading new chunks");
+            warnedLag = true;
+        }
     }
 
     @Override
@@ -133,14 +140,19 @@ public class SearchModule extends ToggleModule
         }
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
         {
-            boolean searchBlock = isSearchBlock(packet.getState());
-            if (packet.getState().isAir() && blocks.containsKey(packet.getPos()))
+            if (isSearchBlock(packet.getState()))
             {
-                blocks.remove(packet.getPos());
+                if (!blocks.containsKey(packet.getPos()))
+                {
+                    blocks.put(packet.getPos(), packet.getState());
+                }
             }
-            else if (searchBlock && !blocks.containsKey(packet.getPos()))
+            else
             {
-                blocks.put(packet.getPos(), packet.getState());
+                if (blocks.containsKey(packet.getPos()))
+                {
+                    blocks.remove(packet.getPos());
+                }
             }
         }
     }
