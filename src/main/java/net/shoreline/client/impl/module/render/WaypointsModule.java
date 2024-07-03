@@ -101,7 +101,7 @@ public class WaypointsModule extends ToggleModule
                 {
                     continue;
                 }
-                Managers.WAYPOINT.register(new Waypoint(player.getGameProfile().getName() + "'s Logout", serverIp, DimensionUtil.getDimension(), player.prevX, player.prevY, player.prevZ));
+                Managers.WAYPOINT.register(new Waypoint(player.getGameProfile().getName() + "'s Logout", serverIp, DimensionUtil.getDimension(), player.getX(), player.getY(), player.getZ()));
             }
         }
     }

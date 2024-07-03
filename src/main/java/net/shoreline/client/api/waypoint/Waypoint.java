@@ -21,12 +21,9 @@ public class Waypoint extends ConfigContainer implements Globals
     private final String ip;
     private final int dimension;
     //
-    private final Config<Double> xConfig = register(new NumberConfig<>("X", "X " +
-            "position of waypoint.", 0.0D, 0.0D, Double.MAX_VALUE));
-    private final Config<Double> yConfig = register(new NumberConfig<>("Y", "Y " +
-            "position of waypoint.", 0.0D, 0.0D, Double.MAX_VALUE));
-    private final Config<Double> zConfig = register(new NumberConfig<>("Z", "Z " +
-            "position of waypoint.", 0.0D, 0.0D, Double.MAX_VALUE));
+    double x;
+    double y;
+    double z;
     private final Timer timer;
 
     /**
@@ -41,9 +38,9 @@ public class Waypoint extends ConfigContainer implements Globals
         super(name);
         this.ip = ip;
         this.dimension = dimension;
-        xConfig.setValue(x);
-        yConfig.setValue(y);
-        zConfig.setValue(z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
         this.timer = new CacheTimer();
     }
 
@@ -76,17 +73,17 @@ public class Waypoint extends ConfigContainer implements Globals
 
     public double getX()
     {
-        return xConfig.getValue();
+        return x;
     }
 
     public double getY()
     {
-        return yConfig.getValue();
+        return y;
     }
 
     public double getZ()
     {
-        return zConfig.getValue();
+        return z;
     }
 
     /**
