@@ -86,6 +86,7 @@
     "network.MixinClientPlayNetworkHandler",
     "network.MixinDecoderHandler",
     "network.MixinPacketByteBuf",
+    "network.MixinServerPlayerEntity",
     "network.MixinPlayerListEntry",
     "network.MixinServerPlayNetworkHandler",
     "network.packet.c2s.MixinPlayerInteractEntityC2SPacket",

@@ -19,6 +19,7 @@ import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.DimensionUtil;
@@ -61,6 +62,12 @@ public class WaypointsModule extends ToggleModule
 
     @EventListener
     public void onDisconnect(DisconnectEvent event)
+    {
+        Managers.WAYPOINT.clear();
+    }
+
+    @EventListener
+    public void onLoadWorld(LoadWorldEvent event)
     {
         Managers.WAYPOINT.clear();
     }

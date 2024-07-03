@@ -29,6 +29,7 @@ import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.LoadChunkBlockEvent;
+import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.client.impl.event.world.UnloadChunkBlocksEvent;
 import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.RenderUtil;
@@ -54,7 +55,7 @@ public class SearchModule extends ToggleModule
             Blocks.MAGENTA_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX, Blocks.PINK_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX, Blocks.RED_SHULKER_BOX,
             Blocks.WHITE_SHULKER_BOX, Blocks.YELLOW_SHULKER_BOX, Blocks.SPAWNER, Blocks.END_PORTAL_FRAME));
     Config<Boolean> tracersConfig = register(new BooleanConfig("Tracers", "Draws tracers to highlighted blocks", false));
-    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.0f, 5.0f));
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.0f, 5.0f, () -> tracersConfig.getValue()));
     Config<Boolean> fillConfig = register(new BooleanConfig("Fill", "Fills the render", true));
     Config<Boolean> softReloadConfig = register(new BooleanConfig("SoftReload", "Reloads without clearing the renders", false));
 
@@ -111,6 +112,12 @@ public class SearchModule extends ToggleModule
 
     @EventListener
     public void onGameJoin(GameJoinEvent event)
+    {
+        blocks.clear();
+    }
+
+    @EventListener
+    public void onChangeDimension(LoadWorldEvent event)
     {
         blocks.clear();
     }
@@ -174,26 +181,6 @@ public class SearchModule extends ToggleModule
         {
             return;
         }
-        RenderBuffers.preRender();
-        for (Map.Entry<BlockPos, BlockState> entry : blocks.entrySet())
-        {
-            BlockPos pos = entry.getKey();
-            VoxelShape outlineShape = entry.getValue().getOutlineShape(mc.world, pos);
-            if (outlineShape.isEmpty())
-            {
-                return;
-            }
-            Box render1 = outlineShape.getBoundingBox();
-            Box render = new Box(pos.getX() + render1.minX, pos.getY() + render1.minY,
-                    pos.getZ() + render1.minZ, pos.getX() + render1.maxX,
-                    pos.getY() + render1.maxY, pos.getZ() + render1.maxZ);
-            if (fillConfig.getValue())
-            {
-                RenderManager.renderBox(event.getMatrices(), render, getColor(pos, entry.getValue(), 40));
-            }
-            RenderManager.renderBoundingBox(event.getMatrices(),
-                    render, 1.5f, getColor(pos, entry.getValue(), 145));
-        }
         if (tracersConfig.getValue())
         {
             MatrixStack matrixStack = new MatrixStack();
@@ -201,6 +188,7 @@ public class SearchModule extends ToggleModule
             matrixStack.multiplyPositionMatrix(mc.gameRenderer.getBasicProjectionMatrix(d));
             Matrix4f prevProjectionMatrix = RenderSystem.getProjectionMatrix();
             RenderSystem.setProjectionMatrix(matrixStack.peek().getPositionMatrix(), VertexSorter.BY_DISTANCE);
+            RenderBuffers.preRender();
             Vec3d playerPos = Interpolation.getRenderPosition(playerEntity, event.getTickDelta());
             double x1 = playerEntity.getX() - playerPos.getX();
             double y1 = playerEntity.getY() - playerPos.getY() + playerEntity.getEyeHeight(playerEntity.getPose());
@@ -227,7 +215,28 @@ public class SearchModule extends ToggleModule
                 BlockPos pos1 = entry.getKey();
                 RenderManager.renderLine(event.getMatrices(), pos, pos1.toCenterPos(), widthConfig.getValue(), getColor(pos1, entry.getValue(), 255));
             }
+            RenderBuffers.postRender();
             RenderSystem.setProjectionMatrix(prevProjectionMatrix, VertexSorter.BY_DISTANCE);
+        }
+        RenderBuffers.preRender();
+        for (Map.Entry<BlockPos, BlockState> entry : blocks.entrySet())
+        {
+            BlockPos pos1 = entry.getKey();
+            VoxelShape outlineShape = entry.getValue().getOutlineShape(mc.world, pos1);
+            if (outlineShape.isEmpty())
+            {
+                continue;
+            }
+            Box render1 = outlineShape.getBoundingBox();
+            Box render = new Box(pos1.getX() + render1.minX, pos1.getY() + render1.minY,
+                    pos1.getZ() + render1.minZ, pos1.getX() + render1.maxX,
+                    pos1.getY() + render1.maxY, pos1.getZ() + render1.maxZ);
+            if (fillConfig.getValue())
+            {
+                RenderManager.renderBox(event.getMatrices(), render, getColor(pos1, entry.getValue(), 40));
+            }
+            RenderManager.renderBoundingBox(event.getMatrices(),
+                    render, 1.5f, getColor(pos1, entry.getValue(), 145));
         }
         RenderBuffers.postRender();
     }
