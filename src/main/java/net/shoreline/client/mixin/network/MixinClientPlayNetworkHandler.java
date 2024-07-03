@@ -1,10 +1,16 @@
 package net.shoreline.client.mixin.network;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.WorldChunk;
+import net.shoreline.client.impl.event.world.LoadChunkBlockEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
@@ -26,6 +32,9 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
 {
     @Shadow
     public abstract ClientConnection getConnection();
+
+    @Shadow
+    private ClientWorld world;
 
     /**
      * @param content
@@ -65,6 +74,28 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
     {
         InventoryEvent inventoryEvent = new InventoryEvent(packet);
         EventBus.INSTANCE.dispatch(inventoryEvent);
+    }
+
+    @Inject(method = "onChunkData", at = @At(value = "RETURN"))
+    private void hookOnChunkData(ChunkDataS2CPacket packet, CallbackInfo ci)
+    {
+        WorldChunk chunk = world.getChunkManager().getWorldChunk(packet.getChunkX(), packet.getChunkZ(), false);
+        int startX = chunk.getPos().getStartX();
+        int startZ = chunk.getPos().getStartZ();
+
+        for (int y = chunk.getBottomY(); y < chunk.getHeight(); y++)
+        {
+            for (int x1 = startX; x1 < startX + 16; x1++)
+            {
+                for (int z1 = startZ; z1 < startZ + 16; z1++)
+                {
+                    BlockPos pos = new BlockPos(x1, y, z1);
+                    BlockState state = chunk.getBlockState(pos);
+                    LoadChunkBlockEvent loadChunkBlockEvent = new LoadChunkBlockEvent(pos, state);
+                    EventBus.INSTANCE.dispatch(loadChunkBlockEvent);
+                }
+            }
+        }
     }
 
     @Override

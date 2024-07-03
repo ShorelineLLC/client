@@ -199,6 +199,11 @@ public class ConfigContainer implements Identifiable, Serializable<Config<?>>, G
                         List<?> val = cfg.fromJson(configObj);
                         cfg.setValue(val);
                     }
+                    else if (config instanceof BlockListConfig cfg)
+                    {
+                        List<?> val = cfg.fromJson(configObj);
+                        cfg.setValue(val);
+                    }
                     else if (config instanceof NumberConfig cfg)
                     {
                         Number val = cfg.fromJson(configObj);

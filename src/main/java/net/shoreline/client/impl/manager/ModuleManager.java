@@ -163,7 +163,7 @@ public final class ModuleManager
                 new NoWeatherModule(),
                 new ParticlesModule(),
                 new PhaseESPModule(),
-                // new SearchModule(),
+                new SearchModule(),
                 new ShadersModule(),
                 new SkeletonModule(),
                 new SkyboxModule(),

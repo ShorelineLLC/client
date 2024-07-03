@@ -248,8 +248,6 @@ public class RenderManager implements Globals
                                 double z1, double x2, double y2, double z2, int color)
     {
         matrices.push();
-
-
         LINES.begin(matrices);
         LINES.color(color);
         LINES.vertexLine(x1, y1, z1, x2, y2, z2);

@@ -6,13 +6,14 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ItemArgumentType implements ArgumentType<Item>
+public class ItemArgumentType implements ArgumentType<Object>
 {
 
     public static ItemArgumentType item()
@@ -20,21 +21,26 @@ public class ItemArgumentType implements ArgumentType<Item>
         return new ItemArgumentType();
     }
 
-    public static Item getItem(final CommandContext<?> context, final String name)
+    public static Object getItem(final CommandContext<?> context, final String name)
     {
-        return context.getArgument(name, Item.class);
+        return context.getArgument(name, Object.class);
     }
 
     @Override
-    public Item parse(StringReader reader) throws CommandSyntaxException
+    public Object parse(StringReader reader) throws CommandSyntaxException
     {
         String string = reader.readString();
         Item item = Registries.ITEM.get(new Identifier("minecraft", string));
-        if (item == null)
+        if (item != null)
         {
-            throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException().createWithContext(reader, null);
+            return item;
         }
-        return item;
+        Block block = Registries.BLOCK.get(new Identifier("minecraft", string));
+        if (block != null)
+        {
+            return block;
+        }
+        throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException().createWithContext(reader, null);
     }
 
     @Override
@@ -43,6 +49,10 @@ public class ItemArgumentType implements ArgumentType<Item>
         for (Item item : Registries.ITEM)
         {
             builder.suggest(Registries.ITEM.getId(item).getPath());
+        }
+        for (Block block : Registries.BLOCK)
+        {
+            builder.suggest(Registries.BLOCK.getId(block).getPath());
         }
         return builder.buildFuture();
     }

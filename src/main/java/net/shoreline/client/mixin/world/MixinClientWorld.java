@@ -7,6 +7,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.entity.EntityLookup;
 import net.shoreline.client.impl.event.world.*;
 import net.shoreline.eventbus.EventBus;
@@ -106,12 +107,19 @@ public abstract class MixinClientWorld
     @Inject(method = "setBlockState", at = @At(value = "HEAD"), cancellable = true)
     private void hookSetBlockState(BlockPos pos, BlockState state, int flags, int maxUpdateDepth, CallbackInfoReturnable<Boolean> cir)
     {
-        SetBlockStateEvent setBlockStateEvent = new SetBlockStateEvent(flags);
+        SetBlockStateEvent setBlockStateEvent = new SetBlockStateEvent(flags, pos, state);
         EventBus.INSTANCE.dispatch(setBlockStateEvent);
         if (setBlockStateEvent.isCanceled())
         {
             cir.cancel();
             cir.setReturnValue(false);
         }
+    }
+
+    @Inject(method = "unloadBlockEntities", at = @At(value = "HEAD"))
+    private void hookUnloadBlockEntities(WorldChunk chunk, CallbackInfo ci)
+    {
+        UnloadChunkBlocksEvent unloadChunkBlocksEvent = new UnloadChunkBlocksEvent(chunk);
+        EventBus.INSTANCE.dispatch(unloadChunkBlocksEvent);
     }
 }

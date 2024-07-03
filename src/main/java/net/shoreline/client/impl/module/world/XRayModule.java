@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.world;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.shoreline.client.api.config.Config;
@@ -15,7 +16,7 @@ public class XRayModule extends ToggleModule
 {
     Config<Integer> opacityConfig = register(new NumberConfig<>("Opacity", "The opacity of the blocks in wallhack", 0, 120, 255));
     Config<Boolean> softReloadConfig = register(new BooleanConfig("SoftReload", "Reloads world renders without causing game interruption", true));
-    Config<List<Item>> blocksConfig = register(new BlockListConfig<>("Blocks", "Valid block whitelist for wallhack",
+    Config<List<Block>> blocksConfig = register(new BlockListConfig<>("Blocks", "Valid block whitelist for wallhack",
             Blocks.EMERALD_ORE, Blocks.DIAMOND_ORE, Blocks.IRON_ORE,
             Blocks.GOLD_ORE, Blocks.COAL_ORE, Blocks.LAPIS_ORE,
             Blocks.REDSTONE_ORE, Blocks.COPPER_ORE, Blocks.DEEPSLATE_EMERALD_ORE,

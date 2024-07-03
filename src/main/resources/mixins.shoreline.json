@@ -102,6 +102,8 @@
     "render.MixinLightmapTextureManager",
     "render.MixinRenderTickCounter",
     "render.MixinWorldRenderer",
+    "render.block.entity.MixinBlockEntityRenderDispatcher",
+    "render.block.MixinBlockRenderManager",
     "render.block.MixinEnchantingTableBlockEntityRenderer",
     "render.entity.MixinArmorFeatureRenderer",
     "render.entity.MixinEndCrystalEntityRenderer",

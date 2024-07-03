@@ -52,3 +52,8 @@ accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftF
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel rightChest Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftChest Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/entity/TrackedPosition pos Lnet/minecraft/util/math/Vec3d;
+accessible class net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
+accessible class net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask$RenderData
+accessible class net/minecraft/client/world/ClientChunkManager$ClientChunkMap
+accessible method net/minecraft/client/world/ClientChunkManager$ClientChunkMap getIndex (II)I
+accessible field net/minecraft/client/world/ClientChunkManager$ClientChunkMap chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;

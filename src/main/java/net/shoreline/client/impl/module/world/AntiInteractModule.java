@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.world;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
@@ -22,7 +23,7 @@ import java.util.List;
 public class AntiInteractModule extends ToggleModule
 {
     //
-    Config<List<Item>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.ENDER_CHEST, Blocks.ANVIL));
+    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.ENDER_CHEST, Blocks.ANVIL));
 
     public AntiInteractModule()
     {

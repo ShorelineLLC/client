@@ -44,8 +44,8 @@ import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.
 public final class ScaffoldModule extends RotationModule
 {
     Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
-    Config<List<Item>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT, Blocks.OBSIDIAN));
-    Config<List<Item>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
+    Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT, Blocks.OBSIDIAN));
+    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim interactions", false));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to scaffold blocks before placing", false));
     Config<Boolean> rotateHoldConfig = register(new BooleanConfig("RotateHold", "Holds rotations to scaffold blocks", false, () -> rotateConfig.getValue()));
