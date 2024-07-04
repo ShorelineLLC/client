@@ -63,6 +63,7 @@
     "gui.hud.MixinChatHud",
     "gui.hud.MixinChatHudLine",
     "gui.hud.MixinChatHudLineVisible",
+    "gui.hud.MixinDebugHud",
     "gui.hud.MixinInGameHud",
     "gui.hud.MixinInGameOverlayRenderer",
     "gui.hud.MixinPlayerListHud",
