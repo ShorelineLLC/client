@@ -16,11 +16,10 @@ import java.util.List;
 @Mixin(DebugHud.class)
 public abstract class MixinDebugHud
 {
-    @Shadow protected abstract List<String> getLeftText();
+    @Shadow
+    protected abstract List<String> getLeftText();
 
-    @Redirect(
-            method = "drawLeftText",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;getLeftText()Ljava/util/List;"))
+    @Redirect(method = "drawLeftText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;getLeftText()Ljava/util/List;"))
     private List<String> redirectRightTextEarly(DebugHud instance)
     {
         List<String> list = getLeftText();
