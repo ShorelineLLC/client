@@ -12,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
@@ -39,6 +40,7 @@ import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.EvictingQueue;
+import net.shoreline.client.util.math.PerSecondCounter;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
@@ -162,7 +164,7 @@ public class AutoCrystalModule extends RotationModule
             Collections.synchronizedMap(new ConcurrentHashMap<>());
     private final Map<BlockPos, Long> placePackets =
             Collections.synchronizedMap(new ConcurrentHashMap<>());
-
+    private final PerSecondCounter crystalCounter = new PerSecondCounter();
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
 
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -184,7 +186,7 @@ public class AutoCrystalModule extends RotationModule
     {
         if (breakDebugConfig.getValue())
         {
-            return String.format("%dms", getBreakMs());
+            return String.format("%dms, %d", getBreakMs(), crystalCounter.getPerSecond());
         }
         return super.getModuleData();
     }
@@ -389,13 +391,17 @@ public class AutoCrystalModule extends RotationModule
         }
         Vec3d crystalPos = crystalEntity.getPos();
         BlockPos blockPos = BlockPos.ofFloored(crystalPos.add(0.0, -1.0, 0.0));
+        renderSpawnPos = blockPos;
+        Long time = placePackets.remove(blockPos);
+        attackRotate = time != null;
+        if (attackRotate)
+        {
+            crystalCounter.mark();
+        }
         if (!instantConfig.getValue())
         {
             return;
         }
-        renderSpawnPos = blockPos;
-        Long time = placePackets.remove(blockPos);
-        attackRotate = time != null;
         if (attackRotate)
         {
             attackInternal(crystalEntity, getCrystalHand());
@@ -454,20 +460,36 @@ public class AutoCrystalModule extends RotationModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (!(event.getPacket() instanceof PlaySoundS2CPacket packet))
+        if (event.getPacket() instanceof PlaySoundS2CPacket packet)
         {
-            return;
-        }
-        if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE && packet.getCategory() == SoundCategory.BLOCKS)
-        {
-            for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
+            if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE && packet.getCategory() == SoundCategory.BLOCKS)
             {
-                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
+                for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
                 {
-                    mc.executeSync(() ->
+                    if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
                     {
-                        mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
-                    });
+                        mc.executeSync(() ->
+                        {
+                            mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
+                        });
+                        Long attackTime = attackPackets.remove(entity.getId());
+                        if (attackTime != null)
+                        {
+                            attackLatency.add(System.currentTimeMillis() - attackTime);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                Long attackTime = attackPackets.remove(id);
+                if (attackTime != null)
+                {
+                    attackLatency.add(System.currentTimeMillis() - attackTime);
                 }
             }
         }
