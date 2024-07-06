@@ -2,7 +2,6 @@ package net.shoreline.client.impl.module.world;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BlockListConfig;
 import net.shoreline.client.api.config.setting.BooleanConfig;
