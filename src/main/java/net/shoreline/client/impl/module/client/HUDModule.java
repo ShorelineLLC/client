@@ -30,6 +30,7 @@ import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.StreamUtils;
+import net.shoreline.client.util.math.PerSecondCounter;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
@@ -85,6 +86,7 @@ public class HUDModule extends ToggleModule
     private float topLeft, topRight, bottomLeft, bottomRight;
     private boolean renderingUp;
     private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
+    private final PerSecondCounter fpsCounter = new PerSecondCounter();
 
     public HUDModule()
     {
@@ -126,6 +128,7 @@ public class HUDModule extends ToggleModule
     @EventListener
     public void onRenderOverlayPost(RenderOverlayEvent.Post event)
     {
+        fpsCounter.mark();
         if (mc.player != null && mc.world != null)
         {
             if (mc.getDebugHud().shouldShowDebugHud())
@@ -324,7 +327,7 @@ public class HUDModule extends ToggleModule
             }
             if (fpsConfig.getValue())
             {
-                String text = String.format("FPS §f%d", mc.getCurrentFps());
+                String text = String.format("FPS §f%d", fpsCounter.getPerSecond());
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
