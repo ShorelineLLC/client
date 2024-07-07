@@ -19,6 +19,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.chunk.light.RenderSkylightEvent;
 import net.shoreline.client.impl.event.entity.ItemTickEvent;
+import net.shoreline.client.impl.event.entity.LimbAnimatorEvent;
 import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
 import net.shoreline.client.impl.event.entity.UpdateServerPositionEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
@@ -42,7 +43,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class NoRenderModule extends ToggleModule
 {
     Config<Boolean> hurtCamConfig = register(new BooleanConfig("NoHurtCam", "Prevents the hurt camera shake effect from rendering", true));
-    Config<Boolean> interpolationConfig = register(new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false));
+    Config<Boolean> noLimbSwing = register(new BooleanConfig("LimbSwing", "Allows you to cancel limb swing animations", false));
+    Config<Boolean> interpolationConfig = register(new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false, () -> noLimbSwing.getValue()));
     Config<Boolean> antiCrashConfig = register(new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Prevents armor pieces from rendering", false));
     Config<Boolean> fireOverlayConfig = register(new BooleanConfig("Overlay-Fire", "Prevents the fire Hud overlay from rendering", true));
@@ -334,6 +336,16 @@ public class NoRenderModule extends ToggleModule
         if (fireEntityConfig.getValue())
         {
             event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onLimbAnimator(LimbAnimatorEvent event)
+    {
+        if (noLimbSwing.getValue())
+        {
+            event.cancel();
+            event.setSpeed(0.0f);
         }
     }
 

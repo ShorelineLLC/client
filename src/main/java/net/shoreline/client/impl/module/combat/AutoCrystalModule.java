@@ -186,7 +186,7 @@ public class AutoCrystalModule extends RotationModule
     {
         if (breakDebugConfig.getValue())
         {
-            return String.format("%dms, %d", getBreakMs(), crystalCounter.getPerSecond());
+            return String.format("%dms, %d", lastAttackTimer.passed(((20.0f - breakSpeedConfig.getValue()) * 50.0f) + 2000.0f) ? 0 : getBreakMs(), crystalCounter.getPerSecond());
         }
         return super.getModuleData();
     }
@@ -201,6 +201,7 @@ public class AutoCrystalModule extends RotationModule
         silentRotations = null;
         attackPackets.clear();
         placePackets.clear();
+        attackLatency.clear();
         fadeList.clear();
         setStage("NONE");
     }
@@ -234,16 +235,19 @@ public class AutoCrystalModule extends RotationModule
             placeCrystal = calculatePlaceCrystal(blocks, entities);
         }
         attackCrystal = calculateAttackCrystal(entities);
-        if (attackCrystal == null && placeCrystal != null)
+        if (attackCrystal == null)
         {
-            EndCrystalEntity crystalEntity = intersectingCrystalCheck(placeCrystal.getDamageData());
-            if (crystalEntity != null)
+            if (placeCrystal != null)
             {
-                double self = ExplosionUtil.getDamageTo(mc.player, crystalEntity.getPos());
-                if (!safetyConfig.getValue() || !playerDamageCheck(self))
+                EndCrystalEntity crystalEntity = intersectingCrystalCheck(placeCrystal.getDamageData());
+                if (crystalEntity != null)
                 {
-                    attackCrystal = new DamageData<>(crystalEntity, placeCrystal.getAttackTarget(),
-                            placeCrystal.getDamage(), self, crystalEntity.getBlockPos().down());
+                    double self = ExplosionUtil.getDamageTo(mc.player, crystalEntity.getPos());
+                    if (!safetyConfig.getValue() || !playerDamageCheck(self))
+                    {
+                        attackCrystal = new DamageData<>(crystalEntity, placeCrystal.getAttackTarget(),
+                                placeCrystal.getDamage(), self, crystalEntity.getBlockPos().down());
+                    }
                 }
             }
         }
@@ -1204,6 +1208,10 @@ public class AutoCrystalModule extends RotationModule
 
     public int getBreakMs()
     {
+        if (attackLatency.isEmpty())
+        {
+            return 0;
+        }
         float avg = 0.0f;
         // fix ConcurrentModificationException
         ArrayList<Long> latencyCopy = Lists.newArrayList(attackLatency);

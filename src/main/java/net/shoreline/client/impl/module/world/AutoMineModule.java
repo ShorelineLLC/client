@@ -139,8 +139,7 @@ public class AutoMineModule extends RotationModule
                 BlockPos crawlingMine = getCrawlingMine();
                 miningQueue.clear();
                 manualOverride = true;
-                MiningData data = new AutoMiningData(crawlingMine, Direction.UP);
-                queueMiningData(data);
+                queueMiningData(new AutoMiningData(crawlingMine, Direction.DOWN));
             }
             else
             {
@@ -175,18 +174,24 @@ public class AutoMineModule extends RotationModule
                         if (!phasePositions.isEmpty())
                         {
                             miningPos2 = phasePositions.remove(0);
-                            miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) : autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
+                            boolean b2 = miningPos2 != null;
+                            miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) : autoRemineConfig.getValue() && !b2 ? miningPositions.peek() : miningPositions2.peek();
                         }
                         else
                         {
-                            miningPos = autoRemineConfig.getValue() ? miningPositions.poll() : miningPositions2.poll();
-                            miningPos2 = miningPositions.poll();
+                            miningPos = autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
+                            boolean b2 = miningPos != null && !mc.world.isAir(miningPos.pos());
+                            if (b2)
+                            {
+                                miningPositions2.poll();
+                            }
+                            miningPos2 = b2 ? miningPositions2.peek() : miningPositions.peek();
                         }
-                        boolean mine2 = miningPos2 != null && !mc.world.isAir(miningPos2.pos());
+                        boolean mine2 = miningPos2 != null;
                         boolean mine1 = miningPos != null;
                         if (mine1 && mine2)
                         {
-                            if (miningData == null || miningData.getPos() != miningPos.pos())
+                            if (miningData == null || miningDataLast.getPos() != miningPos.pos() && miningQueue.size() <= 1)
                             {
                                 if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
@@ -199,8 +204,11 @@ public class AutoMineModule extends RotationModule
                                 else if (!isBlockDelayGrim())
                                 {
                                     // miningQueue.clear();
-                                    queueMiningData(new AutoMiningData(miningPos2.pos(),
-                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP));
+                                    if (!mc.world.isAir(miningPos2.pos()))
+                                    {
+                                        queueMiningData(new AutoMiningData(miningPos2.pos(),
+                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP));
+                                    }
                                     if (!mc.world.isAir(miningPos.pos()))
                                     {
                                         queueMiningData(new AutoMiningData(miningPos.pos(),
@@ -222,10 +230,13 @@ public class AutoMineModule extends RotationModule
                                         miningData.setAttemptedBreak(true);
                                     }
                                 }
-                                else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
+                                else if (!isBlockDelayGrim())
                                 {
-                                    queueMiningData(new AutoMiningData(miningPos.pos(),
-                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP));
+                                    if (!mc.world.isAir(miningPos.pos()))
+                                    {
+                                        queueMiningData(new AutoMiningData(miningPos.pos(),
+                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP));
+                                    }
                                 }
                             }
                         }
@@ -295,7 +306,7 @@ public class AutoMineModule extends RotationModule
             }
             if (data.getBlockDamage() == 0.0f && !instantConfig.getValue())
             {
-                startMining(data);
+                startMining(data, false);
             }
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
@@ -519,8 +530,7 @@ public class AutoMineModule extends RotationModule
         {
             return;
         }
-        MiningData miningData = new MiningData(pos, direction);
-        queueMiningData(miningData);
+        queueMiningData(new MiningData(pos, direction));
     }
 
     private void queueMiningData(MiningData data)
@@ -529,7 +539,12 @@ public class AutoMineModule extends RotationModule
         {
             return;
         }
-        startMining(data);
+        boolean floor = isMiningFloor(data);
+        if (floor && !miningQueue.isEmpty() || miningQueue.stream().anyMatch(d -> d.isFloor()))
+        {
+            miningQueue.clear();
+        }
+        startMining(data, floor);
         miningQueue.addFirst(data);
     }
 
@@ -575,6 +590,7 @@ public class AutoMineModule extends RotationModule
             }
         }
         miningPositions.removeIf(c -> BlastResistantBlocks.isUnbreakable(c.pos()));
+        miningPositions.removeAll(getPhasePosition(mc.player));
         return miningPositions;
     }
 
@@ -607,13 +623,13 @@ public class AutoMineModule extends RotationModule
         }
     }
 
-    private void startMining(MiningData data)
+    private void startMining(MiningData data, boolean floor)
     {
         if (data.getState().isAir() || data.isStarted())
         {
             return;
         }
-        if (doubleBreakConfig.getValue() && !isMiningFloor(data))
+        if (doubleBreakConfig.getValue() && !floor)
         {
             if (grimConfig.getValue())
             {
@@ -630,6 +646,11 @@ public class AutoMineModule extends RotationModule
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            if (floor)
+            {
+                data.setFloorMine();
+                manualOverride = true;
+            }
         }
         data.setStarted();
     }
@@ -650,7 +671,8 @@ public class AutoMineModule extends RotationModule
     {
         for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
         {
-            if (packetMines.contains(pos.down()))
+            BlockPos miningFloor = pos.down();
+            if (packetMines.contains(miningFloor) && !mc.world.isAir(miningFloor))
             {
                 Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos.down(), Direction.UP));
                 packetMines.remove(pos.down());
@@ -779,6 +801,7 @@ public class AutoMineModule extends RotationModule
         private float blockDamage;
         private boolean instantRemine;
         private boolean started;
+        private boolean floor;
 
         public MiningData(BlockPos pos, Direction direction)
         {
@@ -857,6 +880,16 @@ public class AutoMineModule extends RotationModule
         public BlockState getState()
         {
             return mc.world.getBlockState(pos);
+        }
+
+        public void setFloorMine()
+        {
+            this.floor = true;
+        }
+
+        public boolean isFloor()
+        {
+            return floor;
         }
 
         public boolean isStarted()

@@ -16,22 +16,11 @@ import net.shoreline.eventbus.annotation.EventListener;
 public final class AnimationsModule extends ToggleModule
 {
     Config<Boolean> swingSpeedConfig = register(new BooleanConfig("SwingSpeed", "Allows you to modify your swing speed.", true));
-    Config<Integer> swingSpeedFactorConfig = register(new NumberConfig<>("SwingSpeed-Factor", "The speed of your swing.", 1, 6, 20, () -> swingSpeedConfig.getValue()));
-    Config<Boolean> noLimbSwing = register(new BooleanConfig("NoLimbSwing", "Allows you to cancel limb swing animations", false));
+    Config<Integer> swingFactorConfig = register(new NumberConfig<>("SwingFactor", "The speed of your swing.", 1, 6, 20, () -> swingSpeedConfig.getValue()));
 
     public AnimationsModule()
     {
         super("Animations", "Allows you to modify vanilla animation mechanics.", ModuleCategory.RENDER);
-    }
-
-    @EventListener
-    public void onLimbAnimator(LimbAnimatorEvent event)
-    {
-        if (noLimbSwing.getValue())
-        {
-            event.cancel();
-            event.setSpeed(0.0f);
-        }
     }
 
     @EventListener
@@ -40,7 +29,7 @@ public final class AnimationsModule extends ToggleModule
         if (swingSpeedConfig.getValue())
         {
             event.cancel();
-            event.setSwingSpeed(swingSpeedFactorConfig.getValue());
+            event.setSwingSpeed(swingFactorConfig.getValue());
         }
     }
 }
