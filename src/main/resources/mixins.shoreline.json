@@ -49,6 +49,7 @@
     "color.world.MixinBiomeColors",
     "entity.MixinEntity",
     "entity.MixinItemEntity",
+    "entity.MixinLimbAnimator",
     "entity.MixinLivingEntity",
     "entity.mob.MixinMobEntity",
     "entity.passive.MixinAbstractHorseEntity",

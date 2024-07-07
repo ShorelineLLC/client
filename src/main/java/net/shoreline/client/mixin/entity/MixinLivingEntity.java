@@ -46,6 +46,18 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     @Shadow
     private int jumpingCooldown;
 
+    @Inject(method = "getHandSwingDuration", at = @At("HEAD"), cancellable = true)
+    private void hookGetHandSwingDuration(CallbackInfoReturnable<Integer> cir)
+    {
+        SwingSpeedEvent swingSpeedEvent = new SwingSpeedEvent();
+        EventBus.INSTANCE.dispatch(swingSpeedEvent);
+        if (swingSpeedEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(swingSpeedEvent.getSwingSpeed());
+        }
+    }
+
     @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
     private void hookJump$getYaw(CallbackInfo ci)
     {
