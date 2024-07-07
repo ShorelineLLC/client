@@ -131,8 +131,8 @@ public class ModuleButton extends Button
 
         rect(context, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : unfilledColor);
 
-        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
-        int grayText = ClickGuiModule.getInstance().fixTransparency(0xFFAAAAAA);
+        int whiteText = -1;
+        int grayText = 0xFFAAAAAA;
 
         RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? whiteText : grayText);
         if (settingsAnimation.getFactor() > 0.01f)

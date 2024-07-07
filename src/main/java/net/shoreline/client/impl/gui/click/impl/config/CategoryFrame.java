@@ -132,7 +132,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
         }
         rect(context, ClickGuiModule.getInstance().getColor(1.7f));
 
-        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
+        int whiteText = -1;
         RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, whiteText);
         if (categoryAnimation.getFactor() > 0.01f)
         {

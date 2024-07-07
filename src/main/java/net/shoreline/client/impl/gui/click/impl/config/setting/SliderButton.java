@@ -96,12 +96,12 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
                 / (max.floatValue() - min.floatValue());
         fill(context, ix, iy, (fill * width), height, 0.0, ClickGuiModule.getInstance().getColor());
 
-        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
+        int whiteText = -1;
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
 
         int textLeng = RenderManager.textWidth(config.getName());
 
-        int grayText = ClickGuiModule.getInstance().fixTransparency(0xFFAAAAAA);
+        int grayText = 0xFFAAAAAA;
 
         RenderManager.renderText(context, " " + config.getValue(), ix + 2.0F + textLeng, iy + 4.0F, grayText);
     }

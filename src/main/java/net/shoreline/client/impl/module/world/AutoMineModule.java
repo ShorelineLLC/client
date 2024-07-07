@@ -85,9 +85,10 @@ public class AutoMineModule extends RotationModule
     @Override
     public String getModuleData()
     {
-        if (miningQueue.peek() != null)
+        MiningData miningData = miningQueue.peek();
+        if (miningData != null)
         {
-            return String.format("%.1f", Math.min(miningQueue.peek().getBlockDamage(), 1.0f));
+            return String.format("%.1f", Math.min(miningData.getBlockDamage(), 1.0f));
         }
         return super.getModuleData();
     }

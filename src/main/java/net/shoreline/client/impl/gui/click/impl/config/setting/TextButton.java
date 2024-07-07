@@ -38,7 +38,7 @@ public class TextButton extends ConfigButton<String>
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX, float mouseY, float delta)
     {
-        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
+        int whiteText = -1;
         RenderManager.renderText(context, config.getValue(), ix + 3.0f, iy + 3.0f, whiteText);
     }
 

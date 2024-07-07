@@ -47,7 +47,7 @@ public class ColorButton extends ConfigButton<Color>
         int originalColor = ((ColorConfig) config).getRgb();
         int modifiedTransparencyColor = ClickGuiModule.getInstance().fixTransparency(originalColor);
         fill(context, ix + width - 11.0f, iy + 2.0f, 10.0f, 10.0f, modifiedTransparencyColor);
-        int whiteText = ClickGuiModule.getInstance().fixTransparency(-1);
+        int whiteText = -1;
         RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
         if (pickerAnimation.getFactor() > 0.01f)
         {
