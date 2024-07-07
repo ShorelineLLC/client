@@ -8,7 +8,7 @@ import net.shoreline.eventbus.event.Event;
  * @since 1.0
  */
 @Cancelable
-public final class LimbAnimatorEvent extends Event
+public final class LimbAnimationEvent extends Event
 {
     float speed;
 
