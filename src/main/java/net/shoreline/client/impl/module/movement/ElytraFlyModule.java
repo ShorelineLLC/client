@@ -226,7 +226,7 @@ public class ElytraFlyModule extends RotationModule
                 {
                     return;
                 }
-                event.cancel();
+                // event.cancel();
                 boolean boost = mc.options.jumpKey.isPressed();
                 if (boost)
                 {
@@ -249,7 +249,6 @@ public class ElytraFlyModule extends RotationModule
                 {
                     return;
                 }
-                event.cancel();
                 boolean boost = mc.options.jumpKey.isPressed();
                 Vec3d glide = glideElytraVanilla(mc.player.getPitch());
                 Vec3d motion = mc.player.getVelocity();
