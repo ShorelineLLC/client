@@ -11,8 +11,7 @@ import net.shoreline.eventbus.event.Event;
 public final class SwingSpeedEvent extends Event
 {
     int swingSpeed;
-
-    boolean selfOnly = false;
+    boolean selfOnly;
 
     public void setSwingSpeed(int swingSpeed)
     {
