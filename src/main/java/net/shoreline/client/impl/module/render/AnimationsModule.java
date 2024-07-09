@@ -20,7 +20,7 @@ public final class AnimationsModule extends ToggleModule
 
     public AnimationsModule()
     {
-        super("Animations", "Allows you to modify vanilla animation mechanics.", ModuleCategory.RENDER);
+        super("Animations", "Allows you to modify vanilla animations", ModuleCategory.RENDER);
     }
 
     @EventListener

@@ -10,6 +10,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.gui.hud.PlayerListColumnsEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListNameEvent;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -38,7 +39,7 @@ public class ExtraTabModule extends ToggleModule
             event.cancel();
             event.setPlayerName(Text.of(("§s" + event.getPlayerName().getString())));
         }
-        else if (friendsConfig.getValue())
+        else if (friendsConfig.getValue() && SocialsModule.getInstance().isFriendsEnabled())
         {
             for (String s : Managers.SOCIAL.getFriends())
             {

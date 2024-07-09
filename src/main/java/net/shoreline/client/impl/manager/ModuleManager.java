@@ -102,7 +102,7 @@ public final class ModuleManager
                 new BetterInvModule(),
                 new ChatNotifierModule(),
                 new ChestSwapModule(),
-                // new ChestStealerModule(),
+                new ChestStealerModule(),
                 new FakePlayerModule(),
                 new InvCleanerModule(),
                 new MiddleClickModule(),
