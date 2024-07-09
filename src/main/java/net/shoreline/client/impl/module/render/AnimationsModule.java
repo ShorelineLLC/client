@@ -16,6 +16,7 @@ public final class AnimationsModule extends ToggleModule
 {
     Config<Boolean> swingSpeedConfig = register(new BooleanConfig("SwingSpeed", "Allows you to modify your swing speed.", true));
     Config<Integer> swingFactorConfig = register(new NumberConfig<>("SwingFactor", "The speed of your swing.", 1, 6, 20, () -> swingSpeedConfig.getValue()));
+    Config<Boolean> selfOnly = register(new BooleanConfig("SelfOnly", "Make the module only effect yourself", false));
 
     public AnimationsModule()
     {
@@ -27,6 +28,10 @@ public final class AnimationsModule extends ToggleModule
     {
         if (swingSpeedConfig.getValue())
         {
+            if (selfOnly.getValue())
+            {
+                event.setSelfOnly(true);
+            }
             event.cancel();
             event.setSwingSpeed(swingFactorConfig.getValue());
         }
