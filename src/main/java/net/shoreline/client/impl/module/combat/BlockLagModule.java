@@ -97,12 +97,6 @@ public class BlockLagModule extends ObsidianPlacerModule
         }
     }
 
-    private void attack(Entity entity)
-    {
-        Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-    }
-
     private void attackPlace(BlockPos targetPos)
     {
         final int slot = getResistantBlockItem();
@@ -120,7 +114,8 @@ public class BlockLagModule extends ObsidianPlacerModule
             List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
             for (Entity entity : entities)
             {
-                attack(entity);
+                Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             }
         }
 

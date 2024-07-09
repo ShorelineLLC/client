@@ -49,6 +49,10 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     @Inject(method = "getHandSwingDuration", at = @At("HEAD"), cancellable = true)
     private void hookGetHandSwingDuration(CallbackInfoReturnable<Integer> cir)
     {
+        if ((Object) this != mc.player)
+        {
+            return;
+        }
         SwingSpeedEvent swingSpeedEvent = new SwingSpeedEvent();
         EventBus.INSTANCE.dispatch(swingSpeedEvent);
         if (swingSpeedEvent.isCanceled())

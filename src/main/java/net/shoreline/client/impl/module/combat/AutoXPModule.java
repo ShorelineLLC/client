@@ -40,9 +40,15 @@ public class AutoXPModule extends RotationModule
     public void onPlayerTick(PlayerTickEvent event)
     {
 
-        if (mc.player == null || !delayTimer.passed(delayConfig.getValue())) return;
+        if (mc.player == null || !delayTimer.passed(delayConfig.getValue()))
+        {
+            return;
+        }
 
-        if (mc.player.isUsingItem() && !multiTaskConfig.getValue()) return;
+        if (mc.player.isUsingItem() && !multiTaskConfig.getValue())
+        {
+            return;
+        }
 
         if (durabilityCheckConfig.getValue() && areItemsFullDura(mc.player))
         {
@@ -50,7 +56,6 @@ public class AutoXPModule extends RotationModule
             return;
         }
 
-        int prev = mc.player.getInventory().selectedSlot;
         int slot = -1;
         for (int i = 0; i < 9; i++)
         {
@@ -71,14 +76,17 @@ public class AutoXPModule extends RotationModule
         if (rotateConfig.getValue())
         {
             setRotation(mc.player.getYaw(), 90.0f);
-            if (isRotationBlocked()) return;
+            if (isRotationBlocked())
+            {
+                return;
+            }
         }
         Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
         if (swingConfig.getValue())
         {
             mc.player.swingHand(Hand.MAIN_HAND);
         }
-        Managers.INVENTORY.setSlot(prev);
+        Managers.INVENTORY.syncToClient();
         delayTimer.reset();
     }
 

@@ -12,7 +12,6 @@ public class BedAuraModule extends ToggleModule {
      *
      */
     public BedAuraModule() {
-        super("BedAura", "Automatically places and explodes beds",
-                ModuleCategory.COMBAT);
+        super("BedAura", "Automatically places and explodes beds", ModuleCategory.COMBAT);
     }
 }

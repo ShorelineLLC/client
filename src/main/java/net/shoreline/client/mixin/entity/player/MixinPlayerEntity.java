@@ -13,6 +13,7 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.util.Globals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -45,8 +46,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
     @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
     private void hookTravelHead(Vec3d movementInput, CallbackInfo ci)
     {
-        TravelEvent travelEvent = new TravelEvent(movementInput);
-        travelEvent.setStage(StageEvent.EventStage.PRE);
+        TravelEvent travelEvent = new TravelEvent(movementInput, true);
         EventBus.INSTANCE.dispatch(travelEvent);
         if (travelEvent.isCanceled())
         {
@@ -60,11 +60,10 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
      * @param movementInput
      * @param ci
      */
-    @Inject(method = "travel", at = @At(value = "RETURN"), cancellable = true)
+    @Inject(method = "travel", at = @At(value = "RETURN"))
     private void hookTravelTail(Vec3d movementInput, CallbackInfo ci)
     {
-        TravelEvent travelEvent = new TravelEvent(movementInput);
-        travelEvent.setStage(StageEvent.EventStage.POST);
+        TravelEvent travelEvent = new TravelEvent(movementInput, false);
         EventBus.INSTANCE.dispatch(travelEvent);
     }
 

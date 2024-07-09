@@ -7,7 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -26,10 +25,10 @@ import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
-import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.LoadChunkBlockEvent;
 import net.shoreline.client.impl.event.world.LoadWorldEvent;
+import net.shoreline.client.impl.event.world.SetBlockStateEvent;
 import net.shoreline.client.impl.event.world.UnloadChunkBlocksEvent;
 import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.RenderUtil;
@@ -139,27 +138,20 @@ public class SearchModule extends ToggleModule
     }
 
     @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
+    public void onSetBlockState(SetBlockStateEvent event)
     {
-        if (mc.world == null)
+        if (isSearchBlock(event.getState()))
         {
-            return;
-        }
-        if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
-        {
-            if (isSearchBlock(packet.getState()))
+            if (!blocks.containsKey(event.getPos()))
             {
-                if (!blocks.containsKey(packet.getPos()))
-                {
-                    blocks.put(packet.getPos(), packet.getState());
-                }
+                blocks.put(event.getPos(), event.getState());
             }
-            else
+        }
+        else
+        {
+            if (blocks.containsKey(event.getPos()))
             {
-                if (blocks.containsKey(packet.getPos()))
-                {
-                    blocks.remove(packet.getPos());
-                }
+                blocks.remove(event.getPos());
             }
         }
     }
