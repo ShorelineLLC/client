@@ -53,12 +53,9 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
         EventBus.INSTANCE.dispatch(swingSpeedEvent);
         if (swingSpeedEvent.isCanceled())
         {
-            if (swingSpeedEvent.getSelfOnly())
+            if (swingSpeedEvent.getSelfOnly() && ((Object) this != mc.player))
             {
-                if ((Object) this != mc.player)
-                {
-                    return;
-                }
+                return;
             }
             cir.cancel();
             cir.setReturnValue(swingSpeedEvent.getSwingSpeed());

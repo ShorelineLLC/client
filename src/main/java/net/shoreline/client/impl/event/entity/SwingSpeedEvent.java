@@ -12,7 +12,7 @@ public final class SwingSpeedEvent extends Event
 {
     int swingSpeed;
 
-    boolean selfOnly;
+    boolean selfOnly = false;
 
     public void setSwingSpeed(int swingSpeed)
     {
