@@ -70,6 +70,24 @@ public class MixinInGameHud implements Globals
 
     /**
      * @param context
+     * @param nauseaStrength
+     * @param ci
+     */
+    @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
+    private void hookRenderPortalOverlay(DrawContext context,
+                                         float nauseaStrength,
+                                         CallbackInfo ci)
+    {
+        RenderOverlayEvent.Portal renderOverlayEvent = new RenderOverlayEvent.Portal(context);
+        EventBus.INSTANCE.dispatch(renderOverlayEvent);
+        if (renderOverlayEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
+    /**
+     * @param context
      * @param scale
      * @param ci
      */

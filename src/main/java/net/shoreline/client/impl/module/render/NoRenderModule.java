@@ -50,6 +50,7 @@ public class NoRenderModule extends ToggleModule
     Config<Boolean> antiCrashConfig = register(new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Prevents armor pieces from rendering", false));
     Config<Boolean> fireOverlayConfig = register(new BooleanConfig("Overlay-Fire", "Prevents the fire Hud overlay from rendering", true));
+    Config<Boolean> portalOverlayConfig = register(new BooleanConfig("Overlay-Portal", "Prevents the portal Hud overlay from rendering", true));
     Config<Boolean> waterOverlayConfig = register(new BooleanConfig("Overlay-Water", "Prevents the water Hud overlay from rendering", true));
     Config<Boolean> blockOverlayConfig = register(new BooleanConfig("Overlay-Block", "Prevents the block Hud overlay from rendering", true));
     Config<Boolean> spyglassOverlayConfig = register(new BooleanConfig("Overlay-Spyglass", "Prevents the spyglass Hud overlay from rendering", false));
@@ -155,6 +156,15 @@ public class NoRenderModule extends ToggleModule
     public void onRenderOverlayFire(RenderOverlayEvent.Fire event)
     {
         if (fireOverlayConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onRenderOverlayPortal(RenderOverlayEvent.Portal event)
+    {
+        if (portalOverlayConfig.getValue())
         {
             event.cancel();
         }

@@ -127,6 +127,18 @@ public class RenderOverlayEvent extends Event
     }
 
     @Cancelable
+    public static class Portal extends RenderOverlayEvent
+    {
+        /**
+         * @param context
+         */
+        public Portal(DrawContext context)
+        {
+            super(context);
+        }
+    }
+
+    @Cancelable
     public static class Water extends RenderOverlayEvent
     {
         /**
