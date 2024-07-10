@@ -14,6 +14,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.List;
 
@@ -29,8 +30,12 @@ public class ChestStealerModule extends ToggleModule
     }
 
     @EventListener
-    public void onTick(TickEvent tickEvent)
+    public void onTick(TickEvent event)
     {
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
         if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler containerScreen)
         {
             for (int i = 0; i < containerScreen.getInventory().size(); i++)

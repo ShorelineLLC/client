@@ -10,6 +10,7 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
@@ -27,6 +28,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
 import net.shoreline.client.mixin.accessor.AccessorExplosionS2CPacket;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -92,8 +94,8 @@ public class VelocityModule extends ToggleModule
         {
             if (modeConfig.getValue() == VelocityMode.GRIM)
             {
-                float yaw = Managers.ROTATION.getServerYaw();
-                float pitch = Managers.ROTATION.getServerPitch();
+                float yaw = mc.player.getYaw();
+                float pitch = mc.player.getPitch();
                 if (Managers.ROTATION.isRotating())
                 {
                     yaw = Managers.ROTATION.getRotationYaw();
@@ -102,7 +104,7 @@ public class VelocityModule extends ToggleModule
                 Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(),
                         mc.player.getY(), mc.player.getZ(), yaw, pitch, mc.player.isOnGround()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-                        mc.player.isCrawling() ? mc.player.getBlockPos() : mc.player.getBlockPos().up(), Direction.DOWN));
+                        mc.player.getBlockPos(), Direction.DOWN));
             }
             cancelVelocity = false;
         }
@@ -202,7 +204,7 @@ public class VelocityModule extends ToggleModule
     {
         if (cancelVelocity)
         {
-            if (modeConfig.getValue() == VelocityMode.GRIM)
+            if (modeConfig.getValue() == VelocityMode.GRIM && !isPhased())
             {
                 // Fixes issue with rotations
                 float yaw = Managers.ROTATION.getServerYaw();
@@ -246,6 +248,18 @@ public class VelocityModule extends ToggleModule
         {
             event.cancel();
         }
+    }
+
+    private boolean isPhased()
+    {
+        for (BlockPos blockPos : PositionUtil.getAllInBox(mc.player.getBoundingBox()))
+        {
+            if (!mc.world.getBlockState(blockPos).isReplaceable())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private enum VelocityMode

@@ -59,7 +59,7 @@ public class ChatNotifierModule extends ToggleModule
     @EventListener
     public void onGameJoin(GameJoinEvent event)
     {
-        if (grimConfig.getValue())
+        if (grimConfig.getValue() && !mc.isInSingleplayer())
         {
             if (Managers.ANTICHEAT.isGrim())
             {
