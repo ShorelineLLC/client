@@ -91,6 +91,11 @@ public class SpammerModule extends ToggleModule
 
     private String getSpammerMessage()
     {
+        String defaultMessage = "Shoreline victory!";
+        if (messages.isEmpty())
+        {
+            return defaultMessage;
+        }
         if (randomConfig.getValue())
         {
             String message = messages.get(RANDOM.nextInt(messages.size()));
@@ -121,6 +126,6 @@ public class SpammerModule extends ToggleModule
                 return message;
             }
         }
-        return "Shoreline victory!";
+        return defaultMessage;
     }
 }
