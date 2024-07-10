@@ -29,6 +29,7 @@ public class ParticlesModule extends ToggleModule
     Config<Boolean> potionConfig = register(new BooleanConfig("Effects", "Prevents rendering of potion effect particles", true));
     Config<Boolean> bottleConfig = register(new BooleanConfig("BottleSplash", "Prevents rendering of bottle splash particles", true));
     Config<Boolean> portalConfig = register(new BooleanConfig("Portal", "Prevents rendering of portal particles", true));
+    Config<Boolean> blockConfig = register(new BooleanConfig("Block", "Prevents block particles from rendering", false));
     Config<Boolean> blockBreakConfig = register(new BooleanConfig("BlockBreak", "Prevents block break particles from rendering", false));
     Config<Boolean> campfiresConfig = register(new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false));
     Config<Boolean> obsidianTearConfig = register(new BooleanConfig("ObsidianTear", "Prevents obsidian tear particles from rendering", false));
@@ -47,6 +48,7 @@ public class ParticlesModule extends ToggleModule
                 || fireworkConfig.getValue() && event.getParticleType() == ParticleTypes.FIREWORK
                 || bottleConfig.getValue() && (event.getParticleType() == ParticleTypes.EFFECT || event.getParticleType() == ParticleTypes.INSTANT_EFFECT)
                 || portalConfig.getValue() && event.getParticleType() == ParticleTypes.PORTAL
+                || blockConfig.getValue() && event.getParticleType() == ParticleTypes.BLOCK
                 || campfiresConfig.getValue() && event.getParticleType() == ParticleTypes.CAMPFIRE_COSY_SMOKE
                 || obsidianTearConfig.getValue() && (event.getParticleType() == ParticleTypes.FALLING_OBSIDIAN_TEAR || event.getParticleType() == ParticleTypes.DRIPPING_OBSIDIAN_TEAR || event.getParticleType() == ParticleTypes.LANDING_OBSIDIAN_TEAR))
         {
