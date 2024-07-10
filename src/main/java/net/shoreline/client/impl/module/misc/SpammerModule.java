@@ -7,6 +7,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.math.HexRandom;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -57,7 +58,7 @@ public class SpammerModule extends ToggleModule
         }
         if (spamTimer.passed(delayConfig.getValue() * 1000.0f))
         {
-            ChatUtil.serverSendMessage(getSpammerMessage());
+            sendSpamMessage(getSpammerMessage());
             spamTimer.reset();
         }
     }
@@ -67,7 +68,7 @@ public class SpammerModule extends ToggleModule
         File spammerDir = Shoreline.CONFIG.getClientDirectory().resolve("spammer.txt").toFile();
         if (!spammerDir.exists())
         {
-            sendModuleError("spammer.txt file does not exist! Please create one to enable this module");
+            sendModuleError("The spammer.txt file does not exist! Please create one to enable this module");
             disable();
             return;
         }
@@ -127,5 +128,37 @@ public class SpammerModule extends ToggleModule
             }
         }
         return defaultMessage;
+    }
+
+    private void sendSpamMessage(String message)
+    {
+        if (message.charAt(0) == '/')
+        {
+            message = message.substring(1);
+            mc.player.networkHandler.sendCommand(message);
+            return;
+        }
+        if (message.startsWith(Managers.COMMAND.getPrefix()))
+        {
+            String literal = message.substring(1);
+            mc.inGameHud.getChatHud().addToMessageHistory(message);
+            try
+            {
+                Managers.COMMAND.getDispatcher().execute(Managers.COMMAND.getDispatcher().parse(literal, Managers.COMMAND.getSource()));
+            }
+            catch (Exception exception)
+            {
+                // exception.printStackTrace();
+            }
+            return;
+        }
+        if (mc.isInSingleplayer())
+        {
+            ChatUtil.clientSendMessage(message);
+        }
+        else
+        {
+            ChatUtil.serverSendMessage(message);
+        }
     }
 }
