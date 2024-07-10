@@ -124,7 +124,7 @@ public class ToggleModule extends Module implements Hideable
         onEnable();
         if (notifyConfig.getValue() && mc.world != null)
         {
-            ChatUtil.clientSendMessage("§7" + getName() + "§f toggled §son", 1000);
+            ChatUtil.clientSendMessage("§7" + getName() + "§f toggled §son", hashCode());
         }
     }
 
@@ -141,7 +141,7 @@ public class ToggleModule extends Module implements Hideable
         onDisable();
         if (notifyConfig.getValue() && mc.world != null)
         {
-            ChatUtil.clientSendMessage("§7" + getName() + "§f toggled §coff", 1000);
+            ChatUtil.clientSendMessage("§7" + getName() + "§f toggled §coff", hashCode());
         }
     }
 
