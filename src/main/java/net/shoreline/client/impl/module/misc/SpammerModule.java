@@ -1,18 +1,126 @@
 package net.shoreline.client.impl.module.misc;
 
+import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.util.math.HexRandom;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author linus
  * @since 1.0
  */
-public class SpammerModule extends ToggleModule {
+public class SpammerModule extends ToggleModule
+{
+    Config<Float> delayConfig = register(new NumberConfig<>("Delay", "The chat message delay", 0.0f, 1.5f, 10.0f));
+    Config<Boolean> randomConfig = register(new BooleanConfig("Random", "Randomizes the spammed messages", false));
+    Config<Boolean> antiKickConfig = register(new BooleanConfig("AntiKick", "Adds a random suffix to end of messages to prevent kicks", false));
+    private final List<String> messages = new ArrayList<>();
+    private int messageIndex;
+    private final Timer spamTimer = new CacheTimer();
 
-    /**
-     *
-     */
-    public SpammerModule() {
+    public SpammerModule()
+    {
         super("Spammer", "Spams messages in the chat", ModuleCategory.MISCELLANEOUS);
+    }
+
+    @Override
+    public void onEnable()
+    {
+        loadFile();
+        messageIndex = 0;
+    }
+
+    @EventListener
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
+        if (spamTimer.passed(delayConfig.getValue() * 1000.0f))
+        {
+            ChatUtil.serverSendMessage(getSpammerMessage());
+            spamTimer.reset();
+        }
+    }
+
+    private void loadFile()
+    {
+        File spammerDir = Shoreline.CONFIG.getClientDirectory().resolve("spammer.txt").toFile();
+        if (!spammerDir.exists())
+        {
+            sendModuleError("spammer.txt file does not exist! Please create one to enable this module");
+            disable();
+            return;
+        }
+        messages.clear();
+        try
+        {
+            for (String line : Files.readAllLines(Path.of(spammerDir.getAbsolutePath()), StandardCharsets.UTF_8))
+            {
+                String[] messages1 = line.split(",");
+                for (String message : messages1)
+                {
+                    messages.add(message.trim());
+                }
+            }
+        }
+        catch (IOException e)
+        {
+
+        }
+    }
+
+    private String getSpammerMessage()
+    {
+        if (randomConfig.getValue())
+        {
+            String message = messages.get(RANDOM.nextInt(messages.size()));
+            if (message != null)
+            {
+                if (antiKickConfig.getValue())
+                {
+                    message += " " + HexRandom.generateRandomHex(2);
+                }
+                return message;
+            }
+        }
+        else
+        {
+            String message = messages.get(messageIndex);
+            messageIndex++;
+            if (messageIndex >= messages.size())
+            {
+                messageIndex = 0;
+            }
+
+            if (message != null)
+            {
+                if (antiKickConfig.getValue())
+                {
+                    message += " " + HexRandom.generateRandomHex(2);
+                }
+                return message;
+            }
+        }
+        return "Shoreline victory!";
     }
 }

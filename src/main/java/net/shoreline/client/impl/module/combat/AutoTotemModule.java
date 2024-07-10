@@ -179,11 +179,11 @@ public final class AutoTotemModule extends ToggleModule
             if (failureReasonsSet.isEmpty())
             {
                 long serverLatency = System.currentTimeMillis() - replaceTime;
-                sendModuleMessage("Failed to replace totem in %sms!", serverLatency);
+                sendModuleError("Failed to replace totem in %sms!", serverLatency);
             }
             else
             {
-                sendModuleMessage("Failed to replace totem! Possible reasons: %s", String.join(", ", failureReasonsSet));
+                sendModuleError("Failed to replace totem! Possible reasons: %s", String.join(", ", failureReasonsSet));
             }
         }
         // Server should only send this when we pop a totem

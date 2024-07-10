@@ -62,6 +62,23 @@ public class Module extends ConfigContainer implements Globals
     }
 
     /**
+     * @param message
+     */
+    protected void sendModuleError(String message)
+    {
+        ChatUtil.clientSendMessageRaw("§s[%s]§c %s", name, message);
+    }
+
+    /**
+     * @param message
+     * @param params
+     */
+    protected void sendModuleError(String message, Object... params)
+    {
+        sendModuleError(String.format(message, params));
+    }
+
+    /**
      * @return
      */
     @Override

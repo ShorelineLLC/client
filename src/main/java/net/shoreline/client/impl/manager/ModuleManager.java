@@ -110,6 +110,7 @@ public final class ModuleManager
                 new NoSoundLagModule(),
                 new PacketLoggerModule(),
                 new ShulkerceptionModule(),
+                new SpammerModule(),
                 // new SkinGrabberModule(),
                 new TimerModule(),
                 new TrueDurabilityModule(),
