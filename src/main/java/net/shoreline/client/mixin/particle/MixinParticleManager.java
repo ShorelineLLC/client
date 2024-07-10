@@ -1,12 +1,20 @@
 package net.shoreline.client.mixin.particle;
 
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleGroup;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,6 +27,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ParticleManager.class)
 public class MixinParticleManager
 {
+    @Shadow @Final private Object2IntOpenHashMap<ParticleGroup> groupCounts;
+
     /**
      * @param parameters
      * @param x
@@ -61,6 +71,28 @@ public class MixinParticleManager
                 new ParticleEvent.Emitter(parameters);
         EventBus.INSTANCE.dispatch(particleEvent);
         if (particleEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "addBlockBreakParticles", at = @At("HEAD"), cancellable = true)
+    private void onAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci)
+    {
+        BlockBreakParticleEvent blockBreakParticleEvent = new BlockBreakParticleEvent();
+        EventBus.INSTANCE.dispatch(blockBreakParticleEvent);
+        if (blockBreakParticleEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "addBlockBreakingParticles", at = @At("HEAD"), cancellable = true)
+    private void onAddBlockBreakingParticles(BlockPos pos, Direction direction, CallbackInfo ci)
+    {
+        BlockBreakParticleEvent blockBreakParticleEvent = new BlockBreakParticleEvent();
+        EventBus.INSTANCE.dispatch(blockBreakParticleEvent);
+        if (blockBreakParticleEvent.isCanceled())
         {
             ci.cancel();
         }

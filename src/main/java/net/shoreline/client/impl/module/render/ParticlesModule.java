@@ -8,6 +8,7 @@ import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.particle.TotemParticleEvent;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -21,12 +22,16 @@ import java.awt.*;
 public class ParticlesModule extends ToggleModule
 {
 
-    Config<TotemParticle> totemConfig = register(new EnumConfig<>("Totem", "Renders totem particles", TotemParticle.OFF, TotemParticle.values()));
+    Config<TotemParticle> totemConfig = register(new EnumConfig<>("Totem", "Modify totem particle rendering", TotemParticle.OFF, TotemParticle.values()));
     Config<Color> totemColorConfig = register(new ColorConfig("TotemColor", "Color of the totem particles", new Color(25, 120, 0), false, false, () -> totemConfig.getValue() == TotemParticle.COLOR));
-    Config<Boolean> fireworkConfig = register(new BooleanConfig("Firework", "Renders firework particles", false));
-    Config<Boolean> potionConfig = register(new BooleanConfig("Effects", "Renders potion effect particles", true));
-    Config<Boolean> bottleConfig = register(new BooleanConfig("BottleSplash", "Render bottle splash particles", true));
-    Config<Boolean> portalConfig = register(new BooleanConfig("Portal", "Render portal particles", true));
+    Config<Boolean> explosionsConfig = register(new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true));
+    Config<Boolean> fireworkConfig = register(new BooleanConfig("Firework", "Prevents rendering of firework particles", false));
+    Config<Boolean> potionConfig = register(new BooleanConfig("Effects", "Prevents rendering of potion effect particles", true));
+    Config<Boolean> bottleConfig = register(new BooleanConfig("BottleSplash", "Prevents rendering of bottle splash particles", true));
+    Config<Boolean> portalConfig = register(new BooleanConfig("Portal", "Prevents rendering of portal particles", true));
+    Config<Boolean> blockBreakConfig = register(new BooleanConfig("BlockBreak", "Prevents block break particles from rendering", false));
+    Config<Boolean> campfiresConfig = register(new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false));
+    Config<Boolean> obsidianTearConfig = register(new BooleanConfig("ObsidianTear", "Prevents obsidian tear particles from rendering", false));
 
     public ParticlesModule()
     {
@@ -37,9 +42,22 @@ public class ParticlesModule extends ToggleModule
     public void onParticle(ParticleEvent event)
     {
         if (potionConfig.getValue() && event.getParticleType() == ParticleTypes.ENTITY_EFFECT
+
+                || explosionsConfig.getValue() && (event.getParticleType() == ParticleTypes.EXPLOSION ||event.getParticleType() == ParticleTypes.EXPLOSION_EMITTER)
                 || fireworkConfig.getValue() && event.getParticleType() == ParticleTypes.FIREWORK
                 || bottleConfig.getValue() && (event.getParticleType() == ParticleTypes.EFFECT || event.getParticleType() == ParticleTypes.INSTANT_EFFECT)
-                || portalConfig.getValue() && event.getParticleType() == ParticleTypes.PORTAL)
+                || portalConfig.getValue() && event.getParticleType() == ParticleTypes.PORTAL
+                || campfiresConfig.getValue() && event.getParticleType() == ParticleTypes.CAMPFIRE_COSY_SMOKE
+                || obsidianTearConfig.getValue() && (event.getParticleType() == ParticleTypes.FALLING_OBSIDIAN_TEAR || event.getParticleType() == ParticleTypes.DRIPPING_OBSIDIAN_TEAR || event.getParticleType() == ParticleTypes.LANDING_OBSIDIAN_TEAR))
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onParticleEmitter(ParticleEvent.Emitter event)
+    {
+        if (totemConfig.getValue() == TotemParticle.REMOVE && event.getParticleType() == ParticleTypes.TOTEM_OF_UNDYING)
         {
             event.cancel();
         }
@@ -74,9 +92,9 @@ public class ParticlesModule extends ToggleModule
     }
 
     @EventListener
-    public void onParticleEmitter(ParticleEvent.Emitter event)
+    public void onBlockBreakParticle(BlockBreakParticleEvent event)
     {
-        if (totemConfig.getValue() == TotemParticle.REMOVE && event.getParticleType() == ParticleTypes.TOTEM_OF_UNDYING)
+        if (blockBreakConfig.getValue())
         {
             event.cancel();
         }

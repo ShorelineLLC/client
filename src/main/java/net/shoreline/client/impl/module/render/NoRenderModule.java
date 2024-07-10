@@ -9,6 +9,7 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.shoreline.client.api.config.Config;
@@ -24,6 +25,7 @@ import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
 import net.shoreline.client.impl.event.entity.UpdateServerPositionEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.render.block.RenderTileEntityEvent;
@@ -60,10 +62,8 @@ public class NoRenderModule extends ToggleModule
     Config<Boolean> witherSkullsConfig = register(new BooleanConfig("WitherSkulls", "Prevents flying wither skulls from rendering", false));
     Config<Boolean> tileEntitiesConfig = register(new BooleanConfig("TileEntities", "Prevents special tile entity properties from rendering (i.e. enchantment table books or cutting table saws)", false));
     Config<Boolean> fireEntityConfig = register(new BooleanConfig("FireEntities", "Prevents fire from rendering on entities", false));
-    Config<Boolean> fireworksConfig = register(new BooleanConfig("Fireworks", "Prevents firework particles from rendering", true));
-    Config<Boolean> explosionsConfig = register(new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true));
-    Config<Boolean> campfiresConfig = register(new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false));
-    Config<Boolean> totemConfig = register(new BooleanConfig("Totems", "Prevents totem particles from rendering", false));
+    Config<Boolean> fireworksConfig = register(new BooleanConfig("Fireworks", "Prevents firework entities from rendering", true));
+    Config<Boolean> totemConfig = register(new BooleanConfig("Totems", "Prevents totem pop overlay from rendering", false));
     Config<Boolean> worldBorderConfig = register(new BooleanConfig("WorldBorder", "Prevents world border from rendering", false));
     Config<FogRender> fogConfig = register(new EnumConfig<>("Fog", "Prevents fog from rendering in the world", FogRender.OFF, FogRender.values()));
     Config<ItemRender> itemsConfig = register(new EnumConfig<>("Items", "Prevents dropped items from rendering", ItemRender.OFF, ItemRender.values()));
@@ -254,18 +254,6 @@ public class NoRenderModule extends ToggleModule
     public void onRenderEnchantingTableBook(RenderTileEntityEvent.EnchantingTableBook event)
     {
         if (tileEntitiesConfig.getValue())
-        {
-            event.cancel();
-        }
-    }
-
-    @EventListener
-    public void onParticle(ParticleEvent event)
-    {
-        if (explosionsConfig.getValue() && (event.getParticleType() == ParticleTypes.EXPLOSION
-                || event.getParticleType() == ParticleTypes.EXPLOSION_EMITTER)
-                || fireworksConfig.getValue() && event.getParticleType() == ParticleTypes.FIREWORK
-                || campfiresConfig.getValue() && event.getParticleType() == ParticleTypes.CAMPFIRE_COSY_SMOKE)
         {
             event.cancel();
         }
