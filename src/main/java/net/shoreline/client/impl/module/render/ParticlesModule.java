@@ -27,6 +27,7 @@ public class ParticlesModule extends ToggleModule
     Config<Boolean> explosionsConfig = register(new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true));
     Config<Boolean> fireworkConfig = register(new BooleanConfig("Firework", "Prevents rendering of firework particles", false));
     Config<Boolean> potionConfig = register(new BooleanConfig("Effects", "Prevents rendering of potion effect particles", true));
+    Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Prevents rendering of eating particles", false));
     Config<Boolean> bottleConfig = register(new BooleanConfig("BottleSplash", "Prevents rendering of bottle splash particles", true));
     Config<Boolean> portalConfig = register(new BooleanConfig("Portal", "Prevents rendering of portal particles", true));
     Config<Boolean> blockConfig = register(new BooleanConfig("Block", "Prevents block particles from rendering", false));
@@ -46,6 +47,7 @@ public class ParticlesModule extends ToggleModule
 
                 || explosionsConfig.getValue() && (event.getParticleType() == ParticleTypes.EXPLOSION ||event.getParticleType() == ParticleTypes.EXPLOSION_EMITTER)
                 || fireworkConfig.getValue() && event.getParticleType() == ParticleTypes.FIREWORK
+                || itemsConfig.getValue() && event.getParticleType() == ParticleTypes.ITEM
                 || bottleConfig.getValue() && (event.getParticleType() == ParticleTypes.EFFECT || event.getParticleType() == ParticleTypes.INSTANT_EFFECT)
                 || portalConfig.getValue() && event.getParticleType() == ParticleTypes.PORTAL
                 || blockConfig.getValue() && event.getParticleType() == ParticleTypes.BLOCK
