@@ -92,10 +92,7 @@ public class MixinHeldItemRenderer
             h = MathHelper.abs(MathHelper.cos(f / 4.0f * (float)Math.PI) * 0.1f);
             EatTransformationEvent eatTransformationEvent = new EatTransformationEvent();
             EventBus.INSTANCE.dispatch(eatTransformationEvent);
-            if (!eatTransformationEvent.isCanceled())
-            {
-                matrices.translate(0.0f, h, 0.0f);
-            }
+            matrices.translate(0.0f, eatTransformationEvent.isCanceled() ? h * eatTransformationEvent.getFactor() : h, 0.0f);
         }
         h = 1.0f - (float)Math.pow(g, 27.0);
         int i = arm == Arm.RIGHT ? 1 : -1;

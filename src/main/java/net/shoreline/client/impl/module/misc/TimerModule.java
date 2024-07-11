@@ -64,6 +64,12 @@ public class TimerModule extends ToggleModule
         super.toggle();
     }
 
+    @Override
+    public void onDisable()
+    {
+        Managers.TICK.setClientTick(1.0f);
+    }
+
     @EventListener
     public void onTick(TickEvent event)
     {

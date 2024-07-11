@@ -17,8 +17,9 @@ public final class AnimationsModule extends ToggleModule
 {
     Config<Boolean> swingSpeedConfig = register(new BooleanConfig("SwingSpeed", "Allows you to modify your swing speed.", true));
     Config<Integer> swingFactorConfig = register(new NumberConfig<>("SwingFactor", "The speed of your swing.", 1, 6, 20, () -> swingSpeedConfig.getValue()));
-    Config<Boolean> selfOnlyConfig = register(new BooleanConfig("SelfOnly", "Make the module only affect yourself", false));
-    Config<Boolean> noEatTransformConfig = register(new BooleanConfig("NoEatTransform", "Removes the first person eating animation", false));
+    Config<Boolean> selfOnlyConfig = register(new BooleanConfig("SelfOnly", "Make the module only affect yourself", false, () -> swingSpeedConfig.getValue()));
+    Config<Boolean> eatTransformConfig = register(new BooleanConfig("EatTransform", "Transforms the first person eating animation", false));
+    Config<Float> eatTransformFactorConfig = register(new NumberConfig<>("EatTransform-Factor", "Factor for the first person eating animation", 0.0f, 1.0f, 1.0f, () -> eatTransformConfig.getValue()));
 
     public AnimationsModule()
     {
@@ -39,9 +40,10 @@ public final class AnimationsModule extends ToggleModule
     @EventListener
     public void onEatTransformation(EatTransformationEvent event)
     {
-        if (noEatTransformConfig.getValue())
+        if (eatTransformConfig.getValue())
         {
             event.cancel();
+            event.setFactor(eatTransformFactorConfig.getValue());
         }
     }
 }
