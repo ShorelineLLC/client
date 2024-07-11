@@ -6,6 +6,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.SwingSpeedEvent;
+import net.shoreline.client.impl.event.render.item.EatTransformationEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
@@ -17,6 +18,7 @@ public final class AnimationsModule extends ToggleModule
     Config<Boolean> swingSpeedConfig = register(new BooleanConfig("SwingSpeed", "Allows you to modify your swing speed.", true));
     Config<Integer> swingFactorConfig = register(new NumberConfig<>("SwingFactor", "The speed of your swing.", 1, 6, 20, () -> swingSpeedConfig.getValue()));
     Config<Boolean> selfOnlyConfig = register(new BooleanConfig("SelfOnly", "Make the module only affect yourself", false));
+    Config<Boolean> noEatTransformConfig = register(new BooleanConfig("NoEatTransform", "Removes the first person eating animation", false));
 
     public AnimationsModule()
     {
@@ -31,6 +33,15 @@ public final class AnimationsModule extends ToggleModule
             event.cancel();
             event.setSwingSpeed(swingFactorConfig.getValue());
             event.setSelfOnly(selfOnlyConfig.getValue());
+        }
+    }
+
+    @EventListener
+    public void onEatTransformation(EatTransformationEvent event)
+    {
+        if (noEatTransformConfig.getValue())
+        {
+            event.cancel();
         }
     }
 }

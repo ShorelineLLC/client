@@ -154,7 +154,7 @@ public class SpammerModule extends ToggleModule
         }
         if (mc.isInSingleplayer())
         {
-            ChatUtil.clientSendMessage(message);
+            ChatUtil.clientSendMessageRaw(message);
         }
         else
         {
