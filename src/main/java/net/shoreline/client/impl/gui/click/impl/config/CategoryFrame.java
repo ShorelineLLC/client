@@ -226,6 +226,19 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
     }
 
     @Override
+    public void charTyped(char character, int modifiers)
+    {
+        super.charTyped(character, modifiers);
+        if (isOpen())
+        {
+            for (ModuleButton button : moduleButtons)
+            {
+                button.charTyped(character, modifiers);
+            }
+        }
+    }
+
+    @Override
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();

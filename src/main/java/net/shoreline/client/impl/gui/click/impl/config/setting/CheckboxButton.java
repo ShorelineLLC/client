@@ -86,4 +86,10 @@ public class CheckboxButton extends ConfigButton<Boolean>
 
     }
 
+    @Override
+    public void charTyped(char character, int modifiers)
+    {
+
+    }
+
 }

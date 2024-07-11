@@ -69,4 +69,10 @@ public class Frame extends Component implements Interactable
     {
 
     }
+
+    @Override
+    public void charTyped(char character, int modifiers)
+    {
+
+    }
 }

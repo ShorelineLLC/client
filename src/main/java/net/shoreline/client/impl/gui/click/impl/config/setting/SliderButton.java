@@ -138,4 +138,10 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     {
 
     }
+
+    @Override
+    public void charTyped(char character, int modifiers)
+    {
+
+    }
 }

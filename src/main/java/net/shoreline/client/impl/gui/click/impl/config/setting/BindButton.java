@@ -131,6 +131,12 @@ public class BindButton extends ConfigButton<Macro>
         }
     }
 
+    @Override
+    public void charTyped(char character, int modifiers)
+    {
+
+    }
+
     public boolean isListening()
     {
         return listening;

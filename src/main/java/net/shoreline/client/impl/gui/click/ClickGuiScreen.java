@@ -200,6 +200,16 @@ public class ClickGuiScreen extends Screen implements Globals
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    @Override
+    public boolean charTyped(char chr, int modifiers)
+    {
+        for (CategoryFrame frame : frames)
+        {
+            frame.charTyped(chr, modifiers);
+        }
+        return super.charTyped(chr, modifiers);
+    }
+
     /**
      * @return
      */

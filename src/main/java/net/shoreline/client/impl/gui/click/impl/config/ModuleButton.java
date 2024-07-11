@@ -247,6 +247,18 @@ public class ModuleButton extends Button
         }
     }
 
+    @Override
+    public void charTyped(char character, int modifiers)
+    {
+        if (open)
+        {
+            for (ConfigButton<?> component : configComponents)
+            {
+                component.charTyped(character, modifiers);
+            }
+        }
+    }
+
     /**
      * @param in
      */

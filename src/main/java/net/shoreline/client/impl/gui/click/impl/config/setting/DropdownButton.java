@@ -103,4 +103,10 @@ public class DropdownButton extends ConfigButton<Enum<?>>
     {
 
     }
+
+    @Override
+    public void charTyped(char character, int modifiers)
+    {
+
+    }
 }

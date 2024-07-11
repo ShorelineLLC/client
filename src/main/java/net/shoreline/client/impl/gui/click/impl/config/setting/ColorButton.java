@@ -143,6 +143,12 @@ public class ColorButton extends ConfigButton<Color>
 
     }
 
+    @Override
+    public void charTyped(char character, int modifiers)
+    {
+
+    }
+
     public float getPickerHeight()
     {
         float pickerHeight = 16.0f;

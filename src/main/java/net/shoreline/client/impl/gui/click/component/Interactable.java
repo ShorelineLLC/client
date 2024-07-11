@@ -27,4 +27,11 @@ public interface Interactable extends Drawable
      * @param modifiers
      */
     void keyPressed(int keyCode, int scanCode, int modifiers);
+
+    /**
+     *
+     * @param character
+     * @param modifiers
+     */
+    void charTyped(char character, int modifiers);
 }
