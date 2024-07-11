@@ -46,9 +46,9 @@ public class SkinBlinkModule extends ToggleModule
         {
             return;
         }
-        for (PlayerModelPart modelPart : enabledPlayerModelParts)
+        for (PlayerModelPart modelPart : PlayerModelPart.values())
         {
-            mc.options.togglePlayerModelPart(modelPart, true);
+            mc.options.togglePlayerModelPart(modelPart, enabledPlayerModelParts.contains(modelPart));
         }
     }
 
