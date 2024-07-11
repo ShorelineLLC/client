@@ -5,7 +5,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
-import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,6 +44,7 @@ public class TextButton extends ConfigButton<String>
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX, float mouseY, float delta)
     {
+        ClickGuiModule.CLICK_GUI_SCREEN.setCloseOnEscape(!typing);
         x = ix;
         y = iy;
         int whiteText = -1;
