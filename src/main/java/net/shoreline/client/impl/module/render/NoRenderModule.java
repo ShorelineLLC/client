@@ -5,12 +5,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -20,13 +14,8 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.chunk.light.RenderSkylightEvent;
 import net.shoreline.client.impl.event.entity.ItemTickEvent;
-import net.shoreline.client.impl.event.entity.LimbAnimationEvent;
 import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
-import net.shoreline.client.impl.event.entity.UpdateServerPositionEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
-import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
-import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.render.block.RenderTileEntityEvent;
 import net.shoreline.client.impl.event.render.entity.RenderArmorEvent;
@@ -35,8 +24,8 @@ import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
 import net.shoreline.client.impl.event.render.entity.RenderWitherSkullEvent;
 import net.shoreline.client.impl.event.toast.RenderToastEvent;
 import net.shoreline.client.impl.event.world.BlindnessEvent;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus
@@ -45,9 +34,6 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class NoRenderModule extends ToggleModule
 {
     Config<Boolean> hurtCamConfig = register(new BooleanConfig("NoHurtCam", "Prevents the hurt camera shake effect from rendering", true));
-    Config<Boolean> limbSwing = register(new BooleanConfig("LimbSwing", "Allows you to cancel limb swing animations", false));
-    Config<Boolean> interpolationConfig = register(new BooleanConfig("Interpolation", "Entities will be rendered at their server positions", false, () -> limbSwing.getValue()));
-    Config<Boolean> antiCrashConfig = register(new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Prevents armor pieces from rendering", false));
     Config<Boolean> fireOverlayConfig = register(new BooleanConfig("Overlay-Fire", "Prevents the fire Hud overlay from rendering", true));
     Config<Boolean> portalOverlayConfig = register(new BooleanConfig("Overlay-Portal", "Prevents the portal Hud overlay from rendering", true));
@@ -72,8 +58,7 @@ public class NoRenderModule extends ToggleModule
 
     public NoRenderModule()
     {
-        super("NoRender", "Prevents certain game elements from rendering",
-                ModuleCategory.RENDER);
+        super("NoRender", "Prevents certain game elements from rendering", ModuleCategory.RENDER);
     }
 
     @EventListener
@@ -87,49 +72,6 @@ public class NoRenderModule extends ToggleModule
                 {
                     mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
                 }
-            }
-        }
-    }
-
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (mc.world == null)
-        {
-            return;
-        }
-        if (antiCrashConfig.getValue())
-        {
-            // Out of bounds packets from server
-            if (event.getPacket() instanceof PlayerPositionLookS2CPacket packet
-                    && (packet.getX() > 30000000 || packet.getY() > mc.world.getTopY()
-                    || packet.getZ() > 30000000 || packet.getX() < -30000000
-                    || packet.getY() < mc.world.getBottomY() || packet.getZ() < -30000000))
-            {
-                event.cancel();
-            }
-            else if (event.getPacket() instanceof ExplosionS2CPacket packet
-                    && (packet.getX() > 30000000 || packet.getY() > mc.world.getTopY()
-                    || packet.getZ() > 30000000 || packet.getX() < -30000000
-                    || packet.getY() < mc.world.getBottomY() || packet.getZ() < -30000000
-                    || packet.getRadius() > 1000 || packet.getAffectedBlocks().size() > 1000
-                    || packet.getPlayerVelocityX() > 1000 || packet.getPlayerVelocityY() > 1000
-                    || packet.getPlayerVelocityZ() > 1000 || packet.getPlayerVelocityX() < -1000
-                    || packet.getPlayerVelocityY() < -1000 || packet.getPlayerVelocityZ() < -1000))
-            {
-                event.cancel();
-            }
-            else if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet
-                    && (packet.getVelocityX() > 1000 || packet.getVelocityY() > 1000 ||
-                    packet.getVelocityZ() > 1000 || packet.getVelocityX() < -1000 ||
-                    packet.getVelocityY() < -1000 || packet.getVelocityZ() < -1000))
-            {
-                event.cancel();
-            }
-            else if (event.getPacket() instanceof ParticleS2CPacket packet
-                    && packet.getCount() > 500)
-            {
-                event.cancel();
             }
         }
     }
@@ -334,27 +276,6 @@ public class NoRenderModule extends ToggleModule
         if (fireEntityConfig.getValue())
         {
             event.cancel();
-        }
-    }
-
-    @EventListener
-    public void onLimbAnimation(LimbAnimationEvent event)
-    {
-        if (limbSwing.getValue())
-        {
-            event.cancel();
-            event.setSpeed(0.0f);
-        }
-    }
-
-    @EventListener
-    public void onUpdateServerPosition(UpdateServerPositionEvent event)
-    {
-        if (interpolationConfig.getValue())
-        {
-            event.getLivingEntity().setPos(event.getX(), event.getY(), event.getZ());
-            event.getLivingEntity().setYaw(event.getYaw());
-            event.getLivingEntity().setPitch(event.getPitch());
         }
     }
 

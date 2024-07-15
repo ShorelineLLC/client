@@ -52,10 +52,18 @@ public class BreakHighlightModule extends ToggleModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (event.getPacket() instanceof BlockBreakingProgressS2CPacket packet && !contains(packet.getPos())
+        if (event.getPacket() instanceof BlockBreakingProgressS2CPacket packet
                 && !BlastResistantBlocks.isUnbreakable(packet.getPos()))
         {
-            breakingProgress.put(packet, System.currentTimeMillis());
+            BlockBreakingProgressS2CPacket p = getPacketFromPos(packet.getPos());
+            if (p != null)
+            {
+                breakingProgress.replace(p, System.currentTimeMillis());
+            }
+            else
+            {
+                breakingProgress.put(packet, System.currentTimeMillis());
+            }
         }
     }
 
@@ -144,9 +152,9 @@ public class BreakHighlightModule extends ToggleModule
         }
     }
 
-    private boolean contains(BlockPos pos)
+    private BlockBreakingProgressS2CPacket getPacketFromPos(BlockPos pos)
     {
-        return breakingProgress.keySet().stream().anyMatch(p -> p.getPos().equals(pos));
+        return breakingProgress.keySet().stream().filter(p -> p.getPos().equals(pos)).findFirst().orElse(null);
     }
 
     private enum HighlightMode

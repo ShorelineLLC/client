@@ -12,6 +12,7 @@ import net.shoreline.client.api.font.Glyph;
 import net.shoreline.client.api.font.GlyphCache;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.math.HexRandom;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -329,9 +330,7 @@ public final class AWTFontRenderer implements Closeable, Globals
 
     public Identifier getGlyphIdentifier()
     {
-        return new Identifier("shoreline", "font/storage/" + IntStream.range(0, 32)
-                .mapToObj(operand -> String.valueOf((char) new Random().nextInt('a', 'z' + 1)))
-                .collect(Collectors.joining()));
+        return new Identifier("shoreline", "font/storage/" + HexRandom.generateRandomHex(32));
     }
 
     public int[] toRgbComponents(int color)

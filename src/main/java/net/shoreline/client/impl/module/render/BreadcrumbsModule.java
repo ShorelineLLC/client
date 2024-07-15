@@ -60,7 +60,8 @@ public class BreadcrumbsModule extends ToggleModule
         {
             if (fadeConfig.getValue() && !infiniteConfig.getValue())
             {
-                RenderBuffers.LINES.color(ColorsModule.getInstance().getRGB((int) (((float) i / positions.size()) * 255.0f)));
+                float fade = (float) i / positions.size();
+                RenderBuffers.LINES.color(ColorsModule.getInstance().getRGB((int) (fade * 255.0f)));
             }
             else
             {

@@ -62,7 +62,15 @@ public class TextButton extends ConfigButton<String>
     {
         if (isWithin(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_1)
         {
-            typing = !typing;
+            if (typing)
+            {
+                config.setValue(new String(buffer));
+                typing = false;
+            }
+            else
+            {
+                typing = true;
+            }
         }
     }
 

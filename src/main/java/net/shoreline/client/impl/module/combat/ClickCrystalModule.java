@@ -32,7 +32,7 @@ public class ClickCrystalModule extends RotationModule
     Config<Float> breakDelayConfig = register(new NumberConfig<>("SpawnDelay", "Speed to break crystals after spawning", 0.0f, 0.0f, 20.0f));
     Config<Float> randomDelayConfig = register(new NumberConfig<>("RandomDelay", "Randomized break delay", 0.0f, 0.0f, 5.0f));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate before breaking", false));
-    Config<Boolean> randomRotateConfig = register(new BooleanConfig("Rotate-Random", "Slightly randomizes rotations", false, () -> rotateConfig.getValue()));
+    Config<Boolean> randomRotateConfig = register(new BooleanConfig("RotateJitter", "Slightly randomizes rotations", false, () -> rotateConfig.getValue()));
     private final Set<BlockPos> placedCrystals = new HashSet<>();
     private final Map<EndCrystalEntity, Long> spawnedCrystals = new LinkedHashMap<>();
     private float randomDelay = -1;
@@ -57,7 +57,8 @@ public class ClickCrystalModule extends RotationModule
             randomDelay = randomDelayConfig.getValue() == 0.0f ? 0.0f : RANDOM.nextFloat(randomDelayConfig.getValue() * 25.0f);
         }
         float breakDelay = breakDelayConfig.getValue() * 50.0f + randomDelay;
-        if (mc.player.getEyePos().squaredDistanceTo(crystalEntity.getPos()) <= 12.25 && System.currentTimeMillis() - time >= breakDelay)
+        double dist = mc.player.getEyePos().squaredDistanceTo(crystalEntity.getPos());
+        if (dist <= 12.25 && System.currentTimeMillis() - time >= breakDelay)
         {
             if (rotateConfig.getValue())
             {

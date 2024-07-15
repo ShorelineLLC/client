@@ -11,6 +11,7 @@ import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 import net.shoreline.client.impl.event.world.LoadChunkBlockEvent;
+import net.shoreline.client.impl.event.world.LoadChunkEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
@@ -82,7 +83,8 @@ public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetwor
         WorldChunk chunk = world.getChunkManager().getWorldChunk(packet.getChunkX(), packet.getChunkZ(), false);
         int startX = chunk.getPos().getStartX();
         int startZ = chunk.getPos().getStartZ();
-
+        LoadChunkEvent loadChunkEvent = new LoadChunkEvent(chunk);
+        EventBus.INSTANCE.dispatch(loadChunkEvent);
         for (int y = chunk.getBottomY(); y < chunk.getHeight(); y++)
         {
             for (int x1 = startX; x1 < startX + 16; x1++)

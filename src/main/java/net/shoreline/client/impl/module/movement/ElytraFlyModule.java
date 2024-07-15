@@ -48,7 +48,7 @@ public class ElytraFlyModule extends RotationModule
     Config<FlyMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for elytra flight", FlyMode.CONTROL, FlyMode.values()));
     Config<Float> pitchConfig = register(new NumberConfig<>("Pitch", "The pitch for bounce recast", 0.0f, 75.0f, 90.0f, () -> modeConfig.getValue() == FlyMode.BOUNCE));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f));
-    Config<Float> vspeedConfig = register(new NumberConfig<>("VerticalSpeed", "The vertical flight speed", 0.1f, 1.0f, 5.0f, () -> modeConfig.getValue() != FlyMode.BOUNCE));
+    Config<Float> vspeedConfig = register(new NumberConfig<>("VerticalSpeed", "The vertical flight speed", 0.1f, 1.0f, 5.0f, () -> modeConfig.getValue() != FlyMode.BOUNCE && modeConfig.getValue() != FlyMode.BOOST && modeConfig.getValue() != FlyMode.FACTORIZE));
     Config<Boolean> accelerationConfig = register(new BooleanConfig("Acceleration", "Accelerates fly speed", false, () -> modeConfig.getValue() != FlyMode.BOOST));
     Config<Float> accelSpeedConfig = register(new NumberConfig<>("AccelSpeed", "Acceleration speed", 0.01f, 0.21f, 1.00f, () -> accelerationConfig.getValue() && modeConfig.getValue() != FlyMode.BOOST));
     Config<Float> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "The maximum flight speed", 0.1f, 3.5f, 10.0f, () -> accelerationConfig.getValue() || modeConfig.getValue() == FlyMode.BOOST));
@@ -60,6 +60,7 @@ public class ElytraFlyModule extends RotationModule
 
     private float speed;
     private float pitch;
+    private float prevPitch;
     private final Timer lagTimer = new CacheTimer();
     private final Timer redeployTimer = new CacheTimer();
     private final Timer takeoffTimer = new CacheTimer();
@@ -92,6 +93,9 @@ public class ElytraFlyModule extends RotationModule
     public void onDisable()
     {
         Managers.TICK.setClientTick(1.0f);
+        mc.options.jumpKey.setPressed(false);
+        mc.player.getAbilities().flying = false;
+        mc.player.getAbilities().setFlySpeed(0.05f);
     }
 
     @EventListener
@@ -114,6 +118,20 @@ public class ElytraFlyModule extends RotationModule
         else
         {
             Managers.TICK.setClientTick(1.0f);
+        }
+        if (!lagTimer.passed(1000) && modeConfig.getValue() == FlyMode.CONTROL)
+        {
+            if (mc.player.isFallFlying())
+            {
+                mc.player.setVelocity(0.0, 0.0, 0.0);
+                speed = 0.0f;
+            }
+            else if (mc.player.getVelocity().y < 0.0 && lagRedeployConfig.getValue() && redeployTimer.passed(100))
+            {
+                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                redeployTimer.reset();
+            }
+            return;
         }
         if (accelerationConfig.getValue())
         {
@@ -162,107 +180,110 @@ public class ElytraFlyModule extends RotationModule
         }
     }
 
+
     @EventListener
     public void onTravel(TravelEvent event)
     {
-        if (event.getStage() != StageEvent.EventStage.PRE || mc.player == null || mc.world == null)
+        if (mc.player == null || mc.world == null)
         {
             return;
         }
-        if (!lagTimer.passed(1000) && modeConfig.getValue() == FlyMode.CONTROL)
+        if (event.isPre())
         {
-            if (mc.player.isFallFlying())
+            switch (modeConfig.getValue())
             {
-                mc.player.setVelocity(0.0, 0.0, 0.0);
-                speed = 0.0f;
-            }
-            else if (mc.player.getVelocity().y < 0.0 && lagRedeployConfig.getValue() && redeployTimer.passed(100))
-            {
-                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-                redeployTimer.reset();
-            }
-            return;
-        }
-        switch (modeConfig.getValue())
-        {
-            case CONTROL ->
-            {
-                if (!mc.player.isFallFlying())
+                case BOUNCE ->
                 {
-                    return;
+                    prevPitch = mc.player.getPitch();
+                    // mc.player.setPitch(pitchConfig.getValue());
                 }
-                event.cancel();
-                float forward = mc.player.input.movementForward;
-                float strafe = mc.player.input.movementSideways;
-                float yaw = mc.player.getYaw();
-                if (forward == 0.0f && strafe == 0.0f)
+                case CONTROL ->
                 {
-                    Managers.MOVEMENT.setMotionXZ(0.0, 0.0);
+                    if (!mc.player.isFallFlying())
+                    {
+                        return;
+                    }
+                    event.cancel();
+                    float forward = mc.player.input.movementForward;
+                    float strafe = mc.player.input.movementSideways;
+                    float yaw = mc.player.getYaw();
+                    if (forward == 0.0f && strafe == 0.0f)
+                    {
+                        Managers.MOVEMENT.setMotionXZ(0.0, 0.0);
+                    }
+                    else
+                    {
+                        pitch = 12;
+                        double rx = Math.cos(Math.toRadians(yaw + 90.0f));
+                        double rz = Math.sin(Math.toRadians(yaw + 90.0f));
+                        Managers.MOVEMENT.setMotionXZ(((forward * speed * rx)
+                                + (strafe * speed * rz)), (forward * speed * rz)
+                                - (strafe * speed * rx));
+                    }
+                    Managers.MOVEMENT.setMotionY(0.0);
+                    pitch = 0;
+                    if (mc.options.jumpKey.isPressed())
+                    {
+                        pitch = -51;
+                        Managers.MOVEMENT.setMotionY(vspeedConfig.getValue());
+                    }
+                    else if (mc.options.sneakKey.isPressed())
+                    {
+                        Managers.MOVEMENT.setMotionY(-vspeedConfig.getValue());
+                    }
                 }
-                else
+                case BOOST ->
                 {
-                    pitch = 12;
-                    double rx = Math.cos(Math.toRadians(yaw + 90.0f));
-                    double rz = Math.sin(Math.toRadians(yaw + 90.0f));
-                    Managers.MOVEMENT.setMotionXZ(((forward * speed * rx)
-                            + (strafe * speed * rz)), (forward * speed * rz)
-                            - (strafe * speed * rx));
+                    if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava())
+                    {
+                        return;
+                    }
+                    // event.cancel();
+                    boolean boost = mc.options.jumpKey.isPressed();
+                    if (boost)
+                    {
+                        Vec3d glide = glideElytra(speedConfig.getValue() / 10.0f);
+                        Vec3d motion = mc.player.getVelocity();
+                        Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
+                    }
+
+                    Vec3d postMotion = mc.player.getVelocity();
+                    double speed = Math.hypot(postMotion.x, postMotion.z);
+                    if (speed > maxSpeedConfig.getValue())
+                    {
+                        Managers.MOVEMENT.setMotionXZ(postMotion.x * maxSpeedConfig.getValue() / speed,
+                                postMotion.z * maxSpeedConfig.getValue() / speed);
+                    }
                 }
-                Managers.MOVEMENT.setMotionY(0.0);
-                pitch = 0;
-                if (mc.options.jumpKey.isPressed())
+                case FACTORIZE ->
                 {
-                    pitch = -51;
-                    Managers.MOVEMENT.setMotionY(vspeedConfig.getValue());
-                }
-                else if (mc.options.sneakKey.isPressed())
-                {
-                    Managers.MOVEMENT.setMotionY(-vspeedConfig.getValue());
-                }
-            }
-            case BOOST ->
-            {
-                if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava())
-                {
-                    return;
-                }
-                // event.cancel();
-                boolean boost = mc.options.jumpKey.isPressed();
-                if (boost)
-                {
-                    Vec3d glide = glideElytra(speedConfig.getValue() / 10.0f);
+                    if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava())
+                    {
+                        return;
+                    }
+                    event.cancel();
+                    boolean boost = mc.options.jumpKey.isPressed();
+                    Vec3d glide = glideElytraVanilla(mc.player.getPitch());
                     Vec3d motion = mc.player.getVelocity();
                     Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
-                }
-
-                Vec3d postMotion = mc.player.getVelocity();
-                double speed = Math.hypot(postMotion.x, postMotion.z);
-                if (speed > maxSpeedConfig.getValue())
-                {
-                    Managers.MOVEMENT.setMotionXZ(postMotion.x * maxSpeedConfig.getValue() / speed,
-                            postMotion.z * maxSpeedConfig.getValue() / speed);
+                    float yaw = mc.player.getYaw() * 0.017453292f;
+                    if (boost)
+                    {
+                        double sin = -MathHelper.sin(yaw);
+                        double cos = MathHelper.cos(yaw);
+                        double motionX = sin * speedConfig.getValue() / 20.0f;
+                        double motionZ = cos * speedConfig.getValue() / 20.0f;
+                        Managers.MOVEMENT.setMotionXZ(mc.player.getVelocity().x + motionX,
+                                mc.player.getVelocity().z + motionZ);
+                    }
                 }
             }
-            case FACTORIZE ->
+        }
+        else
+        {
+            if (modeConfig.getValue() == FlyMode.BOUNCE)
             {
-                if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava())
-                {
-                    return;
-                }
-                boolean boost = mc.options.jumpKey.isPressed();
-                Vec3d glide = glideElytraVanilla(mc.player.getPitch());
-                Vec3d motion = mc.player.getVelocity();
-                Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
-                float yaw = mc.player.getYaw() * 0.017453292f;
-                if (boost)
-                {
-                    double sin = -MathHelper.sin(yaw);
-                    double cos = MathHelper.cos(yaw);
-                    double motionX = sin * speedConfig.getValue() / 20.0f;
-                    double motionZ = cos * speedConfig.getValue() / 20.0f;
-                    Managers.MOVEMENT.setMotionXZ(mc.player.getVelocity().x + motionX,
-                            mc.player.getVelocity().z + motionZ);
-                }
+                // mc.player.setPitch(prevPitch);
             }
         }
     }
@@ -272,10 +293,10 @@ public class ElytraFlyModule extends RotationModule
     {
         if (modeConfig.getValue() == FlyMode.PACKET)
         {
-            mc.player.getAbilities().flying = false;
-            mc.player.getAbilities().setFlySpeed(0.05f);
             if (mc.player.getInventory().getStack(38).getItem() != Items.ELYTRA)
             {
+                mc.player.getAbilities().flying = false;
+                mc.player.getAbilities().setFlySpeed(0.05f);
                 return;
             }
             event.cancel();
@@ -299,7 +320,6 @@ public class ElytraFlyModule extends RotationModule
     {
         if (modeConfig.getValue() == FlyMode.BOUNCE)
         {
-            mc.player.setPitch(pitchConfig.getValue());
             if (!mc.player.isSprinting())
             {
                 mc.player.setSprinting(true);

@@ -25,6 +25,8 @@ public class MixinPlayerEntityRenderer
     private float yaw, prevYaw, bodyYaw, prevBodyYaw, headYaw, prevHeadYaw;
     @Unique
     private float pitch, prevPitch;
+    @Unique
+    private boolean prevSneaking;
 
     /**
      * @param abstractClientPlayerEntity
@@ -55,6 +57,7 @@ public class MixinPlayerEntityRenderer
         prevHeadYaw = abstractClientPlayerEntity.prevHeadYaw;
         pitch = abstractClientPlayerEntity.getPitch();
         prevPitch = abstractClientPlayerEntity.prevPitch;
+        prevSneaking = abstractClientPlayerEntity.isSneaking();
         if (renderPlayerEvent.isCanceled())
         {
             abstractClientPlayerEntity.setYaw(renderPlayerEvent.getYaw());
@@ -65,6 +68,7 @@ public class MixinPlayerEntityRenderer
             abstractClientPlayerEntity.prevHeadYaw = renderPlayerEvent.getYaw();
             abstractClientPlayerEntity.setPitch(renderPlayerEvent.getPitch());
             abstractClientPlayerEntity.prevPitch = renderPlayerEvent.getPitch();
+            // abstractClientPlayerEntity.setSneaking(renderPlayerEvent.isSneaking());
         }
     }
 
@@ -94,5 +98,6 @@ public class MixinPlayerEntityRenderer
         abstractClientPlayerEntity.prevHeadYaw = prevHeadYaw;
         abstractClientPlayerEntity.setPitch(pitch);
         abstractClientPlayerEntity.prevPitch = prevPitch;
+        // abstractClientPlayerEntity.setSneaking(prevSneaking);
     }
 }

@@ -2,7 +2,7 @@ package net.shoreline.client.impl.module.client;
 
 import net.minecraft.network.packet.c2s.common.ResourcePackStatusC2SPacket;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
-import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -22,6 +22,7 @@ public final class ServerModule extends ConcurrentModule
 {
     Config<Boolean> demoConfig = register(new BooleanConfig("NoDemo", "Prevents servers from forcing you to a demo screen", true));
     Config<Boolean> resourcePackConfig = register(new BooleanConfig("NoResourcePack", "Prevents server from forcing resource pack", false));
+    Config<Boolean> antiCrashConfig = register(new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false));
 
     public ServerModule()
     {
@@ -43,6 +44,43 @@ public final class ServerModule extends ConcurrentModule
         {
             event.cancel();
             Managers.NETWORK.sendPacket(new ResourcePackStatusC2SPacket(mc.player.getUuid(), ResourcePackStatusC2SPacket.Status.DECLINED));
+        }
+        if (mc.world == null)
+        {
+            return;
+        }
+        if (antiCrashConfig.getValue())
+        {
+            // Out of bounds packets from server
+            if (event.getPacket() instanceof PlayerPositionLookS2CPacket packet
+                    && (packet.getX() > 30000000 || packet.getY() > mc.world.getTopY()
+                    || packet.getZ() > 30000000 || packet.getX() < -30000000
+                    || packet.getY() < mc.world.getBottomY() || packet.getZ() < -30000000))
+            {
+                event.cancel();
+            }
+            else if (event.getPacket() instanceof ExplosionS2CPacket packet
+                    && (packet.getX() > 30000000 || packet.getY() > mc.world.getTopY()
+                    || packet.getZ() > 30000000 || packet.getX() < -30000000
+                    || packet.getY() < mc.world.getBottomY() || packet.getZ() < -30000000
+                    || packet.getRadius() > 1000 || packet.getAffectedBlocks().size() > 1000
+                    || packet.getPlayerVelocityX() > 1000 || packet.getPlayerVelocityY() > 1000
+                    || packet.getPlayerVelocityZ() > 1000 || packet.getPlayerVelocityX() < -1000
+                    || packet.getPlayerVelocityY() < -1000 || packet.getPlayerVelocityZ() < -1000))
+            {
+                event.cancel();
+            }
+            else if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet
+                    && (packet.getVelocityX() > 1000 || packet.getVelocityY() > 1000 ||
+                    packet.getVelocityZ() > 1000 || packet.getVelocityX() < -1000 ||
+                    packet.getVelocityY() < -1000 || packet.getVelocityZ() < -1000))
+            {
+                event.cancel();
+            }
+            else if (event.getPacket() instanceof ParticleS2CPacket packet && packet.getCount() > 500)
+            {
+                event.cancel();
+            }
         }
     }
 }

@@ -29,7 +29,7 @@ public class AntiAFKModule extends RotationModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates the player to prevent AFK kick", true));
     Config<Boolean> jumpConfig = register(new BooleanConfig("Jump", "Jumps to prevent AFK kick", true));
     Config<Boolean> autoReplyConfig = register(new BooleanConfig("AutoReply", "Replies to players messaging you in chat", false));
-    Config<String> replyConfig = register(new StringConfig("Reply", "The reply message for AutoReply", "[Shoreline] I am currently AFK.", () -> autoReplyConfig.getValue()));
+    Config<String> replyConfig = register(new StringConfig("Reply", "The reply message for AutoReply", "I am currently AFK.", () -> autoReplyConfig.getValue()));
     Config<Float> delayConfig = register(new NumberConfig<>("Delay", "The delay between actions", 5.0f, 100.0f, 1000.0f));
     private final Timer afkTimer = new CacheTimer();
     private final Timer actionTimer = new CacheTimer();
@@ -89,7 +89,7 @@ public class AntiAFKModule extends RotationModule
             String[] words = packet.body().content().split(" ");
             if (words[1].startsWith("whispers:"))
             {
-                ChatUtil.serverSendMessage("/r " + replyConfig.getValue());
+                ChatUtil.serverSendMessage("/r [Shoreline] " + replyConfig.getValue());
             }
         }
     }
