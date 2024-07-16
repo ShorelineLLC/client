@@ -55,7 +55,6 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
         }
     }
 
-
     /**
      * @param movementInput
      * @param ci

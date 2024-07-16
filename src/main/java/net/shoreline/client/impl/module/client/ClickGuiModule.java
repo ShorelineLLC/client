@@ -42,8 +42,7 @@ public class ClickGuiModule extends ToggleModule
      */
     public ClickGuiModule()
     {
-        super("ClickGui", "Opens the clickgui screen", ModuleCategory.CLIENT,
-                GLFW.GLFW_KEY_RIGHT_SHIFT);
+        super("ClickGui", "Opens the clickgui screen", ModuleCategory.CLIENT, GLFW.GLFW_KEY_RIGHT_SHIFT);
         INSTANCE = this;
     }
 

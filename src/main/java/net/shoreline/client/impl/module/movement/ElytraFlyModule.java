@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.Hand;
@@ -23,6 +24,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.RotationModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.EntityTravelEvent;
 import net.shoreline.client.impl.event.entity.FallFlyingEvent;
 import net.shoreline.client.impl.event.entity.JumpDelayEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
@@ -31,6 +33,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorFireworkRocketEntity;
+import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.MovementUtil;
@@ -47,11 +50,12 @@ public class ElytraFlyModule extends RotationModule
 
     Config<FlyMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for elytra flight", FlyMode.CONTROL, FlyMode.values()));
     Config<Float> pitchConfig = register(new NumberConfig<>("Pitch", "The pitch for bounce recast", 0.0f, 75.0f, 90.0f, () -> modeConfig.getValue() == FlyMode.BOUNCE));
-    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f));
+    Config<Boolean> boostConfig = register(new BooleanConfig("Boost", "Applies boost to bounce motion", false, () -> modeConfig.getValue() == FlyMode.BOUNCE));
+    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The horizontal flight speed", 0.1f, 2.5f, 10.0f, () -> modeConfig.getValue() != FlyMode.BOUNCE || boostConfig.getValue()));
     Config<Float> vspeedConfig = register(new NumberConfig<>("VerticalSpeed", "The vertical flight speed", 0.1f, 1.0f, 5.0f, () -> modeConfig.getValue() != FlyMode.BOUNCE && modeConfig.getValue() != FlyMode.BOOST && modeConfig.getValue() != FlyMode.FACTORIZE));
-    Config<Boolean> accelerationConfig = register(new BooleanConfig("Acceleration", "Accelerates fly speed", false, () -> modeConfig.getValue() != FlyMode.BOOST));
-    Config<Float> accelSpeedConfig = register(new NumberConfig<>("AccelSpeed", "Acceleration speed", 0.01f, 0.21f, 1.00f, () -> accelerationConfig.getValue() && modeConfig.getValue() != FlyMode.BOOST));
-    Config<Float> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "The maximum flight speed", 0.1f, 3.5f, 10.0f, () -> accelerationConfig.getValue() || modeConfig.getValue() == FlyMode.BOOST));
+    Config<Boolean> accelerationConfig = register(new BooleanConfig("Acceleration", "Accelerates fly speed", false, () -> modeConfig.getValue() != FlyMode.BOOST && modeConfig.getValue() != FlyMode.BOUNCE));
+    Config<Float> accelSpeedConfig = register(new NumberConfig<>("AccelSpeed", "Acceleration speed", 0.01f, 0.21f, 1.00f, () -> accelerationConfig.getValue() && modeConfig.getValue() != FlyMode.BOOST && modeConfig.getValue() != FlyMode.BOUNCE));
+    Config<Float> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "The maximum flight speed", 0.1f, 3.5f, 10.0f, () -> accelerationConfig.getValue() && modeConfig.getValue() != FlyMode.BOOST && modeConfig.getValue() != FlyMode.BOUNCE || modeConfig.getValue() == FlyMode.BOOST || (modeConfig.getValue() == FlyMode.BOUNCE && boostConfig.getValue())));
     Config<Boolean> instantFlyConfig = register(new BooleanConfig("InstantFly", "Automatically activates elytra from the ground", false, () -> modeConfig.getValue() != FlyMode.BOUNCE && modeConfig.getValue() != FlyMode.PACKET));
     Config<Boolean> infiniteDurabilityConfig = register(new BooleanConfig("InfiniteDurability", "Prevents elytra from using durability", false, () -> modeConfig.getValue() == FlyMode.PACKET));
     Config<Boolean> lagRedeployConfig = register(new BooleanConfig("LagRedeploy", "Redeploys elytra when lagging", false, () -> modeConfig.getValue() == FlyMode.CONTROL));
@@ -106,7 +110,8 @@ public class ElytraFlyModule extends RotationModule
             return;
         }
 
-        if (!mc.player.isFallFlying() && !mc.player.isOnGround() && modeConfig.getValue() != FlyMode.PACKET && instantFlyConfig.getValue())
+        if (!mc.player.isFallFlying() && !mc.player.isOnGround() && modeConfig.getValue() != FlyMode.PACKET
+                && modeConfig.getValue() != FlyMode.BOUNCE && instantFlyConfig.getValue())
         {
             Managers.TICK.setClientTick(0.3f);
             if (mc.player.getVelocity().y < 0.0 && takeoffTimer.passed(1000))
@@ -167,7 +172,7 @@ public class ElytraFlyModule extends RotationModule
         {
             return;
         }
-        if (modeConfig.getValue() == FlyMode.BOUNCE && bounceTimer.passed(3))
+        if (modeConfig.getValue() == FlyMode.BOUNCE && bounceTimer.passed(5))
         {
             boolean fallFlying = event.isFallFlying();
             if (previousFallFlying && !fallFlying)
@@ -180,11 +185,10 @@ public class ElytraFlyModule extends RotationModule
         }
     }
 
-
     @EventListener
-    public void onTravel(TravelEvent event)
+    public void onTravel(EntityTravelEvent event)
     {
-        if (mc.player == null || mc.world == null)
+        if (mc.player == null || mc.world == null || event.getEntity() != mc.player)
         {
             return;
         }
@@ -195,7 +199,28 @@ public class ElytraFlyModule extends RotationModule
                 case BOUNCE ->
                 {
                     prevPitch = mc.player.getPitch();
-                    // mc.player.setPitch(pitchConfig.getValue());
+                    mc.player.setPitch(pitchConfig.getValue());
+                    if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || mc.player.getHungerManager().getFoodLevel() <= 6.0f)
+                    {
+                        return;
+                    }
+                    if (boostConfig.getValue())
+                    {
+                        boolean boost = mc.options.forwardKey.isPressed();
+                        if (boost)
+                        {
+                            Vec3d glide = glideElytra(speedConfig.getValue() / 10.0f);
+                            Vec3d motion = mc.player.getVelocity();
+                            Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
+                        }
+                        Vec3d postMotion = mc.player.getVelocity();
+                        double speed = Math.hypot(postMotion.x, postMotion.z);
+                        if (speed > maxSpeedConfig.getValue())
+                        {
+                            Managers.MOVEMENT.setMotionXZ(postMotion.x * maxSpeedConfig.getValue() / speed,
+                                    postMotion.z * maxSpeedConfig.getValue() / speed);
+                        }
+                    }
                 }
                 case CONTROL ->
                 {
@@ -234,7 +259,7 @@ public class ElytraFlyModule extends RotationModule
                 }
                 case BOOST ->
                 {
-                    if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava())
+                    if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || mc.player.getHungerManager().getFoodLevel() <= 6.0f)
                     {
                         return;
                     }
@@ -283,7 +308,7 @@ public class ElytraFlyModule extends RotationModule
         {
             if (modeConfig.getValue() == FlyMode.BOUNCE)
             {
-                // mc.player.setPitch(prevPitch);
+                mc.player.setPitch(prevPitch);
             }
         }
     }
@@ -320,6 +345,7 @@ public class ElytraFlyModule extends RotationModule
     {
         if (modeConfig.getValue() == FlyMode.BOUNCE)
         {
+            pitch = pitchConfig.getValue();
             if (!mc.player.isSprinting())
             {
                 mc.player.setSprinting(true);
@@ -327,7 +353,10 @@ public class ElytraFlyModule extends RotationModule
             if (!mc.player.isFallFlying())
             {
                 mc.options.jumpKey.setPressed(true);
-                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                if (mc.player.fallDistance > 0 && checkElytra())
+                {
+                    mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                }
             }
             return;
         }
@@ -367,6 +396,15 @@ public class ElytraFlyModule extends RotationModule
         if (event.getPacket() instanceof EntityTrackerUpdateS2CPacket packet && packet.id() == mc.player.getId() && modeConfig.getValue() == FlyMode.PACKET)
         {
             event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onPacketOutbound(PacketEvent.Outbound event)
+    {
+        if (event.getPacket() instanceof PlayerMoveC2SPacket packet && packet.changesLook() && modeConfig.getValue() == FlyMode.BOUNCE)
+        {
+            ((AccessorPlayerMoveC2SPacket) packet).hookSetPitch(pitchConfig.getValue());
         }
     }
 

@@ -8,14 +8,21 @@ import net.shoreline.eventbus.event.Event;
 public class EntityTravelEvent extends Event
 {
     private final LivingEntity entity;
+    private final boolean pre;
 
-    public EntityTravelEvent(LivingEntity entity)
+    public EntityTravelEvent(LivingEntity entity, boolean pre)
     {
         this.entity = entity;
+        this.pre = pre;
     }
 
     public LivingEntity getEntity()
     {
         return entity;
+    }
+
+    public boolean isPre()
+    {
+        return pre;
     }
 }

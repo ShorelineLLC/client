@@ -157,11 +157,10 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
     public void hookIsFallFlying(CallbackInfoReturnable<Boolean> cir)
     {
-        FallFlyingEvent fallFlyingEvent = new FallFlyingEvent(cir.getReturnValueZ());
+        FallFlyingEvent fallFlyingEvent = new FallFlyingEvent(cir.getReturnValue());
         EventBus.INSTANCE.dispatch(fallFlyingEvent);
-        if (fallFlyingEvent.isCanceled())
+        if (fallFlyingEvent.isCanceled() && !cir.getReturnValue())
         {
-            cir.cancel();
             cir.setReturnValue(fallFlyingEvent.isFallFlying());
         }
     }
@@ -185,13 +184,20 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     }
 
     @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
-    private void hookTravel(Vec3d movementInput, CallbackInfo ci)
+    private void hookTravelPre(Vec3d movementInput, CallbackInfo ci)
     {
-        EntityTravelEvent entityTravelEvent = new EntityTravelEvent((LivingEntity) (Object) this);
+        EntityTravelEvent entityTravelEvent = new EntityTravelEvent((LivingEntity) (Object) this, true);
         EventBus.INSTANCE.dispatch(entityTravelEvent);
         if (entityTravelEvent.isCanceled())
         {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "travel", at = @At(value = "RETURN"))
+    private void hookTravelPost(Vec3d movementInput, CallbackInfo ci)
+    {
+        EntityTravelEvent entityTravelEvent = new EntityTravelEvent((LivingEntity) (Object) this, false);
+        EventBus.INSTANCE.dispatch(entityTravelEvent);
     }
 }
