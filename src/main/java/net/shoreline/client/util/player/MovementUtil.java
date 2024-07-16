@@ -17,10 +17,10 @@ public class MovementUtil implements Globals
      */
     public static boolean isInputtingMovement()
     {
-        return mc.player.input.pressingForward
-                || mc.player.input.pressingBack
-                || mc.player.input.pressingLeft
-                || mc.player.input.pressingRight;
+        return mc.options.forwardKey.isPressed()
+                || mc.options.backKey.isPressed()
+                || mc.options.leftKey.isPressed()
+                || mc.options.rightKey.isPressed();
     }
 
     /**

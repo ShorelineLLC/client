@@ -9,21 +9,14 @@ import net.shoreline.eventbus.event.StageEvent;
 public class TravelEvent extends StageEvent
 {
     private final Vec3d movementInput;
-    private final boolean pre;
 
-    public TravelEvent(Vec3d movementInput, boolean pre)
+    public TravelEvent(Vec3d movementInput)
     {
         this.movementInput = movementInput;
-        this.pre = pre;
     }
 
     public Vec3d getMovementInput()
     {
         return movementInput;
-    }
-
-    public boolean isPre()
-    {
-        return pre;
     }
 }

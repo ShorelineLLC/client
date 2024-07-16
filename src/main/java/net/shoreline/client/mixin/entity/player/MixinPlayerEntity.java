@@ -46,24 +46,13 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
     @Inject(method = "travel", at = @At(value = "HEAD"), cancellable = true)
     private void hookTravelHead(Vec3d movementInput, CallbackInfo ci)
     {
-        TravelEvent travelEvent = new TravelEvent(movementInput, true);
+        TravelEvent travelEvent = new TravelEvent(movementInput);
         EventBus.INSTANCE.dispatch(travelEvent);
         if (travelEvent.isCanceled())
         {
             move(MovementType.SELF, getVelocity());
             ci.cancel();
         }
-    }
-
-    /**
-     * @param movementInput
-     * @param ci
-     */
-    @Inject(method = "travel", at = @At(value = "RETURN"))
-    private void hookTravelTail(Vec3d movementInput, CallbackInfo ci)
-    {
-        TravelEvent travelEvent = new TravelEvent(movementInput, false);
-        EventBus.INSTANCE.dispatch(travelEvent);
     }
 
     /**
