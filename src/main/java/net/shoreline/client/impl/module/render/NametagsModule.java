@@ -305,7 +305,7 @@ public class NametagsModule extends ToggleModule
                 matrixStack.translate(8.0f, 8.0f, 0.0f);
                 matrixStack.scale(16.0f, 16.0f, 0.0f);
                 matrixStack.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 0.0f));
-                renderItem(stack, ModelTransformationMode.GUI, 0xffffff, OverlayTexture.field_32955,
+                renderItem(stack, ModelTransformationMode.GUI, 0xf, OverlayTexture.DEFAULT_UV,
                         matrixStack, mc.getBufferBuilders().getEntityVertexConsumers(), mc.world, 0);
                 mc.getBufferBuilders().getEntityVertexConsumers().draw();
                 matrixStack.pop();
@@ -364,7 +364,7 @@ public class NametagsModule extends ToggleModule
         if (bakedModel.isBuiltin() || stack.isOf(Items.TRIDENT) && !bl)
         {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookGetBuiltinModelItemRenderer().render(stack, renderMode,
-                    matrices, vertexConsumers, light, overlay);
+                    matrices, vertexConsumers, 0xf, overlay);
         }
         else
         {
