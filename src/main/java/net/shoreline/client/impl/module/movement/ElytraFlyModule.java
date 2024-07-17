@@ -222,7 +222,7 @@ public class ElytraFlyModule extends RotationModule
                     boolean boost = mc.options.forwardKey.isPressed();
                     if (boost)
                     {
-                        Vec3d glide = glideElytra(speedConfig.getValue() / 10.0f);
+                        Vec3d glide = glideElytra(speedConfig.getValue() / 50.0f);
                         Vec3d motion = mc.player.getVelocity();
                         Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
                     }

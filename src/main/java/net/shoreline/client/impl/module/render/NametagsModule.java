@@ -171,7 +171,7 @@ public class NametagsModule extends ToggleModule
             {
                 if (pearlEntity.getOwner() == null)
                 {
-                    return;
+                    continue;
                 }
                 Vec3d itemPos = Interpolation.getRenderPosition(pearlEntity, mc.getTickDelta());
                 double rx = pearlEntity.getX() - itemPos.getX();

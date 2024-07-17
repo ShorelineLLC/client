@@ -52,7 +52,7 @@ public class ChatNotifierModule extends ToggleModule
             {
                 return;
             }
-            ChatUtil.clientSendMessage((isFriend ? "§b" : "§s") + playerName + "§f popped §s" + totems + "§f totems", entity.hashCode());
+            ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + playerName + "§f popped §s" + totems + "§f totems", entity.hashCode());
         }
     }
 
@@ -85,7 +85,7 @@ public class ChatNotifierModule extends ToggleModule
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" + playerName : playerName) + "§f entered your visual range", playerEntity.hashCode());
+        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" : "§7") + playerName + "§f entered your visual range", playerEntity.hashCode());
     }
 
     @EventListener
@@ -101,7 +101,7 @@ public class ChatNotifierModule extends ToggleModule
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" + playerName : "§c" + playerName) + "§f left your visual range", playerEntity.hashCode());
+        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§b" : "§c") + playerName + "§f left your visual range", playerEntity.hashCode());
     }
 
     @EventListener
@@ -122,6 +122,6 @@ public class ChatNotifierModule extends ToggleModule
         {
             return;
         }
-        ChatUtil.clientSendMessage((isFriend ? "§b" : "§s") + playerName + "§f died after popping §s" + totems + "§f totems", event.getEntity().hashCode());
+        ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + playerName + "§f died after popping §s" + totems + "§f totems", event.getEntity().hashCode());
     }
 }
