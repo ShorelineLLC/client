@@ -31,6 +31,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -247,8 +248,17 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
+            if (rotateConfig.getValue())
+            {
+                float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalEntity.getPos());
+                Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], grimConfig.getValue());
+            }
             Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
             mc.player.swingHand(Hand.MAIN_HAND);
+            if (rotateConfig.getValue())
+            {
+                Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+            }
             return;
         }
     }
