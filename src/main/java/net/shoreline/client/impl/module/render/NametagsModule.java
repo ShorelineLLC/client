@@ -364,7 +364,7 @@ public class NametagsModule extends ToggleModule
         if (bakedModel.isBuiltin() || stack.isOf(Items.TRIDENT) && !bl)
         {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookGetBuiltinModelItemRenderer().render(stack, renderMode,
-                    matrices, vertexConsumers, 0xf, overlay);
+                    matrices, vertexConsumers, light, overlay);
         }
         else
         {
