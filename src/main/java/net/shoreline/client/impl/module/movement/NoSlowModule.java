@@ -325,7 +325,7 @@ public class NoSlowModule extends ToggleModule
 
     public List<BlockPos> getIntersectingWebs()
     {
-        int radius = 5;
+        int radius = 2;
         final List<BlockPos> blocks = new ArrayList<>();
         for (int x = radius; x > -radius; --x)
         {
