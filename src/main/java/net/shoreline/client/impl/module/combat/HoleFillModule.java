@@ -54,12 +54,12 @@ public class HoleFillModule extends ObsidianPlacerModule
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5));
     Config<Integer> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after filling all holes", false));
-    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
+    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where blocks are being filled", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
     private int shiftDelay;
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
     private List<BlockPos> fills = new ArrayList<>();
-    
+
     /**
      *
      */

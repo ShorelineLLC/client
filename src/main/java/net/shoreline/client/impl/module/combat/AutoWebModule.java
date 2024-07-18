@@ -8,13 +8,21 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.BlockPlacerModule;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author linus
@@ -29,11 +37,22 @@ public class AutoWebModule extends BlockPlacerModule
     Config<Boolean> coverHeadConfig = register(new BooleanConfig("CoverHead", "Places webs on the targets head", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 5));
     Config<Integer> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0, 1, 5));
+    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders web placements", false));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
     private int shiftDelay;
+    private List<BlockPos> webs = new ArrayList<>();
+    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
 
     public AutoWebModule()
     {
         super("AutoWeb", "Automatically traps nearby entities in webs", ModuleCategory.COMBAT);
+    }
+
+    @Override
+    public void onDisable()
+    {
+        fadeList.clear();
+        webs.clear();
     }
 
     @EventListener
@@ -46,12 +65,17 @@ public class AutoWebModule extends BlockPlacerModule
     public void onPlayerTick(PlayerTickEvent event)
     {
         int blocksPlaced = 0;
+        int slot = getBlockItemSlot(Blocks.COBWEB);
+        if (slot == -1)
+        {
+            return;
+        }
         if (shiftDelay < shiftDelayConfig.getValue())
         {
             shiftDelay++;
             return;
         }
-        List<BlockPos> webs = new ArrayList<>();
+        List<BlockPos> webPlacements = new ArrayList<>();
         for (PlayerEntity entity : mc.world.getPlayers())
         {
             if (entity == mc.player || Managers.SOCIAL.isFriend(entity.getName()))
@@ -67,7 +91,7 @@ public class AutoWebModule extends BlockPlacerModule
             double dist = mc.player.getEyePos().squaredDistanceTo(feetPos.toCenterPos());
             if (mc.world.getBlockState(feetPos).isAir() && dist <= ((NumberConfig) rangeConfig).getValueSq())
             {
-                webs.add(feetPos);
+                webPlacements.add(feetPos);
             }
             if (coverHeadConfig.getValue())
             {
@@ -75,10 +99,11 @@ public class AutoWebModule extends BlockPlacerModule
                 double dist2 = mc.player.getEyePos().squaredDistanceTo(headPos.toCenterPos());
                 if (mc.world.getBlockState(headPos).isAir() && dist2 <= ((NumberConfig) rangeConfig).getValueSq())
                 {
-                    webs.add(headPos);
+                    webPlacements.add(headPos);
                 }
             }
         }
+        webs = webPlacements;
         while (blocksPlaced < shiftTicksConfig.getValue())
         {
             if (blocksPlaced >= webs.size())
@@ -90,17 +115,46 @@ public class AutoWebModule extends BlockPlacerModule
             shiftDelay = 0;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            placeWeb(targetPos);
+            placeWeb(targetPos, slot);
         }
     }
 
-    private void placeWeb(BlockPos pos)
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent event)
     {
-        int slot = getBlockItemSlot(Blocks.COBWEB);
-        if (slot == -1)
+        if (renderConfig.getValue())
         {
-            return;
+            RenderBuffers.preRender();
+            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
+            {
+                set.getValue().setState(false);
+                int boxAlpha = (int) (40 * set.getValue().getFactor());
+                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
+                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
+            }
+            RenderBuffers.postRender();
+
+            if (webs.isEmpty())
+            {
+                return;
+            }
+
+            for (BlockPos pos : webs)
+            {
+                Animation animation = new Animation(true, fadeTimeConfig.getValue());
+                fadeList.put(pos, animation);
+            }
         }
+
+        fadeList.entrySet().removeIf(e ->
+                e.getValue().getFactor() == 0.0);
+    }
+
+    private void placeWeb(BlockPos pos, int slot)
+    {
         Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
