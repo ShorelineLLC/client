@@ -25,6 +25,7 @@ import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -58,8 +59,7 @@ public class HoleFillModule extends ObsidianPlacerModule
     private int shiftDelay;
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
     private List<BlockPos> fills = new ArrayList<>();
-    private final Timer attackTimer = new CacheTimer();
-
+    
     /**
      *
      */
@@ -86,6 +86,11 @@ public class HoleFillModule extends ObsidianPlacerModule
     {
         //
         int blocksPlaced = 0;
+        final int slot = websConfig.getValue() ? getBlockItemSlot(Blocks.COBWEB) : getResistantBlockItem();
+        if (slot == -1)
+        {
+            return;
+        }
         if (shiftDelayConfig.getValue() > 0 && shiftDelay < shiftDelayConfig.getValue())
         {
             shiftDelay++;
@@ -143,6 +148,10 @@ public class HoleFillModule extends ObsidianPlacerModule
             }
             return;
         }
+        if (attackConfig.getValue())
+        {
+            attackBlockingCrystals(fills);
+        }
         while (blocksPlaced < shiftTicksConfig.getValue())
         {
             if (blocksPlaced >= fills.size())
@@ -154,38 +163,37 @@ public class HoleFillModule extends ObsidianPlacerModule
             shiftDelay = 0;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            attackPlace(targetPos);
+            placeBlock(targetPos, slot);
         }
     }
 
-    private void attack(Entity entity)
+    public void attackBlockingCrystals(List<BlockPos> posList)
     {
-        Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
-        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-    }
-
-    private void attackPlace(BlockPos targetPos)
-    {
-        final int slot = websConfig.getValue() ? getBlockItemSlot(Blocks.COBWEB) : getResistantBlockItem();
-        if (slot == -1)
+        for (BlockPos blockPos : posList)
         {
+            Entity crystalEntity = mc.world.getOtherEntities(null, new Box(blockPos)).stream()
+                    .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
+            if (crystalEntity == null)
+            {
+                continue;
+            }
+            if (rotateConfig.getValue())
+            {
+                float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalEntity.getPos());
+                Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], grimConfig.getValue());
+            }
+            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
+            mc.player.swingHand(Hand.MAIN_HAND);
+            if (rotateConfig.getValue())
+            {
+                Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+            }
             return;
         }
-        attackPlace(targetPos, slot);
     }
 
-    private void attackPlace(BlockPos targetPos, int slot)
+    private void placeBlock(BlockPos targetPos, int slot)
     {
-        if (attackConfig.getValue() && attackTimer.passed(AutoCrystalModule.getInstance().getBreakDelay()))
-        {
-            List<Entity> entities = mc.world.getOtherEntities(null, new Box(targetPos)).stream().filter(e -> e instanceof EndCrystalEntity).toList();
-            for (Entity entity : entities)
-            {
-                attack(entity);
-            }
-            attackTimer.reset();
-        }
-
         Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
