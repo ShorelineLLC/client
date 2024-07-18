@@ -27,8 +27,8 @@ import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -177,8 +177,8 @@ public class NoSlowModule extends ToggleModule
             {
                 for (BlockPos pos : getIntersectingWebs())
                 {
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, Direction.DOWN));
+                    // Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    //        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, Direction.DOWN));
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.DOWN));
                 }
