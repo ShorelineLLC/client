@@ -2,7 +2,6 @@ package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -27,6 +26,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AirInteractModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -47,11 +47,13 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 {
     private static AutoTrapModule INSTANCE;
 
-    Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f));
+    Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for trap", 0.0f, 4.0f, 6.0f));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true));
-    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
+    Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap if there is none", false));
+    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at targets head", true));
+    Config<Boolean> antiStepConfig = register(new BooleanConfig("PreventStep", "Prevents target from stepping out of the trap", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
     Config<Float> entityDelayConfig = register(new NumberConfig<>("EntityDelay", "The delay to place when placing on entities", 0.0f, 2.0f, 5.0f));
@@ -65,7 +67,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     private final Map<BlockPos, Long> packets = new HashMap<>();
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
     private int blocksPlaced;
-    private double prevY;
 
     public AutoTrapModule()
     {
@@ -76,16 +77,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     public static AutoTrapModule getInstance()
     {
         return INSTANCE;
-    }
-
-    @Override
-    public void onEnable()
-    {
-        if (mc.player == null)
-        {
-            return;
-        }
-        prevY = mc.player.getY();
     }
 
     @Override
@@ -112,7 +103,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        surround = getSurround(trapTarget);
+        BlockPos targetBlockPos = PositionUtil.getRoundedBlockPos(trapTarget.getX(), trapTarget.getY(), trapTarget.getZ());
+        surround = getSurround(targetBlockPos, trapTarget);
         if (surround.isEmpty())
         {
             return;
@@ -129,6 +121,21 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 disable();
             }
             return;
+        }
+        if (supportConfig.getValue())
+        {
+            for (BlockPos block : new ArrayList<>(placements))
+            {
+                if (block.getY() > targetBlockPos.getY())
+                {
+                    continue;
+                }
+                Direction direction = Managers.INTERACT.getInteractDirection(block, grimConfig.getValue(), strictDirectionConfig.getValue());
+                if (direction == null)
+                {
+                    placements.add(block.down());
+                }
+            }
         }
         placements.sort(Comparator.comparingInt(Vec3i::getY));
         while (blocksPlaced < shiftTicksConfig.getValue())
@@ -224,9 +231,9 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     {
         final List<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         return (PlayerEntity) entities.stream()
-                .filter((entity) -> entity instanceof PlayerEntity && entity.isAlive() && !mc.player.equals(entity))
-                .filter((entity) -> mc.player.squaredDistanceTo(entity) <= ((NumberConfig<Float>) placeRangeConfig).getValueSq())
-                .min(Comparator.comparingDouble((entity) -> mc.player.squaredDistanceTo(entity)))
+                .filter(e -> e instanceof PlayerEntity && e.isAlive() && mc.player != e && !Managers.SOCIAL.isFriend(e.getName()))
+                .filter(e -> mc.player.squaredDistanceTo(e) <= ((NumberConfig<Float>) placeRangeConfig).getValueSq())
+                .min(Comparator.comparingDouble(e -> mc.player.squaredDistanceTo(e)))
                 .orElse(null);
     }
 
@@ -276,10 +283,10 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         return placements;
     }
 
-    public List<BlockPos> getSurround(PlayerEntity player)
+    public List<BlockPos> getSurround(BlockPos playerPos, PlayerEntity player)
     {
         List<BlockPos> surroundBlocks = new ArrayList<>();
-        List<BlockPos> playerBlocks = getPlayerBlocks(player);
+        List<BlockPos> playerBlocks = getPlayerBlocks(playerPos, player);
         for (BlockPos pos : playerBlocks)
         {
             for (Direction dir : Direction.values())
@@ -297,20 +304,55 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 surroundBlocks.add(pos1.up());
             }
         }
-        for (BlockPos playerPos : playerBlocks)
+        if (headConfig.getValue())
         {
-            if (playerPos == player.getBlockPos())
+            boolean support = false;
+            final List<BlockPos> headBlocks = new ArrayList<>();
+            for (BlockPos pos : playerBlocks)
             {
-                continue;
+                BlockPos headPos = pos.offset(Direction.UP, 2);
+                if (!mc.world.getBlockState(headPos).isReplaceable())
+                {
+                    support = true;
+                }
+                headBlocks.add(headPos);
+                if (antiStepConfig.getValue())
+                {
+                    BlockPos antiStepPos = pos.offset(Direction.UP, 3);
+                    headBlocks.add(antiStepPos);
+                }
             }
-            surroundBlocks.add(playerPos.down());
+            if (!AirInteractModule.getInstance().isEnabled())
+            {
+                BlockPos supportingPos = null;
+                double min = Double.MAX_VALUE;
+                for (BlockPos pos : surroundBlocks)
+                {
+                    BlockPos pos1 = pos.offset(Direction.UP, 2);
+                    if (!mc.world.getBlockState(pos1).isReplaceable())
+                    {
+                        support = true;
+                        break;
+                    }
+                    double dist = mc.player.squaredDistanceTo(pos1.toCenterPos());
+                    if (dist < min)
+                    {
+                        supportingPos = pos1;
+                        min = dist;
+                    }
+                }
+                if (supportingPos != null && !support)
+                {
+                    surroundBlocks.add(supportingPos);
+                }
+            }
+            surroundBlocks.addAll(headBlocks);
         }
         return surroundBlocks;
     }
 
-    public List<BlockPos> getPlayerBlocks(PlayerEntity entity)
+    public List<BlockPos> getPlayerBlocks(BlockPos playerPos, PlayerEntity entity)
     {
-        BlockPos playerPos = PositionUtil.getRoundedBlockPos(entity.getX(), entity.getY(), entity.getZ());
         final List<BlockPos> playerBlocks = new ArrayList<>();
         if (extendConfig.getValue())
         {
