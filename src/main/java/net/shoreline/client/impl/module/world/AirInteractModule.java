@@ -18,6 +18,8 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
@@ -32,7 +34,7 @@ public final class AirInteractModule extends ToggleModule
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to air place", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
     Config<Boolean> fluidsConfig = register(new BooleanConfig("Fluids", "Place against fluids", false));
-    private int blockPlaceDelay;
+    private final Timer timer = new CacheTimer();
 
     public AirInteractModule()
     {
@@ -52,11 +54,6 @@ public final class AirInteractModule extends ToggleModule
         {
             return;
         }
-        blockPlaceDelay--;
-        if (blockPlaceDelay > 0)
-        {
-            return;
-        }
         final ItemStack stack = mc.player.getMainHandStack();
         if ((stack.isEmpty() || !(stack.getItem() instanceof BlockItem)) || !mc.options.useKey.isPressed())
         {
@@ -64,7 +61,7 @@ public final class AirInteractModule extends ToggleModule
         }
 
         final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
-        if (result instanceof BlockHitResult blockHitResult)
+        if (timer.passed(500) && result instanceof BlockHitResult blockHitResult)
         {
             if (grimConfig.getValue())
             {
@@ -76,7 +73,7 @@ public final class AirInteractModule extends ToggleModule
             {
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
-            blockPlaceDelay = 10;
+            timer.reset();
         }
     }
 }
