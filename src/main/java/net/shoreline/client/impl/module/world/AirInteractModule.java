@@ -9,6 +9,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
@@ -64,8 +65,8 @@ public final class AirInteractModule extends ToggleModule
         final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
         if (timer.passed(500) && result instanceof BlockHitResult blockHitResult)
         {
-            BlockState state = mc.world.getBlockState(blockHitResult.getBlockPos());
-            if (!state.isAir() || state.getFluidState().isEmpty())
+            BlockState state = mc.world.getBlockState(BlockPos.ofFloored(blockHitResult.getPos()));
+            if (!state.isAir() && state.getFluidState().isEmpty())
             {
                 return;
             }
