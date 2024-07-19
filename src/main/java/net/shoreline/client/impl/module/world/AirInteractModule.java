@@ -2,11 +2,13 @@ package net.shoreline.client.impl.module.world;
 
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -25,8 +27,9 @@ public final class AirInteractModule extends ToggleModule
 {
     public static AirInteractModule INSTANCE;
 
-    Config<Float> range = register(new NumberConfig<>("Range", "", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
-    Config<Boolean> fluids = register(new BooleanConfig("Fluids", "", false));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to air place", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
+    Config<Boolean> fluidsConfig = register(new BooleanConfig("Fluids", "Place against fluids", false));
 
     public AirInteractModule()
     {
@@ -48,9 +51,14 @@ public final class AirInteractModule extends ToggleModule
             return;
         }
 
-        final HitResult result = mc.player.raycast(range.getValue(), 1.0f, fluids.getValue());
+        final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
         if (result instanceof BlockHitResult blockHitResult)
         {
+            if (grimConfig.getValue())
+            {
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockHitResult.getBlockPos(), Direction.DOWN));
+            }
             final ActionResult actionResult = mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
             if (actionResult.isAccepted() && actionResult.shouldSwingHand())
             {

@@ -140,6 +140,23 @@ public class RenderManager implements Globals
         QUADS.end();
     }
 
+    public static void renderPlane(MatrixStack matrices, double x1, double y1,
+                                  double z1, double x2, double y2, double z2,int color)
+    {
+        matrices.push();
+        drawPlane(matrices, x1, y1, z1, x2, y2, z2, color);
+        matrices.pop();
+    }
+
+    public static void drawPlane(MatrixStack matrices, double x1, double y1,
+                                double z1, double x2, double y2, double z2, int color)
+    {
+        QUADS.begin(matrices);
+        QUADS.color(color);
+        QUADS.vertex(x1, y1, z1).vertex(x1, y2, z1).vertex(x2, y2, z2).vertex(x2, y1, z2);
+        QUADS.end();
+    }
+
     /**
      * @param p
      * @param width

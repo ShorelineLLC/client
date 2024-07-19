@@ -128,12 +128,17 @@ public class AutoWebModule extends BlockPlacerModule
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 set.getValue().setState(false);
-                int boxAlpha = (int) (40 * set.getValue().getFactor());
                 int lineAlpha = (int) (145 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
                 Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
-                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
-                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
+                BlockPos blockPos = set.getKey();
+                double x1 = blockPos.getX();
+                double y1 = blockPos.getY();
+                double z1 = blockPos.getZ();
+                double x2 = blockPos.getX() + 1.0;
+                double y2 = blockPos.getY() + 1.0;
+                double z2 = blockPos.getZ() + 1.0;
+                RenderManager.renderPlane(event.getMatrices(), x1, y1, z1, x2, y2, z2, lineColor.getRGB());
+                RenderManager.renderPlane(event.getMatrices(), x2, y1, z1, x1, y2, z2, lineColor.getRGB());
             }
             RenderBuffers.postRender();
 
