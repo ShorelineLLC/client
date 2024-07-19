@@ -15,9 +15,11 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author xgraza
@@ -30,6 +32,7 @@ public final class AirInteractModule extends ToggleModule
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to air place", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
     Config<Boolean> fluidsConfig = register(new BooleanConfig("Fluids", "Place against fluids", false));
+    private int blockPlaceDelay;
 
     public AirInteractModule()
     {
@@ -43,8 +46,17 @@ public final class AirInteractModule extends ToggleModule
     }
 
     @EventListener
-    public void onPlayerTick(final PlayerTickEvent event)
+    public void onPlayerTick(final TickEvent event)
     {
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
+        blockPlaceDelay--;
+        if (blockPlaceDelay > 0)
+        {
+            return;
+        }
         final ItemStack stack = mc.player.getMainHandStack();
         if ((stack.isEmpty() || !(stack.getItem() instanceof BlockItem)) || !mc.options.useKey.isPressed())
         {
@@ -64,6 +76,7 @@ public final class AirInteractModule extends ToggleModule
             {
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
+            blockPlaceDelay = 10;
         }
     }
 }

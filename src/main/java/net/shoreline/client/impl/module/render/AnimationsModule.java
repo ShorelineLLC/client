@@ -64,7 +64,7 @@ public final class AnimationsModule extends ToggleModule
     @EventListener
     public void onUpdateServerPosition(UpdateServerPositionEvent event)
     {
-        if (interpolationConfig.getValue())
+        if (limbSwing.getValue() && interpolationConfig.getValue())
         {
             event.getLivingEntity().setPos(event.getX(), event.getY(), event.getZ());
             event.getLivingEntity().setYaw(event.getYaw());
