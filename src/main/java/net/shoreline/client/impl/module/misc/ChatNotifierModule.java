@@ -16,6 +16,7 @@ import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.util.world.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class ChatNotifierModule extends ToggleModule
@@ -41,12 +42,12 @@ public class ChatNotifierModule extends ToggleModule
         if (event.getPacket() instanceof EntityStatusS2CPacket packet && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING && totemPopConfig.getValue())
         {
             Entity entity = packet.getEntity(mc.world);
-            if (!(entity instanceof LivingEntity) || entity.getDisplayName() == null)
+            if (!(entity instanceof LivingEntity))
             {
                 return;
             }
             int totems = Managers.TOTEM.getTotems(entity);
-            String playerName = entity.getDisplayName().getString();
+            String playerName = entity.getName().getString();
             boolean isFriend = Managers.SOCIAL.isFriend(playerName);
             if (isFriend && !friendsConfig.getValue() || entity == mc.player)
             {
@@ -75,11 +76,11 @@ public class ChatNotifierModule extends ToggleModule
     @EventListener
     public void onAddEntity(AddEntityEvent event)
     {
-        if (!visualRangeConfig.getValue() || !(event.getEntity() instanceof PlayerEntity playerEntity) || event.getEntity().getDisplayName() == null)
+        if (!visualRangeConfig.getValue() || !(event.getEntity() instanceof PlayerEntity playerEntity) || event.getEntity() instanceof FakePlayerEntity)
         {
             return;
         }
-        String playerName = event.getEntity().getDisplayName().getString();
+        String playerName = event.getEntity().getName().getString();
         boolean isFriend = Managers.SOCIAL.isFriend(playerName);
         if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player)
         {
@@ -91,11 +92,11 @@ public class ChatNotifierModule extends ToggleModule
     @EventListener
     public void onRemoveEntity(RemoveEntityEvent event)
     {
-        if (!visualRangeConfig.getValue() || !(event.getEntity() instanceof PlayerEntity playerEntity) || event.getEntity().getDisplayName() == null)
+        if (!visualRangeConfig.getValue() || !(event.getEntity() instanceof PlayerEntity playerEntity) || event.getEntity() instanceof FakePlayerEntity)
         {
             return;
         }
-        String playerName = event.getEntity().getDisplayName().getString();
+        String playerName = event.getEntity().getName().getString();
         boolean isFriend = Managers.SOCIAL.isFriend(playerName);
         if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player)
         {
@@ -107,7 +108,7 @@ public class ChatNotifierModule extends ToggleModule
     @EventListener
     public void onEntityDeath(EntityDeathEvent event)
     {
-        if (event.getEntity().getDisplayName() == null || !totemPopConfig.getValue())
+        if (!totemPopConfig.getValue())
         {
             return;
         }
@@ -116,7 +117,7 @@ public class ChatNotifierModule extends ToggleModule
         {
             return;
         }
-        String playerName = event.getEntity().getDisplayName().getString();
+        String playerName = event.getEntity().getName().getString();
         boolean isFriend = Managers.SOCIAL.isFriend(playerName);
         if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player)
         {

@@ -44,7 +44,6 @@ public class ParticlesModule extends ToggleModule
     public void onParticle(ParticleEvent event)
     {
         if (potionConfig.getValue() && event.getParticleType() == ParticleTypes.ENTITY_EFFECT
-
                 || explosionsConfig.getValue() && (event.getParticleType() == ParticleTypes.EXPLOSION ||event.getParticleType() == ParticleTypes.EXPLOSION_EMITTER)
                 || fireworkConfig.getValue() && event.getParticleType() == ParticleTypes.FIREWORK
                 || itemsConfig.getValue() && event.getParticleType() == ParticleTypes.ITEM
