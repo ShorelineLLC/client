@@ -68,11 +68,8 @@ public final class AirInteractModule extends ToggleModule
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockHitResult.getBlockPos(), Direction.DOWN));
             }
-            final ActionResult actionResult = mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
-            if (actionResult.isAccepted() && actionResult.shouldSwingHand())
-            {
-                mc.player.swingHand(Hand.MAIN_HAND);
-            }
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, blockHitResult, id));
+            mc.player.swingHand(Hand.MAIN_HAND);
             timer.reset();
         }
     }
