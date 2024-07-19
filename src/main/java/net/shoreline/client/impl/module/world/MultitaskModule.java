@@ -1,7 +1,5 @@
 package net.shoreline.client.impl.module.world;
 
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.ItemMultitaskEvent;
@@ -13,9 +11,6 @@ import net.shoreline.eventbus.annotation.EventListener;
  */
 public class MultitaskModule extends ToggleModule
 {
-
-    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Allows you to eat while placing on grim", false));
-
     public MultitaskModule()
     {
         super("MultiTask", "Allows you to mine and use items simultaneously", ModuleCategory.WORLD);
@@ -24,9 +19,6 @@ public class MultitaskModule extends ToggleModule
     @EventListener
     public void onItemMultitask(ItemMultitaskEvent event)
     {
-        if (!grimConfig.getValue())
-        {
-            event.cancel();
-        }
+        event.cancel();
     }
 }
