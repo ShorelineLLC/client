@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.world;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -63,6 +64,11 @@ public final class AirInteractModule extends ToggleModule
         final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
         if (timer.passed(500) && result instanceof BlockHitResult blockHitResult)
         {
+            BlockState state = mc.world.getBlockState(blockHitResult.getBlockPos());
+            if (!state.isAir() || state.getFluidState().isEmpty())
+            {
+                return;
+            }
             if (grimConfig.getValue())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(

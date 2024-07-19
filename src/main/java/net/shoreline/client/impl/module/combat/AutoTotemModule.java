@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
@@ -8,6 +9,7 @@ import net.minecraft.item.*;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.hit.BlockHitResult;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -20,6 +22,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
+import net.shoreline.client.util.world.SneakBlocks;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -100,7 +103,18 @@ public final class AutoTotemModule extends ToggleModule
                     || mainHandItem instanceof AxeItem)
                     && PlayerUtil.getLocalPlayerHealth() >= healthConfig.getValue())
             {
-                offhandItem = getGoldenAppleType();
+                if (mc.crosshairTarget instanceof BlockHitResult result)
+                {
+                    BlockState interactBlock = mc.world.getBlockState(result.getBlockPos());
+                    if (!SneakBlocks.isSneakBlock(interactBlock))
+                    {
+                        offhandItem = getGoldenAppleType();
+                    }
+                }
+                else
+                {
+                    offhandItem = getGoldenAppleType();
+                }
             }
         }
 
