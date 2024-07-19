@@ -38,7 +38,6 @@ public final class AutoTotemModule extends ToggleModule
     Config<OffhandItem> itemConfig = register(new EnumConfig<>("Item", "The item to wield in your offhand", OffhandItem.TOTEM, OffhandItem.values()));
     Config<Float> healthConfig = register(new NumberConfig<>("Health", "The health required to fall below before swapping to a totem", 0.0f, 14.0f, 20.0f));
     Config<Boolean> gappleConfig = register(new BooleanConfig("OffhandGapple", "Equips a golden apple if holding down the item use button", true));
-    Config<Boolean> lethalGappleConfig = register(new BooleanConfig("OffhandGapple-Lethal", "Checks lethal before swapping offhand to gapple", true, () -> false));
     Config<Boolean> crappleConfig = register(new BooleanConfig("Crapple", "Uses a normal golden apple if Absorption is present", true));
     Config<Boolean> lethalConfig = register(new BooleanConfig("Lethal", "Calculates lethal damage sources", false, () -> itemConfig.getValue() != OffhandItem.TOTEM));
     Config<Boolean> fastConfig = register(new BooleanConfig("FastSwap", "Swaps items to offhand", true));
@@ -87,7 +86,7 @@ public final class AutoTotemModule extends ToggleModule
         }
 
         offhandItem = itemConfig.getValue().getItem();
-        if (offhandItem != Items.TOTEM_OF_UNDYING && checkLethal())
+        if (checkLethal())
         {
             offhandItem = Items.TOTEM_OF_UNDYING;
         }
@@ -99,9 +98,8 @@ public final class AutoTotemModule extends ToggleModule
                     && (mainHandItem instanceof SwordItem
                     || mainHandItem instanceof TridentItem
                     || mainHandItem instanceof AxeItem)
-                    && (!lethalGappleConfig.getValue() || PlayerUtil.getLocalPlayerHealth() >= healthConfig.getValue()))
+                    && PlayerUtil.getLocalPlayerHealth() >= healthConfig.getValue())
             {
-
                 offhandItem = getGoldenAppleType();
             }
         }
