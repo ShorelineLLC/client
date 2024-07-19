@@ -196,6 +196,15 @@ public class RenderManager implements Globals
         double dx = x2 - x1;
         double dy = y2 - y1;
         double dz = z2 - z1;
+        if (dy == 0.0)
+        {
+            LINES.vertexLine(x1, y1, z1, x2, y1, z1);
+            LINES.vertexLine(x1, y1, z1, x1, y1, z2);
+            LINES.vertexLine(x2, y1, z2, x1, y1, z2);
+            LINES.vertexLine(x2, y1, z2, x2, y1, z1);
+            LINES.end();
+            return;
+        }
         VoxelShapes.cuboid(0.0, 0.0, 0.0, dx, dy, dz).forEachEdge((minX, minY, minZ, maxX, maxY, maxZ) ->
         {
             LINES.vertexLine(minX + x1, minY + y1, minZ + z1, maxX + x1, maxY + y1, maxZ + z1);
