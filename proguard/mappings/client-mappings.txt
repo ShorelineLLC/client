@@ -7097,7 +7097,7 @@ net.shoreline.client.util.world.FakePlayerEntity -> net.shoreline.client.ph:
     118:118:boolean method_29504() -> method_29504
     126:126:net.minecraft.class_1657 getPlayer() -> b
     19:19:void <clinit>() -> <clinit>
-net.shoreline.client.util.world.RenderUtil -> net.shoreline.client.pi:
+net.shoreline.client.util.render.RenderUtil -> net.shoreline.client.pi:
     8:8:void <init>() -> <init>
     15:28:void reloadRenders(boolean) -> x
 net.shoreline.client.util.world.SneakBlocks -> net.shoreline.client.pj:
