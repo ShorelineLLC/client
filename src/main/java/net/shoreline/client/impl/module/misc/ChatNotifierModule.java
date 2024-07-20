@@ -10,6 +10,7 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
+import net.shoreline.client.impl.event.network.ConnectionEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
@@ -19,11 +20,16 @@ import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.world.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 
-public class ChatNotifierModule extends ToggleModule
+/**
+ * @author linus & hockeyl8
+ * @since 1.0
+ */
+public final class ChatNotifierModule extends ToggleModule
 {
-
     Config<Boolean> totemPopConfig = register(new BooleanConfig("TotemPop", "Notifies in chat when a player pops a totem", true));
     Config<Boolean> visualRangeConfig = register(new BooleanConfig("VisualRange", "Notifies in chat when player enters visual range", false));
+    Config<Boolean> joinConfig = register(new BooleanConfig("Join", "Notifies in chat when a player joins", false));
+    Config<Boolean> leaveConfig = register(new BooleanConfig("Leave", "Notifies in chat when a player joins", false));
     Config<Boolean> friendsConfig = register(new BooleanConfig("Friends", "Notifies for friends", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Notifies you if the server you join is running Grim", false));
 
@@ -54,22 +60,6 @@ public class ChatNotifierModule extends ToggleModule
                 return;
             }
             ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + playerName + "§f popped §s" + totems + "§f totems", entity.hashCode());
-        }
-    }
-
-    @EventListener
-    public void onGameJoin(GameJoinEvent event)
-    {
-        if (grimConfig.getValue() && !mc.isInSingleplayer())
-        {
-            if (Managers.ANTICHEAT.isGrim())
-            {
-                ChatUtil.clientSendMessage("This server is running GrimAC.", 101);
-            }
-            else
-            {
-                ChatUtil.clientSendMessage("This server is not running GrimAC.", 101);
-            }
         }
     }
 
@@ -124,5 +114,51 @@ public class ChatNotifierModule extends ToggleModule
             return;
         }
         ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + playerName + "§f died after popping §s" + totems + "§f totems", event.getEntity().hashCode());
+    }
+
+    @EventListener
+    public void onConnectionJoinEvent(ConnectionEvent.JoinEvent event)
+    {
+        if (!joinConfig.getValue())
+        {
+            return;
+        }
+        boolean isFriend = Managers.SOCIAL.isFriend(event.getUsername());
+        if (!friendsConfig.getValue() && isFriend)
+        {
+            return;
+        }
+        ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + event.getUsername() + "§f has joined the server", 101);
+    }
+
+    @EventListener
+    public void onConnectionLeaveEvent(ConnectionEvent.LeaveEvent event)
+    {
+        if (!leaveConfig.getValue())
+        {
+            return;
+        }
+        boolean isFriend = Managers.SOCIAL.isFriend(event.getUsername());
+        if (!friendsConfig.getValue() && isFriend)
+        {
+            return;
+        }
+        ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + event.getUsername() + "§f has left the server", 101);
+    }
+
+    @EventListener
+    public void onGameJoin(GameJoinEvent event)
+    {
+        if (grimConfig.getValue() && !mc.isInSingleplayer())
+        {
+            if (Managers.ANTICHEAT.isGrim())
+            {
+                ChatUtil.clientSendMessage("This server is running GrimAC", 102);
+            }
+            else
+            {
+                ChatUtil.clientSendMessage("This server is not running GrimAC", 102);
+            }
+        }
     }
 }
