@@ -2,10 +2,12 @@ package net.shoreline.client.impl.module.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.VertexSorter;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -19,6 +21,7 @@ import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.mixin.accessor.AccessorCamera;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
@@ -66,8 +69,11 @@ public class TracersModule extends ToggleModule
         RenderSystem.setProjectionMatrix(matrixStack.peek().getPositionMatrix(), VertexSorter.BY_DISTANCE);
         RenderBuffers.preRender();
         Vec3d playerPos = Interpolation.getRenderPosition(playerEntity, event.getTickDelta());
+        // interp on camera y pos
+        Camera camera = mc.gameRenderer.getCamera();
+        double eyeHeight = MathHelper.lerp(event.getTickDelta(), ((AccessorCamera) camera).getLastCameraY(), ((AccessorCamera) camera).getCameraY());
         double x1 = playerEntity.getX() - playerPos.getX();
-        double y1 = playerEntity.getY() - playerPos.getY() + playerEntity.getEyeHeight(playerEntity.getPose());
+        double y1 = playerEntity.getY() - playerPos.getY() + eyeHeight;
         double z1 = playerEntity.getZ() - playerPos.getZ();
         float pitch = playerEntity.getPitch();
         float yaw = playerEntity.getYaw();
