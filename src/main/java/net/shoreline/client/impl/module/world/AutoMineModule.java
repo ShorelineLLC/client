@@ -319,6 +319,7 @@ public class AutoMineModule extends RotationModule
                 }
                 if (data.getSlot() != -1)
                 {
+                    Managers.INVENTORY.setSlot(0);
                     Managers.INVENTORY.setSlot(data.getSlot());
                     if (!data.hasAttemptedBreak())
                     {
