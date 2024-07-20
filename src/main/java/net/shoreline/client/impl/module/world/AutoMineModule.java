@@ -298,7 +298,7 @@ public class AutoMineModule extends RotationModule
             {
                 data.resetBreakTime();
             }
-            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
+            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(1000)))
             {
                 Managers.INVENTORY.syncToClient();
                 miningQueue.remove(data);
