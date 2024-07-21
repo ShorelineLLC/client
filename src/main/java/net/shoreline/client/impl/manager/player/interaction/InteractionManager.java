@@ -2,6 +2,7 @@ package net.shoreline.client.impl.manager.player.interaction;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -46,8 +47,12 @@ public final class InteractionManager implements Globals
         Direction direction = getInteractDirection(pos, grim, strictDirection);
         if (AirInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
         {
-            // TODO: this should be not like this
-            direction = Direction.UP;
+            direction = Direction.DOWN;
+            if (grim)
+            {
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.DOWN));
+            }
         }
         if (direction == null)
         {
@@ -74,8 +79,12 @@ public final class InteractionManager implements Globals
         Direction direction = getInteractDirection(pos, grim, strictDirection);
         if (AirInteractModule.getInstance().isEnabled() && direction == null && !strictDirection)
         {
-            // TODO: this should be not like this
-            direction = Direction.UP;
+            direction = Direction.DOWN;
+            if (grim)
+            {
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.DOWN));
+            }
         }
         if (direction == null)
         {

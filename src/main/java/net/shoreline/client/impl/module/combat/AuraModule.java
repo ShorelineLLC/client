@@ -159,18 +159,19 @@ public class AuraModule extends RotationModule
             return;
         }
         final Vec3d eyepos = Managers.POSITION.getEyePos();
-        switch (modeConfig.getValue())
+        entityTarget = switch (modeConfig.getValue())
         {
-            case SWITCH -> entityTarget = getAttackTarget(eyepos);
+            case SWITCH -> getAttackTarget(eyepos);
             case SINGLE ->
             {
                 if (entityTarget == null || !entityTarget.isAlive()
                         || !isInAttackRange(eyepos, entityTarget))
                 {
-                    entityTarget = getAttackTarget(eyepos);
+                    yield getAttackTarget(eyepos);
                 }
+                yield entityTarget;
             }
-        }
+        };
         if (entityTarget == null || !switchTimer.passed(swapDelayConfig.getValue() * 25.0f))
         {
             silentRotations = null;
@@ -282,6 +283,11 @@ public class AuraModule extends RotationModule
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
+        if (AutoCrystalModule.getInstance().isAttacking()
+                || AutoCrystalModule.getInstance().isPlacing() || mc.player.isSpectator())
+        {
+            return;
+        }
         if (entityTarget != null && renderConfig.getValue() && isHoldingSword())
         {
             int attackDelay;

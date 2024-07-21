@@ -95,7 +95,6 @@ public class Interpolation implements Globals
     {
         Box box = entity.getBoundingBox();
         Box prevBox = entity.getBoundingBox().offset(entity.prevX - entity.getX(), entity.prevY - entity.getY(), entity.prevZ - entity.getZ());
-
         return getInterpolatedBox(prevBox, box);
     }
 }
