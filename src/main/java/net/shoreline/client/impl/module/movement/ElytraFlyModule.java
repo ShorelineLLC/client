@@ -277,7 +277,7 @@ public class ElytraFlyModule extends RotationModule
                     return;
                 }
                 // event.cancel();
-                boolean boost = mc.options.jumpKey.isPressed();
+                boolean boost = (mc.options.jumpKey.isPressed() || AutoWalkModule.getInstance().isEnabled());
                 if (boost)
                 {
                     Vec3d glide = glideElytra(speedConfig.getValue() / 50.0f);

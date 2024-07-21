@@ -14,15 +14,19 @@ import net.shoreline.eventbus.annotation.EventListener;
  */
 public class AutoWalkModule extends ToggleModule
 {
-    //
+    private static AutoWalkModule INSTANCE;
+
     Config<Boolean> lockConfig = register(new BooleanConfig("Lock", "Stops movement when sneaking or jumping", false));
 
-    /**
-     *
-     */
     public AutoWalkModule()
     {
         super("AutoWalk", "Automatically moves forward", ModuleCategory.MOVEMENT);
+        INSTANCE = this;
+    }
+
+    public static AutoWalkModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
