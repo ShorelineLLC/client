@@ -350,7 +350,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         }
         for (BlockPos pos2 : playerBlocks)
         {
-            if (pos2 == playerPos)
+            if (pos2.equals(playerPos))
             {
                 continue;
             }

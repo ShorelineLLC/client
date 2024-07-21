@@ -291,7 +291,7 @@ public class SurroundModule extends ObsidianPlacerModule
         List<BlockPos> playerBlocks = getPlayerBlocks(player);
         for (BlockPos playerPos : playerBlocks)
         {
-            if (playerPos == player.getBlockPos())
+            if (playerPos.equals(player.getBlockPos()))
             {
                 continue;
             }
