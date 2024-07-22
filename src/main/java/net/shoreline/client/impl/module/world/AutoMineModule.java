@@ -22,6 +22,7 @@ import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.event.network.SyncSelectedSlotEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
@@ -75,6 +76,7 @@ public class AutoMineModule extends RotationModule
     private final List<BlockPos> packetMines = new ArrayList<>();
     private long lastBreak;
     private boolean manualOverride;
+    private boolean mining;
 
     public AutoMineModule()
     {
@@ -300,6 +302,7 @@ public class AutoMineModule extends RotationModule
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(1000)))
             {
+                mining = false;
                 Managers.INVENTORY.syncToClient();
                 miningQueue.remove(data);
                 continue;
@@ -311,7 +314,7 @@ public class AutoMineModule extends RotationModule
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (data.getBlockDamage() >= 0.95f && isDataPacketMine(data))
+            if (data.getBlockDamage() >= 0.8f && isDataPacketMine(data))
             {
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                 {
@@ -319,8 +322,7 @@ public class AutoMineModule extends RotationModule
                 }
                 if (data.getSlot() != -1)
                 {
-                    int s1 = data.getSlot() + 1;
-                    Managers.INVENTORY.setSlot(s1 > 8 ? 0 : s1);
+                    mining = true;
                     Managers.INVENTORY.setSlot(data.getSlot());
                     if (!data.hasAttemptedBreak())
                     {
@@ -380,6 +382,15 @@ public class AutoMineModule extends RotationModule
             {
                 miningData2.setAttemptedBreak(true);
             }
+        }
+    }
+
+    @EventListener
+    public void onSyncSelectedSlot(SyncSelectedSlotEvent event)
+    {
+        if (mining)
+        {
+            event.cancel();
         }
     }
 

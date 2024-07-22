@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -208,5 +209,16 @@ public abstract class MixinClientPlayerInteractionManager implements Globals
         ItemDesyncEvent itemDesyncEvent = new ItemDesyncEvent();
         EventBus.INSTANCE.dispatch(itemDesyncEvent);
         return itemDesyncEvent.isCanceled() ? itemDesyncEvent.getServerItem().isEmpty() : instance.isEmpty();
+    }
+
+    @Inject(method = "syncSelectedSlot", at = @At(value = "HEAD"), cancellable = true)
+    private void hookSyncSelectedSlot(CallbackInfo ci)
+    {
+        SyncSelectedSlotEvent syncSelectedSlotEvent = new SyncSelectedSlotEvent();
+        EventBus.INSTANCE.dispatch(syncSelectedSlotEvent);
+        if (syncSelectedSlotEvent.isCanceled())
+        {
+            ci.cancel();
+        }
     }
 }
