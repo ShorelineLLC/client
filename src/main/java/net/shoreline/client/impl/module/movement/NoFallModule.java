@@ -46,7 +46,7 @@ public class NoFallModule extends ToggleModule
         {
             return;
         }
-        if (modeConfig.getValue() == NoFallMode.LATENCY)
+        if (modeConfig.getValue() == NoFallMode.LIMIT)
         {
             if (mc.world.getRegistryKey() == World.NETHER)
             {
@@ -97,7 +97,7 @@ public class NoFallModule extends ToggleModule
     public enum NoFallMode
     {
         ANTI,
-        LATENCY,
+        LIMIT,
         PACKET,
         GRIM
     }

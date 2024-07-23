@@ -26,9 +26,6 @@ public class AntiSpamModule extends ToggleModule
     //
     private final Map<UUID, String> messages = new HashMap<>();
 
-    /**
-     *
-     */
     public AntiSpamModule()
     {
         super("AntiSpam", "Prevents players from spamming the game chat",
@@ -47,7 +44,7 @@ public class AntiSpamModule extends ToggleModule
             if (unicodeConfig.getValue())
             {
                 String msg = packet.body().content();
-                Pattern pattern = Pattern.compile("[\\x00-\\x7F]", Pattern.CASE_INSENSITIVE);
+                Pattern pattern = Pattern.compile("[^\\x00-\\x7F\\u0400-\\u04FF]+", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(msg);
                 if (matcher.find())
                 {

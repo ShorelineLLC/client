@@ -7,6 +7,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.math.HexRandom;
@@ -47,6 +48,12 @@ public class SpammerModule extends ToggleModule
     {
         loadFile();
         messageIndex = 0;
+    }
+
+    @EventListener
+    public void onGameJoin(GameJoinEvent event)
+    {
+        onEnable();
     }
 
     @EventListener

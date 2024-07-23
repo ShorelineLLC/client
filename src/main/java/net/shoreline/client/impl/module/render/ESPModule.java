@@ -42,16 +42,6 @@ public class ESPModule extends ToggleModule
     Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(200, 100, 0), false, () -> itemsConfig.getValue()));
     Config<Boolean> crystalsConfig = register(new BooleanConfig("EndCrystals", "Render end crystals through walls", false));
     Config<Color> crystalsColorConfig = register(new ColorConfig("EndCrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> crystalsConfig.getValue()));
-    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", true));
-    Config<Color> chestsColorConfig = register(new ColorConfig("ChestsColor", "The render color for chests", new Color(200, 200, 101), false, () -> chestsConfig.getValue()));
-    Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", true));
-    Config<Color> echestsColorConfig = register(new ColorConfig("EnderChestsColor", "The render color for ender chests", new Color(155, 0, 200), false, () -> echestsConfig.getValue()));
-    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", true));
-    Config<Color> shulkersColorConfig = register(new ColorConfig("ShulkersColor", "The render color for shulkers", new Color(200, 0, 106), false, () -> shulkersConfig.getValue()));
-    Config<Boolean> hoppersConfig = register(new BooleanConfig("Hoppers", "Render players through walls", false));
-    Config<Color> hoppersColorConfig = register(new ColorConfig("HoppersColor", "The render color for hoppers", new Color(100, 100, 100), false, () -> hoppersConfig.getValue()));
-    Config<Boolean> furnacesConfig = register(new BooleanConfig("Furnaces", "Render players through walls", false));
-    Config<Color> furnacesColorConfig = register(new ColorConfig("FurnacesColor", "The render color for furnaces", new Color(100, 100, 100), () -> furnacesConfig.getValue()));
 
     public ESPModule()
     {
@@ -75,31 +65,6 @@ public class ESPModule extends ToggleModule
             event.cancel();
             event.setColor(getESPColor(event.getEntity()).getRGB());
         }
-    }
-
-    public Color getStorageESPColor(BlockEntity tileEntity)
-    {
-        if (tileEntity instanceof ChestBlockEntity)
-        {
-            return chestsColorConfig.getValue();
-        }
-        if (tileEntity instanceof EnderChestBlockEntity)
-        {
-            return echestsColorConfig.getValue();
-        }
-        if (tileEntity instanceof ShulkerBoxBlockEntity)
-        {
-            return shulkersColorConfig.getValue();
-        }
-        if (tileEntity instanceof HopperBlockEntity)
-        {
-            return hoppersColorConfig.getValue();
-        }
-        if (tileEntity instanceof FurnaceBlockEntity)
-        {
-            return furnacesColorConfig.getValue();
-        }
-        return null;
     }
 
     public Color getESPColor(Entity entity)

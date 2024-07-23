@@ -3,14 +3,17 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BlockListConfig;
+import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.InteractBlockEvent;
+import net.shoreline.client.impl.event.network.InteractBorderEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -24,6 +27,7 @@ public class AntiInteractModule extends ToggleModule
 {
     //
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.ENDER_CHEST, Blocks.ANVIL));
+    Config<Boolean> borderConfig = register(new BooleanConfig("Border", "Prevents interacting with the world border", true));
 
     public AntiInteractModule()
     {
@@ -59,5 +63,15 @@ public class AntiInteractModule extends ToggleModule
                 event.cancel();
             }
         }
+    }
+
+    @EventListener
+    public void onInteractBorder(InteractBorderEvent event)
+    {
+        if (!borderConfig.getValue() || mc.player.getMainHandStack().getItem() instanceof BlockItem)
+        {
+            return;
+        }
+        event.cancel();
     }
 }
