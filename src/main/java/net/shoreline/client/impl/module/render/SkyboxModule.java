@@ -9,6 +9,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.event.render.RenderFogEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -28,6 +29,8 @@ public class SkyboxModule extends ToggleModule
     Config<Boolean> cloudConfig = register(new BooleanConfig("Cloud", "Changes the world cloud color", false));
     Config<Color> cloudColorConfig = register(new ColorConfig("CloudColor", "The color for the world clouds", new Color(255, 0, 0), false, true, () -> cloudConfig.getValue()));
     Config<Boolean> fogConfig = register(new BooleanConfig("Fog", "Changes the world fog color", false));
+    Config<Float> fogStartConfig = register(new NumberConfig<>("FogStart", "The fog start distance", 0.0f, 0.0f, 256.0f, () -> fogConfig.getValue()));
+    Config<Float> fogEndConfig = register(new NumberConfig<>("FogEnd", "The fog start distance", 10.0f, 64.0f, 256.0f, () -> fogConfig.getValue()));
     Config<Color> fogColorConfig = register(new ColorConfig("FogColor", "The color for the world fog", new Color(255, 0, 0), false, true, () -> fogConfig.getValue()));
 
     public SkyboxModule()
@@ -133,6 +136,17 @@ public class SkyboxModule extends ToggleModule
         {
             event.cancel();
             event.setColor(fogColorConfig.getValue());
+        }
+    }
+
+    @EventListener
+    public void onRenderFog(RenderFogEvent event)
+    {
+        if (fogConfig.getValue())
+        {
+            event.cancel();
+            event.setStart(fogStartConfig.getValue());
+            event.setEnd(fogEndConfig.getValue());
         }
     }
 
