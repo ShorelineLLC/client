@@ -1,11 +1,9 @@
 package net.shoreline.client.impl.module.world;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -17,11 +15,13 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
@@ -36,7 +36,6 @@ public final class AirInteractModule extends ToggleModule
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to air place", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
     Config<Boolean> fluidsConfig = register(new BooleanConfig("Fluids", "Place against fluids", false));
-    private final Timer timer = new CacheTimer();
 
     public AirInteractModule()
     {
@@ -63,10 +62,11 @@ public final class AirInteractModule extends ToggleModule
         }
 
         final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
-        if (timer.passed(500) && result instanceof BlockHitResult blockHitResult)
+        if (((AccessorMinecraftClient) mc).hookGetItemUseCooldown() <= 0 && result instanceof BlockHitResult blockHitResult)
         {
-            BlockState state = mc.world.getBlockState(BlockPos.ofFloored(blockHitResult.getPos()));
-            if (!state.isAir() && state.getFluidState().isEmpty())
+            BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
+            Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
+            if (direction != null)
             {
                 return;
             }
@@ -77,7 +77,30 @@ public final class AirInteractModule extends ToggleModule
             }
             Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, blockHitResult, id));
             mc.player.swingHand(Hand.MAIN_HAND);
-            timer.reset();
+        }
+    }
+
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        final ItemStack stack = mc.player.getMainHandStack();
+        if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
+        {
+            return;
+        }
+        final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
+        if (result instanceof BlockHitResult blockHitResult)
+        {
+            BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
+            Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
+            if (direction != null)
+            {
+                return;
+            }
+            RenderBuffers.preRender();
+            // RenderManager.renderBox(event.getMatrices(), blockPos, ColorsModule.getInstance().getRGB(60));
+            RenderManager.renderBoundingBox(event.getMatrices(), blockPos, 1.5f, ColorsModule.getInstance().getRGB(145));
+            RenderBuffers.postRender();
         }
     }
 }
