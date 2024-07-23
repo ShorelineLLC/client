@@ -50,12 +50,12 @@ public class MixinBackgroundRenderer
         {
             return;
         }
-        RenderFogEvent renderFogEvent = new RenderFogEvent();
+        RenderFogEvent renderFogEvent = new RenderFogEvent(viewDistance);
         EventBus.INSTANCE.dispatch(renderFogEvent);
         if (renderFogEvent.isCanceled())
         {
-            RenderSystem.setShaderFogStart(viewDistance * 4.0f);
-            RenderSystem.setShaderFogEnd(viewDistance * 4.25f);
+            RenderSystem.setShaderFogStart(renderFogEvent.getStart());
+            RenderSystem.setShaderFogEnd(renderFogEvent.getEnd());
         }
     }
 

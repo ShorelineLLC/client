@@ -18,6 +18,7 @@ import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.render.block.RenderTileEntityEvent;
+import net.shoreline.client.impl.event.render.block.entity.RenderSignTextEvent;
 import net.shoreline.client.impl.event.render.entity.RenderArmorEvent;
 import net.shoreline.client.impl.event.render.entity.RenderFireworkRocketEvent;
 import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
@@ -48,6 +49,7 @@ public class NoRenderModule extends ToggleModule
     Config<Boolean> skylightConfig = register(new BooleanConfig("Skylight", "Prevents skylight from rendering", true));
     Config<Boolean> witherSkullsConfig = register(new BooleanConfig("WitherSkulls", "Prevents flying wither skulls from rendering", false));
     Config<Boolean> tileEntitiesConfig = register(new BooleanConfig("TileEntities", "Prevents special tile entity properties from rendering (i.e. enchantment table books or cutting table saws)", false));
+    Config<Boolean> signTextConfig = register(new BooleanConfig("SignText", "Prevents the text on signs from rendering", false));
     Config<Boolean> fireEntityConfig = register(new BooleanConfig("FireEntities", "Prevents fire from rendering on entities", false));
     Config<Boolean> fireworksConfig = register(new BooleanConfig("Fireworks", "Prevents firework entities from rendering", true));
     Config<Boolean> totemConfig = register(new BooleanConfig("Totems", "Prevents totem pop overlay from rendering", false));
@@ -212,6 +214,15 @@ public class NoRenderModule extends ToggleModule
     }
 
     @EventListener
+    public void onRenderSignText(RenderSignTextEvent event)
+    {
+        if (signTextConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
     public void onRenderFireworkRocket(RenderFireworkRocketEvent event)
     {
         if (fireworksConfig.getValue())
@@ -238,17 +249,21 @@ public class NoRenderModule extends ToggleModule
         }
     }
 
-    @EventListener
+    @EventListener(priority = Integer.MAX_VALUE)
     public void onRenderFog(RenderFogEvent event)
     {
         if (fogConfig.getValue() == FogRender.LIQUID_VISION
                 && mc.player != null && mc.player.isSubmergedIn(FluidTags.LAVA))
         {
             event.cancel();
+            event.setStart(event.getViewDistance() * 4.0f);
+            event.setEnd(event.getViewDistance() * 4.25f);
         }
         else if (fogConfig.getValue() == FogRender.CLEAR)
         {
             event.cancel();
+            event.setStart(event.getViewDistance() * 4.0f);
+            event.setEnd(event.getViewDistance() * 4.25f);
         }
     }
 

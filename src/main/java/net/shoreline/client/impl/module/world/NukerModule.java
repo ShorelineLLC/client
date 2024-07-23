@@ -14,4 +14,6 @@ public class NukerModule extends ToggleModule
     {
         super("Nuker", "Clears nearby blocks", ModuleCategory.WORLD);
     }
+
+    
 }
