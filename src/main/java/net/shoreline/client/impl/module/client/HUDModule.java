@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.client;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
@@ -35,6 +36,7 @@ import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.string.EnumFormatter;
+import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
 
@@ -66,6 +68,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Displays world coordinates", true));
     Config<Boolean> netherCoordsConfig = register(new BooleanConfig("NetherCoords", "Displays nether coordinates", true, () -> coordsConfig.getValue()));
     Config<Boolean> serverBrandConfig = register(new BooleanConfig("ServerBrand", "Displays the current server brand", false));
+    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Displays the amount of chests in your render distance", true));
     Config<Boolean> speedConfig = register(new BooleanConfig("Speed", "Displays the current movement speed of the player in kmh", true));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Display server response time in ms", true));
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
@@ -79,7 +82,7 @@ public class HUDModule extends ToggleModule
     Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.ALPHA));
     Config<Integer> rainbowBrightnessConfig = register(new NumberConfig<>("Rainbow-Brightness", "The brightness of rainbow colors", 0, 100, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.ALPHA));
     Config<Float> rainbowDifferenceConfig = register(new NumberConfig<>("Rainbow-Difference", "The difference offset for rainbow colors", 0.1f, 40.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
-    //
+
     private final DecimalFormat decimal = new DecimalFormat("0.0");
 
     private int rainbowOffset;
@@ -224,6 +227,28 @@ public class HUDModule extends ToggleModule
                 String brand = mc.player.networkHandler.getBrand();
                 int width = RenderManager.textWidth(brand);
                 RenderManager.renderText(event.getContext(), brand,
+                        res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
+                        getHudColor(rainbowOffset));
+                if (renderingUp)
+                {
+                    bottomRight -= 9.0f;
+                }
+                else
+                {
+                    topRight += 9.0f;
+                }
+                rainbowOffset++;
+            }
+            if (chestsConfig.getValue())
+            {
+                int chests = 0;
+                for (BlockEntity blockEntity : BlockUtil.blockEntities())
+                {
+                    chests++;
+                }
+                String text = String.format("Chests §f%d", chests);
+                int width = RenderManager.textWidth(text);
+                RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
                         getHudColor(rainbowOffset));
                 if (renderingUp)
