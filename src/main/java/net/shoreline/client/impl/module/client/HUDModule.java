@@ -72,7 +72,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Displays world coordinates", true));
     Config<Boolean> netherCoordsConfig = register(new BooleanConfig("NetherCoords", "Displays nether coordinates", true, () -> coordsConfig.getValue()));
     Config<Boolean> serverBrandConfig = register(new BooleanConfig("ServerBrand", "Displays the current server brand", false));
-    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Displays the amount of chests in your render distance", true));
+    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Displays the amount of chests in your render distance", false));
     Config<Boolean> speedConfig = register(new BooleanConfig("Speed", "Displays the current movement speed of the player in kmh", true));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Display server response time in ms", true));
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
@@ -243,44 +243,6 @@ public class HUDModule extends ToggleModule
                 }
                 rainbowOffset++;
             }
-            if (chestsConfig.getValue())
-            {
-                int singleChests = 0;
-                int doubleChests = 0;
-                for (BlockEntity blockEntity : BlockUtil.blockEntities())
-                {
-                    if (blockEntity instanceof ChestBlockEntity)
-                    {
-                        BlockState state = blockEntity.getCachedState();
-                        if (state.contains(ChestBlock.CHEST_TYPE))
-                        {
-                            ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
-                            if (chestType == ChestType.SINGLE)
-                            {
-                                singleChests++;
-                            }
-                            else
-                            {
-                                doubleChests++;
-                            }
-                        }
-                    }
-                }
-                String text = String.format("Chests §f%d", singleChests + (doubleChests / 2));
-                int width = RenderManager.textWidth(text);
-                RenderManager.renderText(event.getContext(), text,
-                        res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
-                        getHudColor(rainbowOffset));
-                if (renderingUp)
-                {
-                    bottomRight -= 9.0f;
-                }
-                else
-                {
-                    topRight += 9.0f;
-                }
-                rainbowOffset++;
-            }
             if (speedConfig.getValue())
             {
                 double x = mc.player.getX() - mc.player.prevX;
@@ -356,6 +318,44 @@ public class HUDModule extends ToggleModule
                 String text = String.format("TPS §f%s §7[§f%s§7]",
                         decimal.format(avg),
                         decimal.format(curr));
+                int width = RenderManager.textWidth(text);
+                RenderManager.renderText(event.getContext(), text,
+                        res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
+                        getHudColor(rainbowOffset));
+                if (renderingUp)
+                {
+                    bottomRight -= 9.0f;
+                }
+                else
+                {
+                    topRight += 9.0f;
+                }
+                rainbowOffset++;
+            }
+            if (chestsConfig.getValue())
+            {
+                int singleChests = 0;
+                int doubleChests = 0;
+                for (BlockEntity blockEntity : BlockUtil.blockEntities())
+                {
+                    if (blockEntity instanceof ChestBlockEntity)
+                    {
+                        BlockState state = blockEntity.getCachedState();
+                        if (state.contains(ChestBlock.CHEST_TYPE))
+                        {
+                            ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
+                            if (chestType == ChestType.SINGLE)
+                            {
+                                singleChests++;
+                            }
+                            else
+                            {
+                                doubleChests++;
+                            }
+                        }
+                    }
+                }
+                String text = String.format("Chests §f%d", singleChests + (doubleChests / 2));
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
