@@ -249,7 +249,7 @@ public class NoRenderModule extends ToggleModule
         }
     }
 
-    @EventListener(priority = Integer.MAX_VALUE)
+    @EventListener(priority = Integer.MIN_VALUE)
     public void onRenderFog(RenderFogEvent event)
     {
         if (fogConfig.getValue() == FogRender.LIQUID_VISION

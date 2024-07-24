@@ -185,10 +185,16 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
     /**
      * @param ci
      */
-    @Inject(method = "doItemUse", at = @At(value = "HEAD"))
+    @Inject(method = "doItemUse", at = @At(value = "HEAD"), cancellable = true)
     private void hookDoItemUse(CallbackInfo ci)
     {
         doItemUseCalled = true;
+        ItemUseEvent itemUseEvent = new ItemUseEvent();
+        EventBus.INSTANCE.dispatch(itemUseEvent);
+        if (itemUseEvent.isCanceled())
+        {
+            ci.cancel();
+        }
     }
 
     /**
