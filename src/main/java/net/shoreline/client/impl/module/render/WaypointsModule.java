@@ -1,11 +1,10 @@
 package net.shoreline.client.impl.module.render;
 
+import com.google.common.collect.Sets;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -17,7 +16,6 @@ import net.shoreline.client.api.waypoint.Waypoint;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
-import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
@@ -27,7 +25,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.text.DecimalFormat;
-import java.util.UUID;
+import java.util.Set;
 
 /**
  * @author linus
@@ -42,6 +40,7 @@ public class WaypointsModule extends ToggleModule
     Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Shows the coordinates of the waypoint", true));
     Config<Boolean> distanceConfig = register(new BooleanConfig("Distance", "Shows the distance to the waypoint", true));
     DecimalFormat format = new DecimalFormat("0.0");
+    private final Set<EntryPos> entries = Sets.newConcurrentHashSet();
 
     public WaypointsModule()
     {
@@ -58,49 +57,49 @@ public class WaypointsModule extends ToggleModule
     public void onDisable()
     {
         Managers.WAYPOINT.clear();
+        entries.clear();
     }
 
     @EventListener
     public void onDisconnect(DisconnectEvent event)
     {
-        Managers.WAYPOINT.clear();
+        onDisable();
     }
 
     @EventListener
     public void onLoadWorld(LoadWorldEvent event)
     {
-        Managers.WAYPOINT.clear();
+        onDisable();
     }
 
     @EventListener
     public void onTick(TickEvent event)
     {
-        if (event.getStage() == StageEvent.EventStage.POST && mc.getNetworkHandler() != null)
-        {
-            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList())
-            {
-                Managers.WAYPOINT.removeContains(entry.getProfile().getName());
-            }
-        }
-    }
-
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (mc.world == null || !logoutsConfig.getValue())
+        if (!logoutsConfig.getValue() || event.getStage() != StageEvent.EventStage.POST || mc.getNetworkHandler() == null)
         {
             return;
         }
-        if (event.getPacket() instanceof PlayerRemoveS2CPacket packet)
+        for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList())
         {
-            String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
-            for (UUID uuid : packet.profileIds())
+            if (entries.stream().noneMatch(e -> e.entry.getProfile().getName().equals(entry.getProfile().getName())))
             {
-                PlayerEntity player = mc.world.getPlayerByUuid(uuid);
+                PlayerEntity player = mc.world.getPlayerByUuid(entry.getProfile().getId());
                 if (player == null)
                 {
                     continue;
                 }
+                entries.add(new EntryPos(entry, player));
+                Managers.WAYPOINT.removeContains(entry.getProfile().getName());
+            }
+        }
+        for (EntryPos pos : entries)
+        {
+            PlayerListEntry entry = pos.entry();
+            if (mc.getNetworkHandler().getPlayerList().stream().noneMatch(e -> e.getProfile().getName().equals(entry.getProfile().getName())))
+            {
+                entries.removeIf(e -> e.entry.getProfile().getName().equals(entry.getProfile().getName()));
+                PlayerEntity player = pos.player();
+                String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
                 Managers.WAYPOINT.register(new Waypoint(player.getGameProfile().getName() + "'s Logout", serverIp, DimensionUtil.getDimension(), player.getX(), player.getY(), player.getZ()));
             }
         }
@@ -140,5 +139,10 @@ public class WaypointsModule extends ToggleModule
             RenderManager.renderSign(waypointTag, waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
         }
         RenderBuffers.postRender();
+    }
+
+    private record EntryPos(PlayerListEntry entry, PlayerEntity player)
+    {
+
     }
 }
