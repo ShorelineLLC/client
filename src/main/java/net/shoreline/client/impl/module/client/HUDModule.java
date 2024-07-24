@@ -1,6 +1,10 @@
 package net.shoreline.client.impl.module.client;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.enums.ChestType;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
@@ -241,12 +245,28 @@ public class HUDModule extends ToggleModule
             }
             if (chestsConfig.getValue())
             {
-                int chests = 0;
+                int singleChests = 0;
+                int doubleChests = 0;
                 for (BlockEntity blockEntity : BlockUtil.blockEntities())
                 {
-                    chests++;
+                    if (blockEntity instanceof ChestBlockEntity)
+                    {
+                        BlockState state = blockEntity.getCachedState();
+                        if (state.contains(ChestBlock.CHEST_TYPE))
+                        {
+                            ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
+                            if (chestType == ChestType.SINGLE)
+                            {
+                                singleChests++;
+                            }
+                            else
+                            {
+                                doubleChests++;
+                            }
+                        }
+                    }
                 }
-                String text = String.format("Chests §f%d", chests);
+                String text = String.format("Chests §f%d", singleChests + (doubleChests / 2));
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
