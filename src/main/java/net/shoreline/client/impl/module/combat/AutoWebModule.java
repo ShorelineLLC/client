@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.BlockPlacerModule;
+import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;

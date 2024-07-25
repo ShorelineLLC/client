@@ -1,7 +1,8 @@
-package net.shoreline.client.api.module;
+package net.shoreline.client.impl.module;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 
 import java.util.LinkedList;

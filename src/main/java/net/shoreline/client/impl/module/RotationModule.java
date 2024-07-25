@@ -1,5 +1,7 @@
-package net.shoreline.client.api.module;
+package net.shoreline.client.impl.module;
 
+import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.manager.player.rotation.Rotation;
 import net.shoreline.client.init.Managers;
 

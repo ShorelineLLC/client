@@ -21,7 +21,7 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.RotationModule;
+import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityTravelEvent;
 import net.shoreline.client.impl.event.entity.FallFlyingEvent;

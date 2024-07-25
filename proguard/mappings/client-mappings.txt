@@ -490,7 +490,7 @@ net.shoreline.client.api.macro.MacroFile -> net.shoreline.client.U:
     32:51:void save() -> c
     58:89:void load() -> d
     69:69:boolean lambda$load$0(java.lang.String,net.shoreline.client.api.macro.Macro) -> a
-net.shoreline.client.api.module.BlockPlacerModule -> net.shoreline.client.V:
+net.shoreline.client.impl.module.BlockPlacerModule -> net.shoreline.client.V:
     net.shoreline.client.api.config.Config strictDirectionConfig -> a
     net.shoreline.client.api.config.Config grimConfig -> b
     14:21:void <init>(java.lang.String,java.lang.String,net.shoreline.client.api.module.ModuleCategory) -> <init>
@@ -526,15 +526,15 @@ net.shoreline.client.api.module.ModuleCategory -> net.shoreline.client.Y:
     8:8:void <init>(java.lang.String,int) -> <init>
     8:8:net.shoreline.client.api.module.ModuleCategory[] $values() -> a
     8:46:void <clinit>() -> <clinit>
-net.shoreline.client.api.module.ObsidianPlacerModule -> net.shoreline.client.Z:
+net.shoreline.client.impl.module.ObsidianPlacerModule -> net.shoreline.client.Z:
     java.util.List RESISTANT_BLOCKS -> a
     26:27:void <init>(java.lang.String,java.lang.String,net.shoreline.client.api.module.ModuleCategory) -> <init>
     31:32:void <init>(java.lang.String,java.lang.String,net.shoreline.client.api.module.ModuleCategory,int) -> <init>
     39:47:int getResistantBlockItem() -> o
     17:17:void <clinit>() -> <clinit>
-net.shoreline.client.api.module.ObsidianPlacerModule$1 -> net.shoreline.client.aa:
+net.shoreline.client.impl.module.ObsidianPlacerModule$1 -> net.shoreline.client.aa:
     18:22:void <init>() -> <init>
-net.shoreline.client.api.module.RotationModule -> net.shoreline.client.ab:
+net.shoreline.client.impl.module.RotationModule -> net.shoreline.client.ab:
     int rotationPriority -> j
     23:25:void <init>(java.lang.String,java.lang.String,net.shoreline.client.api.module.ModuleCategory) -> <init>
     34:36:void <init>(java.lang.String,java.lang.String,net.shoreline.client.api.module.ModuleCategory,int) -> <init>

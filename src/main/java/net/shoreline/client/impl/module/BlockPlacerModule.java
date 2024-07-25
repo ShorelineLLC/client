@@ -1,10 +1,11 @@
-package net.shoreline.client.api.module;
+package net.shoreline.client.impl.module;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.module.ModuleCategory;
 
 import java.util.function.Predicate;
 

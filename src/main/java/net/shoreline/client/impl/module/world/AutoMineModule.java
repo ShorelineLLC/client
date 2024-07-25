@@ -15,7 +15,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.RotationModule;
+import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;

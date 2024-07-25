@@ -12,7 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ObsidianPlacerModule;
+import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
