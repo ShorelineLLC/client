@@ -295,7 +295,7 @@ public class ChamsModelRenderer implements Globals
 
             matrices.push();
             float h = CrystalModelModule.getInstance().isEnabled() && !CrystalModelModule.getInstance().getBounce() ? -1.0f : EndCrystalEntityRenderer.getYOffset(crystalEntity, tickDelta);
-            float j = (crystalEntity.endCrystalAge + tickDelta * (CrystalModelModule.getInstance().isEnabled() ? CrystalModelModule.getInstance().getSpin() : 1.0f)) * 3.0f;
+            float j = (float) ((crystalEntity.endCrystalAge + tickDelta) * (CrystalModelModule.getInstance().isEnabled() ? CrystalModelModule.getInstance().getSpin() : 1.0f)) * 3.0f;
             matrices.push();
             if (CrystalModelModule.getInstance().isEnabled())
             {
