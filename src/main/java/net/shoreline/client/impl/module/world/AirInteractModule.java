@@ -26,8 +26,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 /**
- * @author xgraza
- * @since 04/13/24
+ * @author xgraza, linus, hockeyl8
+ * @since 1.0
  */
 public final class AirInteractModule extends ToggleModule
 {
@@ -36,6 +36,7 @@ public final class AirInteractModule extends ToggleModule
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to air place", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
     Config<Boolean> fluidsConfig = register(new BooleanConfig("Fluids", "Place against fluids", false));
+
     private int airPlaceTicks;
 
     public AirInteractModule()
@@ -58,7 +59,7 @@ public final class AirInteractModule extends ToggleModule
     @EventListener
     public void onPlayerTick(final TickEvent event)
     {
-        if (event.getStage() != StageEvent.EventStage.PRE)
+        if (mc.player == null || mc.interactionManager == null || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
         }
@@ -72,18 +73,20 @@ public final class AirInteractModule extends ToggleModule
             return;
         }
         final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
-        if (((AccessorMinecraftClient) mc).hookGetItemUseCooldown() == 0 && airPlaceTicks == 0 && !mc.player.isUsingItem() && result instanceof BlockHitResult blockHitResult)
+        if (((AccessorMinecraftClient) mc).hookGetItemUseCooldown() == 0 && airPlaceTicks == 0 && !mc.player.isUsingItem()
+                && result instanceof BlockHitResult blockHitResult)
         {
             BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
             Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
-            if (direction != null)
+            if (direction != null || result.getType() == HitResult.Type.ENTITY)
             {
                 return;
             }
             if (grimConfig.getValue())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockHitResult.getBlockPos(), Direction.DOWN));
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                        blockHitResult.getBlockPos(), Direction.DOWN));
             }
             ((AccessorMinecraftClient) mc).hookSetItemUseCooldown(4);
             airPlaceTicks = 4;
@@ -93,7 +96,7 @@ public final class AirInteractModule extends ToggleModule
     }
 
     @EventListener
-    public void onItemUse(ItemUseEvent event)
+    public void onItemUse(final ItemUseEvent event)
     {
         if (airPlaceTicks > 0)
         {
@@ -102,26 +105,30 @@ public final class AirInteractModule extends ToggleModule
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event)
+    public void onRenderWorld(final RenderWorldEvent event)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
         final ItemStack stack = mc.player.getMainHandStack();
         if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
         {
             return;
         }
         final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
-        if (result instanceof BlockHitResult blockHitResult)
+        if (!(result instanceof BlockHitResult blockHitResult) || result.getType() == HitResult.Type.ENTITY)
         {
-            BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
-            Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
-            if (direction != null)
-            {
-                return;
-            }
-            RenderBuffers.preRender();
-            // RenderManager.renderBox(event.getMatrices(), blockPos, ColorsModule.getInstance().getRGB(60));
-            RenderManager.renderBoundingBox(event.getMatrices(), blockPos, 1.5f, ColorsModule.getInstance().getRGB(145));
-            RenderBuffers.postRender();
+            return;
         }
+        BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
+        Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
+        if (direction != null)
+        {
+            return;
+        }
+        RenderBuffers.preRender();
+        RenderManager.renderBoundingBox(event.getMatrices(), blockPos, 1.5f, ColorsModule.getInstance().getRGB(145));
+        RenderBuffers.postRender();
     }
 }
