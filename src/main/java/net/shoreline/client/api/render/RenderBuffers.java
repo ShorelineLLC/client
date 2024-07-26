@@ -22,6 +22,7 @@ import java.util.List;
 public class RenderBuffers
 {
     public static final Buffer QUADS = new Buffer(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+    public static final Buffer TEXTURE_QUADS = new Buffer(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
     public static final Buffer LINES = new Buffer(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
     private static final List<Runnable> postRenderCallbacks = new ArrayList<>();
     private static boolean isSetup = false;
@@ -113,6 +114,13 @@ public class RenderBuffers
             return this;
         }
 
+        public Buffer vertexTex(double x, double y, double z, float u, float v)
+        {
+            Vector4d vector4d = positionMatrix.transform(new Vector4d(x, y, z, 1.0));
+            this.buffer.vertex(vector4d.x(), vector4d.y(), vector4d.z()).texture(u, v).next();
+            return this;
+        }
+
         public Buffer vertexLine(double x1, double y1, double z1, double x2, double y2, double z2)
         {
             float k = (float)(x2 - x1);
@@ -150,7 +158,19 @@ public class RenderBuffers
                 }
                 else
                 {
-                    RenderSystem.setShader(vertexFormat == VertexFormats.LINES ? GameRenderer::getRenderTypeLinesProgram : GameRenderer::getPositionColorProgram);
+                    if (vertexFormat == VertexFormats.LINES)
+                    {
+                        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+                    }
+                    else if (vertexFormat == VertexFormats.POSITION_COLOR)
+                    {
+                        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+                    }
+                    else if (vertexFormat == VertexFormats.POSITION_TEXTURE)
+                    {
+                        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+                    }
+
                     BufferRenderer.drawWithGlobalProgram(this.buffer.end());
                 }
             }

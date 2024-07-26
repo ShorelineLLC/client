@@ -58,4 +58,12 @@ public class ColorUtil
         }
         return f;
     }
+
+    public static int withAlpha(int color, int alpha)
+    {
+        int red = 0xFF & (color >> 16);
+        int blue = 0xFF & color;
+        int green = 0xFF & (color >> 8);
+        return (alpha << 24) | (red << 16) | (green << 8) | blue;
+    }
 }
