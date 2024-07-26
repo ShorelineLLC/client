@@ -3,7 +3,6 @@ package net.shoreline.client.api.render.chams;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -20,13 +19,9 @@ import net.minecraft.util.math.RotationAxis;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
 import net.shoreline.client.util.Globals;
-import net.shoreline.client.util.render.ColorUtil;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
 
 import static net.minecraft.client.render.item.ItemRenderer.ITEM_ENCHANTMENT_GLINT;
 
@@ -40,7 +35,7 @@ public class ChamsModelRenderer implements Globals
     private static final Vector4f pos3 = new Vector4f();
     private static final Vector4f pos4 = new Vector4f();
 
-    public static void render(MatrixStack matrixStack, Entity entity, float tickDelta, int color, float lineWidth, boolean lines, boolean fill, boolean shine)
+    public static void render(MatrixStack matrixStack, Entity entity, float tickDelta, int color, int lineColor, float lineWidth, boolean lines, boolean fill, boolean shine)
     {
         double offsetX = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
         double offsetY = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
@@ -156,11 +151,11 @@ public class ChamsModelRenderer implements Globals
                     matrices.translate(0.0D, m.childHeadYOffset / 16.0f, m.childHeadZOffset / 16.0f);
                     if (model instanceof BipedEntityModel mo)
                     {
-                        render(matrixStack, mo.head, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                     }
                     else
                     {
-                        m.getHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine));
+                        m.getHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
                     }
                     matrices.pop();
                     matrices.push();
@@ -169,15 +164,15 @@ public class ChamsModelRenderer implements Globals
                     matrices.translate(0.0D, m.childBodyYOffset / 16.0f, 0.0D);
                     if (model instanceof BipedEntityModel mo)
                     {
-                        render(matrixStack, mo.body, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.leftArm, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.rightArm, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.leftLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.rightLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.leftArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.rightArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.leftLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.rightLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                     }
                     else
                     {
-                        m.getBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine));
+                        m.getBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
                     }
                     matrices.pop();
                 }
@@ -185,17 +180,17 @@ public class ChamsModelRenderer implements Globals
                 {
                     if (model instanceof BipedEntityModel mo)
                     {
-                        render(matrixStack, mo.head, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.body, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.leftArm, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.rightArm, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.leftLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, mo.rightLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.leftArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.rightArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.leftLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, mo.rightLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                     }
                     else
                     {
-                        m.getHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine));
-                        m.getBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine));
+                        m.getHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
+                        m.getBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
                     }
                 }
             }
@@ -203,11 +198,11 @@ public class ChamsModelRenderer implements Globals
             {
                 if (model instanceof SinglePartEntityModel m)
                 {
-                    render(matrixStack, m.getPart(), offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                    render(matrixStack, m.getPart(), offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                 }
                 else if (model instanceof CompositeEntityModel m)
                 {
-                    m.getParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine));
+                    m.getParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
                 }
                 else if (model instanceof LlamaEntityModel m)
                 {
@@ -216,34 +211,34 @@ public class ChamsModelRenderer implements Globals
                         matrices.push();
                         matrices.scale(0.71428573F, 0.64935064F, 0.7936508F);
                         matrices.translate(0.0D, 1.3125D, 0.2199999988079071D);
-                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                         matrices.pop();
                         matrices.push();
                         matrices.scale(0.625F, 0.45454544F, 0.45454544F);
                         matrices.translate(0.0D, 2.0625D, 0.0D);
-                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                         matrices.pop();
                         matrices.push();
                         matrices.scale(0.45454544F, 0.41322312F, 0.45454544F);
                         matrices.translate(0.0D, 2.0625D, 0.0D);
-                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightChest, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftChest, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightChest, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftChest, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                         matrices.pop();
                     }
                     else
                     {
-                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightChest, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftChest, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightChest, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftChest, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                     }
                 }
                 else if (model instanceof RabbitEntityModel m)
@@ -253,22 +248,22 @@ public class ChamsModelRenderer implements Globals
                         matrices.push();
                         matrices.scale(0.56666666F, 0.56666666F, 0.56666666F);
                         matrices.translate(0.0D, 1.375D, 0.125D);
-                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftEar, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightEar, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.nose, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftEar, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightEar, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.nose, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                         matrices.pop();
                         matrices.push();
                         matrices.scale(0.4F, 0.4F, 0.4F);
                         matrices.translate(0.0D, 2.25D, 0.0D);
-                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftHaunch, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightHaunch, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.tail, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftHaunch, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightHaunch, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.tail, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                         matrices.pop();
                     }
                     else
@@ -276,18 +271,18 @@ public class ChamsModelRenderer implements Globals
                         matrices.push();
                         matrices.scale(0.6F, 0.6F, 0.6F);
                         matrices.translate(0.0D, 1.0D, 0.0D);
-                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftHaunch, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightHaunch, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.rightEar, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.leftEar, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.tail, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
-                        render(matrixStack, m.nose, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightHindLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftHaunch, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightHaunch, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightFrontLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.rightEar, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.leftEar, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.tail, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+                        render(matrixStack, m.nose, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                         matrices.pop();
                     }
                 }
@@ -312,15 +307,15 @@ public class ChamsModelRenderer implements Globals
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(j));
             matrices.translate(0.0D, 1.5F + h / 2.0f, 0.0D);
             matrices.multiply(new Quaternionf().setAngleAxis(1.0471976f, SINE_45_DEGREES, 0.0f, SINE_45_DEGREES));
-            render(matrixStack, renderer.frame, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+            render(matrixStack, renderer.frame, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
             matrices.scale(0.875F, 0.875F, 0.875F);
             matrices.multiply(new Quaternionf().setAngleAxis(1.0471976f, SINE_45_DEGREES, 0.0f, SINE_45_DEGREES));
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(j));
-            render(matrixStack, renderer.frame, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+            render(matrixStack, renderer.frame, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
             matrices.scale(0.875F, 0.875F, 0.875F);
             matrices.multiply(new Quaternionf().setAngleAxis(1.0471976f, SINE_45_DEGREES, 0.0f, SINE_45_DEGREES));
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(j));
-            // render(matrixStack, renderer.core, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+            // render(matrixStack, renderer.core, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
             matrices.pop();
             matrices.pop();
         }
@@ -369,7 +364,7 @@ public class ChamsModelRenderer implements Globals
 //        matrices.pop();
 //    }
     
-    public static void render(MatrixStack matrixStack, ModelPart part, double offsetX, double offsetY, double offsetZ, int color, float lineWidth, boolean lines, boolean fill, boolean shine)
+    public static void render(MatrixStack matrixStack, ModelPart part, double offsetX, double offsetY, double offsetZ, int color, int lineColor, float lineWidth, boolean lines, boolean fill, boolean shine)
     {
         if (!part.visible || (part.cuboids.isEmpty() && part.children.isEmpty()))
         {
@@ -382,16 +377,16 @@ public class ChamsModelRenderer implements Globals
 
         for (ModelPart.Cuboid cuboid : part.cuboids)
         {
-            renderModelPart(matrixStack, cuboid, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+            renderModelPart(matrixStack, cuboid, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
         }
         for (ModelPart child : part.children.values())
         {
-            render(matrixStack, child, offsetX, offsetY, offsetZ, color, lineWidth, lines, fill, shine);
+            render(matrixStack, child, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
         }
         matrices.pop();
     }
 
-    private static void renderModelPart(MatrixStack matrixStack, ModelPart.Cuboid cuboid, double offsetX, double offsetY, double offsetZ, int color, float lineWidth, boolean lines, boolean fill, boolean shine)
+    private static void renderModelPart(MatrixStack matrixStack, ModelPart.Cuboid cuboid, double offsetX, double offsetY, double offsetZ, int color, int lineColor, float lineWidth, boolean lines, boolean fill, boolean shine)
     {
         Matrix4f matrix = matrices.peek().getPositionMatrix();
 
@@ -435,7 +430,7 @@ public class ChamsModelRenderer implements Globals
             {
                 RenderBuffers.LINES.begin(matrixStack);
                 RenderSystem.lineWidth(lineWidth);
-                RenderBuffers.LINES.color(ColorUtil.withAlpha(color, 145));
+                RenderBuffers.LINES.color(lineColor);
                 RenderBuffers.LINES.vertexLine(offsetX + pos1.x, offsetY + pos1.y, offsetZ + pos1.z, offsetX + pos2.x, offsetY + pos2.y, offsetZ + pos2.z);
                 RenderBuffers.LINES.vertexLine(offsetX + pos2.x, offsetY + pos2.y, offsetZ + pos2.z, offsetX + pos3.x, offsetY + pos3.y, offsetZ + pos3.z);
                 RenderBuffers.LINES.vertexLine(offsetX + pos3.x, offsetY + pos3.y, offsetZ + pos3.z, offsetX + pos4.x, offsetY + pos4.y, offsetZ + pos4.z);

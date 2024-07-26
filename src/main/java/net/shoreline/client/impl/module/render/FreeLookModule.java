@@ -13,10 +13,30 @@ public class FreeLookModule extends ToggleModule
 {
     private float cameraYaw;
     private float cameraPitch;
+    private Perspective perspective;
 
     public FreeLookModule()
     {
         super("FreeLook", "Allows you to freely move the camera in third person", ModuleCategory.RENDER);
+    }
+
+    @Override
+    public void onEnable()
+    {
+        perspective = mc.options.getPerspective();
+        if (perspective != Perspective.THIRD_PERSON_BACK)
+        {
+            mc.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+        }
+    }
+
+    @Override
+    public void onDisable()
+    {
+        if (mc.options.getPerspective() != perspective)
+        {
+            mc.options.setPerspective(perspective);
+        }
     }
 
     @EventListener

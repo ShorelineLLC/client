@@ -644,9 +644,9 @@ public class AutoMineModule extends RotationModule
         }
         if (doubleBreakConfig.getValue() && !floor)
         {
-            Managers.INVENTORY.setSlot(data.getSlot());
             if (grimConfig.getValue())
             {
+                Managers.INVENTORY.setSlot(data.getSlot());
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             }
@@ -655,7 +655,10 @@ public class AutoMineModule extends RotationModule
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             packetMines.add(data.getPos());
-            Managers.INVENTORY.syncToClient();
+            if (grimConfig.getValue())
+            {
+                Managers.INVENTORY.syncToClient();
+            }
         }
         else
         {
