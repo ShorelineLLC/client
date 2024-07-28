@@ -100,6 +100,7 @@ public final class ModuleManager
                 new AutoReconnectModule(),
                 new AutoRespawnModule(),
                 new BeaconSelectorModule(),
+                new BetterAnvilModule(),
                 new BetterChatModule(),
                 new BetterInvModule(),
                 new ChatNotifierModule(),
