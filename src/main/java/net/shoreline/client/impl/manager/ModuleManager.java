@@ -78,6 +78,7 @@ public final class ModuleManager
                 new FakeLatencyModule(),
                 new FastLatencyModule(),
                 new FastProjectileModule(),
+                new FireworkBoostModule(),
                 new InventorySyncModule(),
                 new NewChunksModule(),
                 new NoMineAnimationModule(),
