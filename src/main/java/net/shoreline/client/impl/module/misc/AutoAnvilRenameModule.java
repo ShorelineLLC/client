@@ -20,21 +20,23 @@ import java.util.List;
  * @author hockeyl8
  * @since 1.0
  */
-public class BetterAnvilModule extends ToggleModule
+public class AutoAnvilRenameModule extends ToggleModule
 {
-    Config<Boolean> autoRenameConfig = register(new BooleanConfig("AutoRename", "Automatically renames items.", true));
-    Config<Selection> autoRenameSelectionConfig = register(new EnumConfig<>("Selection", "The selection of items to rename", Selection.ALL, Selection.values(), () -> autoRenameConfig.getValue()));
-    Config<List<Item>> autoRenameWhitelistConfig = register(new ItemListConfig<>("Whitelist", "The items to rename.", Items.SHULKER_BOX));
+    Config<Selection> autoRenameSelectionConfig = register(new EnumConfig<>("Selection", "The selection of items to rename", Selection.ALL, Selection.values()));
+    Config<List<Item>> autoRenameWhitelistConfig = register(new ItemListConfig<>("Whitelist", "The items to rename.", Items.SHULKER_BOX, Items.WHITE_SHULKER_BOX,
+            Items.LIGHT_GRAY_SHULKER_BOX, Items.GRAY_SHULKER_BOX, Items.BLACK_SHULKER_BOX, Items.BROWN_SHULKER_BOX, Items.RED_SHULKER_BOX, Items.ORANGE_SHULKER_BOX,
+            Items.YELLOW_SHULKER_BOX, Items.LIME_SHULKER_BOX, Items.GREEN_SHULKER_BOX, Items.CYAN_SHULKER_BOX, Items.LIGHT_BLUE_SHULKER_BOX, Items.BLUE_SHULKER_BOX,
+            Items.PURPLE_SHULKER_BOX, Items.PINK_SHULKER_BOX));
     Config<List<Item>> autoRenameBlacklistConfig = register(new ItemListConfig<>("Blacklist", "The items to not rename.", Items.EXPERIENCE_BOTTLE));
-    Config<String> autoRenameTextConfig = register(new StringConfig("Text", "The text to rename the items to.", "ShorelineClient.net", () -> autoRenameConfig.getValue()));
-    Config<Integer> autoRenameDelayConfig = register(new NumberConfig<>("Delay", "The delay between renaming items.", 0, 10, 20, () -> autoRenameConfig.getValue()));
+    Config<String> autoRenameTextConfig = register(new StringConfig("Text", "The text to rename the items to.", "ShorelineClient.net"));
+    Config<Integer> autoRenameDelayConfig = register(new NumberConfig<>("Delay", "The delay between renaming items.", 0, 10, 20));
     Config<Boolean> debugConfig = register(new BooleanConfig("Debug", "Prints debug information to chat.", false, () -> false));
 
     private final CacheTimer delayTimer = new CacheTimer();
 
-    public BetterAnvilModule()
+    public AutoAnvilRenameModule()
     {
-        super("BetterAnvil", "Makes anvils better.", ModuleCategory.MISCELLANEOUS);
+        super("AutoAnvilRename", "Automatically renames items in anvils.", ModuleCategory.MISCELLANEOUS);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class BetterAnvilModule extends ToggleModule
         {
             return;
         }
-        if (!autoRenameConfig.getValue() && !delayTimer.passed(autoRenameDelayConfig.getValue()))
+        if (!delayTimer.passed(autoRenameDelayConfig.getValue()))
         {
             return;
         }
