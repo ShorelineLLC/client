@@ -162,6 +162,7 @@ public class HoleFillModule extends ObsidianPlacerModule
             // This may not work on all servers
             placeBlock(targetPos, slot);
         }
+        Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
     }
 
     public void attackBlockingCrystals(List<BlockPos> posList)
@@ -181,10 +182,6 @@ public class HoleFillModule extends ObsidianPlacerModule
             }
             Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
             mc.player.swingHand(Hand.MAIN_HAND);
-            if (rotateConfig.getValue())
-            {
-                Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
-            }
             return;
         }
     }
@@ -193,16 +190,9 @@ public class HoleFillModule extends ObsidianPlacerModule
     {
         Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
-            if (rotateConfig.getValue())
+            if (rotateConfig.getValue() && state)
             {
-                if (state)
-                {
-                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
-                }
-                else
-                {
-                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
-                }
+                Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
             }
         });
     }

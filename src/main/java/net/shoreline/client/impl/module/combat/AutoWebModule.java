@@ -104,6 +104,10 @@ public class AutoWebModule extends BlockPlacerModule
             }
         }
         webs = webPlacements;
+        if (webs.isEmpty())
+        {
+            return;
+        }
         while (blocksPlaced < shiftTicksConfig.getValue())
         {
             if (blocksPlaced >= webs.size())
@@ -117,6 +121,7 @@ public class AutoWebModule extends BlockPlacerModule
             // This may not work on all servers
             placeWeb(targetPos, slot);
         }
+        Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
     }
 
     @EventListener
@@ -162,16 +167,9 @@ public class AutoWebModule extends BlockPlacerModule
     {
         Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
         {
-            if (rotateConfig.getValue())
+            if (rotateConfig.getValue() && state)
             {
-                if (state)
-                {
-                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
-                }
-                else
-                {
-                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
-                }
+                Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
             }
         });
     }
