@@ -21,10 +21,7 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public final class AWTFontRenderer implements Closeable, Globals
 {

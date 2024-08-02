@@ -33,7 +33,7 @@ public class ParticlesModule extends ToggleModule
     Config<Boolean> blockConfig = register(new BooleanConfig("Block", "Prevents block particles from rendering", false));
     Config<Boolean> blockBreakConfig = register(new BooleanConfig("BlockBreak", "Prevents block break particles from rendering", false));
     Config<Boolean> campfiresConfig = register(new BooleanConfig("Campfires", "Prevents campfire particles from rendering", false));
-    Config<Boolean> obsidianTearConfig = register(new BooleanConfig("ObsidianTear", "Prevents obsidian tear particles from rendering", false));
+    Config<Boolean> obsidianTearConfig = register(new BooleanConfig("CryingObsidian", "Prevents obsidian tear particles from rendering", false));
 
     public ParticlesModule()
     {

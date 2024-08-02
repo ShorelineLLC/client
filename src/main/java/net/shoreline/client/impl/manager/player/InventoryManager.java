@@ -232,6 +232,10 @@ public class InventoryManager implements Globals
      */
     public int count(Item item)
     {
+        if (mc.player == null)
+        {
+            return 0;
+        }
         ItemStack offhandStack = mc.player.getOffHandStack();
         int itemCount = offhandStack.getItem() == item ? offhandStack.getCount() : 0;
         for (int i = 0; i < 36; i++)

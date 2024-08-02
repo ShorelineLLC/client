@@ -42,6 +42,10 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ *
+ * @see ChamsModelRenderer
+ */
 public class ChamsModule extends ToggleModule
 {
     Config<ChamsMode> modeConfig = register(new EnumConfig<>("Mode", "The rendering mode for the chams", ChamsMode.FILL, ChamsMode.values()));
@@ -381,5 +385,4 @@ public class ChamsModule extends ToggleModule
         WIREFRAME,
         WIRE_FILL
     }
-
 }

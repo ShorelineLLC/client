@@ -24,7 +24,7 @@ public class KillEffectsModule extends ToggleModule
 {
 
     Config<KillEffect> killEffectConfig = register(new EnumConfig<>("Effect", "The kill effect to apply", KillEffect.LIGHTNING, KillEffect.values()));
-    Config<Integer> strikes = register(new NumberConfig<>("Strikes", "The number of lightning strikes", 1, 1, 5, () -> killEffectConfig.getValue() == KillEffect.LIGHTNING));
+    Config<Integer> strikesConfig = register(new NumberConfig<>("Strikes", "The number of lightning strikes", 1, 1, 5, () -> killEffectConfig.getValue() == KillEffect.LIGHTNING));
 
     private final Map<Entity, Long> lastAttackedEntities = new HashMap<>();
 
@@ -44,7 +44,7 @@ public class KillEffectsModule extends ToggleModule
         {
             case LIGHTNING ->
             {
-                for (int i = 0; i < strikes.getValue(); i++)
+                for (int i = 0; i < strikesConfig.getValue(); i++)
                 {
                     LightningEntity lightningEntity = new LightningEntity(EntityType.LIGHTNING_BOLT, mc.world);
                     lightningEntity.setPos(player.getX(), player.getY(), player.getZ());

@@ -28,9 +28,11 @@ import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager;
 import net.shoreline.client.util.player.RotationUtil;
+import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 
 /**
@@ -334,9 +336,9 @@ public class SpeedmineModule extends RotationModule
         double dz = (render1.maxZ - render1.minZ) / 2.0;
         final Box scaled = new Box(center, center).expand(dx * scale, dy * scale, dz * scale);
         RenderManager.renderBox(event.getMatrices(), scaled,
-                damage > 0.95f ? 0x6000ff00 : 0x60ff0000);
+                damage > 0.95f ? ColorUtil.withAlpha(Color.GREEN.getRGB(), 60) : ColorUtil.withAlpha(Color.RED.getRGB(), 60));
         RenderManager.renderBoundingBox(event.getMatrices(), scaled,
-                2.5f, damage > 0.95f ? 0x6000ff00 : 0x60ff0000);
+                2.5f, damage > 0.95f ? ColorUtil.withAlpha(Color.GREEN.getRGB(), 145) : ColorUtil.withAlpha(Color.RED.getRGB(), 145));
         RenderBuffers.postRender();
     }
 

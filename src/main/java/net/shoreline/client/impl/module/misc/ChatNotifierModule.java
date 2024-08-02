@@ -35,7 +35,7 @@ public final class ChatNotifierModule extends ToggleModule
     Config<Boolean> totemPopConfig = register(new BooleanConfig("TotemPop", "Notifies in chat when a player pops a totem", true));
     Config<Boolean> visualRangeConfig = register(new BooleanConfig("VisualRange", "Notifies in chat when player enters visual range", false));
     Config<Boolean> joinConfig = register(new BooleanConfig("Join", "Notifies in chat when a player joins", false));
-    Config<Boolean> leaveConfig = register(new BooleanConfig("Leave", "Notifies in chat when a player joins", false));
+    Config<Boolean> leaveConfig = register(new BooleanConfig("Leave", "Notifies in chat when a player leaves", false));
     Config<Boolean> friendsConfig = register(new BooleanConfig("Friends", "Notifies for friends", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Notifies you if the server you join is running Grim", false));
 

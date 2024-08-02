@@ -74,10 +74,9 @@ public class GlyphCache implements Globals
         int cached = 0;
         int charX = 0;
         int maxX = 0, maxY = 0;
-        int currentX = 0, currentY = 0;
+        int currX = 0, currY = 0;
         int currentRowMaxY = 0;
-        AffineTransform af = new AffineTransform();
-        FontRenderContext frc = new FontRenderContext(af, true, false);
+        FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, false);
         while (cached <= range)
         {
             char currentChar = (char) (start + cached);
@@ -85,18 +84,18 @@ public class GlyphCache implements Globals
             int width = (int) Math.ceil(stringBounds.getWidth());
             int height = (int) Math.ceil(stringBounds.getHeight());
             cached++;
-            maxX = Math.max(maxX, currentX + width);
-            maxY = Math.max(maxY, currentY + height);
+            maxX = Math.max(maxX, currX + width);
+            maxY = Math.max(maxY, currY + height);
             if (charX >= ceiling)
             {
-                currentX = 0;
-                currentY += currentRowMaxY + padding; // add height of highest glyph, and reset
+                currX = 0;
+                currY += currentRowMaxY + padding; // add height of highest glyph, and reset
                 charX = 0;
                 currentRowMaxY = 0;
             }
             currentRowMaxY = Math.max(currentRowMaxY, height); // calculate the highest glyph in this row
-            glyphs1.add(new Glyph(currentX, currentY, width, height, currentChar, this));
-            currentX += width + padding;
+            glyphs1.add(new Glyph(currX, currY, width, height, currentChar, this));
+            currX += width + padding;
             charX++;
         }
         BufferedImage bufferedImage = new BufferedImage(Math.max(maxX + padding, 1), Math.max(maxY + padding, 1), BufferedImage.TYPE_INT_ARGB);
@@ -147,15 +146,15 @@ public class GlyphCache implements Globals
             IntBuffer backingBuffer = MemoryUtil.memIntBuffer(ptr, image.getWidth() * image.getHeight());
             WritableRaster raster = bufferedImage.getRaster();
             ColorModel colorModel = bufferedImage.getColorModel();
-            int nbands = raster.getNumBands();
+            int bands = raster.getNumBands();
             int dataType = raster.getDataBuffer().getDataType();
             Object dataBuffer = switch (dataType)
             {
-                case DataBuffer.TYPE_BYTE -> new byte[nbands];
-                case DataBuffer.TYPE_USHORT -> new short[nbands];
-                case DataBuffer.TYPE_INT -> new int[nbands];
-                case DataBuffer.TYPE_FLOAT -> new float[nbands];
-                case DataBuffer.TYPE_DOUBLE -> new double[nbands];
+                case DataBuffer.TYPE_BYTE -> new byte[bands];
+                case DataBuffer.TYPE_USHORT -> new short[bands];
+                case DataBuffer.TYPE_INT -> new int[bands];
+                case DataBuffer.TYPE_FLOAT -> new float[bands];
+                case DataBuffer.TYPE_DOUBLE -> new double[bands];
                 default -> throw new IllegalArgumentException("Unknown data buffer type: " + dataType);
             };
             for (int y = 0; y < imageHeight; y++)

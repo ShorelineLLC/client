@@ -41,6 +41,7 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
         // handSwingTicks = player.handSwingTicks;
         // lastHandSwingProgress = player.lastHandSwingProgress;
         limbAnimator.pos = player.limbAnimator.getPos();
+        limbAnimator.setSpeed(player.limbAnimator.getSpeed());
         Byte playerModel = player.getDataTracker()
                 .get(PlayerEntity.PLAYER_MODEL_PARTS);
         dataTracker.set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);

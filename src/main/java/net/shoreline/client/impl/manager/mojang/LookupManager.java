@@ -14,6 +14,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+// Mojang api is offline
+@Deprecated
 public class LookupManager implements Globals
 {
     private final Map<String, UUID> lookupsUUID = new HashMap<>();
