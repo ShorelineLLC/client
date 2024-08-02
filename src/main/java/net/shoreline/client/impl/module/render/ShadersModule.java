@@ -33,7 +33,9 @@ public class ShadersModule extends ToggleModule
 
     Config<ShaderMode> modeConfig = register(new EnumConfig<>("Mode", "The shader mode", ShaderMode.NORMAL, ShaderMode.values()));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
-    Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 0.5f, 1.0f, 2.0f, () -> outlineConfig.getValue()));
+    Config<Integer> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1, 1, 5, () -> outlineConfig.getValue()));
+    Config<Boolean> glowConfig = register(new BooleanConfig("Glow", "Glow outline", false));
+    Config<Float> glowRadiusConfig = register(new NumberConfig<>("GlowRadius", "The glow radius", 0.1f, 1.0f, 2.0f, () -> glowConfig.getValue() && outlineConfig.getValue()));
     Config<Boolean> dotsConfig = register(new BooleanConfig("Dots", "Hacker esp", false));
     Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue()));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
@@ -75,6 +77,7 @@ public class ShadersModule extends ToggleModule
         shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
         shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
         shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+        shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
         shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
         shaderEffect.render(mc.getTickDelta());
     }
@@ -100,6 +103,7 @@ public class ShadersModule extends ToggleModule
                 shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
                 shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                 shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+                shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
                 shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
                 shaderEffect.render(mc.getTickDelta());
             }, () ->
@@ -126,6 +130,7 @@ public class ShadersModule extends ToggleModule
     private enum ShaderMode
     {
         NORMAL,
-        GRADIENT
+        GRADIENT,
+        IMAGE
     }
 }

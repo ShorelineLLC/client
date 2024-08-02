@@ -39,12 +39,6 @@ public class AutoAnvilRenameModule extends ToggleModule
         super("AutoAnvilRename", "Automatically renames items in anvils.", ModuleCategory.MISCELLANEOUS);
     }
 
-    @Override
-    public void onDisable()
-    {
-        delayTimer.reset();
-    }
-
     @EventListener
     public void onTick(final TickEvent event)
     {

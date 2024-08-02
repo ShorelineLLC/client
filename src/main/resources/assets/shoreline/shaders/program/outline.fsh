@@ -12,30 +12,52 @@ uniform vec2 texelSize;
 uniform vec4 color;
 uniform float radius;
 uniform int dotRadius;
+uniform float glow;
 
-void main() {
+void main()
+{
     vec4 centerCol = texture(DiffuseSampler, texCoord);
-    if (centerCol.a > 0.0) {
-        if (dotRadius > 0 && int(gl_FragCoord.x) - (dotRadius * int(gl_FragCoord.x / dotRadius)) <= 2.0f && int(gl_FragCoord.y) - (dotRadius * int(gl_FragCoord.y / dotRadius)) <= 2.0f) {
+    if (centerCol.a > 0.0)
+    {
+        if (dotRadius > 0 && int(gl_FragCoord.x) - (dotRadius * int(gl_FragCoord.x / dotRadius)) <= 1.0f && int(gl_FragCoord.y) - (dotRadius * int(gl_FragCoord.y / dotRadius)) <= 1.0f)
+        {
             fragColor = vec4(color.x, color.y, color.z, 1.0f);
         }
-        else {
+        else
+        {
             fragColor = color;
         }
     }
-    else {
-        float closest = radius * 2.0f + 2.0f;
-        for (float x = -radius; x <= radius; x++) {
-            for (float y = -radius; y <= radius; y++) {
-                vec4 currentColor = texture(DiffuseSampler, texCoord + vec2(texelSize.x * x, texelSize.y * y));
-                if (currentColor.a > 0.0) {
-                    float currentDist = sqrt(x * x + y * y);
-                    if (currentDist < closest) {
-                        closest = currentDist;
-                    }
+    else
+    {
+        float dist = radius * radius * 4.0;
+        for (float x = -radius; x <= radius; x++)
+        {
+            for (float y = -radius; y <= radius; y++)
+            {
+                vec4 offset = texture(DiffuseSampler, texCoord + vec2(texelSize.x * x, texelSize.y * y));
+                if (offset.a > 0.0)
+                {
+                    float ndist = x * x + y * y - 1.0;
+                    dist = min(ndist, dist);
                 }
             }
         }
-        fragColor = vec4(color.x, color.y, color.z, max(0.0, (radius - (closest - 1.0)) / radius));
+        float minDist = radius * radius;
+        if (dist > minDist)
+        {
+            fragColor = vec4(color.x, color.y, color.z, 0.0);
+        }
+        else
+        {
+            if (glow < 0.0)
+            {
+                fragColor = vec4(color.x, color.y, color.z, 1.0f);
+            }
+            else
+            {
+                fragColor = vec4(color.x, color.y, color.z, min((1.0 - (dist / minDist)) * glow, 1.0));
+            }
+        }
     }
 }
