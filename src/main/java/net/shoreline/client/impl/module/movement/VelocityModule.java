@@ -209,6 +209,7 @@ public class VelocityModule extends ToggleModule
                 else if (packet1 instanceof EntityVelocityUpdateS2CPacket)
                 {
                     event.cancel();
+                    break;
                 }
             }
         }
