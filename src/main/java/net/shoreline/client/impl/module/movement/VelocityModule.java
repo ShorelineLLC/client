@@ -154,6 +154,13 @@ public class VelocityModule extends ToggleModule
                     event.cancel();
                     cancelVelocity = true;
                 }
+                case GRIM_V3 ->
+                {
+                    if (isPhased())
+                    {
+                        event.cancel();
+                    }
+                }
             }
         }
         else if (event.getPacket() instanceof ExplosionS2CPacket packet && explosionConfig.getValue())
@@ -184,6 +191,13 @@ public class VelocityModule extends ToggleModule
                     }
                     event.cancel();
                     cancelVelocity = true;
+                }
+                case GRIM_V3 ->
+                {
+                    if (isPhased())
+                    {
+                        event.cancel();
+                    }
                 }
             }
             if (event.isCanceled())
