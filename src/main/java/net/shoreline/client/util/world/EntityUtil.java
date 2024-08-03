@@ -51,10 +51,7 @@ public class EntityUtil implements Globals
      */
     public static boolean isNeutral(Entity e)
     {
-        return e instanceof EndermanEntity enderman && !enderman.isAngry()
-                || e instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()
-                || e instanceof WolfEntity wolf && !wolf.isAttacking()
-                || e instanceof IronGolemEntity golem && !golem.isAttacking();
+        return e instanceof EndermanEntity || e instanceof ZombifiedPiglinEntity || e instanceof WolfEntity || e instanceof IronGolemEntity;
     }
 
     /**

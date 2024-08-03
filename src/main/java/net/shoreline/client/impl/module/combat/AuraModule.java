@@ -478,8 +478,7 @@ public class AuraModule extends RotationModule
                     || entity instanceof EndCrystalEntity
                     || entity instanceof ItemEntity
                     || entity instanceof ArrowEntity
-                    || entity instanceof ExperienceBottleEntity
-                    || entity instanceof PlayerEntity player && player.isCreative())
+                    || entity instanceof ExperienceBottleEntity)
             {
                 continue;
             }

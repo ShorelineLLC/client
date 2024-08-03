@@ -154,7 +154,6 @@ public class VelocityModule extends ToggleModule
                     event.cancel();
                     cancelVelocity = true;
                 }
-                case GRIM_V3 -> event.cancel();
             }
         }
         else if (event.getPacket() instanceof ExplosionS2CPacket packet && explosionConfig.getValue())
@@ -186,7 +185,6 @@ public class VelocityModule extends ToggleModule
                     event.cancel();
                     cancelVelocity = true;
                 }
-                case GRIM_V3 -> event.cancel();
             }
             if (event.isCanceled())
             {
@@ -200,10 +198,17 @@ public class VelocityModule extends ToggleModule
         {
             for (Packet<?> packet1 : packet.getPackets())
             {
-                if (packet1 instanceof ExplosionS2CPacket || packet1 instanceof EntityVelocityUpdateS2CPacket)
+                if (packet1 instanceof ExplosionS2CPacket packet2)
                 {
                     event.cancel();
+                    mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
+                            SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS,
+                            4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
                     break;
+                }
+                else if (packet1 instanceof EntityVelocityUpdateS2CPacket)
+                {
+                    event.cancel();
                 }
             }
         }
