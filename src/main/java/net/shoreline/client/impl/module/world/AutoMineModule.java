@@ -65,7 +65,7 @@ public class AutoMineModule extends RotationModule
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
-    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
+    // Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
     Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
     Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
@@ -600,14 +600,14 @@ public class AutoMineModule extends RotationModule
         }
         miningPositions.removeIf(c -> BlastResistantBlocks.isUnbreakable(c.pos()));
         miningPositions.removeAll(getPhasePosition(mc.player));
-        if (headConfig.getValue())
-        {
-            BlockPos headPos = entity.getBlockPos().up(2);
-            if (miningPositions.isEmpty() && !mc.world.getBlockState(headPos).isReplaceable())
-            {
-                miningPositions.add(new AutoMineCalc(headPos, Double.MAX_VALUE, false));
-            }
-        }
+//        if (headConfig.getValue())
+//        {
+//            BlockPos headPos = entity.getBlockPos().up(2);
+//            if (miningPositions.isEmpty() && !mc.world.getBlockState(headPos).isReplaceable())
+//            {
+//                miningPositions.add(new AutoMineCalc(headPos, Double.MAX_VALUE, false));
+//            }
+//        }
         return miningPositions;
     }
 

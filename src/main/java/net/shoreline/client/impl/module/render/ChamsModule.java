@@ -58,7 +58,7 @@ public class ChamsModule extends ToggleModule
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render chams on monsters", true));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render chams on animals", true));
     Config<Boolean> crystalsConfig = register(new BooleanConfig("Crystals", "Render chams on crystals", true));
-    Config<Boolean> popsConfig = register(new BooleanConfig("Pops", "Render chams on totem pops", false));
+    // Config<Boolean> popsConfig = register(new BooleanConfig("Pops", "Render chams on totem pops", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 1000, 3000, () -> false));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the chams", new Color(255, 0, 0, 60)));
 
@@ -130,25 +130,25 @@ public class ChamsModule extends ToggleModule
         }
     }
 
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (mc.world == null)
-        {
-            return;
-        }
-        if (event.getPacket() instanceof EntityStatusS2CPacket packet
-                && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING && popsConfig.getValue())
-        {
-            Entity entity = packet.getEntity(mc.world);
-            if (!(entity instanceof PlayerEntity player))
-            {
-                return;
-            }
-            Animation animation = new Animation(true, fadeTimeConfig.getValue());
-            fadeList.put(new FakePlayerEntity(player), animation);
-        }
-    }
+//    @EventListener
+//    public void onPacketInbound(PacketEvent.Inbound event)
+//    {
+//        if (mc.world == null)
+//        {
+//            return;
+//        }
+//        if (event.getPacket() instanceof EntityStatusS2CPacket packet
+//                && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING && popsConfig.getValue())
+//        {
+//            Entity entity = packet.getEntity(mc.world);
+//            if (!(entity instanceof PlayerEntity player))
+//            {
+//                return;
+//            }
+//            Animation animation = new Animation(true, fadeTimeConfig.getValue());
+//            fadeList.put(new FakePlayerEntity(player), animation);
+//        }
+//    }
 
     @EventListener
     public void onRenderCrystal(RenderCrystalEvent event)
