@@ -1,11 +1,12 @@
 package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.gl.PostEffectProcessor;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
-import net.shoreline.client.impl.event.render.entity.RenderEntityWorldEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.PerspectiveEvent;
 import net.shoreline.client.impl.event.render.RenderWorldBorderEvent;
@@ -78,12 +79,15 @@ public class MixinWorldRenderer implements Globals
         return instance.isThirdPerson();
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/OutlineVertexConsumerProvider;draw()V", shift = At.Shift.AFTER))
-    private void hookRender$1(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
-                              GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci)
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/PostEffectProcessor;render(F)V", ordinal = 0))
+    private void hookRender$1(PostEffectProcessor instance, float tickDelta)
     {
-        RenderShaderEvent renderOutlineShaderEvent = new RenderShaderEvent(matrices, tickDelta);
+        RenderShaderEvent renderOutlineShaderEvent = new RenderShaderEvent();
         EventBus.INSTANCE.dispatch(renderOutlineShaderEvent);
+        if (!renderOutlineShaderEvent.isCanceled())
+        {
+            instance.render(tickDelta);
+        }
     }
 
 //    /**
