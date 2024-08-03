@@ -15,15 +15,14 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.impl.event.network.SyncSelectedSlotEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.FirstOutQueue;
@@ -66,6 +65,7 @@ public class AutoMineModule extends RotationModule
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
+    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
     Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
     Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
@@ -288,6 +288,11 @@ public class AutoMineModule extends RotationModule
                         }
                     }
                 }
+                else
+                {
+                    miningQueue.removeIf(d -> d instanceof AutoMiningData);
+                    fadeList.entrySet().removeIf(d -> d instanceof AutoMiningData);
+                }
             }
         }
         if (miningQueue.isEmpty())
@@ -382,15 +387,6 @@ public class AutoMineModule extends RotationModule
             {
                 miningData2.setAttemptedBreak(true);
             }
-        }
-    }
-
-    @EventListener
-    public void onSyncSelectedSlot(SyncSelectedSlotEvent event)
-    {
-        if (mining)
-        {
-            event.cancel();
         }
     }
 
@@ -604,6 +600,14 @@ public class AutoMineModule extends RotationModule
         }
         miningPositions.removeIf(c -> BlastResistantBlocks.isUnbreakable(c.pos()));
         miningPositions.removeAll(getPhasePosition(mc.player));
+        if (headConfig.getValue())
+        {
+            BlockPos headPos = entity.getBlockPos().up(2);
+            if (miningPositions.isEmpty() && !mc.world.getBlockState(headPos).isReplaceable())
+            {
+                miningPositions.add(new AutoMineCalc(headPos, Double.MAX_VALUE, false));
+            }
+        }
         return miningPositions;
     }
 
@@ -644,6 +648,8 @@ public class AutoMineModule extends RotationModule
         }
         if (doubleBreakConfig.getValue() && !floor)
         {
+            // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
+            // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             if (grimConfig.getValue())
             {
                 Managers.INVENTORY.setSlot(data.getSlot());
@@ -728,8 +734,6 @@ public class AutoMineModule extends RotationModule
                 setRotation(rotations[0], rotations[1]);
             }
         }
-        // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
-        // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
         int slot = data.getSlot();
         boolean canSwap = slot != -1;
         if (canSwap)
