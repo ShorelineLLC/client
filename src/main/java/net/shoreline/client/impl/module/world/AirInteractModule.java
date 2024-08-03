@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.world;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -7,6 +8,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
@@ -22,6 +24,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
+import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
@@ -76,9 +79,9 @@ public final class AirInteractModule extends ToggleModule
         if (((AccessorMinecraftClient) mc).hookGetItemUseCooldown() == 0 && airPlaceTicks == 0 && !mc.player.isUsingItem()
                 && result instanceof BlockHitResult blockHitResult)
         {
-            BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
-            Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
-            if (direction != null || result.getType() == HitResult.Type.ENTITY)
+            final BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
+            final Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
+            if (direction != null || isEntityInBlockPos(blockPos))
             {
                 return;
             }
@@ -117,18 +120,30 @@ public final class AirInteractModule extends ToggleModule
             return;
         }
         final HitResult result = mc.player.raycast(rangeConfig.getValue(), 1.0f, fluidsConfig.getValue());
-        if (!(result instanceof BlockHitResult blockHitResult) || result.getType() == HitResult.Type.ENTITY)
+        if (!(result instanceof BlockHitResult blockHitResult))
         {
             return;
         }
-        BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
-        Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
-        if (direction != null)
+        final BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
+        final Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
+        if (direction != null || isEntityInBlockPos(blockPos))
         {
             return;
         }
         RenderBuffers.preRender();
         RenderManager.renderBoundingBox(event.getMatrices(), blockPos, 1.5f, ColorsModule.getInstance().getRGB(145));
         RenderBuffers.postRender();
+    }
+
+    private boolean isEntityInBlockPos(final BlockPos blockPos)
+    {
+        for (Entity entity : mc.world.getEntities())
+        {
+            if (entity.getBoundingBox().intersects(new Box(blockPos)))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

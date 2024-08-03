@@ -20,7 +20,7 @@ import java.util.List;
  * @author hockeyl8
  * @since 1.0
  */
-public class AutoAnvilRenameModule extends ToggleModule
+public final class AutoAnvilRenameModule extends ToggleModule
 {
     Config<Selection> autoRenameSelectionConfig = register(new EnumConfig<>("Selection", "The selection of items to rename", Selection.ALL, Selection.values()));
     Config<List<Item>> autoRenameWhitelistConfig = register(new ItemListConfig<>("Whitelist", "The items to rename.", Items.SHULKER_BOX, Items.WHITE_SHULKER_BOX,
@@ -101,7 +101,12 @@ public class AutoAnvilRenameModule extends ToggleModule
         delayTimer.reset();
     }
 
-    private void moveToEmptySlot(AnvilScreenHandler screenHandler, int slot) {
+    private void moveToEmptySlot(final AnvilScreenHandler screenHandler, final int slot)
+    {
+        if (mc.interactionManager == null)
+        {
+            return;
+        }
         for (int i = 3; i < 36 + 3; i++)
         {
             final ItemStack itemStack = screenHandler.getSlot(i).getStack();
@@ -115,7 +120,7 @@ public class AutoAnvilRenameModule extends ToggleModule
         mc.interactionManager.clickSlot(screenHandler.syncId, screenHandler.getSlot(slot).id, 0, SlotActionType.THROW, mc.player);
     }
 
-    private boolean equalsName(ItemStack itemStack, String itemName)
+    private boolean equalsName(final ItemStack itemStack, final String itemName)
     {
         if (itemName.trim().isEmpty())
         {

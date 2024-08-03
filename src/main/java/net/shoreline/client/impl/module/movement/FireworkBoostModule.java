@@ -18,12 +18,12 @@ import net.shoreline.eventbus.event.StageEvent;
  * @author hockeyl8
  * @since 1.0
  */
-public class FireworkBoostModule extends ToggleModule
+public final class FireworkBoostModule extends ToggleModule
 {
     Config<Double> speedConfig = register(new NumberConfig<>("Speed", "The initial speed of the rocket.", 1.0, 1.5, 10.0));
     Config<Boolean> accelerateConfig = register(new BooleanConfig("Accelerate", "Whether or not to accelerate the rocket.", false));
     Config<Double> accelSpeedConfig = register(new NumberConfig<>("AccelSpeed", "The speed to accelerate the rocket at.", 0.1, 0.5, 5.0, () -> accelerateConfig.getValue()));
-    Config<Double> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "The initial speed of the rocket.", 1.0, 1.5, 10.0, () -> accelerateConfig.getValue()));
+    Config<Double> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "The initial speed of the rocket.", 1.0, 3.0, 10.0, () -> accelerateConfig.getValue()));
 
     private int tickCounter;
 
