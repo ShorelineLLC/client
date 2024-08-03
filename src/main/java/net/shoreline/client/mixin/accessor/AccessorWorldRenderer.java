@@ -2,6 +2,7 @@ package net.shoreline.client.mixin.accessor;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.render.BlockBreakingInfo;
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.WorldRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,4 +26,7 @@ public interface AccessorWorldRenderer
      */
     @Accessor("blockBreakingInfos")
     Int2ObjectMap<BlockBreakingInfo> getBlockBreakingProgressions();
+
+    @Accessor("bufferBuilders")
+    BufferBuilderStorage hookGetBufferBuilders();
 }

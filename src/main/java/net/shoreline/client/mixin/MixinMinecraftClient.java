@@ -7,6 +7,7 @@ import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.shoreline.client.impl.event.gui.screen.pack.RefreshPacksEvent;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.client.impl.event.*;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author linus
@@ -267,5 +269,12 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
             cir.cancel();
             cir.setReturnValue(true);
         }
+    }
+
+    @Inject(method = "reloadResources(ZLnet/minecraft/client/MinecraftClient$LoadingContext;)Ljava/util/concurrent/CompletableFuture;", at = @At(value = "RETURN"))
+    private void hookReloadResources(boolean force, MinecraftClient.LoadingContext loadingContext, CallbackInfoReturnable<CompletableFuture<Void>> cir)
+    {
+        RefreshPacksEvent refreshPacksEvent = new RefreshPacksEvent();
+        EventBus.INSTANCE.dispatch(refreshPacksEvent);
     }
 }

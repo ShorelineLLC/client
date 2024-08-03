@@ -1,17 +1,22 @@
 package net.shoreline.client.impl.module.movement;
 
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.network.packet.s2c.common.KeepAliveS2CPacket;
+import net.minecraft.network.packet.s2c.common.ResourcePackRemoveS2CPacket;
+import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -19,6 +24,7 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.entity.VelocityEvent;
 import net.shoreline.client.impl.event.entity.player.PushEntityEvent;
 import net.shoreline.client.impl.event.entity.player.PushFluidsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -148,6 +154,7 @@ public class VelocityModule extends ToggleModule
                     event.cancel();
                     cancelVelocity = true;
                 }
+                case GRIM_V3 -> event.cancel();
             }
         }
         else if (event.getPacket() instanceof ExplosionS2CPacket packet && explosionConfig.getValue())
@@ -179,6 +186,7 @@ public class VelocityModule extends ToggleModule
                     event.cancel();
                     cancelVelocity = true;
                 }
+                case GRIM_V3 -> event.cancel();
             }
             if (event.isCanceled())
             {
@@ -187,6 +195,23 @@ public class VelocityModule extends ToggleModule
                         SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS,
                         4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
             }
+        }
+        else if (event.getPacket() instanceof BundleS2CPacket packet && modeConfig.getValue() == VelocityMode.GRIM_V3 && isPhased())
+        {
+            for (Packet<?> packet1 : packet.getPackets())
+            {
+                if (packet1 instanceof ExplosionS2CPacket || packet1 instanceof EntityVelocityUpdateS2CPacket)
+                {
+                    event.cancel();
+                    break;
+                }
+            }
+        }
+        else if (event.getPacket() instanceof EntityDamageS2CPacket packet && packet.entityId() == mc.player.getId() && modeConfig.getValue() == VelocityMode.GRIM_V3 && isPhased())
+        {
+            Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(false));
+            Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
+            // Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
         }
         else if (event.getPacket() instanceof EntityStatusS2CPacket packet
                 && packet.getStatus() == EntityStatuses.PULL_HOOKED_ENTITY && pushFishhookConfig.getValue())
@@ -265,6 +290,7 @@ public class VelocityModule extends ToggleModule
     private enum VelocityMode
     {
         NORMAL,
-        GRIM
+        GRIM,
+        GRIM_V3
     }
 }

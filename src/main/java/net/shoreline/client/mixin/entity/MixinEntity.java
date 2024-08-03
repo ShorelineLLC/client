@@ -59,6 +59,8 @@ public abstract class MixinEntity implements Globals
     @Shadow
     public boolean velocityDirty;
 
+    @Shadow private Vec3d velocity;
+
     /**
      * @param tickDelta
      * @param info
@@ -236,6 +238,18 @@ public abstract class MixinEntity implements Globals
         {
             cir.cancel();
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "setVelocity(Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "HEAD"), cancellable = true)
+    private void hookSetVelocity(Vec3d velocity, CallbackInfo ci)
+    {
+        VelocityEvent velocityEvent = new VelocityEvent(velocity);
+        EventBus.INSTANCE.dispatch(velocityEvent);
+        if (velocityEvent.isCanceled())
+        {
+            ci.cancel();
+            this.velocity = velocityEvent.getVelocity();
         }
     }
 }

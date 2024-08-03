@@ -80,3 +80,4 @@ accessible field net/minecraft/client/model/ModelPart children Ljava/util/Map;
 accessible field net/minecraft/client/model/ModelPart$Cuboid sides [Lnet/minecraft/client/model/ModelPart$Quad;
 accessible field net/minecraft/entity/LimbAnimator pos F
 accessible field net/minecraft/client/gui/screen/ingame/AnvilScreen nameField Lnet/minecraft/client/gui/widget/TextFieldWidget;
+accessible field net/minecraft/client/render/entity/LivingEntityRenderer features Ljava/util/List;

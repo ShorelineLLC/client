@@ -48,8 +48,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, M extend
     private void hookRender(LivingEntity livingEntity, float f, float g,
                             MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci)
     {
-        RenderEntityEvent renderEntityEvent = new RenderEntityEvent(livingEntity,
-                f, g, matrixStack, vertexConsumerProvider, i, model, getRenderLayer((T) livingEntity, true, false, false), features);
+        RenderEntityEvent renderEntityEvent = new RenderEntityEvent((LivingEntityRenderer) (Object) this, livingEntity,
+                f, g, matrixStack, vertexConsumerProvider, i, model, getRenderLayer((T) livingEntity, false, false, false), features);
         EventBus.INSTANCE.dispatch(renderEntityEvent);
         if (renderEntityEvent.isCanceled())
         {
