@@ -4,12 +4,14 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.eventbus.EventBus;
+import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
 import net.shoreline.client.impl.event.render.entity.RenderPlayerEvent;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -27,6 +29,8 @@ public class MixinPlayerEntityRenderer
     private float pitch, prevPitch;
     @Unique
     private boolean prevSneaking;
+    @Unique
+    private boolean prevFallFlying;
 
     /**
      * @param abstractClientPlayerEntity
@@ -99,5 +103,17 @@ public class MixinPlayerEntityRenderer
         abstractClientPlayerEntity.setPitch(pitch);
         abstractClientPlayerEntity.prevPitch = prevPitch;
         // abstractClientPlayerEntity.setSneaking(prevSneaking);
+    }
+
+    @Redirect(method = "setupTransforms(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;isFallFlying()Z"))
+    private boolean hookSetupTransforms(AbstractClientPlayerEntity instance)
+    {
+        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent();
+        EventBus.INSTANCE.dispatch(elytraTransformEvent);
+        if (elytraTransformEvent.isCanceled())
+        {
+            return false;
+        }
+        return instance.isFallFlying();
     }
 }

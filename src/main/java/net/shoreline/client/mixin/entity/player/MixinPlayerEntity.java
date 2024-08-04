@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.shoreline.client.impl.event.entity.player.*;
+import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.util.Globals;
@@ -146,5 +147,17 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
         {
             cir.setReturnValue(ledgeClipEvent.isClipped());
         }
+    }
+
+    @Redirect(method = "updatePose", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isFallFlying()Z"))
+    private boolean hookUpdatePose(PlayerEntity instance)
+    {
+        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent();
+        EventBus.INSTANCE.dispatch(elytraTransformEvent);
+        if (elytraTransformEvent.isCanceled())
+        {
+            return false;
+        }
+        return instance.isFallFlying();
     }
 }

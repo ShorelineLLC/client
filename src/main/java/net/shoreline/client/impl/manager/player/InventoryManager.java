@@ -199,7 +199,7 @@ public class InventoryManager implements Globals
      * @param button
      * @param type
      */
-    private int click(int slot, int button, SlotActionType type)
+    public int click(int slot, int button, SlotActionType type)
     {
         if (slot < 0)
         {
@@ -214,6 +214,33 @@ public class InventoryManager implements Globals
             list.add(slot1.getStack().copy());
         }
         screenHandler.onSlotClick(slot, button, type, mc.player);
+        Int2ObjectOpenHashMap<ItemStack> int2ObjectMap = new Int2ObjectOpenHashMap<>();
+        for (int j = 0; j < i; ++j)
+        {
+            ItemStack itemStack2;
+            ItemStack itemStack = list.get(j);
+            if (ItemStack.areEqual(itemStack, itemStack2 = defaultedList.get(j).getStack())) continue;
+            int2ObjectMap.put(j, itemStack2.copy());
+        }
+        mc.player.networkHandler.sendPacket(new ClickSlotC2SPacket(screenHandler.syncId, screenHandler.getRevision(), slot, button, type, screenHandler.getCursorStack().copy(), int2ObjectMap));
+        return screenHandler.getRevision();
+    }
+
+    public int click2(int slot, int button, SlotActionType type)
+    {
+        if (slot < 0)
+        {
+            return -1;
+        }
+        ScreenHandler screenHandler = mc.player.currentScreenHandler;
+        DefaultedList<Slot> defaultedList = screenHandler.slots;
+        int i = defaultedList.size();
+        ArrayList<ItemStack> list = Lists.newArrayListWithCapacity(i);
+        for (Slot slot1 : defaultedList)
+        {
+            list.add(slot1.getStack().copy());
+        }
+        // screenHandler.onSlotClick(slot, button, type, mc.player);
         Int2ObjectOpenHashMap<ItemStack> int2ObjectMap = new Int2ObjectOpenHashMap<>();
         for (int j = 0; j < i; ++j)
         {

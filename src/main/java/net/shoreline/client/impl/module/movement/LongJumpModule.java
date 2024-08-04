@@ -3,8 +3,13 @@ package net.shoreline.client.impl.module.movement;
 import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ElytraItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -16,13 +21,16 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus
@@ -43,6 +51,7 @@ public class LongJumpModule extends ToggleModule
     //
     private int airTicks;
     private int groundTicks;
+    private final Timer startTimer = new CacheTimer();
 
     /**
      *
@@ -87,6 +96,59 @@ public class LongJumpModule extends ToggleModule
         double dx = mc.player.getX() - mc.player.prevX;
         double dz = mc.player.getZ() - mc.player.prevZ;
         distance = Math.sqrt(dx * dx + dz * dz);
+        if (modeConfig.getValue() == JumpMode.GRIM)
+        {
+            Box bb = mc.player.getBoundingBox();
+            boolean shouldFall = false;
+            for (double i = 0.0; i < 0.55; i += 0.01)
+            {
+                if (!mc.world.isSpaceEmpty(mc.player, bb.offset(0.0, -i, 0.0)))
+                {
+                    shouldFall = true;
+                    break;
+                }
+            }
+            if (mc.player.isOnGround())
+            {
+                mc.player.jump();
+            }
+            else if (mc.player.getVelocity().y < 0.0 && shouldFall)
+            {
+                int elytraSlot = -1;
+                for (int i = 0; i < 36; i++)
+                {
+                    ItemStack stack = mc.player.getInventory().getStack(i);
+                    if (stack.getItem() instanceof ElytraItem)
+                    {
+                        elytraSlot = i;
+                        break;
+                    }
+                }
+                if (elytraSlot != -1)
+                {
+                    Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                    Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+                    Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                }
+                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                mc.player.startFallFlying();
+                if (elytraSlot != -1)
+                {
+                    Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+                    Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                    Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+                }
+            }
+        }
+    }
+
+    @EventListener
+    public void onElytraTransform(ElytraTransformEvent event)
+    {
+        if (modeConfig.getValue() == JumpMode.GRIM)
+        {
+            event.cancel();
+        }
     }
 
     @EventListener
@@ -423,6 +485,7 @@ public class LongJumpModule extends ToggleModule
     public enum JumpMode
     {
         NORMAL,
-        GLIDE
+        GLIDE,
+        GRIM
     }
 }

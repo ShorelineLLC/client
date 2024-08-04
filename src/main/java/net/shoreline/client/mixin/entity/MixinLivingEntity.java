@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.entity.*;
+import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
@@ -199,5 +200,17 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     {
         EntityTravelEvent entityTravelEvent = new EntityTravelEvent((LivingEntity) (Object) this, false);
         EventBus.INSTANCE.dispatch(entityTravelEvent);
+    }
+
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isFallFlying()Z"))
+    private boolean hookTick(LivingEntity instance)
+    {
+        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent();
+        EventBus.INSTANCE.dispatch(elytraTransformEvent);
+        if (elytraTransformEvent.isCanceled())
+        {
+            return false;
+        }
+        return instance.isFallFlying();
     }
 }
