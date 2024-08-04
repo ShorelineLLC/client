@@ -1,11 +1,20 @@
 package net.shoreline.client.impl.module.render;
 
 import ladysnake.satin.api.managed.ManagedShaderEffect;
-import ladysnake.satin.impl.ResettableManagedShaderEffect;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.EnderChestBlockEntity;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -13,12 +22,12 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.EntityOutlineEvent;
-import net.shoreline.client.impl.event.gui.screen.pack.RefreshPacksEvent;
 import net.shoreline.client.impl.event.render.ReloadShaderEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
+import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
+import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -44,8 +53,11 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render shaders on monsters", true));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render shaders on animals", true));
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render shaders on items", true));
-    Config<Boolean> otherConfig = register(new BooleanConfig("Others", "Render shaders on crystals", true));
+    Config<Boolean> otherConfig = register(new BooleanConfig("Crystals", "Render shaders on crystals", true));
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render shaders on invisible entities", true));
+//    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", false));
+//    Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", false));
+//    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", false));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.2f)));
 
     public ShadersModule()
@@ -54,39 +66,100 @@ public class ShadersModule extends ToggleModule
     }
 
     @EventListener
-    public void onEntityOutline(EntityOutlineEvent event)
+    public void onRenderEntityWorld(RenderShaderEvent event)
     {
-        if (checkShaders(event.getEntity()))
+        ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect1();
+        if (shaderEffect == null)
         {
-            event.cancel();
+            return;
         }
+        Managers.SHADER.applyShader(shaderEffect, () ->
+        {
+            shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+            shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+            shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+            shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+            shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+            shaderEffect.render(mc.getTickDelta());
+        }, () ->
+        {
+            VertexConsumerProvider vertexConsumerProvider = ((AccessorWorldRenderer) mc.worldRenderer).hookGetBufferBuilders().getEntityVertexConsumers();
+            for (Entity entity : mc.world.getEntities())
+            {
+                if (checkShaders(entity))
+                {
+                    Vec3d camera = mc.gameRenderer.getCamera().getPos();
+                    double d = MathHelper.lerp(event.getTickDelta(), entity.lastRenderX, entity.getX());
+                    double e = MathHelper.lerp(event.getTickDelta(), entity.lastRenderY, entity.getY());
+                    double f = MathHelper.lerp(event.getTickDelta(), entity.lastRenderZ, entity.getZ());
+                    float g = MathHelper.lerp(event.getTickDelta(), entity.prevYaw, entity.getYaw());
+                    EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(entity);
+                    int light = mc.getEntityRenderDispatcher().getLight(entity, event.getTickDelta());
+                    try
+                    {
+                        Vec3d vec3d = entityRenderer.getPositionOffset(entity, event.getTickDelta());
+                        double x = (d - camera.x) + vec3d.x;
+                        double y = (e - camera.y) + vec3d.y;
+                        double z = (f - camera.z) + vec3d.z;
+                        event.getMatrices().push();
+                        event.getMatrices().translate(x, y, z);
+                        entityRenderer.render(entity, g, event.getTickDelta(), event.getMatrices(), vertexConsumerProvider, light);
+                        event.getMatrices().translate(-vec3d.getX(), -vec3d.getY(), -vec3d.getZ());
+                        event.getMatrices().pop();
+                    }
+                    catch (Exception exception)
+                    {
+                        exception.printStackTrace();
+                        Shoreline.error("Failed to render shader on entity!");
+                    }
+                }
+            }
+            // ciaohack solutions
+            EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(mc.player);
+            event.getMatrices().push();
+            event.getMatrices().translate(0.0, -100000000.0, 0.0);
+            entityRenderer.render(mc.player, mc.player.getYaw(), event.getTickDelta(), event.getMatrices(), vertexConsumerProvider, 0);
+            event.getMatrices().pop();
+        });
     }
 
-    @EventListener
-    public void onRefreshPacks(RefreshPacksEvent event)
-    {
-        Managers.SHADER.reloadShadersInternal();
-    }
-
-    @EventListener
-    public void onRenderShader(RenderShaderEvent event)
-    {
-        event.cancel();
-        // TODO: Add more modes
-        ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect();
-        shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-        shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
-        shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
-        shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
-        shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
-        shaderEffect.render(mc.getTickDelta());
-    }
-
-    @EventListener
-    public void onPackRefresh(RefreshPacksEvent event)
-    {
-        Managers.SHADER.reloadShaders();
-    }
+//    @EventListener
+//    public void onRenderShaderBlocks(RenderShaderEvent.BlockEntities event)
+//    {
+//        ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect1();
+//        if (shaderEffect == null)
+//        {
+//            return;
+//        }
+//        Managers.SHADER.applyShader(shaderEffect, () ->
+//        {
+//            shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+//            shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+//            shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+//            shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+//            shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+//            shaderEffect.render(mc.getTickDelta());
+//        }, () ->
+//        {
+//            VertexConsumerProvider vertexConsumerProvider = ((AccessorWorldRenderer) mc.worldRenderer).hookGetBufferBuilders().getEntityVertexConsumers();
+//            // Blockentity shaders
+//            for (BlockEntity blockEntity : BlockUtil.blockEntities())
+//            {
+//                if (checkStorageShaders(blockEntity))
+//                {
+//                    Vec3d vec3d = mc.gameRenderer.getCamera().getPos();
+//                    double d = vec3d.getX();
+//                    double e = vec3d.getY();
+//                    double g = vec3d.getZ();
+//                    BlockPos blockPos3 = blockEntity.getPos();
+//                    event.getMatrices().push();
+//                    event.getMatrices().translate((double)blockPos3.getX() - d, (double)blockPos3.getY() - e, (double)blockPos3.getZ() - g);
+//                    mc.getBlockEntityRenderDispatcher().render(blockEntity, event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
+//                    event.getMatrices().pop();
+//                }
+//            }
+//        });
+//    }
 
     @EventListener
     public void onReloadShader(ReloadShaderEvent event)
@@ -103,7 +176,6 @@ public class ShadersModule extends ToggleModule
                 shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
                 shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                 shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
-                shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
                 shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
                 shaderEffect.render(mc.getTickDelta());
             }, () ->
@@ -117,7 +189,7 @@ public class ShadersModule extends ToggleModule
     {
         if (entity instanceof PlayerEntity && playersConfig.getValue())
         {
-            return selfConfig.getValue() || entity != mc.player;
+            return selfConfig.getValue() && (!mc.options.getPerspective().isFirstPerson() || FreecamModule.getInstance().isEnabled()) || entity != mc.player;
         }
         return (!entity.isInvisible() || invisiblesConfig.getValue())
                 && (EntityUtil.isMonster(entity) && monstersConfig.getValue()
@@ -126,6 +198,13 @@ public class ShadersModule extends ToggleModule
                 || entity instanceof EndCrystalEntity && otherConfig.getValue()
                 || entity instanceof ItemEntity && itemsConfig.getValue();
     }
+
+//    private boolean checkStorageShaders(BlockEntity blockEntity)
+//    {
+//        return blockEntity instanceof ChestBlockEntity && chestsConfig.getValue()
+//                || blockEntity instanceof EnderChestBlockEntity && echestsConfig.getValue()
+//                || blockEntity instanceof ShulkerBoxBlockEntity && shulkersConfig.getValue();
+//    }
 
     private enum ShaderMode
     {
