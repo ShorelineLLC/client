@@ -108,7 +108,7 @@ public class MixinPlayerEntityRenderer
     @Redirect(method = "setupTransforms(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;isFallFlying()Z"))
     private boolean hookSetupTransforms(AbstractClientPlayerEntity instance)
     {
-        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent();
+        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent(instance);
         EventBus.INSTANCE.dispatch(elytraTransformEvent);
         if (elytraTransformEvent.isCanceled())
         {

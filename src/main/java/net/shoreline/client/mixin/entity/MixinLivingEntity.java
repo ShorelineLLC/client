@@ -205,7 +205,7 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isFallFlying()Z"))
     private boolean hookTick(LivingEntity instance)
     {
-        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent();
+        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent(instance);
         EventBus.INSTANCE.dispatch(elytraTransformEvent);
         if (elytraTransformEvent.isCanceled())
         {

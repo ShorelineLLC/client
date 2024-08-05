@@ -8,6 +8,7 @@ uniform mat4 ProjMat;
 uniform vec2 InSize;
 uniform vec2 OutSize;
 
+//
 uniform vec2 texelSize;
 uniform vec4 color;
 uniform float radius;
@@ -50,7 +51,11 @@ void main()
         }
         else
         {
-            if (glow < 0.0)
+            if (radius < 0.0)
+            {
+                fragColor = vec4(color.x, color.y, color.z, 0.0);
+            }
+            else if (glow < 0.0)
             {
                 fragColor = vec4(color.x, color.y, color.z, 1.0f);
             }

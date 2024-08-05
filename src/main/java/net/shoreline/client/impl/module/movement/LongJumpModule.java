@@ -51,7 +51,6 @@ public class LongJumpModule extends ToggleModule
     //
     private int airTicks;
     private int groundTicks;
-    private final Timer startTimer = new CacheTimer();
 
     /**
      *
@@ -145,7 +144,7 @@ public class LongJumpModule extends ToggleModule
     @EventListener
     public void onElytraTransform(ElytraTransformEvent event)
     {
-        if (modeConfig.getValue() == JumpMode.GRIM)
+        if (modeConfig.getValue() == JumpMode.GRIM && event.getEntity() == mc.player)
         {
             event.cancel();
         }

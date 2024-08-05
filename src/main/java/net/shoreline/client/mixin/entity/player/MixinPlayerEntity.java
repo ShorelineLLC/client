@@ -152,7 +152,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
     @Redirect(method = "updatePose", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isFallFlying()Z"))
     private boolean hookUpdatePose(PlayerEntity instance)
     {
-        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent();
+        ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent(instance);
         EventBus.INSTANCE.dispatch(elytraTransformEvent);
         if (elytraTransformEvent.isCanceled())
         {

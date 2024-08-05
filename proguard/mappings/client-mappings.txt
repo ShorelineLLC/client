@@ -4675,29 +4675,28 @@ net.shoreline.client.impl.module.movement.LongJumpModule -> net.shoreline.client
     double speed -> z
     int airTicks -> aq
     int groundTicks -> ar
-    net.shoreline.client.util.math.timer.Timer startTimer -> M
-    44:63:void <init>() -> <init>
-    67:67:net.shoreline.client.impl.module.movement.LongJumpModule getInstance() -> a
-    73:73:java.lang.String getModuleData() -> x
-    79:80:void onEnable() -> q
-    85:87:void onDisable() -> r
-    92:143:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    148:152:void onElytraTransform(net.shoreline.client.impl.event.render.entity.ElytraTransformEvent) -> a
-    157:214:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
-    220:439:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
-    444:454:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    482:482:double getJumpCollisions(net.minecraft.class_1657,double) -> a
+    44:62:void <init>() -> <init>
+    66:66:net.shoreline.client.impl.module.movement.LongJumpModule getInstance() -> a
+    72:72:java.lang.String getModuleData() -> x
+    78:79:void onEnable() -> q
+    84:86:void onDisable() -> r
+    91:142:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    147:151:void onElytraTransform(net.shoreline.client.impl.event.render.entity.ElytraTransformEvent) -> a
+    156:213:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
+    219:438:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
+    443:453:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    481:481:double getJumpCollisions(net.minecraft.class_1657,double) -> a
     45:45:java.lang.Boolean lambda$new$0() -> h
 net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode -> net.shoreline.client.ju:
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode NORMAL -> a
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode GLIDE -> b
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode GRIM -> c
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] $VALUES -> a
-    485:485:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] values() -> values
-    485:485:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode valueOf(java.lang.String) -> valueOf
-    485:485:void <init>(java.lang.String,int) -> <init>
-    485:485:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] $values() -> a
-    485:489:void <clinit>() -> <clinit>
+    484:484:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] values() -> values
+    484:484:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode valueOf(java.lang.String) -> valueOf
+    484:484:void <init>(java.lang.String,int) -> <init>
+    484:484:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] $values() -> a
+    484:488:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.NoAccelModule -> net.shoreline.client.jv:
     net.shoreline.client.api.config.Config airConfig -> fi
     net.shoreline.client.api.config.Config downwardsConfig -> fj
@@ -4854,7 +4853,7 @@ net.shoreline.client.impl.module.movement.StepModule -> net.shoreline.client.jH:
     net.shoreline.client.api.config.Config strictConfig -> eY
     net.shoreline.client.api.config.Config entityStepConfig -> fC
     boolean cancelTimer -> ac
-    net.shoreline.client.util.math.timer.Timer stepTimer -> N
+    net.shoreline.client.util.math.timer.Timer stepTimer -> M
     33:49:void <init>() -> <init>
     54:54:java.lang.String getModuleData() -> x
     60:66:void onDisable() -> r
@@ -4906,34 +4905,34 @@ net.shoreline.client.impl.module.movement.VelocityModule -> net.shoreline.client
     net.shoreline.client.api.config.Config pushLiquidsConfig -> fM
     net.shoreline.client.api.config.Config pushFishhookConfig -> fN
     boolean cancelVelocity -> ad
-    51:70:void <init>() -> <init>
-    74:74:net.shoreline.client.impl.module.movement.VelocityModule getInstance() -> a
-    80:87:java.lang.String getModuleData() -> x
-    93:94:void onEnable() -> q
-    99:117:void onDisable() -> r
-    122:245:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    250:269:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
-    274:278:void onPushEntity(net.shoreline.client.impl.event.entity.player.PushEntityEvent) -> a
-    283:287:void onPushOutOfBlocks(net.shoreline.client.impl.event.network.PushOutOfBlocksEvent) -> a
-    292:296:void onPushFluid(net.shoreline.client.impl.event.entity.player.PushFluidsEvent) -> a
-    300:307:boolean isPhased() -> az
-    218:220:void lambda$onPacketInbound$3(net.minecraft.class_2664) -> a
-    206:208:void lambda$onPacketInbound$2(net.minecraft.class_2664) -> b
-    55:55:java.lang.Boolean lambda$new$1() -> a
-    54:54:java.lang.Boolean lambda$new$0() -> h
+    44:63:void <init>() -> <init>
+    67:67:net.shoreline.client.impl.module.movement.VelocityModule getInstance() -> a
+    73:80:java.lang.String getModuleData() -> x
+    86:87:void onEnable() -> q
+    92:110:void onDisable() -> r
+    115:238:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    243:262:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
+    267:271:void onPushEntity(net.shoreline.client.impl.event.entity.player.PushEntityEvent) -> a
+    276:280:void onPushOutOfBlocks(net.shoreline.client.impl.event.network.PushOutOfBlocksEvent) -> a
+    285:289:void onPushFluid(net.shoreline.client.impl.event.entity.player.PushFluidsEvent) -> a
+    293:300:boolean isPhased() -> az
+    211:213:void lambda$onPacketInbound$3(net.minecraft.class_2664) -> a
+    199:201:void lambda$onPacketInbound$2(net.minecraft.class_2664) -> b
+    48:48:java.lang.Boolean lambda$new$1() -> a
+    47:47:java.lang.Boolean lambda$new$0() -> h
 net.shoreline.client.impl.module.movement.VelocityModule$1 -> net.shoreline.client.jM:
     int[] $SwitchMap$net$shoreline$client$impl$module$movement$VelocityModule$VelocityMode -> v
-    132:132:void <clinit>() -> <clinit>
+    125:125:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode -> net.shoreline.client.jN:
     net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode NORMAL -> a
     net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode GRIM -> b
     net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode GRIM_V3 -> c
     net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode[] $VALUES -> a
-    310:310:net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode[] values() -> values
-    310:310:net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode valueOf(java.lang.String) -> valueOf
-    310:310:void <init>(java.lang.String,int) -> <init>
-    310:310:net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode[] $values() -> a
-    310:314:void <clinit>() -> <clinit>
+    303:303:net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode[] values() -> values
+    303:303:net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode valueOf(java.lang.String) -> valueOf
+    303:303:void <init>(java.lang.String,int) -> <init>
+    303:303:net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode[] $values() -> a
+    303:307:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.YawModule -> net.shoreline.client.jO:
     net.shoreline.client.api.config.Config lockConfig -> eI
     22:27:void <init>() -> <init>
