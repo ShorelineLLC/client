@@ -25,8 +25,6 @@ import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.impl.module.exploit.PacketFlyModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -97,6 +95,20 @@ public class LongJumpModule extends ToggleModule
         distance = Math.sqrt(dx * dx + dz * dz);
         if (modeConfig.getValue() == JumpMode.GRIM)
         {
+            int elytraSlot = -1;
+            for (int i = 0; i < 36; i++)
+            {
+                ItemStack stack = mc.player.getInventory().getStack(i);
+                if (stack.getItem() instanceof ElytraItem)
+                {
+                    elytraSlot = i;
+                    break;
+                }
+            }
+            if (elytraSlot == -1)
+            {
+                return;
+            }
             Box bb = mc.player.getBoundingBox();
             boolean shouldFall = false;
             for (double i = 0.0; i < 0.55; i += 0.01)
@@ -113,30 +125,14 @@ public class LongJumpModule extends ToggleModule
             }
             else if (mc.player.getVelocity().y < 0.0 && shouldFall)
             {
-                int elytraSlot = -1;
-                for (int i = 0; i < 36; i++)
-                {
-                    ItemStack stack = mc.player.getInventory().getStack(i);
-                    if (stack.getItem() instanceof ElytraItem)
-                    {
-                        elytraSlot = i;
-                        break;
-                    }
-                }
-                if (elytraSlot != -1)
-                {
-                    Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
-                    Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
-                    Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
-                }
+                Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
                 Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
                 mc.player.startFallFlying();
-                if (elytraSlot != -1)
-                {
-                    Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
-                    Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
-                    Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
-                }
+                Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
             }
         }
     }

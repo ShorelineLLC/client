@@ -1600,7 +1600,9 @@ net.shoreline.client.impl.event.render.block.entity.RenderBlockEntityEvent -> ne
 net.shoreline.client.impl.event.render.block.entity.RenderSignTextEvent -> net.shoreline.client.ec:
     7:7:void <init>() -> <init>
 net.shoreline.client.impl.event.render.entity.ElytraTransformEvent -> net.shoreline.client.ed:
-    7:7:void <init>() -> <init>
+    net.minecraft.class_1297 entity -> j
+    13:15:void <init>(net.minecraft.class_1297) -> <init>
+    19:19:net.minecraft.class_1297 getEntity() -> a
 net.shoreline.client.impl.event.render.entity.RenderArmorEvent -> net.shoreline.client.ee:
     net.minecraft.class_1309 entity -> e
     17:19:void <init>(net.minecraft.class_1309) -> <init>
@@ -1640,7 +1642,7 @@ net.shoreline.client.impl.event.render.entity.RenderEntityInvisibleEvent -> net.
     13:15:void <init>(net.minecraft.class_1309) -> <init>
     19:19:net.minecraft.class_1309 getEntity() -> a
 net.shoreline.client.impl.event.render.entity.RenderEntityWorldEvent -> net.shoreline.client.ei:
-    net.minecraft.class_1297 entity -> j
+    net.minecraft.class_1297 entity -> k
     double cameraX -> p
     double cameraY -> q
     double cameraZ -> r
@@ -1656,7 +1658,7 @@ net.shoreline.client.impl.event.render.entity.RenderItemEvent -> net.shoreline.c
     17:19:void <init>(net.minecraft.class_1542) -> <init>
     23:23:net.minecraft.class_1542 getItem() -> a
 net.shoreline.client.impl.event.render.entity.RenderLabelEvent -> net.shoreline.client.em:
-    net.minecraft.class_1297 entity -> k
+    net.minecraft.class_1297 entity -> l
     17:19:void <init>(net.minecraft.class_1297) -> <init>
     23:23:net.minecraft.class_1297 getEntity() -> a
 net.shoreline.client.impl.event.render.entity.RenderLivingEntityEvent -> net.shoreline.client.en:
@@ -1721,7 +1723,7 @@ net.shoreline.client.impl.event.text.TextVisitEvent -> net.shoreline.client.eu:
 net.shoreline.client.impl.event.toast.RenderToastEvent -> net.shoreline.client.ev:
     7:7:void <init>() -> <init>
 net.shoreline.client.impl.event.world.AddEntityEvent -> net.shoreline.client.ew:
-    net.minecraft.class_1297 entity -> l
+    net.minecraft.class_1297 entity -> m
     11:13:void <init>(net.minecraft.class_1297) -> <init>
     17:17:net.minecraft.class_1297 getEntity() -> a
 net.shoreline.client.impl.event.world.BlindnessEvent -> net.shoreline.client.ex:
@@ -1761,7 +1763,7 @@ net.shoreline.client.impl.event.world.PlaySoundEvent -> net.shoreline.client.eD:
     31:31:net.minecraft.class_3414 getSoundEvent() -> a
     36:36:net.minecraft.class_3419 getCategory() -> a
 net.shoreline.client.impl.event.world.RemoveEntityEvent -> net.shoreline.client.eE:
-    net.minecraft.class_1297 entity -> m
+    net.minecraft.class_1297 entity -> n
     net.minecraft.class_1297$class_5529 removalReason -> a
     13:16:void <init>(net.minecraft.class_1297,net.minecraft.class_1297$class_5529) -> <init>
     23:23:net.minecraft.class_1297 getEntity() -> a
@@ -1795,7 +1797,7 @@ net.shoreline.client.impl.event.world.UnloadChunkBlocksEvent -> net.shoreline.cl
     18:20:boolean contains(net.minecraft.class_2338) -> a
 net.shoreline.client.impl.event.world.UpdateCrosshairTargetEvent -> net.shoreline.client.eL:
     float tickDelta -> S
-    net.minecraft.class_1297 cameraEntity -> n
+    net.minecraft.class_1297 cameraEntity -> o
     17:20:void <init>(float,net.minecraft.class_1297) -> <init>
     24:24:float getTickDelta() -> b
     29:29:net.minecraft.class_1297 getCameraEntity() -> d
@@ -2859,7 +2861,7 @@ net.shoreline.client.impl.module.combat.AuraModule -> net.shoreline.client.gz:
     net.shoreline.client.api.config.Config invisiblesConfig -> aU
     net.shoreline.client.api.config.Config renderConfig -> aV
     net.shoreline.client.api.config.Config disableDeathConfig -> aW
-    net.minecraft.class_1297 entityTarget -> o
+    net.minecraft.class_1297 entityTarget -> p
     long randomDelay -> d
     boolean shielding -> F
     boolean sneaking -> A
@@ -3177,7 +3179,7 @@ net.shoreline.client.impl.module.combat.AutoCrystalModule$AttackCrystalTask -> n
 net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData -> net.shoreline.client.gL:
     java.util.List tags -> o
     java.lang.Object damageData -> c
-    net.minecraft.class_1297 attackTarget -> p
+    net.minecraft.class_1297 attackTarget -> q
     net.minecraft.class_2338 blockPos -> h
     double damage -> s
     double selfDamage -> t
@@ -3416,7 +3418,7 @@ net.shoreline.client.impl.module.combat.BowAimModule -> net.shoreline.client.ha:
     net.shoreline.client.api.config.Config neutralsConfig -> aS
     net.shoreline.client.api.config.Config animalsConfig -> aT
     net.shoreline.client.api.config.Config invisiblesConfig -> aU
-    net.minecraft.class_1297 aimTarget -> q
+    net.minecraft.class_1297 aimTarget -> r
     25:39:void <init>() -> <init>
     44:74:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
     79:83:void onLookDirection(net.shoreline.client.impl.event.entity.LookDirectionEvent) -> a
@@ -4448,19 +4450,19 @@ net.shoreline.client.impl.module.movement.ElytraFlyModule -> net.shoreline.clien
     190:203:void onEntityTravel(net.shoreline.client.impl.event.entity.EntityTravelEvent) -> b
     208:318:void onTravel(net.shoreline.client.impl.event.entity.player.TravelEvent) -> b
     323:345:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
-    350:375:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
-    380:385:void onJumpDelay(net.shoreline.client.impl.event.entity.JumpDelayEvent) -> a
-    390:407:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    412:426:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> b
-    430:457:void boostFirework() -> P
-    461:461:boolean isBoostedByRocket() -> ag
-    466:469:net.minecraft.class_243 glideElytra(float) -> b
-    474:504:net.minecraft.class_243 glideElytraVanilla(float) -> c
-    509:515:net.minecraft.class_243 getRotationVector(float,float) -> a
-    520:525:boolean recastElytra() -> an
-    530:535:boolean checkElytra() -> ao
-    540:549:boolean checkFallFlying() -> ap
-    454:454:net.minecraft.class_2596 lambda$boostFirework$11(int) -> f
+    350:376:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
+    381:386:void onJumpDelay(net.shoreline.client.impl.event.entity.JumpDelayEvent) -> a
+    391:408:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    413:427:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> b
+    431:458:void boostFirework() -> P
+    462:462:boolean isBoostedByRocket() -> ag
+    467:470:net.minecraft.class_243 glideElytra(float) -> b
+    475:505:net.minecraft.class_243 glideElytraVanilla(float) -> c
+    510:516:net.minecraft.class_243 getRotationVector(float,float) -> a
+    521:526:boolean recastElytra() -> an
+    531:536:boolean checkElytra() -> ao
+    541:546:boolean checkFallFlying() -> ap
+    455:455:net.minecraft.class_2596 lambda$boostFirework$11(int) -> f
     61:61:java.lang.Boolean lambda$new$10() -> v
     60:60:java.lang.Boolean lambda$new$9() -> w
     59:59:java.lang.Boolean lambda$new$8() -> x
@@ -4482,11 +4484,11 @@ net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode -> net.shoreli
     net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode PACKET -> d
     net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode BOUNCE -> e
     net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode[] $VALUES -> a
-    552:552:net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode[] values() -> values
-    552:552:net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode valueOf(java.lang.String) -> valueOf
-    552:552:void <init>(java.lang.String,int) -> <init>
-    552:552:net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode[] $values() -> a
-    552:558:void <clinit>() -> <clinit>
+    549:549:net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode[] values() -> values
+    549:549:net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode valueOf(java.lang.String) -> valueOf
+    549:549:void <init>(java.lang.String,int) -> <init>
+    549:549:net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode[] $values() -> a
+    549:555:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.EntityControlModule -> net.shoreline.client.jd:
     net.shoreline.client.api.config.Config jumpStrengthConfig -> eV
     net.shoreline.client.api.config.Config noPigMoveConfig -> eW
@@ -4605,12 +4607,12 @@ net.shoreline.client.impl.module.movement.FlightModule -> net.shoreline.client.j
     59:59:java.lang.String getModuleData() -> x
     65:70:void onEnable() -> q
     75:80:void onDisable() -> r
-    85:167:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
-    172:212:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> b
-    216:218:boolean floatingCheck(net.minecraft.class_2828) -> a
-    223:223:boolean isEntityOnAir(net.minecraft.class_1297) -> s
-    228:230:void enableVanillaFly() -> Q
-    234:240:void disableVanillaFly() -> R
+    85:168:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
+    173:203:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> b
+    207:209:boolean floatingCheck(net.minecraft.class_2828) -> a
+    214:214:boolean isEntityOnAir(net.minecraft.class_1297) -> s
+    219:221:void enableVanillaFly() -> Q
+    225:231:void disableVanillaFly() -> R
     36:36:java.lang.Boolean lambda$new$1() -> a
     35:35:java.lang.Boolean lambda$new$0() -> h
 net.shoreline.client.impl.module.movement.FlightModule$AntiKick -> net.shoreline.client.jo:
@@ -4618,24 +4620,24 @@ net.shoreline.client.impl.module.movement.FlightModule$AntiKick -> net.shoreline
     net.shoreline.client.impl.module.movement.FlightModule$AntiKick PACKET -> b
     net.shoreline.client.impl.module.movement.FlightModule$AntiKick OFF -> c
     net.shoreline.client.impl.module.movement.FlightModule$AntiKick[] $VALUES -> a
-    248:248:net.shoreline.client.impl.module.movement.FlightModule$AntiKick[] values() -> values
-    248:248:net.shoreline.client.impl.module.movement.FlightModule$AntiKick valueOf(java.lang.String) -> valueOf
-    248:248:void <init>(java.lang.String,int) -> <init>
-    248:248:net.shoreline.client.impl.module.movement.FlightModule$AntiKick[] $values() -> a
-    248:252:void <clinit>() -> <clinit>
+    239:239:net.shoreline.client.impl.module.movement.FlightModule$AntiKick[] values() -> values
+    239:239:net.shoreline.client.impl.module.movement.FlightModule$AntiKick valueOf(java.lang.String) -> valueOf
+    239:239:void <init>(java.lang.String,int) -> <init>
+    239:239:net.shoreline.client.impl.module.movement.FlightModule$AntiKick[] $values() -> a
+    239:243:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.FlightModule$FlightMode -> net.shoreline.client.jp:
     net.shoreline.client.impl.module.movement.FlightModule$FlightMode NORMAL -> a
     net.shoreline.client.impl.module.movement.FlightModule$FlightMode VANILLA -> b
     net.shoreline.client.impl.module.movement.FlightModule$FlightMode[] $VALUES -> a
-    242:242:net.shoreline.client.impl.module.movement.FlightModule$FlightMode[] values() -> values
-    242:242:net.shoreline.client.impl.module.movement.FlightModule$FlightMode valueOf(java.lang.String) -> valueOf
-    242:242:void <init>(java.lang.String,int) -> <init>
-    242:242:net.shoreline.client.impl.module.movement.FlightModule$FlightMode[] $values() -> a
-    242:245:void <clinit>() -> <clinit>
+    233:233:net.shoreline.client.impl.module.movement.FlightModule$FlightMode[] values() -> values
+    233:233:net.shoreline.client.impl.module.movement.FlightModule$FlightMode valueOf(java.lang.String) -> valueOf
+    233:233:void <init>(java.lang.String,int) -> <init>
+    233:233:net.shoreline.client.impl.module.movement.FlightModule$FlightMode[] $values() -> a
+    233:236:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.IceSpeedModule -> net.shoreline.client.jq:
-    20:22:void <init>() -> <init>
-    27:35:void onEnable() -> q
-    40:48:void onDisable() -> r
+    16:17:void <init>() -> <init>
+    22:30:void onEnable() -> q
+    35:43:void onDisable() -> r
 net.shoreline.client.impl.module.movement.JesusModule -> net.shoreline.client.jr:
     net.shoreline.client.api.config.Config modeConfig -> au
     net.shoreline.client.api.config.Config strictConfig -> eY
@@ -4675,28 +4677,28 @@ net.shoreline.client.impl.module.movement.LongJumpModule -> net.shoreline.client
     double speed -> z
     int airTicks -> aq
     int groundTicks -> ar
-    44:62:void <init>() -> <init>
-    66:66:net.shoreline.client.impl.module.movement.LongJumpModule getInstance() -> a
-    72:72:java.lang.String getModuleData() -> x
-    78:79:void onEnable() -> q
-    84:86:void onDisable() -> r
-    91:142:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    147:151:void onElytraTransform(net.shoreline.client.impl.event.render.entity.ElytraTransformEvent) -> a
-    156:213:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
-    219:438:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
-    443:453:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    481:481:double getJumpCollisions(net.minecraft.class_1657,double) -> a
-    45:45:java.lang.Boolean lambda$new$0() -> h
+    42:60:void <init>() -> <init>
+    64:64:net.shoreline.client.impl.module.movement.LongJumpModule getInstance() -> a
+    70:70:java.lang.String getModuleData() -> x
+    76:77:void onEnable() -> q
+    82:84:void onDisable() -> r
+    89:138:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    143:147:void onElytraTransform(net.shoreline.client.impl.event.render.entity.ElytraTransformEvent) -> a
+    152:209:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
+    215:434:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
+    439:449:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    477:477:double getJumpCollisions(net.minecraft.class_1657,double) -> a
+    43:43:java.lang.Boolean lambda$new$0() -> h
 net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode -> net.shoreline.client.ju:
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode NORMAL -> a
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode GLIDE -> b
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode GRIM -> c
     net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] $VALUES -> a
-    484:484:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] values() -> values
-    484:484:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode valueOf(java.lang.String) -> valueOf
-    484:484:void <init>(java.lang.String,int) -> <init>
-    484:484:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] $values() -> a
-    484:488:void <clinit>() -> <clinit>
+    480:480:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] values() -> values
+    480:480:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode valueOf(java.lang.String) -> valueOf
+    480:480:void <init>(java.lang.String,int) -> <init>
+    480:480:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] $values() -> a
+    480:484:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.NoAccelModule -> net.shoreline.client.jv:
     net.shoreline.client.api.config.Config airConfig -> fi
     net.shoreline.client.api.config.Config downwardsConfig -> fj

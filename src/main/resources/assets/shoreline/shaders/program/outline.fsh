@@ -51,7 +51,7 @@ void main()
         }
         else
         {
-            if (radius < 0.0)
+            if (radius <= 0.0)
             {
                 fragColor = vec4(color.x, color.y, color.z, 0.0);
             }

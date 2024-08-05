@@ -360,6 +360,7 @@ public class ElytraFlyModule extends RotationModule
                 if (mc.player.fallDistance > 0 && checkElytra())
                 {
                     mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                    mc.player.startFallFlying();
                 }
             }
             return;
@@ -540,11 +541,7 @@ public class ElytraFlyModule extends RotationModule
         if (!mc.player.isTouchingWater() && !mc.player.hasStatusEffect(StatusEffects.LEVITATION))
         {
             ItemStack itemStack = mc.player.getEquippedStack(EquipmentSlot.CHEST);
-            if (itemStack.isOf(Items.ELYTRA) && ElytraItem.isUsable(itemStack))
-            {
-                mc.player.startFallFlying();
-                return true;
-            }
+            return itemStack.isOf(Items.ELYTRA) && ElytraItem.isUsable(itemStack);
         }
         return false;
     }

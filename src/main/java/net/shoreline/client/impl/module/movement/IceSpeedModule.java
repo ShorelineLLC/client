@@ -11,14 +11,9 @@ import net.shoreline.client.mixin.accessor.AccessorAbstractBlock;
  */
 public class IceSpeedModule extends ToggleModule
 {
-
-    /**
-     *
-     */
     public IceSpeedModule()
     {
-        super("IceSpeed", "Modifies the walking speed on ice",
-                ModuleCategory.MOVEMENT);
+        super("IceSpeed", "Modifies the walking speed on ice", ModuleCategory.MOVEMENT);
     }
 
     @Override

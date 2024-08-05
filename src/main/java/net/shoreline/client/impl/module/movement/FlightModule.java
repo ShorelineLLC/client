@@ -119,6 +119,7 @@ public class FlightModule extends ToggleModule
         if (floating)
         {
             floatingTicks++;
+            // Vanilla fly kick checks every 80 ticks
             if (floatingTicks >= 20)
             {
                 if (antiKickConfig.getValue() == AntiKick.PACKET)
@@ -175,34 +176,24 @@ public class FlightModule extends ToggleModule
         }
         if (event.getPacket() instanceof PlayerMoveC2SPacket packet && antiKickConfig.getValue() != AntiKick.OFF)
         {
-            double packetY = packet.getY(Double.NaN);
-            // Vanilla fly kick checks every 80 ticks
+            final double packetY = packet.getY(Double.NaN);
             if (!Double.isNaN(packetY))
             {
                 if (modifyY)
                 {
                     ((AccessorPlayerMoveC2SPacket) packet).hookSetY(lastY - 0.04);
                     modifyY = false;
+                    return;
                 }
-                else
-                {
-                    floating = floatingCheck(packet);
-                    lastY = packetY;
-                }
+                floating = floatingCheck(packet);
+                lastY = packetY;
             }
             else
             {
                 if (modifyY)
                 {
-                    PlayerMoveC2SPacket packet1;
-                    if (packet.changesLook())
-                    {
-                        packet1 = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround());
-                    }
-                    else
-                    {
-                        packet1 = new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), packet.isOnGround());
-                    }
+                    PlayerMoveC2SPacket packet1 = packet.changesLook() ? new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround()) :
+                            new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), packet.isOnGround());
                     event.cancel();
                     Managers.NETWORK.sendQuietPacket(packet1);
                     modifyY = false;
