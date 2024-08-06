@@ -319,19 +319,26 @@ public class AutoMineModule extends RotationModule
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (data.getBlockDamage() >= 0.8f && isDataPacketMine(data))
+            if (isDataPacketMine(data))
             {
-                if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+                if (data.getBlockDamage() >= 0.1f && data.getBlockDamage() < 0.9f)
                 {
-                    return;
+                    Managers.INVENTORY.syncToClient();
                 }
-                if (data.getSlot() != -1)
+                else if (data.getBlockDamage() >= 0.9f)
                 {
-                    mining = true;
-                    Managers.INVENTORY.setSlot(data.getSlot());
-                    if (!data.hasAttemptedBreak())
+                    if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                     {
-                        data.setAttemptedBreak(true);
+                        return;
+                    }
+                    if (data.getSlot() != -1)
+                    {
+                        mining = true;
+                        Managers.INVENTORY.setSlot(data.getSlot());
+                        if (!data.hasAttemptedBreak())
+                        {
+                            data.setAttemptedBreak(true);
+                        }
                     }
                 }
             }
@@ -661,10 +668,6 @@ public class AutoMineModule extends RotationModule
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             packetMines.add(data.getPos());
-            if (grimConfig.getValue())
-            {
-                Managers.INVENTORY.syncToClient();
-            }
         }
         else
         {
