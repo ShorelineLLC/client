@@ -170,6 +170,11 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     private void hookDamage(DamageSource source, float amount, CallbackInfo ci)
     {
         // Idk this doesnt work with direct checks??
+        if (mc.player == null)
+        {
+            return;
+        }
+
         if (source.getAttacker() != null && source.getAttacker().getName().getString().equalsIgnoreCase(mc.player.getName().getString()))
         {
             PlayerDamageEvent playerDamageEvent = new PlayerDamageEvent((LivingEntity) (Object) this);
