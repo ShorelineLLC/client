@@ -74,6 +74,7 @@
     "gui.screen.MixinChatScreen",
     "gui.screen.MixinConnectScreen",
     "gui.screen.MixinDisconnectedScreen",
+    "gui.screen.MixinGameMenuScreen",
     "gui.screen.MixinHandledScreen",
     "gui.screen.MixinScreen",
     "gui.screen.MixinTitleScreen",

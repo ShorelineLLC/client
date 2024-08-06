@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.client;
 
 import net.minecraft.network.packet.c2s.common.ResourcePackStatusC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.shoreline.client.Shoreline;
@@ -8,6 +9,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.impl.event.gui.screen.MenuDisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -23,6 +25,7 @@ public final class ServerModule extends ConcurrentModule
     Config<Boolean> demoConfig = register(new BooleanConfig("NoDemo", "Prevents servers from forcing you to a demo screen", true));
     Config<Boolean> resourcePackConfig = register(new BooleanConfig("NoResourcePack", "Prevents server from forcing resource pack", false));
     Config<Boolean> antiCrashConfig = register(new BooleanConfig("NoServerCrash", "Prevents server packets from crashing the client", false));
+    Config<Boolean> illegalDisconnectConfig = register(new BooleanConfig("IllegalDisconnect", "Disconnects by getting kicked from server", false));
 
     public ServerModule()
     {
@@ -81,6 +84,16 @@ public final class ServerModule extends ConcurrentModule
             {
                 event.cancel();
             }
+        }
+    }
+
+    @EventListener
+    public void onMenuDisconnect(MenuDisconnectEvent event)
+    {
+        if (illegalDisconnectConfig.getValue())
+        {
+            event.cancel();
+            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(mc.player, false)); // Illegal packet
         }
     }
 }
