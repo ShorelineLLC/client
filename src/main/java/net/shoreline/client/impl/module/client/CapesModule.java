@@ -7,7 +7,10 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.CapesEvent;
+import net.shoreline.client.impl.irc.IRCManager;
+import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.eventbus.annotation.EventListener;
+import org.jetbrains.annotations.NotNull;
 
 public final class CapesModule extends ToggleModule
 {
@@ -29,14 +32,32 @@ public final class CapesModule extends ToggleModule
         }
         event.cancel();
         event.setShowOptifine(optifineConfig.getValue());
-        if (event.getGameProfile().getName().equalsIgnoreCase(mc.player.getGameProfile().getName()))
+        if (clientConfig.getValue() != Capes.OFF)
         {
-            switch (clientConfig.getValue())
+            OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(event.getGameProfile().getName());
+            if (onlineUser != null)
             {
-                case WHITE -> event.setTexture(new Identifier("shoreline", "cape/cape_white.png"));
-                case BLACK -> event.setTexture(new Identifier("shoreline", "cape/cape_black.png"));
+                String capePath = getCapePath(onlineUser);
+                event.setTexture(new Identifier("shoreline", capePath));
             }
         }
+    }
+
+    private String getCapePath(OnlineUser onlineUser)
+    {
+        StringBuilder capePath = new StringBuilder("cape");
+        switch (clientConfig.getValue())
+        {
+            case WHITE -> capePath.append("/white_bg");
+            case BLACK -> capePath.append("/black_bg");
+        }
+        switch (onlineUser.getUsertype())
+        {
+            // case RELEASE -> capePath.append("/white.png");
+            case BETA, RELEASE -> capePath.append("/blue.png");
+            case DEV -> capePath.append("/red.png");
+        }
+        return capePath.toString();
     }
 
     public enum Capes

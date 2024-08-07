@@ -25,9 +25,6 @@ public class NoFallModule extends ToggleModule
     //
     Config<NoFallMode> modeConfig = register(new EnumConfig<>("Mode", "The mode to prevent fall damage", NoFallMode.ANTI, NoFallMode.values()));
 
-    /**
-     *
-     */
     public NoFallModule()
     {
         super("NoFall", "Prevents all fall damage", ModuleCategory.MOVEMENT);

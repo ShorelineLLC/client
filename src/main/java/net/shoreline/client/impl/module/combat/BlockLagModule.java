@@ -116,6 +116,7 @@ public class BlockLagModule extends ObsidianPlacerModule
             {
                 Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking()));
                 Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                break;
             }
         }
 

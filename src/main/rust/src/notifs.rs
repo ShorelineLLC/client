@@ -70,7 +70,7 @@ pub unsafe fn display_error_msg(msg: &str)
 
 pub unsafe fn display_confirmation_msg(msg: &str) -> bool
 {
-    platform::display_confirmation_message(msg)
+    platform::display_confirmation_msg(msg)
 }
 
 #[cfg(target_os = "windows")]
@@ -134,7 +134,17 @@ mod platform
 #[cfg(target_os = "macos")]
 mod platform
 {
-    pub fn display_error_msg(msg: String)
+    pub fn display_info_msg(msg: &str)
+    {
+        std::panic!("not implemented");
+    }
+
+    pub fn display_error_msg(msg: &str)
+    {
+        std::panic!("not implemented");
+    }
+
+    pub fn display_confirmation_msg(msg: &str) -> bool
     {
         std::panic!("not implemented");
     }
@@ -143,7 +153,17 @@ mod platform
 #[cfg(target_os = "linux")]
 mod platform
 {
-    pub fn display_error_msg(msg: String)
+    pub fn display_info_msg(msg: &str)
+    {
+        std::panic!("not implemented");
+    }
+
+    pub fn display_error_msg(msg: &str)
+    {
+        std::panic!("not implemented");
+    }
+
+    pub fn display_confirmation_msg(msg: &str) -> bool
     {
         std::panic!("not implemented");
     }

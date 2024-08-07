@@ -21,6 +21,7 @@ import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -36,6 +37,8 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
 import net.shoreline.client.impl.event.world.PlaySoundEvent;
+import net.shoreline.client.impl.irc.IRCManager;
+import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.init.Fonts;
@@ -68,6 +71,7 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> itemNameConfig = register(new BooleanConfig("ItemName", "Displays the player's current held item name", false));
     Config<Boolean> entityIdConfig = register(new BooleanConfig("EntityId", "Displays the player's entity id", false));
     Config<Boolean> gamemodeConfig = register(new BooleanConfig("Gamemode", "Displays the player's gamemode", false));
+    Config<Boolean> onlineUsersConfig = register(new BooleanConfig("OnlineUsers", "Displays the online users of Shoreline", true));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Displays the player's server connection ping", true));
     Config<Boolean> healthConfig = register(new BooleanConfig("Health", "Displays the player's current health", true));
     Config<Boolean> totemsConfig = register(new BooleanConfig("Totems", "Displays the player's popped totem count", false));
@@ -75,6 +79,7 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Renders nametags on invisible players", true));
     Config<Boolean> backgroundConfig = register(new BooleanConfig("Background", "Renders a background behind the nametag", true));
     Config<Boolean> borderedConfig = register(new BooleanConfig("Border", "Renders a border around the nametag", false));
+    Config<Float> thicknessConfig = register(new NumberConfig<>("Thickness", "The border thickness", 0.1f, 0.5f, 1.0f, () -> borderedConfig.getValue()));
     Config<Boolean> tamedConfig = register(new BooleanConfig("TamedMobs", "Renders nametags on tamed mobs", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
     Config<Boolean> droppedItemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
@@ -110,7 +115,6 @@ public class NametagsModule extends ToggleModule
         Vec3d interpolate = Interpolation.getRenderPosition(mc.getCameraEntity(), mc.getTickDelta());
         Camera camera = mc.gameRenderer.getCamera();
         Vec3d pos = camera.getPos();
-
         for (Entity entity : mc.world.getEntities())
         {
             if (entity instanceof PlayerEntity player)
@@ -128,7 +132,7 @@ public class NametagsModule extends ToggleModule
                 double rx = player.getX() - pinterpolate.getX();
                 double ry = player.getY() - pinterpolate.getY();
                 double rz = player.getZ() - pinterpolate.getZ();
-                int width = RenderManager.textWidth(info);
+                int width = RenderManager.textWidth(info) + (isOnlineUser(player) ? 10 : 0);
                 float hwidth = width / 2.0f;
                 double dx = (pos.getX() - interpolate.getX()) - rx;
                 double dy = (pos.getY() - interpolate.getY()) - ry;
@@ -231,13 +235,13 @@ public class NametagsModule extends ToggleModule
         matrices.scale(-scaling, -scaling, -1.0f);
         if (backgroundConfig.getValue())
         {
-            RenderManager.rect(matrices, -width - 1.0f, -1.0f, width * 2.0f + 2.0f,
+            RenderManager.rect(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
                     mc.textRenderer.fontHeight + 1.0f, 0.0, 0x55000400);
         }
         if (borderedConfig.getValue())
         {
-            RenderManager.borderedRect(matrices, -width - 1.0f, -1.0f, width * 2.0f + 2.0f,
-                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB(), 0.3);
+            RenderManager.borderedRect(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
+                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB(), thicknessConfig.getValue());
         }
         int color = getNametagColor(entity);
         RenderManager.post(() ->
@@ -246,10 +250,32 @@ public class NametagsModule extends ToggleModule
             RenderSystem.defaultBlendFunc();
             GL11.glDepthFunc(GL11.GL_ALWAYS);
             renderItems(matrices, entity);
-            drawText(matrices, info, -width, 0.0f, color);
+            OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(entity.getGameProfile().getName());
+            if (onlineUsersConfig.getValue() && onlineUser != null)
+            {
+                Identifier identifier = getNametagLogo(onlineUser);
+                RenderManager.rectTextured(matrices, identifier, (int) -width - 1.5f, (int) -width + 6.0f,
+                        0.5f, 8.0f, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+            }
+            drawText(matrices, info, isOnlineUser(entity) ? -width + 10.0f : -width, 0.0f, color);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             RenderSystem.disableBlend();
         });
+    }
+
+    private boolean isOnlineUser(PlayerEntity entity)
+    {
+        return onlineUsersConfig.getValue() && IRCManager.getInstance().findOnlineUser(entity.getGameProfile().getName()) != null;
+    }
+
+    private Identifier getNametagLogo(OnlineUser onlineUser)
+    {
+        return switch (onlineUser.getUsertype())
+        {
+            case RELEASE -> new Identifier("shoreline", "logo/white.png");
+            case BETA -> new Identifier("shoreline", "logo/blue.png");
+            case DEV -> new Identifier("shoreline", "logo/red.png");
+        };
     }
 
     private void drawText(MatrixStack matrices, String text, float x, float y, int color)

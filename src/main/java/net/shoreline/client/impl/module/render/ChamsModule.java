@@ -75,7 +75,7 @@ public class ChamsModule extends ToggleModule
         fadeList.clear();
     }
 
-    @EventListener
+    @EventListener(priority = Integer.MAX_VALUE)
     public void onRenderWorld(RenderWorldEvent event)
     {
         RenderBuffers.preRender();

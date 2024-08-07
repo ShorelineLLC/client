@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.module.client.FontModule;
@@ -469,6 +470,29 @@ public class RenderManager implements Globals
             bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
         }
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+    }
+
+    public static void rectTextured(MatrixStack matrix, Identifier identifier, float x0, float x1,
+                                    float y0, float y1, float z, float u0,
+                                    float u1, float v0, float v1,
+                                    float red, float green, float blue, float alpha)
+    {
+        Matrix4f matrix4f = matrix.peek().getPositionMatrix();
+        RenderSystem.setShaderTexture(0, identifier);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        RenderSystem.enableBlend();
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+        buffer.vertex(matrix4f, (float) x0, (float) y0, (float) z)
+                .color(red, green, blue, alpha).texture(u0, v0).next();
+        buffer.vertex(matrix4f, (float) x0, (float) y1, (float) z)
+                .color(red, green, blue, alpha).texture(u0, v1).next();
+        buffer.vertex(matrix4f, (float) x1, (float) y1, (float) z)
+                .color(red, green, blue, alpha).texture(u1, v1).next();
+        buffer.vertex(matrix4f, (float) x1, (float) y0, (float) z)
+                .color(red, green, blue, alpha).texture(u1, v0).next();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
     }
 
