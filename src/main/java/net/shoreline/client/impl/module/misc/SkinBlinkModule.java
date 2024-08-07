@@ -36,6 +36,10 @@ public class SkinBlinkModule extends ToggleModule
     @Override
     public void onEnable()
     {
+        if (mc.options == null)
+        {
+            return;
+        }
         enabledPlayerModelParts = ((AccessorGameOptions) mc.options).getPlayerModelParts();
     }
 
