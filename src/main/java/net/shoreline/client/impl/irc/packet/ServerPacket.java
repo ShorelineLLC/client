@@ -4,9 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.shoreline.client.impl.irc.IRCManager;
-import net.shoreline.client.impl.irc.packet.server.SPacketDisconnect;
-import net.shoreline.client.impl.irc.packet.server.SPacketPong;
-import net.shoreline.client.impl.irc.packet.server.SPacketSuccessfulConnection;
+import net.shoreline.client.impl.irc.packet.server.*;
 
 public abstract class ServerPacket
 {
@@ -37,6 +35,8 @@ public abstract class ServerPacket
             case "SPacketPong" -> SPacketPong.newInstance(text);
             case "SPacketDisconnect" -> SPacketDisconnect.newInstance(text);
             case "SPacketSuccessfulConnection" -> SPacketSuccessfulConnection.newInstance(text);
+            case "SPacketRateLimit" -> new SPacketRateLimit();
+            case "SPacketChatMessage" -> SPacketChatMessage.newInstance(text);
             default -> null;
         };
 

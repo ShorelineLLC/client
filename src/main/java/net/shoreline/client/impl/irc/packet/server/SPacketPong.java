@@ -7,7 +7,6 @@ import com.google.gson.JsonParser;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.user.OnlineUser;
-import net.shoreline.loader.Loader;
 
 import java.util.ArrayList;
 import java.util.List;

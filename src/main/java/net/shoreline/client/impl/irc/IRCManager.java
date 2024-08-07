@@ -77,7 +77,7 @@ public final class IRCManager implements Globals
                 IRCPacket packet = this.sendQueue.poll();
                 dispatchPacket(packet.fullySerialize());
             }
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        }, 0, 250, TimeUnit.MILLISECONDS);
     }
 
     public void sendPacket(IRCPacket packet)

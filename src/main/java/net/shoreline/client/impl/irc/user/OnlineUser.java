@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.irc.user;
 
+import net.minecraft.util.Formatting;
+
 public final class OnlineUser
 {
     private final String name;
@@ -24,8 +26,20 @@ public final class OnlineUser
 
     public enum UserType
     {
-        RELEASE,
-        BETA,
-        DEV
+        RELEASE(Formatting.WHITE),
+        BETA(Formatting.BLUE),
+        DEV(Formatting.RED);
+
+        private final Formatting colorCode;
+
+        UserType(Formatting colorCode)
+        {
+            this.colorCode = colorCode;
+        }
+
+        public Formatting getColorCode()
+        {
+            return this.colorCode;
+        }
     }
 }
