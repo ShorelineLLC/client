@@ -4,6 +4,7 @@ import io.netty.util.internal.ConcurrentSet;
 import net.shoreline.client.impl.irc.packet.IRCPacket;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.packet.client.CPacketPing;
+import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.loader.Loader;
@@ -36,7 +37,7 @@ public final class IRCManager implements Globals
      * A list of users using Shoreline on the CURRENT SERVER YOU ARE ON, NOT globally.
      * There will be no API to read all online users everywhere.
      */
-    private final Set<String> activeOnlineUsers = ConcurrentHashMap.newKeySet();
+    private final Set<OnlineUser> activeOnlineUsers = ConcurrentHashMap.newKeySet();
 
     private IRCManager()
     {
@@ -102,12 +103,15 @@ public final class IRCManager implements Globals
 
     private native List<String> readIncoming();
 
-    public boolean isUsingShoreline(String playerName)
+    public OnlineUser findOnlineUser(String playerName)
     {
-        return this.activeOnlineUsers.contains(playerName);
+        return this.activeOnlineUsers.stream()
+                .filter(onlineUser -> onlineUser.getName().equals(playerName))
+                .findFirst()
+                .orElse(null);
     }
 
-    public Set<String> getActiveOnlineUsers()
+    public Set<OnlineUser> getActiveOnlineUsers()
     {
         return this.activeOnlineUsers;
     }

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
+import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.loader.Loader;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public final class SPacketPong extends ServerPacket
 {
-    private final List<String> activeOnlineUsers = new ArrayList<>();
+    private final List<OnlineUser> activeOnlineUsers = new ArrayList<>();
 
     public static SPacketPong newInstance(String packet)
     {
@@ -40,8 +41,21 @@ public final class SPacketPong extends ServerPacket
 
         for (JsonElement user : users.asList())
         {
-            String userString = user.toString();
-            this.activeOnlineUsers.add(userString);
+            JsonObject session = user.getAsJsonObject();
+
+            String userName = session.get("Username").getAsString();
+            String userType = session.get("User-Type").getAsString();
+
+            OnlineUser.UserType type = switch (userType.toLowerCase())
+            {
+                case "release" -> OnlineUser.UserType.RELEASE;
+                case "beta" -> OnlineUser.UserType.BETA;
+                case "dev" -> OnlineUser.UserType.DEV;
+                default -> throw new IllegalStateException("Unrecognized session user type");
+            };
+
+            OnlineUser onlineUser = new OnlineUser(userName, type);
+            this.activeOnlineUsers.add(onlineUser);
         }
     }
 
