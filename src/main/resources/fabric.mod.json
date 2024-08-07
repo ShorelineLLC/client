@@ -3,15 +3,14 @@
   "id": "shoreline",
   "version": "${version}",
   "name": "Shoreline",
-  "description": "",
+  "description": "2b2t/Anarchy Utility Mod",
   "authors": [
     "linus"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/"
+    "homepage": "https://shorelineclient.net/"
   },
-  "license": "None",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "preLaunch": [
       "net.shoreline.loader.Loader"
@@ -20,13 +19,14 @@
       "net.shoreline.loader.Loader"
     ]
   },
-  "accessWidener": "shoreline.accesswidener",
   "mixins": [
     "mixins.shoreline.json"
   ],
+  "accessWidener": "shoreline.accesswidener",
   "depends": {
     "java": ">=17",
-    "fabricloader": ">=0.14.17",
-    "minecraft": "1.20.4"
+    "fabricloader": ">=0.15.0",
+    "minecraft": "1.20.4",
+    "fabric-api": "*"
   }
 }

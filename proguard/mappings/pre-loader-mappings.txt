@@ -1,24 +1,33 @@
 net.shoreline.client.ShorelineMod -> net.shoreline.client.bs:
     void onInitializeClient() -> a
-net.shoreline.loader.asm.ClassScanner -> net.shoreline.loader.f:
-    int access -> a
-    java.lang.String superName -> b
-    java.lang.String[] interfaces -> c
-    java.util.List descs -> d
 net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
-net.shoreline.eventbus.EventBus -> net.shoreline.loader.e:
+
+net.shoreline.eventbus.EventBus -> net.shoreline.client.e:
     net.shoreline.eventbus.EventBus INSTANCE -> a
-    java.lang.Object event2InvokerMap -> a
-    void dispatch(net.shoreline.eventbus.event.Event) -> a
-    void subscribe(java.lang.Object) -> a
-    void unsubscribe(java.lang.Object) -> b
-net.shoreline.eventbus.EventBus$Invoker -> net.shoreline.loader.i:
+    java.util.Map event2InvokerMap -> b
+    java.lang.Object subscribe(java.lang.Object) -> a
+    java.lang.Object unsubscribe(java.lang.Object) -> b
+
+net.shoreline.eventbus.EventBus$Invoker -> net.shoreline.client.i:
     void invoke(java.lang.Object) -> a
-net.shoreline.eventbus.EventBus$InvokerNode -> net.shoreline.loader.n:
-    java.lang.Object next -> a
-    java.lang.Object invoker -> b
+
+net.shoreline.eventbus.EventBus$InvokerNode -> net.shoreline.client.n:
+    net.shoreline.eventbus.EventBus$InvokerNode next -> a
+    net.shoreline.eventbus.EventBus$Invoker invoker -> b
     java.lang.Object subscriber -> c
-    java.lang.Object priority -> d
+    java.lang.Integer priority -> d
+
 net.shoreline.loader.Loader -> net.shoreline.loader.give up:
-net.shoreline.loader.impl.classloading.ClassLoader -> net.shoreline.loader.b:
-net.shoreline.loader.impl.classloading.ShorelineResourcePack -> net.shoreline.loader.a:
+    java.lang.Object performVersionCheck(java.lang.Object) -> d
+    java.lang.Object showErrorWindow(java.lang.Object) -> b
+    java.lang.Object getResourceInternal(java.lang.Object) -> a
+
+net.shoreline.loader.mixin.MixinServiceExt -> net.shoreline.loader.a:
+    java.lang.Object getInternalClassBytes(java.lang.Object) -> a
+    java.lang.Object getInternalInputStream(java.lang.Object) -> b
+
+net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
+    java.lang.Object getResourceInternal(java.lang.Object) -> a
+
+net.shoreline.loader.session.UserSession -> net.shoreline.loader.c:
+    java.lang.Object getUserInfo(java.lang.Object) -> a

@@ -1,28 +1,28 @@
-package net.shoreline.loader.impl.classloading;
+package net.shoreline.loader.resource;
 
 import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
-import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
-import net.shoreline.loader.Natives;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
+/**
+ * Allows dynamic resource loading by overwriting ModNioPack to
+ */
 @SuppressWarnings("UnstableApiUsage")
-public final class ShorelineResourcePack implements ResourcePack, ModResourcePack
+public final class ResourcePackExt implements ResourcePack, ModResourcePack
 {
     private final ModNioResourcePack parent;
 
-    public ShorelineResourcePack(ModNioResourcePack parent)
+    public ResourcePackExt(ModNioResourcePack parent)
     {
         this.parent = parent;
     }
@@ -45,21 +45,18 @@ public final class ShorelineResourcePack implements ResourcePack, ModResourcePac
     public InputSupplier<InputStream> open(ResourceType type,
                                            Identifier id)
     {
-        if (!FabricLoader.getInstance().isDevelopmentEnvironment())
+        String formattedName = String.format("assets/shoreline/%s", id.getPath());
+
+        InputStream is;
+        if ((is = (InputStream) getResourceInternal(formattedName)) != null)
         {
-            String formattedName = String.format("assets/shoreline/%s", id.getPath());
-            byte[] content = (byte[]) Natives.k(formattedName);
-
-            if (content == null)
-            {
-                return null;
-            }
-
-            return () -> new ByteArrayInputStream(content);
+            return () -> is;
         }
 
         return this.parent.open(type, id);
     }
+
+    private static native Object getResourceInternal(Object name);
 
     @Override
     public void findResources(ResourceType type,

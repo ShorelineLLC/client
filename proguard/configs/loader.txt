@@ -2,7 +2,6 @@
 -dontshrink
 -dontoptimize
 -allowaccessmodification
--overloadaggressively
 -useuniqueclassmembernames
 -repackageclasses net.shoreline.loader
 -keepattributes *Annotation*
@@ -20,11 +19,6 @@
     java.lang.Object readResolve();
 }
 
--keep,allowshrinking class net.shoreline.loader.asm.ClassScanner {
-    <fields>;
-    <methods>;
-}
-
 -keep,allowshrinking class net.shoreline.loader.Loader {
     *** onInitializeClient(...);
     *** onPreLaunch(...);
@@ -37,16 +31,11 @@
     *** postApply(...);
 }
 
--keepclassmembers,allowshrinking class net.shoreline.loader.impl.classloading.ShorelineMixinService {
+-keepclassmembers,allowshrinking class net.shoreline.loader.mixin.MixinServiceExt {
     <methods>;
 }
 
--keepclassmembers,allowshrinking class net.shoreline.loader.ModLoader {
-    *** onInitializeClient(...);
-    *** onPreLaunch(...);
-}
-
--keepclassmembers,allowshrinking class net.shoreline.loader.impl.classloading.ShorelineResourcePack {
+-keepclassmembers,allowshrinking class net.shoreline.loader.resource.ResourcePackExt {
     <methods>;
 }
 
@@ -55,7 +44,6 @@
     public static ** valueOf(java.lang.String);
 }
 
-# Keep - Native method names. Keep all native class/method names.
 -keepclasseswithmembers,includedescriptorclasses,allowshrinking class * {
     native <methods>;
 }

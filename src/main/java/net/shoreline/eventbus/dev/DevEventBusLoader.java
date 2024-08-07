@@ -1,5 +1,6 @@
 package net.shoreline.eventbus.dev;
 
+import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.event.Event;
 import net.shoreline.loader.Loader;
@@ -13,7 +14,6 @@ import java.util.Map;
 
 /**
  * This class is not exported with the loader or client.
- *
  * It is kept as a dev environment loader ONLY, for the event bus to function.
  */
 @SuppressWarnings("unused") // Called natively
@@ -40,7 +40,7 @@ public final class DevEventBusLoader
         }
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("unchecked")
     private static void loadSingleFile(File file,
                                        String prefix) throws Throwable
     {
@@ -53,15 +53,14 @@ public final class DevEventBusLoader
             Field eventMap = EventBus.class.getDeclaredField("event2InvokerMap");
             eventMap.setAccessible(true);
 
-            Map/*<Class<? extends Event>, Invoker>*/ map = (Map) eventMap.get(instance);
+            Map<Class<? extends Event>, EventBus.InvokerNode> map = (Map<Class<? extends Event>, EventBus.InvokerNode>) eventMap.get(instance);
 
-            Class<?> invoker = Class.forName("net.shoreline.eventbus.EventBus$InvokerNode");
-            Constructor<?> constructor = invoker.getDeclaredConstructor(Object.class, Object.class, Object.class);
+            Constructor<?> constructor = EventBus.InvokerNode.class.getDeclaredConstructor(Object.class, Object.class, Object.class);
             constructor.setAccessible(true);
 
-            Object headInvoker = constructor.newInstance(null, null, null);
+            EventBus.InvokerNode headInvoker = (EventBus.InvokerNode) constructor.newInstance(null, null, null);
 
-            map.put(clazz, headInvoker);
+            map.put((Class<? extends Event>) clazz, headInvoker);
         }
     }
 

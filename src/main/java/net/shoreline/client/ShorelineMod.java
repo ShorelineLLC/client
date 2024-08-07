@@ -1,7 +1,6 @@
 package net.shoreline.client;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.shoreline.loader.Natives;
 
 /**
  * @author linus
@@ -17,7 +16,7 @@ public class ShorelineMod
 
     public ShorelineMod()
     {
-        
+        System.exit(-1);
     }
 
     /**
@@ -27,16 +26,12 @@ public class ShorelineMod
      */
     public void onInitializeClient()
     {
-        if (!FabricLoader.getInstance().isDevelopmentEnvironment())
-        {
-            Natives.e(this);
-        }
-
         if (isMeteorPresent())
         {
             System.exit(0);
             return;
         }
+
         Shoreline.init();
     }
 

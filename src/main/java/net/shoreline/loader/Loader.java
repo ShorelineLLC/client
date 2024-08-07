@@ -3,325 +3,165 @@ package net.shoreline.loader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
-import net.shoreline.client.ShorelineMod;
-import net.shoreline.loader.impl.context.UserContext;
-import net.shoreline.loader.impl.ClientLoader;
+import net.shoreline.loader.session.UserSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import sun.misc.Unsafe;
+import org.spongepowered.asm.mixin.transformer.Config;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.awt.*;
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.nio.file.Files;
-import java.util.HashSet;
+import javax.swing.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-public final class Loader implements
-        ClientModInitializer, PreLaunchEntrypoint, // Fabric
-        IMixinConfigPlugin // Sponge
+public class Loader implements
+		ClientModInitializer, PreLaunchEntrypoint, // Fabric
+		IMixinConfigPlugin // Sponge
 {
-    private static final Logger LOGGER = LogManager.getLogger("Shoreline");
-    public static final String VERSION = "b0.4.0";
-    private static UserContext context;
+	private static final Logger LOGGER = LogManager.getLogger("Shoreline");
+	public static final String VERSION = "r1.0.0";
 
-    private final Impl impl;
+	public static final UserSession SESSION;
 
-    public Loader()
-    {
-        this.impl = new Impl();
-    }
+	static
+	{
+		info("Loading Shoreline...");
 
-    @Override
-    public void onInitializeClient()
-    {
-        this.impl.initializeClient();
-    }
+		try
+		{
+			loadNatives();
+		} catch (Throwable t)
+		{
+			error("Failed to load Shoreline's dependant libraries.");
 
-    @Override
-    public void onPreLaunch()
-    {
-        this.impl.preLaunch();
-    }
+			JOptionPane.showMessageDialog(
+					null,
+					"Failed to load Shoreline's dependant libraries.\n\n" + t.getMessage(),
+					"Error",
+					JOptionPane.ERROR_MESSAGE
+			);
 
-    @Override
-    public void onLoad(String mixinPackage)
-    {
-        this.impl.load();
-    }
+			System.exit(-1);
+		}
 
-    @Override
-    public String getRefMapperConfig()
-    {
-        return this.impl.getRefmapConfig();
-    }
+		SESSION = UserSession.load();
+		performVersionCheck(VERSION);
+	}
 
-    @Override
-    public boolean shouldApplyMixin(String targetClassName,
-                                    String mixinClassName)
-    {
-        return this.impl.shouldApplyMixin();
-    }
+	/* -------------------------------- Fabric --------------------------------*/
 
-    @Override
-    public void acceptTargets(Set<String> myTargets,
-                              Set<String> otherTargets)
-    {
-    }
+	@Override
+	public native void onPreLaunch();
 
-    @Override
-    public List<String> getMixins()
-    {
-        return this.impl.getMixinSet();
-    }
+	@Override
+	public native void onInitializeClient();
 
-    @Override
-    public void preApply(String targetClassName,
-                         ClassNode targetClass,
-                         String mixinClassName,
-                         IMixinInfo mixinInfo)
-    {
-    }
+	/* -------------------------------- Sponge --------------------------------*/
 
-    @Override
-    public void postApply(String targetClassName,
-                          ClassNode targetClass,
-                          String mixinClassName,
-                          IMixinInfo mixinInfo)
-    {
-    }
+	@Override
+	public native void onLoad(String mixinPackage);
 
-    public static void loadNatives() throws Throwable
-    {
-        String ext = getExt();
-        URL url = new URL("https://api.shorelineclient.net/natives");
+	@Override
+	public native String getRefMapperConfig();
 
-        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
-        urlConnection.addRequestProperty("Library-Type", ext);
+	@Override
+	public native boolean shouldApplyMixin(String targetClassName,
+										   String mixinClassName);
 
-        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
-        byte[] buffer = new byte[urlConnection.getContentLength()];
-        for (int i = 0; i < buffer.length; i++)
-        {
-            buffer[i] = nativesInputStream.readByte();
-        }
+	@Override
+	public native void acceptTargets(Set<String> myTargets,
+									 Set<String> otherTargets);
 
-        File natives = Files.createTempFile(
-                null,
-                "." + ext
-        ).toFile();
+	@Override
+	public native List<String> getMixins();
 
-        natives.deleteOnExit();
+	@Override
+	public native void preApply(String targetClassName,
+								ClassNode targetClass,
+								String mixinClassName,
+								IMixinInfo mixinInfo);
 
-        FileOutputStream fos = new FileOutputStream(natives);
-        fos.write(buffer);
-        fos.flush();
-        fos.close();
+	@Override
+	public native void postApply(String targetClassName,
+								 ClassNode targetClass,
+								 String mixinClassName,
+								 IMixinInfo mixinInfo);
 
-        System.load(natives.getAbsolutePath());
-    }
+	/* ------------------------------------------------------------------------*/
 
-    private static String getExt()
-    {
-        String os_name = System.getProperty("os.name");
+	private static void loadNatives() throws Throwable
+	{
 
-        if (os_name.contains("Windows"))
-        {
-            return "dll";
-        }
+//        String ext = getExt();
+//        URL url = new URL("https://api.shorelineclient.net/natives");
+//
+//        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+//        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
+//        urlConnection.addRequestProperty("Library-Type", ext);
+//
+//        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
+//        byte[] buffer = new byte[urlConnection.getContentLength()];
+//        for (int i = 0; i < buffer.length; i++)
+//        {
+//            buffer[i] = nativesInputStream.readByte();
+//        }
+//
+//        File natives = Files.createTempFile(
+//                null,
+//                "." + ext
+//        ).toFile();
+//
+//        natives.deleteOnExit();
+//
+//        FileOutputStream fos = new FileOutputStream(natives);
+//        fos.write(buffer);
+//        fos.flush();
+//        fos.close();
 
-        if (os_name.contains("Linux"))
-        {
-            return "so";
-        }
+		File natives = new File("C:\\Users\\user2\\Desktop\\shoreline\\src\\main\\rust\\target\\release\\shoreline_loader.dll");
+		System.load(natives.getAbsolutePath());
+	}
 
-        if (os_name.contains("OS X"))
-        {
-            return "dylib";
-        }
+	private static native Object performVersionCheck(Object currentVersion);
 
-        Loader.error("Unsupported OS: {}", os_name);
-        crashNotNatively();
+	public static native Object showErrorWindow(Object message);
 
-        throw new IllegalStateException();
-    }
+	public static void info(String message)
+	{
+		LOGGER.info(String.format("[Shoreline] %s", message));
+	}
 
-    public static void crashNotNatively()
-    {
-        try
-        {
-            Field theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafeField.setAccessible(true);
-            Unsafe theUnsafe = (Unsafe) theUnsafeField.get(null);
+	public static void info(String message,
+							Object... params)
+	{
+		LOGGER.info(String.format("[Shoreline] %s", message), params);
+	}
 
-            theUnsafe.freeMemory(Loader.class.hashCode());
-        } catch (Throwable t)
-        {
-            System.exit(-1);
-        }
-    }
+	public static void error(String message)
+	{
+		LOGGER.error(String.format("[Shoreline] %s", message));
+	}
 
-    public static void info(String message)
-    {
-        LOGGER.info(String.format("[Shoreline] %s", message));
-    }
+	public static void error(String message,
+							 Object... params)
+	{
+		LOGGER.error(String.format("[Shoreline] %s", message), params);
+	}
 
-    public static void info(String message,
-                            Object... params)
-    {
-        LOGGER.info(String.format("[Shoreline] %s", message), params);
-    }
+	public static InputStream getResource(String name)
+	{
+		InputStream is;
+		if ((is = (InputStream) getResourceInternal(name)) != null)
+		{
+			return is;
+		}
 
-    public static void error(String message)
-    {
-        LOGGER.error(message);
-    }
+		return Loader.class.getClassLoader().getResourceAsStream(name);
+	}
 
-    public static void error(String message,
-                             Object... params)
-    {
-        LOGGER.error(message, params);
-    }
-
-    public static UserContext getContext()
-    {
-        if (context == null)
-        {
-            context = UserContext.none();
-        }
-
-        return context;
-    }
-
-    public static InputStream getResource(String name)
-    {
-        if (!FabricLoader.getInstance().isDevelopmentEnvironment())
-        {
-            byte[] content = (byte[]) Natives.k(name);
-
-            if (content == null)
-            {
-                return null;
-            }
-
-            return new ByteArrayInputStream(content);
-        }
-
-        return Loader.class.getClassLoader().getResourceAsStream(name);
-    }
-
-    static
-    {
-        info("Loading Shoreline...");
-
-        try
-        {
-            loadNatives();
-        } catch (Throwable t)
-        {
-            Loader.error("Failed to load Shoreline native libraries.");
-            crashNotNatively();
-        }
-    }
-
-    private static class Impl
-    {
-        public void initializeClient()
-        {
-            info("Initializing Shoreline...");
-
-            try
-            {
-                Class<?> shorelineMod = Class.forName("net.shoreline.client.ShorelineMod");
-                /*
-                 * Do not use this constructor! It is purely for obscurity. Hackers will think we
-                 * are getting the constructor and using that to create a new instance of ShorelineMod
-                 * to call its onInitializeClient method. In reality, <init> in ShorelineMod will crash the game.
-                 *
-                 * Instead, we can use a native trick to make a new instance of ShorelineMod WITHOUT calling
-                 * the constructor. This makes it very confusing for crackers trying to make a new instance
-                 * of the main mod.
-                 */
-                Constructor<?> constructor = shorelineMod.getDeclaredConstructor();
-                constructor.setAccessible(true);
-
-                /*
-                 * Natively create a new instance of our main mod and initialize it.
-                 *
-                 * Again, the constructor being passed is completely unused and only used for obscurity.
-                 */
-
-                ((ShorelineMod) Natives.a(constructor)).onInitializeClient();
-            } catch (Throwable ignored)
-            {
-
-            }
-        }
-
-        public void preLaunch()
-        {
-            System.setProperty("java.awt.headless", "true");
-            // DO NOT REMOVE BON - linus
-            GraphicsEnvironment.isHeadless();
-
-            if (FabricLoader.getInstance().isDevelopmentEnvironment())
-            {
-                Loader.info("Dev workspace detected, loading natives...");
-
-                try
-                {
-                    loadNatives();
-                } catch (Throwable t)
-                {
-                    Loader.error("Failed to load native libraries", t);
-                    throw new RuntimeException(t);
-                }
-
-                ClientLoader.setUserCredentials();
-
-                Loader.info("Native library successfully loaded, starting Shoreline...");
-            }
-        }
-
-        public void load()
-        {
-            ClientLoader.setUserCredentials();
-
-            Natives.g(Loader.VERSION);
-
-            ClientLoader.loadClient();
-        }
-
-        public String getRefmapConfig()
-        {
-            return "shoreline-refmap.json";
-        }
-
-        public boolean shouldApplyMixin()
-        {
-            return true;
-        }
-
-        public List<String> getMixinSet()
-        {
-            HashSet<?> mixinSet = (HashSet<?>) Natives.b(this);
-
-            return mixinSet.stream()
-                    .map(obj ->
-                    {
-                        String mixin = (String) obj;
-                        mixin = mixin.replace("/", ".");
-                        mixin = mixin.substring("net.shoreline.client.".length());
-                        return  mixin.substring(0, mixin.length() - ".class".length());
-                    }).toList();
-        }
-    }
+	private static native Object getResourceInternal(Object name);
 }

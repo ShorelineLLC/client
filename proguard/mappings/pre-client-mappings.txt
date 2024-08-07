@@ -1,12 +1,43 @@
 net.shoreline.client.ShorelineMod -> net.shoreline.client.bs:
     void onInitializeClient() -> a
+
 net.shoreline.client.api.render.RenderLayersClient -> net.shoreline.client.lc:
-net.shoreline.client.impl.manager.client.cape.CapeManager$CapeTexture -> net.shoreline.client.ct:
+
 net.shoreline.client.impl.imixin.IMixin -> net.shoreline.client.im:
-net.shoreline.client.util.network.InteractType -> net.shoreline.client.it:
-net.shoreline.client.util.Globals -> net.shoreline.client.nT:
+
 net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
+
 net.shoreline.eventbus.event.StageEvent$EventStage -> net.shoreline.client.es:
+
 net.shoreline.eventbus.annotation.EventListener -> net.shoreline.client.el:
     int priority() -> a
     boolean receiveCanceled() -> b
+
+net.shoreline.client.impl.irc.IRCManager -> net.shoreline.client.ir:
+    void dispatchPacket(java.lang.String) -> a
+    void attemptReconnection(java.lang.String) -> b
+    java.util.List readIncoming() -> a
+
+net.shoreline.eventbus.EventBus -> net.shoreline.client.e:
+    net.shoreline.eventbus.EventBus INSTANCE -> a
+    java.util.Map event2InvokerMap -> b
+    java.lang.Object subscribe(java.lang.Object) -> a
+    java.lang.Object unsubscribe(java.lang.Object) -> b
+
+net.shoreline.eventbus.EventBus$Invoker -> net.shoreline.client.i:
+    void invoke(java.lang.Object) -> a
+
+net.shoreline.eventbus.EventBus$InvokerNode -> net.shoreline.client.n:
+    net.shoreline.eventbus.EventBus$InvokerNode next -> a
+    net.shoreline.eventbus.EventBus$Invoker invoker -> b
+    java.lang.Object subscriber -> c
+    java.lang.Integer priority -> d
+
+# Manually mapped, important classes for anti-crack native obfuscation
+
+net.shoreline.client.Shoreline -> net.shoreline.client.b:
+net.shoreline.client.init.Fonts -> net.shoreline.client.lH:
+net.shoreline.client.init.Managers -> net.shoreline.client.lI:
+net.shoreline.client.impl.manager.ModuleManager -> net.shoreline.client.fD:
+net.shoreline.client.ShutdownHook -> net.shoreline.client.c:
+net.shoreline.client.api.file.ClientConfiguration -> net.shoreline.client.Q:

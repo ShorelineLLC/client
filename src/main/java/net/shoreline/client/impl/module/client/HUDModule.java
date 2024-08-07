@@ -171,7 +171,7 @@ public class HUDModule extends ToggleModule
             {
                 RenderManager.renderText(
                         event.getContext(),
-                        String.format("UID %s", Loader.getContext().uid()),
+                        String.format("UID %s", Loader.SESSION.getUID()),
                         2.0F,
                         topLeft,
                         getHudColor(rainbowOffset)

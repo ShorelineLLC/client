@@ -1,3 +1,9 @@
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+
 import java.nio.file.Files
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
@@ -94,6 +100,7 @@ tasks.register('loaderJar', Jar) {
     outputs.upToDateWhen { false }
 
     // Rename mixins.shoreline.json to mixins.shoreline.plugin.json automatically on build
+    // and remove the accessWidener entry from fabric.mod.json
     def tempDir = new File("${buildDir}/tmp", "tempLoaderJar")
 
     if (tempDir.exists())
@@ -118,19 +125,30 @@ tasks.register('loaderJar', Jar) {
         if (fabricModFile.exists())
         {
             def text = fabricModFile.text
-            text = text.replaceAll('mixins.shoreline.json', 'mixins.shoreline.plugin.json')
-            fabricModFile.text = text
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create()
+            JsonObject obj = JsonParser.parseString(text)
+
+            JsonArray mixins = new JsonArray()
+            mixins.add("mixins.shoreline.plugin.json");
+
+            obj.add("mixins", mixins)
+            obj.remove("accessWidener")
+
+            fabricModFile.text = gson.toJson(obj)
         }
     }
 
     from(tempDir) {
         exclude 'net/shoreline/client/**'
-        exclude 'net/shoreline/eventbus/annotation/**'
-        exclude 'net/shoreline/eventbus/dev/**'
-        exclude 'net/shoreline/eventbus/event/**'
+//        exclude 'net/shoreline/eventbus/annotation/**'
+//        exclude 'net/shoreline/eventbus/dev/**'
+//        exclude 'net/shoreline/eventbus/event/**'
+        exclude 'net/shoreline/eventbus/**'
         exclude 'assets/**'
         exclude 'mixins.shoreline.json'
         exclude 'shoreline-refmap.json'
+        exclude 'shoreline.accesswidener'
     }
 
     archiveBaseName = "loader-raw"
@@ -146,10 +164,12 @@ tasks.register('clientJar', Jar) {
     from(zipTree(tasks.remapJar.archivePath))
 
     include 'net/shoreline/client/**'
-    include 'net/shoreline/eventbus/annotation/**'
-    include 'net/shoreline/eventbus/event/**'
+    include 'net/shoreline/eventbus/**'
+//    include 'net/shoreline/eventbus/annotation/**'
+//    include 'net/shoreline/eventbus/event/**'
     include 'assets/**'
     include 'shoreline-refmap.json'
+    include 'shoreline.accesswidener'
 
     archiveBaseName = "client-raw"
     archiveClassifier = ""

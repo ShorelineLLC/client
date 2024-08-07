@@ -2,6 +2,7 @@ package net.shoreline.client;
 
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.file.ClientConfiguration;
+import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.init.Managers;
 import net.shoreline.loader.Loader;
 
@@ -47,6 +48,8 @@ public class Shoreline
         // load configs AFTER everything has been initialized
         // this is to prevent configs loading before certain aspects of managers are available
         CONFIG.loadClient();
+
+        IRCManager.getInstance(); // Create new IRC manager
     }
 
     public static void info(String message)

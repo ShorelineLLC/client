@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.biome;
 
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.world.biome.Biome;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
