@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.user.OnlineUser;
+import net.shoreline.client.impl.module.client.CapesModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,16 +45,25 @@ public final class SPacketPong extends ServerPacket
 
             String userName = session.get("Username").getAsString();
             String userType = session.get("User-Type").getAsString();
+            String capeColor = session.get("Cape-Color").getAsString();
 
             OnlineUser.UserType type = switch (userType.toLowerCase())
             {
                 case "release" -> OnlineUser.UserType.RELEASE;
                 case "beta" -> OnlineUser.UserType.BETA;
                 case "dev" -> OnlineUser.UserType.DEV;
-                default -> throw new IllegalStateException("Unrecognized session user type");
+                default -> throw new IllegalStateException("Unrecognized session user type" + userType);
             };
 
-            OnlineUser onlineUser = new OnlineUser(userName, type);
+            CapesModule.Capes capes = switch (capeColor.toLowerCase())
+            {
+                case "black" -> CapesModule.Capes.BLACK;
+                case "white" -> CapesModule.Capes.WHITE;
+                case "off" -> CapesModule.Capes.OFF;
+                default -> throw new IllegalStateException("Unrecognized cape color" + capeColor);
+            };
+
+            OnlineUser onlineUser = new OnlineUser(userName, type, capes);
             this.activeOnlineUsers.add(onlineUser);
         }
     }

@@ -122,7 +122,7 @@ public class Loader implements
 //        fos.flush();
 //        fos.close();
 
-		File natives = new File("/Users/nick/Documents/GitHub/caspian/src/main/rust/target/debug/libshoreline_loader.dylib");
+		File natives = new File("C:\\Users\\user2\\Desktop\\shoreline\\src\\main\\rust\\target\\release\\shoreline_loader.dll");
 		System.load(natives.getAbsolutePath());
 	}
 

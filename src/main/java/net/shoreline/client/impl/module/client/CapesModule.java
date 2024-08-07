@@ -17,7 +17,9 @@ import org.jetbrains.annotations.NotNull;
 
 public final class CapesModule extends ToggleModule
 {
-    Config<Capes> clientConfig = register(new EnumConfig<>("Client", "Shows client capes", Capes.OFF, Capes.values()));
+    public static CapesModule instance;
+
+    public Config<Capes> clientConfig = register(new EnumConfig<>("Client", "Shows client capes", Capes.OFF, Capes.values()));
     Config<Boolean> optifineConfig = register(new BooleanConfig("Optifine", "Shows optifine capes", true));
 
     private boolean capesEnabled;
@@ -26,6 +28,7 @@ public final class CapesModule extends ToggleModule
     {
         super("Capes", "Shows player capes", ModuleCategory.CLIENT);
         enable();
+        instance = this;
     }
 
     @Override

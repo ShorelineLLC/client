@@ -342,7 +342,7 @@ fn download_resources_internal(token: String) -> Result<Payload, String>
                             "{}{}{}",
                             obfstr!("Internal server error code 0x4"),
                             http_response_code,
-                            obfstr!(". Please report this to a developer.")
+                            obfstr!(". If this issue persists, please report it to a developer.")
                         };
 
                         Err(formatted)
