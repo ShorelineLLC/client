@@ -6,6 +6,7 @@ import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.user.OnlineUser;
+import net.shoreline.client.impl.module.client.CapesModule;
 
 public final class SPacketChatMessage extends ServerPacket
 {
@@ -45,7 +46,7 @@ public final class SPacketChatMessage extends ServerPacket
             default -> throw new IllegalStateException("Unrecognized session user type");
         };
 
-        this.sender = new OnlineUser(username, type);
+        this.sender = new OnlineUser(username, type, CapesModule.Capes.OFF);
     }
 
     @Override
