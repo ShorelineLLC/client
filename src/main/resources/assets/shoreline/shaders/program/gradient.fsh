@@ -8,10 +8,12 @@ uniform mat4 ProjMat;
 uniform vec2 InSize;
 uniform vec2 OutSize;
 
-//
 uniform vec2 texelSize;
 uniform vec4 color;
-uniform int dotRadius;
+uniform vec4 color1;
+uniform float factor;
+uniform float mixFactor;
+uniform float time;
 
 uniform float radius;
 uniform float glow;
@@ -21,14 +23,14 @@ void main()
     vec4 centerCol = texture(DiffuseSampler, texCoord);
     if (centerCol.a > 0.0)
     {
-        if (dotRadius > 0 && int(gl_FragCoord.x) - (dotRadius * int(gl_FragCoord.x / dotRadius)) <= 1.0 && int(gl_FragCoord.y) - (dotRadius * int(gl_FragCoord.y / dotRadius)) <= 1.0)
-        {
-            fragColor = vec4(color.x, color.y, color.z, 1.0);
-        }
-        else
-        {
-            fragColor = color;
-        }
+        float distance = sqrt(gl_FragCoord.x * gl_FragCoord.x + gl_FragCoord.y * gl_FragCoord.y) + time;
+        distance = distance / factor;
+        distance = ((sin(distance) + 1.0) / 2.0);
+        float distanceInv = 1.0 - distance;
+        float r = color.r * distance + color1.r * distanceInv;
+        float g = color.g * distance + color1.g * distanceInv;
+        float b = color.b * distance + color1.b * distanceInv;
+        fragColor = vec4(r, g, b, mixFactor);
     }
     else
     {

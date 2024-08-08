@@ -17,11 +17,11 @@ public class ShaderManager implements Globals
     private ShaderFramebuffer framebuffer;
 
     public ManagedShaderEffect filledShaderEffect;
-    public ManagedShaderEffect filledShaderEffect1;
+    public ManagedShaderEffect gradientShaderEffect;
 
     public void reloadShaders()
     {
-        if (framebuffer == null && filledShaderEffect == null && filledShaderEffect1 == null)
+        if (framebuffer == null || filledShaderEffect == null || gradientShaderEffect == null)
         {
             reloadShadersInternal();
         }
@@ -30,17 +30,8 @@ public class ShaderManager implements Globals
     public void reloadShadersInternal()
     {
         framebuffer = new ShaderFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
-        filledShaderEffect1 = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));
-        filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"), effect ->
-        {
-            PostEffectProcessor postEffectProcessor = effect.getShaderEffect();
-            if (postEffectProcessor == null)
-            {
-                return;
-            }
-            ((IPostEffectProcessor) postEffectProcessor).overwriteBuffer("bufIn", mc.worldRenderer.getEntityOutlinesFramebuffer());
-            ((IPostEffectProcessor) postEffectProcessor).overwriteBuffer("bufOut", mc.worldRenderer.getEntityOutlinesFramebuffer());
-        });
+        filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));
+        gradientShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/gradient.json"));
     }
 
     public void applyShader(ManagedShaderEffect shaderEffect, Runnable setup, Runnable runnable)
@@ -79,14 +70,14 @@ public class ShaderManager implements Globals
         }
     }
 
+    // Instance without overwritten buffers
     public ManagedShaderEffect getFilledShaderEffect()
     {
         return filledShaderEffect;
     }
 
-    // Instance without overwritten buffers
-    public ManagedShaderEffect getFilledShaderEffect1()
+    public ManagedShaderEffect getGradientShaderEffect()
     {
-        return filledShaderEffect1;
+        return gradientShaderEffect;
     }
 }

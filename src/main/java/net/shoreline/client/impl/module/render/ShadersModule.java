@@ -1,17 +1,13 @@
 package net.shoreline.client.impl.module.render;
 
 import ladysnake.satin.api.managed.ManagedShaderEffect;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.entity.EnderChestBlockEntity;
-import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.Shoreline;
@@ -27,7 +23,6 @@ import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
-import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -40,13 +35,15 @@ import java.awt.*;
 public class ShadersModule extends ToggleModule
 {
 
-    Config<ShaderMode> modeConfig = register(new EnumConfig<>("Mode", "The shader mode", ShaderMode.NORMAL, ShaderMode.values()));
+    Config<ShaderMode> modeConfig = register(new EnumConfig<>("Mode", "The shader mode", ShaderMode.OUTLINE, ShaderMode.values()));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Integer> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1, 1, 5, () -> outlineConfig.getValue()));
     Config<Boolean> glowConfig = register(new BooleanConfig("Glow", "Glow outline", false));
     Config<Float> glowRadiusConfig = register(new NumberConfig<>("GlowRadius", "The glow radius", 0.1f, 1.0f, 2.0f, () -> glowConfig.getValue() && outlineConfig.getValue()));
-    Config<Boolean> dotsConfig = register(new BooleanConfig("Dots", "Hacker esp", false));
-    Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue()));
+    Config<Float> factorConfig = register(new NumberConfig<>("Factor", "The gradient factor", 0.1f, 8.0f, 10.0f, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
+    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The gradient speed factor", 0.01f, 1.5f, 10.0f, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
+    Config<Boolean> dotsConfig = register(new BooleanConfig("Dots", "Hacker esp", false, () -> modeConfig.getValue() == ShaderMode.OUTLINE));
+    Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue() && modeConfig.getValue() == ShaderMode.OUTLINE));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render shaders on the player", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render shaders on other players", true));
@@ -58,7 +55,9 @@ public class ShadersModule extends ToggleModule
 //    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", false));
 //    Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", false));
 //    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", false));
-    Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.2f)));
+    Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.3f)));
+
+    private float shaderTime;
 
     public ShadersModule()
     {
@@ -68,59 +67,95 @@ public class ShadersModule extends ToggleModule
     @EventListener
     public void onRenderEntityWorld(RenderShaderEvent event)
     {
-        ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect1();
-        if (shaderEffect == null)
+        switch (modeConfig.getValue())
         {
-            return;
-        }
-        Managers.SHADER.applyShader(shaderEffect, () ->
-        {
-            shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-            shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
-            shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
-            shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
-            shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
-            shaderEffect.render(mc.getTickDelta());
-        }, () ->
-        {
-            VertexConsumerProvider vertexConsumerProvider = ((AccessorWorldRenderer) mc.worldRenderer).hookGetBufferBuilders().getEntityVertexConsumers();
-            for (Entity entity : mc.world.getEntities())
+            case OUTLINE ->
             {
-                if (checkShaders(entity))
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect();
+                if (shaderEffect == null)
                 {
-                    Vec3d camera = mc.gameRenderer.getCamera().getPos();
-                    double d = MathHelper.lerp(event.getTickDelta(), entity.lastRenderX, entity.getX());
-                    double e = MathHelper.lerp(event.getTickDelta(), entity.lastRenderY, entity.getY());
-                    double f = MathHelper.lerp(event.getTickDelta(), entity.lastRenderZ, entity.getZ());
-                    float g = MathHelper.lerp(event.getTickDelta(), entity.prevYaw, entity.getYaw());
-                    EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(entity);
-                    int light = mc.getEntityRenderDispatcher().getLight(entity, event.getTickDelta());
-                    try
-                    {
-                        Vec3d vec3d = entityRenderer.getPositionOffset(entity, event.getTickDelta());
-                        double x = (d - camera.x) + vec3d.x;
-                        double y = (e - camera.y) + vec3d.y;
-                        double z = (f - camera.z) + vec3d.z;
-                        event.getMatrices().push();
-                        event.getMatrices().translate(x, y, z);
-                        entityRenderer.render(entity, g, event.getTickDelta(), event.getMatrices(), vertexConsumerProvider, light);
-                        event.getMatrices().translate(-vec3d.getX(), -vec3d.getY(), -vec3d.getZ());
-                        event.getMatrices().pop();
-                    }
-                    catch (Exception exception)
-                    {
-                        exception.printStackTrace();
-                        Shoreline.error("Failed to render shader on entity!");
-                    }
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+                    shaderEffect.render(mc.getTickDelta());
+                }, () ->
+                {
+                    renderEntities(event.getTickDelta(), event.getMatrices());
+                });
+            }
+            case GRADIENT ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getGradientShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    Color brighter = colorConfig.getValue().brighter().brighter();
+                    shaderEffect.setUniformValue("color1", brighter.getRed() / 255.0f, brighter.getGreen() / 255.0f, brighter.getBlue() / 255.0f, brighter.getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
+                    shaderEffect.setUniformValue("mixFactor", colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+                    shaderEffect.render(mc.getTickDelta());
+                    shaderTime += speedConfig.getValue();
+                }, () ->
+                {
+                    renderEntities(event.getTickDelta(), event.getMatrices());
+                });
+            }
+        }
+    }
+    
+    private void renderEntities(float tickDelta, MatrixStack matrixStack) 
+    {
+        VertexConsumerProvider vertexConsumerProvider = ((AccessorWorldRenderer) mc.worldRenderer).hookGetBufferBuilders().getEntityVertexConsumers();
+        for (Entity entity : mc.world.getEntities())
+        {
+            if (checkShaders(entity))
+            {
+                Vec3d camera = mc.gameRenderer.getCamera().getPos();
+                double d = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
+                double e = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
+                double f = MathHelper.lerp(tickDelta, entity.lastRenderZ, entity.getZ());
+                float g = MathHelper.lerp(tickDelta, entity.prevYaw, entity.getYaw());
+                EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(entity);
+                int light = mc.getEntityRenderDispatcher().getLight(entity, tickDelta);
+                try
+                {
+                    Vec3d vec3d = entityRenderer.getPositionOffset(entity, tickDelta);
+                    double x = (d - camera.x) + vec3d.x;
+                    double y = (e - camera.y) + vec3d.y;
+                    double z = (f - camera.z) + vec3d.z;
+                    matrixStack.push();
+                    matrixStack.translate(x, y, z);
+                    entityRenderer.render(entity, g, tickDelta, matrixStack, vertexConsumerProvider, light);
+                    matrixStack.translate(-vec3d.getX(), -vec3d.getY(), -vec3d.getZ());
+                    matrixStack.pop();
+                }
+                catch (Exception exception)
+                {
+                    exception.printStackTrace();
+                    Shoreline.error("Failed to render shader on entity!");
                 }
             }
-            // ciaohack solutions
-            EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(mc.player);
-            event.getMatrices().push();
-            event.getMatrices().translate(0.0, -100000000.0, 0.0);
-            entityRenderer.render(mc.player, mc.player.getYaw(), event.getTickDelta(), event.getMatrices(), vertexConsumerProvider, 0);
-            event.getMatrices().pop();
-        });
+        }
+        // ciaohack solutions
+        EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(mc.player);
+        matrixStack.push();
+        matrixStack.translate(0.0, -100000000.0, 0.0);
+        entityRenderer.render(mc.player, mc.player.getYaw(), tickDelta, matrixStack, vertexConsumerProvider, 0);
+        matrixStack.pop();
     }
 
 //    @EventListener
@@ -154,7 +189,7 @@ public class ShadersModule extends ToggleModule
 //                    BlockPos blockPos3 = blockEntity.getPos();
 //                    event.getMatrices().push();
 //                    event.getMatrices().translate((double)blockPos3.getX() - d, (double)blockPos3.getY() - e, (double)blockPos3.getZ() - g);
-//                    mc.getBlockEntityRenderDispatcher().render(blockEntity, event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
+//                    mc.getBlockEntityRenderDispatcher().render(blockEntity, tickDelta, event.getMatrices(), vertexConsumerProvider);
 //                    event.getMatrices().pop();
 //                }
 //            }
@@ -164,25 +199,58 @@ public class ShadersModule extends ToggleModule
     @EventListener
     public void onReloadShader(ReloadShaderEvent event)
     {
-        if (handsConfig.getValue())
+        if (!handsConfig.getValue())
         {
-            ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect1();
-            if (shaderEffect == null)
-            {
-                return;
-            }
-            Managers.SHADER.applyShader(shaderEffect, () ->
-            {
-                shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
-                shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
-                shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
-                shaderEffect.render(mc.getTickDelta());
-            }, () ->
-            {
-                ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
-            });
+            return;
         }
+        switch (modeConfig.getValue())
+        {
+            case OUTLINE ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+                    shaderEffect.render(mc.getTickDelta());
+                }, () ->
+                {
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
+                });
+            }
+            case GRADIENT ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getGradientShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    Color brighter = colorConfig.getValue().brighter().brighter();
+                    shaderEffect.setUniformValue("color1", brighter.getRed() / 255.0f, brighter.getGreen() / 255.0f, brighter.getBlue() / 255.0f, brighter.getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
+                    shaderEffect.setUniformValue("mixFactor", colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+                    shaderEffect.render(mc.getTickDelta());
+                    shaderTime += speedConfig.getValue();
+                }, () ->
+                {
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
+                });
+            }
+        };
     }
 
     private boolean checkShaders(Entity entity)
@@ -208,8 +276,8 @@ public class ShadersModule extends ToggleModule
 
     private enum ShaderMode
     {
-        NORMAL,
-        GRADIENT,
-        IMAGE
+        OUTLINE,
+        GRADIENT
+        // IMAGE
     }
 }

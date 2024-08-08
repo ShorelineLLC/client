@@ -6,7 +6,7 @@
     "dstrgb": "1-srcalpha"
   },
   "vertex": "sobel",
-  "fragment": "shoreline:outline",
+  "fragment": "shoreline:gradient",
   "attributes": [
     "Position"
   ],
@@ -47,8 +47,26 @@
       "values": [ 1.0, 1.0, 1.0, 1.0 ]
     },
     {
-      "name": "dotRadius",
-      "type": "int",
+      "name": "color1",
+      "type": "float",
+      "count": 4,
+      "values": [ 1.0, 1.0, 1.0, 1.0 ]
+    },
+    {
+      "name": "factor",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "mixFactor",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "time",
+      "type": "float",
       "count": 1,
       "values": [ 1.0 ]
     },
