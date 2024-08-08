@@ -336,19 +336,20 @@ public class NametagsModule extends ToggleModule
                 mc.getBufferBuilders().getEntityVertexConsumers().draw();
                 matrixStack.pop();
                 renderItemOverlay(matrixStack, stack, (int) n10, (int) y);
+
+                matrixStack.scale(0.5f, 0.5f, 0.5f);
+                if (durabilityConfig.getValue())
+                {
+                    renderDurability(matrixStack, stack, n10 + 2.0f, m2 - 4.5f);
+                }
+                if (enchantmentsConfig.getValue())
+                {
+                    renderEnchants(matrixStack, stack, n10 + 2.0f, m2);
+                }
+                matrixStack.scale(2.0f, 2.0f, 2.0f);
             }
             // int n4 = (n11 > 4) ? ((n11 - 4) * 8 / 2) : 0;
             // mc.getItemRenderer().renderInGui(matrixStack, mc.textRenderer, stack, n10, m2);
-            matrixStack.scale(0.5f, 0.5f, 0.5f);
-            if (durabilityConfig.getValue())
-            {
-                renderDurability(matrixStack, stack, n10 + 2.0f, m2 - 4.5f);
-            }
-            if (enchantmentsConfig.getValue())
-            {
-                renderEnchants(matrixStack, stack, n10 + 2.0f, m2);
-            }
-            matrixStack.scale(2.0f, 2.0f, 2.0f);
             n10 += 16;
         }
         //

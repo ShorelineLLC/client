@@ -24,6 +24,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
+import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -226,7 +227,7 @@ public final class ScaffoldModule extends RotationModule
     private BlockData getBlockData(boolean hold)
     {
         int posY = (int) Math.floor(mc.player.getY()) - 1;
-        if (keepYConfig.getValue())
+        if (keepYConfig.getValue() && MovementUtil.isInputtingMovement())
         {
             if (mc.player.isOnGround() || groundPosY == -1)
             {

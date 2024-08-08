@@ -309,14 +309,7 @@ pub unsafe fn define_class_via_knot(env: &mut JNIEnv,
         name.replace(obfstr!("."), obfstr!("/")),
         &context_classloader,
         decrypted_class_bytes.as_slice()
-    );
-
-    if env.exception_check().unwrap()
-    {
-        env.exception_describe().unwrap()
-    }
-
-    let clazz = clazz.unwrap();
+    ).unwrap();
 
     // attempt to autoregister the native bootstrap method, which will error if it doesnt exist
     // so we'll just clear the error >:)

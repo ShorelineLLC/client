@@ -23,6 +23,7 @@ import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
+import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.MathUtil;
 import net.shoreline.client.util.player.MovementUtil;
@@ -151,6 +152,8 @@ public class SpeedModule extends ToggleModule
                     || FlightModule.getInstance().isEnabled()
                     || LongJumpModule.getInstance().isEnabled()
                     || DisablerModule.getInstance().grimFireworkCheck()
+                    || (FreecamModule.getInstance().isEnabled() && !FreecamModule.getInstance().control)
+                    || mc.player.getAbilities().flying
                     //      || Modules.ELYTRA_FLY.isEnabled()
                     || mc.player.isRiding()
                     || mc.player.isFallFlying()

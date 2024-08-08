@@ -51,7 +51,7 @@ public class FreecamModule extends ToggleModule
 
     public float yaw, pitch;
 
-    private boolean control = false;
+    public boolean control = false;
 
     public FreecamModule()
     {

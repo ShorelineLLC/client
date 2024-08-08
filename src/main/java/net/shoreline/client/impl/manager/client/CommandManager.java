@@ -100,7 +100,7 @@ public class CommandManager implements Globals
         }
     }
 
-    @EventListener
+    @EventListener(priority = 999)
     public void onChatMessage(ChatMessageEvent.Client event)
     {
         final String text = event.getMessage().trim();

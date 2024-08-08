@@ -141,6 +141,17 @@ public final class IRCManager implements Globals
         });
     }
 
+    public void addServerMessageToChat(String message)
+    {
+        mc.send(() ->
+        {
+            if (mc.player != null && mc.world != null)
+            {
+                ChatUtil.clientSendMessageRaw("§s[IRC/Server]§f %s", message);
+            }
+        });
+    }
+
     public void setBackupToken(String token)
     {
         this.backupToken = token;
