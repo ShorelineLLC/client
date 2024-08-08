@@ -3,13 +3,13 @@ package net.shoreline.client.impl.irc.packet.client;
 import com.google.gson.JsonObject;
 import net.shoreline.client.impl.irc.packet.IRCPacket;
 
-public final class CPacketChatMessage extends IRCPacket
+public final class CPacketBroadcastServerMsg extends IRCPacket
 {
     private final String message;
 
-    public CPacketChatMessage(String message)
+    public CPacketBroadcastServerMsg(String message)
     {
-        super("CPacketChatMessage");
+        super("CPacketBroadcastServerMsg");
 
         this.message = message;
     }

@@ -11,13 +11,14 @@ public abstract class IRCPacket
         this.name = name;
     }
 
-    public abstract JsonObject asJsonObject();
+    public abstract void addData(JsonObject object);
 
     public final String fullySerialize()
     {
-        JsonObject object = asJsonObject();
+        JsonObject object = new JsonObject();
 
         object.addProperty("Packet", this.name);
+        addData(object);
 
         return object.toString();
     }

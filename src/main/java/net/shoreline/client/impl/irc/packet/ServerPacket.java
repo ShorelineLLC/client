@@ -37,6 +37,7 @@ public abstract class ServerPacket
             case "SPacketSuccessfulConnection" -> SPacketSuccessfulConnection.newInstance(text);
             case "SPacketRateLimit" -> new SPacketRateLimit();
             case "SPacketChatMessage" -> SPacketChatMessage.newInstance(text);
+            case "SPacketServerMessage" -> SPacketServerMessage.newInstance(text);
             default -> null;
         };
 
