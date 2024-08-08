@@ -253,7 +253,7 @@ public class NametagsModule extends ToggleModule
             OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(entity.getGameProfile().getName());
             if (onlineUsersConfig.getValue() && onlineUser != null)
             {
-                Identifier identifier = getNametagLogo(onlineUser);
+                Identifier identifier = getNametagLogo(onlineUser.getUsertype());
                 RenderManager.rectTextured(matrices, identifier, (int) -width - 1.5f, (int) -width + 6.0f,
                         0.5f, 8.0f, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
             }
@@ -268,9 +268,9 @@ public class NametagsModule extends ToggleModule
         return onlineUsersConfig.getValue() && IRCManager.getInstance().findOnlineUser(entity.getGameProfile().getName()) != null;
     }
 
-    private Identifier getNametagLogo(OnlineUser onlineUser)
+    public Identifier getNametagLogo(OnlineUser.UserType onlineUser)
     {
-        return switch (onlineUser.getUsertype())
+        return switch (onlineUser)
         {
             case RELEASE -> new Identifier("shoreline", "logo/white.png");
             case BETA -> new Identifier("shoreline", "logo/blue.png");

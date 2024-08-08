@@ -3,13 +3,17 @@ package net.shoreline.client.mixin.gui.hud;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.event.gui.hud.PlayerListColumnsEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListEvent;
+import net.shoreline.client.impl.event.gui.hud.PlayerListIconEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListNameEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
@@ -17,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -30,7 +35,6 @@ import java.util.List;
 @Mixin(PlayerListHud.class)
 public abstract class MixinPlayerListHud
 {
-
     @Shadow
     @Final
     private static Comparator<PlayerListEntry> ENTRY_ORDERING;
@@ -64,6 +68,28 @@ public abstract class MixinPlayerListHud
             cir.cancel();
             cir.setReturnValue(playerListNameEvent.getPlayerName());
         }
+    }
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;getWidth(Lnet/minecraft/text/StringVisitable;)I"))
+    private int hookRender(TextRenderer instance, StringVisitable text)
+    {
+        PlayerListIconEvent.Width playerListIconEvent = new PlayerListIconEvent.Width(text.getString());
+        EventBus.INSTANCE.dispatch(playerListIconEvent);
+        if (playerListIconEvent.isCanceled())
+        {
+            return instance.getWidth(text) + 12;
+        }
+        return instance.getWidth(text);
+    }
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)I"))
+    private int hookRender(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int color)
+    {
+        PlayerListIconEvent.Render playerListIconEvent = new PlayerListIconEvent.Render(text, instance, textRenderer, x, y, color);
+        EventBus.INSTANCE.dispatch(playerListIconEvent);
+        int x1 = playerListIconEvent.isCanceled() ? x + 12 : x;
+        instance.drawTextWithShadow(textRenderer, text, x1, y, color);
+        return x1;
     }
 
     /**

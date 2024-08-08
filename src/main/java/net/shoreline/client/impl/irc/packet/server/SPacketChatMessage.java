@@ -52,9 +52,8 @@ public final class SPacketChatMessage extends ServerPacket
     @Override
     public void apply(IRCManager ircManager)
     {
-        String message = Formatting.GRAY
-                + "<" + this.sender.getUsertype().getColorCode() + this.sender.getName() + Formatting.GRAY + "> "
-                + this.sender.getUsertype().getChatColorCode() + this.message;
+        String message = this.sender.getUsertype().getColorCode()
+                + "<" + this.sender.getName() + "> " + Formatting.GRAY + this.message;
 
         ircManager.addToChat(message);
     }

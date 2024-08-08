@@ -31,7 +31,7 @@ public final class AWTFontRenderer implements Closeable, Globals
     private int scale;
     private int lastScale;
 
-    private final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OG]");
+    private static final Pattern PATTERN_CONTROL_CODE = Pattern.compile("(?i)\\u00A7[0-9A-FK-OG]");
 
     private final ObjectList<GlyphCache> caches = new ObjectArrayList<>();
     private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
@@ -52,9 +52,9 @@ public final class AWTFontRenderer implements Closeable, Globals
         createFont(font, size);
     }
 
-    public String stripControlCodes(String text)
+    public static String stripControlCodes(String text)
     {
-        return patternControlCode.matcher(text).replaceAll("");
+        return PATTERN_CONTROL_CODE.matcher(text).replaceAll("");
     }
 
     private void createFont(Font font, float size)

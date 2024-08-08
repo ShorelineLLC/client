@@ -1,15 +1,22 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.gui.hud.PlayerListColumnsEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListEvent;
+import net.shoreline.client.impl.event.gui.hud.PlayerListIconEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListNameEvent;
+import net.shoreline.client.impl.font.AWTFontRenderer;
+import net.shoreline.client.impl.irc.IRCManager;
+import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -34,21 +41,67 @@ public class ExtraTabModule extends ToggleModule
     @EventListener
     public void onPlayerListName(PlayerListNameEvent event)
     {
-        if (selfConfig.getValue() && event.getPlayerName().getString().contains(mc.getGameProfile().getName()))
+        String[] names = event.getPlayerName().getString().split(" ");
+        if (selfConfig.getValue())
         {
-            event.cancel();
-            event.setPlayerName(Text.of(("§s" + event.getPlayerName().getString())));
+            for (String s : names)
+            {
+                if (s.equals(mc.getGameProfile().getName()))
+                {
+                    event.cancel();
+                    event.setPlayerName(Text.of(("§s" + event.getPlayerName().getString())));
+                    break;
+                }
+            }
         }
         else if (friendsConfig.getValue() && SocialsModule.getInstance().isFriendsEnabled())
         {
-            for (String s : Managers.SOCIAL.getFriends())
+            for (String s : names)
             {
-                if (event.getPlayerName().getString().contains(s))
+                if (Managers.SOCIAL.isFriend(s))
                 {
                     event.cancel();
                     event.setPlayerName(Text.of(Formatting.AQUA + event.getPlayerName().getString()));
                     break;
                 }
+            }
+        }
+    }
+
+    @EventListener
+    public void onPlayerListIcon(PlayerListIconEvent.Width event)
+    {
+        String[] names = event.getText().split(" ");
+        for (String name : names)
+        {
+            String name1 = stripControlCodes(name);
+            OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(name1);
+            if (onlineUser != null)
+            {
+                event.cancel();
+                break;
+            }
+        }
+    }
+
+    @EventListener
+    public void onPlayerListIconRender(PlayerListIconEvent.Render event)
+    {
+        String[] names = event.getPlayerNameText().getString().split(" ");
+        for (String name : names)
+        {
+            // String name1 = AWTFontRenderer.stripControlCodes(name);
+            String name1 = stripControlCodes(name);
+            OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(name1);
+            if (onlineUser != null)
+            {
+                event.cancel();
+                Identifier identifier = NametagsModule.getInstance().getNametagLogo(onlineUser.getUsertype());
+                event.getMatrixStack().push();
+                RenderManager.rectTextured(event.getMatrixStack(), identifier, (float) event.getX() + 1.0f, (float) event.getX() + 9.0f, (float) event.getY(), (float) event.getY() + 8.0f,
+                        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+                event.getMatrixStack().pop();
+                break;
             }
         }
     }
@@ -65,5 +118,26 @@ public class ExtraTabModule extends ToggleModule
     {
         event.cancel();
         event.setTabHeight(columnsConfig.getValue());
+    }
+
+    private String stripControlCodes(String string)
+    {
+        StringBuilder builder = new StringBuilder();
+        boolean skip = false;
+        for (char c : string.toCharArray())
+        {
+            if (c == Formatting.FORMATTING_CODE_PREFIX)
+            {
+                skip = true;
+                continue;
+            }
+            if (skip)
+            {
+                skip = false;
+                continue;
+            }
+            builder.append(c);
+        }
+        return builder.toString();
     }
 }

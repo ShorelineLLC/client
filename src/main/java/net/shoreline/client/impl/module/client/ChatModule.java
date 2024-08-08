@@ -10,6 +10,7 @@ import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.client.CPacketChatMessage;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -38,7 +39,7 @@ public class ChatModule extends ToggleModule
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press CONTROL to enter IRC chat!", 107);
+        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press ALT to enter IRC chat!", 107);
         notified = true;
     }
 
@@ -49,7 +50,7 @@ public class ChatModule extends ToggleModule
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press CONTROL to enter IRC chat!", 107);
+        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press ALT to enter IRC chat!", 107);
         notified = true;
     }
 
@@ -60,20 +61,24 @@ public class ChatModule extends ToggleModule
         {
             return;
         }
-        if (event.getAction() != GLFW.GLFW_REPEAT && (event.getKeycode() == GLFW.GLFW_KEY_LEFT_CONTROL
-                || event.getKeycode() == GLFW.GLFW_KEY_LEFT_SUPER) && mc.currentScreen instanceof ChatScreen)
+        if (event.getAction() != GLFW.GLFW_REPEAT && (event.getKeycode() == GLFW.GLFW_KEY_LEFT_ALT
+                || event.getKeycode() == GLFW.GLFW_KEY_RIGHT_ALT) && mc.currentScreen instanceof ChatScreen)
         {
             ircChat = !ircChat;
             timer.reset();
         }
     }
 
-    @EventListener
+    @EventListener(priority = Integer.MIN_VALUE)
     public void onChatMessage(ChatMessageEvent.Client event)
     {
         if (ircChat)
         {
             final String text = event.getMessage().trim();
+            if (text.isEmpty() || text.isBlank() || text.startsWith(Managers.COMMAND.getPrefix()) || text.startsWith("/"))
+            {
+                return;
+            }
             event.cancel();
             IRCManager.getInstance().sendPacket(new CPacketChatMessage(text));
         }
