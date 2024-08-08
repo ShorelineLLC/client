@@ -55,7 +55,7 @@ import java.util.stream.Stream;
  */
 public class HUDModule extends ToggleModule
 {
-
+    private static HUDModule INSTANCE;
     //
     // private static final HudScreen HUD_SCREEN = new HudScreen();
     //
@@ -99,6 +99,12 @@ public class HUDModule extends ToggleModule
     {
         super("HUD", "Displays the HUD (heads up display) screen.",
                 ModuleCategory.CLIENT);
+        INSTANCE = this;
+    }
+
+    public static HUDModule getInstance()
+    {
+        return INSTANCE;
     }
 
     private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule)

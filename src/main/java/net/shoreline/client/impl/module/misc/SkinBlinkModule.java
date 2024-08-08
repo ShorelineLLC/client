@@ -46,7 +46,7 @@ public class SkinBlinkModule extends ToggleModule
     @Override
     public void onDisable()
     {
-        if (enabledPlayerModelParts == null)
+        if (enabledPlayerModelParts == null || mc.options == null)
         {
             return;
         }

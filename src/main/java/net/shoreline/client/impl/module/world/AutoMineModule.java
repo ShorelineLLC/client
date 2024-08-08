@@ -323,6 +323,11 @@ public class AutoMineModule extends RotationModule
             {
                 if (data.getBlockDamage() >= 0.1f && data.getBlockDamage() < 0.9f)
                 {
+                    if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+                    {
+                        return;
+                    }
+                    Managers.INVENTORY.setSlot(data.getSlot());
                     Managers.INVENTORY.syncToClient();
                 }
                 else if (data.getBlockDamage() >= 0.9f)

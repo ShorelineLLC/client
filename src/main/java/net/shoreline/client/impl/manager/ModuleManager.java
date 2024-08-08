@@ -36,6 +36,7 @@ public final class ModuleManager
                 // Client
                 new ServerModule(),
                 new CapesModule(),
+                new ChatModule(),
                 new ClickGuiModule(),
                 new ColorsModule(),
                 new FontModule(),
