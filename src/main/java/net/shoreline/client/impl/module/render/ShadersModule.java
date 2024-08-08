@@ -103,7 +103,6 @@ public class ShadersModule extends ToggleModule
                     Color brighter = colorConfig.getValue().brighter().brighter();
                     shaderEffect.setUniformValue("color1", brighter.getRed() / 255.0f, brighter.getGreen() / 255.0f, brighter.getBlue() / 255.0f, brighter.getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
-                    shaderEffect.setUniformValue("mixFactor", colorConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
@@ -239,7 +238,6 @@ public class ShadersModule extends ToggleModule
                     Color brighter = colorConfig.getValue().brighter().brighter();
                     shaderEffect.setUniformValue("color1", brighter.getRed() / 255.0f, brighter.getGreen() / 255.0f, brighter.getBlue() / 255.0f, brighter.getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
-                    shaderEffect.setUniformValue("mixFactor", colorConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);

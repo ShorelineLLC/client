@@ -12,7 +12,6 @@ uniform vec2 texelSize;
 uniform vec4 color;
 uniform vec4 color1;
 uniform float factor;
-uniform float mixFactor;
 uniform float time;
 
 uniform float radius;
@@ -30,7 +29,7 @@ void main()
         float r = color.r * distance + color1.r * distanceInv;
         float g = color.g * distance + color1.g * distanceInv;
         float b = color.b * distance + color1.b * distanceInv;
-        fragColor = vec4(r, g, b, mixFactor);
+        fragColor = vec4(r, g, b, color.a);
     }
     else
     {

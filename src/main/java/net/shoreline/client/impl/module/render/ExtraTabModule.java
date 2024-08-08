@@ -44,22 +44,24 @@ public class ExtraTabModule extends ToggleModule
         {
             for (String s : names)
             {
-                if (s.equals(mc.getGameProfile().getName()))
+                String name1 = stripControlCodes(s);
+                if (name1.equals(mc.getGameProfile().getName()))
                 {
                     event.cancel();
                     event.setPlayerName(Text.of(("§s" + event.getPlayerName().getString())));
-                    break;
+                    return;
                 }
             }
         }
-        else if (friendsConfig.getValue() && SocialsModule.getInstance().isFriendsEnabled())
+        if (friendsConfig.getValue() && SocialsModule.getInstance().isFriendsEnabled())
         {
             for (String s : names)
             {
-                if (Managers.SOCIAL.isFriend(s))
+                String name1 = stripControlCodes(s);
+                if (Managers.SOCIAL.isFriend(name1))
                 {
                     event.cancel();
-                    event.setPlayerName(Text.of(Formatting.AQUA + event.getPlayerName().getString()));
+                    event.setPlayerName(Text.of("§b" + event.getPlayerName().getString()));
                     break;
                 }
             }
