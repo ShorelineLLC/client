@@ -23,7 +23,7 @@ public final class CloakCommand extends Command
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
         builder.then(
-                argument("rank", StringArgumentType.greedyString())
+                argument("rank", StringArgumentType.string())
                         .suggests(suggest(getSuggestions()))
                         .executes(c ->
                         {

@@ -3,6 +3,8 @@ package net.shoreline.client.impl.irc.user;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.module.client.CapesModule;
 
+import java.text.Format;
+
 public final class OnlineUser
 {
     private final String name;
@@ -35,20 +37,28 @@ public final class OnlineUser
 
     public enum UserType
     {
-        RELEASE(Formatting.WHITE),
-        BETA(Formatting.BLUE),
-        DEV(Formatting.RED);
+        RELEASE(Formatting.WHITE, Formatting.GRAY),
+        BETA(Formatting.BLUE, Formatting.WHITE),
+        DEV(Formatting.RED, Formatting.WHITE);
 
         private final Formatting colorCode;
+        private final Formatting chatColorCode;
 
-        UserType(Formatting colorCode)
+        UserType(Formatting colorCode,
+                 Formatting chatColorCode)
         {
             this.colorCode = colorCode;
+            this.chatColorCode = chatColorCode;
         }
 
         public Formatting getColorCode()
         {
             return this.colorCode;
+        }
+
+        public Formatting getChatColorCode()
+        {
+            return this.chatColorCode;
         }
     }
 }

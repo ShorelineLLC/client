@@ -54,7 +54,7 @@ public final class SPacketChatMessage extends ServerPacket
     {
         String message = Formatting.GRAY
                 + "<" + this.sender.getUsertype().getColorCode() + this.sender.getName() + Formatting.GRAY + "> "
-                + this.message;
+                + this.sender.getUsertype().getChatColorCode() + this.message;
 
         ircManager.addToChat(message);
     }

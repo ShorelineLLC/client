@@ -21,7 +21,7 @@ public final class DirectServerMsgCommand extends Command
     {
         builder.then(
                 argument("username", StringArgumentType.string())
-                        .then(argument("message", StringArgumentType.string())
+                        .then(argument("message", StringArgumentType.greedyString())
                         .executes(c ->
                         {
                             String username = c.getArgument("username", String.class);

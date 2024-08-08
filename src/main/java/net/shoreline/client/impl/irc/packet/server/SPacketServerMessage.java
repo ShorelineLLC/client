@@ -34,7 +34,7 @@ public final class SPacketServerMessage extends ServerPacket
     @Override
     public void apply(IRCManager ircManager)
     {
-        String message = Formatting.GRAY + "[" + Formatting.YELLOW + "SERVER" + Formatting.GRAY + "] "
+        String message = Formatting.WHITE + "[" + Formatting.YELLOW + "SERVER" + Formatting.WHITE + "] "
                 + Formatting.WHITE
                 + this.message;
 

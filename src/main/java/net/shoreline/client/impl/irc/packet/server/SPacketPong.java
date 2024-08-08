@@ -15,6 +15,7 @@ import java.util.List;
 public final class SPacketPong extends ServerPacket
 {
     private final List<OnlineUser> activeOnlineUsers = new ArrayList<>();
+    private final List<String> allOnlineUsers = new ArrayList<>();
 
     public static SPacketPong newInstance(String packet)
     {
@@ -37,9 +38,9 @@ public final class SPacketPong extends ServerPacket
     {
         JsonObject object = JsonParser.parseString(packet).getAsJsonObject();
 
-        JsonArray users = object.get("Online-Users").getAsJsonArray();
+        JsonArray activeUsers = object.get("Active-Online-Users").getAsJsonArray();
 
-        for (JsonElement user : users.asList())
+        for (JsonElement user : activeUsers.asList())
         {
             JsonObject session = user.getAsJsonObject();
 
@@ -66,6 +67,14 @@ public final class SPacketPong extends ServerPacket
             OnlineUser onlineUser = new OnlineUser(userName, type, capes);
             this.activeOnlineUsers.add(onlineUser);
         }
+
+        JsonArray users = object.get("All-Online-Users").getAsJsonArray();
+
+        for (JsonElement user : users.asList())
+        {
+            String username = user.getAsString();
+            this.allOnlineUsers.add(username);
+        }
     }
 
     @Override
@@ -73,5 +82,8 @@ public final class SPacketPong extends ServerPacket
     {
         ircManager.getActiveOnlineUsers().clear();
         ircManager.getActiveOnlineUsers().addAll(this.activeOnlineUsers);
+
+        ircManager.getAllOnlineUsers().clear();
+        ircManager.getAllOnlineUsers().addAll(this.allOnlineUsers);
     }
 }

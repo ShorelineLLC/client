@@ -35,9 +35,13 @@ public final class IRCManager implements Globals
 
     /**
      * A list of users using Shoreline on the CURRENT SERVER YOU ARE ON, NOT globally.
-     * There will be no API to read all online users everywhere.
      */
     private final Set<OnlineUser> activeOnlineUsers = ConcurrentHashMap.newKeySet();
+
+    /**
+     * A list of global Shoreline users
+     */
+    private final Set<String> allOnlineUsers = ConcurrentHashMap.newKeySet();
 
     private IRCManager()
     {
@@ -114,6 +118,11 @@ public final class IRCManager implements Globals
     public Set<OnlineUser> getActiveOnlineUsers()
     {
         return this.activeOnlineUsers;
+    }
+
+    public Set<String> getAllOnlineUsers()
+    {
+        return this.allOnlineUsers;
     }
 
     public void clearOutboundPackets()

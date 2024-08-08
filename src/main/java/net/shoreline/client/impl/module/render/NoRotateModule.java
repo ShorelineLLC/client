@@ -35,6 +35,12 @@ public class NoRotateModule extends ToggleModule
         {
             return;
         }
+
+        if (mc.isInSingleplayer())
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket packet)
         {
             yaw = packet.getYaw();
@@ -53,6 +59,11 @@ public class NoRotateModule extends ToggleModule
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event)
     {
+        if (mc.isInSingleplayer())
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof PlayerMoveC2SPacket.Full packet && cancelRotate)
         {
             if (positionAdjustConfig.getValue())

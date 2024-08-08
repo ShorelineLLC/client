@@ -20,7 +20,7 @@ public final class BroadcastServerMsgCommand extends Command
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
         builder.then(
-                argument("message", StringArgumentType.string())
+                argument("message", StringArgumentType.greedyString())
                         .executes(c ->
                         {
                             String argument = c.getArgument("message", String.class);
