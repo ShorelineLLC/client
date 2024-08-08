@@ -14,6 +14,8 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.lwjgl.glfw.GLFW;
 
@@ -26,6 +28,8 @@ public class ChatModule extends ToggleModule
     private boolean ircChat;
     private boolean notified;
     private final Timer timer = new CacheTimer();
+
+    private final Animation ircAnimation = new Animation(false, 200, Easing.LINEAR);
 
     public ChatModule()
     {
@@ -65,6 +69,7 @@ public class ChatModule extends ToggleModule
                 || event.getKeycode() == GLFW.GLFW_KEY_RIGHT_ALT) && mc.currentScreen instanceof ChatScreen)
         {
             ircChat = !ircChat;
+            ircAnimation.setState(ircChat);
             timer.reset();
         }
     }
@@ -87,13 +92,13 @@ public class ChatModule extends ToggleModule
     @EventListener
     public void onRenderOverlay(RenderOverlayEvent.Post event)
     {
-        if (mc.currentScreen instanceof ChatScreen && ircChat)
+        if (mc.currentScreen instanceof ChatScreen && ircAnimation.getFactor() > 0.01)
         {
             float height = mc.getWindow().getScaledHeight();
             float width = mc.getWindow().getScaledWidth();
             float anim = HUDModule.getInstance().isEnabled() ? HUDModule.getInstance().getChatAnimation() : 1.0f;
-            RenderManager.borderedRect(event.getContext().getMatrices(), 2, (int) (height - 2.0f),
-                    width - 4, -12.0f * anim, ColorsModule.getInstance().getRGB(), 1.0f);
+            RenderManager.borderedRect(event.getContext().getMatrices(), 2, (int) (height - 1.0f),
+                    width - 4, -14.0f * anim, ColorsModule.getInstance().getRGB((int) (255.0f * ircAnimation.getFactor())), 1.0f);
         }
     }
 }

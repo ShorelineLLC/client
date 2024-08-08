@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.render;
 
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -14,7 +13,6 @@ import net.shoreline.client.impl.event.gui.hud.PlayerListColumnsEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListIconEvent;
 import net.shoreline.client.impl.event.gui.hud.PlayerListNameEvent;
-import net.shoreline.client.impl.font.AWTFontRenderer;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.impl.module.client.SocialsModule;
