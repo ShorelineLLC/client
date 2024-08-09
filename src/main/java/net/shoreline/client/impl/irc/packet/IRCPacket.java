@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.irc.packet;
 
 import com.google.gson.JsonObject;
+import net.shoreline.client.impl.irc.IRCManager;
 
 public abstract class IRCPacket
 {
@@ -12,6 +13,8 @@ public abstract class IRCPacket
     }
 
     public abstract void addData(JsonObject object);
+
+    public void onSend(IRCManager ircManager) {}
 
     public final String fullySerialize()
     {

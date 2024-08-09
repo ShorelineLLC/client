@@ -6,16 +6,16 @@ import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.OnlineUserArgumentType;
 import net.shoreline.client.impl.irc.IRCManager;
-import net.shoreline.client.impl.irc.packet.client.CPacketBroadcastServerMsg;
+import net.shoreline.client.impl.irc.packet.client.CPacketDirectMessage;
 import net.shoreline.client.impl.irc.packet.client.CPacketDirectServerMsg;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.chat.ChatUtil;
 
-public final class DirectServerMsgCommand extends Command
+public final class DirectMessageCommand extends Command
 {
-    public DirectServerMsgCommand()
+    public DirectMessageCommand()
     {
-        super("DirectServerMsg", "Directs a server message to a player in the IRC", literal("directservermsg"));
+        super("DirectMessageCommand", "Directs a message to an online Shoreline user", literal("dm"));
     }
 
     @Override
@@ -24,16 +24,16 @@ public final class DirectServerMsgCommand extends Command
         builder.then(
                 argument("username", OnlineUserArgumentType.user())
                         .then(argument("message", StringArgumentType.greedyString())
-                        .executes(c ->
-                        {
-                            OnlineUser user = c.getArgument("username", OnlineUser.class);
-                            String message = c.getArgument("message", String.class);
+                                .executes(c ->
+                                {
+                                    OnlineUser user = c.getArgument("username", OnlineUser.class);
+                                    String message = c.getArgument("message", String.class);
 
-                            CPacketDirectServerMsg packet = new CPacketDirectServerMsg(user, message);
-                            IRCManager.getInstance().sendPacket(packet);
+                                    CPacketDirectMessage packet = new CPacketDirectMessage(user, message);
+                                    IRCManager.getInstance().sendPacket(packet);
 
-                            return 1;
-                        }))
+                                    return 1;
+                                }))
                         .executes(c -> {
                             ChatUtil.error("Invalid usage! Usage: " + getUsage());
                             return 1;

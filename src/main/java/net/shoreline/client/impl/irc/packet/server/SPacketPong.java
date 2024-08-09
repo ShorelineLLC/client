@@ -15,7 +15,7 @@ import java.util.List;
 public final class SPacketPong extends ServerPacket
 {
     private final List<OnlineUser> activeOnlineUsers = new ArrayList<>();
-    private final List<String> allOnlineUsers = new ArrayList<>();
+    private final List<OnlineUser> allOnlineUsers = new ArrayList<>();
 
     public static SPacketPong newInstance(String packet)
     {
@@ -72,8 +72,21 @@ public final class SPacketPong extends ServerPacket
 
         for (JsonElement user : users.asList())
         {
-            String username = user.getAsString();
-            this.allOnlineUsers.add(username);
+            JsonObject session = user.getAsJsonObject();
+
+            String userName = session.get("Username").getAsString();
+            String userType = session.get("User-Type").getAsString();
+
+            OnlineUser.UserType type = switch (userType.toLowerCase())
+            {
+                case "release" -> OnlineUser.UserType.RELEASE;
+                case "beta" -> OnlineUser.UserType.BETA;
+                case "dev" -> OnlineUser.UserType.DEV;
+                default -> throw new IllegalStateException("Unrecognized session user type" + userType);
+            };
+
+            OnlineUser onlineUser = new OnlineUser(userName, type, CapesModule.Capes.OFF);
+            this.allOnlineUsers.add(onlineUser);
         }
     }
 

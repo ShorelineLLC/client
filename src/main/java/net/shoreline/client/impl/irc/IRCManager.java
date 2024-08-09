@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.irc;
 
-import io.netty.util.internal.ConcurrentSet;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.irc.packet.IRCPacket;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.packet.client.CPacketPing;
@@ -9,7 +9,6 @@ import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.loader.Loader;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -41,7 +40,7 @@ public final class IRCManager implements Globals
     /**
      * A list of global Shoreline users
      */
-    private final Set<String> allOnlineUsers = ConcurrentHashMap.newKeySet();
+    private final Set<OnlineUser> allOnlineUsers = ConcurrentHashMap.newKeySet();
 
     private IRCManager()
     {
@@ -80,6 +79,7 @@ public final class IRCManager implements Globals
             {
                 IRCPacket packet = this.sendQueue.poll();
                 dispatchPacket(packet.fullySerialize());
+                packet.onSend(this);
             }
         }, 0, 250, TimeUnit.MILLISECONDS);
     }
@@ -115,12 +115,20 @@ public final class IRCManager implements Globals
                 .orElse(null);
     }
 
+    public OnlineUser findGlobalOnlineUser(String username)
+    {
+        return this.allOnlineUsers.stream()
+                .filter(onlineUser -> onlineUser.getName().equals(username))
+                .findFirst()
+                .orElse(null);
+    }
+
     public Set<OnlineUser> getActiveOnlineUsers()
     {
         return this.activeOnlineUsers;
     }
 
-    public Set<String> getAllOnlineUsers()
+    public Set<OnlineUser> getAllOnlineUsers()
     {
         return this.allOnlineUsers;
     }
@@ -136,7 +144,7 @@ public final class IRCManager implements Globals
         {
             if (mc.player != null && mc.world != null)
             {
-                ChatUtil.clientSendMessageRaw("§s[IRC]§f %s", message);
+                ChatUtil.clientSendMessageRaw("§s[IRC]§7 %s", message);
             }
         });
     }
@@ -147,7 +155,7 @@ public final class IRCManager implements Globals
         {
             if (mc.player != null && mc.world != null)
             {
-                ChatUtil.clientSendMessageRaw("§s[IRC/Server]§f %s", message);
+                ChatUtil.clientSendMessageRaw("§s[IRC/Server]§7 %s", message);
             }
         });
     }
