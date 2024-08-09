@@ -318,16 +318,12 @@ pub unsafe extern "system" fn on_initialize_client(mut env: JNIEnv,
         &[(&main_client_class).into()]
     ).unwrap().l().unwrap();
 
-    let a = env.call_method(
+    env.call_method(
         main_client_instance,
         client_initialization_function,
         obfstr!("()V"),
         &[]
-    );
-
-    env.exception_describe().unwrap();
-
-    a.unwrap().v().unwrap();
+    ).unwrap();
 }
 
 /* -------------------------------- Sponge -------------------------------- */

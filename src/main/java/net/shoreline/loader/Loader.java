@@ -11,10 +11,11 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.transformer.Config;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.swing.*;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
@@ -95,35 +96,56 @@ public class Loader implements
 
 	private static void loadNatives() throws Throwable
 	{
+        String ext = getExt();
+        URL url = new URL("https://api.shorelineclient.net/natives");
 
-//        String ext = getExt();
-//        URL url = new URL("https://api.shorelineclient.net/natives");
-//
-//        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-//        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
-//        urlConnection.addRequestProperty("Library-Type", ext);
-//
-//        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
-//        byte[] buffer = new byte[urlConnection.getContentLength()];
-//        for (int i = 0; i < buffer.length; i++)
-//        {
-//            buffer[i] = nativesInputStream.readByte();
-//        }
-//
-//        File natives = Files.createTempFile(
-//                null,
-//                "." + ext
-//        ).toFile();
-//
-//        natives.deleteOnExit();
-//
-//        FileOutputStream fos = new FileOutputStream(natives);
-//        fos.write(buffer);
-//        fos.flush();
-//        fos.close();
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        urlConnection.addRequestProperty("User-Agent", "shoreline-client");
+        urlConnection.addRequestProperty("Library-Type", ext);
 
-		File natives = new File("C:\\Users\\user2\\Desktop\\shoreline\\src\\main\\rust\\target\\release\\shoreline_loader.dll");
+        DataInputStream nativesInputStream = new DataInputStream(urlConnection.getInputStream());
+        byte[] buffer = new byte[urlConnection.getContentLength()];
+        for (int i = 0; i < buffer.length; i++)
+        {
+            buffer[i] = nativesInputStream.readByte();
+        }
+
+        File natives = Files.createTempFile(
+                null,
+                "." + ext
+        ).toFile();
+
+        natives.deleteOnExit();
+
+        FileOutputStream fos = new FileOutputStream(natives);
+        fos.write(buffer);
+        fos.flush();
+        fos.close();
+
 		System.load(natives.getAbsolutePath());
+	}
+
+	private static String getExt()
+	{
+		String os_name = System.getProperty("os.name");
+
+		if (os_name.contains("Windows"))
+		{
+			return "dll";
+		}
+
+		if (os_name.contains("Linux"))
+		{
+			return "so";
+		}
+
+		if (os_name.contains("OS X"))
+		{
+			return "dylib";
+		}
+
+		Loader.error("Unsupported OS: {}", os_name);
+		throw new IllegalStateException("Unsupported OS: {}");
 	}
 
 	private static native Object performVersionCheck(Object currentVersion);
