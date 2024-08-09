@@ -145,7 +145,7 @@ public class Loader implements
 		}
 
 		Loader.error("Unsupported OS: {}", os_name);
-		throw new IllegalStateException("Unsupported OS: {}");
+		throw new IllegalStateException("Unsupported OS: " + os_name);
 	}
 
 	private static native Object performVersionCheck(Object currentVersion);
