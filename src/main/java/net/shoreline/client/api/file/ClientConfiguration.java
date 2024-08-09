@@ -121,6 +121,17 @@ public class ClientConfiguration implements Globals
         }
     }
 
+    public void saveClientModules()
+    {
+        for (ConfigFile file : files)
+        {
+            if (file instanceof ModuleFile)
+            {
+                file.save();
+            }
+        }
+    }
+
     /**
      *
      */
@@ -129,6 +140,17 @@ public class ClientConfiguration implements Globals
         for (ConfigFile file : files)
         {
             file.load();
+        }
+    }
+
+    public void loadClientModules()
+    {
+        for (ConfigFile file : files)
+        {
+            if (file instanceof ModuleFile)
+            {
+                file.load();
+            }
         }
     }
 
