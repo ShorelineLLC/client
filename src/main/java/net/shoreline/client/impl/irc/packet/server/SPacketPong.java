@@ -16,6 +16,7 @@ public final class SPacketPong extends ServerPacket
 {
     private final List<OnlineUser> activeOnlineUsers = new ArrayList<>();
     private final List<OnlineUser> allOnlineUsers = new ArrayList<>();
+    private final boolean muted;
 
     public static SPacketPong newInstance(String packet)
     {
@@ -88,6 +89,8 @@ public final class SPacketPong extends ServerPacket
             OnlineUser onlineUser = new OnlineUser(userName, type, CapesModule.Capes.OFF);
             this.allOnlineUsers.add(onlineUser);
         }
+
+        this.muted = object.get("Muted").getAsBoolean();
     }
 
     @Override
@@ -98,5 +101,7 @@ public final class SPacketPong extends ServerPacket
 
         ircManager.getAllOnlineUsers().clear();
         ircManager.getAllOnlineUsers().addAll(this.allOnlineUsers);
+
+        ircManager.MUTED = this.muted;
     }
 }

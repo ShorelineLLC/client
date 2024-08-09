@@ -30,6 +30,8 @@ public final class IRCManager implements Globals
 
     public boolean FULLY_KILLED = false;
 
+    public boolean MUTED = false;
+
     private final Queue<IRCPacket> sendQueue = new ConcurrentLinkedQueue<>();
 
     /**
