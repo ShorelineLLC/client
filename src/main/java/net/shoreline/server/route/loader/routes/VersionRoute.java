@@ -1,4 +1,4 @@
-package net.shoreline.server.route.loader.route;
+package net.shoreline.server.route.loader.routes;
 
 import io.javalin.http.*;
 import net.shoreline.server.ServerMain;
@@ -6,11 +6,11 @@ import net.shoreline.server.route.Route;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * Throws:
  *   NotFoundResponse (404) -> Headers not set properly, session attribute not set
+ *   ConflictResponse (409) -> The versions of the loader don't match the server
  *   InternalServerErrorResponse (500) -> Some internal error happened
  */
 public final class VersionRoute extends Route
@@ -32,7 +32,7 @@ public final class VersionRoute extends Route
             throw new NotFoundResponse();
         }
 
-        String usertype = context.sessionAttribute("Usertype");
+        String usertype = context.sessionAttribute("User-Type");
 
         if (usertype == null)
         {
@@ -40,7 +40,7 @@ public final class VersionRoute extends Route
         }
 
         String path = String.format(
-                "/home/container/assets/%s/%s-loader-version.txt",
+                "/home/container/assets/loader/%s/%s-loader-version.txt",
                 usertype,
                 usertype
         );

@@ -1,4 +1,4 @@
-package net.shoreline.server.route.loader.route;
+package net.shoreline.server.route.installer.routes;
 
 import io.javalin.http.Context;
 import io.javalin.http.InternalServerErrorResponse;
@@ -13,7 +13,7 @@ public final class NativesRoute extends Route
     {
         String userAgent = context.header("User-Agent");
 
-        if (!"shoreline-client".equals(userAgent))
+        if (!"shoreline-installer".equals(userAgent))
         {
             throw new NotFoundResponse();
         }
@@ -26,7 +26,7 @@ public final class NativesRoute extends Route
         }
 
         String path = String.format(
-                "/home/container/assets/natives/shoreline_loader.%s",
+                "/home/container/assets/installer/natives/shoreline_installer.%s",
                 libType
         );
 

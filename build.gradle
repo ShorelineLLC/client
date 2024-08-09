@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'net.shoreline'
-version = '0.1'
+version = '0.2'
 
 repositories {
     mavenCentral()
@@ -18,6 +18,8 @@ dependencies {
     implementation 'com.zaxxer:HikariCP:5.1.0'
     implementation 'org.ow2.asm:asm:9.7'
     implementation 'org.ow2.asm:asm-tree:9.7'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
 }
 
 application {
@@ -43,3 +45,4 @@ shadowJar {
     archiveClassifier = ""
     archiveVersion = ""
 }
+

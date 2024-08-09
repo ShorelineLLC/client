@@ -2,8 +2,11 @@ package net.shoreline.server;
 
 import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
+import net.shoreline.server.command.CommandManager;
 import net.shoreline.server.database.Database;
 import net.shoreline.server.route.frontend.FrontendEndpoint;
+import net.shoreline.server.route.installer.InstallerEndpoint;
+import net.shoreline.server.route.irc.IRCEndpoint;
 import net.shoreline.server.route.loader.LoaderEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +35,40 @@ public final class ServerMain
                     .apiBuilder(new FrontendEndpoint());
         }).start(1338);
 
+        Javalin IRC = Javalin.create(config ->
+        {
+            config.router
+                    .apiBuilder(new IRCEndpoint());
+        }).start(1339);
+
+        Javalin INSTALLER = Javalin.create(config ->
+        {
+            config.router
+                    .apiBuilder(new InstallerEndpoint());
+        }).start(1340);
+
         // Default responses
-        API.get("/*", ctx -> {
+        API.get("/*", ctx ->
+        {
             throw new NotFoundResponse();
         });
 
-        FRONTEND.get("/*", ctx -> {
+        FRONTEND.get("/*", ctx ->
+        {
             throw new NotFoundResponse();
         });
 
+        IRC.get("/*", ctx ->
+        {
+            throw new NotFoundResponse();
+        });
 
+        INSTALLER.get("/*", ctx ->
+        {
+            throw new NotFoundResponse();
+        });
+
+        CommandManager.startListening();
     }
 
     public static Database getUserDatabase()

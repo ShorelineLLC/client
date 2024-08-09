@@ -1,4 +1,4 @@
-package net.shoreline.server.route.loader.route;
+package net.shoreline.server.route.loader.routes;
 
 import io.javalin.http.*;
 import net.shoreline.server.ServerMain;
@@ -35,7 +35,7 @@ public final class IntegrityRoute extends Route
             throw new NotFoundResponse();
         }
 
-        String usertype = context.sessionAttribute("Usertype");
+        String usertype = context.sessionAttribute("User-Type");
 
         if (usertype == null)
         {
@@ -43,7 +43,7 @@ public final class IntegrityRoute extends Route
         }
 
         String path = String.format(
-                "/home/container/assets/%s/loader.jar",
+                "/home/container/assets/loader/%s/loader.jar",
                 usertype
         );
 

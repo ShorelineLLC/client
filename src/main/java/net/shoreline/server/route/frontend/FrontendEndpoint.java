@@ -2,10 +2,10 @@ package net.shoreline.server.route.frontend;
 
 import io.javalin.apibuilder.ApiBuilder;
 import io.javalin.apibuilder.EndpointGroup;
-import net.shoreline.server.route.frontend.routes.HomeRoute;
+import net.shoreline.server.route.frontend.routes.*;
 import net.shoreline.server.route.frontend.routes.assets.*;
-import net.shoreline.server.route.frontend.routes.pages.PagesRoute;
-import net.shoreline.server.route.frontend.routes.styles.StylesRoute;
+import net.shoreline.server.route.frontend.routes.pages.*;
+import net.shoreline.server.route.frontend.routes.styles.*;
 
 public final class FrontendEndpoint implements EndpointGroup
 {
@@ -13,6 +13,10 @@ public final class FrontendEndpoint implements EndpointGroup
     public void addEndpoints()
     {
         ApiBuilder.get("/", new HomeRoute());
+        ApiBuilder.get("/changelogs", new ChangelogsRoute());
+        ApiBuilder.get("/login", new LoginRoute());
+        ApiBuilder.get("/purchase", new PurchaseRoute());
+        ApiBuilder.get("/register", new RegisterRoute());
 
         ApiBuilder.get("/pages/{page}", new PagesRoute());
         ApiBuilder.get("/styles/{style}", new StylesRoute());

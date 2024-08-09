@@ -1,10 +1,16 @@
 package net.shoreline.server.token;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class TokenManager
 {
-    private final HashMap<String, Long> pendingTokens = new HashMap<>();
+    private final long authorizationDelay;
+    private final ConcurrentHashMap<String, Long> pendingTokens = new ConcurrentHashMap<>();
+
+    public TokenManager(long authorizationDelay)
+    {
+        this.authorizationDelay = authorizationDelay;
+    }
 
     public String getAndAuthorizeNewToken()
     {
@@ -16,12 +22,12 @@ public final class TokenManager
     public boolean isAuthorizedToken(String token)
     {
         this.pendingTokens.entrySet()
-                .removeIf(entry -> (System.currentTimeMillis() - entry.getValue()) > 500L);
+                .removeIf(entry -> (System.currentTimeMillis() - entry.getValue()) > this.authorizationDelay);
 
         return this.pendingTokens.remove(token) != null;
     }
 
-    private String generateRandomToken()
+    public static String generateRandomToken()
     {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 

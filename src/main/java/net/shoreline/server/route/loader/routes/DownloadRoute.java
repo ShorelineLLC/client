@@ -1,4 +1,4 @@
-package net.shoreline.server.route.loader.route;
+package net.shoreline.server.route.loader.routes;
 
 import io.javalin.http.Context;
 import io.javalin.http.InternalServerErrorResponse;
@@ -44,7 +44,7 @@ public final class DownloadRoute extends Route
             throw new NotFoundResponse();
         }
 
-        String usertype = context.sessionAttribute("Usertype");
+        String usertype = context.sessionAttribute("User-Type");
 
         if (usertype == null)
         {
@@ -76,7 +76,7 @@ public final class DownloadRoute extends Route
         }
 
         String path = String.format(
-                "/home/container/assets/%s/client.jar",
+                "/home/container/assets/loader/%s/client.jar",
                 usertype
         );
 
@@ -193,18 +193,6 @@ public final class DownloadRoute extends Route
             byteVector.putByteArray(this.type.getBytes(), 0, this.type.length());
 
             return byteVector;
-        }
-
-        @Override
-        public boolean isUnknown()
-        {
-            return true;
-        }
-
-        @Override
-        public boolean isCodeAttribute()
-        {
-            return false;
         }
     }
 }

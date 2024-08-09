@@ -1,7 +1,8 @@
-package net.shoreline.server.route.loader.route;
+package net.shoreline.server.route.loader.routes;
 
 import io.javalin.http.*;
 import net.shoreline.server.ServerMain;
+import net.shoreline.server.database.Database;
 import net.shoreline.server.route.Route;
 
 import java.sql.Connection;
@@ -17,7 +18,7 @@ import java.sql.ResultSet;
 public final class AuthRoute extends Route
 {
     @Override
-    public void doHandle(Context context)
+    public void doHandle(Context context) throws Exception
     {
         String userAgent = context.header("User-Agent");
 
@@ -33,7 +34,9 @@ public final class AuthRoute extends Route
             throw new NotFoundResponse();
         }
 
-        try (Connection connection = ServerMain.getUserDatabase().getDataSource().getConnection())
+        Database database = ServerMain.getUserDatabase();
+        database.getLock().lock();
+        try (Connection connection = database.getDataSource().getConnection())
         {
             String query = "SELECT u.username, u.uid, u.usertype FROM users u JOIN hwids h ON u.id = h.user_id WHERE h.hwid = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query))
@@ -50,7 +53,7 @@ public final class AuthRoute extends Route
                         context.sessionAttribute("Hardware-ID", hardwareID);
                         context.sessionAttribute("Username", username);
                         context.sessionAttribute("UID", uid);
-                        context.sessionAttribute("Usertype", usertype);
+                        context.sessionAttribute("User-Type", usertype);
 
                         context.result(hardwareID + ":" + username + ":" + uid + ":" + usertype);
                     } else
@@ -60,18 +63,36 @@ public final class AuthRoute extends Route
                     }
                 } catch (Throwable t)
                 {
+                    if (t instanceof HttpResponseException)
+                    {
+                        throw t;
+                    }
+
                     ServerMain.LOGGER.error("Failed to execute query: ", t);
                     throw new InternalServerErrorResponse();
                 }
             } catch (Throwable t)
             {
+                if (t instanceof HttpResponseException)
+                {
+                    throw t;
+                }
+
                 ServerMain.LOGGER.error("Failed to prepare statement: ", t);
                 throw new InternalServerErrorResponse();
             }
         } catch (Throwable t)
         {
+            if (t instanceof HttpResponseException)
+            {
+                throw t;
+            }
+
             ServerMain.LOGGER.error("Failed to establish user database connection: ", t);
             throw new InternalServerErrorResponse();
+        } finally
+        {
+            database.getLock().unlock();
         }
     }
 }
