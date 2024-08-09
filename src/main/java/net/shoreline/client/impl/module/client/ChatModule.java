@@ -110,7 +110,7 @@ public class ChatModule extends ToggleModule
         if (ircChat)
         {
             final String text = event.getMessage().trim();
-            if (text.isEmpty() || text.isBlank() || text.startsWith(Managers.COMMAND.getPrefix()) || (ShorelineMod.isBaritonePresent() && text.startsWith(BaritoneAPI.getSettings().prefix.value) || text.startsWith("/")))
+            if (text.isEmpty() || text.isBlank() || text.startsWith(Managers.COMMAND.getPrefix()) || (ShorelineMod.isBaritonePresent() && text.startsWith(BaritoneAPI.getSettings().prefix.value)) || text.startsWith("/"))
             {
                 return;
             }
