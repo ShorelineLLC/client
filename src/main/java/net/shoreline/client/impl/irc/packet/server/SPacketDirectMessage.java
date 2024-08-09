@@ -53,7 +53,7 @@ public final class SPacketDirectMessage extends ServerPacket
     @Override
     public void apply(IRCManager ircManager)
     {
-        if (!ChatModule.instance.isEnabled())
+        if (!ChatModule.getInstance().isEnabled())
         {
             return;
         }
