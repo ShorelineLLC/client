@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.IRCPacket;
-import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.loader.Loader;
 
 public final class CPacketChatMessage extends IRCPacket

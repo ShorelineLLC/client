@@ -3,6 +3,7 @@ package net.shoreline.client.impl.irc.packet.client;
 import com.google.gson.JsonObject;
 import net.shoreline.client.impl.irc.packet.IRCPacket;
 import net.shoreline.client.impl.module.client.CapesModule;
+import net.shoreline.client.impl.module.client.ChatModule;
 
 public final class CPacketPing extends IRCPacket
 {
@@ -23,5 +24,6 @@ public final class CPacketPing extends IRCPacket
         data.addProperty("Session-Username", currentSessionUsername);
         data.addProperty("Connected-Server", currentConnectedServer);
         data.addProperty("Cape-Color", CapesModule.instance.clientConfig.getValue().name());
+        data.addProperty("Chat-Enabled", ChatModule.instance.isEnabled());
     }
 }

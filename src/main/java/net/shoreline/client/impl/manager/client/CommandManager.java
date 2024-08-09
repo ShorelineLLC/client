@@ -54,6 +54,8 @@ public class CommandManager implements Globals
         {
             register(new BroadcastServerMsgCommand());
             register(new DirectServerMsgCommand());
+            register(new MuteCommand());
+            register(new UnmuteCommand());
         }
 
         if (rank.equals("dev") || rank.equals("beta"))

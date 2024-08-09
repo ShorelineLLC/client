@@ -34,6 +34,6 @@ public final class SPacketServerMessage extends ServerPacket
     @Override
     public void apply(IRCManager ircManager)
     {
-        ircManager.addServerMessageToChat(this.message);
+        ircManager.addServerMessageToChat(Formatting.RED + this.message);
     }
 }

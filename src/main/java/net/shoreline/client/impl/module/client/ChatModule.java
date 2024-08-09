@@ -1,6 +1,9 @@
 package net.shoreline.client.impl.module.client;
 
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.util.Formatting;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
@@ -25,42 +28,59 @@ import org.lwjgl.glfw.GLFW;
  */
 public class ChatModule extends ToggleModule
 {
+    public static ChatModule instance;
+
     private boolean ircChat;
     private boolean notified;
     private final Timer timer = new CacheTimer();
+
+    public Config<Boolean> dmsOnly = register(new BooleanConfig("DMs Only", "Only receive private messages from IRC", false));
 
     private final Animation ircAnimation = new Animation(false, 200, Easing.LINEAR);
 
     public ChatModule()
     {
         super("Chat", "Manages the client chat", ModuleCategory.CLIENT);
+
+        instance = this;
     }
 
     @Override
     public void onEnable()
     {
-        if (mc.player == null || notified)
+        if (mc.player == null || notified || dmsOnly.getValue())
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press ALT to enter IRC chat!", 107);
+
+        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press ALT in chat to enter IRC!", 107);
         notified = true;
     }
 
     @EventListener
     public void onGameJoin(GameJoinEvent event)
     {
+        if (dmsOnly.getValue())
+        {
+            return;
+        }
+
         if (notified)
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press ALT to enter IRC chat!", 107);
+        ChatUtil.clientSendMessageRaw("§s[Chat]§7 Press ALT in chat to enter IRC!", 107);
         notified = true;
     }
 
     @EventListener
     public void onKey(KeyboardInputEvent event)
     {
+        if (dmsOnly.getValue())
+        {
+            return;
+        }
+
         if (!timer.passed(250))
         {
             return;
@@ -77,6 +97,11 @@ public class ChatModule extends ToggleModule
     @EventListener(priority = Integer.MIN_VALUE)
     public void onChatMessage(ChatMessageEvent.Client event)
     {
+        if (dmsOnly.getValue())
+        {
+            return;
+        }
+
         if (ircChat)
         {
             final String text = event.getMessage().trim();
@@ -84,6 +109,7 @@ public class ChatModule extends ToggleModule
             {
                 return;
             }
+
             event.cancel();
             IRCManager.getInstance().sendPacket(new CPacketChatMessage(text));
         }
@@ -92,6 +118,11 @@ public class ChatModule extends ToggleModule
     @EventListener
     public void onRenderOverlay(RenderOverlayEvent.Post event)
     {
+        if (dmsOnly.getValue())
+        {
+            return;
+        }
+
         if (mc.currentScreen instanceof ChatScreen && ircAnimation.getFactor() > 0.01)
         {
             float height = mc.getWindow().getScaledHeight();

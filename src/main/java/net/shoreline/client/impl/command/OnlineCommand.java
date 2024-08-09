@@ -2,6 +2,7 @@ package net.shoreline.client.impl.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.user.OnlineUser;
@@ -35,7 +36,7 @@ public final class OnlineCommand extends Command
                 playersList.add(onlineUser.getUsertype().getColorCode() + onlineUser.getName());
             }
 
-            IRCManager.getInstance().addToChat("Online Users: " + String.join(", ", playersList));
+            IRCManager.getInstance().addToChat("Online Users: " + String.join(Formatting.GRAY + ", ", playersList));
 
             return 1;
         });

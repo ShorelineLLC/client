@@ -48,6 +48,6 @@ public final class SPacketSuccessfulConnection extends ServerPacket
         );
 
         Loader.info(message);
-        ircManager.addToChat(Formatting.GREEN + message);
+        ircManager.addToChat(message);
     }
 }

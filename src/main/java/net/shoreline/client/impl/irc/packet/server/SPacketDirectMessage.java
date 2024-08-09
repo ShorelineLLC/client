@@ -7,6 +7,7 @@ import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.impl.module.client.CapesModule;
+import net.shoreline.client.impl.module.client.ChatModule;
 
 public final class SPacketDirectMessage extends ServerPacket
 {
@@ -52,6 +53,11 @@ public final class SPacketDirectMessage extends ServerPacket
     @Override
     public void apply(IRCManager ircManager)
     {
+        if (!ChatModule.instance.isEnabled())
+        {
+            return;
+        }
+
         String message = Formatting.ITALIC + "§sFrom "
                 + this.sender.getUsertype().getColorCode() + Formatting.ITALIC + this.sender.getName()
                 + "§s: " + this.message;
