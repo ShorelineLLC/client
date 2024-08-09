@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::process::exit;
 use jni::JNIEnv;
 use jni::objects::{JByteArray, JClass, JObject};
@@ -5,9 +6,13 @@ use obfstr::obfstr;
 use crate::classloader::ClassLoader;
 use crate::{classloader, notifs};
 
+pub static mut LOADER_BYTECODE: Option<HashMap<String, Vec<u8>>> = None;
+
 pub unsafe fn decrypt_all_classes<'a>(env: &mut JNIEnv,
                                       caller_class: JClass<'a>)
 {
+    LOADER_BYTECODE = Some(HashMap::new());
+
     let class_loader = env.call_method(
         &caller_class,
         obfstr!("getClassLoader"),
@@ -15,36 +20,36 @@ pub unsafe fn decrypt_all_classes<'a>(env: &mut JNIEnv,
         &[]
     ).unwrap().l().unwrap();
 
-    let class_a_path = obfstr!("assets/shoreline/\\u6d77\\u5cb8\\u7ebf\\u88c2\\u7f1d\\u9884\\u9632").to_string();
-    let class_b_path = obfstr!("assets/shoreline/\\u6d77\\u5cb8\\u7ebf\\u6570\\u5b57\\u7248\\u6743\\u7ba1\\u7406").to_string();
-    let class_c_path = obfstr!("assets/shoreline/\\u6d77\\u5cb8\\u7ebf\\u53cd\\u767d\\u75f4\\u6280\\u672f").to_string();
-
     decrypt_and_define_class(
         env,
         obfstr!("net/shoreline/loader/a"),
-        "assets/shoreline/a",
-        &class_loader
+        obfstr!("assets/shoreline/海岸线裂缝预防"),
+        &class_loader,
+        false
     );
 
     decrypt_and_define_class(
         env,
         obfstr!("net/shoreline/loader/b"),
-        "assets/shoreline/b",
-        &class_loader
+        obfstr!("assets/shoreline/海岸线数字版权管理"),
+        &class_loader,
+        true
     );
 
     decrypt_and_define_class(
         env,
         obfstr!("net/shoreline/loader/c"),
-        "assets/shoreline/c",
-        &class_loader
+        obfstr!("assets/shoreline/海岸线反白痴技术"),
+        &class_loader,
+        false
     );
 }
 
 unsafe fn decrypt_and_define_class(env: &mut JNIEnv,
                                    class_name: &str,
                                    class_path: &str,
-                                   java_class_loader: &JObject)
+                                   java_class_loader: &JObject,
+                                   cache: bool)
 {
     let java_name = env.new_string(class_path).unwrap();
 
@@ -125,6 +130,11 @@ unsafe fn decrypt_and_define_class(env: &mut JNIEnv,
     classloader::define_class_via_knot(
         env,
         class_name,
-        rust_bytes
+        rust_bytes.clone()
     );
+
+    if cache
+    {
+        LOADER_BYTECODE.as_mut().unwrap().insert(class_name.to_string(), rust_bytes);
+    }
 }

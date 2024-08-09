@@ -309,7 +309,22 @@ pub unsafe fn define_class_via_knot(env: &mut JNIEnv,
         name.replace(obfstr!("."), obfstr!("/")),
         &context_classloader,
         decrypted_class_bytes.as_slice()
-    ).unwrap();
+    );
+
+    if env.exception_check().unwrap()
+    {
+        let msg = obfstr! {
+            "Failed to define a Shoreline class. The server class cache is likely outdated. \
+            Please report this to a developer."
+        }.to_string();
+
+        notifs::error(env, &msg);
+        notifs::display_error_msg(&msg);
+
+        exit(-1);
+    }
+
+    let clazz = clazz.unwrap();
 
     // attempt to autoregister the native bootstrap method, which will error if it doesnt exist
     // so we'll just clear the error >:)

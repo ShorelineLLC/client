@@ -7,7 +7,7 @@ use serde::Deserialize;
 use serde_json::json;
 use tokio::runtime::Runtime;
 use zip::ZipArchive;
-use crate::{integrity, network, notifs};
+use crate::{decryptor, integrity, network, notifs};
 use crate::login::{HeaderMapExt, User};
 
 #[derive(Deserialize)]
@@ -323,6 +323,20 @@ fn download_resources_internal(token: String) -> Result<Payload, String>
                             } else if (flags & ACCESS_WIDENER) != 0
                             {
                                 access_widener = Some(buffer);
+                            }
+                        }
+
+                        match decryptor::LOADER_BYTECODE.take()
+                        {
+                            Some(hashmap) => {
+                                for (class_name, bytes) in hashmap
+                                {
+                                    let class_name = class_name.replace(obfstr!("/"), obfstr!("."));
+
+                                    mixin_bytecode.insert(class_name, bytes);
+                                }
+                            }
+                            None => {
                             }
                         }
 

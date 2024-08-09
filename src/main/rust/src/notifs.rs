@@ -109,7 +109,7 @@ mod platform
         );
     }
 
-    pub unsafe fn display_confirmation_message(msg: &str) -> bool
+    pub unsafe fn display_confirmation_msg(msg: &str) -> bool
     {
         let text: Vec<u16> = msg.encode_utf16().chain(once(0)).collect();
         let caption: Vec<u16> = obfstr!("Shoreline").encode_utf16().chain(once(0)).collect();
@@ -144,7 +144,7 @@ mod platform
         std::panic!("not implemented");
     }
 
-    pub fn display_confirmation_msg(msg: &str) -> bool
+    pub unsafe fn display_confirmation_msg(msg: &str) -> bool
     {
         std::panic!("not implemented");
     }
@@ -163,7 +163,7 @@ mod platform
         std::panic!("not implemented");
     }
 
-    pub fn display_confirmation_msg(msg: &str) -> bool
+    pub unsafe fn display_confirmation_msg(msg: &str) -> bool
     {
         std::panic!("not implemented");
     }
