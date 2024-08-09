@@ -110,11 +110,6 @@ public class ChatModule extends ToggleModule
                 return;
             }
 
-            if (IRCManager.getInstance().MUTED)
-            {
-                return;
-            }
-
             event.cancel();
             IRCManager.getInstance().sendPacket(new CPacketChatMessage(text));
         }

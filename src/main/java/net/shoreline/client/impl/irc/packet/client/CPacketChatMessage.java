@@ -37,6 +37,11 @@ public final class CPacketChatMessage extends IRCPacket
         String message = colorCode
                 + "<" + Loader.SESSION.getUsername() + "> " + Formatting.GRAY + this.message;
 
+        if (ircManager.MUTED)
+        {
+            return;
+        }
+
         ircManager.addToChat(message);
     }
 }
