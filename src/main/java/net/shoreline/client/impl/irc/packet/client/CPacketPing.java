@@ -24,6 +24,6 @@ public final class CPacketPing extends IRCPacket
         data.addProperty("Session-Username", currentSessionUsername);
         data.addProperty("Connected-Server", currentConnectedServer);
         data.addProperty("Cape-Color", CapesModule.instance.clientConfig.getValue().name());
-        data.addProperty("Chat-Enabled", ChatModule.instance.isEnabled());
+        data.addProperty("Chat-Enabled", ChatModule.getInstance().isEnabled());
     }
 }

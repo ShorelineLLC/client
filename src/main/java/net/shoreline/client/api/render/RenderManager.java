@@ -379,8 +379,8 @@ public class RenderManager implements Globals
     {
         rect(matrices, x1 - thickness, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
         rect(matrices, x1 + x2, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
-        rect(matrices, x1, y1 - thickness, x2, thickness, borderColor);
-        rect(matrices, x1, y1 + y2, x2, thickness, borderColor);
+        rect(matrices, x1 - thickness, y1 - thickness, x2 + (thickness * 2.0), thickness, borderColor);
+        rect(matrices, x1 - thickness, y1 + y2, x2 + (thickness * 2.0), thickness, borderColor);
     }
 
     /**

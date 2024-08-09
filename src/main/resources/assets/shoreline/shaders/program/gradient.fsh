@@ -25,10 +25,10 @@ void main()
         float distance = sqrt(gl_FragCoord.x * gl_FragCoord.x + gl_FragCoord.y * gl_FragCoord.y) + time;
         distance = distance / factor;
         distance = ((sin(distance) + 1.0) / 2.0);
-        float distanceInv = 1.0 - distance;
-        float r = color.r * distance + color1.r * distanceInv;
-        float g = color.g * distance + color1.g * distanceInv;
-        float b = color.b * distance + color1.b * distanceInv;
+        float j = 1.0 - distance;
+        float r = color.r * distance + color1.r * j;
+        float g = color.g * distance + color1.g * j;
+        float b = color.b * distance + color1.b * j;
         fragColor = vec4(r, g, b, color.a);
     }
     else

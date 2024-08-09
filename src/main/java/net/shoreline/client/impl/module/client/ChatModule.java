@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.client;
 
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -28,21 +27,25 @@ import org.lwjgl.glfw.GLFW;
  */
 public class ChatModule extends ToggleModule
 {
-    public static ChatModule instance;
+    private static ChatModule INSTANCE;
 
     private boolean ircChat;
     private boolean notified;
     private final Timer timer = new CacheTimer();
 
-    public Config<Boolean> dmsOnly = register(new BooleanConfig("DMs Only", "Only receive private messages from IRC", false));
+    public Config<Boolean> dmsOnly = register(new BooleanConfig("DMOnly", "Only receive private messages from IRC", false));
 
     private final Animation ircAnimation = new Animation(false, 200, Easing.LINEAR);
 
     public ChatModule()
     {
         super("Chat", "Manages the client chat", ModuleCategory.CLIENT);
+        INSTANCE = this;
+    }
 
-        instance = this;
+    public static ChatModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -131,5 +134,10 @@ public class ChatModule extends ToggleModule
             RenderManager.borderedRect(event.getContext().getMatrices(), 2, (int) (height - 1.0f),
                     width - 4, -14.0f * anim, ColorsModule.getInstance().getRGB((int) (255.0f * ircAnimation.getFactor())), 1.0f);
         }
+    }
+
+    public boolean isDmsOnly()
+    {
+        return dmsOnly.getValue();
     }
 }
