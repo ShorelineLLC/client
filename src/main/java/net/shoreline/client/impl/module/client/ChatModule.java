@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.client;
 
+import baritone.api.BaritoneAPI;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -108,7 +110,7 @@ public class ChatModule extends ToggleModule
         if (ircChat)
         {
             final String text = event.getMessage().trim();
-            if (text.isEmpty() || text.isBlank() || text.startsWith(Managers.COMMAND.getPrefix()) || text.startsWith("/"))
+            if (text.isEmpty() || text.isBlank() || text.startsWith(Managers.COMMAND.getPrefix()) || (ShorelineMod.isBaritonePresent() && text.startsWith(BaritoneAPI.getSettings().prefix.value) || text.startsWith("/")))
             {
                 return;
             }
