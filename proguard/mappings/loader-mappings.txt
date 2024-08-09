@@ -13,6 +13,7 @@ net.shoreline.loader.Loader -> net.shoreline.loader.give up:
     void preApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> preApply
     void postApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> postApply
     void loadNatives() -> a
+    java.lang.String getExt() -> b
     java.lang.Object performVersionCheck(java.lang.Object) -> d
     java.lang.Object showErrorWindow(java.lang.Object) -> b
     void info(java.lang.String) -> a
@@ -50,12 +51,12 @@ net.shoreline.loader.session.UserSession -> net.shoreline.loader.c:
     java.lang.String usertype -> h
     java.util.List runningMods -> i
     void <init>(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.util.List) -> <init>
-    java.lang.String getHardwareID() -> b
-    java.lang.String getUsername() -> c
-    java.lang.String getUID() -> d
-    java.lang.String getUserType() -> e
-    java.util.List getRunningMods() -> f
-    net.shoreline.loader.session.UserSession load() -> g
+    java.lang.String getHardwareID() -> c
+    java.lang.String getUsername() -> d
+    java.lang.String getUID() -> e
+    java.lang.String getUserType() -> f
+    java.util.List getRunningMods() -> g
+    net.shoreline.loader.session.UserSession load() -> h
     java.lang.Object getUserInfo(java.lang.Object) -> a
     boolean lambda$load$1(java.lang.String) -> d
     java.lang.String lambda$load$0(net.fabricmc.loader.api.ModContainer) -> a
