@@ -92,7 +92,7 @@ public final class ServerModule extends ConcurrentModule
     {
         if (illegalDisconnectConfig.getValue())
         {
-            event.cancel();
+            // event.cancel();
             Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(mc.player, false)); // Illegal packet
         }
     }
