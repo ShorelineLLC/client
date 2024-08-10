@@ -28,7 +28,6 @@ import java.awt.*;
  */
 public class FullbrightModule extends ToggleModule
 {
-    TotemParticle
     Config<Brightness> brightnessConfig = register(new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values()));
     Config<Boolean> ambienceConfig = register(new BooleanConfig("Ambience", "Colors the light", false));
     Config<Color> ambienceColorConfig = register(new ColorConfig("AmbienceColor", "The color of the biome", Color.RED, false, true, () -> ambienceConfig.getValue()));
