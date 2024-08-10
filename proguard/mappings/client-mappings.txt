@@ -604,17 +604,17 @@ net.shoreline.client.api.render.RenderBuffers$Buffer -> net.shoreline.client.ai:
     126:137:net.shoreline.client.api.render.RenderBuffers$Buffer vertexLine(double,double,double,double,double,double) -> a
     142:149:void color(int) -> d
     153:177:void draw() -> y
-net.shoreline.client.api.render.RenderLayersClient -> net.shoreline.client.lc:
+net.shoreline.client.api.render.layers.RenderLayersClient -> net.shoreline.client.lc:
     net.minecraft.class_293 POSITION_COLOR_TEXTURE_OVERLAY -> b
     net.minecraft.class_1921 GLINT -> a
     net.minecraft.class_1921 ITEM_ENTITY_TRANSLUCENT_CULL -> b
     13:13:void <init>() -> <init>
     16:23:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.RenderLayersClient$DepthTest -> net.shoreline.client.aj:
+net.shoreline.client.api.render.layers.RenderLayersClient$DepthTest -> net.shoreline.client.aj:
     29:30:void <init>() -> <init>
     35:37:void method_23516() -> method_23516
     42:46:void method_23518() -> method_23518
-net.shoreline.client.api.render.RenderLayersClient$Lightmap -> net.shoreline.client.ak:
+net.shoreline.client.api.render.layers.RenderLayersClient$Lightmap -> net.shoreline.client.ak:
     54:63:void <init>() -> <init>
     61:62:void lambda$new$1() -> z
     57:58:void lambda$new$0() -> u

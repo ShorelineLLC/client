@@ -1,6 +1,7 @@
 package net.shoreline.client.init;
 
 import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.render.layers.LightmapManager;
 import net.shoreline.client.api.render.shader.ShaderManager;
 import net.shoreline.client.impl.manager.EventManager;
 import net.shoreline.client.impl.manager.ModuleManager;
@@ -53,6 +54,7 @@ public class Managers
     public static CapeManager CAPES;
     public static ShaderManager SHADER;
     public static LookupManager LOOKUP;
+    public static LightmapManager LIGHT_MAP;
     // The initialized state of the managers. If this is true, all managers
     // have been initialized and the init process is complete. As a general
     // rule, it is good practice to check this state before accessing instances.
@@ -106,6 +108,7 @@ public class Managers
             MACRO.postInit();
             ACCOUNT.postInit();
             CAPES = new CapeManager();
+            LIGHT_MAP = new LightmapManager();
         }
     }
 

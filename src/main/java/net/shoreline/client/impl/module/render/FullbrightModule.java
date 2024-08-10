@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.render;
 
+import net.fabricmc.fabric.api.client.particle.v1.ParticleRenderEvents;
 import net.minecraft.client.color.world.BiomeColors;
+import net.minecraft.client.particle.TotemParticle;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.shoreline.client.api.config.Config;
@@ -13,6 +15,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.color.world.BiomeColorEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
+import net.shoreline.client.impl.event.render.AmbientColorEvent;
 import net.shoreline.client.impl.event.render.LightmapGammaEvent;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -25,14 +28,10 @@ import java.awt.*;
  */
 public class FullbrightModule extends ToggleModule
 {
-
+    TotemParticle
     Config<Brightness> brightnessConfig = register(new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values()));
-    Config<Boolean> biomeConfig = register(new BooleanConfig("Biome", "Colors the light of the biome", false));
-    Config<Color> biomeColorConfig = register(new ColorConfig("BiomeColor", "The color of the biome", Color.RED, false, true, () -> biomeConfig.getValue()));
-    Config<Boolean> waterConfig = register(new BooleanConfig("Water", "Colors the water", false));
-    Config<Color> waterColorConfig = register(new ColorConfig("WaterColor", "The color of the water", Color.RED, false, true, () -> waterConfig.getValue()));
-    Config<Boolean> grassConfig = register(new BooleanConfig("Grass", "Colors the grass", false));
-    Config<Color> grassColorConfig = register(new ColorConfig("GrassColor", "The color of the grass", Color.RED, false, true, () -> grassConfig.getValue()));
+    Config<Boolean> ambienceConfig = register(new BooleanConfig("Ambience", "Colors the light", false));
+    Config<Color> ambienceColorConfig = register(new ColorConfig("AmbienceColor", "The color of the biome", Color.RED, false, true, () -> ambienceConfig.getValue()));
 
     public FullbrightModule()
     {
@@ -98,22 +97,12 @@ public class FullbrightModule extends ToggleModule
     }
 
     @EventListener
-    public void onBiomeColor(BiomeColorEvent event)
+    public void onBiomeColor(AmbientColorEvent event)
     {
-        if (biomeConfig.getValue() && event.getColorResolver() == BiomeColors.FOLIAGE_COLOR)
+        if (ambienceConfig.getValue())
         {
             event.cancel();
-            event.setColor(biomeColorConfig.getValue());
-        }
-        else if (waterConfig.getValue() && event.getColorResolver() == BiomeColors.WATER_COLOR)
-        {
-            event.cancel();
-            event.setColor(waterColorConfig.getValue());
-        }
-        else if (grassConfig.getValue() && event.getColorResolver() == BiomeColors.GRASS_COLOR)
-        {
-            event.cancel();
-            event.setColor(grassColorConfig.getValue());
+            event.setColor(ambienceColorConfig.getValue());
         }
     }
 

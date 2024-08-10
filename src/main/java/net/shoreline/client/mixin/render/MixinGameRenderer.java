@@ -2,11 +2,14 @@ package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceFactory;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.network.ReachEvent;
@@ -44,6 +47,13 @@ public class MixinGameRenderer implements Globals
     @Shadow
     private float fovMultiplier;
 
+    @Inject(method = "<init>", at = @At(value = "RETURN"))
+    private void hookInit(MinecraftClient client, HeldItemRenderer heldItemRenderer, ResourceManager resourceManager, BufferBuilderStorage buffers, CallbackInfo ci)
+    {
+        LightmapInitEvent lightmapInitEvent = new LightmapInitEvent();
+        EventBus.INSTANCE.dispatch(lightmapInitEvent);
+    }
+
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 1))
     private void hookRenderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
     {
@@ -56,6 +66,20 @@ public class MixinGameRenderer implements Globals
     {
         ReloadShaderEvent reloadShaderEvent = new ReloadShaderEvent(matrices, tickDelta);
         EventBus.INSTANCE.dispatch(reloadShaderEvent);
+    }
+
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/LightmapTextureManager;update(F)V"))
+    private void hookRenderWorld$3(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
+    {
+        LightmapUpdateEvent lightmapUpdateEvent = new LightmapUpdateEvent(tickDelta);
+        EventBus.INSTANCE.dispatch(lightmapUpdateEvent);
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/LightmapTextureManager;tick()V"))
+    private void hookTick(CallbackInfo ci)
+    {
+        LightmapTickEvent lightmapTickEvent = new LightmapTickEvent();
+        EventBus.INSTANCE.dispatch(lightmapTickEvent);
     }
 
     @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.AFTER))

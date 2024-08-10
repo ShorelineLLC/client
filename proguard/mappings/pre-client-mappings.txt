@@ -1,7 +1,7 @@
 net.shoreline.client.ShorelineMod -> net.shoreline.client.bs:
     void onInitializeClient() -> a
 
-net.shoreline.client.api.render.RenderLayersClient -> net.shoreline.client.lc:
+net.shoreline.client.api.render.layers.RenderLayersClient -> net.shoreline.client.lc:
 
 net.shoreline.client.impl.imixin.IMixin -> net.shoreline.client.im:
 
