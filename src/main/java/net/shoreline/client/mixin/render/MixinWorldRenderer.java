@@ -78,19 +78,11 @@ public class MixinWorldRenderer implements Globals
         return instance.isThirdPerson();
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", shift = At.Shift.AFTER, ordinal = 11))
+    @Inject(method = "render", at = @At(value = "RETURN"))
     private void hookRender$1(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
                               GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci)
     {
         RenderShaderEvent renderOutlineShaderEvent = new RenderShaderEvent(matrices, tickDelta);
-        EventBus.INSTANCE.dispatch(renderOutlineShaderEvent);
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 12))
-    private void hookRender$2(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
-                              GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci)
-    {
-        RenderShaderEvent.BlockEntities renderOutlineShaderEvent = new RenderShaderEvent.BlockEntities(matrices, tickDelta);
         EventBus.INSTANCE.dispatch(renderOutlineShaderEvent);
     }
 
