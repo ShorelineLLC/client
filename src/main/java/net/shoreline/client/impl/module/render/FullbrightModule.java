@@ -1,8 +1,5 @@
 package net.shoreline.client.impl.module.render;
 
-import net.fabricmc.fabric.api.client.particle.v1.ParticleRenderEvents;
-import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.particle.TotemParticle;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.shoreline.client.api.config.Config;
@@ -12,13 +9,12 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.color.world.BiomeColorEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.render.AmbientColorEvent;
 import net.shoreline.client.impl.event.render.LightmapGammaEvent;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.awt.*;
 

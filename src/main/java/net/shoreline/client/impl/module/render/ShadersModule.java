@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import ladysnake.satin.api.managed.ManagedShaderEffect;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -18,6 +20,7 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.ReloadShaderEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.init.Managers;
@@ -119,6 +122,7 @@ public class ShadersModule extends ToggleModule
     private void renderEntities(float tickDelta, MatrixStack matrixStack) 
     {
         VertexConsumerProvider vertexConsumerProvider = ((AccessorWorldRenderer) mc.worldRenderer).hookGetBufferBuilders().getEntityVertexConsumers();
+        // RenderSystem.disableDepthTest();
         for (Entity entity : mc.world.getEntities())
         {
             if (checkShaders(entity))
