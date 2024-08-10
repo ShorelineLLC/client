@@ -1,8 +1,10 @@
 package net.shoreline.client.impl.module.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import ladysnake.satin.api.managed.ManagedShaderEffect;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.EnderChestBlockEntity;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,6 +12,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
+import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.Shoreline;
@@ -20,12 +25,12 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.ReloadShaderEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
+import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -54,10 +59,11 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render shaders on animals", true));
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render shaders on items", true));
     Config<Boolean> otherConfig = register(new BooleanConfig("Crystals", "Render shaders on crystals", true));
+    Config<Boolean> projectilesConfig = register(new BooleanConfig("Projectiles", "Render shaders on projectiles", true));
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render shaders on invisible entities", true));
-//    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", false));
-//    Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", false));
-//    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", false));
+    Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", false));
+    Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", false));
+    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", false));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.3f)));
 
     private float shaderTime;
@@ -152,6 +158,22 @@ public class ShadersModule extends ToggleModule
                     Shoreline.error("Failed to render shader on entity!");
                 }
             }
+            // Blockentity shaders
+            for (BlockEntity blockEntity : BlockUtil.blockEntities())
+            {
+                if (checkStorageShaders(blockEntity))
+                {
+                    Vec3d vec3d = mc.gameRenderer.getCamera().getPos();
+                    double d = vec3d.getX();
+                    double e = vec3d.getY();
+                    double g = vec3d.getZ();
+                    BlockPos blockPos3 = blockEntity.getPos();
+                    matrixStack.push();
+                    matrixStack.translate((double)blockPos3.getX() - d, (double)blockPos3.getY() - e, (double)blockPos3.getZ() - g);
+                    mc.getBlockEntityRenderDispatcher().render(blockEntity, tickDelta, matrixStack, vertexConsumerProvider);
+                    matrixStack.pop();
+                }
+            }
         }
         // ciaohack solutions
         EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(mc.player);
@@ -160,44 +182,6 @@ public class ShadersModule extends ToggleModule
         entityRenderer.render(mc.player, mc.player.getYaw(), tickDelta, matrixStack, vertexConsumerProvider, 0);
         matrixStack.pop();
     }
-
-//    @EventListener
-//    public void onRenderShaderBlocks(RenderShaderEvent.BlockEntities event)
-//    {
-//        ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect1();
-//        if (shaderEffect == null)
-//        {
-//            return;
-//        }
-//        Managers.SHADER.applyShader(shaderEffect, () ->
-//        {
-//            shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-//            shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
-//            shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
-//            shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
-//            shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
-//            shaderEffect.render(mc.getTickDelta());
-//        }, () ->
-//        {
-//            VertexConsumerProvider vertexConsumerProvider = ((AccessorWorldRenderer) mc.worldRenderer).hookGetBufferBuilders().getEntityVertexConsumers();
-//            // Blockentity shaders
-//            for (BlockEntity blockEntity : BlockUtil.blockEntities())
-//            {
-//                if (checkStorageShaders(blockEntity))
-//                {
-//                    Vec3d vec3d = mc.gameRenderer.getCamera().getPos();
-//                    double d = vec3d.getX();
-//                    double e = vec3d.getY();
-//                    double g = vec3d.getZ();
-//                    BlockPos blockPos3 = blockEntity.getPos();
-//                    event.getMatrices().push();
-//                    event.getMatrices().translate((double)blockPos3.getX() - d, (double)blockPos3.getY() - e, (double)blockPos3.getZ() - g);
-//                    mc.getBlockEntityRenderDispatcher().render(blockEntity, tickDelta, event.getMatrices(), vertexConsumerProvider);
-//                    event.getMatrices().pop();
-//                }
-//            }
-//        });
-//    }
 
     @EventListener
     public void onReloadShader(ReloadShaderEvent event)
@@ -266,15 +250,17 @@ public class ShadersModule extends ToggleModule
                 || (EntityUtil.isNeutral(entity)
                 || EntityUtil.isPassive(entity)) && animalsConfig.getValue())
                 || entity instanceof EndCrystalEntity && otherConfig.getValue()
-                || entity instanceof ItemEntity && itemsConfig.getValue();
+                || entity instanceof ItemEntity && itemsConfig.getValue()
+                || entity instanceof ExperienceBottleEntity && projectilesConfig.getValue()
+                || entity instanceof EnderPearlEntity && projectilesConfig.getValue();
     }
 
-//    private boolean checkStorageShaders(BlockEntity blockEntity)
-//    {
-//        return blockEntity instanceof ChestBlockEntity && chestsConfig.getValue()
-//                || blockEntity instanceof EnderChestBlockEntity && echestsConfig.getValue()
-//                || blockEntity instanceof ShulkerBoxBlockEntity && shulkersConfig.getValue();
-//    }
+    private boolean checkStorageShaders(BlockEntity blockEntity)
+    {
+        return blockEntity instanceof ChestBlockEntity && chestsConfig.getValue()
+                || blockEntity instanceof EnderChestBlockEntity && echestsConfig.getValue()
+                || blockEntity instanceof ShulkerBoxBlockEntity && shulkersConfig.getValue();
+    }
 
     public static Color brighten(Color color, double fraction)
     {
