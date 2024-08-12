@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 
 public class FormattingUtil
 {
-
-    private static final Map<Integer, Formatting> COLOR_TO_FORMATTING = Stream.of(Formatting.values()).filter(Formatting::isColor).collect(ImmutableMap.toImmutableMap(formatting -> formatting.getColorValue(), Function.identity()));
+    private static final Map<Integer, Formatting> COLOR_TO_FORMATTING = Stream.of(Formatting.values()).filter(Formatting::isColor)
+            .collect(ImmutableMap.toImmutableMap(formatting -> formatting.getColorValue(), Function.identity()));
 
     // Fuck minecraft
     public static String toString(Text text)
@@ -23,7 +23,11 @@ public class FormattingUtil
         {
             if (!message.isEmpty())
             {
-                if (styleOverride.getColor() != null)
+                if (styleOverride.isEmpty())
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("r");
+                }
+                else if (styleOverride.getColor() != null)
                 {
                     Formatting formatting = COLOR_TO_FORMATTING.get(styleOverride.getColor().getRgb());
                     if (formatting != null)

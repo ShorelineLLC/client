@@ -91,19 +91,20 @@ public final class FirstOutQueue<E> extends ForwardingQueue<E> implements Serial
         return true;
     }
 
-    public boolean addFirst(E e)
+    public E addFirst(E e)
     {
         checkNotNull(e); // check before removing
         if (maxSize == 0)
         {
-            return true;
+            return null;
         }
+        E removed = null;
         if (size() == maxSize)
         {
-            delegate.remove();
+            removed = delegate.remove();
         }
         delegate.addFirst(e);
-        return true;
+        return removed;
     }
 
     public E getFirst()

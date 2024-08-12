@@ -47,6 +47,7 @@ import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.world.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -71,7 +72,8 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> itemNameConfig = register(new BooleanConfig("ItemName", "Displays the player's current held item name", false));
     Config<Boolean> entityIdConfig = register(new BooleanConfig("EntityId", "Displays the player's entity id", false));
     Config<Boolean> gamemodeConfig = register(new BooleanConfig("Gamemode", "Displays the player's gamemode", false));
-    Config<Boolean> onlineUsersConfig = register(new BooleanConfig("OnlineUsers", "Displays the online users of Shoreline", true));
+    // Pooron check
+    Config<Boolean> onlineUsersConfig = register(new BooleanConfig("OnlineUsers", "Displays the online users of Shoreline", true, () -> Loader.SESSION.getUserType().equalsIgnoreCase("release")));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Displays the player's server connection ping", true));
     Config<Boolean> healthConfig = register(new BooleanConfig("Health", "Displays the player's current health", true));
     Config<Boolean> totemsConfig = register(new BooleanConfig("Totems", "Displays the player's popped totem count", false));
