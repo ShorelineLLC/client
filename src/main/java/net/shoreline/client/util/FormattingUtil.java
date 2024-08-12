@@ -31,8 +31,27 @@ public class FormattingUtil
                         builder.append(Formatting.FORMATTING_CODE_PREFIX).append(formatting.getCode());
                     }
                 }
-                else if (!styleOverride.isBold() && !styleOverride.isItalic() && !styleOverride.isUnderlined()
-                        && !styleOverride.isStrikethrough() && !styleOverride.isObfuscated())
+                else if (styleOverride.isObfuscated())
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("k");
+                }
+                else if (styleOverride.isBold())
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("l");
+                }
+                else if (styleOverride.isStrikethrough())
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("m");
+                }
+                else if (styleOverride.isUnderlined())
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("n");
+                }
+                else if (styleOverride.isItalic())
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("o");
+                }
+                else
                 {
                     builder.append(Formatting.FORMATTING_CODE_PREFIX).append("r");
                 }
