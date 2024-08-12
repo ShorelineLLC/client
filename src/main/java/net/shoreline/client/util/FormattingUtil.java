@@ -23,17 +23,18 @@ public class FormattingUtil
         {
             if (!message.isEmpty())
             {
-                if (styleOverride.isEmpty())
-                {
-                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("r");
-                }
-                else if (styleOverride.getColor() != null)
+                if (styleOverride.getColor() != null)
                 {
                     Formatting formatting = COLOR_TO_FORMATTING.get(styleOverride.getColor().getRgb());
                     if (formatting != null)
                     {
                         builder.append(Formatting.FORMATTING_CODE_PREFIX).append(formatting.getCode());
                     }
+                }
+                else if (!styleOverride.isBold() && !styleOverride.isItalic() && !styleOverride.isUnderlined()
+                        && !styleOverride.isStrikethrough() && !styleOverride.isObfuscated())
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("r");
                 }
                 builder.append(message);
             }
