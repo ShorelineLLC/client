@@ -22,7 +22,6 @@ import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.impl.event.network.SetCurrentHandEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.combat.SurroundModule;
@@ -336,21 +335,18 @@ public class AutoMineModule extends RotationModule
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (isDataPacketMine(data))
+            if (isDataPacketMine(data) && data.getBlockDamage() > 0.0f)
             {
-                if (data.getBlockDamage() > 0.0f)
+                if (mc.player.isUsingItem())
                 {
-                    if (mc.player.isUsingItem())
+                    Managers.INVENTORY.syncToClient();
+                }
+                else if (data.getSlot() != -1)
+                {
+                    Managers.INVENTORY.setSlot(data.getSlot());
+                    if (!data.hasAttemptedBreak() && data.getBlockDamage() > 1.0f)
                     {
-                        Managers.INVENTORY.syncToClient();
-                    }
-                    else if (data.getSlot() != -1)
-                    {
-                        Managers.INVENTORY.setSlot(data.getSlot());
-                        if (!data.hasAttemptedBreak() && data.getBlockDamage() > 1.0f)
-                        {
-                            data.setAttemptedBreak(true);
-                        }
+                        data.setAttemptedBreak(true);
                     }
                 }
             }

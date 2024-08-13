@@ -159,19 +159,22 @@ public class ShadersModule extends ToggleModule
                 }
             }
             // Blockentity shaders
-            for (BlockEntity blockEntity : BlockUtil.blockEntities())
+            if (echestsConfig.getValue() || chestsConfig.getValue() || shulkersConfig.getValue())
             {
-                if (checkStorageShaders(blockEntity))
+                for (BlockEntity blockEntity : BlockUtil.blockEntities())
                 {
-                    Vec3d vec3d = mc.gameRenderer.getCamera().getPos();
-                    double d = vec3d.getX();
-                    double e = vec3d.getY();
-                    double g = vec3d.getZ();
-                    BlockPos blockPos3 = blockEntity.getPos();
-                    matrixStack.push();
-                    matrixStack.translate((double)blockPos3.getX() - d, (double)blockPos3.getY() - e, (double)blockPos3.getZ() - g);
-                    mc.getBlockEntityRenderDispatcher().render(blockEntity, tickDelta, matrixStack, vertexConsumerProvider);
-                    matrixStack.pop();
+                    if (checkStorageShaders(blockEntity))
+                    {
+                        Vec3d vec3d = mc.gameRenderer.getCamera().getPos();
+                        double d = vec3d.getX();
+                        double e = vec3d.getY();
+                        double g = vec3d.getZ();
+                        BlockPos blockPos3 = blockEntity.getPos();
+                        matrixStack.push();
+                        matrixStack.translate((double)blockPos3.getX() - d, (double)blockPos3.getY() - e, (double)blockPos3.getZ() - g);
+                        mc.getBlockEntityRenderDispatcher().render(blockEntity, tickDelta, matrixStack, vertexConsumerProvider);
+                        matrixStack.pop();
+                    }
                 }
             }
         }
