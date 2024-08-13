@@ -37,18 +37,21 @@ public final class OnlineUser
 
     public enum UserType
     {
-        RELEASE(Formatting.WHITE, Formatting.GRAY),
-        BETA(Formatting.BLUE, Formatting.WHITE),
-        DEV(Formatting.RED, Formatting.WHITE);
+        RELEASE(Formatting.WHITE, Formatting.GRAY, 0),
+        BETA(Formatting.BLUE, Formatting.WHITE, 1),
+        DEV(Formatting.RED, Formatting.WHITE, 2);
 
         private final Formatting colorCode;
         private final Formatting chatColorCode;
+        private final int rank;
 
         UserType(Formatting colorCode,
-                 Formatting chatColorCode)
+                 Formatting chatColorCode,
+                 int rank)
         {
             this.colorCode = colorCode;
             this.chatColorCode = chatColorCode;
+            this.rank = rank;
         }
 
         public Formatting getColorCode()
@@ -59,6 +62,11 @@ public final class OnlineUser
         public Formatting getChatColorCode()
         {
             return this.chatColorCode;
+        }
+
+        public int getRank()
+        {
+            return rank;
         }
     }
 }
