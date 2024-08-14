@@ -12,12 +12,15 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.Tameable;
+import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
@@ -51,10 +54,7 @@ import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -151,16 +151,28 @@ public class NametagsModule extends ToggleModule
                 }
                 renderInfo(info, hwidth, player, rx, ry, rz, camera, scaling);
             }
-            else if (entity instanceof Tameable tameable && tameable.getOwnerUuid() != null && tamedConfig.getValue())
+            else if (entity instanceof AbstractHorseEntity tameable && tameable.getOwnerUuid() != null && tamedConfig.getValue())
             {
                 String lookup = Managers.LOOKUP.getNameFromUUID(tameable.getOwnerUuid());
                 if (lookup != null)
                 {
-                    Vec3d itemPos = Interpolation.getRenderPosition(entity, mc.getTickDelta());
-                    double rx = entity.getX() - itemPos.getX();
-                    double ry = (entity.getY() + entity.getHeight() + 0.43f) - itemPos.getY();
-                    double rz = entity.getZ() - itemPos.getZ();
-                    RenderManager.renderSign(lookup, rx, ry, rz, -1);
+                    Vec3d tamePos = Interpolation.getRenderPosition(entity, mc.getTickDelta());
+                    double rx = entity.getX() - tamePos.getX();
+                    double ry = (entity.getY() + entity.getHeight() + 0.43f) - tamePos.getY();
+                    double rz = entity.getZ() - tamePos.getZ();
+                    RenderManager.renderSign("Owner: " + lookup, rx, ry, rz, -1);
+                }
+            }
+            else if (entity instanceof TameableEntity tameable && tameable.getOwnerUuid() != null && tamedConfig.getValue())
+            {
+                String lookup = Managers.LOOKUP.getNameFromUUID(tameable.getOwnerUuid());
+                if (lookup != null)
+                {
+                    Vec3d tamePos = Interpolation.getRenderPosition(entity, mc.getTickDelta());
+                    double rx = entity.getX() - tamePos.getX();
+                    double ry = (entity.getY() + entity.getHeight() + 0.43f) - tamePos.getY();
+                    double rz = entity.getZ() - tamePos.getZ();
+                    RenderManager.renderSign("Owner: " + lookup, rx, ry, rz, -1);
                 }
             }
             else if (entity instanceof ItemEntity itemEntity && droppedItemsConfig.getValue())

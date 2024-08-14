@@ -14,16 +14,14 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-// Mojang api is offline
-@Deprecated
 public class LookupManager implements Globals
 {
-    private final Map<String, UUID> lookupsUUID = new HashMap<>();
-    private final Map<UUID, String> lookupsName = new HashMap<>();
+    private static final Map<String, UUID> LOOKUPS_UUID = new HashMap<>();
+    private static final Map<UUID, String> LOOKUPS_NAME = new HashMap<>();
 
     public UUID getUUIDFromName(String name)
     {
-        UUID uuid = lookupsUUID.get(name);
+        UUID uuid = LOOKUPS_UUID.get(name);
         if (uuid != null)
         {
             return uuid;
@@ -37,7 +35,7 @@ public class LookupManager implements Globals
             if (profile != null)
             {
                 UUID result = profile.getProfile().getId();
-                lookupsUUID.put(name, result);
+                LOOKUPS_UUID.put(name, result);
                 return result;
             }
         }
@@ -46,20 +44,17 @@ public class LookupManager implements Globals
 
     public String getNameFromUUID(UUID uuid)
     {
-        if (lookupsName.containsKey(uuid))
+        if (LOOKUPS_NAME.containsKey(uuid))
         {
-            return lookupsName.get(uuid);
+            return LOOKUPS_NAME.get(uuid);
         }
-        String uuidString = uuid.toString().replace("-", "");
-        String url = String.format("https://api.mojang.com/user/profiles/%s/names", uuidString);
+        String url = String.format("https://laby.net/api/v2/user/%s/get-profile", uuid.toString());
         try
         {
             String name = IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
-            JsonArray array = (JsonArray) JsonParser.parseString(name);
-            String player = array.get(array.size() - 1).toString();
-            JsonObject object = (JsonObject) JsonParser.parseString(player);
-            String result = object.get("name").toString();
-            lookupsName.put(uuid, result);
+            JsonObject jsonObject = JsonParser.parseString(name).getAsJsonObject();
+            String result = jsonObject.get("username").toString();
+            LOOKUPS_NAME.put(uuid, result.replace("\"", ""));
             return result;
         }
         catch (IOException e)
@@ -69,13 +64,12 @@ public class LookupManager implements Globals
         return null;
     }
 
-    public Map<Date, String> getNameHistoryFromUUID(UUID uuid)
+    public Map<String, String> getNameHistoryFromUUID(UUID uuid)
     {
-        Map<Date, String> result = new TreeMap<>(Collections.reverseOrder());
+        Map<String, String> result = new TreeMap<>(Collections.reverseOrder());
         try
         {
-            String uuidString = uuid.toString().replace("-", "");
-            String url = String.format("https://api.mojang.com/user/profiles/%s/names", uuidString);
+            String url = String.format("https://laby.net/api/v2/user/%s/get-profile", uuid.toString());
             JsonArray array;
             HttpsURLConnection connection = null;
             try
@@ -93,7 +87,8 @@ public class LookupManager implements Globals
                 }
                 scanner.close();
                 String json = builder.toString();
-                array = JsonParser.parseString(json).getAsJsonArray();
+                JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+                array = jsonObject.getAsJsonArray("username_history");
             }
             finally
             {
@@ -109,9 +104,9 @@ public class LookupManager implements Globals
             for (JsonElement element : array)
             {
                 JsonObject object = element.getAsJsonObject();
-                String name = object.get("name").getAsString();
-                long changedAt = object.has("changedToAt") ? object.get("changedToAt").getAsLong() : 0;
-                result.put(new Date(changedAt), name);
+                String name = object.get("username").getAsString();
+                String changedAt = object.has("changed_at") ? object.get("changed_at").getAsString() : "";
+                result.put(changedAt, name);
             }
         }
         catch (Exception e)

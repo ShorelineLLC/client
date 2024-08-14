@@ -33,17 +33,16 @@ public class HistoryCommand extends Command
                 ChatUtil.error("Could not find player UUID!");
                 return 0;
             }
-            Map<Date, String> nameHistory = Managers.LOOKUP.getNameHistoryFromUUID(uuid);
+            Map<String, String> nameHistory = Managers.LOOKUP.getNameHistoryFromUUID(uuid);
             if (nameHistory == null)
             {
                 ChatUtil.error("Could not find player name history!");
                 return 0;
             }
             ArrayList<String> nameHistoryList = new ArrayList<>();
-            for (Map.Entry<Date, String> entry : nameHistory.entrySet())
+            for (Map.Entry<String, String> entry : nameHistory.entrySet())
             {
-                String date = new SimpleDateFormat("dd.MM.yyyy, HH:mm:ss").format(entry.getKey());
-                nameHistoryList.add(entry.getValue() + " - " + date);
+                nameHistoryList.add(entry.getValue() + " - " + entry.getKey().substring(0, 10));
             }
             if (nameHistoryList.isEmpty())
             {
