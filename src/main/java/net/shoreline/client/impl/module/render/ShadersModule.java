@@ -59,15 +59,15 @@ import java.util.Optional;
 public class ShadersModule extends ToggleModule
 {
 
-    Config<ShaderMode> modeConfig = register(new EnumConfig<>("Mode", "The shader mode", ShaderMode.OUTLINE, ShaderMode.values()));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Integer> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1, 1, 5, () -> outlineConfig.getValue()));
     Config<Boolean> glowConfig = register(new BooleanConfig("Glow", "Glow outline", false));
     Config<Float> glowRadiusConfig = register(new NumberConfig<>("GlowRadius", "The glow radius", 0.1f, 1.0f, 2.0f, () -> glowConfig.getValue() && outlineConfig.getValue()));
+    Config<ShaderMode> modeConfig = register(new EnumConfig<>("Fill", "The shader mode", ShaderMode.OFF, ShaderMode.values()));
     Config<Float> factorConfig = register(new NumberConfig<>("Factor", "The gradient factor", 0.1f, 8.0f, 10.0f, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The gradient speed factor", 0.01f, 1.5f, 10.0f, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
-    Config<Boolean> dotsConfig = register(new BooleanConfig("Dots", "Hacker esp", false, () -> modeConfig.getValue() == ShaderMode.OUTLINE));
-    Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue() && modeConfig.getValue() == ShaderMode.OUTLINE));
+    Config<Boolean> dotsConfig = register(new BooleanConfig("Dots", "Hacker esp", false, () -> modeConfig.getValue() == ShaderMode.DEFAULT));
+    Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue() && modeConfig.getValue() == ShaderMode.DEFAULT));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render shaders on the player", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render shaders on other players", true));
@@ -125,7 +125,7 @@ public class ShadersModule extends ToggleModule
     {
         switch (modeConfig.getValue())
         {
-            case OUTLINE ->
+            case DEFAULT, OFF ->
             {
                 final ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect();
                 if (shaderEffect == null)
@@ -134,8 +134,9 @@ public class ShadersModule extends ToggleModule
                 }
                 Managers.SHADER.applyShader(shaderEffect, () ->
                 {
+                    Color color = modeConfig.getValue() == ShaderMode.DEFAULT ? colorConfig.getValue() : new Color(255, 255, 255, 0);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
@@ -264,7 +265,7 @@ public class ShadersModule extends ToggleModule
         }
         switch (modeConfig.getValue())
         {
-            case OUTLINE ->
+            case DEFAULT, OFF ->
             {
                 final ManagedShaderEffect shaderEffect = Managers.SHADER.getFilledShaderEffect();
                 if (shaderEffect == null)
@@ -273,8 +274,9 @@ public class ShadersModule extends ToggleModule
                 }
                 Managers.SHADER.applyShader(shaderEffect, () ->
                 {
+                    Color color = modeConfig.getValue() == ShaderMode.DEFAULT ? colorConfig.getValue() : new Color(255, 255, 255, 0);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
@@ -441,8 +443,9 @@ public class ShadersModule extends ToggleModule
 
     private enum ShaderMode
     {
-        OUTLINE,
+        DEFAULT,
         GRADIENT,
-        IMAGE
+        IMAGE,
+        OFF
     }
 }
