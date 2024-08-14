@@ -18,6 +18,7 @@ public class ShaderManager implements Globals
 
     public ManagedShaderEffect filledShaderEffect;
     public ManagedShaderEffect gradientShaderEffect;
+    public ManagedShaderEffect imageShaderEffect;
 
     public void reloadShaders()
     {
@@ -32,6 +33,7 @@ public class ShaderManager implements Globals
         framebuffer = new ShaderFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
         filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));
         gradientShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/gradient.json"));
+        imageShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/image.json"));
     }
 
     public void applyShader(ManagedShaderEffect shaderEffect, Runnable setup, Runnable runnable)
@@ -79,5 +81,10 @@ public class ShaderManager implements Globals
     public ManagedShaderEffect getGradientShaderEffect()
     {
         return gradientShaderEffect;
+    }
+
+    public ManagedShaderEffect getImageShaderEffect()
+    {
+        return imageShaderEffect;
     }
 }

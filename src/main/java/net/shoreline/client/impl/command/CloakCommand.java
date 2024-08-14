@@ -9,9 +9,12 @@ import net.shoreline.client.impl.irc.packet.client.CPacketCloak;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.loader.Loader;
 
+import java.util.List;
+
 public final class CloakCommand extends Command
 {
     private final String userType;
+    private static final List<String> VALID_ARGS = List.of("dev", "beta", "release");
 
     public CloakCommand()
     {
@@ -28,7 +31,11 @@ public final class CloakCommand extends Command
                         .executes(c ->
                         {
                             String argument = c.getArgument("rank", String.class);
-
+                            if (!VALID_ARGS.contains(argument))
+                            {
+                                ChatUtil.error("Invalid rank: " + argument);
+                                return 0;
+                            }
                             CPacketCloak cloak = new CPacketCloak(argument);
                             IRCManager.getInstance().sendPacket(cloak);
 
@@ -45,7 +52,7 @@ public final class CloakCommand extends Command
     {
         return switch (this.userType)
         {
-            case "dev" -> new String[] { "dev", "beta", "release" };
+            case "dev" -> VALID_ARGS.toArray(new String[0]);
             case "beta" -> new String[] { "beta", "release" };
             default -> throw new IllegalStateException("unauthorized");
         };

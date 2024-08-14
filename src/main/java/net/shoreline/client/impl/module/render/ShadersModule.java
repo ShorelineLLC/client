@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.TextureUtil;
 import ladysnake.satin.api.managed.ManagedShaderEffect;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
@@ -14,6 +16,8 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
+import net.minecraft.resource.Resource;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -25,6 +29,8 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
+import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.render.ReloadShaderEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.init.Managers;
@@ -33,8 +39,18 @@ import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
 import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
+import org.lwjgl.opengl.GL32C;
+import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Optional;
 
 /**
  * @author linus
@@ -56,6 +72,7 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render shaders on the player", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render shaders on other players", true));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render shaders on monsters", true));
+    Config<Boolean> neutralsConfig = register(new BooleanConfig("Neutrals", "Render shaders on neutrals", true));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render shaders on animals", true));
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render shaders on items", true));
     Config<Boolean> otherConfig = register(new BooleanConfig("Crystals", "Render shaders on crystals", true));
@@ -64,13 +81,43 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", false));
     Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", false));
     Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", false));
-    Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.3f)));
+    Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.4f)));
 
     private float shaderTime;
+
+    private int textureId;
 
     public ShadersModule()
     {
         super("Shaders", "Renders shaders over entities", ModuleCategory.RENDER);
+    }
+
+    @Override
+    public void onEnable()
+    {
+        if (modeConfig.getValue() == ShaderMode.IMAGE)
+        {
+            loadShaderImage();
+        }
+    }
+
+    @EventListener
+    public void onConfigUpdate(ConfigUpdateEvent event)
+    {
+        if (event.getConfig() == modeConfig && modeConfig.getValue() == ShaderMode.IMAGE
+                && event.getStage() == StageEvent.EventStage.POST)
+        {
+            loadShaderImage();
+        }
+    }
+
+    @EventListener
+    public void onGameJoin(GameJoinEvent event)
+    {
+        if (modeConfig.getValue() == ShaderMode.IMAGE)
+        {
+            loadShaderImage();
+        }
     }
 
     @EventListener
@@ -117,6 +164,28 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
                     shaderEffect.render(mc.getTickDelta());
                     shaderTime += speedConfig.getValue();
+                }, () ->
+                {
+                    renderEntities(event.getTickDelta(), event.getMatrices());
+                });
+            }
+            case IMAGE ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getImageShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    GlStateManager._activeTexture(GL32C.GL_TEXTURE0 + 1);
+                    GlStateManager._bindTexture(textureId);
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("imageTexture", 1);
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+                    shaderEffect.render(mc.getTickDelta());
                 }, () ->
                 {
                     renderEntities(event.getTickDelta(), event.getMatrices());
@@ -239,7 +308,103 @@ public class ShadersModule extends ToggleModule
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
                 });
             }
-        };
+            case IMAGE ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getImageShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    GlStateManager._activeTexture(GL32C.GL_TEXTURE0 + 1);
+                    GlStateManager._bindTexture(textureId);
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("imageTexture", 1);
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
+                    shaderEffect.render(mc.getTickDelta());
+                }, () ->
+                {
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
+                });
+            }
+        }
+    }
+
+    private void loadShaderImage()
+    {
+        try
+        {
+            ByteBuffer data = null;
+            String[] fileFormats = new String[] {"png", "jpg"};
+            for (String fileFormat : fileFormats)
+            {
+                File shaderFile = Shoreline.CONFIG.getClientDirectory().resolve("shader." + fileFormat).toFile();
+                if (shaderFile.exists())
+                {
+                    FileInputStream fileInputStream = new FileInputStream(shaderFile);
+                    data = TextureUtil.readResource(fileInputStream);
+                    break;
+                }
+                else
+                {
+                    Optional<Resource> optional = mc.getResourceManager().getResource(new Identifier("shoreline", "shaders/shader." + fileFormat));
+                    if (optional.isEmpty() || optional.get().getInputStream() == null)
+                    {
+                        continue;
+                    }
+                    data = TextureUtil.readResource(optional.get().getInputStream());
+                    break;
+                }
+            }
+            if (data == null)
+            {
+                return;
+            }
+
+            data.rewind();
+            try (MemoryStack stack = MemoryStack.stackPush())
+            {
+                IntBuffer width = stack.mallocInt(1);
+                IntBuffer height = stack.mallocInt(1);
+                IntBuffer comp = stack.mallocInt(1);
+
+                STBImage.stbi_set_flip_vertically_on_load(true);
+                ByteBuffer image = STBImage.stbi_load_from_memory(data, width, height, comp, 3);
+                if (image == null)
+                {
+                    return;
+                }
+
+                textureId = GlStateManager._genTexture();
+                GlStateManager._activeTexture(GL32C.GL_TEXTURE0);
+                GlStateManager._bindTexture(textureId);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_SWAP_BYTES, GL32C.GL_FALSE);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_LSB_FIRST, GL32C.GL_FALSE);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_ROW_LENGTH, 0);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_IMAGE_HEIGHT, 0);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_SKIP_ROWS, 0);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_SKIP_PIXELS, 0);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_SKIP_IMAGES, 0);
+                GlStateManager._pixelStore(GL32C.GL_UNPACK_ALIGNMENT, 4);
+                GlStateManager._texParameter(GL32C.GL_TEXTURE_2D, GL32C.GL_TEXTURE_WRAP_S, GL32C.GL_REPEAT);
+                GlStateManager._texParameter(GL32C.GL_TEXTURE_2D, GL32C.GL_TEXTURE_WRAP_T, GL32C.GL_REPEAT);
+                GlStateManager._texParameter(GL32C.GL_TEXTURE_2D, GL32C.GL_TEXTURE_MIN_FILTER, GL32C.GL_NEAREST);
+                GlStateManager._texParameter(GL32C.GL_TEXTURE_2D, GL32C. GL_TEXTURE_MAG_FILTER, GL32C.GL_NEAREST);
+
+                image.rewind();
+                GL32C.glTexImage2D(GL32C.GL_TEXTURE_2D, 0, GL32C.GL_RGB, width.get(0), height.get(0), 0, GL32C.GL_RGB, GL32C.GL_UNSIGNED_BYTE, image);
+
+                STBImage.stbi_image_free(image);
+                STBImage.stbi_set_flip_vertically_on_load(false);
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private boolean checkShaders(Entity entity)
@@ -250,8 +415,8 @@ public class ShadersModule extends ToggleModule
         }
         return (!entity.isInvisible() || invisiblesConfig.getValue())
                 && (EntityUtil.isMonster(entity) && monstersConfig.getValue()
-                || (EntityUtil.isNeutral(entity)
-                || EntityUtil.isPassive(entity)) && animalsConfig.getValue())
+                || EntityUtil.isNeutral(entity) && neutralsConfig.getValue()
+                || EntityUtil.isPassive(entity) && animalsConfig.getValue())
                 || entity instanceof EndCrystalEntity && otherConfig.getValue()
                 || entity instanceof ItemEntity && itemsConfig.getValue()
                 || entity instanceof ExperienceBottleEntity && projectilesConfig.getValue()
@@ -277,7 +442,7 @@ public class ShadersModule extends ToggleModule
     private enum ShaderMode
     {
         OUTLINE,
-        GRADIENT
-        // IMAGE
+        GRADIENT,
+        IMAGE
     }
 }

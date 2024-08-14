@@ -222,6 +222,15 @@ public abstract class Config<T> implements Identifiable, Serializable<T>
     }
 
     /**
+     *
+     * @param visible
+     */
+    public void setVisible(boolean visible)
+    {
+        this.visible = () -> visible;
+    }
+
+    /**
      * @return
      */
     public boolean isVisible()

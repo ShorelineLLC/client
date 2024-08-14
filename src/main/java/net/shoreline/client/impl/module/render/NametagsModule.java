@@ -11,16 +11,14 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.Tameable;
-import net.minecraft.entity.passive.*;
+import net.minecraft.entity.passive.AbstractHorseEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
@@ -35,8 +33,8 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.api.render.RenderBuffers;
-import net.shoreline.client.api.render.layers.RenderLayersClient;
 import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.api.render.layers.RenderLayersClient;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
 import net.shoreline.client.impl.event.world.PlaySoundEvent;
@@ -54,7 +52,10 @@ import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -73,7 +74,7 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> entityIdConfig = register(new BooleanConfig("EntityId", "Displays the player's entity id", false));
     Config<Boolean> gamemodeConfig = register(new BooleanConfig("Gamemode", "Displays the player's gamemode", false));
     // Pooron check
-    Config<Boolean> onlineUsersConfig = register(new BooleanConfig("OnlineUsers", "Displays the online users of Shoreline", true, () -> Loader.SESSION.getUserType().equalsIgnoreCase("release")));
+    Config<Boolean> onlineUsersConfig = register(new BooleanConfig("OnlineUsers", "Displays the online users of Shoreline", true, () -> !Loader.SESSION.getUserType().equals("release")));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Displays the player's server connection ping", true));
     Config<Boolean> healthConfig = register(new BooleanConfig("Health", "Displays the player's current health", true));
     Config<Boolean> totemsConfig = register(new BooleanConfig("Totems", "Displays the player's popped totem count", false));
@@ -82,7 +83,7 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> backgroundConfig = register(new BooleanConfig("Background", "Renders a background behind the nametag", true));
     Config<Boolean> borderedConfig = register(new BooleanConfig("Border", "Renders a border around the nametag", false));
     Config<Float> thicknessConfig = register(new NumberConfig<>("Thickness", "The border thickness", 0.1f, 0.5f, 1.0f, () -> borderedConfig.getValue()));
-    Config<Boolean> tamedConfig = register(new BooleanConfig("TamedMobs", "Renders nametags on tamed mobs", false));
+    Config<Boolean> tamedConfig = register(new BooleanConfig("MobOwner", "Renders nametags on tamed mobs", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
     Config<Boolean> droppedItemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
     Config<Boolean> soundsConfig = register(new BooleanConfig("Sounds", "Renders nametags on sounds", false));
