@@ -26,10 +26,17 @@ public final class FireworkBoostModule extends ToggleModule
     Config<Double> maxSpeedConfig = register(new NumberConfig<>("MaxSpeed", "The initial speed of the rocket.", 1.0, 3.0, 10.0, () -> accelerateConfig.getValue()));
 
     private int tickCounter;
+    private double speed;
 
     public FireworkBoostModule()
     {
         super("FireworkBoost", "Allows you to change the acceleration of your firework.", ModuleCategory.MOVEMENT);
+    }
+
+    @Override
+    public void onDisable()
+    {
+        speed = 0.0f;
     }
 
     @EventListener
@@ -43,7 +50,6 @@ public final class FireworkBoostModule extends ToggleModule
         {
             final Vec3d vec3d = mc.player.getRotationVector();
             final Vec3d vec3d2 = mc.player.getVelocity();
-            double speed = speedConfig.getValue();
             if (accelerateConfig.getValue())
             {
                 speed += accelSpeedConfig.getValue() * tickCounter;
@@ -56,10 +62,18 @@ public final class FireworkBoostModule extends ToggleModule
                     speed = MathHelper.clamp(speed, 0, maxSpeedConfig.getValue());
                 }
             }
+            else
+            {
+                speed = speedConfig.getValue();
+            }
             mc.player.setVelocity(vec3d2.add(
                     vec3d.x * 0.1 + (vec3d.x * speed - vec3d2.x) * 0.5,
                     vec3d.y * 0.1 + (vec3d.y * speed - vec3d2.y) * 0.5,
                     vec3d.z * 0.1 + (vec3d.z * speed - vec3d2.z) * 0.5));
+        }
+        else
+        {
+            speed = 0.0f;
         }
     }
 
