@@ -139,6 +139,8 @@ mod platform
     use obfstr::obfstr;
     use objc::{class, msg_send};
     use crate::notifs::platform::NSAlertStyle::{Critical, Informational};
+    use objc::sel;
+    use objc::sel_impl;
 
     pub unsafe fn display_info_msg(msg: &str)
     {
@@ -174,10 +176,9 @@ mod platform
         alert.setInformativeText(NSString::alloc(nil).init_str(msg));
         alert.setAlertStyle(Informational);
         alert.setWindowLevel(10);
-        let response: id = alert.runModal();
 
-        let NSAlertFirstButtonReturn: id = msg_send![class!(NSAlert), NSAlertFirstButtonReturn];
-        if response == NSAlertFirstButtonReturn
+        let response: i32 = msg_send![alert, runModal];
+        if response == 1000
         {
             return true;
         }

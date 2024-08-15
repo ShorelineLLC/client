@@ -104,6 +104,10 @@ public class ShadersModule extends ToggleModule
     @EventListener
     public void onConfigUpdate(ConfigUpdateEvent event)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
         if (event.getConfig() == modeConfig && modeConfig.getValue() == ShaderMode.IMAGE
                 && event.getStage() == StageEvent.EventStage.POST)
         {
@@ -134,10 +138,9 @@ public class ShadersModule extends ToggleModule
                 }
                 Managers.SHADER.applyShader(shaderEffect, () ->
                 {
-                    Color color = modeConfig.getValue() == ShaderMode.DEFAULT ? colorConfig.getValue() : new Color(255, 255, 255, 0);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
-                    shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, modeConfig.getValue() == ShaderMode.DEFAULT ? colorConfig.getValue().getAlpha() / 255.0f : 0.0f);
+                    shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? dotRadiusConfig.getValue() : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
                     shaderEffect.render(mc.getTickDelta());
@@ -274,10 +277,9 @@ public class ShadersModule extends ToggleModule
                 }
                 Managers.SHADER.applyShader(shaderEffect, () ->
                 {
-                    Color color = modeConfig.getValue() == ShaderMode.DEFAULT ? colorConfig.getValue() : new Color(255, 255, 255, 0);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
-                    shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() ? dotRadiusConfig.getValue() : 0);
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, modeConfig.getValue() == ShaderMode.DEFAULT ? colorConfig.getValue().getAlpha() / 255.0f : 0.0f);
+                    shaderEffect.setUniformValue("dotRadius", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? dotRadiusConfig.getValue() : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
                     shaderEffect.render(mc.getTickDelta());
