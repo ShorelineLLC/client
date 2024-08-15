@@ -27,6 +27,7 @@ import java.awt.*;
 public class ESPModule extends ToggleModule
 {
     //
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The ESP render range", 10.0f, 50.0f, 200.0f));
     Config<ESPMode> modeConfig = register(new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.GLOW, ESPMode.values()));
     Config<Float> widthConfig = register(new NumberConfig<>("Linewidth", "ESP rendering line width", 0.1f, 1.25f, 5.0f));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render players through walls", true));
@@ -51,8 +52,12 @@ public class ESPModule extends ToggleModule
     @EventListener
     public void onEntityOutline(EntityOutlineEvent event)
     {
-        if (modeConfig.getValue() == ESPMode.GLOW && checkESP(event.getEntity()))
+        if (mc.player != null && modeConfig.getValue() == ESPMode.GLOW && checkESP(event.getEntity()))
         {
+            if (mc.player.squaredDistanceTo(event.getEntity()) > ((NumberConfig) rangeConfig).getValueSq())
+            {
+                return;
+            }
             event.cancel();
         }
     }
@@ -60,8 +65,12 @@ public class ESPModule extends ToggleModule
     @EventListener
     public void onTeamColor(TeamColorEvent event)
     {
-        if (modeConfig.getValue() == ESPMode.GLOW && checkESP(event.getEntity()))
+        if (mc.player != null && modeConfig.getValue() == ESPMode.GLOW && checkESP(event.getEntity()))
         {
+            if (mc.player.squaredDistanceTo(event.getEntity()) > ((NumberConfig) rangeConfig).getValueSq())
+            {
+                return;
+            }
             event.cancel();
             event.setColor(getESPColor(event.getEntity()).getRGB());
         }

@@ -48,6 +48,7 @@ import java.util.Map;
  */
 public class ChamsModule extends ToggleModule
 {
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The chams render range", 10.0f, 50.0f, 200.0f));
     Config<ChamsMode> modeConfig = register(new EnumConfig<>("Mode", "The rendering mode for the chams", ChamsMode.FILL, ChamsMode.values()));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the render", 1.0f, 1.5f, 5.0f, () -> modeConfig.getValue() != ChamsMode.FILL));
     Config<Boolean> wallsConfig = register(new BooleanConfig("ThroughWalls", "Renders chams through walls", true));
@@ -85,6 +86,10 @@ public class ChamsModule extends ToggleModule
         }
         for (Entity entity : mc.world.getEntities())
         {
+            if (mc.player.squaredDistanceTo(entity) > ((NumberConfig) rangeConfig).getValueSq())
+            {
+                continue;
+            }
             double x = Math.abs(mc.gameRenderer.getCamera().getPos().x - entity.getX());
             double z = Math.abs(mc.gameRenderer.getCamera().getPos().z - entity.getZ());
             double d = (mc.options.getViewDistance().getValue() + 1) * 16;
@@ -153,8 +158,12 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderCrystal(RenderCrystalEvent event)
     {
-        if (!textureConfig.getValue() && crystalsConfig.getValue())
+        if (mc.player != null && !textureConfig.getValue() && crystalsConfig.getValue())
         {
+            if (mc.player.squaredDistanceTo(event.endCrystalEntity) > ((NumberConfig) rangeConfig).getValueSq())
+            {
+                return;
+            }
             event.cancel();
         }
     }
@@ -162,7 +171,11 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderEntity(RenderEntityEvent event)
     {
-        if (textureConfig.getValue() || !checkChams(event.entity))
+        if (mc.player == null || textureConfig.getValue() || !checkChams(event.entity))
+        {
+            return;
+        }
+        if (mc.player.squaredDistanceTo(event.entity) > ((NumberConfig) rangeConfig).getValueSq())
         {
             return;
         }

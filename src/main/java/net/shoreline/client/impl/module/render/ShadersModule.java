@@ -38,6 +38,7 @@ import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
 import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.world.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 import org.lwjgl.opengl.GL32C;
@@ -59,6 +60,7 @@ import java.util.Optional;
 public class ShadersModule extends ToggleModule
 {
 
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The shader render range", 10.0f, 50.0f, 200.0f));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Integer> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1, 1, 5, () -> outlineConfig.getValue()));
     Config<Boolean> glowConfig = register(new BooleanConfig("Glow", "Glow outline", false));
@@ -229,6 +231,10 @@ public class ShadersModule extends ToggleModule
         {
             if (checkShaders(entity))
             {
+                if (mc.player.squaredDistanceTo(entity) > ((NumberConfig) rangeConfig).getValueSq())
+                {
+                    continue;
+                }
                 Vec3d camera = mc.gameRenderer.getCamera().getPos();
                 double d = MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX());
                 double e = MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY());
@@ -275,10 +281,12 @@ public class ShadersModule extends ToggleModule
             }
         }
         // ciaohack solutions
-        EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(mc.player);
+        FakePlayerEntity fakePlayerEntity = new FakePlayerEntity(mc.player);
+        fakePlayerEntity.setId(Integer.MAX_VALUE);
+        EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(fakePlayerEntity);
         matrixStack.push();
         matrixStack.translate(0.0, -100000000.0, 0.0);
-        entityRenderer.render(mc.player, mc.player.getYaw(), tickDelta, matrixStack, vertexConsumerProvider, 0);
+        entityRenderer.render(fakePlayerEntity, fakePlayerEntity.getYaw(), tickDelta, matrixStack, vertexConsumerProvider, 0);
         matrixStack.pop();
     }
 
