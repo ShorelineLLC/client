@@ -35,8 +35,18 @@ nom = "7.1.3"
 rust-crypto = "0.2.36"
 hyper-rustls = "0.27.2"
 
+# Platform dependant dependencies, for message boxes
+
 [target.'cfg(target_os = "windows")'.dependencies]
 winapi = { version = "0.3.9", features = ["winuser"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.26.0"
+objc = "0.2.7"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = "0.18.1"
+glib = "0.20.1"
 
 [profile.release]
 strip = "symbols"

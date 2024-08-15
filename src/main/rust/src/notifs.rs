@@ -134,19 +134,125 @@ mod platform
 #[cfg(target_os = "macos")]
 mod platform
 {
-    pub fn display_info_msg(msg: &str)
+    use cocoa::base::{id, nil};
+    use cocoa::foundation::NSString;
+    use obfstr::obfstr;
+    use objc::{class, msg_send};
+    use crate::notifs::platform::NSAlertStyle::{Critical, Informational};
+
+    pub unsafe fn display_info_msg(msg: &str)
     {
-        std::panic!("not implemented");
+        let alert = NSAlert::alloc(nil).init().autorelease();
+
+        alert.addButton(NSString::alloc(nil).init_str(obfstr!("OK")));
+        alert.setMessageText(NSString::alloc(nil).init_str(obfstr!("Shoreline")));
+        alert.setInformativeText(NSString::alloc(nil).init_str(msg));
+        alert.setAlertStyle(Informational);
+        alert.setWindowLevel(10);
+        alert.runModal();
     }
 
-    pub fn display_error_msg(msg: &str)
+    pub unsafe fn display_error_msg(msg: &str)
     {
-        std::panic!("not implemented");
+        let alert = NSAlert::alloc(nil).init().autorelease();
+
+        alert.addButton(NSString::alloc(nil).init_str(obfstr!("OK")));
+        alert.setMessageText(NSString::alloc(nil).init_str(obfstr!("Shoreline")));
+        alert.setInformativeText(NSString::alloc(nil).init_str(msg));
+        alert.setAlertStyle(Critical);
+        alert.setWindowLevel(10);
+        alert.runModal();
     }
 
     pub unsafe fn display_confirmation_msg(msg: &str) -> bool
     {
-        std::panic!("not implemented");
+        let alert = NSAlert::alloc(nil).init().autorelease();
+
+        alert.addButton(NSString::alloc(nil).init_str(obfstr!("Yes")));
+        alert.addButton(NSString::alloc(nil).init_str(obfstr!("No")));
+        alert.setMessageText(NSString::alloc(nil).init_str(obfstr!("Shoreline")));
+        alert.setInformativeText(NSString::alloc(nil).init_str(msg));
+        alert.setAlertStyle(Informational);
+        alert.setWindowLevel(10);
+        let response: id = alert.runModal();
+
+        let NSAlertFirstButtonReturn: id = msg_send![class!(NSAlert), NSAlertFirstButtonReturn];
+        if response == NSAlertFirstButtonReturn
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    pub enum NSAlertStyle
+    {
+        Warning = 0,
+        Informational = 1,
+        Critical = 2,
+    }
+
+    pub trait NSAlert: Sized
+    {
+        unsafe fn alloc(_: Self) -> id
+        {
+            msg_send![class!(NSAlert), alloc]
+        }
+
+        unsafe fn init(self) -> id;
+        unsafe fn autorelease(self) -> id;
+
+        unsafe fn setAlertStyle(self, style: NSAlertStyle);
+        unsafe fn setMessageText(self, messageText: id);
+        unsafe fn setInformativeText(self, informativeText: id);
+        unsafe fn addButton(self, withTitle: id);
+        unsafe fn window(self) -> id;
+        unsafe fn setWindowLevel(self, level: i32);
+        unsafe fn runModal(self) -> id;
+    }
+
+    impl NSAlert for id
+    {
+        unsafe fn init(self) -> id
+        {
+            msg_send![self, init]
+        }
+
+        unsafe fn autorelease(self) -> id
+        {
+            msg_send![self, autorelease]
+        }
+
+        unsafe fn setAlertStyle(self, alertStyle: NSAlertStyle)
+        {
+            msg_send![self, setAlertStyle: alertStyle]
+        }
+
+        unsafe fn setMessageText(self, messageText: id)
+        {
+            msg_send![self, setMessageText: messageText]
+        }
+
+        unsafe fn setInformativeText(self, informativeText: id)
+        {
+            msg_send![self, setInformativeText: informativeText]
+        }
+
+        unsafe fn addButton(self, withTitle: id) {
+            msg_send![self, addButtonWithTitle: withTitle]
+        }
+
+        unsafe fn window(self) -> id {
+            msg_send![self, window]
+        }
+
+        unsafe fn runModal(self) -> id {
+            msg_send![self, runModal]
+        }
+
+        unsafe fn setWindowLevel(self, level: i32) {
+            msg_send![self.window(), setLevel: level]
+        }
     }
 }
 
