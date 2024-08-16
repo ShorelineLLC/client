@@ -21,7 +21,14 @@ public class RenderLayersClient implements Globals
     public static final Identifier SHULKER_BOXES_ATLAS_TEXTURE = new Identifier("textures/atlas/shulker_boxes.png");
     public static final Identifier CHEST_ATLAS_TEXTURE = new Identifier("textures/atlas/chest.png");
 
-    public static final VertexFormat POSITION_COLOR_TEXTURE_OVERLAY = new VertexFormat((ImmutableMap) ImmutableMap.builder().put("Position", VertexFormats.POSITION_ELEMENT).put("Color", VertexFormats.COLOR_ELEMENT).put("UV0", VertexFormats.TEXTURE_ELEMENT).put("Padding", VertexFormats.PADDING_ELEMENT).put("UV1", VertexFormats.OVERLAY_ELEMENT).put("UV2", VertexFormats.LIGHT_ELEMENT).build());
+    public static final VertexFormat POSITION_COLOR_TEXTURE_OVERLAY = new VertexFormat((ImmutableMap) ImmutableMap.builder()
+            .put("Position", VertexFormats.POSITION_ELEMENT)
+            .put("Color", VertexFormats.COLOR_ELEMENT)
+            .put("UV0", VertexFormats.TEXTURE_ELEMENT)
+            .put("UV1", VertexFormats.OVERLAY_ELEMENT)
+            .put("Padding", VertexFormats.PADDING_ELEMENT)
+            .put("UV2", VertexFormats.LIGHT_ELEMENT)
+            .put("Normal", VertexFormats.NORMAL_ELEMENT).build());
     public static final RenderLayer GLINT = RenderLayer.of("glint", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.MultiPhaseParameters.builder()
             .program(RenderPhase.GLINT_PROGRAM).texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, true, false))
             .writeMaskState(RenderPhase.COLOR_MASK).cull(RenderPhase.DISABLE_CULLING).depthTest(new DepthTest()).transparency(RenderPhase.GLINT_TRANSPARENCY).texturing(RenderPhase.GLINT_TEXTURING).build(false));
@@ -49,6 +56,10 @@ public class RenderLayersClient implements Globals
     public static final Function<Identifier, RenderLayer> ENTITY_TRANSLUCENT_CULL = Util.memoize((texture) -> {
         RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_TRANSLUCENT_CULL_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).build(true);
         return RenderLayer.of("entity_translucent_cull", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);
+    });
+    public static final Function<Identifier, RenderLayer> ENTITY_TRANSLUCENT_CULL_2 = Util.memoize((texture) -> {
+        RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_TRANSLUCENT_CULL_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).build(true);
+        return RenderLayer.of("entity_translucent_cull", POSITION_COLOR_TEXTURE_OVERLAY, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);
     });
     public static final Function<Identifier, RenderLayer> ENTITY_CUTOUT = Util.memoize((texture) -> {
         RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_CUTOUT_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.NO_TRANSPARENCY).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).build(true);
@@ -94,6 +105,7 @@ public class RenderLayersClient implements Globals
         public void startDrawing()
         {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glDepthMask(true);
             GL11.glDepthFunc(GL11.GL_EQUAL);
         }
 
@@ -101,6 +113,7 @@ public class RenderLayersClient implements Globals
         public void endDrawing()
         {
             GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glDepthMask(false);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             GL11.glDepthFunc(GL11.GL_ALWAYS);
             // GL11.glClearDepth(1.0);

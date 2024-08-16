@@ -5,6 +5,7 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
@@ -405,13 +406,13 @@ public class NametagsModule extends ToggleModule
         matrices.translate(-0.5f, -0.5f, -0.5f);
         if (bakedModel.isBuiltin() || stack.isOf(Items.TRIDENT) && !bl)
         {
-            ((AccessorItemRenderer) mc.getItemRenderer()).hookGetBuiltinModelItemRenderer().render(stack, renderMode,
-                    matrices, vertexConsumers, light, overlay);
+            ((AccessorItemRenderer) mc.getItemRenderer()).hookGetBuiltinModelItemRenderer().render(
+                    stack, renderMode, matrices, vertexConsumers, light, overlay);
         }
         else
         {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookRenderBakedItemModel(bakedModel, stack, light,
-                    overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayersClient.ITEM_ENTITY_TRANSLUCENT_CULL, stack.hasGlint()));
+                    overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayersClient.ENTITY_TRANSLUCENT_CULL_2.apply(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE), stack.hasGlint()));
         }
     }
 

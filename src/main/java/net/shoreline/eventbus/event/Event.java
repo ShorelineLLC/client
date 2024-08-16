@@ -24,7 +24,9 @@ public class Event
         if (isCancelable())
         {
             canceled = cancel;
+            return;
         }
+        throw new IllegalStateException("Cannot set event canceled");
     }
 
     public void cancel()
