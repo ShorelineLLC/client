@@ -817,12 +817,8 @@ public class AutoCrystalModule extends RotationModule
         DamageData<EndCrystalEntity> data = null;
         for (Entity crystal : entities)
         {
-            if (!(crystal instanceof EndCrystalEntity crystal1) || !crystal.isAlive())
-            {
-                continue;
-            }
-            Integer antiStuckCount = antiStuckCrystals.get(crystal.getId());
-            if (antiStuckCount != null && antiStuckCount > attackLimitConfig.getValue())
+            if (!(crystal instanceof EndCrystalEntity crystal1) || !crystal.isAlive()
+                    || stuckCrystals.stream().anyMatch(d -> d.id() == crystal.getId()))
             {
                 continue;
             }
@@ -1187,7 +1183,7 @@ public class AutoCrystalModule extends RotationModule
                 else
                 {
                     double dist = mc.player.squaredDistanceTo(entity1);
-                    stuckCrystals.add(new AntiStuckData(entity1.getBlockPos(), entity1.getPos(), dist));
+                    stuckCrystals.add(new AntiStuckData(entity1.getId(), entity1.getBlockPos(), entity1.getPos(), dist));
                 }
             }
         }
@@ -1313,7 +1309,7 @@ public class AutoCrystalModule extends RotationModule
         OFF
     }
 
-    private record AntiStuckData(BlockPos blockPos, Vec3d pos, double stuckDist) {}
+    private record AntiStuckData(int id, BlockPos blockPos, Vec3d pos, double stuckDist) {}
 
     private static class DamageData<T>
     {
