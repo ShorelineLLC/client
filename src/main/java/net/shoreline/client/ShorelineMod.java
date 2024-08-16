@@ -26,22 +26,11 @@ public class ShorelineMod
      */
     public void onInitializeClient()
     {
-        if (isMeteorPresent())
-        {
-            System.exit(0);
-            return;
-        }
-
         Shoreline.init();
     }
 
     public static boolean isBaritonePresent()
     {
         return FabricLoader.getInstance().getModContainer("baritone").isPresent();
-    }
-
-    public static boolean isMeteorPresent()
-    {
-        return FabricLoader.getInstance().getModContainer("meteor-client").isPresent();
     }
 }
