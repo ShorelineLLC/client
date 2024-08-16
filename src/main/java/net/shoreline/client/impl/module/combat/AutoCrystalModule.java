@@ -88,6 +88,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Float> breakSpeedConfig = register(new NumberConfig<>("BreakSpeed", "Speed to break crystals", 0.1f, 18.0f, 20.0f));
     Config<Float> attackDelayConfig = register(new NumberConfig<>("AttackDelay", "Added delays", 0.0f, 0.0f, 5.0f));
     Config<Integer> attackFactorConfig = register(new NumberConfig<>("AttackFactor", "Factor of attack delay", 0, 0, 3, () -> attackDelayConfig.getValue() > 0.0));
+    Config<Integer> attackLimitConfig = register(new NumberConfig<>("AttackLimit", "Attacks before considering a crystal unbreakable", 5, 15, 25));
     Config<Float> randomSpeedConfig = register(new NumberConfig<>("RandomSpeed", "Randomized delay for breaking crystals", 0.0f, 0.0f, 10.0f));
     Config<Boolean> breakDelayConfig = register(new BooleanConfig("BreakDelay", "Uses attack latency to calculate break delays", false));
     Config<Float> breakTimeoutConfig = register(new NumberConfig<>("BreakTimeout", "Time after waiting for the average break time before considering a crystal attack failed", 0.0f, 3.0f, 10.0f, () -> breakDelayConfig.getValue()));
@@ -166,6 +167,9 @@ public class AutoCrystalModule extends RotationModule
             Collections.synchronizedMap(new ConcurrentHashMap<>());
     private final PerSecondCounter crystalCounter = new PerSecondCounter();
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
+    // Antistuck
+    private final Map<Integer, Integer> antiStuckCrystals = new HashMap<>();
+    private final List<AntiStuckData> stuckCrystals = new CopyOnWriteArrayList<>();
 
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
@@ -199,7 +203,9 @@ public class AutoCrystalModule extends RotationModule
         placeCrystal = null;
         crystalRotation = null;
         silentRotations = null;
+        stuckCrystals.clear();
         attackPackets.clear();
+        antiStuckCrystals.clear();
         placePackets.clear();
         attackLatency.clear();
         fadeList.clear();
@@ -213,6 +219,10 @@ public class AutoCrystalModule extends RotationModule
         {
             disable();
         }
+        else
+        {
+            onDisable();
+        }
     }
 
     @EventListener
@@ -221,6 +231,14 @@ public class AutoCrystalModule extends RotationModule
         if (mc.player.isSpectator())
         {
             return;
+        }
+        for (AntiStuckData d : stuckCrystals)
+        {
+            double dist = mc.player.squaredDistanceTo(d.pos());
+            if (Math.abs(dist - d.stuckDist()) > 0.5)
+            {
+                stuckCrystals.remove(d);
+            }
         }
         if (mc.player.isUsingItem() && mc.player.getActiveHand() == Hand.MAIN_HAND
                 || mc.options.attackKey.isPressed() || PlayerUtil.isHotbarKeysPressed())
@@ -476,6 +494,7 @@ public class AutoCrystalModule extends RotationModule
                         {
                             mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
                         });
+                        antiStuckCrystals.remove(entity.getId());
                         Long attackTime = attackPackets.remove(entity.getId());
                         if (attackTime != null)
                         {
@@ -490,6 +509,7 @@ public class AutoCrystalModule extends RotationModule
         {
             for (int id : packet.getEntityIds())
             {
+                antiStuckCrystals.remove(id);
                 Long attackTime = attackPackets.remove(id);
                 if (attackTime != null)
                 {
@@ -612,7 +632,6 @@ public class AutoCrystalModule extends RotationModule
 
     private void attackInternal(EndCrystalEntity crystalEntity, Hand hand)
     {
-
         if (isRotationBlocked() || !rotated && rotateConfig.getValue())
         {
             return;
@@ -622,6 +641,15 @@ public class AutoCrystalModule extends RotationModule
         // ((AccessorPlayerInteractEntityC2SPacket) packet).hookSetEntityId(id);
         Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
         attackPackets.put(crystalEntity.getId(), System.currentTimeMillis());
+        Integer antiStuckCount = antiStuckCrystals.get(crystalEntity.getId());
+        if (antiStuckCount != null)
+        {
+            antiStuckCrystals.replace(crystalEntity.getId(), antiStuckCount + 1);
+        }
+        else
+        {
+            antiStuckCrystals.put(crystalEntity.getId(), 1);
+        }
         if (swingConfig.getValue())
         {
             mc.player.swingHand(hand);
@@ -793,6 +821,11 @@ public class AutoCrystalModule extends RotationModule
             {
                 continue;
             }
+            Integer antiStuckCount = antiStuckCrystals.get(crystal.getId());
+            if (antiStuckCount != null && antiStuckCount > attackLimitConfig.getValue())
+            {
+                continue;
+            }
             Long time = attackPackets.get(crystal.getId());
             boolean attacked = time != null && time < getBreakMs();
             if ((crystal.age < ticksExistedConfig.getValue() || attacked) && inhibitConfig.getValue())
@@ -859,9 +892,11 @@ public class AutoCrystalModule extends RotationModule
      */
     private boolean attackRangeCheck(Vec3d entityPos)
     {
+        double breakRange = breakRangeConfig.getValue();
+        double breakWallRange = breakWallRangeConfig.getValue();
         Vec3d playerPos = mc.player.getEyePos();
         double dist = playerPos.squaredDistanceTo(entityPos);
-        if (dist > ((NumberConfig) breakRangeConfig).getValueSq())
+        if (dist > breakRange * breakRange)
         {
             return true;
         }
@@ -873,8 +908,7 @@ public class AutoCrystalModule extends RotationModule
         BlockHitResult result = mc.world.raycast(new RaycastContext(
                 playerPos, entityPos, RaycastContext.ShapeType.COLLIDER,
                 RaycastContext.FluidHandling.NONE, mc.player));
-        return result.getType() != HitResult.Type.MISS
-                && dist > breakWallRangeConfig.getValue() * breakWallRangeConfig.getValue();
+        return result.getType() != HitResult.Type.MISS && dist > breakWallRange * breakWallRange;
     }
 
     private DamageData<BlockPos> calculatePlaceCrystal(List<BlockPos> placeBlocks, List<Entity> entities)
@@ -886,7 +920,7 @@ public class AutoCrystalModule extends RotationModule
         DamageData<BlockPos> data = null;
         for (BlockPos pos : placeBlocks)
         {
-            if (!canUseCrystalOnBlock(pos) || placeRangeCheck(pos))
+            if (!canUseCrystalOnBlock(pos) || placeRangeCheck(pos) || intersectingAntiStuckCheck(pos))
             {
                 continue;
             }
@@ -940,10 +974,12 @@ public class AutoCrystalModule extends RotationModule
      */
     private boolean placeRangeCheck(BlockPos pos)
     {
+        double placeRange = placeRangeConfig.getValue();
+        double placeWallRange = placeWallRangeConfig.getValue();
         Vec3d player = placeRangeEyeConfig.getValue() ? mc.player.getEyePos() : mc.player.getPos();
         double dist = placeRangeCenterConfig.getValue() ?
                 player.squaredDistanceTo(pos.toCenterPos()) : pos.getSquaredDistance(player.x, player.y, player.z);
-        if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
+        if (dist > placeRange * placeRange)
         {
             return true;
         }
@@ -956,7 +992,7 @@ public class AutoCrystalModule extends RotationModule
         if (result != null && result.getType() == HitResult.Type.BLOCK && !result.getBlockPos().equals(pos))
         {
             maxDist = breakWallRangeConfig.getValue() * breakWallRangeConfig.getValue();
-            if (!raytraceConfig.getValue() || dist > placeWallRangeConfig.getValue() * placeWallRangeConfig.getValue())
+            if (!raytraceConfig.getValue() || dist > placeWallRange * placeWallRange)
             {
                 return true;
             }
@@ -1141,12 +1177,30 @@ public class AutoCrystalModule extends RotationModule
                 entities.remove(entity);
             }
             else if (entity instanceof EndCrystalEntity entity1
-                    && entity1.getBoundingBox().intersects(box) || attackPackets.containsKey(entity.getId()) && entity.age < ticksExistedConfig.getValue())
+                    && entity1.getBoundingBox().intersects(box))
             {
-                entities.remove(entity);
+                Integer antiStuckAttacks = antiStuckCrystals.get(entity1.getId());
+                if (!attackRangeCheck(entity1) && (antiStuckAttacks == null || antiStuckAttacks <= attackLimitConfig.getValue()))
+                {
+                    entities.remove(entity);
+                }
+                else
+                {
+                    double dist = mc.player.squaredDistanceTo(entity1);
+                    stuckCrystals.add(new AntiStuckData(entity1.getBlockPos(), entity1.getPos(), dist));
+                }
             }
         }
         return entities;
+    }
+
+    private boolean intersectingAntiStuckCheck(BlockPos blockPos)
+    {
+        if (stuckCrystals.isEmpty())
+        {
+            return false;
+        }
+        return stuckCrystals.stream().anyMatch(d -> d.blockPos().equals(blockPos.up()));
     }
 
     private EndCrystalEntity intersectingCrystalCheck(BlockPos pos)
@@ -1258,6 +1312,8 @@ public class AutoCrystalModule extends RotationModule
         SEMI,
         OFF
     }
+
+    private record AntiStuckData(BlockPos blockPos, Vec3d pos, double stuckDist) {}
 
     private static class DamageData<T>
     {
