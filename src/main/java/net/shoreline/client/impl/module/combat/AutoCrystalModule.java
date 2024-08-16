@@ -99,18 +99,8 @@ public class AutoCrystalModule extends RotationModule
     Config<Float> breakWallRangeConfig = register(new NumberConfig<>("BreakWallRange", "Range to break crystals through walls", 0.1f, 4.0f, 6.0f));
     Config<Swap> antiWeaknessConfig = register(new EnumConfig<>("AntiWeakness", "Swap to tools before attacking crystals", Swap.OFF, Swap.values()));
     Config<Float> swapDelayConfig = register(new NumberConfig<>("SwapPenalty", "Delay for attacking after swapping items which prevents NCP flags", 0.0f, 0.0f, 10.0f));
-    // fight.speed:
-    //        limit: 13
-    // shortterm:
-    //        ticks: 8
+    //
     Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
-    // default NCP config
-    // limitforseconds:
-    //        half: 8
-    //        one: 15
-    //        two: 30
-    //        four: 60
-    //        eight: 100
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
@@ -159,7 +149,10 @@ public class AutoCrystalModule extends RotationModule
     private final Timer lastPlaceTimer = new CacheTimer();
     private final Timer lastSwapTimer = new CacheTimer();
     private final Timer autoSwapTimer = new CacheTimer();
-    //
+    // default NCP config
+    // fight.speed: limit: 13
+    // shortterm: ticks: 8
+    // limitforseconds: half: 8, one: 15, two: 30, four: 60, eight: 100
     private final Deque<Long> attackLatency = new EvictingQueue<>(20);
     private final Map<Integer, Long> attackPackets =
             Collections.synchronizedMap(new ConcurrentHashMap<>());
