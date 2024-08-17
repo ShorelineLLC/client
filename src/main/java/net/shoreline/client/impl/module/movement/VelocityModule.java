@@ -9,7 +9,6 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
@@ -290,14 +289,8 @@ public class VelocityModule extends ToggleModule
 
     private boolean isPhased()
     {
-        for (BlockPos blockPos : PositionUtil.getAllInBox(mc.player.getBoundingBox()))
-        {
-            if (!mc.world.getBlockState(blockPos).isReplaceable())
-            {
-                return true;
-            }
-        }
-        return false;
+        return PositionUtil.getAllInBox(mc.player.getBoundingBox()).stream()
+                .anyMatch(blockPos -> !mc.world.getBlockState(blockPos).isReplaceable());
     }
 
     private enum VelocityMode

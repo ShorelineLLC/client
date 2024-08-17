@@ -68,7 +68,7 @@ public class ShadersModule extends ToggleModule
     Config<ShaderMode> modeConfig = register(new EnumConfig<>("Fill", "The shader mode", ShaderMode.OFF, ShaderMode.values()));
     Config<Float> factorConfig = register(new NumberConfig<>("Factor", "The gradient factor", 0.1f, 8.0f, 10.0f, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The gradient speed factor", 0.01f, 1.5f, 10.0f, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
-    Config<Float> scaleConfig = register(new NumberConfig<>("Scale", "The marble speed factor", 0.001f, 0.003f, 0.01f, () -> modeConfig.getValue() == ShaderMode.MARBLE));
+    Config<Float> marbleFactorConfig = register(new NumberConfig<>("MotionFactor", "The marble speed factor", 0.001f, 0.003f, 0.01f, () -> modeConfig.getValue() == ShaderMode.MARBLE));
     Config<Boolean> dotsConfig = register(new BooleanConfig("Dots", "Hacker esp", false, () -> modeConfig.getValue() == ShaderMode.DEFAULT));
     Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue() && modeConfig.getValue() == ShaderMode.DEFAULT));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
@@ -192,7 +192,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
                     shaderEffect.render(mc.getTickDelta());
-                    shaderTime += scaleConfig.getValue();
+                    shaderTime += marbleFactorConfig.getValue();
                 }, () ->
                 {
                     renderEntities(event.getTickDelta(), event.getMatrices());
@@ -359,7 +359,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? glowRadiusConfig.getValue() : -1.0f);
                     shaderEffect.render(mc.getTickDelta());
-                    shaderTime += scaleConfig.getValue();
+                    shaderTime += marbleFactorConfig.getValue();
                 }, () ->
                 {
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());

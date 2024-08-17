@@ -87,6 +87,7 @@ public class CommandManager implements Globals
                 new ResetGuiCommand(),
                 new SaveCommand(),
                 new ReloadSoundCommand(),
+                new SkinGrabCommand(),
                 new ToggleCommand(),
                 new VanishCommand(),
                 new VClipCommand(),

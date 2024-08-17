@@ -72,15 +72,12 @@ public class JesusModule extends ToggleModule
     {
         BlockState state = event.getState();
         if (FlightModule.getInstance().isEnabled() || PacketFlyModule.getInstance().isEnabled()
-                || mc.player.isSpectator() || mc.player.isOnFire()
-                || state.getFluidState().isEmpty())
+                || mc.player.isSpectator() || mc.player.isOnFire() || state.getFluidState().isEmpty())
         {
             return;
         }
-        if (modeConfig.getValue() != JesusMode.DOLPHIN
-                && ((state.getBlock() == Blocks.WATER
-                | state.getFluidState().getFluid() == Fluids.WATER)
-                || state.getBlock() == Blocks.LAVA))
+        if (modeConfig.getValue() != JesusMode.DOLPHIN && ((state.getBlock() == Blocks.WATER
+                || state.getFluidState().getFluid() == Fluids.WATER) || state.getBlock() == Blocks.LAVA))
         {
             event.cancel();
             event.setVoxelShape(VoxelShapes.cuboid(new Box(0.0, 0.0, 0.0, 1.0, 0.99, 1.0)));
