@@ -28,6 +28,8 @@ import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.FirstOutQueue;
 import net.shoreline.client.util.math.position.PositionUtil;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
@@ -76,6 +78,7 @@ public class AutoMineModule extends RotationModule
     private final List<BlockPos> packetMines = new ArrayList<>();
     private long lastBreak;
     private boolean manualOverride;
+    private final Timer stopMiningTimer = new CacheTimer();
 
     public AutoMineModule()
     {
@@ -381,7 +384,6 @@ public class AutoMineModule extends RotationModule
             }
             else
             {
-                startMining(miningData2, false);
                 miningData2.resetDamage();
             }
             return;
@@ -398,10 +400,14 @@ public class AutoMineModule extends RotationModule
             {
                 return;
             }
-            stopMining(miningData2);
-            if (!miningData2.hasAttemptedBreak())
+            if (instantConfig.getValue() || stopMiningTimer.passed(500))
             {
-                miningData2.setAttemptedBreak(true);
+                stopMining(miningData2);
+                if (!miningData2.hasAttemptedBreak())
+                {
+                    miningData2.setAttemptedBreak(true);
+                }
+                stopMiningTimer.reset();
             }
         }
     }
@@ -473,14 +479,26 @@ public class AutoMineModule extends RotationModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
         {
-            for (MiningData data : miningQueue)
+            if (packet.getState().isAir())
             {
-                if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()))
+                for (MiningData data : miningQueue)
                 {
-                    data.setAttemptedBreak(false);
-                    return;
+                    if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()))
+                    {
+                        data.setAttemptedBreak(false);
+                    }
+                }
+            }
+            else if (!instantConfig.getValue())
+            {
+                for (MiningData data : miningQueue)
+                {
+                    if (data.getPos().equals(packet.getPos()))
+                    {
+                        startMining(data, false);
+                    }
                 }
             }
         }
@@ -568,6 +586,10 @@ public class AutoMineModule extends RotationModule
         if (floor && !miningQueue.isEmpty() || miningQueue.stream().anyMatch(d -> d.isFloor()))
         {
             miningQueue.clear();
+        }
+        if (data.getState().isAir())
+        {
+            return;
         }
         if (startMining(data, floor))
         {
@@ -679,7 +701,7 @@ public class AutoMineModule extends RotationModule
 
     private boolean startMining(MiningData data, boolean floor)
     {
-        if (data.getState().isAir() || data.isStarted())
+        if (data.isStarted())
         {
             return false;
         }
