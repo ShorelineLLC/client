@@ -29,7 +29,6 @@ public class FastFallModule extends ToggleModule
     Config<FallMode> fallModeConfig = register(new EnumConfig<>("Mode", "The mode for falling down blocks", FallMode.STEP, FallMode.values()));
     Config<Boolean> accelerateConfig = register(new BooleanConfig("Accelerate", "Accels the fall speed", false, () -> fallModeConfig.getValue() == FallMode.STEP));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "Number of ticks to shift ahead", 1, 3, 5, () -> fallModeConfig.getValue() == FallMode.SHIFT));
-    Config<Boolean> slowdownConfig = register(new BooleanConfig("Slowdown", "Slow movement over falls", false)); // Better version of anchor
     //
     private boolean prevOnGround;
     //
@@ -79,10 +78,7 @@ public class FastFallModule extends ToggleModule
                 double fallHeight = traceDown();
                 if (fallHeight > 0.01 && fallHeight <= heightConfig.getValue() && mc.player.isOnGround())
                 {
-                    if (slowdownConfig.getValue())
-                    {
-                        Managers.MOVEMENT.setMotionXZ(mc.player.getVelocity().x * 0.05, mc.player.getVelocity().z * 0.05);
-                    }
+                    Managers.MOVEMENT.setMotionXZ(mc.player.getVelocity().x * 0.05, mc.player.getVelocity().z * 0.05);
                     Managers.MOVEMENT.setMotionY(accelerateConfig.getValue() ? mc.player.getVelocity().y - 0.62f : -3.0);
                     // Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(false));
                 }
@@ -115,7 +111,7 @@ public class FastFallModule extends ToggleModule
             double fallHeight = traceDown();
             if (fallHeight > 0.01 && fallHeight <= heightConfig.getValue() + 0.01)
             {
-                if (slowdownConfig.getValue() && mc.player.isOnGround())
+                if (mc.player.isOnGround())
                 {
                     Managers.MOVEMENT.setMotionXZ(mc.player.getVelocity().x * 0.05, mc.player.getVelocity().z * 0.05);
                 }
