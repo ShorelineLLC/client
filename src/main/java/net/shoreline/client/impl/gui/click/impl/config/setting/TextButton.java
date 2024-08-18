@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.gui.click.impl.config.setting;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
@@ -20,6 +21,7 @@ public class TextButton extends ConfigButton<String>
 
     private char[] buffer;
     private boolean typing;
+    // Insertion point
     private boolean idling;
     private final Timer idleTimer = new CacheTimer();
 
@@ -48,8 +50,8 @@ public class TextButton extends ConfigButton<String>
         x = ix;
         y = iy;
         int whiteText = -1;
-        String renderText = new String(buffer) + getInsertionPoint();
-        RenderManager.renderText(context, renderText, ix + 3.0f, iy + 3.0f, whiteText);
+        String renderText = typing ? new String(buffer) + getInsertionPoint() : config.getName() + Formatting.GRAY + " " + new String(buffer) + getInsertionPoint();
+        drawStringScaled(context, renderText, ix + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
     }
 
     /**

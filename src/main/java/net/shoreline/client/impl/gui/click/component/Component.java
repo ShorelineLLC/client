@@ -10,6 +10,7 @@ import net.minecraft.client.util.Window;
 import net.minecraft.util.math.ColorHelper;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.Globals;
 import org.joml.Matrix4f;
 
@@ -35,13 +36,21 @@ public abstract class Component implements Drawable, Globals
     @Override
     public abstract void render(DrawContext context, float mouseX, float mouseY, float delta);
 
+    protected void drawStringScaled(DrawContext context, String string, float x, float y, int color)
+    {
+        context.getMatrices().scale(ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, 0.0f);
+        float j = 1.0f / ClickGuiModule.CLICK_GUI_SCALE;
+        RenderManager.renderText(context, string, x * j, y * j, color);
+        context.getMatrices().scale(j, j, 0.0f);
+    }
+
     /**
      * @param context
      * @param color
      */
     protected void rect(DrawContext context, int color)
     {
-        fill(context, x, y, width, height, color);
+        fill(context, x, y, width * ClickGuiModule.CLICK_GUI_SCALE, height * ClickGuiModule.CLICK_GUI_SCALE, color);
     }
 
     /**
@@ -50,7 +59,7 @@ public abstract class Component implements Drawable, Globals
      */
     protected void rectGradient(DrawContext context, int color1, int color2)
     {
-        fillGradient(context, x, y, x + width, y + height, color1, color2);
+        fillGradient(context, x, y, x + (width * ClickGuiModule.CLICK_GUI_SCALE), y + (height * ClickGuiModule.CLICK_GUI_SCALE), color1, color2);
     }
 
     protected void scale(DrawContext context, float scale)
@@ -421,7 +430,7 @@ public abstract class Component implements Drawable, Globals
 
     public float getHeight()
     {
-        return height;
+        return height * ClickGuiModule.CLICK_GUI_SCALE;
     }
 
     public void setHeight(float height)
@@ -431,7 +440,7 @@ public abstract class Component implements Drawable, Globals
 
     public float getWidth()
     {
-        return width;
+        return width * ClickGuiModule.CLICK_GUI_SCALE;
     }
 
     public void setWidth(float width)
@@ -458,7 +467,7 @@ public abstract class Component implements Drawable, Globals
      */
     public boolean isWithin(float xval, float yval)
     {
-        return isMouseOver(xval, yval, x, y, width, height);
+        return isMouseOver(xval, yval, x, y, width * ClickGuiModule.CLICK_GUI_SCALE, height * ClickGuiModule.CLICK_GUI_SCALE);
     }
 
     public boolean isMouseOver(double mx, double my, double x1, double y1,

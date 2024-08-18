@@ -47,13 +47,12 @@ public class DropdownButton extends ConfigButton<Enum<?>>
         rect(context, ClickGuiModule.getInstance().getColor());
 
         int whiteText = -1;
-        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
+        drawStringScaled(context, config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
 
-        int textLeng = RenderManager.textWidth(config.getName());
+        float textLeng = RenderManager.textWidth(config.getName()) * ClickGuiModule.CLICK_GUI_SCALE;
 
         int grayText = 0xFFAAAAAA;
-
-        RenderManager.renderText(context, " " + val, ix + 2.0F + textLeng, iy + 4.0F, grayText);
+        drawStringScaled(context, " " + val, ix + (2.0F * ClickGuiModule.CLICK_GUI_SCALE) + textLeng, iy + (4.0F * ClickGuiModule.CLICK_GUI_SCALE), grayText);
     }
 
     /**

@@ -1,5 +1,9 @@
 package net.shoreline.client.impl.gui.click.component;
 
+import net.minecraft.client.gui.DrawContext;
+import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
+
 /**
  * @author linus
  * @since 1.0

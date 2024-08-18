@@ -43,7 +43,7 @@ public class CheckboxButton extends ConfigButton<Boolean>
         Animation checkboxAnimation = config.getAnimation();
         rect(context, checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor((float) checkboxAnimation.getFactor()) : 0x00000000);
         int whiteText = -1;
-        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
+        drawStringScaled(context, config.getName(), (ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE)), (iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE)), whiteText);
     }
 
     /**

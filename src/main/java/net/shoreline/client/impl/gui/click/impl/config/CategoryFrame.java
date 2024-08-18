@@ -98,7 +98,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
         }
         // draw the component
         // context.drawTexture(categoryIcon, (int) (x + 2.0f), (int) (y + 1.0f), 0, 0, 12, 12, 12, 12);
-        fheight = 2.0f;
+        fheight = 2.0f * ClickGuiModule.CLICK_GUI_SCALE;
         for (ModuleButton moduleButton : moduleButtons)
         {
             // account for button height
@@ -107,7 +107,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
             {
                 continue;
             }
-            fheight += 3.0f * moduleButton.getScaledTime();
+            fheight += 3.0f * ClickGuiModule.CLICK_GUI_SCALE * moduleButton.getScaledTime();
             for (ConfigButton<?> configButton : moduleButton.getConfigButtons())
             {
                 if (!configButton.getConfig().isVisible())
@@ -133,7 +133,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
         rect(context, ClickGuiModule.getInstance().getColor(1.7f));
 
         int whiteText = -1;
-        RenderManager.renderText(context, name, x + 3.0f, y + 4.0f, whiteText);
+        drawStringScaled(context, name, x + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
         if (categoryAnimation.getFactor() > 0.01f)
         {
             // Enabling scissor during the animation zoom in process causes some weird visual bugs
@@ -141,18 +141,18 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
 
             if (canScissor)
             {
-                enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + fheight * categoryAnimation.getFactor()));
+                enableScissor((int) x, (int) (y + (height * ClickGuiModule.CLICK_GUI_SCALE)), (int) (x + (width * ClickGuiModule.CLICK_GUI_SCALE)), (int) (y + (ClickGuiModule.CLICK_GUI_SCALE * height) + fheight * categoryAnimation.getFactor()));
             }
 
             int fillColor = ClickGuiModule.getInstance().fixTransparency(0x77000000);
-            fill(context, x, y + height, width, fheight, fillColor);
-            off = y + height + 1.0f;
+            fill(context, x, y + (height * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE), fheight, fillColor);
+            off = y + (height * ClickGuiModule.CLICK_GUI_SCALE) + ClickGuiModule.CLICK_GUI_SCALE;
             inner = off;
             for (ModuleButton moduleButton : moduleButtons)
             {
-                moduleButton.render(context, x + 1.0f, inner + 1.0f, mouseX, mouseY, delta);
-                off += (float) ((moduleButton.getHeight() + 1.0f) * categoryAnimation.getFactor());
-                inner += moduleButton.getHeight() + 1.0f;
+                moduleButton.render(context, x + ClickGuiModule.CLICK_GUI_SCALE, inner + ClickGuiModule.CLICK_GUI_SCALE, mouseX, mouseY, delta);
+                off += (float) ((moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE) * categoryAnimation.getFactor());
+                inner += moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE;
             }
 
             if (canScissor)
@@ -270,7 +270,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
      */
     public boolean isWithinTotal(float mx, float my)
     {
-        return isMouseOver(mx, my, x, y, width, getTotalHeight());
+        return isMouseOver(mx, my, x, y, width * ClickGuiModule.CLICK_GUI_SCALE, getTotalHeight());
     }
 
     /**
@@ -310,7 +310,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
      */
     public float getTotalHeight()
     {
-        return height + fheight;
+        return (height * ClickGuiModule.CLICK_GUI_SCALE) + fheight;
     }
 
     /**

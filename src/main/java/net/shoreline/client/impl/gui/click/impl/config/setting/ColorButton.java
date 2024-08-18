@@ -46,26 +46,27 @@ public class ColorButton extends ConfigButton<Color>
         y = iy;
         int originalColor = ((ColorConfig) config).getRgb();
         int modifiedTransparencyColor = ClickGuiModule.getInstance().fixTransparency(originalColor);
-        fill(context, ix + width - 11.0f, iy + 2.0f, 10.0f, 10.0f, modifiedTransparencyColor);
+        fill(context, ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - (11.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), (10.0f * ClickGuiModule.CLICK_GUI_SCALE), (10.0f * ClickGuiModule.CLICK_GUI_SCALE), modifiedTransparencyColor);
         int whiteText = -1;
-        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
+        drawStringScaled(context, config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
+
         if (pickerAnimation.getFactor() > 0.01f)
         {
             ColorConfig colorConfig = (ColorConfig) config;
             if (ClickGuiScreen.MOUSE_LEFT_HOLD)
             {
-                if (isMouseOver(mouseX, mouseY, x + 1.0f, y + height + 2.0f, width - 2.0f, width) && !colorConfig.isGlobal())
+                if (isMouseOver(mouseX, mouseY, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE), width * ClickGuiModule.CLICK_GUI_SCALE) && !colorConfig.isGlobal())
                 {
-                    selectedColor[1] = (mouseX - (x + 1.0f)) / (width - 1.0f);
-                    selectedColor[2] = (mouseY - (y + height + 2.0f)) / width;
+                    selectedColor[1] = (mouseX - (x + ClickGuiModule.CLICK_GUI_SCALE)) / ((width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE);
+                    selectedColor[2] = (mouseY - (y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (2.0f * ClickGuiModule.CLICK_GUI_SCALE))) / width * ClickGuiModule.CLICK_GUI_SCALE;
                 }
-                if (isMouseOver(mouseX, mouseY, x + 1.0f, y + height + 4.0f + width, width - 2.0f, 10.0f) && !colorConfig.isGlobal())
+                if (isMouseOver(mouseX, mouseY, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (4.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE), 10.0f * ClickGuiModule.CLICK_GUI_SCALE) && !colorConfig.isGlobal())
                 {
-                    selectedColor[0] = (mouseX - (x + 1.0f)) / (width - 1.0f);
+                    selectedColor[0] = (mouseX - (x + ClickGuiModule.CLICK_GUI_SCALE)) / ((width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE);
                 }
-                if (colorConfig.allowAlpha() && isMouseOver(mouseX, mouseY, x + 1.0f, y + height + 17.0f + width, width - 2.0f, 10.0f))
+                if (colorConfig.allowAlpha() && isMouseOver(mouseX, mouseY, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE), 10.0f * ClickGuiModule.CLICK_GUI_SCALE))
                 {
-                    selectedColor[3] = (mouseX - (x + 1.0f)) / (width - 1.0f);
+                    selectedColor[3] = (mouseX - (x + ClickGuiModule.CLICK_GUI_SCALE)) / (width - ClickGuiModule.CLICK_GUI_SCALE);
                 }
                 Color color = Color.getHSBColor(MathHelper.clamp(selectedColor[0], 0.001f, 0.999f), MathHelper.clamp(selectedColor[1], 0.001f, 0.999f), 1.0f - MathHelper.clamp(selectedColor[2], 0.001f, 0.999f));
                 color = new Color(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, MathHelper.clamp(selectedColor[3], 0.0f, 1.0f));
@@ -77,30 +78,32 @@ public class ColorButton extends ConfigButton<Color>
 
             if (canScissor)
             {
-                enableScissor((int) x, (int) (y + height), (int) (x + width), (int) (y + height + (getPickerHeight() * getScaledTime())));
+                enableScissor((int) x, (int) (y + (height * ClickGuiModule.CLICK_GUI_SCALE)), (int) (x + (width * ClickGuiModule.CLICK_GUI_SCALE)), (int) (y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (getPickerHeight() * getScaledTime())));
             }
-            for (float i = 0.0f; i < width - 2.0f; i += 1.0f)
+            for (float i = 0.0f; i < (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE); i += ClickGuiModule.CLICK_GUI_SCALE)
             {
-                float hue = i / (width - 2.0f);
-                fill(context, x + 1.0f + i, y + height + 4.0f + width, 1.0f, 10.0f, Color.getHSBColor(hue, 1.0f, 1.0f).getRGB());
+                float hue = i / ((width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE));
+                fill(context, x + ClickGuiModule.CLICK_GUI_SCALE + i, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (4.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, 10.0f * ClickGuiModule.CLICK_GUI_SCALE, Color.getHSBColor(hue, 1.0f, 1.0f).getRGB());
             }
-            fill(context, x + 1.0f + ((width - 2.0f) * hsb[0]), y + height + 4.0f + width, 1.0f, 10.0f, -1);
-            fillGradientQuad(context, x + 1.0f, y + height + 2.0f, x + width - 1.0f, y + height + 2.0f + width, 0xffffffff, color, true);
-            fillGradientQuad(context, x + 1.0f, y + height + 2.0f, x + width - 1.0f, y + height + 2.0f + width, 0, 0xff000000, false);
-            fill(context, x + (width * hsb[1]), y + height + 1.0f + (width * (1.0f - hsb[2])), 2.0f, 2.0f, -1);
+            fill(context, x + ClickGuiModule.CLICK_GUI_SCALE + (((width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE)) * hsb[0]), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (4.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, 10.0f * ClickGuiModule.CLICK_GUI_SCALE, -1);
+            fillGradientQuad(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (2.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), 0xffffffff, color, true);
+            fillGradientQuad(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (2.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), 0, 0xff000000, false);
+            fill(context, x + (width * ClickGuiModule.CLICK_GUI_SCALE * hsb[1]), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + ClickGuiModule.CLICK_GUI_SCALE + (width * ClickGuiModule.CLICK_GUI_SCALE * (1.0f - hsb[2])), 2.0f * ClickGuiModule.CLICK_GUI_SCALE, 2.0f * ClickGuiModule.CLICK_GUI_SCALE, -1);
             if (colorConfig.allowAlpha())
             {
-                fillGradient(context, x + 1.0f, y + height + 17.0f + width, x + width - 1.0f, y + height + 27.0f + width, color, 0xff000000);
-                fill(context, x + 1.0f + ((width - 2.0f) * hsb[3]), y + height + 17.0f + width, 1.0f, 10.0f, -1);
+                fillGradient(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (27.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), color, 0xff000000);
+                fill(context, x + ClickGuiModule.CLICK_GUI_SCALE + (((width - 2.0f) * ClickGuiModule.CLICK_GUI_SCALE) * hsb[3]), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, 10.0f * ClickGuiModule.CLICK_GUI_SCALE, -1);
             }
             if (!config.getContainer().getName().equalsIgnoreCase("Colors"))
             {
                 Animation globalAnimation = colorConfig.getAnimation();
                 if (globalAnimation.getFactor() > 0.01)
                 {
-                    fill(context, x + 1.0f, y + height + (colorConfig.allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f, ClickGuiModule.getInstance().getColor((float) globalAnimation.getFactor()));
+                    fill(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 29.0f * ClickGuiModule.CLICK_GUI_SCALE : 17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE),
+                            (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE), 13.0f * ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor((float) globalAnimation.getFactor()));
                 }
-                RenderManager.renderText(context, "ClientColor", x + 3.0f, y + height + (colorConfig.allowAlpha() ? 31.0f : 21.0f) + width, whiteText);
+                drawStringScaled(context, "ClientColor", x + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (height  * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 31.0f  * ClickGuiModule.CLICK_GUI_SCALE : 21.0f  * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
+
             }
             moduleButton.offset((float) (getPickerHeight() * pickerAnimation.getFactor()));
             ((CategoryFrame) frame).offset((float) (getPickerHeight() * pickerAnimation.getFactor() * moduleButton.getScaledTime()));
@@ -121,7 +124,8 @@ public class ColorButton extends ConfigButton<Color>
             pickerAnimation.setState(open);
         }
         if (!config.getContainer().getName().equalsIgnoreCase("Colors") && isMouseOver(mouseX, mouseY,
-                x + 1.0f, y + height + (((ColorConfig) config).allowAlpha() ? 29.0f : 17.0f) + width, width - 2.0f, 13.0f) && button == 0)
+                x + 1.0f, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (((ColorConfig) config).allowAlpha() ? 29.0f * ClickGuiModule.CLICK_GUI_SCALE : 17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE),
+                (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE), 13.0f * ClickGuiModule.CLICK_GUI_SCALE) && button == 0)
         {
             ColorConfig colorConfig = (ColorConfig) config;
             boolean val = !colorConfig.isGlobal();
@@ -151,16 +155,16 @@ public class ColorButton extends ConfigButton<Color>
 
     public float getPickerHeight()
     {
-        float pickerHeight = 16.0f;
+        float pickerHeight = 16.0f * ClickGuiModule.CLICK_GUI_SCALE;
         if (((ColorConfig) config).allowAlpha())
         {
-            pickerHeight += 12.0f;
+            pickerHeight += 12.0f * ClickGuiModule.CLICK_GUI_SCALE;
         }
         if (!config.getContainer().getName().equalsIgnoreCase("Colors"))
         {
-            pickerHeight += 15.0f;
+            pickerHeight += 15.0f * ClickGuiModule.CLICK_GUI_SCALE;
         }
-        return pickerHeight + width;
+        return pickerHeight + (width * ClickGuiModule.CLICK_GUI_SCALE);
     }
 
     public float getScaledTime()

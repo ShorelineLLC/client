@@ -56,7 +56,7 @@ public class ClickGuiScreen extends Screen implements Globals
         {
             CategoryFrame frame = new CategoryFrame(category, x, 15.0f);
             frames.add(frame);
-            x += frame.getWidth() + 2.0f;
+            x += frame.getWidth() + (2.0f * ClickGuiModule.CLICK_GUI_SCALE);
         }
     }
 
@@ -81,28 +81,6 @@ public class ClickGuiScreen extends Screen implements Globals
                 frame.setDragging(true);
             }
             frame.render(context, mouseX, mouseY, delta);
-            float scale = module.getScale();
-            if (scale != 1.0f)
-            {
-                frame.setDimensions(frame.getWidth() * scale,
-                        frame.getHeight() * scale);
-                for (ModuleButton button : frame.getModuleButtons())
-                {
-                    button.setDimensions(button.getWidth() * scale,
-                            button.getHeight() * scale);
-                    for (ConfigButton<?> component : button.getConfigButtons())
-                    {
-                        if (component instanceof BindButton bindButton && bindButton.isListening() && !button.isOpen())
-                        {
-                            bindButton.setListening(false);
-                            setCloseOnEscape(true);
-                        }
-
-                        component.setDimensions(component.getWidth() * scale,
-                                component.getHeight() * scale);
-                    }
-                }
-            }
         }
         // update mouse state
         MOUSE_LEFT_CLICK = false;

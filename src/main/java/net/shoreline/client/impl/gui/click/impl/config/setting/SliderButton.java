@@ -54,7 +54,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         Number max = ((NumberConfig<T>) config).getMax();
         if (isWithin(mouseX, mouseY) && ClickGuiScreen.MOUSE_LEFT_HOLD)
         {
-            float fillv = (mouseX - ix) / width;
+            float fillv = (mouseX - ix) / (width * ClickGuiModule.CLICK_GUI_SCALE);
             if (config.getValue() instanceof Integer)
             {
                 float val = min.floatValue() + fillv * (max.intValue() - min.intValue());
@@ -79,8 +79,8 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
                 bval = bigDecimal.setScale(scale, RoundingMode.HALF_UP).doubleValue();
                 ((NumberConfig<Double>) config).setValue(bval);
             }
-            float lower = ix + 1.0f;
-            float upper = ix + width - 1.0f;
+            float lower = ix + ClickGuiModule.CLICK_GUI_SCALE;
+            float upper = ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE;
             // out of bounds
             if (mouseX < lower)
             {
@@ -94,16 +94,15 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         // slider fill
         float fill = (config.getValue().floatValue() - min.floatValue())
                 / (max.floatValue() - min.floatValue());
-        fill(context, ix, iy, (fill * width), height, 0.0, ClickGuiModule.getInstance().getColor());
+        fill(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor());
 
         int whiteText = -1;
-        RenderManager.renderText(context, config.getName(), ix + 2.0f, iy + 4.0f, whiteText);
+        drawStringScaled(context, config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
 
-        int textLeng = RenderManager.textWidth(config.getName());
+        float textLeng = RenderManager.textWidth(config.getName()) * ClickGuiModule.CLICK_GUI_SCALE;
 
         int grayText = 0xFFAAAAAA;
-
-        RenderManager.renderText(context, " " + config.getValue(), ix + 2.0F + textLeng, iy + 4.0F, grayText);
+        drawStringScaled(context, " " + config.getValue(), ix + (2.0F * ClickGuiModule.CLICK_GUI_SCALE) + textLeng, iy + (4.0F * ClickGuiModule.CLICK_GUI_SCALE), grayText);
     }
 
     /**

@@ -134,10 +134,10 @@ public class ModuleButton extends Button
         int whiteText = -1;
         int grayText = 0xFFAAAAAA;
 
-        RenderManager.renderText(context, module.getName(), ix + 2, iy + 3.5f, scaledTime > 0.99f ? whiteText : grayText);
+        drawStringScaled(context, module.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (3.5f * ClickGuiModule.CLICK_GUI_SCALE), scaledTime > 0.99f ? whiteText : grayText);
         if (settingsAnimation.getFactor() > 0.01f)
         {
-            off = y + height + 1.0f;
+            off = y + (height * ClickGuiModule.CLICK_GUI_SCALE) + ClickGuiModule.CLICK_GUI_SCALE;
             float fheight = 0.0f;
             for (ConfigButton<?> configButton : configComponents)
             {
@@ -155,7 +155,7 @@ public class ModuleButton extends Button
 
             if (canScissor)
             {
-                enableScissor((int) x, (int) (off - 1.0f), (int) (x + width), (int) (off + 3.0f + (fheight * settingsAnimation.getFactor())));
+                enableScissor((int) x, (int) (off - ClickGuiModule.CLICK_GUI_SCALE), (int) (x + width * ClickGuiModule.CLICK_GUI_SCALE), (int) (off + (3.0f * ClickGuiModule.CLICK_GUI_SCALE) + (fheight * settingsAnimation.getFactor())));
             }
             for (ConfigButton<?> configButton : configComponents)
             {
@@ -164,21 +164,21 @@ public class ModuleButton extends Button
                     continue;
                 }
                 // run draw event
-                configButton.render(context, ix + 2.0f, off, mouseX, mouseY, delta);
+                configButton.render(context, ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), off, mouseX, mouseY, delta);
                 ((CategoryFrame) frame).offset((float) (configButton.getHeight() * settingsAnimation.getFactor()));
                 off += configButton.getHeight();
             }
             if (fill)
             {
-                fill(context, ix, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.getInstance().getColor(scaledTime));
-                fill(context, ix + width - 1.0f, y + height, 1.0f, off - (y + height) + 1.0f, ClickGuiModule.getInstance().getColor(scaledTime));
-                fill(context, ix, off + 1.0f, width, 1.0f, 0.0, ClickGuiModule.getInstance().getColor(scaledTime));
+                fill(context, ix, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(scaledTime));
+                fill(context, ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(scaledTime));
+                fill(context, ix, off + ClickGuiModule.CLICK_GUI_SCALE, width * ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor(scaledTime));
             }
             if (canScissor)
             {
                 disableScissor();
             }
-            ((CategoryFrame) frame).offset((float) (3.0f * settingsAnimation.getFactor()));
+            ((CategoryFrame) frame).offset((float) (3.0f * ClickGuiModule.CLICK_GUI_SCALE * settingsAnimation.getFactor()));
         }
     }
 

@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.client;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
@@ -20,8 +21,8 @@ public class ClickGuiModule extends ToggleModule
 
     private static ClickGuiModule INSTANCE;
 
+    Config<Float> scaleConfig = register(new NumberConfig<>("Scale", "The gui scale", 0.5f, 1.0f, 3.0f));
     public Config<Boolean> underGlow = register(new BooleanConfig("UnderGlow", "GUI underglow", false));
-
     //    Config<Integer> hueConfig = register(new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
 //    Config<Integer> saturationConfig = register(new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
 //    Config<Integer> brightnessConfig = register(new NumberConfig<>("Brightness", "The brightness of colors", 0, 50, 100);
@@ -31,11 +32,9 @@ public class ClickGuiModule extends ToggleModule
 //    Config<Integer> alphaConfig = register(new NumberConfig<>("Alpha", "The alpha of colors", 0, 100, 100);
     //
     public static ClickGuiScreen CLICK_GUI_SCREEN;
+    public static float CLICK_GUI_SCALE = 1.0f;
     private final Animation openCloseAnimation = new Animation(false, 400, Easing.BACK_OUT);
     private final Animation transparencyAnimation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
-
-    // TODO: Fix Gui scaling
-    public float scaleConfig = 1.0f;
 
     /**
      *
@@ -62,13 +61,20 @@ public class ClickGuiModule extends ToggleModule
         // initialize the null gui screen instance
         if (CLICK_GUI_SCREEN == null)
         {
+            CLICK_GUI_SCALE = scaleConfig.getValue();
             CLICK_GUI_SCREEN = new ClickGuiScreen(this);
             Shoreline.CONFIG.loadClickGui();
+        }
+        if (CLICK_GUI_SCALE != scaleConfig.getValue())
+        {
+            CLICK_GUI_SCALE = scaleConfig.getValue();
+            CLICK_GUI_SCREEN = new ClickGuiScreen(this);
         }
         openCloseAnimation.setState(true);
         transparencyAnimation.setState(true);
         openCloseAnimation.reset();
         transparencyAnimation.reset();
+
         mc.setScreen(CLICK_GUI_SCREEN);
     }
 
@@ -126,13 +132,5 @@ public class ClickGuiModule extends ToggleModule
     public float getScaleFactor()
     {
         return (float) (openCloseAnimation.getFactor());
-    }
-
-    /**
-     * @return
-     */
-    public Float getScale()
-    {
-        return scaleConfig;
     }
 }
