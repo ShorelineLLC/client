@@ -180,6 +180,16 @@ public class ModuleButton extends Button
             }
             ((CategoryFrame) frame).offset((float) (3.0f * ClickGuiModule.CLICK_GUI_SCALE * settingsAnimation.getFactor()));
         }
+        else
+        {
+            for (ConfigButton<?> configButton : configComponents)
+            {
+                if (configButton instanceof TextButton textButton)
+                {
+                    textButton.endTyping();
+                }
+            }
+        }
     }
 
     /**

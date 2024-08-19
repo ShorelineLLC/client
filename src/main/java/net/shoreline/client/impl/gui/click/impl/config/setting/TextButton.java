@@ -3,7 +3,6 @@ package net.shoreline.client.impl.gui.click.impl.config.setting;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
@@ -51,7 +50,7 @@ public class TextButton extends ConfigButton<String>
         y = iy;
         int whiteText = -1;
         String renderText = typing ? new String(buffer) + getInsertionPoint() : config.getName() + Formatting.GRAY + " " + new String(buffer) + getInsertionPoint();
-        drawStringScaled(context, renderText, ix + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
+        drawStringScaled(context, renderText, ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
     }
 
     /**
@@ -127,6 +126,12 @@ public class TextButton extends ConfigButton<String>
         {
             buffer = ArrayUtils.add(buffer, character);
         }
+    }
+
+    public void endTyping()
+    {
+        this.typing = false;
+        ClickGuiModule.CLICK_GUI_SCREEN.setCloseOnEscape(true);
     }
 
     public String getInsertionPoint()

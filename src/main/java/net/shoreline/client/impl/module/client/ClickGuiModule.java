@@ -96,6 +96,7 @@ public class ClickGuiModule extends ToggleModule
         mc.player.closeScreen();
         openCloseAnimation.setState(false);
         transparencyAnimation.setState(false);
+        CLICK_GUI_SCREEN.setCloseOnEscape(true);
     }
 
     @EventListener
