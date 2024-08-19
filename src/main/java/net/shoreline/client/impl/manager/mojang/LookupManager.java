@@ -18,6 +18,7 @@ public class LookupManager implements Globals
 {
     private static final Map<String, UUID> LOOKUPS_UUID = new HashMap<>();
     private static final Map<UUID, String> LOOKUPS_NAME = new HashMap<>();
+    private static final Set<UUID> FAILED_LOOKUPS = new HashSet<>();
 
     public UUID getUUIDFromName(String name)
     {
@@ -44,6 +45,10 @@ public class LookupManager implements Globals
 
     public String getNameFromUUID(UUID uuid)
     {
+        if (FAILED_LOOKUPS.contains(uuid))
+        {
+            return null;
+        }
         if (LOOKUPS_NAME.containsKey(uuid))
         {
             return LOOKUPS_NAME.get(uuid);
@@ -60,6 +65,7 @@ public class LookupManager implements Globals
         catch (IOException e)
         {
             e.printStackTrace();
+            FAILED_LOOKUPS.add(uuid);
         }
         return null;
     }
