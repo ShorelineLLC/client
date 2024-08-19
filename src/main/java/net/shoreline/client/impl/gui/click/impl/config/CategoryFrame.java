@@ -141,7 +141,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
 
             if (canScissor)
             {
-                enableScissor((int) x, (int) (y + (height * ClickGuiModule.CLICK_GUI_SCALE)), (int) (x + (width * ClickGuiModule.CLICK_GUI_SCALE)), (int) (y + (ClickGuiModule.CLICK_GUI_SCALE * height) + fheight * categoryAnimation.getFactor()));
+                enableScissor(x, y + (height * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE), y + (ClickGuiModule.CLICK_GUI_SCALE * height) + fheight * categoryAnimation.getFactor());
             }
 
             int fillColor = ClickGuiModule.getInstance().fixTransparency(0x77000000);

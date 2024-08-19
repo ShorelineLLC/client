@@ -496,9 +496,13 @@ public abstract class Component implements Drawable, Globals
         setHeight(height);
     }
 
-    public void enableScissor(int x1, int y1, int x2, int y2)
+    public void enableScissor(double x1, double y1, double x2, double y2)
     {
-        setScissor(ClickGuiScreen.SCISSOR_STACK.push(new ScreenRect(x1, y1, x2 - x1, y2 - y1)));
+        x1 = Math.floor(x1);
+        y1 = Math.floor(y1);
+        x2 = Math.ceil(x2);
+        y2 = Math.ceil(y2);
+        setScissor(ClickGuiScreen.SCISSOR_STACK.push(new ScreenRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1))));
     }
 
     public void disableScissor()

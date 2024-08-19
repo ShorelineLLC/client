@@ -92,11 +92,16 @@ public class RenderBuffers
 
         public void begin(MatrixStack stack)
         {
+            updateMatrices(stack);
+            if (!buffer.isBuilding()) buffer.begin(drawMode, vertexFormat);
+        }
+
+        public void updateMatrices(MatrixStack stack)
+        {
             this.positionMatrix = toMatrix4d(stack.peek().getPositionMatrix());
             this.normalMatrix = stack.peek().getNormalMatrix();
             Vec3d pos = MinecraftClient.getInstance().getBlockEntityRenderDispatcher().camera.getPos();
             positionMatrix.translate(-pos.x, -pos.y, -pos.z);
-            if (!buffer.isBuilding()) buffer.begin(drawMode, vertexFormat);
         }
 
         /**

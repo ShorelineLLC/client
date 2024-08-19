@@ -78,7 +78,7 @@ public class ColorButton extends ConfigButton<Color>
 
             if (canScissor)
             {
-                enableScissor((int) x, (int) (y + (height * ClickGuiModule.CLICK_GUI_SCALE)), (int) (x + (width * ClickGuiModule.CLICK_GUI_SCALE)), (int) (y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (getPickerHeight() * getScaledTime())));
+                enableScissor(x, y + (height * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (getPickerHeight() * getScaledTime()));
             }
             for (float i = 0.0f; i < (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE); i += ClickGuiModule.CLICK_GUI_SCALE)
             {

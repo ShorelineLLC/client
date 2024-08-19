@@ -155,7 +155,7 @@ public class ModuleButton extends Button
 
             if (canScissor)
             {
-                enableScissor((int) x, (int) (off - ClickGuiModule.CLICK_GUI_SCALE), (int) (x + width * ClickGuiModule.CLICK_GUI_SCALE), (int) (off + (3.0f * ClickGuiModule.CLICK_GUI_SCALE) + (fheight * settingsAnimation.getFactor())));
+                enableScissor(x, off - ClickGuiModule.CLICK_GUI_SCALE, x + (width * ClickGuiModule.CLICK_GUI_SCALE), off + (3.0f * ClickGuiModule.CLICK_GUI_SCALE + (fheight * settingsAnimation.getFactor())));
             }
             for (ConfigButton<?> configButton : configComponents)
             {
