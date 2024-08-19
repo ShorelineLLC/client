@@ -66,7 +66,7 @@ public class ColorButton extends ConfigButton<Color>
                 }
                 if (colorConfig.allowAlpha() && isMouseOver(mouseX, mouseY, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE), 10.0f * ClickGuiModule.CLICK_GUI_SCALE))
                 {
-                    selectedColor[3] = (mouseX - (x + ClickGuiModule.CLICK_GUI_SCALE)) / (width - ClickGuiModule.CLICK_GUI_SCALE);
+                    selectedColor[3] = (mouseX - (x + ClickGuiModule.CLICK_GUI_SCALE)) / ((width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE);
                 }
                 Color color = Color.getHSBColor(MathHelper.clamp(selectedColor[0], 0.001f, 0.999f), MathHelper.clamp(selectedColor[1], 0.001f, 0.999f), 1.0f - MathHelper.clamp(selectedColor[2], 0.001f, 0.999f));
                 color = new Color(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, MathHelper.clamp(selectedColor[3], 0.0f, 1.0f));
@@ -92,7 +92,7 @@ public class ColorButton extends ConfigButton<Color>
             if (colorConfig.allowAlpha())
             {
                 fillGradient(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (27.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), color, 0xff000000);
-                fill(context, x + ClickGuiModule.CLICK_GUI_SCALE + (((width - 2.0f) * ClickGuiModule.CLICK_GUI_SCALE) * hsb[3]), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, 10.0f * ClickGuiModule.CLICK_GUI_SCALE, -1);
+                fill(context, x + ClickGuiModule.CLICK_GUI_SCALE + (((width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE)) * hsb[3]), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (17.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, 10.0f * ClickGuiModule.CLICK_GUI_SCALE, -1);
             }
             if (!config.getContainer().getName().equalsIgnoreCase("Colors"))
             {
