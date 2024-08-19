@@ -6,9 +6,12 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -93,6 +96,16 @@ public class ClickGuiModule extends ToggleModule
         mc.player.closeScreen();
         openCloseAnimation.setState(false);
         transparencyAnimation.setState(false);
+    }
+
+    @EventListener
+    public void onConfigUpdate(ConfigUpdateEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.POST
+                && event.getConfig() == scaleConfig && mc.world == null)
+        {
+            CLICK_GUI_SCALE = scaleConfig.getValue();
+        }
     }
 
     public int getColor()
