@@ -10,6 +10,7 @@
     "MixinMinecraftClient",
     "MixinMouse",
     "accessor.AccessorAbstractBlock",
+    "accessor.AccessorAnimalModel",
     "accessor.AccessorBufferBuilderStorage",
     "accessor.AccessorCamera",
     "accessor.AccessorChatHud",

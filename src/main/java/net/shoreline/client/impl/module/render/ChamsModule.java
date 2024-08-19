@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityStatuses;
@@ -16,8 +15,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -28,6 +25,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.api.render.chams.ChamsModelRenderer;
+import net.shoreline.client.api.render.model.StaticBipedEntityModel;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
@@ -59,11 +57,11 @@ public class ChamsModule extends ToggleModule
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render chams on monsters", true));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render chams on animals", true));
     Config<Boolean> crystalsConfig = register(new BooleanConfig("Crystals", "Render chams on crystals", true));
-    // Config<Boolean> popsConfig = register(new BooleanConfig("Pops", "Render chams on totem pops", false));
+    Config<Boolean> popsConfig = register(new BooleanConfig("Pops", "Render chams on totem pops", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 1000, 3000, () -> false));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the chams", new Color(255, 0, 0, 60)));
 
-    private final Map<FakePlayerEntity, Animation> fadeList = new HashMap<>();
+    private final Map<PopChamEntity, Animation> fadeList = new HashMap<>();
 
     public ChamsModule()
     {
@@ -79,6 +77,26 @@ public class ChamsModule extends ToggleModule
     @EventListener(priority = Integer.MAX_VALUE)
     public void onRenderWorld(RenderWorldEvent event)
     {
+        // Pop chams
+        RenderBuffers.preRender();
+        RenderSystem.disableDepthTest();
+        for (Map.Entry<PopChamEntity, Animation> set : fadeList.entrySet())
+        {
+            set.getValue().setState(false);
+            Color color = colorConfig.getValue();
+            int boxAlpha = (int) (color.getAlpha() * set.getValue().getFactor());
+            int lineAlpha = (int) (145 * set.getValue().getFactor());
+            int boxColor = ColorUtil.withAlpha(color.getRGB(), boxAlpha);
+            int lineColor = ColorUtil.withAlpha(color.getRGB(), lineAlpha);
+            ChamsModelRenderer.renderStaticPlayerModel(event.getMatrices(), set.getKey(), set.getKey().getModel(), event.getTickDelta(), boxColor, lineColor,
+                    widthConfig.getValue(), modeConfig.getValue() != ChamsMode.FILL, modeConfig.getValue() != ChamsMode.WIREFRAME, false);
+        }
+        fadeList.entrySet().removeIf(e ->
+                e.getValue().getFactor() == 0.0);
+
+        RenderBuffers.postRender();
+
+        // Entity chams
         RenderBuffers.preRender();
         if (!wallsConfig.getValue())
         {
@@ -113,20 +131,6 @@ public class ChamsModule extends ToggleModule
                         widthConfig.getValue(), modeConfig.getValue() != ChamsMode.FILL, modeConfig.getValue() != ChamsMode.WIREFRAME, false);
             }
         }
-        for (Map.Entry<FakePlayerEntity, Animation> set : fadeList.entrySet())
-        {
-            set.getValue().setState(false);
-            Color color = colorConfig.getValue();
-            int boxAlpha = (int) (color.getAlpha() * set.getValue().getFactor());
-            int lineAlpha = (int) (145 * set.getValue().getFactor());
-            int boxColor = ColorUtil.withAlpha(color.getRGB(), boxAlpha);
-            int lineColor = ColorUtil.withAlpha(color.getRGB(), lineAlpha);
-            ChamsModelRenderer.render(event.getMatrices(), set.getKey(), event.getTickDelta(), boxColor, lineColor,
-                    widthConfig.getValue(), modeConfig.getValue() != ChamsMode.FILL, modeConfig.getValue() != ChamsMode.WIREFRAME, false);
-        }
-
-        fadeList.entrySet().removeIf(e ->
-                e.getValue().getFactor() == 0.0);
 
         RenderBuffers.postRender();
         if (!wallsConfig.getValue())
@@ -135,25 +139,25 @@ public class ChamsModule extends ToggleModule
         }
     }
 
-//    @EventListener
-//    public void onPacketInbound(PacketEvent.Inbound event)
-//    {
-//        if (mc.world == null)
-//        {
-//            return;
-//        }
-//        if (event.getPacket() instanceof EntityStatusS2CPacket packet
-//                && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING && popsConfig.getValue())
-//        {
-//            Entity entity = packet.getEntity(mc.world);
-//            if (!(entity instanceof PlayerEntity player))
-//            {
-//                return;
-//            }
-//            Animation animation = new Animation(true, fadeTimeConfig.getValue());
-//            fadeList.put(new FakePlayerEntity(player), animation);
-//        }
-//    }
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (mc.world == null)
+        {
+            return;
+        }
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet
+                && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING && popsConfig.getValue())
+        {
+            Entity entity = packet.getEntity(mc.world);
+            if (entity == mc.player || !(entity instanceof PlayerEntity player))
+            {
+                return;
+            }
+            Animation animation = new Animation(true, fadeTimeConfig.getValue());
+            fadeList.put(new PopChamEntity(player, mc.getTickDelta()), animation);
+        }
+    }
 
     @EventListener
     public void onRenderCrystal(RenderCrystalEvent event)
@@ -223,11 +227,11 @@ public class ChamsModule extends ToggleModule
         float l = getAnimationProgress(event.entity, event.g);
         if (event.entity instanceof PlayerEntity)
         {
-            setupPlayerTransforms((AbstractClientPlayerEntity) event.entity, event.matrixStack, l, h, event.g);
+            ChamsModelRenderer.setupPlayerTransforms((AbstractClientPlayerEntity) event.entity, event.matrixStack, l, h, event.g);
         }
         else
         {
-            setupTransforms(event.entity, event.matrixStack, l, h, event.g);
+            ChamsModelRenderer.setupTransforms(event.entity, event.matrixStack, l, h, event.g);
         }
         event.matrixStack.scale(-1.0f, -1.0f, 1.0f);
         event.matrixStack.scale(0.9375f, 0.9375f, 0.9375f);
@@ -258,111 +262,6 @@ public class ChamsModule extends ToggleModule
             }
         }
         event.matrixStack.pop();
-    }
-
-    protected void setupPlayerTransforms(AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h)
-    {
-        float i = abstractClientPlayerEntity.getLeaningPitch(h);
-        float j = abstractClientPlayerEntity.getPitch(h);
-        if (abstractClientPlayerEntity.isFallFlying())
-        {
-            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
-            float k = (float) abstractClientPlayerEntity.getRoll() + h;
-            float l = MathHelper.clamp(k * k / 100.0f, 0.0f, 1.0f);
-            if (!abstractClientPlayerEntity.isUsingRiptide())
-            {
-                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(l * (-90.0f - j)));
-            }
-            Vec3d vec3d = abstractClientPlayerEntity.getRotationVec(h);
-            Vec3d vec3d2 = abstractClientPlayerEntity.lerpVelocity(h);
-            double d = vec3d2.horizontalLengthSquared();
-            double e = vec3d.horizontalLengthSquared();
-            if (d > 0.0 && e > 0.0)
-            {
-                double m = (vec3d2.x * vec3d.x + vec3d2.z * vec3d.z) / Math.sqrt(d * e);
-                double n = vec3d2.x * vec3d.z - vec3d2.z * vec3d.x;
-                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation((float) (Math.signum(n) * Math.acos(m))));
-            }
-        }
-        else if (i > 0.0f)
-        {
-            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
-            float k = abstractClientPlayerEntity.isTouchingWater() ? -90.0f - j : -90.0f;
-            float l = MathHelper.lerp(i, 0.0f, k);
-            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(l));
-            if (abstractClientPlayerEntity.isInSwimmingPose())
-            {
-                matrixStack.translate(0.0f, -1.0f, 0.3f);
-            }
-        }
-        else
-        {
-            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
-        }
-    }
-
-    protected void setupTransforms(LivingEntity entity, MatrixStack matrices, float animationProgress,
-                                   float bodyYaw, float tickDelta)
-    {
-        if (entity.isFrozen())
-        {
-            bodyYaw += (float) (Math.cos((double) entity.age * 3.25) * Math.PI * (double) 0.4f);
-        }
-        if (!entity.isInPose(EntityPose.SLEEPING))
-        {
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f - bodyYaw));
-        }
-        if (entity.deathTime > 0)
-        {
-            float f = ((float) entity.deathTime + tickDelta - 1.0f) / 20.0f * 1.6f;
-            if ((f = MathHelper.sqrt(f)) > 1.0f)
-            {
-                f = 1.0f;
-            }
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * 90.0f));
-        }
-        else if (entity.isUsingRiptide())
-        {
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f - entity.getPitch()));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(((float) entity.age + tickDelta) * -75.0f));
-        }
-        else if (entity.isInPose(EntityPose.SLEEPING))
-        {
-            Direction direction = entity.getSleepingDirection();
-            float g = direction != null ? getYaw(direction) : bodyYaw;
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(g));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90.0f));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270.0f));
-        }
-        else if (LivingEntityRenderer.shouldFlipUpsideDown(entity))
-        {
-            matrices.translate(0.0f, entity.getHeight() + 0.1f, 0.0f);
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
-        }
-    }
-
-    private float getYaw(Direction direction)
-    {
-        switch (direction)
-        {
-            case SOUTH:
-            {
-                return 90.0f;
-            }
-            case WEST:
-            {
-                return 0.0f;
-            }
-            case NORTH:
-            {
-                return 270.0f;
-            }
-            case EAST:
-            {
-                return 180.0f;
-            }
-        }
-        return 0.0f;
     }
 
     private float getAnimationProgress(LivingEntity entity, float f)
@@ -397,5 +296,24 @@ public class ChamsModule extends ToggleModule
         FILL,
         WIREFRAME,
         WIRE_FILL
+    }
+
+    public static class PopChamEntity extends FakePlayerEntity
+    {
+        private final StaticBipedEntityModel<AbstractClientPlayerEntity> model;
+
+        public PopChamEntity(PlayerEntity player, float tickDelta)
+        {
+            super(player);
+            this.model = new StaticBipedEntityModel<>((AbstractClientPlayerEntity) player, false, tickDelta);
+            this.leaningPitch = player.leaningPitch;
+            this.lastLeaningPitch = player.lastLeaningPitch;
+            setPose(player.getPose());
+        }
+
+        public StaticBipedEntityModel<AbstractClientPlayerEntity> getModel()
+        {
+            return model;
+        }
     }
 }

@@ -37,12 +37,8 @@ accessible class net/minecraft/client/particle/FireworksSparkParticle$Explosion
 accessible method net/minecraft/client/render/entity/PlayerEntityRenderer getArmPose (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/client/render/entity/model/BipedEntityModel$ArmPose;
 accessible method net/minecraft/client/render/entity/LivingEntityRenderer setupTransforms (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V
 accessible method net/minecraft/client/render/entity/LivingEntityRenderer scale (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V
-accessible field net/minecraft/client/render/entity/model/AnimalModel headScaled Z
-accessible field net/minecraft/client/render/entity/model/AnimalModel invertedChildHeadScale F
-accessible field net/minecraft/client/render/entity/model/AnimalModel childHeadYOffset F
-accessible field net/minecraft/client/render/entity/model/AnimalModel childHeadZOffset F
-accessible method net/minecraft/client/render/entity/model/AnimalModel getHeadParts ()Ljava/lang/Iterable;
-accessible field net/minecraft/client/render/entity/model/AnimalModel invertedChildBodyScale F
+accessible method net/minecraft/client/render/entity/PlayerEntityRenderer setupTransforms (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V
+accessible method net/minecraft/client/render/entity/PlayerEntityRenderer scale (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel head Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel body Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel rightHindLeg Lnet/minecraft/client/model/ModelPart;
@@ -58,8 +54,6 @@ accessible class net/minecraft/client/world/ClientChunkManager$ClientChunkMap
 accessible method net/minecraft/client/world/ClientChunkManager$ClientChunkMap getIndex (II)I
 accessible field net/minecraft/client/world/ClientChunkManager$ClientChunkMap chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
 accessible method net/minecraft/client/render/entity/LivingEntityRenderer getAnimationProgress (Lnet/minecraft/entity/LivingEntity;F)F
-accessible field net/minecraft/client/render/entity/model/AnimalModel childBodyYOffset F
-accessible method net/minecraft/client/render/entity/model/AnimalModel getBodyParts ()Ljava/lang/Iterable;
 accessible field net/minecraft/client/render/entity/model/RabbitEntityModel head Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/RabbitEntityModel leftEar Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/RabbitEntityModel rightEar Lnet/minecraft/client/model/ModelPart;
@@ -81,3 +75,5 @@ accessible field net/minecraft/client/model/ModelPart$Cuboid sides [Lnet/minecra
 accessible field net/minecraft/entity/LimbAnimator pos F
 accessible field net/minecraft/client/gui/screen/ingame/AnvilScreen nameField Lnet/minecraft/client/gui/widget/TextFieldWidget;
 accessible field net/minecraft/client/render/entity/LivingEntityRenderer features Ljava/util/List;
+accessible field net/minecraft/entity/LivingEntity leaningPitch F
+accessible field net/minecraft/entity/LivingEntity lastLeaningPitch F

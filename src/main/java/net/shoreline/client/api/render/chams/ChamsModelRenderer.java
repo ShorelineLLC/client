@@ -10,15 +10,21 @@ import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.model.StaticBipedEntityModel;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
+import net.shoreline.client.mixin.accessor.AccessorAnimalModel;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.chat.ChatUtil;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
@@ -34,6 +40,126 @@ public class ChamsModelRenderer implements Globals
     private static final Vector4f pos2 = new Vector4f();
     private static final Vector4f pos3 = new Vector4f();
     private static final Vector4f pos4 = new Vector4f();
+
+    public static void renderStaticPlayerModel(MatrixStack matrixStack, AbstractClientPlayerEntity entity, StaticBipedEntityModel playerModel, float tickDelta, int color, int lineColor, float lineWidth, boolean lines, boolean fill, boolean shine)
+    {
+        double offsetX = playerModel.getX();
+        double offsetY = playerModel.getY();
+        double offsetZ = playerModel.getZ();
+        matrices.push();
+        float animationProgress;
+        EntityRenderer<?> entityRenderer = mc.getEntityRenderDispatcher().getRenderer(entity);
+        if (entityRenderer instanceof PlayerEntityRenderer renderer)
+        {
+            animationProgress = renderer.getAnimationProgress(entity, tickDelta);
+            setupPlayerTransforms(entity, matrices, animationProgress, entity.getBodyYaw(), tickDelta);
+            matrices.scale(-1, -1, 1);
+            renderer.scale(entity, matrices, tickDelta);
+            matrices.translate(0, -1.5010000467300415, 0);
+
+            playerModel.animateModel(entity, playerModel.getLimbSwing(), playerModel.getLimbSwingAmount(), tickDelta);
+            playerModel.setAngles(entity, playerModel.getLimbSwing(), playerModel.getLimbSwingAmount(), animationProgress, playerModel.getYaw(), playerModel.getPitch());
+            render(matrixStack, playerModel.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+            render(matrixStack, playerModel.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+            render(matrixStack, playerModel.leftArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+            render(matrixStack, playerModel.rightArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+            render(matrixStack, playerModel.leftLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+            render(matrixStack, playerModel.rightLeg, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+        }
+        matrices.pop();
+    }
+
+    public static void setupPlayerTransforms(AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f, float g, float h)
+    {
+        float i = abstractClientPlayerEntity.getLeaningPitch(h);
+        float j = abstractClientPlayerEntity.getPitch(h);
+        if (abstractClientPlayerEntity.isFallFlying())
+        {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+            float k = (float) abstractClientPlayerEntity.getRoll() + h;
+            float l = MathHelper.clamp(k * k / 100.0f, 0.0f, 1.0f);
+            if (!abstractClientPlayerEntity.isUsingRiptide())
+            {
+                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(l * (-90.0f - j)));
+            }
+            Vec3d vec3d = abstractClientPlayerEntity.getRotationVec(h);
+            Vec3d vec3d2 = abstractClientPlayerEntity.lerpVelocity(h);
+            double d = vec3d2.horizontalLengthSquared();
+            double e = vec3d.horizontalLengthSquared();
+            if (d > 0.0 && e > 0.0)
+            {
+                double m = (vec3d2.x * vec3d.x + vec3d2.z * vec3d.z) / Math.sqrt(d * e);
+                double n = vec3d2.x * vec3d.z - vec3d2.z * vec3d.x;
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation((float) (Math.signum(n) * Math.acos(m))));
+            }
+        }
+        else if (i > 0.0f)
+        {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+            float k = abstractClientPlayerEntity.isTouchingWater() ? -90.0f - j : -90.0f;
+            float l = MathHelper.lerp(i, 0.0f, k);
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(l));
+            if (abstractClientPlayerEntity.isInSwimmingPose())
+            {
+                matrixStack.translate(0.0f, -1.0f, 0.3f);
+            }
+        }
+        else
+        {
+            setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
+        }
+    }
+
+    public static void setupTransforms(LivingEntity entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta)
+    {
+        if (entity.isFrozen())
+        {
+            bodyYaw += (float) (Math.cos((double) entity.age * 3.25) * Math.PI * (double) 0.4f);
+        }
+        if (!entity.isInPose(EntityPose.SLEEPING))
+        {
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f - bodyYaw));
+        }
+        if (entity.deathTime > 0)
+        {
+            float f = ((float) entity.deathTime + tickDelta - 1.0f) / 20.0f * 1.6f;
+            if ((f = MathHelper.sqrt(f)) > 1.0f)
+            {
+                f = 1.0f;
+            }
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * 90.0f));
+        }
+        else if (entity.isUsingRiptide())
+        {
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f - entity.getPitch()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(((float) entity.age + tickDelta) * -75.0f));
+        }
+        else if (entity.isInPose(EntityPose.SLEEPING))
+        {
+            Direction direction = entity.getSleepingDirection();
+            float g = direction != null ? getYaw(direction) : bodyYaw;
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(g));
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270.0f));
+        }
+        else if (LivingEntityRenderer.shouldFlipUpsideDown(entity))
+        {
+            matrices.translate(0.0f, entity.getHeight() + 0.1f, 0.0f);
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
+        }
+    }
+
+    private static float getYaw(Direction direction)
+    {
+        return switch (direction)
+        {
+            case SOUTH -> 90.0f;
+            case WEST -> 0.0f;
+            case NORTH -> 270.0f;
+            case EAST -> 180.0f;
+            default -> 0.0f;
+        };
+    }
 
     public static void render(MatrixStack matrixStack, Entity entity, float tickDelta, int color, int lineColor, float lineWidth, boolean lines, boolean fill, boolean shine)
     {
@@ -142,26 +268,26 @@ public class ChamsModelRenderer implements Globals
                 {
                     matrices.push();
                     float g;
-                    if (m.headScaled)
+                    if (((AccessorAnimalModel) m).hookGetHeadScaled())
                     {
-                        g = 1.5F / m.invertedChildHeadScale;
+                        g = 1.5F / ((AccessorAnimalModel) m).hookGetInvertedChildHeadScale();
                         matrices.scale(g, g, g);
                     }
 
-                    matrices.translate(0.0D, m.childHeadYOffset / 16.0f, m.childHeadZOffset / 16.0f);
+                    matrices.translate(0.0D, ((AccessorAnimalModel) m).hookGetChildHeadYOffset() / 16.0f, ((AccessorAnimalModel) m).hookGetChildHeadZOffset() / 16.0f);
                     if (model instanceof BipedEntityModel mo)
                     {
                         render(matrixStack, mo.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
                     }
                     else
                     {
-                        m.getHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
+                        ((AccessorAnimalModel) m).hookGetHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
                     }
                     matrices.pop();
                     matrices.push();
-                    g = 1.0f / m.invertedChildBodyScale;
+                    g = 1.0f / ((AccessorAnimalModel) m).hookGetInvertedChildBodyScale();
                     matrices.scale(g, g, g);
-                    matrices.translate(0.0D, m.childBodyYOffset / 16.0f, 0.0D);
+                    matrices.translate(0.0D, ((AccessorAnimalModel) m).hookGetChildBodyYOffset() / 16.0f, 0.0D);
                     if (model instanceof BipedEntityModel mo)
                     {
                         render(matrixStack, mo.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
@@ -172,7 +298,7 @@ public class ChamsModelRenderer implements Globals
                     }
                     else
                     {
-                        m.getBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
+                        ((AccessorAnimalModel) m).hookGetBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
                     }
                     matrices.pop();
                 }
@@ -189,8 +315,8 @@ public class ChamsModelRenderer implements Globals
                     }
                     else
                     {
-                        m.getHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
-                        m.getBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
+                        ((AccessorAnimalModel) m).hookGetHeadParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
+                        ((AccessorAnimalModel) m).hookGetBodyParts().forEach(modelPart -> render(matrixStack, (ModelPart) modelPart, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine));
                     }
                 }
             }
