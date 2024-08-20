@@ -46,8 +46,28 @@ public class ExplosionUtil implements Globals
         return getDamageTo(entity, explosion, ignoreTerrain, 12.0f);
     }
 
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final IgnoreTerrain ignoreTerrain)
+    {
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final IgnoreTerrain ignoreTerrain,
+                                     float power)
+    {
+        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity, ignoreTerrain);
+        double w = d / power;
+        double ac = (1.0 - w) * ab;
+        double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        return Math.max(0.0, dmg);
+    }
+
     /**
-     * @param pos
      * @param entity
      * @param explosion
      * @return
@@ -58,7 +78,7 @@ public class ExplosionUtil implements Globals
                                      float power)
     {
         double d = Math.sqrt(entity.squaredDistanceTo(explosion));
-        double ab = getExposure(explosion, entity, ignoreTerrain);
+        double ab = getExposure(explosion, entity, ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE);
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
@@ -84,7 +104,7 @@ public class ExplosionUtil implements Globals
         double dz = pos.getZ() - bb.minZ;
         final Box box = bb.offset(dx, dy, dz);
         //
-        double ab = getExposure(explosion, box, ignoreTerrain);
+        double ab = getExposure(explosion, box, ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE);
         double w = Math.sqrt(pos.squaredDistanceTo(explosion)) / 12.0;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
@@ -161,7 +181,7 @@ public class ExplosionUtil implements Globals
      */
     private static float getExposure(final Vec3d source,
                                      final Entity entity,
-                                     final boolean ignoreTerrain)
+                                     final IgnoreTerrain ignoreTerrain)
     {
         final Box box = entity.getBoundingBox();
         return getExposure(source, box, ignoreTerrain);
@@ -175,7 +195,7 @@ public class ExplosionUtil implements Globals
      */
     private static float getExposure(final Vec3d source,
                                      final Box box,
-                                     final boolean ignoreTerrain)
+                                     final IgnoreTerrain ignoreTerrain)
     {
         RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain);
 
@@ -227,9 +247,9 @@ public class ExplosionUtil implements Globals
         return 0f;
     }
 
-    private static RaycastFactory getRaycastFactory(boolean ignoreTerrain)
+    private static RaycastFactory getRaycastFactory(IgnoreTerrain ignoreTerrain)
     {
-        if (ignoreTerrain)
+        if (ignoreTerrain == IgnoreTerrain.BLAST)
         {
             return (context, blockPos) ->
             {
@@ -238,6 +258,10 @@ public class ExplosionUtil implements Globals
 
                 return blockState.getCollisionShape(mc.world, blockPos).raycast(context.start(), context.end(), blockPos);
             };
+        }
+        else if (ignoreTerrain == IgnoreTerrain.ALL)
+        {
+            return (context, blockPos) -> null;
         }
         else
         {
@@ -263,5 +287,12 @@ public class ExplosionUtil implements Globals
     @FunctionalInterface
     public interface RaycastFactory extends BiFunction<ExposureRaycastContext, BlockPos, BlockHitResult>
     {
+    }
+
+    public enum IgnoreTerrain
+    {
+        ALL,
+        BLAST,
+        NONE
     }
 }

@@ -33,6 +33,7 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
+import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 import org.jetbrains.annotations.NotNull;
@@ -628,8 +629,9 @@ public class AutoMineModule extends RotationModule
             {
                 continue;
             }
+            double damage = ExplosionUtil.getDamageTo(entity, blockPos.toCenterPos(), ExplosionUtil.IgnoreTerrain.ALL);
             // Check surrounding positions
-            miningPositions.add(new AutoMineCalc(blockPos, -dist, false));
+            miningPositions.add(new AutoMineCalc(blockPos, -damage, false));
         }
         miningPositions.removeIf(c -> BlastResistantBlocks.isUnbreakable(c.pos()));
         miningPositions.removeAll(getPhasePosition(mc.player));
