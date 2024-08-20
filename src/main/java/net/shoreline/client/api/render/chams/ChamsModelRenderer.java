@@ -57,8 +57,6 @@ public class ChamsModelRenderer implements Globals
             renderer.scale(entity, matrices, tickDelta);
             matrices.translate(0, -1.5010000467300415, 0);
 
-            playerModel.animateModel(entity, playerModel.getLimbSwing(), playerModel.getLimbSwingAmount(), tickDelta);
-            playerModel.setAngles(entity, playerModel.getLimbSwing(), playerModel.getLimbSwingAmount(), animationProgress, playerModel.getYaw(), playerModel.getPitch());
             render(matrixStack, playerModel.head, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
             render(matrixStack, playerModel.body, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
             render(matrixStack, playerModel.leftArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);

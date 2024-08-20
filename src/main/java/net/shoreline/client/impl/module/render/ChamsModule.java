@@ -307,7 +307,7 @@ public class ChamsModule extends ToggleModule
             super(player);
             this.model = new StaticBipedEntityModel<>((AbstractClientPlayerEntity) player, false, tickDelta);
             this.leaningPitch = player.leaningPitch;
-            this.lastLeaningPitch = player.lastLeaningPitch;
+            this.lastLeaningPitch = player.leaningPitch;
             setPose(player.getPose());
         }
 

@@ -37,6 +37,8 @@ public class StaticBipedEntityModel<T extends AbstractClientPlayerEntity> extend
         this.x = player.getX();
         this.y = player.getY();
         this.z = player.getZ();
+        animateModel(player, limbSwing, limbSwingAmount, tickDelta);
+        setAngles(player, limbSwing, limbSwingAmount, player.age + tickDelta, yaw, pitch);
     }
 
     public AbstractClientPlayerEntity getPlayer()
