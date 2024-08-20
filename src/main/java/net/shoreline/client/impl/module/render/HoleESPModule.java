@@ -1,8 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -15,9 +14,14 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.manager.combat.hole.Hole;
 import net.shoreline.client.impl.manager.combat.hole.HoleType;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author linus
@@ -29,6 +33,7 @@ public class HoleESPModule extends ToggleModule
 
     //
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Range to display holes", 3.0f, 5.0f, 25.0f));
+    Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Renders an outline around the hole", true));
     Config<Float> heightConfig = register(new NumberConfig<>("Size", "Render height of holes", -1.0f, 1.00f, 1.0f));
     Config<Boolean> ignoreSelfConfig = register(new BooleanConfig("IgnoreSelf", "Ignores the hole the player is standing in", false));
     Config<Boolean> obsidianCheckConfig = register(new BooleanConfig("Obsidian", "Displays obsidian holes", true));
@@ -36,16 +41,23 @@ public class HoleESPModule extends ToggleModule
     Config<Boolean> doubleConfig = register(new BooleanConfig("Double", "Displays double holes where the player can stand in the middle of two blocks to block explosion damage", false));
     Config<Boolean> quadConfig = register(new BooleanConfig("Quad", "Displays quad holes where the player can stand in the middle of four blocks to block explosion damage", false));
     Config<Boolean> voidConfig = register(new BooleanConfig("Void", "Displays void holes in the world", false));
-    Config<Boolean> fadeConfig = register(new BooleanConfig("Fade", "Fades the opacity of holes based on distance", false));
     Config<Color> obsidianConfig = register(new ColorConfig("ObsidianColor", "The color for rendering obsidian holes", new Color(255, 0, 0, 80), () -> obsidianCheckConfig.getValue()));
     Config<Color> mixedConfig = register(new ColorConfig("Obsidian-BedrockColor", "The color for rendering mixed holes", new Color(255, 255, 0, 80), () -> obsidianBedrockConfig.getValue()));
     Config<Color> bedrockConfig = register(new ColorConfig("BedrockColor", "The color for rendering bedrock holes", new Color(0, 255, 0, 80)));
     Config<Color> voidColorConfig = register(new ColorConfig("VoidColor", "The color for rendering bedrock holes", new Color(255, 0, 0, 140), () -> voidConfig.getValue()));
 
+    private final Map<Hole, Animation> fadeList = new HashMap<>();
+
     public HoleESPModule()
     {
         super("HoleESP", "Displays nearby blast resistant holes", ModuleCategory.RENDER);
         INSTANCE = this;
+    }
+
+    @Override
+    public void onDisable()
+    {
+        fadeList.clear();
     }
 
     public static HoleESPModule getInstance()
@@ -60,7 +72,6 @@ public class HoleESPModule extends ToggleModule
         {
             return;
         }
-        RenderBuffers.preRender();
         for (Hole hole : Managers.HOLE.getHoles())
         {
             if ((hole.isDoubleX() || hole.isDoubleZ()) && !doubleConfig.getValue()
@@ -71,19 +82,7 @@ public class HoleESPModule extends ToggleModule
             {
                 continue;
             }
-            boolean standing = false;
-            if (ignoreSelfConfig.getValue())
-            {
-                for (BlockPos pos : hole.getHoleOffsets())
-                {
-                    if (mc.player.getBlockPos().equals(pos))
-                    {
-                        standing = true;
-                        break;
-                    }
-                }
-            }
-            if (standing)
+            if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
             {
                 continue;
             }
@@ -92,66 +91,95 @@ public class HoleESPModule extends ToggleModule
             {
                 continue;
             }
-            double x = hole.getX();
-            double y = hole.getY();
-            double z = hole.getZ();
-            Box render = null;
-            if (hole.getSafety() == HoleType.VOID)
+            if (!containsPos(fadeList, hole))
             {
-                render = new Box(x, y, z, x + 1.0, y + 1.0, z + 1.0);
+                Animation anim = new Animation(false, 300);
+                fadeList.put(hole, anim);
             }
-            else if (hole.isDoubleX())
-            {
-                render = new Box(x, y, z, x + 2.0,
-                        y + heightConfig.getValue(), z + 1.0);
-            }
-            else if (hole.isDoubleZ())
-            {
-                render = new Box(x, y, z, x + 1.0,
-                        y + heightConfig.getValue(), z + 2.0);
-            }
-            else if (hole.isQuad())
-            {
-                render = new Box(x, y, z, x + 2.0,
-                        y + heightConfig.getValue(), z + 2.0);
-            }
-            else if (hole.isStandard())
-            {
-                render = new Box(x, y, z, x + 1.0,
-                        y + heightConfig.getValue(), z + 1.0);
-            }
-            if (render == null)
-            {
-                return;
-            }
-            double alpha = 1.0;
-            if (fadeConfig.getValue())
-            {
-                double fadeRange = rangeConfig.getValue() - 1.0;
-                double fadeRangeSq = fadeRange * fadeRange;
-                alpha = (fadeRangeSq + 9.0 - mc.player.squaredDistanceTo(hole.getX(),
-                        hole.getY(), hole.getZ())) / fadeRangeSq;
-                alpha = MathHelper.clamp(alpha, 0.0, 1.0);
-            }
-            RenderManager.renderBox(event.getMatrices(), render, getHoleColor(hole.getSafety(), alpha));
-            RenderManager.renderBoundingBox(event.getMatrices(), render, 1.5f, getHoleColor(hole.getSafety(), (int) (alpha * 145.0f)));
         }
+
+        RenderBuffers.preRender();
+        for (Map.Entry<Hole, Animation> set : fadeList.entrySet())
+        {
+            Hole hole = set.getKey();
+            set.getValue().setState(containsPos(Managers.HOLE.getHoles(), hole));
+
+            Color color = getHoleColor(hole.getSafety());
+            int boxAlpha = (int) (color.getAlpha() * set.getValue().getFactor());
+            int lineAlpha = (int) (145 * set.getValue().getFactor());
+
+            renderHole(event.getMatrices(), hole, getHoleColor(hole.getSafety(), boxAlpha),
+                    getHoleColor(hole.getSafety(), lineAlpha));
+        }
+
         RenderBuffers.postRender();
     }
 
-    private int getHoleColor(HoleType holeType, double alpha)
+    private void renderHole(MatrixStack matrixStack, Hole hole, int color1, int color2)
     {
-        ColorConfig obsidian = ((ColorConfig) obsidianConfig);
-        ColorConfig mixed = ((ColorConfig) mixedConfig);
-        ColorConfig bedrock = ((ColorConfig) bedrockConfig);
-        ColorConfig voidColor = ((ColorConfig) voidColorConfig);
-        return switch (holeType)
+        double x = hole.getX();
+        double y = hole.getY();
+        double z = hole.getZ();
+        Box render = null;
+        if (hole.getSafety() == HoleType.VOID)
         {
-            case OBSIDIAN -> obsidian.getRgb((int) (obsidian.getAlpha() * alpha));
-            case OBSIDIAN_BEDROCK -> mixed.getRgb((int) (mixed.getAlpha() * alpha));
-            case BEDROCK -> bedrock.getRgb((int) (bedrock.getAlpha() * alpha));
-            case VOID -> voidColor.getRgb((int) (voidColor.getAlpha() * alpha));
-        };
+            render = new Box(x, y, z, x + 1.0, y + 1.0, z + 1.0);
+        }
+        else if (hole.isDoubleX())
+        {
+            render = new Box(x, y, z, x + 2.0,
+                    y + heightConfig.getValue(), z + 1.0);
+        }
+        else if (hole.isDoubleZ())
+        {
+            render = new Box(x, y, z, x + 1.0,
+                    y + heightConfig.getValue(), z + 2.0);
+        }
+        else if (hole.isQuad())
+        {
+            render = new Box(x, y, z, x + 2.0,
+                    y + heightConfig.getValue(), z + 2.0);
+        }
+        else if (hole.isStandard())
+        {
+            render = new Box(x, y, z, x + 1.0,
+                    y + heightConfig.getValue(), z + 1.0);
+        }
+        if (render == null)
+        {
+            return;
+        }
+        RenderManager.renderBox(matrixStack, render, color1);
+        if (outlineConfig.getValue())
+        {
+            RenderManager.renderBoundingBox(matrixStack, render, 1.5f, color2);
+        }
+    }
+
+    private boolean containsPos(Map<Hole, ?> map, Hole hole)
+    {
+        return map.keySet().stream().anyMatch(hole1 ->
+        {
+            if (hole1.isDoubleX() != hole.isDoubleX() || hole1.isDoubleZ() != hole.isDoubleZ()
+                    || hole1.isQuad() != hole.isQuad() || hole1.isStandard() != hole.isStandard())
+            {
+                return false;
+            }
+            return new HashSet<>(hole.getHoleOffsets()).containsAll(hole1.getHoleOffsets());
+        });
+    }
+
+    private boolean containsPos(Set<Hole> set, Hole hole)
+    {
+        return set.stream().anyMatch(hole1 ->
+        {
+            if (hole1.isDoubleX() != hole.isDoubleX() || hole1.isDoubleZ() != hole.isDoubleZ()
+                    || hole1.isQuad() != hole.isQuad() || hole1.isStandard() != hole.isStandard())
+            {
+                return false;
+            }
+            return new HashSet<>(hole.getHoleOffsets()).containsAll(hole1.getHoleOffsets());
+        });
     }
 
     private int getHoleColor(HoleType holeType, int alpha)
@@ -162,6 +190,17 @@ public class HoleESPModule extends ToggleModule
             case OBSIDIAN_BEDROCK -> ((ColorConfig) mixedConfig).getRgb(alpha);
             case BEDROCK -> ((ColorConfig) bedrockConfig).getRgb(alpha);
             case VOID -> ((ColorConfig) voidColorConfig).getRgb(alpha);
+        };
+    }
+
+    private Color getHoleColor(HoleType holeType)
+    {
+        return switch (holeType)
+        {
+            case OBSIDIAN -> obsidianConfig.getValue();
+            case OBSIDIAN_BEDROCK -> mixedConfig.getValue();
+            case BEDROCK -> bedrockConfig.getValue();
+            case VOID -> voidColorConfig.getValue();
         };
     }
 
