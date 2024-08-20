@@ -104,14 +104,10 @@ public class ChamsModule extends ToggleModule
         }
         for (Entity entity : mc.world.getEntities())
         {
-            if (mc.player.squaredDistanceTo(entity) > ((NumberConfig) rangeConfig).getValueSq())
-            {
-                continue;
-            }
             double x = Math.abs(mc.gameRenderer.getCamera().getPos().x - entity.getX());
             double z = Math.abs(mc.gameRenderer.getCamera().getPos().z - entity.getZ());
             double d = (mc.options.getViewDistance().getValue() + 1) * 16;
-            if (x > d || z > d)
+            if (mc.player.squaredDistanceTo(entity) > ((NumberConfig) rangeConfig).getValueSq() || x > d || z > d)
             {
                 continue;
             }
@@ -162,12 +158,9 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderCrystal(RenderCrystalEvent event)
     {
-        if (mc.player != null && !textureConfig.getValue() && crystalsConfig.getValue())
+        if (mc.player != null && !textureConfig.getValue() && crystalsConfig.getValue() &&
+                mc.player.squaredDistanceTo(event.endCrystalEntity) <= ((NumberConfig) rangeConfig).getValueSq())
         {
-            if (mc.player.squaredDistanceTo(event.endCrystalEntity) > ((NumberConfig) rangeConfig).getValueSq())
-            {
-                return;
-            }
             event.cancel();
         }
     }
@@ -175,11 +168,8 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderEntity(RenderEntityEvent event)
     {
-        if (mc.player == null || textureConfig.getValue() || !checkChams(event.entity))
-        {
-            return;
-        }
-        if (mc.player.squaredDistanceTo(event.entity) > ((NumberConfig) rangeConfig).getValueSq())
+        if (mc.player == null || textureConfig.getValue() || !checkChams(event.entity)
+                || mc.player.squaredDistanceTo(event.entity) > ((NumberConfig) rangeConfig).getValueSq())
         {
             return;
         }

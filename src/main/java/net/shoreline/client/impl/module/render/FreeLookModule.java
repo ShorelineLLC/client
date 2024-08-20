@@ -24,7 +24,7 @@ public class FreeLookModule extends ToggleModule
     public void onEnable()
     {
         perspective = mc.options.getPerspective();
-        if (perspective != Perspective.THIRD_PERSON_BACK)
+        if (perspective != null && perspective != Perspective.THIRD_PERSON_BACK)
         {
             mc.options.setPerspective(Perspective.THIRD_PERSON_BACK);
         }
@@ -33,7 +33,7 @@ public class FreeLookModule extends ToggleModule
     @Override
     public void onDisable()
     {
-        if (mc.options.getPerspective() != perspective)
+        if (perspective != null)
         {
             mc.options.setPerspective(perspective);
         }

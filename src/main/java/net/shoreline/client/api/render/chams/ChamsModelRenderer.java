@@ -24,7 +24,6 @@ import net.shoreline.client.api.render.model.StaticBipedEntityModel;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
 import net.shoreline.client.mixin.accessor.AccessorAnimalModel;
 import net.shoreline.client.util.Globals;
-import net.shoreline.client.util.chat.ChatUtil;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector4f;
