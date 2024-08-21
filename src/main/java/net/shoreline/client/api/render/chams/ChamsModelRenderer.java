@@ -22,6 +22,7 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.model.StaticBipedEntityModel;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorAnimalModel;
 import net.shoreline.client.util.Globals;
 import org.joml.Matrix4f;
@@ -201,8 +202,9 @@ public class ChamsModelRenderer implements Globals
             model.riding = livingEntity.hasVehicle();
             model.child = livingEntity.isBaby();
 
-            float bodyYaw = MathHelper.lerpAngleDegrees(tickDelta, livingEntity.prevBodyYaw, livingEntity.bodyYaw);
-            float headYaw = MathHelper.lerpAngleDegrees(tickDelta, livingEntity.prevHeadYaw, livingEntity.headYaw);
+            boolean rotating = entity == mc.player && Managers.ROTATION.isRotating();
+            float bodyYaw = rotating ? Managers.ROTATION.getRotationYaw() : MathHelper.lerpAngleDegrees(tickDelta, livingEntity.prevBodyYaw, livingEntity.bodyYaw);
+            float headYaw = rotating ? Managers.ROTATION.getRotationYaw() : MathHelper.lerpAngleDegrees(tickDelta, livingEntity.prevHeadYaw, livingEntity.headYaw);
             float yaw = headYaw - bodyYaw;
 
             float animationProgress;
@@ -230,7 +232,7 @@ public class ChamsModelRenderer implements Globals
                 yaw = headYaw - bodyYaw;
             }
 
-            float pitch = MathHelper.lerp(tickDelta, livingEntity.prevPitch, livingEntity.getPitch());
+            float pitch = rotating ? Managers.ROTATION.getRotationPitch() : MathHelper.lerp(tickDelta, livingEntity.prevPitch, livingEntity.getPitch());
 
             animationProgress = renderer.getAnimationProgress(livingEntity, tickDelta);
             float limbDistance = 0;
