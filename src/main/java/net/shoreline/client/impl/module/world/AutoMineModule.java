@@ -120,15 +120,6 @@ public class AutoMineModule extends RotationModule
     }
 
     @EventListener
-    public void onTick(TickEvent event)
-    {
-        if (event.getStage() == StageEvent.EventStage.PRE && mc.options.useKey.isPressed())
-        {
-            Managers.INVENTORY.syncToClient();
-        }
-    }
-
-    @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
         if (mc.player.isCreative() || mc.player.isSpectator())
@@ -330,7 +321,7 @@ public class AutoMineModule extends RotationModule
             {
                 data.resetBreakTime();
             }
-            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(2000)))
+            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(1000)))
             {
                 Managers.INVENTORY.syncToClient();
                 miningQueue.remove(data);
@@ -339,19 +330,12 @@ public class AutoMineModule extends RotationModule
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (isDataPacketMine(data) && data.getBlockDamage() > 0.0f)
+            if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f && data.getSlot() != -1)
             {
-                if (mc.player.isUsingItem())
+                Managers.INVENTORY.setSlot(data.getSlot());
+                if (!data.hasAttemptedBreak())
                 {
-                    Managers.INVENTORY.syncToClient();
-                }
-                else if (data.getSlot() != -1)
-                {
-                    Managers.INVENTORY.setSlot(data.getSlot());
-                    if (!data.hasAttemptedBreak() && data.getBlockDamage() > 1.0f)
-                    {
-                        data.setAttemptedBreak(true);
-                    }
+                    data.setAttemptedBreak(true);
                 }
             }
         }
@@ -843,7 +827,7 @@ public class AutoMineModule extends RotationModule
         }
     }
 
-    public class MiningData
+    public static class MiningData
     {
         private boolean attemptedBreak;
         private long breakTime;
