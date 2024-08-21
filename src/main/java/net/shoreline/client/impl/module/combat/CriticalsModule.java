@@ -19,7 +19,7 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.network.InteractType;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.string.EnumFormatter;
-import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**

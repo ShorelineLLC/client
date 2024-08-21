@@ -32,8 +32,8 @@ import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.world.EntityUtil;
-import net.shoreline.client.util.world.FakePlayerEntity;
+import net.shoreline.client.util.entity.EntityUtil;
+import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;

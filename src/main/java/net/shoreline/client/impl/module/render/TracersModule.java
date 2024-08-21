@@ -22,7 +22,7 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorCamera;
-import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
 

@@ -4503,7 +4503,7 @@ net.shoreline.client.impl.module.misc.ChestSwapModule$Priority -> net.shoreline.
     99:99:net.shoreline.client.impl.module.misc.ChestSwapModule$Priority[] $values() -> a
     99:102:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.misc.FakePlayerModule -> net.shoreline.client.jr:
-    net.shoreline.client.util.world.FakePlayerEntity fakePlayer -> a
+    net.shoreline.client.util.entity.FakePlayerEntity fakePlayer -> a
     25:27:void <init>() -> <init>
     32:37:void onEnable() -> s
     42:47:void onDisable() -> t
@@ -4754,7 +4754,7 @@ net.shoreline.client.impl.module.movement.FakeLagModule -> net.shoreline.client.
     net.shoreline.client.api.config.Config pulseConfig -> fa
     net.shoreline.client.api.config.Config factorConfig -> dj
     net.shoreline.client.api.config.Config renderConfig -> aX
-    net.shoreline.client.util.world.FakePlayerEntity serverModel -> b
+    net.shoreline.client.util.entity.FakePlayerEntity serverModel -> b
     boolean blinking -> ag
     java.util.Queue packets -> g
     30:46:void <init>() -> <init>
@@ -7523,7 +7523,7 @@ net.shoreline.client.util.world.BlockUtil -> net.shoreline.client.qg:
 net.shoreline.client.util.world.DimensionUtil -> net.shoreline.client.qh:
     7:7:void <init>() -> <init>
     11:24:int getDimension() -> o
-net.shoreline.client.util.world.EntityUtil -> net.shoreline.client.qi:
+net.shoreline.client.util.entity.EntityUtil -> net.shoreline.client.qi:
     20:20:void <init>() -> <init>
     29:33:float getHealth(net.minecraft.class_1297) -> a
     42:42:boolean isMonster(net.minecraft.class_1297) -> B
@@ -7563,7 +7563,7 @@ net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext -> net.shor
     259:259:net.minecraft.class_243 start() -> p
     259:259:net.minecraft.class_243 end() -> q
 net.shoreline.client.util.world.ExplosionUtil$RaycastFactory -> net.shoreline.client.qm:
-net.shoreline.client.util.world.FakePlayerEntity -> net.shoreline.client.qn:
+net.shoreline.client.util.entity.FakePlayerEntity -> net.shoreline.client.qn:
     java.util.concurrent.atomic.AtomicInteger CURRENT_ID -> a
     net.minecraft.class_1657 player -> e
     29:58:void <init>(net.minecraft.class_1657,java.lang.String) -> <init>

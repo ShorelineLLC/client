@@ -4,7 +4,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.player.PushEntityEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
-import net.shoreline.client.util.world.FakePlayerEntity;
+import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**

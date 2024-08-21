@@ -1,4 +1,4 @@
-package net.shoreline.client.util.world;
+package net.shoreline.client.util.entity;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
@@ -36,10 +36,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
         prevHeadYaw = headYaw;
         bodyYaw = player.bodyYaw;
         prevBodyYaw = bodyYaw;
-        // handSwinging = player.handSwinging;
-        // handSwingProgress = player.handSwingProgress;
-        // handSwingTicks = player.handSwingTicks;
-        // lastHandSwingProgress = player.lastHandSwingProgress;
         limbAnimator.pos = player.limbAnimator.getPos();
         limbAnimator.setSpeed(player.limbAnimator.getSpeed());
         Byte playerModel = player.getDataTracker()
@@ -76,7 +72,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
                 .get(PlayerEntity.PLAYER_MODEL_PARTS);
         dataTracker.set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
         getAttributes().setFrom(player.getAttributes());
-        setPose(player.getPose());
         setHealth(player.getHealth());
         setAbsorptionAmount(player.getAbsorptionAmount());
         // setBoundingBox(player.getBoundingBox());

@@ -20,7 +20,7 @@ import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
-import net.shoreline.client.util.world.FakePlayerEntity;
+import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;

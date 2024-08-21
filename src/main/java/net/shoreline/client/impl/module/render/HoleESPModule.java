@@ -82,10 +82,6 @@ public class HoleESPModule extends ToggleModule
             {
                 continue;
             }
-            if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
-            {
-                continue;
-            }
             double dist = hole.squaredDistanceTo(mc.player);
             if (dist > ((NumberConfig) rangeConfig).getValueSq())
             {
@@ -102,6 +98,10 @@ public class HoleESPModule extends ToggleModule
         for (Map.Entry<Hole, Animation> set : fadeList.entrySet())
         {
             Hole hole = set.getKey();
+            if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
+            {
+                continue;
+            }
             set.getValue().setState(containsPos(Managers.HOLE.getHoles(), hole));
 
             Color color = getHoleColor(hole.getSafety());

@@ -11,7 +11,7 @@ import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.event.entity.LookDirectionEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 

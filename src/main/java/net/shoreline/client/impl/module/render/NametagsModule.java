@@ -47,7 +47,7 @@ import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
 import net.shoreline.client.util.render.ColorUtil;
-import net.shoreline.client.util.world.FakePlayerEntity;
+import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;

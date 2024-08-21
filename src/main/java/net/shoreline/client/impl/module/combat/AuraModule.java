@@ -41,7 +41,7 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.string.EnumFormatter;
-import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Comparator;

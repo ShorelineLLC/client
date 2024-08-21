@@ -46,7 +46,7 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 

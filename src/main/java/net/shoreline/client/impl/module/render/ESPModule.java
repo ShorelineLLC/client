@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.render;
 
-import net.minecraft.block.entity.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -15,7 +14,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.EntityOutlineEvent;
 import net.shoreline.client.impl.event.entity.decoration.TeamColorEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.world.EntityUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
