@@ -67,6 +67,7 @@ public class CommandManager implements Globals
                 new BindCommand(),
                 new ConfigCommand(),
                 new ConnectCommand(),
+                new CoordsCommand(),
                 new DirectMessageCommand(),
                 new DisableAllCommand(),
                 new DrawnCommand(),

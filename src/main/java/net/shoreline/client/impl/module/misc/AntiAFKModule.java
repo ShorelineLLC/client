@@ -89,7 +89,7 @@ public class AntiAFKModule extends RotationModule
             String[] words = packet.body().content().split(" ");
             if (words[1].startsWith("whispers:"))
             {
-                ChatUtil.serverSendMessage("/r [Shoreline] " + replyConfig.getValue());
+                ChatUtil.serverSendCommand("r [Shoreline] " + replyConfig.getValue());
             }
         }
     }

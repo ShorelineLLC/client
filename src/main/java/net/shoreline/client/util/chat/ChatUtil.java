@@ -76,6 +76,14 @@ public class ChatUtil implements Globals
         }
     }
 
+    public static void serverSendCommand(String message)
+    {
+        if (mc.player != null)
+        {
+            mc.player.networkHandler.sendChatCommand(message);
+        }
+    }
+
     /**
      * @param player
      * @param message
