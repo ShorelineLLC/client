@@ -23,6 +23,7 @@ import java.awt.*;
 
 public class StorageESPModule extends ToggleModule
 {
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The ESP render range", 10.0f, 50.0f, 200.0f));
     Config<Boolean> fillConfig = register(new BooleanConfig("Fill", "Fills in the highlight", false));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the highlight", 1.0f, 1.5f, 5.0f));
     Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render players through walls", true));
@@ -47,6 +48,11 @@ public class StorageESPModule extends ToggleModule
         RenderBuffers.preRender();
         for (BlockEntity blockEntity : BlockUtil.blockEntities())
         {
+            double dist = mc.player.squaredDistanceTo(blockEntity.getPos().toCenterPos());
+            if (dist > ((NumberConfig) rangeConfig).getValueSq())
+            {
+                continue;
+            }
             Color color = getStorageESPColor(blockEntity);
             if (color == null)
             {
