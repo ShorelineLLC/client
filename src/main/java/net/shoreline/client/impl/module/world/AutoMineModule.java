@@ -332,6 +332,10 @@ public class AutoMineModule extends RotationModule
             data.damage(damageDelta);
             if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f && data.getSlot() != -1)
             {
+                if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+                {
+                    return;
+                }
                 Managers.INVENTORY.setSlot(data.getSlot());
                 if (!data.hasAttemptedBreak())
                 {
@@ -718,6 +722,7 @@ public class AutoMineModule extends RotationModule
             }
         }
         data.setStarted();
+        Managers.INVENTORY.syncToClient();
         return true;
     }
 
