@@ -25,6 +25,7 @@ import net.shoreline.client.impl.event.entity.EntityRotationVectorEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.render.BobViewEvent;
+import net.shoreline.client.impl.event.render.item.RenderArmEvent;
 import net.shoreline.client.impl.manager.player.rotation.Rotation;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.RayCastUtil;
@@ -183,6 +184,12 @@ public class FreecamModule extends ToggleModule
     // Render the player in third person
     @EventListener
     public void onPerspective(PerspectiveEvent event)
+    {
+        event.cancel();
+    }
+
+    @EventListener
+    public void onRenderArm(RenderArmEvent event)
     {
         event.cancel();
     }

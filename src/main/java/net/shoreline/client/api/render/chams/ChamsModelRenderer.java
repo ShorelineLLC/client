@@ -27,6 +27,7 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.model.StaticBipedEntityModel;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
+import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorAnimalModel;
 import net.shoreline.client.util.Globals;
@@ -455,7 +456,7 @@ public class ChamsModelRenderer implements Globals
     public static void renderHand(MatrixStack matrixStack, float tickDelta, int lineColor, int color,
                                   float lineWidth, boolean lines, boolean fill, boolean shine)
     {
-        if (!mc.options.getPerspective().isFirstPerson())
+        if (!mc.options.getPerspective().isFirstPerson() || FreecamModule.getInstance().isEnabled())
         {
             return;
         }
