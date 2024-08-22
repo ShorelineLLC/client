@@ -87,7 +87,7 @@ public class HoleESPModule extends ToggleModule
             {
                 continue;
             }
-            if (!containsPos(fadeList, hole))
+            if (!containsPos(fadeList.keySet(), hole))
             {
                 Animation anim = new Animation(false, 300);
                 fadeList.put(hole, anim);
@@ -99,6 +99,14 @@ public class HoleESPModule extends ToggleModule
         {
             Hole hole = set.getKey();
             if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
+            {
+                continue;
+            }
+            if ((hole.isDoubleX() || hole.isDoubleZ()) && !doubleConfig.getValue()
+                    || hole.isQuad() && !quadConfig.getValue()
+                    || hole.getSafety() == HoleType.VOID && !voidConfig.getValue()
+                    || hole.getSafety() == HoleType.OBSIDIAN && !obsidianCheckConfig.getValue()
+                    || hole.getSafety() == HoleType.OBSIDIAN_BEDROCK && !obsidianBedrockConfig.getValue())
             {
                 continue;
             }
@@ -156,25 +164,16 @@ public class HoleESPModule extends ToggleModule
         }
     }
 
-    private boolean containsPos(Map<Hole, ?> map, Hole hole)
-    {
-        return map.keySet().stream().anyMatch(hole1 ->
-        {
-            if (hole1.isDoubleX() != hole.isDoubleX() || hole1.isDoubleZ() != hole.isDoubleZ()
-                    || hole1.isQuad() != hole.isQuad() || hole1.isStandard() != hole.isStandard())
-            {
-                return false;
-            }
-            return new HashSet<>(hole.getHoleOffsets()).containsAll(hole1.getHoleOffsets());
-        });
-    }
-
     private boolean containsPos(Set<Hole> set, Hole hole)
     {
         return set.stream().anyMatch(hole1 ->
         {
             if (hole1.isDoubleX() != hole.isDoubleX() || hole1.isDoubleZ() != hole.isDoubleZ()
                     || hole1.isQuad() != hole.isQuad() || hole1.isStandard() != hole.isStandard())
+            {
+                return false;
+            }
+            if (hole.getSafety() != hole1.getSafety())
             {
                 return false;
             }

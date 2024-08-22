@@ -701,7 +701,6 @@ public class AutoMineModule extends RotationModule
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             if (grimConfig.getValue())
             {
-                Managers.INVENTORY.setSlot(data.getSlot());
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             }
@@ -722,7 +721,6 @@ public class AutoMineModule extends RotationModule
             }
         }
         data.setStarted();
-        Managers.INVENTORY.syncToClient();
         return true;
     }
 
