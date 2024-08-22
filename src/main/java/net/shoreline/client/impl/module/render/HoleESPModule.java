@@ -100,18 +100,25 @@ public class HoleESPModule extends ToggleModule
             Hole hole = set.getKey();
             if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
             {
-                continue;
+                set.getValue().setState(false);
             }
-            if ((hole.isDoubleX() || hole.isDoubleZ()) && !doubleConfig.getValue()
+            else if ((hole.isDoubleX() || hole.isDoubleZ()) && !doubleConfig.getValue()
                     || hole.isQuad() && !quadConfig.getValue()
                     || hole.getSafety() == HoleType.VOID && !voidConfig.getValue()
                     || hole.getSafety() == HoleType.OBSIDIAN && !obsidianCheckConfig.getValue()
                     || hole.getSafety() == HoleType.OBSIDIAN_BEDROCK && !obsidianBedrockConfig.getValue())
             {
+                set.getValue().setState(false);
+            }
+            else
+            {
+                set.getValue().setState(containsPos(Managers.HOLE.getHoles(), hole));
+            }
+
+            if (set.getValue().getFactor() < 0.01f)
+            {
                 continue;
             }
-            set.getValue().setState(containsPos(Managers.HOLE.getHoles(), hole));
-
             Color color = getHoleColor(hole.getSafety());
             int boxAlpha = (int) (color.getAlpha() * set.getValue().getFactor());
             int lineAlpha = (int) (145 * set.getValue().getFactor());
