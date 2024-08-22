@@ -31,8 +31,8 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
-import net.shoreline.client.impl.event.render.ReloadShaderEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
@@ -291,7 +291,7 @@ public class ShadersModule extends ToggleModule
     }
 
     @EventListener
-    public void onReloadShader(ReloadShaderEvent event)
+    public void onReloadShader(RenderWorldEvent.Hand event)
     {
         if (!handsConfig.getValue())
         {
@@ -316,7 +316,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.render(mc.getTickDelta());
                 }, () ->
                 {
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
                 });
             }
             case GRADIENT ->
@@ -340,7 +340,7 @@ public class ShadersModule extends ToggleModule
                     shaderTime += speedConfig.getValue();
                 }, () ->
                 {
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
                 });
             }
             case MARBLE ->
@@ -362,7 +362,7 @@ public class ShadersModule extends ToggleModule
                     shaderTime += marbleFactorConfig.getValue();
                 }, () ->
                 {
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
                 });
             }
             case IMAGE ->
@@ -384,7 +384,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.render(mc.getTickDelta());
                 }, () ->
                 {
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrixStack(), mc.gameRenderer.getCamera(), event.getDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
                 });
             }
         }

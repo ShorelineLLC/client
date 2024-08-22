@@ -77,3 +77,7 @@ accessible field net/minecraft/client/gui/screen/ingame/AnvilScreen nameField Ln
 accessible field net/minecraft/client/render/entity/LivingEntityRenderer features Ljava/util/List;
 accessible field net/minecraft/entity/LivingEntity leaningPitch F
 accessible field net/minecraft/entity/LivingEntity lastLeaningPitch F
+accessible field net/minecraft/client/render/item/HeldItemRenderer prevEquipProgressMainHand F
+accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgressMainHand F
+accessible field net/minecraft/client/render/item/HeldItemRenderer prevEquipProgressOffHand F
+accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgressOffHand F

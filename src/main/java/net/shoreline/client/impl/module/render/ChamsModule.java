@@ -30,6 +30,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
+import net.shoreline.client.impl.event.render.item.RenderArmEvent;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.entity.EntityUtil;
@@ -54,6 +55,7 @@ public class ChamsModule extends ToggleModule
     Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", false));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render chams on other players", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render chams on the player", true, () -> playersConfig.getValue()));
+    Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render chams on first-person hands", true));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render chams on monsters", true));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render chams on animals", true));
     Config<Boolean> crystalsConfig = register(new BooleanConfig("Crystals", "Render chams on crystals", true));
@@ -133,6 +135,20 @@ public class ChamsModule extends ToggleModule
         {
             RenderSystem.depthMask(true);
         }
+    }
+
+    @EventListener
+    public void onRenderGame(RenderWorldEvent.Hand event)
+    {
+        RenderBuffers.preRender();
+        if (handsConfig.getValue())
+        {
+            int color1 = colorConfig.getValue().getRGB();
+            int lineColor1 = ColorUtil.withAlpha(color1, 145);
+            ChamsModelRenderer.renderHand(event.getMatrices(), event.getTickDelta(), lineColor1, color1, widthConfig.getValue(),
+                    modeConfig.getValue() != ChamsMode.FILL, modeConfig.getValue() != ChamsMode.WIREFRAME, false);
+        }
+        RenderBuffers.postRender();
     }
 
     @EventListener
@@ -252,6 +268,15 @@ public class ChamsModule extends ToggleModule
             }
         }
         event.matrixStack.pop();
+    }
+
+    @EventListener
+    public void onRenderArm(RenderArmEvent event)
+    {
+        if (handsConfig.getValue() && !textureConfig.getValue())
+        {
+            event.cancel();
+        }
     }
 
     private float getAnimationProgress(LivingEntity entity, float f)

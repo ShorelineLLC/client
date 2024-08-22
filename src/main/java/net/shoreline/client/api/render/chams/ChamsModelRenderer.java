@@ -1,5 +1,6 @@
 package net.shoreline.client.api.render.chams;
 
+import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -13,6 +14,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.CrossbowItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
@@ -446,48 +451,132 @@ public class ChamsModelRenderer implements Globals
         }
         matrices.pop();
     }
+
+    public static void renderHand(MatrixStack matrixStack, float tickDelta, int lineColor, int color,
+                                  float lineWidth, boolean lines, boolean fill, boolean shine)
+    {
+        if (!mc.options.getPerspective().isFirstPerson())
+        {
+            return;
+        }
+        mc.gameRenderer.loadProjectionMatrix(mc.gameRenderer.getBasicProjectionMatrix(mc.options.getFov().getValue() / 2.0f));
+        matrixStack.loadIdentity();
+        // Bob view
+        PlayerEntity playerEntity = (PlayerEntity) mc.getCameraEntity();
+        float f = playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed;
+        float g = -(playerEntity.horizontalSpeed + f * tickDelta);
+        float h = MathHelper.lerp(tickDelta, playerEntity.prevStrideDistance, playerEntity.strideDistance);
+        matrixStack.translate(MathHelper.sin(g * (float)Math.PI) * h * 0.5f, -Math.abs(MathHelper.cos(g * (float)Math.PI) * h), 0.0f);
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float)Math.PI) * h * 3.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * 5.0f));
+        //
+        float h1 = MathHelper.lerp(tickDelta, mc.player.lastRenderPitch, mc.player.renderPitch);
+        float i1 = MathHelper.lerp(tickDelta, mc.player.lastRenderYaw, mc.player.renderYaw);
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((mc.player.getPitch(tickDelta) - h1) * 0.1f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((mc.player.getYaw(tickDelta) - i1) * 0.1f));
+        float f1 = mc.player.getHandSwingProgress(tickDelta);
+        Hand hand = MoreObjects.firstNonNull(mc.player.preferredHand, Hand.MAIN_HAND);
+        boolean bl2;
+        ItemStack itemStack = mc.player.getMainHandStack();
+        ItemStack itemStack2 = mc.player.getOffHandStack();
+        boolean bl = itemStack.isOf(Items.BOW) || itemStack2.isOf(Items.BOW);
+        bl2 = itemStack.isOf(Items.CROSSBOW) || itemStack2.isOf(Items.CROSSBOW);
+        HandRenderType handRenderType = HandRenderType.RENDER_BOTH_HANDS;
+        if (!bl && !bl2)
+        {
+            handRenderType = HandRenderType.RENDER_BOTH_HANDS;
+        }
+        else if (mc.player.isUsingItem())
+        {
+            ItemStack itemStack1 = mc.player.getActiveItem();
+            Hand hand1 = mc.player.getActiveHand();
+            if (itemStack1.isOf(Items.BOW) || itemStack1.isOf(Items.CROSSBOW))
+            {
+                handRenderType = HandRenderType.shouldOnlyRender(hand1);
+            }
+            else
+            {
+                handRenderType = hand == Hand.MAIN_HAND && mc.player.getOffHandStack().isOf(Items.CROSSBOW) && CrossbowItem.isCharged(mc.player.getOffHandStack()) ? HandRenderType.RENDER_MAIN_HAND_ONLY : HandRenderType.RENDER_BOTH_HANDS;
+            }
+        }
+        else if (itemStack.isOf(Items.CROSSBOW) && CrossbowItem.isCharged(itemStack))
+        {
+            handRenderType = HandRenderType.RENDER_MAIN_HAND_ONLY;
+        }
+        PlayerEntityRenderer playerEntityRenderer = (PlayerEntityRenderer) mc.getEntityRenderDispatcher().getRenderer(mc.player);
+        float k;
+        float j;
+        if (handRenderType.renderMainHand)
+        {
+            boolean bl1 = hand == Hand.MAIN_HAND;
+            j = bl1 ? f1 : 0.0f;
+            k = 1.0f - MathHelper.lerp(tickDelta, mc.gameRenderer.firstPersonRenderer.prevEquipProgressMainHand, mc.gameRenderer.firstPersonRenderer.equipProgressMainHand);
+            Arm arm = bl1 ? mc.player.getMainArm() : mc.player.getMainArm().getOpposite();
+            if (itemStack.isEmpty() && bl1 && !mc.player.isInvisible())
+            {
+                renderFirstPersonItem(matrixStack, tickDelta, playerEntityRenderer, arm, j, k, lineColor, color, lineWidth, lines, fill, shine);
+            }
+        }
+        if (handRenderType.renderOffHand)
+        {
+            boolean bl1 = hand == Hand.OFF_HAND;
+            j = bl1 ? f1 : 0.0f;
+            k = 1.0f - MathHelper.lerp(tickDelta, mc.gameRenderer.firstPersonRenderer.prevEquipProgressOffHand, mc.gameRenderer.firstPersonRenderer.equipProgressOffHand);
+            Arm arm = bl1 ? mc.player.getMainArm() : mc.player.getMainArm().getOpposite();
+            if (itemStack.isEmpty() && bl1 && !mc.player.isInvisible())
+            {
+                renderFirstPersonItem(matrixStack, tickDelta, playerEntityRenderer, arm, j, k, lineColor, color, lineWidth, lines, fill, shine);
+            }
+        }
+    }
     
-//    public static void renderFirstPersonItem(Arm arm, int color) 
-//    {
-//        matrices.push();
-//        boolean bl = arm != Arm.LEFT;
-//        float f = bl ? 1.0f : -1.0f;
-//        float g = MathHelper.sqrt(swingProgress);
-//        float h = -0.3f * MathHelper.sin(g * (float) Math.PI);
-//        float i = 0.4f * MathHelper.sin(g * ((float) Math.PI * 2));
-//        float j = -0.4f * MathHelper.sin(swingProgress * (float) Math.PI);
-//        matrices.translate(f * (h + 0.64000005f), i + -0.6f + equipProgress * -0.6f, j + -0.71999997f);
-//        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f * 45.0f));
-//        float k = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
-//        float l = MathHelper.sin(g * (float) Math.PI);
-//        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f * l * 70.0f));
-//        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * k * -20.0f));
-//        matrices.translate(f * -1.0f, 3.6f, 3.5f);
-//        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * 120.0f));
-//        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(200.0f));
-//        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f * -135.0f));
-//        matrices.translate(f * 5.6f, 0.0f, 0.0f);
-//        playerEntityRenderer.setModelPose(mc.player);
-//        playerEntityRenderer.getModel().handSwingProgress = 0.0f;
-//        playerEntityRenderer.getModel().sneaking = false;
-//        playerEntityRenderer.getModel().leaningPitch = 0.0f;
-//        playerEntityRenderer.getModel().setAngles(mc.player, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-//        if (arm == Arm.RIGHT)
-//        {
-//            playerEntityRenderer.getModel().rightArm.pitch = 0.0f;
-//            playerEntityRenderer.getModel().rightArm.render(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV);
-//            playerEntityRenderer.getModel().rightSleeve.pitch = 0.0f;
-//            playerEntityRenderer.getModel().rightSleeve.render(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV);
-//        }
-//        else
-//        {
-//            playerEntityRenderer.getModel().leftArm.pitch = 0.0f;
-//            playerEntityRenderer.getModel().leftArm.render(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV);
-//            playerEntityRenderer.getModel().leftSleeve.pitch = 0.0f;
-//            playerEntityRenderer.getModel().leftSleeve.render(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV);
-//        }
-//        matrices.pop();
-//    }
+    public static void renderFirstPersonItem(MatrixStack matrixStack, float tickDelta, PlayerEntityRenderer playerEntityRenderer, Arm arm, float swingProgress,
+                                             float equipProgress, int lineColor, int color, float lineWidth, boolean lines, boolean fill, boolean shine)
+    {
+        RenderSystem.disableDepthTest();
+        double offsetX = mc.gameRenderer.getCamera().getPos().x;
+        double offsetY = mc.gameRenderer.getCamera().getPos().y;
+        double offsetZ = mc.gameRenderer.getCamera().getPos().z;
+        matrices.push();
+        boolean bl = arm != Arm.LEFT;
+        float f = bl ? 1.0f : -1.0f;
+        float g = MathHelper.sqrt(swingProgress);
+        float h = -0.3f * MathHelper.sin(g * (float) Math.PI);
+        float i = 0.4f * MathHelper.sin(g * ((float) Math.PI * 2));
+        float j = -0.4f * MathHelper.sin(swingProgress * (float) Math.PI);
+        matrices.translate(f * (h + 0.64000005f), i + -0.6f + equipProgress * -0.6f, j + -0.71999997f);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f * 45.0f));
+        float k = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
+        float l = MathHelper.sin(g * (float) Math.PI);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f * l * 70.0f));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * k * -20.0f));
+        matrices.translate(f * -1.0f, 3.6f, 3.5f);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(f * 120.0f));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(200.0f));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f * -135.0f));
+        matrices.translate(f * 5.6f, 0.0f, 0.0f);
+        playerEntityRenderer.setModelPose(mc.player);
+        PlayerEntityModel model = playerEntityRenderer.getModel();
+        model.handSwingProgress = 0.0f;
+        model.sneaking = false;
+        model.leaningPitch = 0.0f;
+        model.setAngles(mc.player, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+        if (arm == Arm.RIGHT)
+        {
+            model.rightArm.pitch = 0.0f;
+            render(matrixStack, model.rightArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+            model.rightSleeve.pitch = 0.0f;
+            // render(matrixStack, model.rightSleeve, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+        }
+        else
+        {
+            model.leftArm.pitch = 0.0f;
+            render(matrixStack, model.leftArm, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+            model.leftSleeve.pitch = 0.0f;
+            // render(matrixStack, model.leftSleeve, offsetX, offsetY, offsetZ, color, lineColor, lineWidth, lines, fill, shine);
+        }
+        matrices.pop();
+    }
     
     public static void render(MatrixStack matrixStack, ModelPart part, double offsetX, double offsetY, double offsetZ, int color, int lineColor, float lineWidth, boolean lines, boolean fill, boolean shine)
     {
@@ -562,6 +651,27 @@ public class ChamsModelRenderer implements Globals
                 RenderBuffers.LINES.vertexLine(offsetX + pos1.x, offsetY + pos1.y, offsetZ + pos1.z, offsetX + pos1.x, offsetY + pos1.y, offsetZ + pos1.z);
                 RenderBuffers.LINES.end();
             }
+        }
+    }
+
+    private enum HandRenderType
+    {
+        RENDER_BOTH_HANDS(true, true),
+        RENDER_MAIN_HAND_ONLY(true, false),
+        RENDER_OFF_HAND_ONLY(false, true);
+
+        final boolean renderMainHand;
+        final boolean renderOffHand;
+
+        HandRenderType(boolean renderMainHand, boolean renderOffHand)
+        {
+            this.renderMainHand = renderMainHand;
+            this.renderOffHand = renderOffHand;
+        }
+
+        public static HandRenderType shouldOnlyRender(Hand hand)
+        {
+            return hand == Hand.MAIN_HAND ? RENDER_MAIN_HAND_ONLY : RENDER_OFF_HAND_ONLY;
         }
     }
 }

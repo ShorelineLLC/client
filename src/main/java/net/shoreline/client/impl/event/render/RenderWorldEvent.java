@@ -50,4 +50,16 @@ public class RenderWorldEvent extends Event
             super(matrices, tickDelta);
         }
     }
+
+    public static class Hand extends RenderWorldEvent
+    {
+        /**
+         * @param matrices
+         * @param tickDelta
+         */
+        public Hand(MatrixStack matrices, float tickDelta)
+        {
+            super(matrices, tickDelta);
+        }
+    }
 }

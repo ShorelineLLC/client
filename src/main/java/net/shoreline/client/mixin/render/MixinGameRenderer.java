@@ -64,7 +64,7 @@ public class MixinGameRenderer implements Globals
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
     public void hookRenderWorld$2(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
     {
-        ReloadShaderEvent reloadShaderEvent = new ReloadShaderEvent(matrices, tickDelta);
+        RenderWorldEvent.Hand reloadShaderEvent = new RenderWorldEvent.Hand(matrices, tickDelta);
         EventBus.INSTANCE.dispatch(reloadShaderEvent);
     }
 

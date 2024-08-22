@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.manager;
 
 import net.shoreline.client.impl.event.FinishLoadingEvent;
-import net.shoreline.client.impl.event.render.ReloadShaderEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -21,7 +21,7 @@ public class EventManager
     }
 
     @EventListener
-    public void onReloadShader(ReloadShaderEvent event)
+    public void onReloadShader(RenderWorldEvent.Hand event)
     {
         Managers.SHADER.reloadShaders();
     }
