@@ -74,19 +74,6 @@ public class HoleESPModule extends ToggleModule
         }
         for (Hole hole : Managers.HOLE.getHoles())
         {
-            if ((hole.isDoubleX() || hole.isDoubleZ()) && !doubleConfig.getValue()
-                    || hole.isQuad() && !quadConfig.getValue()
-                    || hole.getSafety() == HoleType.VOID && !voidConfig.getValue()
-                    || hole.getSafety() == HoleType.OBSIDIAN && !obsidianCheckConfig.getValue()
-                    || hole.getSafety() == HoleType.OBSIDIAN_BEDROCK && !obsidianBedrockConfig.getValue())
-            {
-                continue;
-            }
-            double dist = hole.squaredDistanceTo(mc.player);
-            if (dist > ((NumberConfig) rangeConfig).getValueSq())
-            {
-                continue;
-            }
             if (!containsPos(fadeList.keySet(), hole))
             {
                 Animation anim = new Animation(false, 300);
@@ -98,7 +85,12 @@ public class HoleESPModule extends ToggleModule
         for (Map.Entry<Hole, Animation> set : fadeList.entrySet())
         {
             Hole hole = set.getKey();
-            if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
+            double dist = hole.squaredDistanceTo(mc.player);
+            if (dist > ((NumberConfig) rangeConfig).getValueSq())
+            {
+                set.getValue().setState(false);
+            }
+            else if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
             {
                 set.getValue().setState(false);
             }

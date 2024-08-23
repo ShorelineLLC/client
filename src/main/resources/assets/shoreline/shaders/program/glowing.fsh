@@ -31,7 +31,7 @@ void main()
     }
     else
     {
-        float dist = radius * 2.0f + 2.0f;
+        float dist = radius * radius * 4.0;
         for (float x = -radius; x <= radius; x++)
         {
             for (float y = -radius; y <= radius; y++)
