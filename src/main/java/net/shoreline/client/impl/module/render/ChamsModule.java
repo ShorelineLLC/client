@@ -31,15 +31,15 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
 import net.shoreline.client.impl.event.render.item.RenderArmEvent;
-import net.shoreline.client.util.render.ColorUtil;
-import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.entity.FakePlayerEntity;
+import net.shoreline.client.util.render.ColorUtil;
+import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -63,7 +63,7 @@ public class ChamsModule extends ToggleModule
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 1000, 3000, () -> false));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the chams", new Color(255, 0, 0, 60)));
 
-    private final Map<PopChamEntity, Animation> fadeList = new HashMap<>();
+    private final Map<PopChamEntity, Animation> fadeList = new ConcurrentHashMap<>();
 
     public ChamsModule()
     {
