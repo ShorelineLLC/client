@@ -54,7 +54,7 @@ public class ChamsModule extends ToggleModule
     // Config<Boolean> shineConfig = register(new BooleanConfig("Shine", "Adds enchantment glint", false));
     Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", false));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render chams on other players", true));
-    Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render chams on the player", true, () -> playersConfig.getValue()));
+    Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render chams on the player", true));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render chams on first-person hands", true));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render chams on monsters", true));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render chams on animals", true));
