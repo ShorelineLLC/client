@@ -44,8 +44,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
      * @param delta
      */
     @Override
-    public void render(DrawContext context, float ix, float iy, float mouseX,
-                       float mouseY, float delta)
+    public void render(DrawContext context, float ix, float iy, float mouseX, float mouseY, float delta)
     {
         x = ix;
         y = iy;
@@ -79,14 +78,14 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
                 bval = bigDecimal.setScale(scale, RoundingMode.HALF_UP).doubleValue();
                 ((NumberConfig<Double>) config).setValue(bval);
             }
-            float lower = ix + ClickGuiModule.CLICK_GUI_SCALE;
-            float upper = ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE;
+            float lower = MathHelper.ceil(x + ClickGuiModule.CLICK_GUI_SCALE);
+            float upper = MathHelper.floor(x + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE);
             // out of bounds
             if (mouseX < lower)
             {
                 config.setValue((T) min);
             }
-            else if (mouseX > upper)
+            else if (mouseX >= upper)
             {
                 config.setValue((T) max);
             }
