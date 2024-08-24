@@ -242,6 +242,10 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     {
         for (BlockPos blockPos : posList)
         {
+            if (!mc.world.getBlockState(blockPos).isReplaceable())
+            {
+                continue;
+            }
             Entity crystalEntity = mc.world.getOtherEntities(null, new Box(blockPos)).stream()
                     .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
             if (crystalEntity == null)
