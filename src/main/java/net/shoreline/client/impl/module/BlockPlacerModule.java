@@ -9,7 +9,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 
 import java.util.function.Predicate;
 
-public class BlockPlacerModule extends RotationModule
+public class BlockPlacerModule extends CombatModule
 {
 
     protected Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Places on visible sides only", false));

@@ -38,6 +38,7 @@ import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -82,7 +83,7 @@ public class ChamsModule extends ToggleModule
         // Pop chams
         RenderBuffers.preRender();
         RenderSystem.disableDepthTest();
-        for (Map.Entry<PopChamEntity, Animation> set : fadeList.entrySet())
+        for (Map.Entry<PopChamEntity, Animation> set : new HashSet<>(fadeList.entrySet()))
         {
             set.getValue().setState(false);
             Color color = colorConfig.getValue();
