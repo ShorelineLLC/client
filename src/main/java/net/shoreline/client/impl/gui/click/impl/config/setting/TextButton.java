@@ -3,6 +3,7 @@ package net.shoreline.client.impl.gui.click.impl.config.setting;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
@@ -45,6 +46,7 @@ public class TextButton extends ConfigButton<String>
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX, float mouseY, float delta)
     {
+        setHeight(RenderManager.textHeight() + 4.0f);
         ClickGuiModule.CLICK_GUI_SCREEN.setCloseOnEscape(!typing);
         x = ix;
         y = iy;

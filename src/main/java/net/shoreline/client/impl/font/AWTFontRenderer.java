@@ -291,6 +291,11 @@ public final class AWTFontRenderer implements Closeable, Globals
         return currentLine + previous;
     }
 
+    public float getFontHeight()
+    {
+        return size;
+    }
+
     private Glyph getGlyphFromChar(char c)
     {
         // Return cached glyph

@@ -122,11 +122,11 @@ public class HUDModule extends ToggleModule
                 renderingUp ? topRight : bottomRight, getHudColor(rainbowOffset));
         if (renderingUp)
         {
-            topRight += 9.0f;
+            topRight += RenderManager.textHeight();
         }
         else
         {
-            bottomRight -= 9.0f;
+            bottomRight -= RenderManager.textHeight();
         }
         rainbowOffset++;
     }
@@ -170,7 +170,7 @@ public class HUDModule extends ToggleModule
                 RenderManager.renderText(event.getContext(), String.format("%s %s (%s%s)",
                         ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER,
                         ShorelineMod.MOD_BUILD_NUMBER, !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""), 2.0f, topLeft, getHudColor(rainbowOffset));
-                topLeft += 9.0f;
+                topLeft += RenderManager.textHeight();
             }
 
             if (userInfo.getValue())
@@ -183,7 +183,7 @@ public class HUDModule extends ToggleModule
                         getHudColor(rainbowOffset)
                 );
 
-                topLeft += 9.0F;
+                topLeft += RenderManager.textHeight();
             }
 
             if (arraylistConfig.getValue())
@@ -223,11 +223,11 @@ public class HUDModule extends ToggleModule
                             potionColorsConfig.getValue() ? effect.getColor() : getHudColor(rainbowOffset));
                     if (renderingUp)
                     {
-                        bottomRight -= 9.0f;
+                        bottomRight -= RenderManager.textHeight();
                     }
                     else
                     {
-                        topRight += 9.0f;
+                        topRight += RenderManager.textHeight();
                     }
                     rainbowOffset++;
                 }
@@ -241,11 +241,11 @@ public class HUDModule extends ToggleModule
                         getHudColor(rainbowOffset));
                 if (renderingUp)
                 {
-                    bottomRight -= 9.0f;
+                    bottomRight -= RenderManager.textHeight();
                 }
                 else
                 {
-                    topRight += 9.0f;
+                    topRight += RenderManager.textHeight();
                 }
                 rainbowOffset++;
             }
@@ -266,11 +266,11 @@ public class HUDModule extends ToggleModule
                         getHudColor(rainbowOffset));
                 if (renderingUp)
                 {
-                    bottomRight -= 9.0f;
+                    bottomRight -= RenderManager.textHeight();
                 }
                 else
                 {
-                    topRight += 9.0f;
+                    topRight += RenderManager.textHeight();
                 }
                 rainbowOffset++;
             }
@@ -291,11 +291,11 @@ public class HUDModule extends ToggleModule
                         color.getRGB());
                 if (renderingUp)
                 {
-                    bottomRight -= 9.0f;
+                    bottomRight -= RenderManager.textHeight();
                 }
                 else
                 {
-                    topRight += 9.0f;
+                    topRight += RenderManager.textHeight();
                 }
                 rainbowOffset++;
             }
@@ -309,11 +309,11 @@ public class HUDModule extends ToggleModule
                         getHudColor(rainbowOffset));
                 if (renderingUp)
                 {
-                    bottomRight -= 9.0f;
+                    bottomRight -= RenderManager.textHeight();
                 }
                 else
                 {
-                    topRight += 9.0f;
+                    topRight += RenderManager.textHeight();
                 }
                 rainbowOffset++;
             }
@@ -330,11 +330,11 @@ public class HUDModule extends ToggleModule
                         getHudColor(rainbowOffset));
                 if (renderingUp)
                 {
-                    bottomRight -= 9.0f;
+                    bottomRight -= RenderManager.textHeight();
                 }
                 else
                 {
-                    topRight += 9.0f;
+                    topRight += RenderManager.textHeight();
                 }
                 rainbowOffset++;
             }
@@ -368,11 +368,11 @@ public class HUDModule extends ToggleModule
                         getHudColor(rainbowOffset));
                 if (renderingUp)
                 {
-                    bottomRight -= 9.0f;
+                    bottomRight -= RenderManager.textHeight();
                 }
                 else
                 {
-                    topRight += 9.0f;
+                    topRight += RenderManager.textHeight();
                 }
                 rainbowOffset++;
             }
@@ -383,7 +383,7 @@ public class HUDModule extends ToggleModule
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
                         getHudColor(rainbowOffset));
-                // bottomRight -= 9.0f;
+                // bottomRight -= RenderManager.textHeight();
                 rainbowOffset++;
             }
             if (coordsConfig.getValue())
@@ -401,7 +401,7 @@ public class HUDModule extends ToggleModule
                                 nether ? decimal.format(x * 8) : decimal.format(x / 8),
                                 nether ? decimal.format(z * 8) : decimal.format(z / 8)),
                         2, bottomLeft, getHudColor(rainbowOffset));
-                bottomLeft -= 9.0f;
+                bottomLeft -= RenderManager.textHeight();
                 rainbowOffset++;
             }
             if (directionConfig.getValue())
@@ -414,7 +414,7 @@ public class HUDModule extends ToggleModule
                         String.format("%s §7[§f%s%s§7]", dir, axis,
                                 pos ? "+" : "-"), 2, bottomLeft,
                         getHudColor(rainbowOffset));
-                // bottomLeft -= 9.0f;
+                // bottomLeft -= RenderManager.textHeight();
                 rainbowOffset++;
             }
             if (armorConfig.getValue())

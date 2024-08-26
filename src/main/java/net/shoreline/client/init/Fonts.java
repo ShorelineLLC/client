@@ -12,6 +12,7 @@ public class Fonts
     public static AWTFontRenderer CLIENT;
     //
     private static boolean initialized;
+    public static float FONT_SIZE = 9.0f;
 
     public static void init()
     {
@@ -22,6 +23,12 @@ public class Fonts
         CLIENT = new AWTFontRenderer(Loader.getResource("assets/shoreline/font/verdana.ttf"), 9.0f);
         Shoreline.info("Loaded fonts!");
         initialized = true;
+    }
+
+    public static void setSize(float size)
+    {
+        FONT_SIZE = size;
+        CLIENT = new AWTFontRenderer(Loader.getResource("assets/shoreline/font/verdana.ttf"), FONT_SIZE);
     }
 
     public static boolean isInitialized()

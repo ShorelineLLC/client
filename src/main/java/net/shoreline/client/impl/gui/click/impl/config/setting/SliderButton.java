@@ -46,6 +46,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     @Override
     public void render(DrawContext context, float ix, float iy, float mouseX, float mouseY, float delta)
     {
+        setHeight(RenderManager.textHeight() + 4.0f);
         x = ix;
         y = iy;
         //

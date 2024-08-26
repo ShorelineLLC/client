@@ -117,6 +117,7 @@ public class ModuleButton extends Button
     public void render(DrawContext context, float ix, float iy, float mouseX,
                        float mouseY, float delta)
     {
+        setHeight(RenderManager.textHeight() + 4.0f);
         x = ix;
         y = iy;
         float scaledTime = 1.0f;

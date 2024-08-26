@@ -42,6 +42,7 @@ public class ColorButton extends ConfigButton<Color>
     public void render(DrawContext context, float ix, float iy, float mouseX,
                        float mouseY, float delta)
     {
+        setHeight(RenderManager.textHeight() + 4.0f);
         x = ix;
         y = iy;
         int originalColor = ((ColorConfig) config).getRgb();

@@ -91,6 +91,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
     @Override
     public void render(DrawContext context, float mouseX, float mouseY, float delta)
     {
+        setHeight(RenderManager.textHeight() + 6.0f);
         if (drag)
         {
             x += ClickGuiScreen.MOUSE_X - px;

@@ -525,4 +525,13 @@ public class RenderManager implements Globals
         }
         return mc.textRenderer.getWidth(text);
     }
+
+    public static int textHeight()
+    {
+        if (FontModule.getInstance().isEnabled() && Fonts.CLIENT != null)
+        {
+            return (int) Fonts.CLIENT.getFontHeight();
+        }
+        return mc.textRenderer.fontHeight;
+    }
 }
