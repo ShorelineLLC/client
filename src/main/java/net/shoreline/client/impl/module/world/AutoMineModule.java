@@ -300,14 +300,6 @@ public class AutoMineModule extends CombatModule
         {
             if (data.getState().isAir())
             {
-                // Once we broke the block that overrode that the auto city, we can allow the module
-                // to auto mine "city" blocks
-                if (manualOverride)
-                {
-                    manualOverride = false;
-                    miningQueue.remove(data);
-                    return;
-                }
                 data.resetBreakTime();
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(1000)))
@@ -323,7 +315,7 @@ public class AutoMineModule extends CombatModule
             {
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                 {
-                    continue;
+                    return;
                 }
                 Managers.INVENTORY.setSlot(data.getSlot());
                 if (!data.hasAttemptedBreak())
@@ -342,6 +334,14 @@ public class AutoMineModule extends CombatModule
         }
         if (miningData2.getState().isAir())
         {
+            // Once we broke the block that overrode that the auto city, we can allow the module
+            // to auto mine "city" blocks
+            if (manualOverride)
+            {
+                manualOverride = false;
+                miningQueue.remove(miningData2);
+                return;
+            }
             if (instantConfig.getValue())
             {
                 if (miningData2 instanceof AutoMiningData && !autoRemineConfig.getValue())
@@ -544,7 +544,6 @@ public class AutoMineModule extends CombatModule
             return;
         }
         queueMiningData(new ManualMiningData(pos, direction));
-        manualOverride = true;
     }
 
     private void queueMiningData(MiningData data)
@@ -565,32 +564,6 @@ public class AutoMineModule extends CombatModule
         if (startMining(data, floor))
         {
             miningQueue.addFirst(data);
-        }
-    }
-
-    private void removeQueuedMine()
-    {
-        miningQueue.remove();
-        updateManualOverride();
-    }
-
-    private void removeQueuedMine(MiningData data)
-    {
-        miningQueue.remove(data);
-        updateManualOverride();
-    }
-
-    private void removeIfQueuedMine(Predicate<MiningData> dataPredicate)
-    {
-        miningQueue.removeIf(dataPredicate);
-        updateManualOverride();
-    }
-
-    private void updateManualOverride()
-    {
-        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
-        {
-            manualOverride = false;
         }
     }
 
@@ -668,6 +641,32 @@ public class AutoMineModule extends CombatModule
                 return calc.pos().equals(pos);
             }
             return false;
+        }
+    }
+
+    private void removeQueuedMine()
+    {
+        miningQueue.remove();
+        updateManualOverride();
+    }
+
+    private void removeQueuedMine(MiningData data)
+    {
+        miningQueue.remove(data);
+        updateManualOverride();
+    }
+
+    private void removeIfQueuedMine(Predicate<MiningData> dataPredicate)
+    {
+        miningQueue.removeIf(dataPredicate);
+        updateManualOverride();
+    }
+
+    private void updateManualOverride()
+    {
+        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
+        {
+            manualOverride = false;
         }
     }
 
@@ -830,7 +829,7 @@ public class AutoMineModule extends CombatModule
         };
     }
 
-    public class ManualMiningData extends MiningData
+    public static class ManualMiningData extends MiningData
     {
         public ManualMiningData(BlockPos pos, Direction direction)
         {
@@ -838,7 +837,7 @@ public class AutoMineModule extends CombatModule
         }
     }
 
-    public class AutoMiningData extends MiningData
+    public static class AutoMiningData extends MiningData
     {
         public AutoMiningData(BlockPos pos, Direction direction)
         {
