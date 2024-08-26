@@ -189,11 +189,6 @@ public class ColorConfig extends Config<Color>
      */
     public Color parseColor(String colorString)
     {
-        if (colorString.startsWith("0x"))
-        {
-            colorString = colorString.substring(2);
-            return new Color((int) Long.parseLong(colorString, 16), true);
-        }
-        throw new IllegalArgumentException("Unknown color: " + colorString);
+        return new Color((int) Long.parseLong(colorString, 16), true);
     }
 }
