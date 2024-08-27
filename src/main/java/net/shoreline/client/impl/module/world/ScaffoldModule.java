@@ -226,7 +226,7 @@ public final class ScaffoldModule extends RotationModule
 
     private BlockData getBlockData(boolean hold)
     {
-        int posY = (int) Math.floor(mc.player.getY()) - 1;
+        int posY = (int) Math.round(mc.player.getY()) - 1;
         if (keepYConfig.getValue() && MovementUtil.isInputtingMovement())
         {
             if (mc.player.isOnGround() || groundPosY == -1)
