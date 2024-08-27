@@ -88,6 +88,7 @@ public final class ModuleManager
                 new PortalGodModeModule(),
                 new RaytraceResolverModule(),
                 new ReachModule(),
+                new SwingModule(),
                 // Misc
                 new AntiAFKModule(),
                 new AntiAimModule(),

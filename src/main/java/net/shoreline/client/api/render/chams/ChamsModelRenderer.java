@@ -26,6 +26,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.model.StaticBipedEntityModel;
+import net.shoreline.client.impl.module.exploit.SwingModule;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
 import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.init.Managers;
@@ -476,7 +477,7 @@ public class ChamsModelRenderer implements Globals
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees((mc.player.getPitch(tickDelta) - h1) * 0.1f));
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((mc.player.getYaw(tickDelta) - i1) * 0.1f));
         float f1 = mc.player.getHandSwingProgress(tickDelta);
-        Hand hand = MoreObjects.firstNonNull(mc.player.preferredHand, Hand.MAIN_HAND);
+        Hand hand = SwingModule.getInstance().isEnabled() ? SwingModule.getInstance().getPrevPreferredHand() : MoreObjects.firstNonNull(mc.player.preferredHand, Hand.MAIN_HAND);
         boolean bl2;
         ItemStack itemStack = mc.player.getMainHandStack();
         ItemStack itemStack2 = mc.player.getOffHandStack();
@@ -510,7 +511,8 @@ public class ChamsModelRenderer implements Globals
         if (handRenderType.renderMainHand)
         {
             boolean bl1 = hand == Hand.MAIN_HAND;
-            j = bl1 ? f1 : 0.0f;
+            boolean bl3 = mc.player.preferredHand == Hand.MAIN_HAND;
+            j = bl3 ? f1 : 0.0f;
             k = 1.0f - MathHelper.lerp(tickDelta, mc.gameRenderer.firstPersonRenderer.prevEquipProgressMainHand, mc.gameRenderer.firstPersonRenderer.equipProgressMainHand);
             Arm arm = bl1 ? mc.player.getMainArm() : mc.player.getMainArm().getOpposite();
             if (itemStack.isEmpty() && bl1 && !mc.player.isInvisible())
@@ -521,9 +523,10 @@ public class ChamsModelRenderer implements Globals
         if (handRenderType.renderOffHand)
         {
             boolean bl1 = hand == Hand.OFF_HAND;
-            j = bl1 ? f1 : 0.0f;
+            boolean bl3 = mc.player.preferredHand == Hand.MAIN_HAND;
+            j = bl3 ? f1 : 0.0f;
             k = 1.0f - MathHelper.lerp(tickDelta, mc.gameRenderer.firstPersonRenderer.prevEquipProgressOffHand, mc.gameRenderer.firstPersonRenderer.equipProgressOffHand);
-            Arm arm = bl1 ? mc.player.getMainArm() : mc.player.getMainArm().getOpposite();
+            Arm arm = bl1 ? mc.player.getMainArm().getOpposite() : mc.player.getMainArm();
             if (itemStack.isEmpty() && bl1 && !mc.player.isInvisible())
             {
                 renderFirstPersonItem(matrixStack, tickDelta, playerEntityRenderer, arm, j, k, lineColor, color, lineWidth, lines, fill, shine);
