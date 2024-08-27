@@ -21,22 +21,10 @@ public class RenderLayersClient implements Globals
     public static final Identifier SHULKER_BOXES_ATLAS_TEXTURE = new Identifier("textures/atlas/shulker_boxes.png");
     public static final Identifier CHEST_ATLAS_TEXTURE = new Identifier("textures/atlas/chest.png");
 
-    public static final VertexFormat POSITION_COLOR_TEXTURE_OVERLAY = new VertexFormat((ImmutableMap) ImmutableMap.builder()
-            .put("Position", VertexFormats.POSITION_ELEMENT)
-            .put("Color", VertexFormats.COLOR_ELEMENT)
-            .put("UV0", VertexFormats.TEXTURE_ELEMENT)
-            .put("UV1", VertexFormats.OVERLAY_ELEMENT)
-            .put("Padding", VertexFormats.PADDING_ELEMENT)
-            .put("UV2", VertexFormats.LIGHT_ELEMENT)
-            .put("Normal", VertexFormats.NORMAL_ELEMENT).build());
     public static final RenderLayer GLINT = RenderLayer.of("glint", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.MultiPhaseParameters.builder()
             .program(RenderPhase.GLINT_PROGRAM).texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, true, false))
             .writeMaskState(RenderPhase.COLOR_MASK).cull(RenderPhase.DISABLE_CULLING).depthTest(new DepthTest()).transparency(RenderPhase.GLINT_TRANSPARENCY).texturing(RenderPhase.GLINT_TEXTURING).build(false));
     // Using custom lightmap for 3d rendering
-    public static final RenderLayer ITEM_ENTITY_TRANSLUCENT_CULL = RenderLayer.of("item_entity_translucent_cull", POSITION_COLOR_TEXTURE_OVERLAY, VertexFormat.DrawMode.QUADS, 1536,
-            RenderLayer.MultiPhaseParameters.builder().program(RenderPhase.ITEM_ENTITY_TRANSLUCENT_CULL_PROGRAM).texture(RenderPhase.BLOCK_ATLAS_TEXTURE).lightmap(new Lightmap())
-                    .target(RenderPhase.ITEM_ENTITY_TARGET).writeMaskState(RenderPhase.ALL_MASK).build(true));
-
     public static final Function<Identifier, RenderLayer> ENTITY_NO_OUTLINE = Util.memoize((texture) -> {
         RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_NO_OUTLINE_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY).cull(RenderLayer.DISABLE_CULLING).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).writeMaskState(RenderLayer.COLOR_MASK).build(false);
         return RenderLayer.of("entity_no_outline", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, false, true, multiPhaseParameters);
@@ -56,10 +44,6 @@ public class RenderLayersClient implements Globals
     public static final Function<Identifier, RenderLayer> ENTITY_TRANSLUCENT_CULL = Util.memoize((texture) -> {
         RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_TRANSLUCENT_CULL_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).build(true);
         return RenderLayer.of("entity_translucent_cull", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);
-    });
-    public static final Function<Identifier, RenderLayer> ENTITY_TRANSLUCENT_CULL_2 = Util.memoize((texture) -> {
-        RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_TRANSLUCENT_CULL_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).build(true);
-        return RenderLayer.of("entity_translucent_cull", POSITION_COLOR_TEXTURE_OVERLAY, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);
     });
     public static final Function<Identifier, RenderLayer> ENTITY_CUTOUT = Util.memoize((texture) -> {
         RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_CUTOUT_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.NO_TRANSPARENCY).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).build(true);

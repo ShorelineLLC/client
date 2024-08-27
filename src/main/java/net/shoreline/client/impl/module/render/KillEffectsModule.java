@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.client.particle.FireworksSparkParticle;
+import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
@@ -102,6 +103,10 @@ public class KillEffectsModule extends ToggleModule
 
     private void addExplosionParticle(double x, double y, double z, double velocityX, double velocityY, double velocityZ)
     {
+        if (mc.particleManager == null || mc.world == null)
+        {
+            return;
+        }
         FireworksSparkParticle.Explosion explosion = (FireworksSparkParticle.Explosion) mc.particleManager.addParticle(ParticleTypes.FIREWORK, x, y, z, velocityX, velocityY, velocityZ);
         if (explosion == null)
         {

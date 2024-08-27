@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.ModelIdentifier;
@@ -24,8 +25,11 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -51,8 +55,13 @@ import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryStack;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -380,7 +389,7 @@ public class NametagsModule extends ToggleModule
         matrixStack.scale(0.5f, 0.5f, 0.5f);
         if (itemNameConfig.getValue())
         {
-            renderItemName(matrixStack, heldItem, 0, durabilityConfig.getValue() ? m2 - 9.0f : m2 - 4.5f);
+            renderItemName(matrixStack, heldItem, 0, durabilityConfig.getValue() ? m2 - 10.0f : m2 - 5.5f);
         }
         matrixStack.scale(2.0f, 2.0f, 2.0f);
     }
@@ -414,8 +423,72 @@ public class NametagsModule extends ToggleModule
         }
         else
         {
-            ((AccessorItemRenderer) mc.getItemRenderer()).hookRenderBakedItemModel(bakedModel, stack, light,
-                    overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayersClient.ITEM_ENTITY_TRANSLUCENT_CULL, stack.hasGlint()));
+            renderBakedItemModel(bakedModel, stack, light, overlay, matrices,
+                    getItemGlintConsumer(vertexConsumers, RenderLayersClient.ENTITY_TRANSLUCENT_CULL.apply(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE), stack.hasGlint()));
+        }
+    }
+
+    private void renderBakedItemModel(BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices)
+    {
+        Random random = Random.create();
+        long l = 42L;
+        for (Direction direction : Direction.values())
+        {
+            random.setSeed(42L);
+            renderBakedItemQuads(matrices, vertices, model.getQuads(null, direction, random), stack, light, overlay);
+        }
+        random.setSeed(42L);
+        renderBakedItemQuads(matrices, vertices, model.getQuads(null, null, random), stack, light, overlay);
+    }
+
+    private void renderBakedItemQuads(MatrixStack matrices, VertexConsumer vertices, List<BakedQuad> quads, ItemStack stack, int light, int overlay)
+    {
+        MatrixStack.Entry entry = matrices.peek();
+        for (BakedQuad bakedQuad : quads)
+        {
+            int i = -1;
+            float f = (float)(i >> 16 & 0xFF) / 255.0f;
+            float g = (float)(i >> 8 & 0xFF) / 255.0f;
+            float h = (float)(i & 0xFF) / 255.0f;
+            quad(vertices, entry, bakedQuad, f, g, h, light, overlay);
+        }
+    }
+
+    public void quad(VertexConsumer vertexConsumer, MatrixStack.Entry matrixEntry, BakedQuad quad, float red, float green, float blue, int light, int overlay)
+    {
+        float[] fs = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+        int[] is = new int[]{light, light, light, light};
+        int[] js = quad.getVertexData();
+        Vec3i vec3i = quad.getFace().getVector();
+        Matrix4f matrix4f = matrixEntry.getPositionMatrix();
+        Vector3f vector3f = matrixEntry.getNormalMatrix().transform(new Vector3f(vec3i.getX(), vec3i.getY(), vec3i.getZ()));
+        int i = 8;
+        int j = js.length / 8;
+        try (MemoryStack memoryStack = MemoryStack.stackPush())
+        {
+            ByteBuffer byteBuffer = memoryStack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
+            IntBuffer intBuffer = byteBuffer.asIntBuffer();
+            for (int k = 0; k < j; ++k)
+            {
+                float q;
+                float p;
+                float o;
+                float n;
+                float m;
+                intBuffer.clear();
+                intBuffer.put(js, k * 8, 8);
+                float f = byteBuffer.getFloat(0);
+                float g = byteBuffer.getFloat(4);
+                float h = byteBuffer.getFloat(8);
+                o = fs[k] * red;
+                p = fs[k] * green;
+                q = fs[k] * blue;
+                int r = is[k];
+                m = byteBuffer.getFloat(16);
+                n = byteBuffer.getFloat(20);
+                Vector4f vector4f = matrix4f.transform(new Vector4f(f, g, h, 1.0f));
+                vertexConsumer.vertex(vector4f.x(), vector4f.y(), vector4f.z(), o, p, q, 1.0f, m, n, overlay, r, 1.0f, 1.0f, 1.0f);
+            }
         }
     }
 
