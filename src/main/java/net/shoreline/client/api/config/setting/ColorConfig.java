@@ -155,7 +155,7 @@ public class ColorConfig extends Config<Color>
     {
         JsonObject configObj = super.toJson();
         // hex value for readability
-        configObj.addProperty("value", "0x" + Integer.toHexString(getRgb()));
+        configObj.addProperty("value", Integer.toHexString(getRgb()));
         configObj.addProperty("global", global);
         return configObj;
     }
