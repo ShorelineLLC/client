@@ -26,7 +26,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.model.StaticBipedEntityModel;
-import net.shoreline.client.impl.module.exploit.SwingModule;
+import net.shoreline.client.impl.module.misc.SwingModule;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
 import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.init.Managers;

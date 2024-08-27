@@ -88,7 +88,6 @@ public final class ModuleManager
                 new PortalGodModeModule(),
                 new RaytraceResolverModule(),
                 new ReachModule(),
-                new SwingModule(),
                 // Misc
                 new AntiAFKModule(),
                 new AntiAimModule(),
@@ -116,7 +115,7 @@ public final class ModuleManager
                 new ShulkerceptionModule(),
                 new SkinBlinkModule(),
                 new SpammerModule(),
-                // new SkinGrabberModule(),
+                new SwingModule(),
                 new TimerModule(),
                 new TrueDurabilityModule(),
                 new UnfocusedFPSModule(),

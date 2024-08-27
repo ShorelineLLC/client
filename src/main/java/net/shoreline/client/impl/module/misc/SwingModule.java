@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.exploit;
+package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
@@ -25,7 +25,7 @@ public class SwingModule extends ToggleModule
 
     public SwingModule()
     {
-        super("Swing", "Modifies the swinging hand", ModuleCategory.EXPLOITS);
+        super("Swing", "Modifies the swinging hand", ModuleCategory.MISCELLANEOUS);
         INSTANCE = this;
     }
 
