@@ -136,7 +136,8 @@ public class NametagsModule extends ToggleModule
                 double rx = player.getX() - pinterpolate.getX();
                 double ry = player.getY() - pinterpolate.getY();
                 double rz = player.getZ() - pinterpolate.getZ();
-                int width = RenderManager.textWidth(info) + (isOnlineUser(player) ? 10 : 0);
+                float w1 = FontModule.getInstance().isEnabled() ? Fonts.CLIENT_UNSCALED.getStringWidth(info) : mc.textRenderer.getWidth(info);
+                int width = (int) (w1 + (isOnlineUser(player) ? 10 : 0));
                 float hwidth = width / 2.0f;
                 double dx = (pos.getX() - interpolate.getX()) - rx;
                 double dy = (pos.getY() - interpolate.getY()) - ry;
