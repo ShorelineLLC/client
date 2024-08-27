@@ -298,7 +298,7 @@ public class NametagsModule extends ToggleModule
     {
         if (FontModule.getInstance().isEnabled())
         {
-            Fonts.CLIENT.drawStringWithShadow(matrices, text, x, y + 1.0f, color);
+            Fonts.CLIENT_UNSCALED.drawStringWithShadow(matrices, text, x, y + 1.0f, color);
         }
         else
         {
@@ -354,16 +354,18 @@ public class NametagsModule extends ToggleModule
                 renderItemOverlay(matrixStack, stack, (int) n10, (int) y);
 
                 matrixStack.scale(0.5f, 0.5f, 0.5f);
-                if (durabilityConfig.getValue())
-                {
-                    renderDurability(matrixStack, stack, n10 + 2.0f, m2 - 4.5f);
-                }
                 if (enchantmentsConfig.getValue())
                 {
                     renderEnchants(matrixStack, stack, n10 + 2.0f, m2);
                 }
                 matrixStack.scale(2.0f, 2.0f, 2.0f);
             }
+            matrixStack.scale(0.5f, 0.5f, 0.5f);
+            if (durabilityConfig.getValue())
+            {
+                renderDurability(matrixStack, stack, n10 + 2.0f, m2 - 4.5f);
+            }
+            matrixStack.scale(2.0f, 2.0f, 2.0f);
             // int n4 = (n11 > 4) ? ((n11 - 4) * 8 / 2) : 0;
             // mc.getItemRenderer().renderInGui(matrixStack, mc.textRenderer, stack, n10, m2);
             n10 += 16;
@@ -403,7 +405,7 @@ public class NametagsModule extends ToggleModule
             }
         }
         bakedModel.getTransformation().getTransformation(renderMode).apply(false, matrices);
-        matrices.translate(-0.5f, -0.5f, -0.5f);
+        matrices.translate(-0.5f, -0.5f, 0.0f);
         if (bakedModel.isBuiltin() || stack.isOf(Items.TRIDENT) && !bl)
         {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookGetBuiltinModelItemRenderer().render(
@@ -412,7 +414,7 @@ public class NametagsModule extends ToggleModule
         else
         {
             ((AccessorItemRenderer) mc.getItemRenderer()).hookRenderBakedItemModel(bakedModel, stack, light,
-                    overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayersClient.ENTITY_TRANSLUCENT_CULL_2.apply(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE), stack.hasGlint()));
+                    overlay, matrices, getItemGlintConsumer(vertexConsumers, RenderLayersClient.ITEM_ENTITY_TRANSLUCENT_CULL, stack.hasGlint()));
         }
     }
 

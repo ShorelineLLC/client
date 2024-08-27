@@ -10,6 +10,7 @@ public class Fonts
     //
     public static final VanillaTextRenderer VANILLA = new VanillaTextRenderer();
     public static AWTFontRenderer CLIENT;
+    public static AWTFontRenderer CLIENT_UNSCALED;
     //
     private static boolean initialized;
     public static float FONT_SIZE = 9.0f;
@@ -20,7 +21,8 @@ public class Fonts
         {
             return;
         }
-        CLIENT = new AWTFontRenderer(Loader.getResource("assets/shoreline/font/verdana.ttf"), 9.0f);
+        CLIENT = new AWTFontRenderer(Loader.getResource("assets/shoreline/font/verdana.ttf"), FONT_SIZE);
+        CLIENT_UNSCALED = new AWTFontRenderer(Loader.getResource("assets/shoreline/font/verdana.ttf"), 9.0f);
         Shoreline.info("Loaded fonts!");
         initialized = true;
     }

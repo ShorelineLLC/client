@@ -339,7 +339,7 @@ public class RenderManager implements Globals
 
             if (FontModule.getInstance().isEnabled())
             {
-                Fonts.CLIENT.drawStringWithShadow(matrices, text, -hwidth, 0.0f, color);
+                Fonts.CLIENT_UNSCALED.drawStringWithShadow(matrices, text, -hwidth, 0.0f, color);
             }
             else
             {
