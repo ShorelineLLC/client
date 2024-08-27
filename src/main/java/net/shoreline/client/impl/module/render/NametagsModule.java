@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
@@ -443,10 +444,15 @@ public class NametagsModule extends ToggleModule
 
     private void renderBakedItemQuads(MatrixStack matrices, VertexConsumer vertices, List<BakedQuad> quads, ItemStack stack, int light, int overlay)
     {
+        boolean bl = !stack.isEmpty();
         MatrixStack.Entry entry = matrices.peek();
         for (BakedQuad bakedQuad : quads)
         {
             int i = -1;
+            if (bl && bakedQuad.hasColor())
+            {
+                i = ((AccessorItemRenderer) mc.getItemRenderer()).hookGetItemColors().getColor(stack, bakedQuad.getColorIndex());
+            }
             float f = (float)(i >> 16 & 0xFF) / 255.0f;
             float g = (float)(i >> 8 & 0xFF) / 255.0f;
             float h = (float)(i & 0xFF) / 255.0f;
@@ -456,12 +462,12 @@ public class NametagsModule extends ToggleModule
 
     public void quad(VertexConsumer vertexConsumer, MatrixStack.Entry matrixEntry, BakedQuad quad, float red, float green, float blue, int light, int overlay)
     {
-        float[] fs = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
-        int[] is = new int[]{light, light, light, light};
+        float[] fs = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
+        int[] is = new int[] {light, light, light, light};
         int[] js = quad.getVertexData();
-        Vec3i vec3i = quad.getFace().getVector();
         Matrix4f matrix4f = matrixEntry.getPositionMatrix();
-        Vector3f vector3f = matrixEntry.getNormalMatrix().transform(new Vector3f(vec3i.getX(), vec3i.getY(), vec3i.getZ()));
+        // Vec3i vec3i = quad.getFace().getVector();
+        // Vector3f vector3f = matrixEntry.getNormalMatrix().transform(new Vector3f(vec3i.getX(), vec3i.getY(), vec3i.getZ()));
         int i = 8;
         int j = js.length / 8;
         try (MemoryStack memoryStack = MemoryStack.stackPush())
