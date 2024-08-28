@@ -3,7 +3,9 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -85,16 +87,21 @@ public final class AirInteractModule extends ToggleModule
             {
                 return;
             }
-            if (grimConfig.getValue())
-            {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-                        blockHitResult.getBlockPos(), Direction.DOWN));
-            }
             ((AccessorMinecraftClient) mc).hookSetItemUseCooldown(4);
             airPlaceTicks = 4;
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
-            mc.player.swingHand(Hand.MAIN_HAND);
+            if (grimConfig.getValue())
+            {
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, blockHitResult.getBlockPos(), blockHitResult.getSide()));
+                Managers.NETWORK.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, blockHitResult, 0));
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, blockHitResult.getBlockPos(), blockHitResult.getSide()));
+                mc.player.swingHand(Hand.MAIN_HAND);
+            }
+            else
+            {
+                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
+                mc.player.swingHand(Hand.MAIN_HAND);
+            }
         }
     }
 
