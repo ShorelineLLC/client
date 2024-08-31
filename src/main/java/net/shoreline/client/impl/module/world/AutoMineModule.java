@@ -504,8 +504,8 @@ public class AutoMineModule extends CombatModule
             set.getValue().setState(false);
             int boxAlpha = (int) (40 * set.getValue().getFactor());
             int lineAlpha = (int) (145 * set.getValue().getFactor());
-            int boxColor = data.getBlockDamage() >= 0.95f ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
-            int lineColor = data.getBlockDamage() >= 0.95f ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
+            int boxColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
+            int lineColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
             BlockPos mining = data.getPos();
             VoxelShape outlineShape = VoxelShapes.fullCube();
             if (!data.isInstantRemine())
@@ -519,7 +519,7 @@ public class AutoMineModule extends CombatModule
                     mining.getY() + render1.maxY, mining.getZ() + render1.maxZ);
             Vec3d center = render.getCenter();
             float total = isDataPacketMine(data) ? 1.0f : speedConfig.getValue();
-            float scale = data.isInstantRemine() ? 1.0f : MathHelper.clamp((data.getBlockDamage() + (data.getBlockDamage() - data.getLastDamage()) * event.getTickDelta()) / total, 0.0f, 1.0f);
+            float scale = data.isInstantRemine() || data.getState().isAir() ? 1.0f : MathHelper.clamp((data.getBlockDamage() + (data.getBlockDamage() - data.getLastDamage()) * event.getTickDelta()) / total, 0.0f, 1.0f);
             double dx = (render1.maxX - render1.minX) / 2.0;
             double dy = (render1.maxY - render1.minY) / 2.0;
             double dz = (render1.maxZ - render1.minZ) / 2.0;
@@ -529,6 +529,10 @@ public class AutoMineModule extends CombatModule
         }
         for (MiningData data : miningQueue)
         {
+            if (data.getState().isAir() && !data.isInstantRemine())
+            {
+                continue;
+            }
             Animation animation = new Animation(true, fadeTimeConfig.getValue());
             fadeList.put(data, animation);
         }
@@ -713,6 +717,11 @@ public class AutoMineModule extends CombatModule
             }
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            if (!grimConfig.getValue())
+            {
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+            }
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             packetMines.add(data.getPos());
