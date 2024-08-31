@@ -47,6 +47,24 @@
       "values": [ 1.0, 1.0, 1.0, 1.0 ]
     },
     {
+      "name": "samples",
+      "type": "int",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "steps",
+      "type": "int",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "dots",
+      "type": "int",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
       "name": "dotRadius",
       "type": "int",
       "count": 1,
@@ -60,6 +78,12 @@
     },
     {
       "name": "glow",
+      "type": "int",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "glowRadius",
       "type": "float",
       "count": 1,
       "values": [ 1.0 ]

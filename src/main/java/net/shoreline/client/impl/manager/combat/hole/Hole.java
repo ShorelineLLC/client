@@ -7,6 +7,7 @@ import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -117,6 +118,16 @@ public class Hole implements Position
             return origin.toCenterPos();
         }
         return Vec3d.of(center);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof Hole hole)
+        {
+            return new HashSet<>(hole.getHoleOffsets()).containsAll(holeOffsets);
+        }
+        return false;
     }
 
     /**

@@ -18,10 +18,7 @@ import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author linus
@@ -176,7 +173,7 @@ public class HoleESPModule extends ToggleModule
             {
                 return false;
             }
-            return new HashSet<>(hole.getHoleOffsets()).containsAll(hole1.getHoleOffsets());
+            return hole.equals(hole1);
         });
     }
 
