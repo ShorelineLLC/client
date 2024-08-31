@@ -88,7 +88,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Float> breakSpeedConfig = register(new NumberConfig<>("BreakSpeed", "Speed to break crystals", 0.1f, 18.0f, 20.0f));
     Config<Float> attackDelayConfig = register(new NumberConfig<>("AttackDelay", "Added delays", 0.0f, 0.0f, 5.0f));
     Config<Integer> attackFactorConfig = register(new NumberConfig<>("AttackFactor", "Factor of attack delay", 0, 0, 3, () -> attackDelayConfig.getValue() > 0.0));
-    Config<Float> attackLimitConfig = register(new NumberConfig<>("AttackLimit", "Attacks before considering a crystal unbreakable", 0.5f, 1.5f, 10.0f));
+    Config<Float> attackLimitConfig = register(new NumberConfig<>("AttackLimit", "Attacks before considering a crystal unbreakable", 0.5f, 1.5f, 20.0f));
     Config<Float> randomSpeedConfig = register(new NumberConfig<>("RandomSpeed", "Randomized delay for breaking crystals", 0.0f, 0.0f, 10.0f));
     Config<Boolean> breakDelayConfig = register(new BooleanConfig("BreakDelay", "Uses attack latency to calculate break delays", false));
     Config<Float> breakTimeoutConfig = register(new NumberConfig<>("BreakTimeout", "Time after waiting for the average break time before considering a crystal attack failed", 0.0f, 3.0f, 10.0f, () -> breakDelayConfig.getValue()));

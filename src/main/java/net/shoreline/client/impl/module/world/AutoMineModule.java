@@ -726,9 +726,14 @@ public class AutoMineModule extends CombatModule
             }
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            if (!grimConfig.getValue())
+            {
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+            }
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            if (floor)
+            if (floor && grimConfig.getValue())
             {
                 data.setFloorMine();
                 manualOverride = true;
