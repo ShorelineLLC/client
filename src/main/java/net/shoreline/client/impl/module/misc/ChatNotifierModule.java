@@ -136,7 +136,7 @@ public final class ChatNotifierModule extends ToggleModule
         }
         String playerName = event.getEntity().getName().getString();
         boolean isFriend = Managers.SOCIAL.isFriend(playerName);
-        if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player)
+        if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player || playerName.equalsIgnoreCase("ShaderPlayer"))
         {
             return;
         }
@@ -152,7 +152,7 @@ public final class ChatNotifierModule extends ToggleModule
         }
         String playerName = event.getEntity().getName().getString();
         boolean isFriend = Managers.SOCIAL.isFriend(playerName);
-        if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player)
+        if (isFriend && !friendsConfig.getValue() || event.getEntity() == mc.player || playerName.equalsIgnoreCase("ShaderPlayer"))
         {
             return;
         }
