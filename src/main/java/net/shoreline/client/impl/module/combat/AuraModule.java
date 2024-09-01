@@ -349,7 +349,7 @@ public class AuraModule extends RotationModule
 
         if (silentRotateConfig.getValue())
         {
-            Managers.ROTATION.setRotationSilentSync(true);
+            Managers.ROTATION.setRotationSilentSync();
         }
         return true;
     }

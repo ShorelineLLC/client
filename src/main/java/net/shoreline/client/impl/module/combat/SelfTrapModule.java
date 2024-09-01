@@ -161,7 +161,11 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             // This may not work on all servers
             placeBlock(targetPos, slot);
         }
-        Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+
+        if (grimConfig.getValue())
+        {
+            Managers.ROTATION.setRotationSilentSync();
+        }
     }
 
     @EventListener
@@ -221,7 +225,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         {
             if (rotateConfig.getValue() && state)
             {
-                Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
+                Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
             }
         });
         packets.put(pos, System.currentTimeMillis());
@@ -244,7 +248,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             if (rotateConfig.getValue())
             {
                 float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalEntity.getPos());
-                Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], grimConfig.getValue());
+                Managers.ROTATION.setRotationSilent(rotations[0], rotations[1]);
             }
             Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
             mc.player.swingHand(Hand.MAIN_HAND);

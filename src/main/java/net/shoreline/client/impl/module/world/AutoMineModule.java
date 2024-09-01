@@ -793,9 +793,9 @@ public class AutoMineModule extends CombatModule
         {
             swapSync(slot);
         }
-        if (rotateConfig.getValue())
+        if (rotateConfig.getValue() && grimConfig.getValue())
         {
-            Managers.ROTATION.setRotationSilentSync(true);
+            Managers.ROTATION.setRotationSilentSync();
         }
     }
 

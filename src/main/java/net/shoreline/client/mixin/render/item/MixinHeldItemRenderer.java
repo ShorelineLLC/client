@@ -13,18 +13,21 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.shoreline.client.impl.event.render.item.EatTransformationEvent;
-import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.render.item.RenderArmEvent;
 import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
+import net.shoreline.client.impl.event.render.item.RenderSwingAnimationEvent;
+import net.shoreline.client.util.Globals;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HeldItemRenderer.class)
-public class MixinHeldItemRenderer
+public class MixinHeldItemRenderer implements Globals
 {
 
     @Shadow
@@ -34,6 +37,12 @@ public class MixinHeldItemRenderer
     @Shadow
     @Final
     private MinecraftClient client;
+
+    @Shadow
+    public float equipProgressMainHand;
+
+    @Shadow
+    private ItemStack mainHand;
 
     /**
      * @param matrices
@@ -49,6 +58,17 @@ public class MixinHeldItemRenderer
         RenderArmEvent renderArmEvent = new RenderArmEvent(matrices, vertexConsumers, light, equipProgress, swingProgress, arm, playerEntityRenderer);
         EventBus.INSTANCE.dispatch(renderArmEvent);
         if (renderArmEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderFirstPersonItem", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderFirstPersonItem$2(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci)
+    {
+        RenderFirstPersonEvent.Head renderFirstPersonEvent = new RenderFirstPersonEvent.Head(hand, item, equipProgress, matrices);
+        EventBus.INSTANCE.dispatch(renderFirstPersonEvent);
+        if (renderFirstPersonEvent.isCanceled())
         {
             ci.cancel();
         }
@@ -100,5 +120,15 @@ public class MixinHeldItemRenderer
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float)i * h * 90.0f));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(h * 10.0f));
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float)i * h * 30.0f));
+    }
+
+    @ModifyArg(method = "updateHeldItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F", ordinal = 2), index = 0)
+    private float hookEquipProgressMainhand(float value)
+    {
+        RenderSwingAnimationEvent renderSwingAnimation = new RenderSwingAnimationEvent();
+        EventBus.INSTANCE.dispatch(renderSwingAnimation);
+        float f = mc.player.getAttackCooldownProgress(1.0f);
+        float modified = renderSwingAnimation.isCanceled() ? 1.0f : f * f * f;
+        return (ItemStack.areEqual(mainHand, mc.player.getMainHandStack()) ? modified : 0.0f) - equipProgressMainHand;
     }
 }

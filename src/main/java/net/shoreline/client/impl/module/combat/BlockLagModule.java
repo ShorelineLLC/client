@@ -41,6 +41,7 @@ public class BlockLagModule extends ObsidianPlacerModule
     public BlockLagModule()
     {
         super("BlockLag", "Lags you into a block", ModuleCategory.COMBAT);
+        unregister(grimConfig);
     }
 
     @Override
@@ -126,11 +127,7 @@ public class BlockLagModule extends ObsidianPlacerModule
             {
                 if (state)
                 {
-                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
-                }
-                else
-                {
-                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+                    Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
                 }
             }
         });

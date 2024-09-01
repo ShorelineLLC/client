@@ -128,11 +128,14 @@ public class AutoAnchorModule extends BlockPlacerModule
             {
                 if (state)
                 {
-                    Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
+                    Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
                 }
                 else
                 {
-                    Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+                    if (grimConfig.getValue())
+                    {
+                        Managers.ROTATION.setRotationSilentSync();
+                    }
                 }
             }
         });

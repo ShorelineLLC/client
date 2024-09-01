@@ -138,7 +138,7 @@ public final class ScaffoldModule extends RotationModule
                 {
                     if (grimConfig.getValue())
                     {
-                        Managers.ROTATION.setRotationSilent(rotations[0], rotations[1], true);
+                        Managers.ROTATION.setRotationSilent(rotations[0], rotations[1]);
                     }
                     else
                     {
@@ -149,7 +149,7 @@ public final class ScaffoldModule extends RotationModule
                 {
                     if (grimConfig.getValue())
                     {
-                        Managers.ROTATION.setRotationSilentSync(true);
+                        Managers.ROTATION.setRotationSilentSync();
                     }
                 }
             }

@@ -121,7 +121,11 @@ public class AutoWebModule extends BlockPlacerModule
             // This may not work on all servers
             placeWeb(targetPos, slot);
         }
-        Managers.ROTATION.setRotationSilentSync(grimConfig.getValue());
+
+        if (grimConfig.getValue())
+        {
+            Managers.ROTATION.setRotationSilentSync();
+        }
     }
 
     @EventListener
@@ -169,7 +173,7 @@ public class AutoWebModule extends BlockPlacerModule
         {
             if (rotateConfig.getValue() && state)
             {
-                Managers.ROTATION.setRotationSilent(angles[0], angles[1], grimConfig.getValue());
+                Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
             }
         });
     }
