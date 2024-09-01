@@ -50,8 +50,15 @@ public final class InteractionManager implements Globals
             direction = Direction.DOWN;
             if (grim)
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.DOWN));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
+                boolean result = placeBlock(pos, direction, slot, clientSwing, rotationCallback);
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
+                return result;
+            }
+            else
+            {
+                return placeBlock(pos, direction, slot, clientSwing, rotationCallback);
             }
         }
         if (direction == null)
@@ -82,8 +89,15 @@ public final class InteractionManager implements Globals
             direction = Direction.DOWN;
             if (grim)
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.DOWN));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
+                boolean result = placeBlock(pos, direction, slot, clientSwing, packet, rotationCallback);
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
+                return result;
+            }
+            else
+            {
+                return placeBlock(pos, direction, slot, clientSwing, packet, rotationCallback);
             }
         }
         if (direction == null)
