@@ -3,6 +3,7 @@ package net.shoreline.client.impl.event.render.item;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.shoreline.eventbus.annotation.Cancelable;
 import net.shoreline.eventbus.event.Event;
 
 public class RenderFirstPersonEvent extends Event
@@ -18,5 +19,14 @@ public class RenderFirstPersonEvent extends Event
         this.item = item;
         this.equipProgress = equipProgress;
         this.matrices = matrices;
+    }
+
+    @Cancelable
+    public static class Head extends RenderFirstPersonEvent
+    {
+        public Head(Hand hand, ItemStack item, float equipProgress, MatrixStack matrices)
+        {
+            super(hand, item, equipProgress, matrices);
+        }
     }
 }

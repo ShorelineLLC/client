@@ -26,6 +26,7 @@ import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.render.BobViewEvent;
 import net.shoreline.client.impl.event.render.item.RenderArmEvent;
+import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
 import net.shoreline.client.impl.manager.player.rotation.Rotation;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.RayCastUtil;
@@ -189,7 +190,7 @@ public class FreecamModule extends ToggleModule
     }
 
     @EventListener
-    public void onRenderArm(RenderArmEvent event)
+    public void onRenderArm(RenderFirstPersonEvent.Head event)
     {
         event.cancel();
     }

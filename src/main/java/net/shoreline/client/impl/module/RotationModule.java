@@ -44,7 +44,7 @@ public class RotationModule extends ToggleModule
 
     protected void setRotationSilent(float yaw, float pitch)
     {
-        Managers.ROTATION.setRotationSilent(yaw, pitch, true);
+        Managers.ROTATION.setRotationSilent(yaw, pitch);
     }
 
     /**
