@@ -14,7 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.shoreline.client.util.Globals;
 
-import java.util.List;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
@@ -70,8 +70,31 @@ public class ExplosionUtil implements Globals
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
+                                     final boolean ignoreTerrain,
+                                     final Set<BlockPos> ignoreBlocks)
+    {
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final boolean ignoreTerrain,
+                                     float power,
+                                     final Set<BlockPos> ignoreBlocks)
+    {
+        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity, ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE, ignoreBlocks);
+        double w = d / power;
+        double ac = (1.0 - w) * ab;
+        double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        return Math.max(0.0, dmg);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain,
-                                     final BlockPos... ignoreBlocks)
+                                     final Set<BlockPos> ignoreBlocks)
     {
         return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks);
     }
@@ -80,7 +103,7 @@ public class ExplosionUtil implements Globals
                                      final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain,
                                      float power,
-                                     final BlockPos... ignoreBlocks)
+                                     final Set<BlockPos> ignoreBlocks)
     {
         double d = Math.sqrt(entity.squaredDistanceTo(explosion));
         double ab = getExposure(explosion, entity, ignoreTerrain, ignoreBlocks);
@@ -207,9 +230,9 @@ public class ExplosionUtil implements Globals
     private static float getExposure(final Vec3d source,
                                      final Entity entity,
                                      final IgnoreTerrain ignoreTerrain,
-                                     final BlockPos... ignoreBlocks)
+                                     final Set<BlockPos> ignoreBlocks)
     {
-        RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain, List.of(ignoreBlocks));
+        RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain, ignoreBlocks);
         final Box box = entity.getBoundingBox();
         return getExposure(source, box, raycastFactory);
     }
@@ -286,7 +309,7 @@ public class ExplosionUtil implements Globals
         return 0f;
     }
 
-    private static RaycastFactory getRaycastFactory(IgnoreTerrain ignoreTerrain, List<BlockPos> ignoreBlocks)
+    private static RaycastFactory getRaycastFactory(IgnoreTerrain ignoreTerrain, Set<BlockPos> ignoreBlocks)
     {
         if (ignoreTerrain == IgnoreTerrain.BLAST)
         {

@@ -28,7 +28,6 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.RunTickEvent;
@@ -37,16 +36,18 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
+import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.EvictingQueue;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.PerSecondCounter;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -54,6 +55,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * @author linus
@@ -938,8 +940,17 @@ public class AutoCrystalModule extends RotationModule
                 {
                     continue;
                 }
-                double damage = ExplosionUtil.getDamageTo(entity,
-                        crystalDamageVec(pos), blockDestructionConfig.getValue());
+                double damage;
+                if (AutoMineModule.getInstance().isEnabled())
+                {
+                    damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos),
+                            blockDestructionConfig.getValue(), AutoMineModule.getInstance().getCompletedMines());
+                }
+                else
+                {
+                    damage = ExplosionUtil.getDamageTo(entity,
+                            crystalDamageVec(pos), blockDestructionConfig.getValue());
+                }
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;

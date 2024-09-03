@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
  */
 public class AutoMineModule extends CombatModule
 {
+    private static AutoMineModule INSTANCE;
 
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows mining while using items", false));
     Config<Boolean> autoConfig = register(new BooleanConfig("Auto", "Automatically mines nearby players feet", false));
@@ -85,6 +86,12 @@ public class AutoMineModule extends CombatModule
     public AutoMineModule()
     {
         super("AutoMine", "Automatically mines blocks", ModuleCategory.WORLD, 900);
+        INSTANCE = this;
+    }
+
+    public static AutoMineModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -630,7 +637,7 @@ public class AutoMineModule extends CombatModule
                 }
 
                 double damage = ExplosionUtil.getDamageTo(entity, off.toCenterPos(),
-                        ExplosionUtil.IgnoreTerrain.NONE, off);
+                        ExplosionUtil.IgnoreTerrain.NONE, Set.of(off));
                 if (damage > bestDamage)
                 {
                     bestDamage = damage;
@@ -882,6 +889,14 @@ public class AutoMineModule extends CombatModule
             case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
             case ALL -> true;
         };
+    }
+
+    public Set<BlockPos> getCompletedMines()
+    {
+        return miningQueue.stream()
+                .filter(d -> d.getBlockDamage() > 0.8f)
+                .map(MiningData::getPos)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     public static class ManualMiningData extends MiningData
