@@ -134,9 +134,21 @@ public class AutoMineModule extends CombatModule
         {
             return;
         }
+
+        // Remove any floor blocks
         if (doubleBreakConfig.getValue())
         {
-            clearMiningFloor();
+            for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
+            {
+                BlockPos miningFloor = pos.down();
+                if (packetMines.contains(miningFloor) && !mc.world.isAir(miningFloor))
+                {
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos.down(), Direction.UP));
+                    packetMines.remove(pos.down());
+                    removeIfQueuedMine(d -> d.getPos().equals(pos.down()));
+                }
+            }
         }
 
         if (autoConfig.getValue() && !manualOverride)
@@ -610,10 +622,12 @@ public class AutoMineModule extends CombatModule
     private PriorityQueue<AutoMineCalc> getMiningPosition(PlayerEntity entity)
     {
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
+        List<AutoMineCalc> phasePositions = getPhasePosition(mc.player);
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
         for (BlockPos blockPos : surroundBlocks)
         {
-            if (avoidSelfConfig.getValue() && SurroundModule.getInstance().getSurroundNoDown(mc.player).contains(blockPos))
+            if (avoidSelfConfig.getValue() && (SurroundModule.getInstance().getSurroundNoDown(mc.player).contains(blockPos)
+                    || phasePositions.stream().anyMatch(d -> d.pos().equals(blockPos))))
             {
                 continue;
             }
@@ -647,8 +661,6 @@ public class AutoMineModule extends CombatModule
             // Check surrounding positions
             miningPositions.add(new AutoMineCalc(blockPos, bestDamage, false));
         }
-        miningPositions.removeIf(c -> BlastResistantBlocks.isUnbreakable(c.pos()));
-        miningPositions.removeAll(getPhasePosition(mc.player));
 //        if (headConfig.getValue())
 //        {
 //            BlockPos headPos = entity.getBlockPos().up(2);
@@ -725,20 +737,6 @@ public class AutoMineModule extends CombatModule
             }
         }
         return false;
-    }
-
-    public void clearMiningFloor()
-    {
-        for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
-        {
-            BlockPos miningFloor = pos.down();
-            if (packetMines.contains(miningFloor) && !mc.world.isAir(miningFloor))
-            {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos.down(), Direction.UP));
-                packetMines.remove(pos.down());
-                removeIfQueuedMine(d -> d.getPos().equals(pos.down()));
-            }
-        }
     }
 
     private boolean startMining(MiningData data, boolean floor)
