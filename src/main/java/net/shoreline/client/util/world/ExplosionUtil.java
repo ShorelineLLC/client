@@ -14,6 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.shoreline.client.util.Globals;
 
+import java.util.List;
 import java.util.function.BiFunction;
 
 /**
@@ -67,6 +68,29 @@ public class ExplosionUtil implements Globals
         return Math.max(0.0, dmg);
     }
 
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final IgnoreTerrain ignoreTerrain,
+                                     final BlockPos... ignoreBlocks)
+    {
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final IgnoreTerrain ignoreTerrain,
+                                     float power,
+                                     final BlockPos... ignoreBlocks)
+    {
+        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity, ignoreTerrain, ignoreBlocks);
+        double w = d / power;
+        double ac = (1.0 - w) * ab;
+        double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        return Math.max(0.0, dmg);
+    }
+
     /**
      * @param entity
      * @param explosion
@@ -104,7 +128,8 @@ public class ExplosionUtil implements Globals
         double dz = pos.getZ() - bb.minZ;
         final Box box = bb.offset(dx, dy, dz);
         //
-        double ab = getExposure(explosion, box, ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE);
+        RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE);
+        double ab = getExposure(explosion, box, raycastFactory);
         double w = Math.sqrt(pos.squaredDistanceTo(explosion)) / 12.0;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
@@ -181,24 +206,38 @@ public class ExplosionUtil implements Globals
      */
     private static float getExposure(final Vec3d source,
                                      final Entity entity,
+                                     final IgnoreTerrain ignoreTerrain,
+                                     final BlockPos... ignoreBlocks)
+    {
+        RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain, List.of(ignoreBlocks));
+        final Box box = entity.getBoundingBox();
+        return getExposure(source, box, raycastFactory);
+    }
+
+    /**
+     * @param source
+     * @param entity
+     * @param ignoreTerrain
+     * @return
+     */
+    private static float getExposure(final Vec3d source,
+                                     final Entity entity,
                                      final IgnoreTerrain ignoreTerrain)
     {
+        RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain);
         final Box box = entity.getBoundingBox();
-        return getExposure(source, box, ignoreTerrain);
+        return getExposure(source, box, raycastFactory);
     }
 
     /**
      * @param source
      * @param box
-     * @param ignoreTerrain
      * @return
      */
     private static float getExposure(final Vec3d source,
                                      final Box box,
-                                     final IgnoreTerrain ignoreTerrain)
+                                     final RaycastFactory raycastFactory)
     {
-        RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain);
-
         double xDiff = box.maxX - box.minX;
         double yDiff = box.maxY - box.minY;
         double zDiff = box.maxZ - box.minZ;
@@ -245,6 +284,40 @@ public class ExplosionUtil implements Globals
         }
 
         return 0f;
+    }
+
+    private static RaycastFactory getRaycastFactory(IgnoreTerrain ignoreTerrain, List<BlockPos> ignoreBlocks)
+    {
+        if (ignoreTerrain == IgnoreTerrain.BLAST)
+        {
+            return (context, blockPos) ->
+            {
+                if (ignoreBlocks.contains(blockPos))
+                {
+                    return null;
+                }
+                BlockState blockState = mc.world.getBlockState(blockPos);
+                if (blockState.getBlock().getBlastResistance() < 600) return null;
+
+                return blockState.getCollisionShape(mc.world, blockPos).raycast(context.start(), context.end(), blockPos);
+            };
+        }
+        else if (ignoreTerrain == IgnoreTerrain.ALL)
+        {
+            return (context, blockPos) -> null;
+        }
+        else
+        {
+            return (context, blockPos) ->
+            {
+                if (ignoreBlocks.contains(blockPos))
+                {
+                    return null;
+                }
+                BlockState blockState = mc.world.getBlockState(blockPos);
+                return blockState.getCollisionShape(mc.world, blockPos).raycast(context.start(), context.end(), blockPos);
+            };
+        }
     }
 
     private static RaycastFactory getRaycastFactory(IgnoreTerrain ignoreTerrain)

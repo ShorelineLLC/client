@@ -22,6 +22,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.CombatModule;
+import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.FirstOutQueue;
@@ -57,6 +58,7 @@ public class AutoMineModule extends CombatModule
     Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.OBSIDIAN, Blocks.ENDER_CHEST));
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
     Config<Boolean> autoRemineConfig = register(new BooleanConfig("AutoRemine", "Automatically remines mined blocks", true, () -> autoConfig.getValue()));
+    Config<Boolean> avoidSelfConfig = register(new BooleanConfig("AvoidSelf", "Avoids mining blocks in your surround", false, () -> autoConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Only mines on visible faces", false, () -> autoConfig.getValue()));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for targets", 1.0f, 5.0f, 10.0f, () -> autoConfig.getValue()));
     Config<Boolean> doubleBreakConfig = register(new BooleanConfig("DoubleBreak", "Allows you to mine two blocks at once", false));
@@ -591,20 +593,52 @@ public class AutoMineModule extends CombatModule
         return phasePositions;
     }
 
+    /**
+     * Returns a {@link PriorityQueue} of {@link AutoMineCalc} with the highest damage calculation
+     * at the head of the queue.
+     *
+     * @param entity The mining target
+     * @return A priority queue of Mining calculations
+     */
     private PriorityQueue<AutoMineCalc> getMiningPosition(PlayerEntity entity)
     {
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
         for (BlockPos blockPos : surroundBlocks)
         {
+            if (avoidSelfConfig.getValue() && SurroundModule.getInstance().getSurroundNoDown(mc.player).contains(blockPos))
+            {
+                continue;
+            }
             double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
             if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq())
             {
                 continue;
             }
-            double damage = ExplosionUtil.getDamageTo(entity, blockPos.toCenterPos(), ExplosionUtil.IgnoreTerrain.ALL);
+            // Check all possible crystal placements for highest damage
+            double bestDamage = 0.0;
+            for (Direction direction : Direction.values())
+            {
+                if (!direction.getAxis().isHorizontal())
+                {
+                    continue;
+                }
+                BlockPos off = blockPos.offset(direction);
+                if (!AutoCrystalModule.getInstance().canUseCrystalOnBlock(off.down()))
+                {
+                    continue;
+                }
+
+                double damage = ExplosionUtil.getDamageTo(entity, off.toCenterPos(),
+                        ExplosionUtil.IgnoreTerrain.NONE, off);
+                if (damage > bestDamage)
+                {
+                    bestDamage = damage;
+                }
+            }
+
             // Check surrounding positions
-            miningPositions.add(new AutoMineCalc(blockPos, -damage, false));
+            miningPositions.add(new AutoMineCalc(blockPos, bestDamage, false));
         }
         miningPositions.removeIf(c -> BlastResistantBlocks.isUnbreakable(c.pos()));
         miningPositions.removeAll(getPhasePosition(mc.player));
