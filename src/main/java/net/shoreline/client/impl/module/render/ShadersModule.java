@@ -14,6 +14,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
@@ -31,6 +32,8 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.chams.ChamsModelRenderer;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
@@ -61,6 +64,7 @@ import java.util.UUID;
  */
 public class ShadersModule extends ToggleModule
 {
+    private static ShadersModule INSTANCE;
 
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The shader render range", 10.0f, 50.0f, 200.0f));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
@@ -97,6 +101,12 @@ public class ShadersModule extends ToggleModule
     public ShadersModule()
     {
         super("Shaders", "Renders shaders over entities", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static ShadersModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -269,6 +279,7 @@ public class ShadersModule extends ToggleModule
     private void renderEntities(float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider)
     {
         // RenderSystem.disableDepthTest();
+        RenderBuffers.preRender();
         for (Entity entity : mc.world.getEntities())
         {
             if (checkShaders(entity))
@@ -291,9 +302,17 @@ public class ShadersModule extends ToggleModule
                     double y = (e - camera.y) + vec3d.y;
                     double z = (f - camera.z) + vec3d.z;
                     matrixStack.push();
-                    matrixStack.translate(x, y, z);
-                    entityRenderer.render(entity, g, tickDelta, matrixStack, vertexConsumerProvider, light);
-                    matrixStack.translate(-vec3d.getX(), -vec3d.getY(), -vec3d.getZ());
+                    if (ChamsModule.getInstance().isEnabled() && (entity instanceof LivingEntity entity1
+                            && ChamsModule.getInstance().checkChams(entity1) || entity instanceof EndCrystalEntity && ChamsModule.getInstance().crystalsConfig.getValue()))
+                    {
+                        ChamsModule.getInstance().renderEntityChams(matrixStack, entity, tickDelta);
+                    }
+                    else
+                    {
+                        matrixStack.translate(x, y, z);
+                        entityRenderer.render(entity, g, tickDelta, matrixStack, vertexConsumerProvider, light);
+                        matrixStack.translate(-vec3d.getX(), -vec3d.getY(), -vec3d.getZ());
+                    }
                     matrixStack.pop();
                 }
                 catch (Exception exception)
@@ -302,6 +321,8 @@ public class ShadersModule extends ToggleModule
                     Shoreline.error("Failed to render shader on entity!");
                 }
             }
+            RenderBuffers.postRender();
+
             // Blockentity shaders
             if (echestsConfig.getValue() || chestsConfig.getValue() || shulkersConfig.getValue())
             {
@@ -322,6 +343,7 @@ public class ShadersModule extends ToggleModule
                 }
             }
         }
+
         // ciaohack solutions
         OtherClientPlayerEntity fakePlayerEntity = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.fromString("041f2043-a047-482e-a5b2-41c711badc42"), "nigger"));
         fakePlayerEntity.setPosition(0.0, -100000000.0, 0.0);
@@ -548,7 +570,7 @@ public class ShadersModule extends ToggleModule
         }
     }
 
-    private boolean checkShaders(Entity entity)
+    public boolean checkShaders(Entity entity)
     {
         if (entity instanceof PlayerEntity && playersConfig.getValue())
         {

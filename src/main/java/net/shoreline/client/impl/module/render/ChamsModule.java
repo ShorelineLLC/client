@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityStatuses;
@@ -48,6 +49,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChamsModule extends ToggleModule
 {
+    private static ChamsModule INSTANCE;
+
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The chams render range", 10.0f, 50.0f, 200.0f));
     Config<ChamsMode> modeConfig = register(new EnumConfig<>("Mode", "The rendering mode for the chams", ChamsMode.FILL, ChamsMode.values()));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the render", 1.0f, 1.5f, 5.0f, () -> modeConfig.getValue() != ChamsMode.FILL));
@@ -69,6 +72,12 @@ public class ChamsModule extends ToggleModule
     public ChamsModule()
     {
         super("Chams", "Renders entity models through walls", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static ChamsModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -124,10 +133,7 @@ public class ChamsModule extends ToggleModule
                 {
                     RenderSystem.depthMask(false);
                 }
-                int color = colorConfig.getValue().getRGB();
-                int lineColor = ColorUtil.withAlpha(color, 145);
-                ChamsModelRenderer.render(event.getMatrices(), entity, event.getTickDelta(), color, lineColor,
-                        widthConfig.getValue(), modeConfig.getValue() != ChamsMode.FILL, modeConfig.getValue() != ChamsMode.WIREFRAME, false);
+                renderEntityChams(event.getMatrices(), entity, event.getTickDelta());
             }
         }
 
@@ -141,6 +147,10 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderGame(RenderWorldEvent.Hand event)
     {
+        if (ShadersModule.getInstance().isEnabled() && ShadersModule.getInstance().handsConfig.getValue())
+        {
+            return;
+        }
         RenderBuffers.preRender();
         if (handsConfig.getValue())
         {
@@ -280,6 +290,19 @@ public class ChamsModule extends ToggleModule
         }
     }
 
+    public void renderEntityChams(MatrixStack matrixStack, Entity entity, float tickDelta)
+    {
+        int color1 = colorConfig.getValue().getRGB();
+        int lineColor1 = ColorUtil.withAlpha(color1, 145);
+        renderEntityChams(matrixStack, entity, tickDelta, color1, lineColor1);
+    }
+
+    public void renderEntityChams(MatrixStack matrixStack, Entity entity, float tickDelta, int color, int lineColor)
+    {
+        ChamsModelRenderer.render(matrixStack, entity, tickDelta, color, lineColor,
+                widthConfig.getValue(), modeConfig.getValue() != ChamsMode.FILL, modeConfig.getValue() != ChamsMode.WIREFRAME, false);
+    }
+
     private float getAnimationProgress(LivingEntity entity, float f)
     {
         if (entity instanceof SquidEntity)
@@ -289,7 +312,7 @@ public class ChamsModule extends ToggleModule
         return entity instanceof WolfEntity wolf ? wolf.getTailAngle() : entity.age + f;
     }
 
-    private boolean checkChams(LivingEntity entity)
+    public boolean checkChams(LivingEntity entity)
     {
         if (entity instanceof PlayerEntity)
         {
