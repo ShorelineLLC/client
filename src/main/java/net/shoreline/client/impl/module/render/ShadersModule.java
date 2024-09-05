@@ -33,11 +33,13 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
-import net.shoreline.client.api.render.chams.ChamsModelRenderer;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
+import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
+import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
@@ -67,6 +69,7 @@ public class ShadersModule extends ToggleModule
     private static ShadersModule INSTANCE;
 
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The shader render range", 10.0f, 50.0f, 200.0f));
+    Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", true));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1.0f, 1.5f, 10.0f, () -> outlineConfig.getValue()));
     Config<Integer> qualityConfig = register(new NumberConfig<>("Quality", "The outline pixel quality", 2, 10, 32, () -> outlineConfig.getValue()));
@@ -97,6 +100,7 @@ public class ShadersModule extends ToggleModule
     private float shaderTime;
 
     private int textureId;
+    private boolean ignoreEntityRender;
 
     public ShadersModule()
     {
@@ -116,6 +120,7 @@ public class ShadersModule extends ToggleModule
         {
             loadShaderImage();
         }
+        ignoreEntityRender = false;
     }
 
     @EventListener
@@ -275,9 +280,41 @@ public class ShadersModule extends ToggleModule
             }
         }
     }
+
+    @EventListener
+    public void onRenderCrystal(RenderCrystalEvent event)
+    {
+        if (mc.player != null && !textureConfig.getValue() && otherConfig.getValue() && !ignoreEntityRender &&
+                mc.player.squaredDistanceTo(event.endCrystalEntity) <= ((NumberConfig) rangeConfig).getValueSq())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onRenderEntity(RenderEntityEvent event)
+    {
+        if (mc.player == null || textureConfig.getValue() || !checkShaders(event.entity) || ignoreEntityRender
+                || mc.player.squaredDistanceTo(event.entity) > ((NumberConfig) rangeConfig).getValueSq())
+        {
+            return;
+        }
+        event.cancel();
+    }
+
+    @EventListener
+    public void onRenderArm(RenderFirstPersonEvent.Head event)
+    {
+        if (mc.player == null || textureConfig.getValue() || !handsConfig.getValue() || ignoreEntityRender)
+        {
+            return;
+        }
+        event.cancel();
+    }
     
     private void renderEntities(float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider)
     {
+        ignoreEntityRender = true;
         // RenderSystem.disableDepthTest();
         RenderBuffers.preRender();
         for (Entity entity : mc.world.getEntities())
@@ -353,6 +390,7 @@ public class ShadersModule extends ToggleModule
         matrixStack.translate(0.0, -100000000.0, 0.0);
         entityRenderer.render(fakePlayerEntity, fakePlayerEntity.getYaw(), tickDelta, matrixStack, vertexConsumerProvider, 0);
         matrixStack.pop();
+        ignoreEntityRender = false;
     }
 
     @EventListener
@@ -385,7 +423,9 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.render(mc.getTickDelta());
                 }, () ->
                 {
+                    ignoreEntityRender = true;
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ignoreEntityRender = false;
                 });
             }
             case GRADIENT ->
@@ -412,7 +452,9 @@ public class ShadersModule extends ToggleModule
                     shaderTime += speedConfig.getValue();
                 }, () ->
                 {
+                    ignoreEntityRender = true;
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ignoreEntityRender = false;
                 });
             }
             case MARBLE ->
@@ -437,7 +479,9 @@ public class ShadersModule extends ToggleModule
                     shaderTime += marbleFactorConfig.getValue();
                 }, () ->
                 {
+                    ignoreEntityRender = true;
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ignoreEntityRender = false;
                 });
             }
             case FLAME ->
@@ -462,7 +506,9 @@ public class ShadersModule extends ToggleModule
                     shaderTime += 0.005f;
                 }, () ->
                 {
+                    ignoreEntityRender = true;
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ignoreEntityRender = false;
                 });
             }
             case IMAGE ->
@@ -487,7 +533,9 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.render(mc.getTickDelta());
                 }, () ->
                 {
+                    ignoreEntityRender = true;
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ignoreEntityRender = false;
                 });
             }
         }

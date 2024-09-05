@@ -116,6 +116,10 @@ public class ChamsModule extends ToggleModule
         }
         for (Entity entity : mc.world.getEntities())
         {
+            if (ShadersModule.getInstance().isEnabled() && !ShadersModule.getInstance().textureConfig.getValue())
+            {
+                return;
+            }
             double x = Math.abs(mc.gameRenderer.getCamera().getPos().x - entity.getX());
             double z = Math.abs(mc.gameRenderer.getCamera().getPos().z - entity.getZ());
             double d = (mc.options.getViewDistance().getValue() + 1) * 16;
@@ -147,7 +151,7 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderGame(RenderWorldEvent.Hand event)
     {
-        if (ShadersModule.getInstance().isEnabled() && ShadersModule.getInstance().handsConfig.getValue())
+        if (ShadersModule.getInstance().isEnabled() && !ShadersModule.getInstance().textureConfig.getValue())
         {
             return;
         }
