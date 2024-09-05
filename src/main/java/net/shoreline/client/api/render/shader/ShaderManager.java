@@ -20,6 +20,7 @@ public class ShaderManager implements Globals
     public ManagedShaderEffect gradientShaderEffect;
     public ManagedShaderEffect imageShaderEffect;
     public ManagedShaderEffect glowingShaderEffect;
+    public ManagedShaderEffect flameShaderEffect;
 
     public void reloadShaders()
     {
@@ -36,6 +37,7 @@ public class ShaderManager implements Globals
         gradientShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/gradient.json"));
         imageShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/image.json"));
         glowingShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/glowing.json"));
+        flameShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/flame.json"));
     }
 
     public void applyShader(ManagedShaderEffect shaderEffect, Runnable setup, Runnable runnable)
@@ -93,5 +95,10 @@ public class ShaderManager implements Globals
     public ManagedShaderEffect getGlowingShaderEffect()
     {
         return glowingShaderEffect;
+    }
+
+    public ManagedShaderEffect getFlameShaderEffect()
+    {
+        return flameShaderEffect;
     }
 }

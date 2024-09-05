@@ -22,7 +22,6 @@ import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.DimensionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
 import java.text.DecimalFormat;
 import java.util.Set;
@@ -75,7 +74,7 @@ public class WaypointsModule extends ToggleModule
     @EventListener
     public void onTick(TickEvent event)
     {
-        if (!logoutsConfig.getValue() || event.getStage() != StageEvent.EventStage.POST || mc.getNetworkHandler() == null)
+        if (!logoutsConfig.getValue() || mc.getNetworkHandler() == null)
         {
             return;
         }

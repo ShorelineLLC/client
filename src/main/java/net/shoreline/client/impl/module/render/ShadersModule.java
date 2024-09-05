@@ -66,8 +66,8 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1.0f, 1.5f, 10.0f, () -> outlineConfig.getValue()));
     Config<Integer> qualityConfig = register(new NumberConfig<>("Quality", "The outline pixel quality", 2, 10, 32, () -> outlineConfig.getValue()));
+    Config<Integer> stepsConfig = register(new NumberConfig<>("Steps", "The number of steps for finding edges", 2, 4, 32, () -> outlineConfig.getValue()));
     Config<Boolean> glowConfig = register(new BooleanConfig("Glow", "Glow outline", false, () -> outlineConfig.getValue()));
-    Config<Integer> stepsConfig = register(new NumberConfig<>("Steps", "The number of steps for finding edges", 2, 4, 32, () -> glowConfig.getValue() && outlineConfig.getValue()));
     Config<Float> glowRadiusConfig = register(new NumberConfig<>("GlowFactor", "The glow radius", 0.1f, 1.0f, 3.0f, () -> glowConfig.getValue() && outlineConfig.getValue()));
     Config<ShaderMode> modeConfig = register(new EnumConfig<>("Fill", "The shader mode", ShaderMode.OFF, ShaderMode.values()));
     Config<Float> factorConfig = register(new NumberConfig<>("Factor", "The gradient factor", 0.1f, 8.0f, 10.0f, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
@@ -213,6 +213,31 @@ public class ShadersModule extends ToggleModule
                     renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
                 });
             }
+            case FLAME ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFlameShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
+                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
+                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
+                    shaderEffect.render(mc.getTickDelta());
+                    shaderTime += 0.005f;
+                }, () ->
+                {
+                    renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
+                });
+            }
             case IMAGE ->
             {
                 final ManagedShaderEffect shaderEffect = Managers.SHADER.getImageShaderEffect();
@@ -298,11 +323,9 @@ public class ShadersModule extends ToggleModule
             }
         }
         // ciaohack solutions
-        mc.world.removeEntity(Integer.MAX_VALUE, Entity.RemovalReason.DISCARDED);
-        OtherClientPlayerEntity fakePlayerEntity = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.randomUUID(), "ShaderPlayer"));
+        OtherClientPlayerEntity fakePlayerEntity = new OtherClientPlayerEntity(mc.world, new GameProfile(UUID.fromString("041f2043-a047-482e-a5b2-41c711badc42"), "nigger"));
         fakePlayerEntity.setPosition(0.0, -100000000.0, 0.0);
         fakePlayerEntity.setId(Integer.MAX_VALUE);
-        mc.world.addEntity(fakePlayerEntity);
         EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) mc.getEntityRenderDispatcher().getRenderer(fakePlayerEntity);
         matrixStack.push();
         matrixStack.translate(0.0, -100000000.0, 0.0);
@@ -390,6 +413,31 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getTickDelta());
                     shaderTime += marbleFactorConfig.getValue();
+                }, () ->
+                {
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                });
+            }
+            case FLAME ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFlameShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
+                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
+                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
+                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
+                    shaderEffect.render(mc.getTickDelta());
+                    shaderTime += 0.005f;
                 }, () ->
                 {
                     ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
@@ -537,6 +585,7 @@ public class ShadersModule extends ToggleModule
         DEFAULT,
         GRADIENT,
         MARBLE,
+        FLAME,
         IMAGE,
         OFF
     }

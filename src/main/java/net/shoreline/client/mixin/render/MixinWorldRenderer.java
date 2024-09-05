@@ -78,7 +78,7 @@ public class MixinWorldRenderer implements Globals
         return instance.isThirdPerson();
     }
 
-    @Inject(method = "render", at = @At(value = "RETURN"))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;applyModelViewMatrix()V", ordinal = 0, shift = At.Shift.BEFORE))
     private void hookRender$1(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
                               GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci)
     {
