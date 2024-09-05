@@ -70,7 +70,7 @@ void main()
     {
         float edgeDist = computeEdgeDistance(texCoord);
 
-        if (edgeDist <= radius)
+        if (radius > 0.0f && edgeDist <= radius)
         {
             if (glow != 0)
             {

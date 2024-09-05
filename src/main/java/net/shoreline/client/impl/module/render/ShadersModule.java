@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import ladysnake.satin.api.managed.ManagedShaderEffect;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
@@ -315,8 +316,8 @@ public class ShadersModule extends ToggleModule
     private void renderEntities(float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider)
     {
         ignoreEntityRender = true;
-        // RenderSystem.disableDepthTest();
         RenderBuffers.preRender();
+        // RenderSystem.enableDepthTest();
         for (Entity entity : mc.world.getEntities())
         {
             if (checkShaders(entity))
