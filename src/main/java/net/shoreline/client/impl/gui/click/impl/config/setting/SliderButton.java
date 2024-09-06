@@ -290,6 +290,11 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         return "";
     }
 
+    public void endTyping()
+    {
+        typing = false;
+    }
+
     public boolean isTyping()
     {
         return typing;

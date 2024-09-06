@@ -185,6 +185,10 @@ public class ModuleButton extends Button
         {
             for (ConfigButton<?> configButton : configComponents)
             {
+                if (configButton instanceof BindButton bindButton)
+                {
+                    bindButton.setListening(false);
+                }
                 if (configButton instanceof TextButton textButton)
                 {
                     textButton.endTyping();
@@ -192,6 +196,10 @@ public class ModuleButton extends Button
                 if (configButton instanceof ColorButton colorButton)
                 {
                     colorButton.endTyping();
+                }
+                if (configButton instanceof SliderButton sliderButton)
+                {
+                    sliderButton.endTyping();
                 }
             }
         }
