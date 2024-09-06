@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import ladysnake.satin.api.managed.ManagedShaderEffect;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
@@ -40,6 +39,7 @@ import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
+import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
 import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
@@ -301,6 +301,16 @@ public class ShadersModule extends ToggleModule
             return;
         }
         event.cancel();
+    }
+
+    @EventListener
+    public void onRenderItem(RenderItemEvent event)
+    {
+        if (mc.player != null && !textureConfig.getValue() && itemsConfig.getValue() && !ignoreEntityRender &&
+                mc.player.squaredDistanceTo(event.getItem()) <= ((NumberConfig) rangeConfig).getValueSq())
+        {
+            event.cancel();
+        }
     }
 
     @EventListener
