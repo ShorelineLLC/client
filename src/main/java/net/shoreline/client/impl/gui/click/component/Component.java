@@ -379,7 +379,7 @@ public abstract class Component implements Drawable, Globals
                 (v + (float) regionHeight) / (float) textureHeight);
     }
 
-    private void drawTexturedQuad(Matrix4f matrix, int x0, int x1, int y0,
+    public void drawTexturedQuad(Matrix4f matrix, int x0, int x1, int y0,
                                   int y1, int z, float u0, float u1,
                                   float v0, float v1)
     {
@@ -397,7 +397,7 @@ public abstract class Component implements Drawable, Globals
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
-    private void drawTexturedQuad(Matrix4f matrix, int x0, int x1,
+    public void drawTexturedQuad(Matrix4f matrix, int x0, int x1,
                                   int y0, int y1, int z, float u0,
                                   float u1, float v0, float v1,
                                   float red, float green, float blue, float alpha)

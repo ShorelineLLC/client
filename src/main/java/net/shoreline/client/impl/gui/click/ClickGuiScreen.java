@@ -9,7 +9,9 @@ import net.shoreline.client.impl.gui.click.component.ScissorStack;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.BindButton;
+import net.shoreline.client.impl.gui.click.impl.config.setting.ColorButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
+import net.shoreline.client.impl.gui.click.impl.config.setting.TextButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.Globals;
 import org.lwjgl.glfw.GLFW;
@@ -41,8 +43,7 @@ public class ClickGuiScreen extends Screen implements Globals
     private final ClickGuiModule module;
     //
     private CategoryFrame focus;
-    //
-    private boolean closeOnEscape = true;
+    private boolean shouldCloseOnEsc = true;
 
     /**
      *
@@ -171,6 +172,29 @@ public class ClickGuiScreen extends Screen implements Globals
             // System.out.println("Hard reset");
         }
 
+        // Insanity
+        shouldCloseOnEsc = true;
+        for (CategoryFrame frame : frames)
+        {
+            for (ModuleButton moduleButton : frame.getModuleButtons())
+            {
+                for (ConfigButton<?> configButton : moduleButton.getConfigButtons())
+                {
+                    if (configButton instanceof BindButton bindButton && bindButton.isListening())
+                    {
+                        shouldCloseOnEsc = false;
+                    }
+                    if (configButton instanceof TextButton textButton && textButton.isTyping())
+                    {
+                        shouldCloseOnEsc = false;
+                    }
+                    if (configButton instanceof ColorButton colorButton && colorButton.isTyping())
+                    {
+                        shouldCloseOnEsc = false;
+                    }
+                }
+            }
+        }
         for (CategoryFrame frame : frames)
         {
             frame.keyPressed(keyCode, scanCode, modifiers);
@@ -215,7 +239,7 @@ public class ClickGuiScreen extends Screen implements Globals
     @Override
     public boolean shouldCloseOnEsc()
     {
-        return closeOnEscape;
+        return shouldCloseOnEsc;
     }
 
     private void renderAndScaleGUI(DrawContext context)
@@ -280,11 +304,6 @@ public class ClickGuiScreen extends Screen implements Globals
             }
         }
         return true;
-    }
-
-    public void setCloseOnEscape(boolean closeOnEscape)
-    {
-        this.closeOnEscape = closeOnEscape;
     }
 
     public List<CategoryFrame> getCategoryFrames()

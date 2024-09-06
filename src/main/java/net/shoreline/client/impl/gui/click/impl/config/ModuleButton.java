@@ -189,6 +189,10 @@ public class ModuleButton extends Button
                 {
                     textButton.endTyping();
                 }
+                if (configButton instanceof ColorButton colorButton)
+                {
+                    colorButton.endTyping();
+                }
             }
         }
     }

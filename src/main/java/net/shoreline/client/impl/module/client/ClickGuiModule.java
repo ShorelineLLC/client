@@ -92,7 +92,6 @@ public class ClickGuiModule extends ToggleModule
         if (CLICK_GUI_SCREEN != null)
         {
             Shoreline.CONFIG.saveClickGui();
-            CLICK_GUI_SCREEN.setCloseOnEscape(true);
         }
         mc.player.closeScreen();
         openCloseAnimation.setState(false);

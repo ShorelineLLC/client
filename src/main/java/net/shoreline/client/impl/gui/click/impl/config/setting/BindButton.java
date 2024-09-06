@@ -44,8 +44,6 @@ public class BindButton extends ConfigButton<Macro>
                        float mouseY, float delta)
     {
         setHeight(RenderManager.textHeight() + 4.0f);
-        // If to allow the GUI to be exited by pressing ESC
-        ClickGuiModule.CLICK_GUI_SCREEN.setCloseOnEscape(!listening);
 
         x = ix;
         y = iy;

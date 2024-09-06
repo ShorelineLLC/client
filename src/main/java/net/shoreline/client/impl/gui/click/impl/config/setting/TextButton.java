@@ -47,11 +47,10 @@ public class TextButton extends ConfigButton<String>
     public void render(DrawContext context, float ix, float iy, float mouseX, float mouseY, float delta)
     {
         setHeight(RenderManager.textHeight() + 4.0f);
-        ClickGuiModule.CLICK_GUI_SCREEN.setCloseOnEscape(!typing);
         x = ix;
         y = iy;
         int whiteText = -1;
-        String renderText = typing ? new String(buffer) + getInsertionPoint() : config.getName() + Formatting.GRAY + " " + new String(buffer) + getInsertionPoint();
+        String renderText = typing ? new String(buffer) + getInsertionPoint() : config.getName() + Formatting.GRAY + " " + new String(buffer);
         drawStringScaled(context, renderText, ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
     }
 
@@ -133,7 +132,11 @@ public class TextButton extends ConfigButton<String>
     public void endTyping()
     {
         this.typing = false;
-        ClickGuiModule.CLICK_GUI_SCREEN.setCloseOnEscape(true);
+    }
+
+    public boolean isTyping()
+    {
+        return typing;
     }
 
     public String getInsertionPoint()

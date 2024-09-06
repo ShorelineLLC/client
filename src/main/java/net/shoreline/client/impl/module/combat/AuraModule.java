@@ -79,7 +79,7 @@ public class AuraModule extends RotationModule
     Config<Boolean> silentRotateConfig = register(new BooleanConfig("RotateSilent", "Rotates silently to server", false, () -> rotateConfig.getValue()));
     Config<Boolean> strictRotateConfig = register(new BooleanConfig("YawStep", "Rotates yaw over multiple ticks to prevent certain rotation flags in NCP", false, () -> rotateConfig.getValue()));
     Config<Integer> rotateLimitConfig = register(new NumberConfig<>("YawStep-Limit", "Maximum yaw rotation in degrees for one tick", 1, 180, 180, NumberDisplay.DEGREES, () -> rotateConfig.getValue() && strictRotateConfig.getValue()));
-    Config<Integer> ticksExistedConfig = register(new NumberConfig<>("TicksExisted", "The minimum age of the entity to be considered for attack", 0, 50, 200));
+    Config<Integer> ticksExistedConfig = register(new NumberConfig<>("TicksExisted", "The minimum age of the entity to be considered for attack", 0, 0, 200));
     Config<Boolean> armorCheckConfig = register(new BooleanConfig("ArmorCheck", "Checks if target has armor before attacking", false));
     // Config<Boolean> autoBlockConfig = register(new BooleanConfig("AutoBlock", "Automatically blocks after attack", false);
     Config<Boolean> stopSprintConfig = register(new BooleanConfig("StopSprint", "Stops sprinting before attacking to maintain vanilla behavior", false));
