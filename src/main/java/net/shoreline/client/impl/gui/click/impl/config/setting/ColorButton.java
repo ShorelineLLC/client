@@ -161,8 +161,9 @@ public class ColorButton extends ConfigButton<Color>
 
             mc.getTextureManager().bindTexture(new Identifier("shoreline", "icon/sync_clickgui.png"));
             // RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-            context.drawTexture(new Identifier("shoreline", "icon/sync_clickgui.png"), (int) x2, (int) y2, 0, 0,
-                    (int) Math.ceil(11 * ClickGuiModule.CLICK_GUI_SCALE), (int) Math.ceil(10 * ClickGuiModule.CLICK_GUI_SCALE), (int) Math.ceil(11 * ClickGuiModule.CLICK_GUI_SCALE), (int) Math.ceil(10 * ClickGuiModule.CLICK_GUI_SCALE));
+            RenderSystem.setShaderTexture(0, new Identifier("shoreline", "icon/sync_clickgui.png"));
+            drawTexture(context, x2, y2, 0, 0, 11 * ClickGuiModule.CLICK_GUI_SCALE,
+                    10 * ClickGuiModule.CLICK_GUI_SCALE, 11 * ClickGuiModule.CLICK_GUI_SCALE, 10 * ClickGuiModule.CLICK_GUI_SCALE);
 
             moduleButton.offset((float) (getPickerHeight() * pickerAnimation.getFactor()));
             ((CategoryFrame) frame).offset((float) (getPickerHeight() * pickerAnimation.getFactor() * moduleButton.getScaledTime()));

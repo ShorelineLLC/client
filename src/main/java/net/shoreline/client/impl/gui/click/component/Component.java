@@ -350,27 +350,27 @@ public abstract class Component implements Drawable, Globals
                 height, u, v, textureWidth, textureHeight);
     }
 
-    public void drawTexture(DrawContext context, int x, int y, int width,
-                            int height, float u, float v, int regionWidth,
-                            int regionHeight, int textureWidth,
-                            int textureHeight)
+    public void drawTexture(DrawContext context, float x, float y, float width,
+                            float height, float u, float v, float regionWidth,
+                            float regionHeight, float textureWidth,
+                            float textureHeight)
     {
         drawTexture(context, x, x + width, y, y + height, 0,
                 regionWidth, regionHeight, u, v, textureWidth, textureHeight);
     }
 
-    public void drawTexture(DrawContext context, int x, int y, float u,
-                            float v, int width, int height,
-                            int textureWidth, int textureHeight)
+    public void drawTexture(DrawContext context, float x, float y, float u,
+                            float v, float width, float height,
+                            float textureWidth, float textureHeight)
     {
         drawTexture(context, x, y, width, height, u, v, width, height,
                 textureWidth, textureHeight);
     }
 
-    private void drawTexture(DrawContext context, int x0, int x1,
-                             int y0, int y1, int z, int regionWidth,
-                             int regionHeight, float u, float v,
-                             int textureWidth, int textureHeight)
+    private void drawTexture(DrawContext context, float x0, float x1,
+                             float y0, float y1, float z, float regionWidth,
+                             float regionHeight, float u, float v,
+                             float textureWidth, float textureHeight)
     {
         drawTexturedQuad(context.getMatrices().peek().getPositionMatrix(), x0, x1, y0, y1, z,
                 (u + 0.0F) / (float) textureWidth,
@@ -379,8 +379,8 @@ public abstract class Component implements Drawable, Globals
                 (v + (float) regionHeight) / (float) textureHeight);
     }
 
-    public void drawTexturedQuad(Matrix4f matrix, int x0, int x1, int y0,
-                                  int y1, int z, float u0, float u1,
+    public void drawTexturedQuad(Matrix4f matrix, float x0, float x1, float y0,
+                                  float y1, float z, float u0, float u1,
                                   float v0, float v1)
     {
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
@@ -397,8 +397,8 @@ public abstract class Component implements Drawable, Globals
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
-    public void drawTexturedQuad(Matrix4f matrix, int x0, int x1,
-                                  int y0, int y1, int z, float u0,
+    public void drawTexturedQuad(Matrix4f matrix, float x0, float x1,
+                                  float y0, float y1, float z, float u0,
                                   float u1, float v0, float v1,
                                   float red, float green, float blue, float alpha)
     {
