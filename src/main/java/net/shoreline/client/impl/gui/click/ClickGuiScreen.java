@@ -8,10 +8,7 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.ScissorStack;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
-import net.shoreline.client.impl.gui.click.impl.config.setting.BindButton;
-import net.shoreline.client.impl.gui.click.impl.config.setting.ColorButton;
-import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
-import net.shoreline.client.impl.gui.click.impl.config.setting.TextButton;
+import net.shoreline.client.impl.gui.click.impl.config.setting.*;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.Globals;
 import org.lwjgl.glfw.GLFW;
@@ -180,15 +177,10 @@ public class ClickGuiScreen extends Screen implements Globals
             {
                 for (ConfigButton<?> configButton : moduleButton.getConfigButtons())
                 {
-                    if (configButton instanceof BindButton bindButton && bindButton.isListening())
-                    {
-                        shouldCloseOnEsc = false;
-                    }
-                    if (configButton instanceof TextButton textButton && textButton.isTyping())
-                    {
-                        shouldCloseOnEsc = false;
-                    }
-                    if (configButton instanceof ColorButton colorButton && colorButton.isTyping())
+                    if (configButton instanceof BindButton bindButton && bindButton.isListening()
+                            || configButton instanceof TextButton textButton && textButton.isTyping()
+                            || configButton instanceof ColorButton colorButton && colorButton.isTyping()
+                            || configButton instanceof SliderButton sliderButton && sliderButton.isTyping())
                     {
                         shouldCloseOnEsc = false;
                     }

@@ -9,6 +9,10 @@ import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
+import org.apache.commons.lang3.ArrayUtils;
+import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,6 +27,12 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     // Slider rounding scale
     private final int scale;
 
+    private char[] buffer;
+    private boolean typing;
+    // Insertion point
+    private boolean idling;
+    private final Timer idleTimer = new CacheTimer();
+
     /**
      * @param frame
      * @param config
@@ -33,6 +43,18 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         //
         final String sval = String.valueOf(config.getValue());
         scale = sval.substring(sval.indexOf(".") + 1).length();
+        if (config.getValue() instanceof Integer)
+        {
+            buffer = String.valueOf(config.getValue().intValue()).toCharArray();
+        }
+        else if (config.getValue() instanceof Float)
+        {
+            buffer = String.valueOf(config.getValue().floatValue()).toCharArray();
+        }
+        else if (config.getValue() instanceof Double)
+        {
+            buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
+        }
     }
 
     /**
@@ -92,17 +114,23 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
             }
         }
         // slider fill
-        float fill = (config.getValue().floatValue() - min.floatValue())
-                / (max.floatValue() - min.floatValue());
-        fill(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor());
+        if (!typing)
+        {
+            float fill = (config.getValue().floatValue() - min.floatValue())
+                    / (max.floatValue() - min.floatValue());
+            fill(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor());
+        }
 
         int whiteText = -1;
-        drawStringScaled(context, config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
+        drawStringScaled(context, typing ? new String(buffer) + getInsertionPoint() : config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
 
         float textLeng = RenderManager.textWidth(config.getName()) * ClickGuiModule.CLICK_GUI_SCALE;
 
-        int grayText = 0xFFAAAAAA;
-        drawStringScaled(context, " " + config.getValue(), ix + (2.0F * ClickGuiModule.CLICK_GUI_SCALE) + textLeng, iy + (4.0F * ClickGuiModule.CLICK_GUI_SCALE), grayText);
+        if (!typing)
+        {
+            int grayText = 0xFFAAAAAA;
+            drawStringScaled(context, " " + config.getValue(), ix + (2.0F * ClickGuiModule.CLICK_GUI_SCALE) + textLeng, iy + (4.0F * ClickGuiModule.CLICK_GUI_SCALE), grayText);
+        }
     }
 
     /**
@@ -113,7 +141,37 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button)
     {
+        if (isWithin(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            if (typing)
+            {
+                String number = new String(buffer);
+                try
+                {
+                    if (config.getValue() instanceof Integer)
+                    {
+                        ((NumberConfig<Integer>) config).setValue(Integer.parseInt(number));
+                    }
+                    else if (config.getValue() instanceof Float)
+                    {
+                        ((NumberConfig<Float>) config).setValue(Float.parseFloat(number));
+                    }
+                    else if (config.getValue() instanceof Double)
+                    {
+                        ((NumberConfig<Double>) config).setValue(Double.parseDouble(number));
+                    }
+                }
+                catch (NumberFormatException ignored)
+                {
 
+                }
+                typing = false;
+            }
+            else
+            {
+                typing = true;
+            }
+        }
     }
 
     /**
@@ -135,12 +193,86 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers)
     {
+        if (typing)
+        {
+            switch (keyCode)
+            {
+                case GLFW.GLFW_KEY_ENTER ->
+                {
+                    String number = new String(buffer);
+                    try
+                    {
+                        if (config.getValue() instanceof Integer)
+                        {
+                            ((NumberConfig<Integer>) config).setValue(Integer.parseInt(number));
+                        }
+                        else if (config.getValue() instanceof Float)
+                        {
+                            ((NumberConfig<Float>) config).setValue(Float.parseFloat(number));
+                        }
+                        else if (config.getValue() instanceof Double)
+                        {
+                            ((NumberConfig<Double>) config).setValue(Double.parseDouble(number));
+                        }
+                    }
+                    catch (NumberFormatException ignored)
+                    {
 
+                    }
+                    typing = false;
+                }
+                case GLFW.GLFW_KEY_BACKSPACE ->
+                {
+                    if (buffer.length != 0)
+                    {
+                        buffer = ArrayUtils.remove(buffer, buffer.length - 1);
+                    }
+                }
+                case GLFW.GLFW_KEY_ESCAPE ->
+                {
+                    if (config.getValue() instanceof Integer)
+                    {
+                        buffer = String.valueOf(config.getValue().intValue()).toCharArray();
+                    }
+                    else if (config.getValue() instanceof Float)
+                    {
+                        buffer = String.valueOf(config.getValue().floatValue()).toCharArray();
+                    }
+                    else if (config.getValue() instanceof Double)
+                    {
+                        buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
+                    }
+                    typing = false;
+                }
+            }
+        }
     }
 
     @Override
     public void charTyped(char character, int modifiers)
     {
+        if (typing)
+        {
+            buffer = ArrayUtils.add(buffer, character);
+        }
+    }
 
+    public String getInsertionPoint()
+    {
+        if (idleTimer.passed(250))
+        {
+            idling = !idling;
+            idleTimer.reset();
+        }
+        if (idling && typing)
+        {
+            return "_";
+        }
+        return "";
+    }
+
+    public boolean isTyping()
+    {
+        return typing;
     }
 }
