@@ -219,6 +219,18 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
                     {
 
                     }
+                    if (config.getValue() instanceof Integer)
+                    {
+                        buffer = String.valueOf(config.getValue().intValue()).toCharArray();
+                    }
+                    else if (config.getValue() instanceof Float)
+                    {
+                        buffer = String.valueOf(config.getValue().floatValue()).toCharArray();
+                    }
+                    else if (config.getValue() instanceof Double)
+                    {
+                        buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
+                    }
                     typing = false;
                 }
                 case GLFW.GLFW_KEY_BACKSPACE ->

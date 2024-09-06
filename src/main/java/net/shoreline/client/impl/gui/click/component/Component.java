@@ -326,8 +326,8 @@ public abstract class Component implements Drawable, Globals
                 sprite.getMinV(), sprite.getMaxV(), red, green, blue, alpha);
     }
 
-    public void drawBorder(DrawContext context, int x, int y, int width,
-                           int height, int color)
+    public void drawBorder(DrawContext context, double x, double y, double width,
+                           double height, int color)
     {
         fill(context, x, y, x + width, y + 1, color);
         fill(context, x, y + height - 1, x + width, y + height, color);

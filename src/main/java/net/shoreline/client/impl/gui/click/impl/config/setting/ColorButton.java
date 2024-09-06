@@ -257,6 +257,7 @@ public class ColorButton extends ConfigButton<Color>
                     {
 
                     }
+                    buffer = Integer.toHexString(colorConfig.getRgb()).toCharArray();
                     typing = false;
                 }
                 case GLFW.GLFW_KEY_BACKSPACE ->

@@ -6,6 +6,7 @@ import net.minecraft.text.Text;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.ScissorStack;
+import net.shoreline.client.impl.gui.click.impl.SearchButton;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.*;
@@ -173,6 +174,11 @@ public class ClickGuiScreen extends Screen implements Globals
         shouldCloseOnEsc = true;
         for (CategoryFrame frame : frames)
         {
+            if (frame.getSearchButton() != null && frame.getSearchButton().isTyping())
+            {
+                shouldCloseOnEsc = false;
+                continue;
+            }
             for (ModuleButton moduleButton : frame.getModuleButtons())
             {
                 for (ConfigButton<?> configButton : moduleButton.getConfigButtons())

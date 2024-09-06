@@ -5,12 +5,12 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.Serializable;
-import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.component.Frame;
+import net.shoreline.client.impl.gui.click.impl.SearchButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ColorButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
@@ -49,6 +49,8 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
     //
     private final Animation categoryAnimation = new Animation(false, 200, Easing.CUBIC_IN_OUT);
 
+    private SearchButton searchButton;
+
     /**
      * @param x
      * @param y
@@ -68,6 +70,10 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
             {
                 moduleButtons.add(new ModuleButton(module, this, x, y));
             }
+        }
+        if (category == ModuleCategory.CLIENT)
+        {
+            searchButton = new SearchButton(this, x, y);
         }
         setOpen(true);
     }
@@ -100,10 +106,19 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
         // draw the component
         // context.drawTexture(categoryIcon, (int) (x + 2.0f), (int) (y + 1.0f), 0, 0, 12, 12, 12, 12);
         fheight = 2.0f * ClickGuiModule.CLICK_GUI_SCALE;
+        if (searchButton != null)
+        {
+            fheight += searchButton.getHeight() + (6.0f * ClickGuiModule.CLICK_GUI_SCALE);
+        }
         for (ModuleButton moduleButton : moduleButtons)
         {
+            if (SearchButton.SEARCH_TEXT != null && !SearchButton.SEARCH_TEXT.isEmpty()
+                    && !moduleButton.getModule().getName().toLowerCase().startsWith(SearchButton.SEARCH_TEXT.toLowerCase()))
+            {
+                continue;
+            }
             // account for button height
-            fheight += moduleButton.getHeight() + 1.0f;
+            fheight += moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE;
             if (moduleButton.getScaledTime() < 0.01f)
             {
                 continue;
@@ -140,6 +155,11 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
             // Enabling scissor during the animation zoom in process causes some weird visual bugs
             boolean canScissor = ClickGuiModule.getInstance().getScaleFactor() == 1.0F;
 
+            float y1 = y;
+            if (searchButton != null)
+            {
+                y1 += searchButton.getHeight() + (6.0f * ClickGuiModule.CLICK_GUI_SCALE);
+            }
             if (canScissor)
             {
                 enableScissor(x, y + (height * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE), y + (ClickGuiModule.CLICK_GUI_SCALE * height) + fheight * categoryAnimation.getFactor());
@@ -147,10 +167,23 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
 
             int fillColor = ClickGuiModule.getInstance().fixTransparency(0x77000000);
             fill(context, x, y + (height * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE), fheight, fillColor);
-            off = y + (height * ClickGuiModule.CLICK_GUI_SCALE) + ClickGuiModule.CLICK_GUI_SCALE;
+
+            if (searchButton != null)
+            {
+                searchButton.render(context, x + ClickGuiModule.CLICK_GUI_SCALE,
+                        y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (4.0f * ClickGuiModule.CLICK_GUI_SCALE),
+                        mouseX, mouseY, delta);
+            }
+
+            off = y1 + (height * ClickGuiModule.CLICK_GUI_SCALE) + ClickGuiModule.CLICK_GUI_SCALE;
             inner = off;
             for (ModuleButton moduleButton : moduleButtons)
             {
+                if (SearchButton.SEARCH_TEXT != null && !SearchButton.SEARCH_TEXT.isEmpty()
+                        && !moduleButton.getModule().getName().toLowerCase().startsWith(SearchButton.SEARCH_TEXT.toLowerCase()))
+                {
+                    continue;
+                }
                 moduleButton.render(context, x + ClickGuiModule.CLICK_GUI_SCALE, inner + ClickGuiModule.CLICK_GUI_SCALE, mouseX, mouseY, delta);
                 off += (float) ((moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE) * categoryAnimation.getFactor());
                 inner += moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE;
@@ -187,6 +220,10 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
                 button.mouseClicked(mouseX, mouseY, mouseButton);
             }
         }
+        if (searchButton != null)
+        {
+            searchButton.mouseClicked(mouseX, mouseY, mouseButton);
+        }
     }
 
     /**
@@ -206,6 +243,10 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
                 button.mouseReleased(mouseX, mouseY, mouseButton);
             }
         }
+        if (searchButton != null)
+        {
+            searchButton.mouseReleased(mouseX, mouseY, mouseButton);
+        }
     }
 
     /**
@@ -224,6 +265,10 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
                 button.keyPressed(keyCode, scanCode, modifiers);
             }
         }
+        if (searchButton != null)
+        {
+            searchButton.keyPressed(keyCode, scanCode, modifiers);
+        }
     }
 
     @Override
@@ -236,6 +281,10 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
             {
                 button.charTyped(character, modifiers);
             }
+        }
+        if (searchButton != null)
+        {
+            searchButton.charTyped(character, modifiers);
         }
     }
 
@@ -330,5 +379,10 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
     public boolean isDragging()
     {
         return drag;
+    }
+
+    public SearchButton getSearchButton()
+    {
+        return searchButton;
     }
 }
