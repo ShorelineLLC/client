@@ -67,14 +67,23 @@ public class SearchButton extends Button
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button)
     {
-        if (isWithin(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_1)
+        if (isWithin(mouseX, mouseY))
         {
-            typing = !typing;
-            if (!typing)
+            if (button == GLFW.GLFW_MOUSE_BUTTON_1)
             {
-                SEARCH_TEXT = null;
-                buffer = "".toCharArray();
+                typing = !typing;
+                if (!typing)
+                {
+                    SEARCH_TEXT = null;
+                    buffer = "".toCharArray();
+                }
             }
+        }
+        else
+        {
+            typing = false;
+            SEARCH_TEXT = null;
+            buffer = "".toCharArray();
         }
     }
 

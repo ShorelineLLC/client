@@ -141,36 +141,43 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button)
     {
-        if (isWithin(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+        if (isWithin(mouseX, mouseY))
         {
-            if (typing)
+            if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
             {
-                String number = new String(buffer);
-                try
+                if (typing)
                 {
-                    if (config.getValue() instanceof Integer)
+                    String number = new String(buffer);
+                    try
                     {
-                        ((NumberConfig<Integer>) config).setValue(Integer.parseInt(number));
+                        if (config.getValue() instanceof Integer)
+                        {
+                            ((NumberConfig<Integer>) config).setValue(Integer.parseInt(number));
+                        }
+                        else if (config.getValue() instanceof Float)
+                        {
+                            ((NumberConfig<Float>) config).setValue(Float.parseFloat(number));
+                        }
+                        else if (config.getValue() instanceof Double)
+                        {
+                            ((NumberConfig<Double>) config).setValue(Double.parseDouble(number));
+                        }
                     }
-                    else if (config.getValue() instanceof Float)
+                    catch (NumberFormatException ignored)
                     {
-                        ((NumberConfig<Float>) config).setValue(Float.parseFloat(number));
-                    }
-                    else if (config.getValue() instanceof Double)
-                    {
-                        ((NumberConfig<Double>) config).setValue(Double.parseDouble(number));
-                    }
-                }
-                catch (NumberFormatException ignored)
-                {
 
+                    }
+                    typing = false;
                 }
-                typing = false;
+                else
+                {
+                    typing = true;
+                }
             }
-            else
-            {
-                typing = true;
-            }
+        }
+        else
+        {
+            typing = false;
         }
     }
 
