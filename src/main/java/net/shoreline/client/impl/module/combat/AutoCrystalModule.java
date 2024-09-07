@@ -682,6 +682,12 @@ public class AutoCrystalModule extends RotationModule
                 return;
             }
             int crystalSlot = getCrystalSlot();
+            if (autoSwapConfig.getValue() != Swap.OFF
+                    && AutoMineModule.getInstance().isEnabled()
+                    && !AutoMineModule.getInstance().canSilentSwap())
+            {
+                return;
+            }
             if (crystalSlot != -1)
             {
                 boolean canSwap = autoSwapConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500);

@@ -81,6 +81,7 @@ public class AutoMineModule extends CombatModule
     private final List<BlockPos> packetMines = new ArrayList<>();
     private long lastBreak;
     private boolean manualOverride;
+    private boolean canSilentSwap;
     private final Timer stopMiningTimer = new CacheTimer();
 
     public AutoMineModule()
@@ -112,6 +113,19 @@ public class AutoMineModule extends CombatModule
         fadeList.clear();
         manualOverride = false;
         Managers.INVENTORY.syncToClient();
+        // Remove any floor blocks
+        if (doubleBreakConfig.getValue())
+        {
+            for (BlockPos pos : packetMines)
+            {
+                if (!mc.world.isAir(pos))
+                {
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.UP));
+                }
+            }
+            packetMines.clear();
+        }
     }
 
     @Override
@@ -125,6 +139,7 @@ public class AutoMineModule extends CombatModule
         {
             miningQueue = new FirstOutQueue<>(1);
         }
+        canSilentSwap = true;
     }
 
     @EventListener
@@ -323,25 +338,31 @@ public class AutoMineModule extends CombatModule
             {
                 data.resetBreakTime();
             }
-            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(1000)))
+            if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f)
             {
                 Managers.INVENTORY.syncToClient();
+                canSilentSwap = true;
                 removeQueuedMine(data);
                 continue;
             }
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f && data.getSlot() != -1)
+            if (isDataPacketMine(data) && data.getBlockDamage() >= 0.5f && data.getSlot() != -1)
             {
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                 {
                     return;
                 }
-                Managers.INVENTORY.setSlot(data.getSlot());
-                if (!data.hasAttemptedBreak())
+
+                canSilentSwap = false;
+                if (data.getBlockDamage() >= 0.7f)
                 {
-                    data.setAttemptedBreak(true);
+                    Managers.INVENTORY.setSlot(data.getSlot());
+                    if (!data.hasAttemptedBreak())
+                    {
+                        data.setAttemptedBreak(true);
+                    }
                 }
             }
         }
@@ -878,6 +899,11 @@ public class AutoMineModule extends CombatModule
             case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
             case ALL -> true;
         };
+    }
+
+    public boolean canSilentSwap()
+    {
+        return canSilentSwap;
     }
 
     public Set<BlockPos> getCompletedMines()
