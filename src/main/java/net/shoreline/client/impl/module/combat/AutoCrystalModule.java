@@ -55,7 +55,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 /**
  * @author linus
@@ -126,7 +125,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> safetyOverride = register(new BooleanConfig("SafetyOverride", "Overrides the safety checks if the crystal will kill an enemy", false));
     Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
     Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
-    Config<Boolean> extrapolateRangeConfig = register(new BooleanConfig("ExtrapolateRange", "Accounts for motion when calculating ranges", false));
+    Config<Boolean> selfExtrapolateConfig = register(new BooleanConfig("SelfExtrapolate", "Accounts for motion when calculating self damage", false));
     Config<Integer> extrapolateTicksConfig = register(new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the current placement", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
@@ -255,7 +254,8 @@ public class AutoCrystalModule extends RotationModule
                 EndCrystalEntity crystalEntity = intersectingCrystalCheck(placeCrystal.getDamageData());
                 if (crystalEntity != null)
                 {
-                    double self = ExplosionUtil.getDamageTo(mc.player, crystalEntity.getPos());
+                    double self = ExplosionUtil.getDamageTo(mc.player, crystalEntity.getPos(),
+                            blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
                     if (!safetyConfig.getValue() || !playerDamageCheck(self))
                     {
                         attackCrystal = new DamageData<>(crystalEntity, placeCrystal.getAttackTarget(),
@@ -431,8 +431,8 @@ public class AutoCrystalModule extends RotationModule
             {
                 return;
             }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                    crystalPos, blockDestructionConfig.getValue());
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalPos,
+                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
             if (playerDamageCheck(selfDamage))
             {
                 return;
@@ -456,7 +456,7 @@ public class AutoCrystalModule extends RotationModule
                     continue;
                 }
                 double damage = ExplosionUtil.getDamageTo(entity,
-                        crystalPos, blockDestructionConfig.getValue());
+                        crystalPos, blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
                 // TODO: Test this
                 DamageData<EndCrystalEntity> data = new DamageData<>(crystalEntity,
                         entity, damage, selfDamage, crystalEntity.getBlockPos().down());
@@ -827,8 +827,8 @@ public class AutoCrystalModule extends RotationModule
             {
                 continue;
             }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                    crystal.getPos(), blockDestructionConfig.getValue());
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystal.getPos(),
+                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer && !safetyOverride.getValue())
             {
@@ -853,7 +853,7 @@ public class AutoCrystalModule extends RotationModule
                     continue;
                 }
                 double damage = ExplosionUtil.getDamageTo(entity,
-                        crystal.getPos(), blockDestructionConfig.getValue());
+                        crystal.getPos(), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
@@ -915,8 +915,8 @@ public class AutoCrystalModule extends RotationModule
             {
                 continue;
             }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                    crystalDamageVec(pos), blockDestructionConfig.getValue());
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalDamageVec(pos),
+                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer && !safetyOverride.getValue())
             {
@@ -943,13 +943,13 @@ public class AutoCrystalModule extends RotationModule
                 double damage;
                 if (AutoMineModule.getInstance().isEnabled())
                 {
-                    damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos),
-                            blockDestructionConfig.getValue(), AutoMineModule.getInstance().getCompletedMines());
+                    damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos), blockDestructionConfig.getValue(),
+                            AutoMineModule.getInstance().getCompletedMines(), extrapolateTicksConfig.getValue());
                 }
                 else
                 {
                     damage = ExplosionUtil.getDamageTo(entity,
-                            crystalDamageVec(pos), blockDestructionConfig.getValue());
+                            crystalDamageVec(pos), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
                 }
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {

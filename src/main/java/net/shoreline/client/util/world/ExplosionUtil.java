@@ -44,23 +44,57 @@ public class ExplosionUtil implements Globals
                                      final Vec3d explosion,
                                      final boolean ignoreTerrain)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, 0);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final boolean ignoreTerrain,
+                                     int extrapolationTicks)
+    {
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, extrapolationTicks);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, 0);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain,
-                                     float power)
+                                     int extrapolationTicks)
     {
-        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
-        double ab = getExposure(explosion, entity, ignoreTerrain);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, extrapolationTicks);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final IgnoreTerrain ignoreTerrain,
+                                     float power,
+                                     int extrapolationTicks)
+    {
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+
+        Vec3d vec3d2 = Vec3d.ZERO;
+        if (extrapolationTicks != 0)
+        {
+            double ox = (x - entity.prevX) * extrapolationTicks;
+            double oy = (y - entity.prevY) * extrapolationTicks * 0.3;
+            double oz = (z - entity.prevZ) * extrapolationTicks;
+            x += ox;
+            y += oy;
+            z += oz;
+            vec3d2 = new Vec3d(ox, oy, oz);
+        }
+
+        Vec3d vec3d = new Vec3d(x, y, z);
+        double d = Math.sqrt(vec3d.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity.getBoundingBox().offset(vec3d2), ignoreTerrain);
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
@@ -73,17 +107,44 @@ public class ExplosionUtil implements Globals
                                      final boolean ignoreTerrain,
                                      final Set<BlockPos> ignoreBlocks)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, 0);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final boolean ignoreTerrain,
+                                     final Set<BlockPos> ignoreBlocks,
+                                     int extrapolationTicks)
+    {
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, extrapolationTicks);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final boolean ignoreTerrain,
                                      float power,
-                                     final Set<BlockPos> ignoreBlocks)
+                                     final Set<BlockPos> ignoreBlocks,
+                                     int extrapolationTicks)
     {
-        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
-        double ab = getExposure(explosion, entity, ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE, ignoreBlocks);
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+
+        Vec3d vec3d2 = Vec3d.ZERO;
+        if (extrapolationTicks != 0)
+        {
+            double ox = (x - entity.prevX) * extrapolationTicks;
+            double oy = (y - entity.prevY) * extrapolationTicks * 0.3;
+            double oz = (z - entity.prevZ) * extrapolationTicks;
+            x += ox;
+            y += oy;
+            z += oz;
+            vec3d2 = new Vec3d(ox, oy, oz);
+        }
+
+        Vec3d vec3d = new Vec3d(x, y, z);
+        double d = Math.sqrt(vec3d.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity.getBoundingBox().offset(vec3d2), ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE, ignoreBlocks);
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
@@ -96,17 +157,35 @@ public class ExplosionUtil implements Globals
                                      final IgnoreTerrain ignoreTerrain,
                                      final Set<BlockPos> ignoreBlocks)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, 0);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain,
                                      float power,
-                                     final Set<BlockPos> ignoreBlocks)
+                                     final Set<BlockPos> ignoreBlocks,
+                                     int extrapolationTicks)
     {
-        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
-        double ab = getExposure(explosion, entity, ignoreTerrain, ignoreBlocks);
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+
+        Vec3d vec3d2 = Vec3d.ZERO;
+        if (extrapolationTicks != 0)
+        {
+            double ox = (x - entity.prevX) * extrapolationTicks;
+            double oy = (y - entity.prevY) * extrapolationTicks * 0.3;
+            double oz = (z - entity.prevZ) * extrapolationTicks;
+            x += ox;
+            y += oy;
+            z += oz;
+            vec3d2 = new Vec3d(ox, oy, oz);
+        }
+
+        Vec3d vec3d = new Vec3d(x, y, z);
+        double d = Math.sqrt(vec3d.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity.getBoundingBox().offset(vec3d2), ignoreTerrain, ignoreBlocks);
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
@@ -122,10 +201,28 @@ public class ExplosionUtil implements Globals
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final boolean ignoreTerrain,
-                                     float power)
+                                     float power,
+                                     int extrapolationTicks)
     {
-        double d = Math.sqrt(entity.squaredDistanceTo(explosion));
-        double ab = getExposure(explosion, entity, ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE);
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+
+        Vec3d vec3d2 = Vec3d.ZERO;
+        if (extrapolationTicks != 0)
+        {
+            double ox = (x - entity.prevX) * extrapolationTicks;
+            double oy = (y - entity.prevY) * extrapolationTicks * 0.3;
+            double oz = (z - entity.prevZ) * extrapolationTicks;
+            x += ox;
+            y += oy;
+            z += oz;
+            vec3d2 = new Vec3d(ox, oy, oz);
+        }
+
+        Vec3d vec3d = new Vec3d(x, y, z);
+        double d = Math.sqrt(vec3d.squaredDistanceTo(explosion));
+        double ab = getExposure(explosion, entity.getBoundingBox().offset(vec3d2), ignoreTerrain ? IgnoreTerrain.BLAST : IgnoreTerrain.NONE);
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
@@ -223,32 +320,30 @@ public class ExplosionUtil implements Globals
 
     /**
      * @param source
-     * @param entity
+     * @param box
      * @param ignoreTerrain
      * @return
      */
     private static float getExposure(final Vec3d source,
-                                     final Entity entity,
+                                     final Box box,
                                      final IgnoreTerrain ignoreTerrain,
                                      final Set<BlockPos> ignoreBlocks)
     {
         RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain, ignoreBlocks);
-        final Box box = entity.getBoundingBox();
         return getExposure(source, box, raycastFactory);
     }
 
     /**
      * @param source
-     * @param entity
+     * @param box
      * @param ignoreTerrain
      * @return
      */
     private static float getExposure(final Vec3d source,
-                                     final Entity entity,
+                                     final Box box,
                                      final IgnoreTerrain ignoreTerrain)
     {
         RaycastFactory raycastFactory = getRaycastFactory(ignoreTerrain);
-        final Box box = entity.getBoundingBox();
         return getExposure(source, box, raycastFactory);
     }
 

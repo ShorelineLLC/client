@@ -113,7 +113,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
         for (ModuleButton moduleButton : moduleButtons)
         {
             if (SearchButton.SEARCH_TEXT != null && !SearchButton.SEARCH_TEXT.isEmpty()
-                    && !moduleButton.getModule().getName().toLowerCase().startsWith(SearchButton.SEARCH_TEXT.toLowerCase()))
+                    && !moduleButton.getModule().getName().toLowerCase().contains(SearchButton.SEARCH_TEXT.toLowerCase()))
             {
                 continue;
             }
@@ -180,7 +180,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
             for (ModuleButton moduleButton : moduleButtons)
             {
                 if (SearchButton.SEARCH_TEXT != null && !SearchButton.SEARCH_TEXT.isEmpty()
-                        && !moduleButton.getModule().getName().toLowerCase().startsWith(SearchButton.SEARCH_TEXT.toLowerCase()))
+                        && !moduleButton.getModule().getName().toLowerCase().contains(SearchButton.SEARCH_TEXT.toLowerCase()))
                 {
                     continue;
                 }

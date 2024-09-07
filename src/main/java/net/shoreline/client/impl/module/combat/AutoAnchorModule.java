@@ -159,7 +159,7 @@ public class AutoAnchorModule extends BlockPlacerModule
                 continue;
             }
             double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                    pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f); // Anchor explosions power = 10
+                    pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0); // Anchor explosions power = 10
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer)
             {
@@ -184,7 +184,7 @@ public class AutoAnchorModule extends BlockPlacerModule
                     continue;
                 }
                 double damage = ExplosionUtil.getDamageTo(entity,
-                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f);
+                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0);
                 if (data == null || damage > dmg)
                 {
                     data = pos;
