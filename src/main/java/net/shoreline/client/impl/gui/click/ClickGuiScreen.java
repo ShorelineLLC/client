@@ -3,6 +3,7 @@ package net.shoreline.client.impl.gui.click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.ScissorStack;
@@ -39,8 +40,7 @@ public class ClickGuiScreen extends Screen implements Globals
     public static final ScissorStack SCISSOR_STACK = new ScissorStack();
     private final List<CategoryFrame> frames = new CopyOnWriteArrayList<>();
     private final ClickGuiModule module;
-    //
-    private CategoryFrame focus;
+
     private boolean shouldCloseOnEsc = true;
 
     /**
@@ -71,10 +71,6 @@ public class ClickGuiScreen extends Screen implements Globals
         renderAndScaleGUI(context);
         for (CategoryFrame frame : frames)
         {
-            if (frame.isWithinTotal(mouseX, mouseY))
-            {
-                focus = frame;
-            }
             if (frame.isWithin(mouseX, mouseY) && MOUSE_LEFT_HOLD && checkDragging())
             {
                 frame.setDragging(true);
@@ -147,9 +143,11 @@ public class ClickGuiScreen extends Screen implements Globals
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
     {
-        if (focus != null)
+        for (CategoryFrame frame : frames)
         {
-            focus.setPos(focus.getX(), (float) (focus.getY() + verticalAmount * 50f));
+            float scrolledY = (float) (frame.getY() + verticalAmount * ClickGuiModule.getInstance().getScrollSpeed());
+            scrolledY = MathHelper.clamp(scrolledY, -(frame.getTotalHeight() - 10.0f),15.0f);
+            frame.setPos(frame.getX(), scrolledY);
         }
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }

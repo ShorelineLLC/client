@@ -138,14 +138,6 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
                 }
             }
         }
-        if (y < -(fheight - 10))
-        {
-            y = -(fheight - 10);
-        }
-        if (y > mc.getWindow().getHeight() - 10)
-        {
-            y = mc.getWindow().getHeight() - 10;
-        }
         rect(context, ClickGuiModule.getInstance().getColor(1.7f));
 
         int whiteText = -1;

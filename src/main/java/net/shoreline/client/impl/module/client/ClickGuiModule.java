@@ -25,6 +25,7 @@ public class ClickGuiModule extends ToggleModule
     private static ClickGuiModule INSTANCE;
 
     Config<Float> scaleConfig = register(new NumberConfig<>("Scale", "The gui scale", 0.5f, 1.0f, 3.0f));
+    Config<Integer> scrollSpeedConfig = register(new NumberConfig<>("ScrollSpeed", "The speed of GUI scrolling", 5, 30, 100));
     public Config<Boolean> underGlow = register(new BooleanConfig("UnderGlow", "GUI underglow", false));
     //    Config<Integer> hueConfig = register(new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
 //    Config<Integer> saturationConfig = register(new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
@@ -145,5 +146,10 @@ public class ClickGuiModule extends ToggleModule
     public float getScaleFactor()
     {
         return (float) (openCloseAnimation.getFactor());
+    }
+
+    public int getScrollSpeed()
+    {
+        return scrollSpeedConfig.getValue();
     }
 }
