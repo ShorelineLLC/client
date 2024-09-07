@@ -154,6 +154,11 @@ public class NetworkManager implements Globals
         return getServerIp().contains("crystalpvp.cc");
     }
 
+    public boolean is2b2t()
+    {
+        return getServerIp().contains("2b2t.org");
+    }
+
     public String getServerIp()
     {
         if (info != null)
