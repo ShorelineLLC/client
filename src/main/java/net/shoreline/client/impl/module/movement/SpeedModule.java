@@ -45,6 +45,7 @@ public class SpeedModule extends ToggleModule
     Config<Float> collisionDistanceConfig = register(new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f, () -> speedModeConfig.getValue() == Speed.VANILLA));
     Config<Boolean> timerConfig = register(new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false, () -> isStrafe()));
+    Config<Boolean> fastConfig = register(new BooleanConfig("FastFall", "Fast fall speed", false, () -> speedModeConfig.getValue() == Speed.STRAFE_STRICT));
     Config<Boolean> strafeBoostConfig = register(new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false, () -> isStrafe()));
     Config<Integer> boostTicksConfig = register(new NumberConfig<>("BoostTicks", "The number of ticks to boost strafe", 10, 20, 40, () -> isStrafe() && strafeBoostConfig.getValue()));
     Config<Boolean> speedWaterConfig = register(new BooleanConfig("SpeedInWater", "Applies speed even in water and lava", false));
@@ -196,6 +197,12 @@ public class SpeedModule extends ToggleModule
                 if (timerConfig.getValue())
                 {
                     TimerModule.getInstance().setTimer(1.0888f);
+                }
+                if (fastConfig.getValue() && MathUtil.round(mc.player.getY() - (int) mc.player.getY(), 3) == MathUtil.round(0.138, 3))
+                {
+                    Managers.MOVEMENT.setMotionY(mc.player.getVelocity().y - 0.08);
+                    event.setY(event.getY() - 0.09316090325960147D);
+                    mc.player.setPos(mc.player.getX(), mc.player.getY() - 0.09316090325960147, mc.player.getZ());
                 }
                 if (strafe == 1)
                 {

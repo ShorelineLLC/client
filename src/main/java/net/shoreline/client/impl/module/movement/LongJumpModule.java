@@ -41,6 +41,7 @@ public class LongJumpModule extends ToggleModule
     //
     Config<JumpMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for long jump", JumpMode.NORMAL, JumpMode.values()));
     Config<Float> boostConfig = register(new NumberConfig<>("Boost", "The jump boost speed", 0.1f, 4.5f, 10.0f, () -> modeConfig.getValue() == JumpMode.NORMAL));
+    Config<Float> heightConfig = register(new NumberConfig<>("Height", "The jump height", 0.3f, 1.0f, 2.0f, () -> modeConfig.getValue() == JumpMode.GRIM));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Automatically disables when rubberband is detected", true));
     //
     private int stage;
@@ -93,6 +94,7 @@ public class LongJumpModule extends ToggleModule
         double dx = mc.player.getX() - mc.player.prevX;
         double dz = mc.player.getZ() - mc.player.prevZ;
         distance = Math.sqrt(dx * dx + dz * dz);
+
         if (modeConfig.getValue() == JumpMode.GRIM)
         {
             int elytraSlot = -1;
@@ -111,7 +113,7 @@ public class LongJumpModule extends ToggleModule
             }
             Box bb = mc.player.getBoundingBox();
             boolean shouldFall = false;
-            for (double i = 0.0; i < 0.55; i += 0.01)
+            for (double i = 0.0; i < heightConfig.getValue(); i += 0.01)
             {
                 if (!mc.world.isSpaceEmpty(mc.player, bb.offset(0.0, -i, 0.0)))
                 {
@@ -123,7 +125,7 @@ public class LongJumpModule extends ToggleModule
             {
                 mc.player.jump();
             }
-            else if (mc.player.getVelocity().y < 0.0 && shouldFall)
+            else if (mc.player.getVelocity().y < 0.0 && shouldFall && !mc.player.isFallFlying())
             {
                 Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
                 Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
