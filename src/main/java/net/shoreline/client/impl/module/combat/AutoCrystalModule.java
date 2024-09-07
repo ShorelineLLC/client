@@ -103,6 +103,7 @@ public class AutoCrystalModule extends RotationModule
     //
     Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
+    Config<Boolean> placeInstantConfig = register(new BooleanConfig("InstantPlace", "Places crystals in between ticks", true));
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
     Config<Float> placeWallRangeConfig = register(new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
@@ -336,10 +337,11 @@ public class AutoCrystalModule extends RotationModule
                 lastAttackTimer.reset();
             }
         }
+        boolean placeRotate = !placeInstantConfig.getValue() && lastPlaceTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f);
         if (placeCrystal != null)
         {
             renderPos = placeCrystal.getDamageData();
-            if (lastPlaceTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f))
+            if (placeRotate)
             {
                 // ChatUtil.clientSendMessage("place range:" + Math.sqrt(mc.player.getEyePos().squaredDistanceTo(placeCrystal.getDamageData().toCenterPos())));
                 placeCrystal(placeCrystal.getDamageData(), hand);
@@ -352,15 +354,27 @@ public class AutoCrystalModule extends RotationModule
     @EventListener
     public void onRunTick(RunTickEvent event)
     {
-        if (mc.player == null || attackDelayConfig.getValue() <= 0.0)
+        if (mc.player == null)
         {
             return;
         }
-        float attackFactor = 50.0f / Math.max(1.0f, attackFactorConfig.getValue());
-        if (attackCrystal != null && lastAttackTimer.passed(attackDelayConfig.getValue() * attackFactor))
+        final Hand hand = getCrystalHand();
+        if (attackDelayConfig.getValue() > 0.0)
         {
-            attackCrystal(attackCrystal.getDamageData(), getCrystalHand());
-            lastAttackTimer.reset();
+            float attackFactor = 50.0f / Math.max(1.0f, attackFactorConfig.getValue());
+            if (attackCrystal != null && lastAttackTimer.passed(attackDelayConfig.getValue() * attackFactor))
+            {
+                attackCrystal(attackCrystal.getDamageData(), hand);
+                lastAttackTimer.reset();
+            }
+        }
+        if (placeInstantConfig.getValue())
+        {
+            if (placeCrystal != null && lastPlaceTimer.passed(1000.0f - (50.0f * placeSpeedConfig.getValue())))
+            {
+                placeCrystal(placeCrystal.getDamageData(), hand);
+                lastPlaceTimer.reset();
+            }
         }
     }
 
