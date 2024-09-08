@@ -12,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -337,7 +338,7 @@ public class AutoCrystalModule extends RotationModule
                 lastAttackTimer.reset();
             }
         }
-        boolean placeRotate = !placeInstantConfig.getValue() && lastPlaceTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f);
+        boolean placeRotate = lastPlaceTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f);
         if (placeCrystal != null)
         {
             renderPos = placeCrystal.getDamageData();
@@ -366,14 +367,6 @@ public class AutoCrystalModule extends RotationModule
             {
                 attackCrystal(attackCrystal.getDamageData(), hand);
                 lastAttackTimer.reset();
-            }
-        }
-        if (placeInstantConfig.getValue())
-        {
-            if (placeCrystal != null && lastPlaceTimer.passed(1000.0f - (50.0f * placeSpeedConfig.getValue())))
-            {
-                placeCrystal(placeCrystal.getDamageData(), hand);
-                lastPlaceTimer.reset();
             }
         }
     }
@@ -491,6 +484,11 @@ public class AutoCrystalModule extends RotationModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
+        if (mc.player == null || mc.world == null)
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof PlaySoundS2CPacket packet)
         {
             if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE && packet.getCategory() == SoundCategory.BLOCKS)
@@ -523,6 +521,48 @@ public class AutoCrystalModule extends RotationModule
                 if (attackTime != null)
                 {
                     attackLatency.add(System.currentTimeMillis() - attackTime);
+                }
+            }
+        }
+
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir() && placeInstantConfig.getValue())
+        {
+            final BlockPos blockPos = packet.getPos();
+            if (placeRangeCheck(blockPos))
+            {
+                return;
+            }
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalDamageVec(blockPos),
+                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
+            if (playerDamageCheck(selfDamage))
+            {
+                return;
+            }
+            for (Entity entity : mc.world.getEntities())
+            {
+                if (entity == null || !entity.isAlive() || entity == mc.player
+                        || !isValidTarget(entity)
+                        || Managers.SOCIAL.isFriend(entity.getName()))
+                {
+                    continue;
+                }
+                double dist = mc.player.squaredDistanceTo(entity);
+                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
+                {
+                    continue;
+                }
+                double damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(blockPos),
+                        blockDestructionConfig.getValue(), Set.of(blockPos), extrapolateTicksConfig.getValue());
+                DamageData<BlockPos> data = new DamageData<>(blockPos,
+                        entity, damage, selfDamage);
+                boolean placeRotate = placeCrystal == null && damage > minDamageConfig.getValue() || placeCrystal != null
+                        && damage >= placeCrystal.getDamage()
+                        || entity instanceof LivingEntity entity1 && isCrystalLethalTo(data, entity1);
+                if (placeRotate)
+                {
+                    placeCrystal(blockPos, getCrystalHand());
+                    lastPlaceTimer.reset();
+                    break;
                 }
             }
         }
@@ -696,12 +736,6 @@ public class AutoCrystalModule extends RotationModule
                 return;
             }
             int crystalSlot = getCrystalSlot();
-            if (autoSwapConfig.getValue() != Swap.OFF
-                    && AutoMineModule.getInstance().isEnabled()
-                    && !AutoMineModule.getInstance().canSilentSwap())
-            {
-                return;
-            }
             if (crystalSlot != -1)
             {
                 boolean canSwap = autoSwapConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500);
@@ -961,16 +995,8 @@ public class AutoCrystalModule extends RotationModule
                     continue;
                 }
                 double damage;
-                if (AutoMineModule.getInstance().isEnabled())
-                {
-                    damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos), blockDestructionConfig.getValue(),
-                            AutoMineModule.getInstance().getCompletedMines(), extrapolateTicksConfig.getValue());
-                }
-                else
-                {
-                    damage = ExplosionUtil.getDamageTo(entity,
-                            crystalDamageVec(pos), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
-                }
+                damage = ExplosionUtil.getDamageTo(entity,
+                        crystalDamageVec(pos), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
