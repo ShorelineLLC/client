@@ -344,8 +344,8 @@ public class AutoMineModule extends CombatModule
             {
                 data.resetBreakTime();
             }
-            if (isDataPacketMine(data) && (data.getState().isAir()
-                    || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(1000)))
+            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak()
+                    && data.passedAttemptedBreakTime(1000)))
             {
                 Managers.INVENTORY.syncToClient();
                 removeQueuedMine(data);
@@ -354,15 +354,14 @@ public class AutoMineModule extends CombatModule
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     data.getState(), mc.world, data.getPos());
             data.damage(damageDelta);
-            if (isDataPacketMine(data) && data.getBlockDamage() >= 0.7f && data.getSlot() != -1)
+            if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f && data.getSlot() != -1)
             {
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                 {
                     return;
                 }
-
                 Managers.INVENTORY.setSlot(data.getSlot());
-                if (data.getBlockDamage() >= 1.0f && !data.hasAttemptedBreak())
+                if (!data.hasAttemptedBreak())
                 {
                     data.setAttemptedBreak(true);
                 }
