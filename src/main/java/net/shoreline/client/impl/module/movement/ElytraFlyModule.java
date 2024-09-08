@@ -21,6 +21,7 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
 import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityTravelEvent;
@@ -59,6 +60,7 @@ public class ElytraFlyModule extends RotationModule
     Config<Boolean> infiniteDurabilityConfig = register(new BooleanConfig("InfiniteDurability", "Prevents elytra from using durability", false, () -> modeConfig.getValue() == FlyMode.PACKET));
     Config<Boolean> lagRedeployConfig = register(new BooleanConfig("LagRedeploy", "Redeploys elytra when lagging", false, () -> modeConfig.getValue() == FlyMode.CONTROL));
     Config<Boolean> fireworkConfig = register(new BooleanConfig("Fireworks", "Uses fireworks when flying", false, () -> modeConfig.getValue() == FlyMode.CONTROL));
+    Config<Boolean> fakeFlyConfig = register(new BooleanConfig("FakeFly", "Fly without showing your elytra", false, () -> modeConfig.getValue() == FlyMode.BOOST));
     Config<Boolean> baritoneConfig = new BooleanConfig("Baritone", "Uses baritone to automatically navigate around obstacles", false);
 
     private float speed;
@@ -203,11 +205,48 @@ public class ElytraFlyModule extends RotationModule
     }
 
     @EventListener
+    public void onElytraTransform(ElytraTransformEvent event)
+    {
+        if (fakeFlyConfig.getValue() && modeConfig.getValue() == FlyMode.BOOST && event.getEntity() == mc.player)
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
     public void onTravel(TravelEvent event)
     {
         if (mc.player == null || mc.world == null)
         {
             return;
+        }
+        if (fakeFlyConfig.getValue() && modeConfig.getValue() == FlyMode.BOOST)
+        {
+            int elytraSlot = -1;
+            for (int i = 0; i < 36; i++)
+            {
+                ItemStack stack = mc.player.getInventory().getStack(i);
+                if (stack.getItem() instanceof ElytraItem)
+                {
+                    elytraSlot = i;
+                    break;
+                }
+            }
+            if (elytraSlot == -1)
+            {
+                return;
+            }
+            if (mc.player.getVelocity().y < 0.0 && !mc.player.isFallFlying())
+            {
+                Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                mc.player.startFallFlying();
+                Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
+                Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+            }
         }
         switch (modeConfig.getValue())
         {
@@ -220,7 +259,7 @@ public class ElytraFlyModule extends RotationModule
                         return;
                     }
                     boolean boost = mc.options.forwardKey.isPressed();
-                    if (boost)
+                    if (boost && mc.player.getVelocity().y < 0.0)
                     {
                         Vec3d glide = glideElytra(speedConfig.getValue() / 50.0f);
                         Vec3d motion = mc.player.getVelocity();
@@ -230,8 +269,8 @@ public class ElytraFlyModule extends RotationModule
                     double speed = Math.hypot(postMotion.x, postMotion.z);
                     if (speed > maxSpeedConfig.getValue())
                     {
-                        Managers.MOVEMENT.setMotionXZ(postMotion.x * maxSpeedConfig.getValue() / speed,
-                                postMotion.z * maxSpeedConfig.getValue() / speed);
+                        Managers.MOVEMENT.setMotionXZ(postMotion.x * (maxSpeedConfig.getValue() / speed),
+                                postMotion.z * (maxSpeedConfig.getValue() / speed));
                     }
                 }
             }
@@ -278,7 +317,7 @@ public class ElytraFlyModule extends RotationModule
                 }
                 // event.cancel();
                 boolean boost = (mc.options.jumpKey.isPressed() || AutoWalkModule.getInstance().isEnabled());
-                if (boost)
+                if (boost && mc.player.getVelocity().y < 0.0)
                 {
                     Vec3d glide = glideElytra(speedConfig.getValue() / 50.0f);
                     Vec3d motion = mc.player.getVelocity();
@@ -289,8 +328,8 @@ public class ElytraFlyModule extends RotationModule
                 double speed = Math.hypot(postMotion.x, postMotion.z);
                 if (speed > maxSpeedConfig.getValue())
                 {
-                    Managers.MOVEMENT.setMotionXZ(postMotion.x * maxSpeedConfig.getValue() / speed,
-                            postMotion.z * maxSpeedConfig.getValue() / speed);
+                    Managers.MOVEMENT.setMotionXZ(postMotion.x * (maxSpeedConfig.getValue() / speed),
+                            postMotion.z * (maxSpeedConfig.getValue() / speed));
                 }
             }
             case FACTORIZE ->

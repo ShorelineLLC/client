@@ -17,8 +17,8 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
+import net.shoreline.client.impl.event.entity.player.TravelEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
@@ -85,12 +85,8 @@ public class LongJumpModule extends ToggleModule
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTravel(TravelEvent event)
     {
-        if (event.getStage() != StageEvent.EventStage.PRE)
-        {
-            return;
-        }
         double dx = mc.player.getX() - mc.player.prevX;
         double dz = mc.player.getZ() - mc.player.prevZ;
         distance = Math.sqrt(dx * dx + dz * dz);

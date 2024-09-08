@@ -190,7 +190,9 @@ public class AutoMineModule extends CombatModule
                     }
                     List<AutoMineCalc> phasePositions = getPhasePosition(playerTarget);
                     PriorityQueue<AutoMineCalc> miningPositions = getMiningPosition(playerTarget);
-                    PriorityQueue<AutoMineCalc> miningPositions2 = miningPositions.stream().filter(c -> !mc.world.isAir(c.pos())).collect(Collectors.toCollection(PriorityQueue::new));
+                    PriorityQueue<AutoMineCalc> miningPositions2 = miningPositions.stream()
+                            .filter(c -> !mc.world.isAir(c.pos()))
+                            .collect(Collectors.toCollection(PriorityQueue::new));
                     if (doubleBreakConfig.getValue())
                     {
                         AutoMineCalc miningPos;
@@ -199,7 +201,8 @@ public class AutoMineModule extends CombatModule
                         if (miningPhasePos)
                         {
                             miningPos2 = phasePositions.remove(0);
-                            miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) : autoRemineConfig.getValue() && miningPos2 == null ? miningPositions.peek() : miningPositions2.peek();
+                            miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) : autoRemineConfig.getValue()
+                                    && miningPos2 == null ? miningPositions.peek() : miningPositions2.peek();
                         }
                         else
                         {
@@ -219,7 +222,8 @@ public class AutoMineModule extends CombatModule
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos()) && miningQueue.size() < 2;
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -254,7 +258,8 @@ public class AutoMineModule extends CombatModule
                             if (instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -278,7 +283,8 @@ public class AutoMineModule extends CombatModule
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -296,14 +302,16 @@ public class AutoMineModule extends CombatModule
                     }
                     else
                     {
-                        AutoMineCalc miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) : autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
+                        AutoMineCalc miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) :
+                                autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
                         if (miningPos != null)
                         {
                             boolean instantMineIncorrect = miningData != null && miningData.getPos() != miningPos.pos();
                             if (instantMineIncorrect || miningQueue.isEmpty())
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -395,7 +403,8 @@ public class AutoMineModule extends CombatModule
             return;
         }
         // Something went wrong, remove and remine
-        if (miningData2.getBlockDamage() >= speedConfig.getValue() && miningData2.hasAttemptedBreak() && miningData2.passedAttemptedBreakTime(1000))
+        if (miningData2.getBlockDamage() >= speedConfig.getValue() && miningData2.hasAttemptedBreak()
+                && miningData2.passedAttemptedBreakTime(1000))
         {
             abortMining(miningData2);
             removeQueuedMine(miningData2);
