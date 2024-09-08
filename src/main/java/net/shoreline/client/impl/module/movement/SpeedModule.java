@@ -25,12 +25,12 @@ import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.client.util.math.MathUtil;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
-import net.shoreline.client.util.entity.FakePlayerEntity;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus
@@ -60,6 +60,8 @@ public class SpeedModule extends ToggleModule
     private double distance;
     //
     private boolean prevTimer;
+
+    private static final float FRICTION = 159.077f;
 
     /**
      *
@@ -198,12 +200,6 @@ public class SpeedModule extends ToggleModule
                 {
                     TimerModule.getInstance().setTimer(1.0888f);
                 }
-                if (fastConfig.getValue() && MathUtil.round(mc.player.getY() - (int) mc.player.getY(), 3) == MathUtil.round(0.138, 3))
-                {
-                    Managers.MOVEMENT.setMotionY(mc.player.getVelocity().y - 0.08);
-                    event.setY(event.getY() - 0.09316090325960147D);
-                    mc.player.setPos(mc.player.getX(), mc.player.getY() - 0.09316090325960147, mc.player.getZ());
-                }
                 if (strafe == 1)
                 {
                     speed = 1.35f * base - 0.01f;
@@ -232,7 +228,7 @@ public class SpeedModule extends ToggleModule
                     {
                         strafe = MovementUtil.isInputtingMovement() ? 1 : 0;
                     }
-                    speed = distance - distance / 159.0;
+                    speed = distance - distance / FRICTION;
                 }
                 speed = Math.max(speed, base);
                 if (strafeBoostConfig.getValue())
@@ -251,9 +247,15 @@ public class SpeedModule extends ToggleModule
                 {
                     return;
                 }
+                if (fastConfig.getValue() && MathUtil.round(mc.player.getY() - (int) mc.player.getY(), 3) == MathUtil.round(0.138, 3))
+                {
+                    Managers.MOVEMENT.setMotionY(mc.player.getVelocity().y - 0.08);
+                    event.setY(event.getY() - 0.09316090325960147D);
+                    mc.player.setPos(mc.player.getX(), mc.player.getY() - 0.09316090325960147, mc.player.getZ());
+                }
                 if (strafe == 1)
                 {
-                    speed = 1.35f * base - 0.01f;
+                    speed = (fastConfig.getValue() ? 1.38f : 1.35f) * base - 0.01f;
                 }
                 else if (strafe == 2)
                 {
@@ -261,7 +263,7 @@ public class SpeedModule extends ToggleModule
                     {
                         return;
                     }
-                    float jump = 0.3999999463558197f + jumpEffect;
+                    float jump = (fastConfig.getValue() ? 0.41999998688697815f : 0.3999999463558197f) + jumpEffect;
                     event.setY(jump);
                     Managers.MOVEMENT.setMotionY(jump);
                     speed *= 2.149;
@@ -278,7 +280,7 @@ public class SpeedModule extends ToggleModule
                     {
                         strafe = MovementUtil.isInputtingMovement() ? 1 : 0;
                     }
-                    speed = distance - distance / 159.0;
+                    speed = distance - distance / FRICTION;
                 }
                 strictTicks++;
                 speed = Math.max(speed, base);
@@ -364,7 +366,7 @@ public class SpeedModule extends ToggleModule
                     {
                         strafe = MovementUtil.isInputtingMovement() ? 1 : 0;
                     }
-                    speed = distance - distance / 159.0;
+                    speed = distance - distance / FRICTION;
                 }
                 speed = Math.max(speed, base);
                 Vec2f motion = handleVanillaMotion((float) speed);
@@ -410,7 +412,7 @@ public class SpeedModule extends ToggleModule
                             strafe = MovementUtil.isInputtingMovement() ? 1 : 0;
                         }
                     }
-                    speed = distance - distance / 159.0;
+                    speed = distance - distance / FRICTION;
                 }
                 speed = Math.max(speed, base);
                 if (strafe > 0)
@@ -473,7 +475,7 @@ public class SpeedModule extends ToggleModule
                                     strafe = MovementUtil.isInputtingMovement() ? 1 : 0;
                                 }
                             }
-                            speed = distance - distance / 159.0;
+                            speed = distance - distance / FRICTION;
                         }
                     }
                     else
@@ -524,7 +526,7 @@ public class SpeedModule extends ToggleModule
                         {
                             strafe = 1;
                         }
-                        speed = distance - distance / 159.0;
+                        speed = distance - distance / FRICTION;
                     }
                 }
                 else
