@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -11,10 +12,15 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.render.Interpolation;
+import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.EntityOutlineEvent;
 import net.shoreline.client.impl.event.entity.decoration.TeamColorEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
+import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
@@ -27,8 +33,9 @@ public class ESPModule extends ToggleModule
 {
     //
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The ESP render range", 10.0f, 50.0f, 200.0f));
-    Config<ESPMode> modeConfig = register(new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.GLOW, ESPMode.values()));
-    Config<Float> widthConfig = register(new NumberConfig<>("Linewidth", "ESP rendering line width", 0.1f, 1.25f, 5.0f));
+    Config<ESPMode> modeConfig = register(new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.BOX, ESPMode.values()));
+    Config<Boolean> fillConfig = register(new BooleanConfig("Fill", "Fills the box render", false, () -> modeConfig.getValue() == ESPMode.BOX));
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "ESP rendering line width", 0.1f, 2.0f, 5.0f, () -> modeConfig.getValue() == ESPMode.BOX));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render players through walls", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render self through walls", true));
     Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue() || selfConfig.getValue()));
@@ -46,6 +53,36 @@ public class ESPModule extends ToggleModule
     public ESPModule()
     {
         super("ESP", "See entities and objects through walls", ModuleCategory.RENDER);
+    }
+
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        if (modeConfig.getValue() != ESPMode.BOX)
+        {
+            return;
+        }
+        RenderBuffers.preRender();
+        for (Entity entity : mc.world.getEntities())
+        {
+            if (entity == mc.player)
+            {
+                continue;
+            }
+            if (checkESP(entity))
+            {
+                Color espColor = getESPColor(entity);
+                Box box = Interpolation.getInterpolatedEntityBox(entity);
+                if (fillConfig.getValue())
+                {
+                    RenderManager.renderBox(event.getMatrices(), box,
+                            ColorUtil.withAlpha(espColor.getRGB(), 60));
+                }
+                RenderManager.renderBoundingBox(event.getMatrices(), box,
+                        widthConfig.getValue(), ColorUtil.withAlpha(espColor.getRGB(), 144));
+            }
+        }
+        RenderBuffers.postRender();
     }
 
     @EventListener
@@ -124,7 +161,7 @@ public class ESPModule extends ToggleModule
 
     public enum ESPMode
     {
-        // OUTLINE,
+        BOX,
         GLOW
     }
 }
