@@ -113,7 +113,7 @@ public class AutoMineModule extends CombatModule
         manualOverride = false;
         Managers.INVENTORY.syncToClient();
         // Remove any floor blocks
-        if (doubleBreakConfig.getValue())
+        if (doubleBreakConfig.getValue() && grimConfig.getValue())
         {
             for (BlockPos pos : packetMines)
             {
@@ -149,7 +149,7 @@ public class AutoMineModule extends CombatModule
         }
 
         // Remove any floor blocks
-        if (doubleBreakConfig.getValue())
+        if (doubleBreakConfig.getValue() && grimConfig.getValue())
         {
             for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
             {
@@ -336,7 +336,8 @@ public class AutoMineModule extends CombatModule
             {
                 data.resetBreakTime();
             }
-            if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f)
+            if (isDataPacketMine(data) && (data.getState().isAir()
+                    || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(1000)))
             {
                 Managers.INVENTORY.syncToClient();
                 removeQueuedMine(data);
@@ -353,12 +354,9 @@ public class AutoMineModule extends CombatModule
                 }
 
                 Managers.INVENTORY.setSlot(data.getSlot());
-                if (data.getBlockDamage() >= 1.0f)
+                if (data.getBlockDamage() >= 1.0f && !data.hasAttemptedBreak())
                 {
-                    if (!data.hasAttemptedBreak())
-                    {
-                        data.setAttemptedBreak(true);
-                    }
+                    data.setAttemptedBreak(true);
                 }
             }
         }
@@ -771,24 +769,37 @@ public class AutoMineModule extends CombatModule
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             packetMines.add(data.getPos());
         }
         else
         {
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            if (!grimConfig.getValue() || Managers.NETWORK.is2b2t())
+            if (Managers.NETWORK.is2b2t())
             {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             }
+            else
+            {
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                if (!grimConfig.getValue())
+                {
+                    Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                }
+            }
+
             if (floor)
             {
                 data.setFloorMine();

@@ -15,6 +15,7 @@ import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
 import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
 import net.shoreline.client.util.FormattingUtil;
+import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.client.util.render.animation.TimeAnimation;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -46,6 +47,11 @@ public class BetterChatModule extends ToggleModule
     {
         if (timestampConfig.getValue() != Timestamp.OFF)
         {
+            String string = FormattingUtil.toString(event.getText());
+            if (string.contains(ChatUtil.PREFIX))
+            {
+                return;
+            }
             String time = new SimpleDateFormat("k:mm").format(new Date());
             String text = switch (timestampConfig.getValue())
             {
@@ -55,7 +61,7 @@ public class BetterChatModule extends ToggleModule
                 case OFF -> "";
             };
             event.cancel();
-            event.setText(Text.of(text + FormattingUtil.toString(event.getText())));
+            event.setText(Text.of(text + string));
         }
     }
 
