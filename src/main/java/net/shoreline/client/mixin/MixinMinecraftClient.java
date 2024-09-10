@@ -154,7 +154,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
             TickEvent tickPostEvent = new TickEvent();
             tickPostEvent.setStage(StageEvent.EventStage.POST);
             EventBus.INSTANCE.dispatch(tickPostEvent);
-            world.getEntities().forEach(entity ->
+            for (Entity entity : world.getEntities())
             {
                 if (entity instanceof LivingEntity e)
                 {
@@ -169,7 +169,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
                         deadList.remove((Integer) e.getId());
                     }
                 }
-            });
+            }
         }
     }
 
