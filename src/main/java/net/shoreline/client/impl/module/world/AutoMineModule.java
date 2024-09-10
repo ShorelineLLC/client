@@ -4,12 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -18,10 +18,10 @@ import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.CombatModule;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
@@ -110,7 +110,7 @@ public class AutoMineModule extends CombatModule
     @Override
     protected void onDisable()
     {
-        miningQueue.clear();
+        clearMiningQueue();
         fadeList.clear();
         manualOverride = false;
         Managers.INVENTORY.syncToClient();
@@ -143,9 +143,9 @@ public class AutoMineModule extends CombatModule
     }
 
     @EventListener
-    public void onPlayerTick(final PlayerTickEvent event)
+    public void onPlayerTick(final TickEvent event)
     {
-        if (mc.player.isCreative() || mc.player.isSpectator())
+        if (mc.player.isCreative() || mc.player.isSpectator() || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
         }
@@ -171,7 +171,7 @@ public class AutoMineModule extends CombatModule
             if (mc.player.isCrawling() && crawlingConfig.getValue() && getCrawlingMine() != null)
             {
                 BlockPos crawlingMine = getCrawlingMine();
-                miningQueue.clear();
+                clearMiningQueue();
                 manualOverride = true;
                 queueMiningData(new AutoMiningData(crawlingMine, Direction.DOWN));
             }
@@ -239,7 +239,7 @@ public class AutoMineModule extends CombatModule
                                     boolean full = !mc.world.isAir(miningPos.pos());
                                     if (full && full2)
                                     {
-                                        miningQueue.clear();
+                                        clearMiningQueue();
                                     }
                                     if (full2)
                                     {
@@ -363,8 +363,8 @@ public class AutoMineModule extends CombatModule
                     return;
                 }
                 Managers.INVENTORY.setSlot(data.getSlot());
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, new BlockHitResult(Vec3d.ZERO, Direction.UP, data.getPos(), true), id));
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+
                 if (!data.hasAttemptedBreak())
                 {
                     data.setAttemptedBreak(true);
@@ -458,7 +458,7 @@ public class AutoMineModule extends CombatModule
             }
             if (data instanceof AutoMiningData)
             {
-                miningQueue.clear();
+                clearMiningQueue();
                 manualOverride = true;
             }
             startManualMine(event.getPos(), event.getDirection());
@@ -607,7 +607,7 @@ public class AutoMineModule extends CombatModule
         boolean floor = isMiningFloor(data);
         if (floor && !miningQueue.isEmpty() || miningQueue.stream().anyMatch(d -> d.isFloor()))
         {
-            miningQueue.clear();
+            clearMiningQueue();
         }
         if (data.getState().isAir())
         {
@@ -653,6 +653,10 @@ public class AutoMineModule extends CombatModule
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
         for (BlockPos blockPos : surroundBlocks)
         {
+            if (BlastResistantBlocks.isUnbreakable(blockPos)) // bedrock mine exploit!!
+            {
+                continue;
+            }
             if (avoidSelfConfig.getValue() && (SurroundModule.getInstance().getSurroundNoDown(mc.player).contains(blockPos)
                     || phasePositions.stream().anyMatch(d -> d.pos().equals(blockPos))))
             {
@@ -730,6 +734,12 @@ public class AutoMineModule extends CombatModule
             }
             return false;
         }
+    }
+
+    private void clearMiningQueue()
+    {
+        // Need to abort blocks here??
+        miningQueue.clear();
     }
 
     private void removeQueuedMine()
@@ -890,13 +900,13 @@ public class AutoMineModule extends CombatModule
 
     private void stopMiningInternal(MiningData data)
     {
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
         if (grimConfig.getValue())
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos().up(500), data.getDirection()));
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, new BlockPos(data.getPos().getX(), 1341, data.getPos().getZ()), data.getDirection()));
         }
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
     }
 
     // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L80
