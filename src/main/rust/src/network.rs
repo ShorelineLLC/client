@@ -20,7 +20,7 @@ lazy_static!
 
     // Expires on: Monday, October 14, 2024
     static ref SHORELINE_CERT_SHA256: String = obfstr! {
-        "a2bb2f83cd36f988d46619db34b8053e059ead879ae1f1464bab0dde67cd5fa0"
+        "8718a0cdf8e0dc244af3cedd9719a42c8695919d8967c0647be668a4bb281410"
     }.to_string();
 
     static ref WE1_CERT_SHA256: String = obfstr! {

@@ -318,12 +318,29 @@ pub unsafe extern "system" fn on_initialize_client(mut env: JNIEnv,
         &[(&main_client_class).into()]
     ).unwrap().l().unwrap();
 
-    env.call_method(
+    let init_call = env.call_method(
         main_client_instance,
         client_initialization_function,
         obfstr!("()V"),
         &[]
-    ).unwrap();
+    );
+
+    if env.exception_check().unwrap()
+    {
+        env.exception_describe().unwrap();
+
+        let msg = obfstr! {
+            "Failed to initialize Shoreline. Please copy the stacktrace found in your latest.log \
+            and send it to a developer."
+        }.to_string();
+
+        notifs::error(&mut env, &msg);
+        notifs::display_error_msg(&msg);
+
+        exit(-1);
+    }
+
+    init_call.unwrap();
 }
 
 /* -------------------------------- Sponge -------------------------------- */
