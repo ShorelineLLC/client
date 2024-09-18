@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameMode;
 import net.minecraft.world.border.WorldBorder;
+import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.util.Globals;
@@ -136,8 +137,11 @@ public abstract class MixinClientPlayerInteractionManager implements Globals
             }
             syncSelectedSlot();
             MutableObject<ActionResult> mutableObject = new MutableObject();
-            this.sendSequencedPacket(mc.world, (sequence) -> {
-                PlayerInteractItemC2SPacket playerInteractItemC2SPacket = new PlayerInteractItemC2SPacket(hand, sequence, player.getYaw(), player.getPitch());
+            this.sendSequencedPacket(mc.world, (sequence) ->
+            {
+                PlayerInteractItemC2SPacket playerInteractItemC2SPacket = new PlayerInteractItemC2SPacket(
+                        hand, sequence, Managers.ROTATION.isRotating() ? Managers.ROTATION.getRotationYaw() : player.getYaw(),
+                        Managers.ROTATION.isRotating() ? Managers.ROTATION.getRotationPitch() : player.getPitch());
                 ItemStack itemStack = player.getStackInHand(hand);
                 if (player.getItemCooldownManager().isCoolingDown(itemStack.getItem())) {
                     mutableObject.setValue(ActionResult.PASS);
