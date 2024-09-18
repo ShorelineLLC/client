@@ -25,6 +25,7 @@ public class AutoXPModule extends RotationModule
 
     Config<Boolean> multiTaskConfig = register(new BooleanConfig("MultiTask", "Allows you to throw xp while using items", false));
     Config<Float> delayConfig = register(new NumberConfig<>("Delay", "Delay to throw xp in ticks.", 1.0f, 1.0f, 10.0f, NumberDisplay.DEFAULT));
+    Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of xp bottles to throw in one tick", 1, 20, 64));
     Config<Boolean> durabilityCheckConfig = register(new BooleanConfig("DurabilityCheck", "Check if your armor and held item durability is full then disables if it is.", true));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates the player while throwing xp.", false));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swings hand while throwing xp.", false));
@@ -81,10 +82,13 @@ public class AutoXPModule extends RotationModule
                 return;
             }
         }
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
-        if (swingConfig.getValue())
+        for (int i = 0; i < shiftTicksConfig.getValue(); i++)
         {
-            mc.player.swingHand(Hand.MAIN_HAND);
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+            if (swingConfig.getValue())
+            {
+                mc.player.swingHand(Hand.MAIN_HAND);
+            }
         }
         Managers.INVENTORY.syncToClient();
         delayTimer.reset();
