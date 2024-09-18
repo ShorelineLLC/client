@@ -15,6 +15,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.event.entity.StepEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -38,6 +39,7 @@ public class StepModule extends ToggleModule
     private boolean cancelTimer;
     //
     private final Timer stepTimer = new CacheTimer();
+    private float stepHeight;
 
     /**
      *
@@ -55,13 +57,13 @@ public class StepModule extends ToggleModule
     }
 
     @Override
-    public void onDisable()
+    public void onEnable()
     {
         if (mc.player == null)
         {
             return;
         }
-        setStepHeight(isAbstractHorse(mc.player.getVehicle()) ? 1.0f : 0.6f);
+        stepHeight = isAbstractHorse(mc.player.getVehicle()) ? 1.0f : 0.6f;
         Managers.TICK.setClientTick(1.0f);
     }
 
@@ -105,7 +107,7 @@ public class StepModule extends ToggleModule
         if (mc.player.isTouchingWater() || mc.player.isInLava() || mc.player.isFallFlying())
         {
             Managers.TICK.setClientTick(1.0f);
-            setStepHeight(isAbstractHorse(mc.player.getVehicle()) ? 1.0f : 0.6f);
+            stepHeight = isAbstractHorse(mc.player.getVehicle()) ? 1.0f : 0.6f;
             return;
         }
         if (cancelTimer && mc.player.isOnGround())
@@ -115,11 +117,22 @@ public class StepModule extends ToggleModule
         }
         if (mc.player.isOnGround() && stepTimer.passed(200))
         {
-            setStepHeight(heightConfig.getValue());
+            stepHeight = heightConfig.getValue();
         }
         else
         {
-            setStepHeight(isAbstractHorse(mc.player.getVehicle()) ? 1.0f : 0.6f);
+            stepHeight = isAbstractHorse(mc.player.getVehicle()) ? 1.0f : 0.6f;
+        }
+    }
+
+    @EventListener
+    public void onStep(StepEvent event)
+    {
+        if (event.getEntity() == mc.player || (entityStepConfig.getValue() && mc.player.getVehicle() != null
+                && event.getEntity() == mc.player.getVehicle()))
+        {
+            event.cancel();
+            event.setStepHeight(stepHeight);
         }
     }
 
@@ -129,18 +142,6 @@ public class StepModule extends ToggleModule
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
         {
             disable();
-        }
-    }
-
-    private void setStepHeight(float stepHeight)
-    {
-        if (entityStepConfig.getValue() && mc.player.getVehicle() != null)
-        {
-            mc.player.getVehicle().setStepHeight(stepHeight);
-        }
-        else
-        {
-            mc.player.setStepHeight(stepHeight);
         }
     }
 

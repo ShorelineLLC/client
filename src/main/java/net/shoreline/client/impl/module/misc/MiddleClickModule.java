@@ -49,7 +49,7 @@ public class MiddleClickModule extends ToggleModule
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_MIDDLE
                 && event.getAction() == GLFW.GLFW_PRESS && mc.currentScreen == null)
         {
-            double d = mc.interactionManager.hasExtendedReach() ? 6.0 : mc.interactionManager.getReachDistance();
+            double d = mc.player.getEntityInteractionRange();
             HitResult result = FreecamModule.getInstance().isEnabled() ? RayCastUtil.raycastEntity(d, FreecamModule.getInstance().getCameraPosition(), FreecamModule.getInstance().getCameraRotations()) : RayCastUtil.raycastEntity(d);
             if (friendConfig.getValue() && result != null && result.getType() == HitResult.Type.ENTITY && ((EntityHitResult) result).getEntity() instanceof PlayerEntity target)
             {

@@ -3,10 +3,10 @@ package net.shoreline.client.mixin.particle;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleGroup;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleGroup;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
@@ -27,7 +27,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ParticleManager.class)
 public class MixinParticleManager
 {
-    @Shadow @Final private Object2IntOpenHashMap<ParticleGroup> groupCounts;
+    @Shadow
+    @Final
+    private Object2IntOpenHashMap<ParticleGroup> groupCounts;
 
     /**
      * @param parameters

@@ -49,9 +49,9 @@ public class TrajectoriesModule extends ToggleModule
         if (((throwItem instanceof BowItem || throwItem instanceof CrossbowItem || throwItem instanceof TridentItem) && mc.player.getItemUseTime() > 0) || isThrowableItem(throwItem))
         {
             float yaw = mc.player.getYaw();
-            double x = Interpolation.interpolateDouble(mc.player.prevX, mc.player.getX(), mc.getTickDelta());
-            double y = Interpolation.interpolateDouble(mc.player.prevY, mc.player.getY(), mc.getTickDelta());
-            double z = Interpolation.interpolateDouble(mc.player.prevZ, mc.player.getZ(), mc.getTickDelta());
+            double x = Interpolation.interpolateDouble(mc.player.prevX, mc.player.getX(), mc.getRenderTickCounter().getTickDelta(true));
+            double y = Interpolation.interpolateDouble(mc.player.prevY, mc.player.getY(), mc.getRenderTickCounter().getTickDelta(true));
+            double z = Interpolation.interpolateDouble(mc.player.prevZ, mc.player.getZ(), mc.getRenderTickCounter().getTickDelta(true));
             y = y + mc.player.getEyeHeight(mc.player.getPose()) - 0.1000000014901161;
 
             if (throwItem == mc.player.getMainHandStack().getItem())

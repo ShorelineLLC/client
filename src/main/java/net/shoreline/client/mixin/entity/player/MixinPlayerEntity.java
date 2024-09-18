@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.shoreline.client.impl.event.entity.player.*;
+import net.shoreline.client.impl.event.network.ReachEvent;
 import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
 import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.EventBus;
@@ -159,5 +160,29 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
             return false;
         }
         return instance.isFallFlying();
+    }
+
+    @Inject(method = "getBlockInteractionRange", at = @At(value = "HEAD"), cancellable = true)
+    private void hookGetBlockInteractionRange(CallbackInfoReturnable<Float> cir)
+    {
+        final ReachEvent.Block reachEvent = new ReachEvent.Block();
+        EventBus.INSTANCE.dispatch(reachEvent);
+        if (reachEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(reachEvent.getReach());
+        }
+    }
+
+    @Inject(method = "getEntityInteractionRange", at = @At(value = "HEAD"), cancellable = true)
+    private void hookGetEntityInteractionRange(CallbackInfoReturnable<Float> cir)
+    {
+        final ReachEvent.Entity reachEvent = new ReachEvent.Entity();
+        EventBus.INSTANCE.dispatch(reachEvent);
+        if (reachEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(reachEvent.getReach());
+        }
     }
 }

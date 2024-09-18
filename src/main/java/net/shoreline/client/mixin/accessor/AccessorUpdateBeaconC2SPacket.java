@@ -17,14 +17,14 @@ public interface AccessorUpdateBeaconC2SPacket
     /**
      * @param primaryEffectId
      */
-    @Accessor("primaryEffectId")
+    @Accessor("primary")
     @Mutable
     void setPrimaryEffect(Optional<StatusEffect> primaryEffectId);
 
     /**
      * @param secondaryEffectId
      */
-    @Accessor("secondaryEffectId")
+    @Accessor("secondary")
     @Mutable
     void setSecondaryEffect(Optional<StatusEffect> secondaryEffectId);
 }

@@ -10,19 +10,19 @@ import net.shoreline.eventbus.event.Event;
 @Cancelable
 public class CameraClipEvent extends Event
 {
-    private double distance;
+    private float distance;
 
-    public CameraClipEvent(double distance)
+    public CameraClipEvent(float distance)
     {
         this.distance = distance;
     }
 
-    public double getDistance()
+    public float getDistance()
     {
         return distance;
     }
 
-    public void setDistance(double distance)
+    public void setDistance(float distance)
     {
         this.distance = distance;
     }

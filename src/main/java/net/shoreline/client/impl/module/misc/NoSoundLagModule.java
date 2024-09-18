@@ -19,14 +19,14 @@ public class NoSoundLagModule extends ToggleModule
 {
     //
     private final static Set<SoundEvent> LAG_SOUNDS = Set.of(
-            SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
-            SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA,
-            SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE,
-            SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND,
-            SoundEvents.ITEM_ARMOR_EQUIP_IRON,
-            SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
-            SoundEvents.ITEM_ARMOR_EQUIP_CHAIN,
-            SoundEvents.ITEM_ARMOR_EQUIP_LEATHER
+            SoundEvents.ITEM_ARMOR_EQUIP_GENERIC.value(),
+            SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA.value(),
+            SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE.value(),
+            SoundEvents.ITEM_ARMOR_EQUIP_DIAMOND.value(),
+            SoundEvents.ITEM_ARMOR_EQUIP_IRON.value(),
+            SoundEvents.ITEM_ARMOR_EQUIP_GOLD.value(),
+            SoundEvents.ITEM_ARMOR_EQUIP_CHAIN.value(),
+            SoundEvents.ITEM_ARMOR_EQUIP_LEATHER.value()
     );
 
     /**

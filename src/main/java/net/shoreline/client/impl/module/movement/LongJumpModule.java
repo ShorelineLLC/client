@@ -87,6 +87,10 @@ public class LongJumpModule extends ToggleModule
     @EventListener
     public void onTravel(TravelEvent event)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
         double dx = mc.player.getX() - mc.player.prevX;
         double dz = mc.player.getZ() - mc.player.prevZ;
         distance = Math.sqrt(dx * dx + dz * dz);

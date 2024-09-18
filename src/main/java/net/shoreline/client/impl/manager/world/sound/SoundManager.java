@@ -20,7 +20,7 @@ public class SoundManager implements Globals
 
     static
     {
-        EMPTY_SOUND_SET = new WeightedSoundSet(new Identifier("minecraft",
+        EMPTY_SOUND_SET = new WeightedSoundSet(Identifier.of("minecraft",
                 "intentionally_empty"), null);
     }
 
@@ -47,7 +47,7 @@ public class SoundManager implements Globals
             @Override
             public Sound getSound()
             {
-                return new Sound(sound.name(), ConstantFloatProvider.create(1.0f),
+                return new Sound(sound.getId(), ConstantFloatProvider.create(1.0f),
                         ConstantFloatProvider.create(1.0f), 1,
                         Sound.RegistrationType.SOUND_EVENT, false, false, 16);
             }

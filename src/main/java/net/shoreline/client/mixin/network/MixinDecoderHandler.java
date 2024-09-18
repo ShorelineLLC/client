@@ -24,8 +24,7 @@ public class MixinDecoderHandler
      * @param objects
      * @param ci
      */
-    @Inject(method = "decode", at = @At(value = "INVOKE", target = "Lnet/minecraft/" +
-            "network/NetworkState;getId()Ljava/lang/String;", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "decode", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkPhase;getId()Ljava/lang/String;", shift = At.Shift.AFTER), cancellable = true)
     private void hookDecode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> objects, CallbackInfo ci)
     {
         DecodePacketEvent decodePacketEvent = new DecodePacketEvent();

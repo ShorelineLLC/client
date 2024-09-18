@@ -1,9 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
@@ -13,14 +11,16 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
+import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.awt.*;
@@ -31,6 +31,7 @@ import java.awt.*;
  */
 public class SkeletonModule extends ToggleModule
 {
+    Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the skeleton", 1.0f, 1.0f, 5.0f));
 
     public SkeletonModule()
     {
@@ -41,15 +42,8 @@ public class SkeletonModule extends ToggleModule
     public void onRenderWorld(RenderWorldEvent.Game event)
     {
         MatrixStack matrixStack = event.getMatrices();
-        Vec3d pos = mc.getBlockEntityRenderDispatcher().camera.getPos();
-        matrixStack.translate(-pos.x, -pos.y, -pos.z);
         float g = event.getTickDelta();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(MinecraftClient.isFancyGraphicsOrBetter());
-        RenderSystem.enableCull();
+        RenderBuffers.preRender();
         for (Entity entity : mc.world.getEntities())
         {
             if (entity == null || !entity.isAlive())
@@ -67,15 +61,16 @@ public class SkeletonModule extends ToggleModule
                         (PlayerEntityRenderer) (LivingEntityRenderer<?, ?>) mc.getEntityRenderDispatcher().getRenderer(playerEntity);
                 PlayerEntityModel<PlayerEntity> playerEntityModel =
                         (PlayerEntityModel) livingEntityRenderer.getModel();
+                boolean rotating = Managers.ROTATION.isRotating();
                 float h = MathHelper.lerpAngleDegrees(g,
-                        playerEntity.prevBodyYaw, playerEntity.bodyYaw);
+                        rotating ? Managers.ROTATION.getRotationYaw() : playerEntity.prevBodyYaw, rotating ? Managers.ROTATION.getRotationYaw() : playerEntity.bodyYaw);
                 float j = MathHelper.lerpAngleDegrees(g,
-                        playerEntity.prevHeadYaw, playerEntity.headYaw);
+                        rotating ? Managers.ROTATION.getRotationYaw() : playerEntity.prevHeadYaw, rotating ? Managers.ROTATION.getRotationYaw() : playerEntity.headYaw);
                 float q = playerEntity.limbAnimator.getPos() - playerEntity.limbAnimator.getSpeed() * (1.0f - g);
                 float p = playerEntity.limbAnimator.getSpeed(g);
                 float o = (float) playerEntity.age + g;
                 float k = j - h;
-                float m = playerEntity.getPitch(g);
+                float m = rotating ? Managers.ROTATION.getRotationPitch() : playerEntity.getPitch(g);
                 playerEntityModel.animateModel(playerEntity, q, p, g);
                 playerEntityModel.setAngles(playerEntity, q, p, o, k, m);
                 boolean swimming = playerEntity.isInSwimmingPose();
@@ -101,86 +96,53 @@ public class SkeletonModule extends ToggleModule
                 {
                     matrixStack.translate(0, -0.95f, 0);
                 }
-                Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder bufferBuilder = tessellator.getBuffer();
-                bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-                // RenderSystem.lineWidth(2.0f);
-                Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+                RenderBuffers.LINES.begin(matrixStack);
+                RenderSystem.lineWidth(widthConfig.getValue());
                 Color skeletonColor = ColorsModule.getInstance().getColor();
                 if (Managers.SOCIAL.isFriend(playerEntity.getName()))
                 {
                     skeletonColor = new Color(0xff66ffff);
                 }
-                bufferBuilder.vertex(matrix4f, 0, sneaking ? 0.6f : 0.7f,
-                        sneaking ? 0.23f : 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0, sneaking ? 1.05f : 1.4f,
-                        0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, -0.37f, sneaking ? 1.05f :
-                        1.35f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0.37f, sneaking ? 1.05f :
-                        1.35f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, -0.15f, sneaking ? 0.6f :
-                        0.7f, sneaking ? 0.23f : 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0.15f, sneaking ? 0.6f : 0.7f,
-                        sneaking ? 0.23f : 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
+                RenderBuffers.LINES.color(skeletonColor.getRGB());
+                RenderBuffers.LINES.vertexLine(0, sneaking ? 0.6f : 0.7f, sneaking ? 0.23f : 0, 0, sneaking ? 1.05f : 1.4f, 0);
+                RenderBuffers.LINES.vertexLine(-0.37f, sneaking ? 1.05f : 1.35f, 0, 0.37f, sneaking ? 1.05f : 1.35f, 0);
+                RenderBuffers.LINES.vertexLine(-0.15f, sneaking ? 0.6f : 0.7f, sneaking ? 0.23f : 0, 0.15f, sneaking ? 0.6f : 0.7f, sneaking ? 0.23f : 0);
+                RenderBuffers.LINES.end();
                 matrixStack.push();
                 matrixStack.translate(0, sneaking ? 1.05f : 1.4f, 0);
                 rotateSkeleton(matrixStack, head);
-                matrix4f = matrixStack.peek().getPositionMatrix();
-                bufferBuilder.vertex(matrix4f, 0, 0, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0, 0.25f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
+                RenderBuffers.LINES.updateMatrices(matrixStack);
+                RenderBuffers.LINES.vertexLine(0, 0, 0, 0, 0.25f, 0);
                 matrixStack.pop();
                 matrixStack.push();
                 matrixStack.translate(0.15f, sneaking ? 0.6f : 0.7f, sneaking ? 0.23f : 0);
                 rotateSkeleton(matrixStack, rightLeg);
-                matrix4f = matrixStack.peek().getPositionMatrix();
-                bufferBuilder.vertex(matrix4f, 0, 0, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0, -0.6f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
+                RenderBuffers.LINES.updateMatrices(matrixStack);
+                RenderBuffers.LINES.vertexLine(0, 0, 0, 0, -0.6f, 0);
                 matrixStack.pop();
                 matrixStack.push();
                 matrixStack.translate(-0.15f, sneaking ? 0.6f : 0.7f, sneaking ? 0.23f : 0);
                 rotateSkeleton(matrixStack, leftLeg);
-                matrix4f = matrixStack.peek().getPositionMatrix();
-                bufferBuilder.vertex(matrix4f, 0, 0, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0, -0.6f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
+                RenderBuffers.LINES.updateMatrices(matrixStack);
+                RenderBuffers.LINES.vertexLine(0, 0, 0, 0, -0.6f, 0);
                 matrixStack.pop();
                 matrixStack.push();
                 matrixStack.translate(0.37f, sneaking ? 1.05f : 1.35f, 0);
                 rotateSkeleton(matrixStack, rightArm);
-                matrix4f = matrixStack.peek().getPositionMatrix();
-                bufferBuilder.vertex(matrix4f, 0, 0, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0, -0.55f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
+                RenderBuffers.LINES.updateMatrices(matrixStack);
+                RenderBuffers.LINES.vertexLine(0, 0, 0, 0, -0.55f, 0);
                 matrixStack.pop();
                 matrixStack.push();
                 matrixStack.translate(-0.37f, sneaking ? 1.05f : 1.35f, 0);
                 rotateSkeleton(matrixStack, leftArm);
-                matrix4f = matrixStack.peek().getPositionMatrix();
-                bufferBuilder.vertex(matrix4f, 0, 0, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
-                bufferBuilder.vertex(matrix4f, 0, -0.55f, 0).color(skeletonColor.getRed() / 255.0f, skeletonColor.getGreen() / 255.0f, skeletonColor.getBlue() / 255.0f, 1.0f).next();
+                RenderBuffers.LINES.updateMatrices(matrixStack);
+                RenderBuffers.LINES.vertexLine(0, 0, 0, 0, -0.55f, 0);
                 matrixStack.pop();
-                tessellator.draw();
-                if (swimming)
-                {
-                    matrixStack.translate(0, 0.95f, 0);
-                }
-                if (swimming || flying)
-                {
-                    matrixStack.multiply(new Quaternionf().setAngleAxis((90.0f + m) * Math.PI / 180.0f, 1, 0, 0));
-                }
-                if (swimming)
-                {
-                    matrixStack.translate(0, -0.35f, 0);
-                }
-                matrixStack.multiply(new Quaternionf().setAngleAxis((h + 180.0f) * Math.PI / 180.0f, 0, 1, 0));
-                matrixStack.translate(-skeletonPos.x, -skeletonPos.y, -skeletonPos.z);
                 matrixStack.pop();
             }
         }
-        RenderSystem.disableCull();
-        RenderSystem.disableBlend();
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(true);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderBuffers.postRender();
+        RenderBuffers.LINES.end();
     }
 
     private void rotateSkeleton(MatrixStack matrix, ModelPart modelPart)
@@ -199,3 +161,4 @@ public class SkeletonModule extends ToggleModule
         }
     }
 }
+

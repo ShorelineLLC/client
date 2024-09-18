@@ -16,6 +16,7 @@ import net.shoreline.client.impl.manager.combat.hole.HoleType;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
+import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.util.*;
@@ -110,7 +111,7 @@ public class HoleESPModule extends ToggleModule
             }
             Color color = getHoleColor(hole.getSafety());
             int boxAlpha = (int) (color.getAlpha() * set.getValue().getFactor());
-            int lineAlpha = (int) (145 * set.getValue().getFactor());
+            int lineAlpha = (int) (100 * set.getValue().getFactor());
 
             renderHole(event.getMatrices(), hole, getHoleColor(hole.getSafety(), boxAlpha),
                     getHoleColor(hole.getSafety(), lineAlpha));

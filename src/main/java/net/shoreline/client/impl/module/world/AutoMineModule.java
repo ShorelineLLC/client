@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -363,7 +362,7 @@ public class AutoMineModule extends CombatModule
                     return;
                 }
                 Managers.INVENTORY.setSlot(data.getSlot());
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
 
                 if (!data.hasAttemptedBreak())
                 {
@@ -551,7 +550,7 @@ public class AutoMineModule extends CombatModule
             MiningData data = set.getKey();
             set.getValue().setState(false);
             int boxAlpha = (int) (40 * set.getValue().getFactor());
-            int lineAlpha = (int) (145 * set.getValue().getFactor());
+            int lineAlpha = (int) (100 * set.getValue().getFactor());
             int boxColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
             int lineColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
             BlockPos mining = data.getPos();

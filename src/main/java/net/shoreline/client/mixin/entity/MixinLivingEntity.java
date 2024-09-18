@@ -5,7 +5,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.entity.*;
@@ -31,13 +33,6 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     @Shadow
     protected ItemStack activeItemStack;
 
-    /**
-     * @param effect
-     * @return
-     */
-    @Shadow
-    public abstract boolean hasStatusEffect(StatusEffect effect);
-
     @Shadow
     public abstract float getYaw(float tickDelta);
 
@@ -46,6 +41,9 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
 
     @Shadow
     private int jumpingCooldown;
+
+    @Shadow
+    public abstract boolean hasStatusEffect(RegistryEntry<StatusEffect> par1);
 
     @Inject(method = "getHandSwingDuration", at = @At("HEAD"), cancellable = true)
     private void hookGetHandSwingDuration(CallbackInfoReturnable<Integer> cir)
@@ -91,12 +89,10 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
      * @param effect
      * @return
      */
-    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/" +
-            "minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/" +
-            "entity/effect/StatusEffect;)Z"))
-    private boolean hookHasStatusEffect(LivingEntity instance, StatusEffect effect)
+    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/registry/entry/RegistryEntry;)Z"))
+    private boolean hookHasStatusEffect(LivingEntity instance, RegistryEntry<StatusEffect> effect)
     {
-        if (instance.equals(mc.player))
+        if (instance.equals(mc.player) && effect == StatusEffects.LEVITATION)
         {
             LevitationEvent levitationEvent = new LevitationEvent();
             EventBus.INSTANCE.dispatch(levitationEvent);
@@ -217,5 +213,17 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
             return false;
         }
         return instance.isFallFlying();
+    }
+
+    @Inject(method = "getStepHeight", at = @At(value = "HEAD"), cancellable = true)
+    private void hookGetStepHeight(CallbackInfoReturnable<Float> cir)
+    {
+        StepEvent stepEvent = new StepEvent((LivingEntity) (Object) this, cir.getReturnValueF());
+        EventBus.INSTANCE.dispatch(stepEvent);
+        if (stepEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(stepEvent.getStepHeight());
+        }
     }
 }

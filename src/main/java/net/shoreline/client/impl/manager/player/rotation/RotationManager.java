@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.manager.player.rotation;
 
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.render.Interpolation;
@@ -186,8 +188,8 @@ public class RotationManager implements Globals
         if (event.getEntity() == mc.player && rotation != null)
         {
             // Match packet server rotations
-            event.setYaw(Interpolation.interpolateFloat(prevYaw, getServerYaw(), mc.getTickDelta()));
-            event.setPitch(Interpolation.interpolateFloat(prevPitch, getServerPitch(), mc.getTickDelta()));
+            event.setYaw(Interpolation.interpolateFloat(prevYaw, getServerYaw(), mc.getRenderTickCounter().getTickDelta(true)));
+            event.setPitch(Interpolation.interpolateFloat(prevPitch, getServerPitch(), mc.getRenderTickCounter().getTickDelta(true)));
             prevYaw = event.getYaw();
             prevPitch = event.getPitch();
             event.cancel();
@@ -240,12 +242,6 @@ public class RotationManager implements Globals
 
     public void setRotationSilent(float yaw, float pitch)
     {
-        if (RotationsModule.getInstance().getMouseSensFix())
-        {
-            double fix = Math.pow(mc.options.getMouseSensitivity().getValue() * 0.6 + 0.2, 3.0) * 1.2;
-            yaw = (float) (yaw - (yaw - serverYaw) % fix);
-            pitch = (float) (pitch - (pitch - serverPitch) % fix);
-        }
         setRotation(new Rotation(MAX_VALUE, yaw, pitch, true));
         Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
                 mc.player.getX(), mc.player.getY(), mc.player.getZ(), yaw, pitch, mc.player.isOnGround()));

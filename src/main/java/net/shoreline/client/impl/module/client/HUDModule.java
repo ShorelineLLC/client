@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
@@ -83,8 +84,8 @@ public class HUDModule extends ToggleModule
     // Rainbow settings
     Config<RainbowMode> rainbowModeConfig = register(new EnumConfig<>("Rainbow", "The rendering mode for rainbow", RainbowMode.OFF, RainbowMode.values()));
     Config<Float> rainbowSpeedConfig = register(new NumberConfig<>("Rainbow-Speed", "The speed for the rainbow color cycling", 0.1f, 50.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
-    Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.ALPHA));
-    Config<Integer> rainbowBrightnessConfig = register(new NumberConfig<>("Rainbow-Brightness", "The brightness of rainbow colors", 0, 100, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.ALPHA));
+    Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.GRADIENT_ALPHA));
+    Config<Integer> rainbowBrightnessConfig = register(new NumberConfig<>("Rainbow-Brightness", "The brightness of rainbow colors", 0, 100, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.GRADIENT));
     Config<Float> rainbowDifferenceConfig = register(new NumberConfig<>("Rainbow-Difference", "The difference offset for rainbow colors", 0.1f, 40.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
 
     private final DecimalFormat decimal = new DecimalFormat("0.0");
@@ -144,7 +145,7 @@ public class HUDModule extends ToggleModule
         fpsCounter.mark();
         if (mc.player != null && mc.world != null)
         {
-            if (mc.getDebugHud().shouldShowDebugHud())
+            if (mc.options.hudHidden)
             {
                 return;
             }
@@ -206,7 +207,7 @@ public class HUDModule extends ToggleModule
             {
                 for (StatusEffectInstance e : mc.player.getStatusEffects())
                 {
-                    final StatusEffect effect = e.getEffectType();
+                    final StatusEffect effect = e.getEffectType().value();
                     if (effect == StatusEffects.NIGHT_VISION)
                     {
                         continue;
@@ -513,9 +514,15 @@ public class HUDModule extends ToggleModule
         return switch (rainbowModeConfig.getValue())
         {
             case OFF -> ColorsModule.getInstance().getRGB();
-            case STATIC -> rainbow(1L);
-            case GRADIENT -> rainbow(rainbowOffset);
-            case ALPHA -> alpha(rainbowOffset);
+            case STATIC_HUE -> rainbow(1L);
+            case GRADIENT_HUE -> rainbow(rainbowOffset);
+            case GRADIENT_ALPHA -> alpha(rainbowOffset);
+            case GRADIENT ->
+            {
+                double roundY = Math.sin(Math.toRadians((rainbowOffset * rainbowDifferenceConfig.getValue()) + ((double) System.currentTimeMillis() / (100.0f - rainbowSpeedConfig.getValue()))));
+                roundY = Math.abs(roundY);
+                yield ColorUtil.interpolateColor((float) MathHelper.clamp(roundY, 0.0f, 1.0f), ColorsModule.getInstance().getColor(), Color.WHITE).getRGB();
+            }
         };
     }
 
@@ -547,7 +554,7 @@ public class HUDModule extends ToggleModule
         float b = (float) (((double) System.currentTimeMillis() * (rainbowSpeedConfig.getValue() / 10)
                 + (double) (offset * 500L)) % (30000 / (rainbowDifferenceConfig.getValue() / 100))
                 / (30000 / (rainbowDifferenceConfig.getValue() / 20.0f)));
-        float brightness = hsb[2] * Math.abs(b % 1.0f - 0.55f) + 0.45f;
+        float brightness = hsb[2] * Math.abs(b % 1.0f - 0.55f) + 0.4f;
         return Color.HSBtoRGB(hsb[0], hsb[1], brightness);
     }
 
@@ -579,7 +586,8 @@ public class HUDModule extends ToggleModule
     {
         OFF,
         GRADIENT,
-        STATIC,
-        ALPHA
+        GRADIENT_HUE,
+        STATIC_HUE,
+        GRADIENT_ALPHA
     }
 }

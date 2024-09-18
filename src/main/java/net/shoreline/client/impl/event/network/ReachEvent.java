@@ -17,4 +17,14 @@ public class ReachEvent extends Event
     {
         this.reach = reach;
     }
+
+    public static class Block extends ReachEvent
+    {
+
+    }
+
+    public static class Entity extends ReachEvent
+    {
+
+    }
 }

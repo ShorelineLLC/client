@@ -39,8 +39,8 @@ public class BeaconSelectorModule extends ToggleModule
     {
         if (event.getPacket() instanceof UpdateBeaconC2SPacket packet)
         {
-            ((AccessorUpdateBeaconC2SPacket) packet).setPrimaryEffect(Optional.ofNullable(primaryEffect));
-            ((AccessorUpdateBeaconC2SPacket) packet).setSecondaryEffect(Optional.ofNullable(secondaryEffect));
+            // ((AccessorUpdateBeaconC2SPacket) packet).setPrimaryEffect(Optional.ofNullable(primaryEffect));
+            // ((AccessorUpdateBeaconC2SPacket) packet).setSecondaryEffect(Optional.ofNullable(secondaryEffect));
         }
     }
 

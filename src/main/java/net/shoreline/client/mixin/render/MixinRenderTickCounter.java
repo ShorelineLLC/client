@@ -3,6 +3,7 @@ package net.shoreline.client.mixin.render;
 import net.minecraft.client.render.RenderTickCounter;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,15 +15,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * @see RenderTickCounter
  * @since 1.0
  */
-@Mixin(RenderTickCounter.class)
+@Mixin(RenderTickCounter.Dynamic.class)
 public class MixinRenderTickCounter
 {
     @Shadow
     private float lastFrameDuration;
+
     @Shadow
     private float tickDelta;
+
     @Shadow
     private long prevTimeMillis;
+
+    @Final
     @Shadow
     private float tickTime;
 
@@ -30,10 +35,8 @@ public class MixinRenderTickCounter
      * @param timeMillis
      * @param cir
      */
-    @Inject(method = "beginRenderTick", at = @At(value = "HEAD"),
-            cancellable = true)
-    private void hookBeginRenderTick(long timeMillis,
-                                     CallbackInfoReturnable<Integer> cir)
+    @Inject(method = "beginRenderTick(J)I", at = @At(value = "HEAD"), cancellable = true)
+    private void hookBeginRenderTick(long timeMillis, CallbackInfoReturnable<Integer> cir)
     {
         TickCounterEvent tickCounterEvent = new TickCounterEvent();
         EventBus.INSTANCE.dispatch(tickCounterEvent);

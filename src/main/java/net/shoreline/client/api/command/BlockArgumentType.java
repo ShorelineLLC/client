@@ -28,7 +28,7 @@ public class BlockArgumentType implements ArgumentType<Block>
     public Block parse(StringReader reader) throws CommandSyntaxException
     {
         String string = reader.readString();
-        Block block = Registries.BLOCK.get(new Identifier("minecraft", string));
+        Block block = Registries.BLOCK.get(Identifier.of("minecraft", string));
         if (block == null)
         {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherParseException().createWithContext(reader, null);

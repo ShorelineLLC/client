@@ -77,7 +77,7 @@ public class Interpolation implements Globals
     public static Box getInterpolatedBox(Box prevBox, Box box)
     {
 
-        double delta = mc.isPaused() ? 1f : mc.getTickDelta();
+        double delta = mc.isPaused() ? 1f : mc.getRenderTickCounter().getTickDelta(true);
 
         return new Box(interpolateDouble(prevBox.minX, box.minX, delta),
                 interpolateDouble(prevBox.minY, box.minY, delta),

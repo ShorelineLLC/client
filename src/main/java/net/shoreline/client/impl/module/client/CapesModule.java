@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.module.client;
 
-import net.minecraft.client.render.entity.PlayerModelPart;
+import net.minecraft.entity.player.PlayerModelPart;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -13,7 +13,6 @@ import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.mixin.accessor.AccessorGameOptions;
 import net.shoreline.eventbus.annotation.EventListener;
-import org.jetbrains.annotations.NotNull;
 
 public final class CapesModule extends ToggleModule
 {
@@ -71,7 +70,7 @@ public final class CapesModule extends ToggleModule
         if (onlineUser != null && onlineUser.getCapeColor() != Capes.OFF)
         {
             String capePath = getCapePath(onlineUser);
-            event.setTexture(new Identifier("shoreline", capePath));
+            event.setTexture(Identifier.of("shoreline", capePath));
         }
     }
 

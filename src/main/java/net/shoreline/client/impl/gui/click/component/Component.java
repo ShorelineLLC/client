@@ -91,13 +91,13 @@ public abstract class Component implements Drawable, Globals
         buffer.begin(VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION_COLOR);
         buffer.vertex(matrix4f, (float) x1, (float) y1, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         buffer.vertex(matrix4f, (float) x1, (float) y2, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         buffer.vertex(matrix4f, (float) x2, (float) y2, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         buffer.vertex(matrix4f, (float) x2, (float) y1, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
         shader.unbind();
@@ -127,13 +127,13 @@ public abstract class Component implements Drawable, Globals
         buffer.begin(VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION_COLOR);
         buffer.vertex(matrix4f, (float) (x - radius), (float) (y - radius),
-                (float) z).color(g, h, j, f).next();
+                (float) z).color(g, h, j, f);
         buffer.vertex(matrix4f, (float) (x - radius), (float) (y + radius),
-                        (float) z).color(g, h, j, f).next();
+                        (float) z).color(g, h, j, f);
         buffer.vertex(matrix4f, (float) (x + radius), (float) (y + radius),
-                        (float) z).color(g, h, j, f).next();
+                        (float) z).color(g, h, j, f);
         buffer.vertex(matrix4f, (float) (x + radius), (float) (y - radius),
-                (float) z).color(g, h, j, f).next();
+                (float) z).color(g, h, j, f);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
         shader.unbind();
@@ -193,22 +193,21 @@ public abstract class Component implements Drawable, Globals
         float g = (float) ColorHelper.Argb.getRed(color) / 255.0f;
         float h = (float) ColorHelper.Argb.getGreen(color) / 255.0f;
         float j = (float) ColorHelper.Argb.getBlue(color) / 255.0f;
-        BufferBuilder buffer = RenderManager.BUFFER;
         RenderSystem.enableBlend();
         if (RenderSystem.getShader() != GameRenderer.getPositionColorProgram())
         {
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         }
-        buffer.begin(VertexFormat.DrawMode.QUADS,
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION_COLOR);
         buffer.vertex(matrix4f, (float) x1, (float) y1, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         buffer.vertex(matrix4f, (float) x1, (float) y2, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         buffer.vertex(matrix4f, (float) x2, (float) y2, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         buffer.vertex(matrix4f, (float) x2, (float) y1, (float) z)
-                .color(g, h, j, f).next();
+                .color(g, h, j, f);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
     }
@@ -227,11 +226,10 @@ public abstract class Component implements Drawable, Globals
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         fillGradient(context.getMatrices().peek().getPositionMatrix(), buffer,
                 startX, startY, endX, endY, z, colorStart, colorEnd);
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
     }
 
@@ -249,13 +247,13 @@ public abstract class Component implements Drawable, Globals
         float l = (float) ColorHelper.Argb.getGreen(colorEnd) / 255.0f;
         float m = (float) ColorHelper.Argb.getBlue(colorEnd) / 255.0f;
         builder.vertex(matrix, (float) startX, (float) startY, (float) z)
-                .color(k, l, m, j).next();
+                .color(k, l, m, j);
         builder.vertex(matrix, (float) startX, (float) endY, (float) z)
-                .color(k, l, m, j).next();
+                .color(k, l, m, j);
         builder.vertex(matrix, (float) endX, (float) endY, (float) z)
-                .color(g, h, i, f).next();
+                .color(g, h, i, f);
         builder.vertex(matrix, (float) endX, (float) startY, (float) z)
-                .color(g, h, i, f).next();
+                .color(g, h, i, f);
     }
 
     protected void fillGradientQuad(DrawContext context, float x1, float y1, float x2, float y2,
@@ -269,26 +267,25 @@ public abstract class Component implements Drawable, Globals
         float f5 = (float) (endColor >> 16 & 255) / 255.0F;
         float f6 = (float) (endColor >> 8 & 255) / 255.0F;
         float f7 = (float) (endColor & 255) / 255.0F;
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         if (sideways)
         {
-            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
-            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4).next();
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4);
         }
         else
         {
-            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4).next();
-            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4);
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
         }
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
@@ -384,16 +381,15 @@ public abstract class Component implements Drawable, Globals
                                   float v0, float v1)
     {
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
         buffer.vertex(matrix, (float) x0, (float) y0, (float) z)
-                .texture(u0, v0).next();
+                .texture(u0, v0);
         buffer.vertex(matrix, (float) x0, (float) y1, (float) z)
-                .texture(u0, v1).next();
+                .texture(u0, v1);
         buffer.vertex(matrix, (float) x1, (float) y1, (float) z)
-                .texture(u1, v1).next();
+                .texture(u1, v1);
         buffer.vertex(matrix, (float) x1, (float) y0, (float) z)
-                .texture(u1, v0).next();
+                .texture(u1, v0);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
@@ -402,18 +398,17 @@ public abstract class Component implements Drawable, Globals
                                   float u1, float v0, float v1,
                                   float red, float green, float blue, float alpha)
     {
-        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         RenderSystem.enableBlend();
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(matrix, (float) x0, (float) y0, (float) z)
-                .color(red, green, blue, alpha).texture(u0, v0).next();
+                .color(red, green, blue, alpha).texture(u0, v0);
         buffer.vertex(matrix, (float) x0, (float) y1, (float) z)
-                .color(red, green, blue, alpha).texture(u0, v1).next();
+                .color(red, green, blue, alpha).texture(u0, v1);
         buffer.vertex(matrix, (float) x1, (float) y1, (float) z)
-                .color(red, green, blue, alpha).texture(u1, v1).next();
+                .color(red, green, blue, alpha).texture(u1, v1);
         buffer.vertex(matrix, (float) x1, (float) y0, (float) z)
-                .color(red, green, blue, alpha).texture(u1, v0).next();
+                .color(red, green, blue, alpha).texture(u1, v0);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
     }

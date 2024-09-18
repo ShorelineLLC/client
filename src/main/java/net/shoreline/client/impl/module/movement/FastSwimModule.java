@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.registry.tag.FluidTags;
@@ -13,6 +14,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.player.EnchantmentUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class FastSwimModule extends ToggleModule
@@ -33,7 +35,7 @@ public class FastSwimModule extends ToggleModule
     @EventListener
     public void onPlayerMove(PlayerMoveEvent event)
     {
-        if (!depthStriderConfig.getValue() && EnchantmentHelper.getDepthStrider(mc.player) > 0)
+        if (!depthStriderConfig.getValue() && EnchantmentUtil.getLevel(mc.player.getEquippedStack(EquipmentSlot.FEET), Enchantments.DEPTH_STRIDER) > 0)
         {
             return;
         }

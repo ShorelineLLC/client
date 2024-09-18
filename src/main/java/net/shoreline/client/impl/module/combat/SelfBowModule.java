@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.BowItem;
@@ -7,18 +8,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.TippedArrowItem;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -62,17 +62,22 @@ public class SelfBowModule extends RotationModule
             {
                 continue;
             }
-            Potion p = PotionUtil.getPotion(stack);
-            for (StatusEffectInstance effect : p.getEffects())
+            if (stack.getComponents().contains(DataComponentTypes.POTION_CONTENTS))
             {
-                StatusEffect type = effect.getEffectType();
-                if (type.isBeneficial() && !arrows.contains(effect))
+                List<StatusEffectInstance> p = (List<StatusEffectInstance>) stack.getComponents()
+                        .get(DataComponentTypes.POTION_CONTENTS).getEffects();
+                for (StatusEffectInstance effect : p)
                 {
-                    arrowSlot = i;
-                    statusEffect = effect;
-                    break;
+                    StatusEffect type = effect.getEffectType().value();
+                    if (type.isBeneficial() && !arrows.contains(effect))
+                    {
+                        arrowSlot = i;
+                        statusEffect = effect;
+                        break;
+                    }
                 }
             }
+
             if (arrowSlot != -1)
             {
                 break;

@@ -386,7 +386,7 @@ public class AutoCrystalModule extends RotationModule
 
                 set.getValue().setState(false);
                 int boxAlpha = (int) (40 * set.getValue().getFactor());
-                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                int lineAlpha = (int) (100 * set.getValue().getFactor());
                 Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
                 Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
@@ -402,7 +402,6 @@ public class AutoCrystalModule extends RotationModule
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(renderPos, animation);
             }
-
         }
     }
 
@@ -491,7 +490,7 @@ public class AutoCrystalModule extends RotationModule
 
         if (event.getPacket() instanceof PlaySoundS2CPacket packet)
         {
-            if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE && packet.getCategory() == SoundCategory.BLOCKS)
+            if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE.value() && packet.getCategory() == SoundCategory.BLOCKS)
             {
                 for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
                 {

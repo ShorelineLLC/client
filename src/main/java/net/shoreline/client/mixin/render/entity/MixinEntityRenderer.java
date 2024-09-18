@@ -4,6 +4,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
@@ -28,10 +29,8 @@ public abstract class MixinEntityRenderer
      * @param light
      * @param ci
      */
-    @Inject(method = "renderLabelIfPresent", at = @At(value = "HEAD"),
-            cancellable = true)
-    public void hookRenderLabelIfPresent(Entity entity, Text text, MatrixStack matrices,
-                                         VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci)
+    @Inject(method = "renderLabelIfPresent", at = @At(value = "HEAD"), cancellable = true)
+    public void hookRenderLabelIfPresent(Entity entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float tickDelta, CallbackInfo ci)
     {
         RenderLabelEvent renderLabelEvent = new RenderLabelEvent(entity);
         EventBus.INSTANCE.dispatch(renderLabelEvent);

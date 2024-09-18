@@ -114,7 +114,7 @@ public class ItemListConfig<T extends List<Item>> extends Config<T>
             for (JsonElement je : element.getAsJsonArray())
             {
                 String val = je.getAsString();
-                Item item = Registries.ITEM.get(new Identifier(val));
+                Item item = Registries.ITEM.get(Identifier.of(val));
                 temp.add(item);
             }
             return (T) temp;

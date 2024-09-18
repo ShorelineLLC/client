@@ -32,12 +32,12 @@ public class ItemArgumentType implements ArgumentType<Object>
     public Object parse(StringReader reader) throws CommandSyntaxException
     {
         String string = reader.readString();
-        Item item = Registries.ITEM.get(new Identifier("minecraft", string));
+        Item item = Registries.ITEM.get(Identifier.of("minecraft", string));
         if (item != Items.AIR)
         {
             return item;
         }
-        Block block = Registries.BLOCK.get(new Identifier("minecraft", string));
+        Block block = Registries.BLOCK.get(Identifier.of("minecraft", string));
         if (block != Blocks.AIR)
         {
             return block;

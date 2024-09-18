@@ -35,9 +35,9 @@ accessible method net/minecraft/client/MinecraftClient doAttack ()Z
 accessible field net/minecraft/client/option/SimpleOption callbacks Lnet/minecraft/client/option/SimpleOption$Callbacks;
 accessible class net/minecraft/client/particle/FireworksSparkParticle$Explosion
 accessible method net/minecraft/client/render/entity/PlayerEntityRenderer getArmPose (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/client/render/entity/model/BipedEntityModel$ArmPose;
-accessible method net/minecraft/client/render/entity/LivingEntityRenderer setupTransforms (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V
+accessible method net/minecraft/client/render/entity/LivingEntityRenderer setupTransforms (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFFF)V
 accessible method net/minecraft/client/render/entity/LivingEntityRenderer scale (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V
-accessible method net/minecraft/client/render/entity/PlayerEntityRenderer setupTransforms (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V
+accessible method net/minecraft/client/render/entity/PlayerEntityRenderer setupTransforms (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFFF)V
 accessible method net/minecraft/client/render/entity/PlayerEntityRenderer scale (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel head Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel body Lnet/minecraft/client/model/ModelPart;
@@ -49,7 +49,6 @@ accessible field net/minecraft/client/render/entity/model/LlamaEntityModel right
 accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftChest Lnet/minecraft/client/model/ModelPart;
 accessible field net/minecraft/entity/TrackedPosition pos Lnet/minecraft/util/math/Vec3d;
 accessible class net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
-accessible class net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask$RenderData
 accessible class net/minecraft/client/world/ClientChunkManager$ClientChunkMap
 accessible method net/minecraft/client/world/ClientChunkManager$ClientChunkMap getIndex (II)I
 accessible field net/minecraft/client/world/ClientChunkManager$ClientChunkMap chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;

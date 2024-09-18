@@ -7,6 +7,7 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
@@ -103,12 +104,14 @@ public class MixinHeldItemRenderer implements Globals
     }
 
     @Inject(method = "applyEatOrDrinkTransformation", at = @At(value = "HEAD"), cancellable = true)
-    private void hookApplyEatOrDrinkTransformation(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, CallbackInfo ci) {
+    private void hookApplyEatOrDrinkTransformation(MatrixStack matrices, float tickDelta, Arm arm, ItemStack stack, PlayerEntity player, CallbackInfo ci)
+    {
         ci.cancel();
         float h;
         float f = (float)this.client.player.getItemUseTimeLeft() - tickDelta + 1.0f;
-        float g = f / (float)stack.getMaxUseTime();
-        if (g < 0.8f) {
+        float g = f / (float)stack.getMaxUseTime(mc.player);
+        if (g < 0.8f)
+        {
             h = MathHelper.abs(MathHelper.cos(f / 4.0f * (float)Math.PI) * 0.1f);
             EatTransformationEvent eatTransformationEvent = new EatTransformationEvent();
             EventBus.INSTANCE.dispatch(eatTransformationEvent);

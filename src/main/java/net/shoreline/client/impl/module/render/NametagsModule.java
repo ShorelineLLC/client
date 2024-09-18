@@ -1,9 +1,9 @@
 package net.shoreline.client.impl.module.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
@@ -19,9 +19,9 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.EnchantedGoldenAppleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
@@ -29,7 +29,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.shoreline.client.api.config.Config;
@@ -51,22 +50,20 @@ import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
-import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.entity.FakePlayerEntity;
+import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
+import java.awt.*;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -126,7 +123,7 @@ public class NametagsModule extends ToggleModule
             return;
         }
         RenderBuffers.preRender();
-        Vec3d interpolate = Interpolation.getRenderPosition(mc.getCameraEntity(), mc.getTickDelta());
+        Vec3d interpolate = Interpolation.getRenderPosition(mc.getCameraEntity(), mc.getRenderTickCounter().getTickDelta(true));
         Camera camera = mc.gameRenderer.getCamera();
         Vec3d pos = camera.getPos();
         for (Entity entity : mc.world.getEntities())
@@ -142,7 +139,7 @@ public class NametagsModule extends ToggleModule
                     continue;
                 }
                 String info = getNametagInfo(player);
-                Vec3d pinterpolate = Interpolation.getRenderPosition(player, mc.getTickDelta());
+                Vec3d pinterpolate = Interpolation.getRenderPosition(player, mc.getRenderTickCounter().getTickDelta(true));
                 double rx = player.getX() - pinterpolate.getX();
                 double ry = player.getY() - pinterpolate.getY();
                 double rz = player.getZ() - pinterpolate.getZ();
@@ -169,7 +166,7 @@ public class NametagsModule extends ToggleModule
                 String lookup = Managers.LOOKUP.getNameFromUUID(tameable.getOwnerUuid());
                 if (lookup != null)
                 {
-                    Vec3d tamePos = Interpolation.getRenderPosition(entity, mc.getTickDelta());
+                    Vec3d tamePos = Interpolation.getRenderPosition(entity, mc.getRenderTickCounter().getTickDelta(true));
                     double rx = entity.getX() - tamePos.getX();
                     double ry = (entity.getY() + entity.getHeight() + 0.43f) - tamePos.getY();
                     double rz = entity.getZ() - tamePos.getZ();
@@ -181,7 +178,7 @@ public class NametagsModule extends ToggleModule
                 String lookup = Managers.LOOKUP.getNameFromUUID(tameable.getOwnerUuid());
                 if (lookup != null)
                 {
-                    Vec3d tamePos = Interpolation.getRenderPosition(entity, mc.getTickDelta());
+                    Vec3d tamePos = Interpolation.getRenderPosition(entity, mc.getRenderTickCounter().getTickDelta(true));
                     double rx = entity.getX() - tamePos.getX();
                     double ry = (entity.getY() + entity.getHeight() + 0.43f) - tamePos.getY();
                     double rz = entity.getZ() - tamePos.getZ();
@@ -190,7 +187,7 @@ public class NametagsModule extends ToggleModule
             }
             else if (entity instanceof ItemEntity itemEntity && droppedItemsConfig.getValue())
             {
-                Vec3d itemPos = Interpolation.getRenderPosition(itemEntity, mc.getTickDelta());
+                Vec3d itemPos = Interpolation.getRenderPosition(itemEntity, mc.getRenderTickCounter().getTickDelta(true));
                 double rx = itemEntity.getX() - itemPos.getX();
                 double ry = itemEntity.getY() - itemPos.getY();
                 double rz = itemEntity.getZ() - itemPos.getZ();
@@ -204,7 +201,7 @@ public class NametagsModule extends ToggleModule
                 {
                     continue;
                 }
-                Vec3d itemPos = Interpolation.getRenderPosition(pearlEntity, mc.getTickDelta());
+                Vec3d itemPos = Interpolation.getRenderPosition(pearlEntity, mc.getRenderTickCounter().getTickDelta(true));
                 double rx = pearlEntity.getX() - itemPos.getX();
                 double ry = pearlEntity.getY() - itemPos.getY();
                 double rz = pearlEntity.getZ() - itemPos.getZ();
@@ -259,7 +256,12 @@ public class NametagsModule extends ToggleModule
                 z - pos.getZ());
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-        matrices.scale(-scaling, -scaling, -1.0f);
+        matrices.scale(-scaling, -scaling, 1.0f);
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        GL11.glDepthFunc(GL11.GL_ALWAYS);
+
         if (backgroundConfig.getValue())
         {
             RenderManager.rect(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
@@ -270,24 +272,20 @@ public class NametagsModule extends ToggleModule
             RenderManager.borderedRect(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
                     mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB(), thicknessConfig.getValue());
         }
+
         int color = getNametagColor(entity);
-        RenderManager.post(() ->
+        renderItems(matrices, entity);
+        OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(entity.getGameProfile().getName());
+        if (onlineUsersConfig.getValue() && onlineUser != null)
         {
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            GL11.glDepthFunc(GL11.GL_ALWAYS);
-            renderItems(matrices, entity);
-            OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(entity.getGameProfile().getName());
-            if (onlineUsersConfig.getValue() && onlineUser != null)
-            {
-                Identifier identifier = getNametagLogo(onlineUser.getUsertype());
-                RenderManager.rectTextured(matrices, identifier, (int) -width - 1.5f, (int) -width + 6.0f,
-                        0.5f, 8.0f, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
-            }
-            drawText(matrices, info, isOnlineUser(entity) ? -width + 10.0f : -width, 0.0f, color);
-            GL11.glDepthFunc(GL11.GL_LEQUAL);
-            RenderSystem.disableBlend();
-        });
+            Identifier identifier = getNametagLogo(onlineUser.getUsertype());
+            RenderManager.rectTextured(matrices, identifier, (int) -width - 1.5f, (int) -width + 6.0f,
+                    0.5f, 8.0f, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+        }
+        drawText(matrices, info, isOnlineUser(entity) ? -width + 10.0f : -width, 0.0f, color);
+
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
+        RenderSystem.disableBlend();
     }
 
     private boolean isOnlineUser(PlayerEntity entity)
@@ -299,9 +297,9 @@ public class NametagsModule extends ToggleModule
     {
         return switch (onlineUser)
         {
-            case RELEASE -> new Identifier("shoreline", "logo/white.png");
-            case BETA -> new Identifier("shoreline", "logo/blue.png");
-            case DEV -> new Identifier("shoreline", "logo/red.png");
+            case RELEASE -> Identifier.of("shoreline", "logo/white.png");
+            case BETA -> Identifier.of("shoreline", "logo/blue.png");
+            case DEV -> Identifier.of("shoreline", "logo/red.png");
         };
     }
 
@@ -341,9 +339,9 @@ public class NametagsModule extends ToggleModule
         for (ItemStack stack : displayItems)
         {
             n10 -= 8;
-            if (stack.getEnchantments().size() > n11)
+            if (stack.getEnchantments().getEnchantments().size() > n11)
             {
-                n11 = stack.getEnchantments().size();
+                n11 = stack.getEnchantments().getEnchantments().size();
             }
         }
         float m2 = enchantOffset(n11);
@@ -493,7 +491,12 @@ public class NametagsModule extends ToggleModule
                 m = byteBuffer.getFloat(16);
                 n = byteBuffer.getFloat(20);
                 Vector4f vector4f = matrix4f.transform(new Vector4f(f, g, h, 1.0f));
-                vertexConsumer.vertex(vector4f.x(), vector4f.y(), vector4f.z(), o, p, q, 1.0f, m, n, overlay, r, 1.0f, 1.0f, 1.0f);
+                vertexConsumer.vertex(vector4f.x(), vector4f.y(), vector4f.z());
+                vertexConsumer.color(new Color(o, p, q).getRGB());
+                vertexConsumer.texture(m, n);
+                vertexConsumer.overlay(overlay);
+                vertexConsumer.light(r);
+                vertexConsumer.normal(1.0f, 1.0f, 1.0f);
             }
         }
     }
@@ -544,7 +547,7 @@ public class NametagsModule extends ToggleModule
 
     private void renderEnchants(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
     {
-        if (itemStack.getItem() instanceof EnchantedGoldenAppleItem)
+        if (itemStack.getItem() == Items.ENCHANTED_GOLDEN_APPLE)
         {
             drawText(matrixStack, "God", x * 2, y * 2, 0xffc34e41);
             return;
@@ -553,14 +556,14 @@ public class NametagsModule extends ToggleModule
         {
             return;
         }
-        Map<Enchantment, Integer> enchants = EnchantmentHelper.get(itemStack);
+        Set<Object2IntMap.Entry<RegistryEntry<Enchantment>>> enchants = EnchantmentHelper.getEnchantments(itemStack).getEnchantmentEntries();
 
         float n2 = 0;
-        for (Enchantment enchantment : enchants.keySet())
+        for (Object2IntMap.Entry<RegistryEntry<Enchantment>> e : enchants)
         {
-            int lvl = enchants.get(enchantment);
+            int lvl = e.getIntValue();
             StringBuilder enchantString = new StringBuilder();
-            String translatedName = enchantment.getName(lvl).getString();
+            String translatedName = Enchantment.getName(e.getKey(), lvl).getString();
             if (translatedName.contains("Vanish"))
             {
                 enchantString.append("Van");

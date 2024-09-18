@@ -119,7 +119,6 @@ public final class AWTFontRenderer implements Closeable, Globals
 
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
         Matrix4f matrix4f = stack.peek().getPositionMatrix();
         char[] chars = text.toCharArray();
         float xOffset = 0;
@@ -187,7 +186,7 @@ public final class AWTFontRenderer implements Closeable, Globals
 
                 List<CharLocation> objects = cache.get(identifier);
 
-                bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+                BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
                 for (CharLocation object : objects)
                 {
                     float xo = object.x;
@@ -203,10 +202,10 @@ public final class AWTFontRenderer implements Closeable, Globals
                     float v1 = (float) glyph.textureHeight() / owner.getHeight();
                     float u2 = (float) (glyph.textureWidth() + glyph.width()) / owner.getWidth();
                     float v2 = (float) (glyph.textureHeight() + glyph.height()) / owner.getHeight();
-                    bufferBuilder.vertex(matrix4f, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a).next();
-                    bufferBuilder.vertex(matrix4f, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a).next();
-                    bufferBuilder.vertex(matrix4f, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a).next();
-                    bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a).next();
+                    bufferBuilder.vertex(matrix4f, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a);
+                    bufferBuilder.vertex(matrix4f, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a);
+                    bufferBuilder.vertex(matrix4f, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a);
+                    bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a);
                 }
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
             }
@@ -332,7 +331,7 @@ public final class AWTFontRenderer implements Closeable, Globals
 
     public Identifier getGlyphIdentifier()
     {
-        return new Identifier("shoreline", "font/storage/" + HexRandom.generateRandomHex(32));
+        return Identifier.of("shoreline", "font/storage/" + HexRandom.generateRandomHex(32));
     }
 
     public int[] toRgbComponents(int color)

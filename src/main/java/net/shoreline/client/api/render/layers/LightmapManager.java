@@ -201,16 +201,8 @@ public class LightmapManager implements AutoCloseable, Globals
 
     private float getDarknessFactor(float delta)
     {
-        if (mc.player.hasStatusEffect(StatusEffects.DARKNESS)) 
-        {
-            StatusEffectInstance statusEffectInstance = mc.player.getStatusEffect(StatusEffects.DARKNESS);
-            if (statusEffectInstance != null && statusEffectInstance.getFactorCalculationData().isPresent()) 
-            {
-                return ((StatusEffectInstance.FactorCalculationData)statusEffectInstance.getFactorCalculationData().get()).lerp(mc.player, delta);
-            }
-        }
-
-        return 0.0f;
+        StatusEffectInstance statusEffectInstance = mc.player.getStatusEffect(StatusEffects.DARKNESS);
+        return statusEffectInstance != null ? statusEffectInstance.getFadeFactor(mc.player, delta) : 0.0f;
     }
 
     private float getDarkness(LivingEntity entity, float factor, float delta)

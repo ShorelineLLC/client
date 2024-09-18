@@ -3,7 +3,7 @@ package net.shoreline.client.impl.module.render;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.render.BlockBreakingInfo;
+import net.minecraft.entity.player.BlockBreakingInfo;
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -145,8 +145,8 @@ public class BreakHighlightModule extends ToggleModule
                 double dy = (render1.maxY - render1.minY) / 2.0;
                 double dz = (render1.maxZ - render1.minZ) / 2.0;
                 final Box scaled = new Box(center, center).expand(dx * scale, dy * scale, dz * scale);
-                RenderManager.renderBox(event.getMatrices(), scaled, ((ColorConfig) colorConfig).getValue(60).getRGB());
-                RenderManager.renderBoundingBox(event.getMatrices(), scaled, 1.5f, ((ColorConfig) colorConfig).getValue(125).getRGB());
+                RenderManager.renderBox(event.getMatrices(), scaled, ((ColorConfig) colorConfig).getValue(40).getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), scaled, 1.5f, ((ColorConfig) colorConfig).getValue(100).getRGB());
             }
             RenderBuffers.postRender();
         }

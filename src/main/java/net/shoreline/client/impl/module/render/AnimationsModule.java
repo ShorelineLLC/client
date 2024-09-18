@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
@@ -8,7 +9,9 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.entity.LimbAnimationEvent;
 import net.shoreline.client.impl.event.entity.SwingSpeedEvent;
 import net.shoreline.client.impl.event.entity.UpdateServerPositionEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.item.EatTransformationEvent;
+import net.shoreline.client.impl.event.render.item.RenderSwingAnimationEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
@@ -17,6 +20,7 @@ import net.shoreline.eventbus.annotation.EventListener;
  */
 public final class AnimationsModule extends ToggleModule
 {
+    Config<Boolean> oldSwingConfig = register(new BooleanConfig("OldSwingAnimation", "Reverts to the 1.8 swinging animations", false));
     Config<Boolean> swingSpeedConfig = register(new BooleanConfig("SwingSpeed", "Allows you to modify your swing speed.", false));
     Config<Integer> swingFactorConfig = register(new NumberConfig<>("SwingFactor", "The speed of your swing.", 1, 6, 20, () -> swingSpeedConfig.getValue()));
     Config<Boolean> selfOnlyConfig = register(new BooleanConfig("SelfOnly", "Make the module only affect yourself", true, () -> false));
@@ -69,6 +73,30 @@ public final class AnimationsModule extends ToggleModule
             event.getLivingEntity().setPos(event.getX(), event.getY(), event.getZ());
             event.getLivingEntity().setYaw(event.getYaw());
             event.getLivingEntity().setPitch(event.getPitch());
+        }
+    }
+
+    @EventListener
+    public void onRenderSwing(RenderSwingAnimationEvent event)
+    {
+        if (oldSwingConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (mc.player == null)
+        {
+            return;
+        }
+        if (event.getPacket() instanceof EntityAnimationS2CPacket packet && oldSwingConfig.getValue()
+                && packet.getEntityId() == mc.player.getId()
+                && (packet.getAnimationId() == EntityAnimationS2CPacket.SWING_MAIN_HAND || packet.getAnimationId() == EntityAnimationS2CPacket.SWING_OFF_HAND))
+        {
+            event.cancel();
         }
     }
 }

@@ -108,7 +108,7 @@ public class BlockListConfig<T extends List<Block>> extends Config<T>
             for (JsonElement je : element.getAsJsonArray())
             {
                 String val = je.getAsString();
-                Block block = Registries.BLOCK.get(new Identifier(val));
+                Block block = Registries.BLOCK.get(Identifier.of(val));
                 temp.add(block);
             }
             return (T) temp;

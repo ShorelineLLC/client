@@ -3,6 +3,7 @@ package net.shoreline.client.mixin.gui.hud;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
@@ -32,16 +33,11 @@ public class MixinInGameHud implements Globals
     @Final
     private static Identifier POWDER_SNOW_OUTLINE;
 
-    /**
-     * @param context
-     * @param tickDelta
-     * @param ci
-     */
     @Inject(method = "render", at = @At(value = "TAIL"))
-    private void hookRender(DrawContext context, float tickDelta, CallbackInfo ci)
+    private void hookRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
         RenderOverlayEvent.Post renderOverlayEvent =
-                new RenderOverlayEvent.Post(context, tickDelta);
+                new RenderOverlayEvent.Post(context, tickCounter.getTickDelta(true));
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
     }
 
@@ -56,8 +52,7 @@ public class MixinInGameHud implements Globals
      */
     @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"),
             cancellable = true)
-    private void hookRenderStatusEffectOverlay(DrawContext context,
-                                               CallbackInfo ci)
+    private void hookRenderStatusEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
     {
         RenderOverlayEvent.StatusEffect renderOverlayEvent =
                 new RenderOverlayEvent.StatusEffect(context);
@@ -146,10 +141,8 @@ public class MixinInGameHud implements Globals
      * @return
      */
     @Redirect(method = "renderHeldItemTooltip", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow" +
-                    "(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)I"))
-    private int hookRenderHeldItemTooltip(DrawContext instance, TextRenderer textRenderer,
-                                          Text text, int x, int y, int color)
+            target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithBackground(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIII)I"))
+    private int hookRenderHeldItemTooltip(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int width, int color)
     {
         RenderOverlayEvent.ItemName renderOverlayEvent =
                 new RenderOverlayEvent.ItemName(instance);

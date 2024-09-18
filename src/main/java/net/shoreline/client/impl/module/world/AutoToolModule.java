@@ -11,6 +11,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.player.EnchantmentUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
@@ -77,7 +78,7 @@ public final class AutoToolModule extends ToggleModule
                 continue;
             }
             float speed = stack.getMiningSpeedMultiplier(state);
-            final int efficiency = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
+            final int efficiency = EnchantmentUtil.getLevel(stack, Enchantments.EFFICIENCY);
             if (efficiency > 0)
             {
                 speed += efficiency * efficiency + 1.0f;

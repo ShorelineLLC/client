@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -14,6 +15,7 @@ import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.imixin.IMinecraftClient;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -68,6 +70,10 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
      */
     @Shadow
     protected abstract boolean doAttack();
+
+    @Shadow
+    @Final
+    private Window window;
 
     /**
      *
@@ -276,5 +282,12 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
     {
         RefreshPacksEvent refreshPacksEvent = new RefreshPacksEvent();
         EventBus.INSTANCE.dispatch(refreshPacksEvent);
+    }
+
+    @Inject(method = "onResolutionChanged", at = @At(value = "TAIL"))
+    private void hookOnResolutionChanged(CallbackInfo ci)
+    {
+        ResolutionEvent resolutionEvent = new ResolutionEvent(window);
+        EventBus.INSTANCE.dispatch(resolutionEvent);
     }
 }

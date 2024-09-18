@@ -22,12 +22,12 @@ public class NbtCommand extends Command
         builder.executes(context ->
         {
             ItemStack mainhand = mc.player.getMainHandStack();
-            if (!mainhand.hasNbt() || mainhand.getNbt() == null)
+            if (!mainhand.getComponents().isEmpty())
             {
                 ChatUtil.error("No Nbt tags on this item!");
                 return 0;
             }
-            ChatUtil.clientSendMessage(mainhand.getNbt().toString());
+            ChatUtil.clientSendMessage(mainhand.getComponents().toString());
             return 1;
         });
     }

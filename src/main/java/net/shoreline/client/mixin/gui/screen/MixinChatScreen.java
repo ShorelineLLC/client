@@ -65,19 +65,16 @@ public class MixinChatScreen extends MixinScreen
     /**
      * @param chatText
      * @param addToHistory
-     * @param cir
      */
     @Inject(method = "sendMessage", at = @At(value = "HEAD"), cancellable = true)
-    private void hookSendMessage(String chatText, boolean addToHistory,
-                                 CallbackInfoReturnable<Boolean> cir)
+    private void hookSendMessage(String chatText, boolean addToHistory, CallbackInfo ci)
     {
         ChatMessageEvent.Client chatMessageEvent =
                 new ChatMessageEvent.Client(chatText);
         EventBus.INSTANCE.dispatch(chatMessageEvent);
         if (chatMessageEvent.isCanceled())
         {
-            cir.setReturnValue(true);
-            cir.cancel();
+            ci.cancel();
         }
     }
 

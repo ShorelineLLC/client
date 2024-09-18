@@ -182,7 +182,7 @@ public class ChamsModule extends ToggleModule
                 return;
             }
             Animation animation = new Animation(true, fadeTimeConfig.getValue());
-            fadeList.put(new PopChamEntity(player, mc.getTickDelta()), animation);
+            fadeList.put(new PopChamEntity(player, mc.getRenderTickCounter().getTickDelta(true)), animation);
         }
     }
 

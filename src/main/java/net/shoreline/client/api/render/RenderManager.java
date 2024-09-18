@@ -26,7 +26,6 @@ public class RenderManager implements Globals
 {
     //
     public static final Tessellator TESSELLATOR = RenderSystem.renderThreadTesselator();
-    public static final BufferBuilder BUFFER = TESSELLATOR.getBuffer();
 
     /**
      * When rendering using vanilla methods, you should call this method in order to ensure the GL state does not get
@@ -417,17 +416,17 @@ public class RenderManager implements Globals
         float j = ColorHelper.Argb.getBlue(color) / 255.0f;
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        BUFFER.begin(VertexFormat.DrawMode.QUADS,
+        BufferBuilder bufferBuilder = TESSELLATOR.begin(VertexFormat.DrawMode.QUADS,
                 VertexFormats.POSITION_COLOR);
-        BUFFER.vertex(matrix4f, (float) x1, (float) y1, (float) z)
-                .color(g, h, j, f).next();
-        BUFFER.vertex(matrix4f, (float) x1, (float) y2, (float) z)
-                .color(g, h, j, f).next();
-        BUFFER.vertex(matrix4f, (float) x2, (float) y2, (float) z)
-                .color(g, h, j, f).next();
-        BUFFER.vertex(matrix4f, (float) x2, (float) y1, (float) z)
-                .color(g, h, j, f).next();
-        BufferRenderer.drawWithGlobalProgram(BUFFER.end());
+        bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, (float) z)
+                .color(g, h, j, f);
+        bufferBuilder.vertex(matrix4f, (float) x1, (float) y2, (float) z)
+                .color(g, h, j, f);
+        bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, (float) z)
+                .color(g, h, j, f);
+        bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, (float) z)
+                .color(g, h, j, f);
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
     }
 
@@ -448,26 +447,25 @@ public class RenderManager implements Globals
         float f5 = (endColor >> 16 & 255) / 255.0F;
         float f6 = (endColor >> 8 & 255) / 255.0F;
         float f7 = (endColor & 255) / 255.0F;
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         if (sideways)
         {
-            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
-            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4).next();
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4);
         }
         else
         {
-            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f).next();
-            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4).next();
-            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4).next();
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4);
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
         }
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
@@ -480,18 +478,17 @@ public class RenderManager implements Globals
     {
         Matrix4f matrix4f = matrix.peek().getPositionMatrix();
         RenderSystem.setShaderTexture(0, identifier);
-        RenderSystem.setShader(GameRenderer::getPositionColorTexProgram);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         RenderSystem.enableBlend();
-        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
         buffer.vertex(matrix4f, (float) x0, (float) y0, (float) z)
-                .color(red, green, blue, alpha).texture(u0, v0).next();
+                .color(red, green, blue, alpha).texture(u0, v0);
         buffer.vertex(matrix4f, (float) x0, (float) y1, (float) z)
-                .color(red, green, blue, alpha).texture(u0, v1).next();
+                .color(red, green, blue, alpha).texture(u0, v1);
         buffer.vertex(matrix4f, (float) x1, (float) y1, (float) z)
-                .color(red, green, blue, alpha).texture(u1, v1).next();
+                .color(red, green, blue, alpha).texture(u1, v1);
         buffer.vertex(matrix4f, (float) x1, (float) y0, (float) z)
-                .color(red, green, blue, alpha).texture(u1, v0).next();
+                .color(red, green, blue, alpha).texture(u1, v0);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
     }

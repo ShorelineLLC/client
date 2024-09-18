@@ -173,7 +173,7 @@ public class FreecamModule extends ToggleModule
         {
             float[] currentAngles = {yaw, pitch};
             Vec3d eyePos = position;
-            HitResult result = RayCastUtil.rayCast(mc.interactionManager.getReachDistance(), eyePos, currentAngles);
+            HitResult result = RayCastUtil.rayCast(mc.player.getBlockInteractionRange(), eyePos, currentAngles);
             if (result.getType() == HitResult.Type.BLOCK)
             {
                 float[] newAngles = RotationUtil.getRotationsTo(mc.player.getEyePos(), result.getPos());

@@ -314,9 +314,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
      * @param instance
      * @return
      */
-    @Redirect(method = "updateNausea", at = @At(value = "FIELD", target = "Lnet" +
-            "/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/" +
-            "client/gui/screen/Screen;"))
+    @Redirect(method = "tickNausea", at = @At(value = "FIELD", target = "Lnet" +
+            "/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;"))
     private Screen hookCurrentScreen(MinecraftClient instance)
     {
         //

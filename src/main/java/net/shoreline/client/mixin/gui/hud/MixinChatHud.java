@@ -23,6 +23,7 @@ import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
 import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.impl.imixin.IChatHudLineVisible;
+import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +41,7 @@ import java.util.List;
  * @since 1.0
  */
 @Mixin(ChatHud.class)
-public abstract class MixinChatHud implements IChatHud
+public abstract class MixinChatHud implements IChatHud, Globals
 {
     @Shadow
     @Final
@@ -137,17 +138,8 @@ public abstract class MixinChatHud implements IChatHud
         return signatureIndicatorEvent.isCanceled() ? null : original;
     }
 
-    /**
-     * @param message
-     * @param signature
-     * @param ticks
-     * @param indicator
-     * @param refresh
-     * @param ci
-     */
-    @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", at = @At(value = "HEAD"), cancellable = true)
-    private void hookAddMessage(Text message, MessageSignatureData signature,
-                                int ticks, MessageIndicator indicator, boolean refresh, CallbackInfo ci)
+    @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V", at = @At(value = "HEAD"), cancellable = true)
+    private void hookAddMessage(Text message, MessageSignatureData signatureData, MessageIndicator indicator, CallbackInfo ci)
     {
         ci.cancel();
         visibleMessages.removeIf(msg -> ((IChatHudLineVisible) (Object) msg).getId() == currentId && currentId != 0);
@@ -178,7 +170,7 @@ public abstract class MixinChatHud implements IChatHud
             ChatTextEvent chatMessageEvent = new ChatTextEvent(orderedText);
             EventBus.INSTANCE.dispatch(chatMessageEvent);
             boolean bl2 = j == list.size() - 1;
-            ChatHudLine.Visible visibleLine = new ChatHudLine.Visible(ticks, chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2);
+            ChatHudLine.Visible visibleLine = new ChatHudLine.Visible(mc.inGameHud.getTicks(), chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2);
             ((IChatHudLineVisible) (Object) visibleLine).setId(currentId);
             this.visibleMessages.add(0, visibleLine);
         }
@@ -190,19 +182,6 @@ public abstract class MixinChatHud implements IChatHud
             while (this.visibleMessages.size() > 100)
             {
                 this.visibleMessages.remove(this.visibleMessages.size() - 1);
-            }
-        }
-        if (!refresh)
-        {
-            ChatHudLine chatHudLine = new ChatHudLine(ticks, chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, signature, indicator);
-            ((IChatHudLine) (Object) chatHudLine).setId(currentId);
-            this.messages.add(0, chatHudLine);
-            if (!bl1)
-            {
-                while (this.messages.size() > 100)
-                {
-                    this.messages.remove(this.messages.size() - 1);
-                }
             }
         }
     }

@@ -18,8 +18,8 @@ import java.util.function.Function;
 
 public class RenderLayersClient implements Globals
 {
-    public static final Identifier SHULKER_BOXES_ATLAS_TEXTURE = new Identifier("textures/atlas/shulker_boxes.png");
-    public static final Identifier CHEST_ATLAS_TEXTURE = new Identifier("textures/atlas/chest.png");
+    public static final Identifier SHULKER_BOXES_ATLAS_TEXTURE = Identifier.of("textures/atlas/shulker_boxes.png");
+    public static final Identifier CHEST_ATLAS_TEXTURE = Identifier.of("textures/atlas/chest.png");
 
     public static final RenderLayer GLINT = RenderLayer.of("glint", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.MultiPhaseParameters.builder()
             .program(RenderPhase.GLINT_PROGRAM).texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, true, false))

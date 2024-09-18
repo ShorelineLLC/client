@@ -211,7 +211,7 @@ public class HoleFillModule extends ObsidianPlacerModule
             {
                 set.getValue().setState(false);
                 int boxAlpha = (int) (40 * set.getValue().getFactor());
-                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                int lineAlpha = (int) (100 * set.getValue().getFactor());
                 Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
                 Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());

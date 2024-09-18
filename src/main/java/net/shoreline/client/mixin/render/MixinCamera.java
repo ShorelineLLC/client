@@ -1,7 +1,7 @@
 package net.shoreline.client.mixin.render;
 
+import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.CameraSubmersionType;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.camera.CameraPositionEvent;
 import net.shoreline.client.impl.event.camera.CameraRotationEvent;
@@ -48,15 +48,14 @@ public abstract class MixinCamera
     }
 
     /**
-     * @param desiredCameraDistance
+     * @param f
      * @param cir
      */
     @Inject(method = "clipToSpace", at = @At(value = "HEAD"), cancellable = true)
-    private void hookClipToSpace(double desiredCameraDistance,
-                                 CallbackInfoReturnable<Double> cir)
+    private void hookClipToSpace(float f, CallbackInfoReturnable<Float> cir)
     {
         CameraClipEvent cameraClipEvent =
-                new CameraClipEvent(desiredCameraDistance);
+                new CameraClipEvent(f);
         EventBus.INSTANCE.dispatch(cameraClipEvent);
         if (cameraClipEvent.isCanceled())
         {

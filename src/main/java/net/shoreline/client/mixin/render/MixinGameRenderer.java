@@ -1,10 +1,13 @@
 package net.shoreline.client.mixin.render;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -12,18 +15,17 @@ import net.minecraft.resource.ResourceFactory;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.api.render.satin.ReloadableShaderEffectManager;
 import net.shoreline.client.impl.event.network.ReachEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.world.UpdateCrosshairTargetEvent;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -54,24 +56,24 @@ public class MixinGameRenderer implements Globals
         EventBus.INSTANCE.dispatch(lightmapInitEvent);
     }
 
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", ordinal = 1))
-    private void hookRenderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = {"ldc=hand"}), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+    private void hookRenderWorld(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrix4f2, @Local(ordinal = 1) float tickDelta, @Local MatrixStack matrixStack)
     {
-        RenderWorldEvent.Game renderWorldEvent = new RenderWorldEvent.Game(matrices, tickDelta);
+        RenderWorldEvent.Game renderWorldEvent = new RenderWorldEvent.Game(matrixStack, tickDelta);
         EventBus.INSTANCE.dispatch(renderWorldEvent);
     }
 
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V", shift = At.Shift.AFTER))
-    public void hookRenderWorld$2(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/render/Camera;FLorg/joml/Matrix4f;)V", shift = At.Shift.AFTER))
+    public void hookRenderWorld$2(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrix4f2, @Local(ordinal = 1) float tickDelta, @Local MatrixStack matrixStack)
     {
-        RenderWorldEvent.Hand reloadShaderEvent = new RenderWorldEvent.Hand(matrices, tickDelta);
+        RenderWorldEvent.Hand reloadShaderEvent = new RenderWorldEvent.Hand(matrixStack, tickDelta);
         EventBus.INSTANCE.dispatch(reloadShaderEvent);
     }
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/LightmapTextureManager;update(F)V"))
-    private void hookRenderWorld$3(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci)
+    private void hookRenderWorld$3(RenderTickCounter tickCounter, CallbackInfo ci)
     {
-        LightmapUpdateEvent lightmapUpdateEvent = new LightmapUpdateEvent(tickDelta);
+        LightmapUpdateEvent lightmapUpdateEvent = new LightmapUpdateEvent(tickCounter.getTickDelta(true));
         EventBus.INSTANCE.dispatch(lightmapUpdateEvent);
     }
 
@@ -82,7 +84,7 @@ public class MixinGameRenderer implements Globals
         EventBus.INSTANCE.dispatch(lightmapTickEvent);
     }
 
-    @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.AFTER))
+    @Inject(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V", shift = At.Shift.AFTER))
     private void hookUpdateTargetedEntity$1(final float tickDelta, final CallbackInfo info)
     {
         UpdateCrosshairTargetEvent event = new UpdateCrosshairTargetEvent(tickDelta, client.getCameraEntity());
@@ -160,12 +162,8 @@ public class MixinGameRenderer implements Globals
      * @param tickDelta
      * @param info
      */
-    @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast" +
-                    "(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/" +
-                    "Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/" +
-                    "math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/" +
-                    "util/hit/EntityHitResult;"), cancellable = true)
+    @Inject(method = "updateCrosshairTarget", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/render/GameRenderer;findCrosshairTarget(Lnet/minecraft/entity/Entity;DDF)Lnet/minecraft/util/hit/HitResult;"), cancellable = true)
     private void hookUpdateTargetedEntity$2(float tickDelta, CallbackInfo info)
     {
         TargetEntityEvent targetEntityEvent = new TargetEntityEvent();
@@ -178,18 +176,26 @@ public class MixinGameRenderer implements Globals
     }
 
     /**
-     * @param d
      * @return
      */
-    @ModifyConstant(method = "updateTargetedEntity", constant = @Constant(doubleValue = 9))
-    private double updateTargetedEntityModifySquaredMaxReach(double d)
+    @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityInteractionRange()D"))
+    private double updateTargetedEntityModifySquaredMaxReach(ClientPlayerEntity instance)
     {
-        ReachEvent reachEvent = new ReachEvent();
+        ReachEvent.Entity reachEvent = new ReachEvent.Entity();
         EventBus.INSTANCE.dispatch(reachEvent);
-        double reach = reachEvent.getReach() + 3.0;
-        return reachEvent.isCanceled() ? reach * reach : 9.0;
+        return reachEvent.isCanceled() ? reachEvent.getReach() : instance.getEntityInteractionRange();
     }
 
+    /**
+     * @return
+     */
+    @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getBlockInteractionRange()D"))
+    private double updateTargetedEntityModifySquaredMaxReach$1(ClientPlayerEntity instance)
+    {
+        ReachEvent.Block reachEvent = new ReachEvent.Block();
+        EventBus.INSTANCE.dispatch(reachEvent);
+        return reachEvent.isCanceled() ? reachEvent.getReach() : instance.getBlockInteractionRange();
+    }
 
     /**
      * @param matrices
@@ -237,5 +243,11 @@ public class MixinGameRenderer implements Globals
     {
         LoadProgramsEvent loadProgramsEvent = new LoadProgramsEvent();
         EventBus.INSTANCE.dispatch(loadProgramsEvent);
+    }
+
+    @Inject(method = "loadPrograms", at = @At(value = "RETURN"))
+    private void loadSatinPrograms(ResourceFactory factory, CallbackInfo ci)
+    {
+        ReloadableShaderEffectManager.INSTANCE.reload(factory);
     }
 }

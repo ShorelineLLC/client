@@ -38,6 +38,7 @@ import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.player.EnchantmentUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.string.EnumFormatter;
@@ -306,7 +307,7 @@ public class AuraModule extends RotationModule
             RenderManager.renderBox(event.getMatrices(),
                     Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.getInstance().getRGB(40 + attackDelay));
             RenderManager.renderBoundingBox(event.getMatrices(),
-                    Interpolation.getInterpolatedEntityBox(entityTarget), 1.5f, ColorsModule.getInstance().getRGB(145));
+                    Interpolation.getInterpolatedEntityBox(entityTarget), 1.5f, ColorsModule.getInstance().getRGB(100));
             RenderBuffers.postRender();
         }
     }
@@ -364,9 +365,9 @@ public class AuraModule extends RotationModule
             final ItemStack stack = mc.player.getInventory().getStack(i);
             if (stack.getItem() instanceof SwordItem swordItem)
             {
-                float sharpness = EnchantmentHelper.getLevel(
-                        Enchantments.SHARPNESS, stack) * 0.5f + 0.5f;
-                float dmg = swordItem.getAttackDamage() + sharpness;
+                float sharpness = EnchantmentUtil.getLevel(stack,
+                        Enchantments.SHARPNESS) * 0.5f + 0.5f;
+                float dmg = swordItem.getMaterial().getAttackDamage() + sharpness;
                 if (dmg > sharp)
                 {
                     sharp = dmg;
@@ -375,9 +376,9 @@ public class AuraModule extends RotationModule
             }
             else if (stack.getItem() instanceof AxeItem axeItem)
             {
-                float sharpness = EnchantmentHelper.getLevel(
-                        Enchantments.SHARPNESS, stack) * 0.5f + 0.5f;
-                float dmg = axeItem.getAttackDamage() + sharpness;
+                float sharpness = EnchantmentUtil.getLevel(stack,
+                        Enchantments.SHARPNESS) * 0.5f + 0.5f;
+                float dmg = axeItem.getMaterial().getAttackDamage() + sharpness;
                 if (dmg > sharp)
                 {
                     sharp = dmg;
@@ -386,8 +387,8 @@ public class AuraModule extends RotationModule
             }
             else if (stack.getItem() instanceof TridentItem)
             {
-                float sharpness = EnchantmentHelper.getLevel(
-                        Enchantments.SHARPNESS, stack) * 0.5f + 0.5f;
+                float sharpness = EnchantmentUtil.getLevel(stack,
+                        Enchantments.SHARPNESS) * 0.5f + 0.5f;
                 float dmg = TridentItem.ATTACK_DAMAGE + sharpness;
                 if (dmg > sharp)
                 {
@@ -439,7 +440,7 @@ public class AuraModule extends RotationModule
         if (shielding)
         {
             Managers.NETWORK.sendSequencedPacket(s ->
-                    new PlayerInteractItemC2SPacket(Hand.OFF_HAND, s));
+                    new PlayerInteractItemC2SPacket(Hand.OFF_HAND, s, mc.player.getYaw(), mc.player.getPitch()));
         }
         if (sneaking)
         {
@@ -483,8 +484,8 @@ public class AuraModule extends RotationModule
                 continue;
             }
             if (armorCheckConfig.getValue()
-                    && entity instanceof LivingEntity
-                    && !entity.getArmorItems().iterator().hasNext())
+                    && entity instanceof LivingEntity livingEntity
+                    && !livingEntity.getArmorItems().iterator().hasNext())
             {
                 continue;
             }

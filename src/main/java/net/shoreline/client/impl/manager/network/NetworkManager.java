@@ -49,7 +49,7 @@ public class NetworkManager implements Globals
             return;
         }
         mc.getNetworkHandler().getConnection().connect(address.getAddress(), address.getPort(),
-                new ClientLoginNetworkHandler(mc.getNetworkHandler().getConnection(), mc, info, null, false, null, null));
+                new ClientLoginNetworkHandler(mc.getNetworkHandler().getConnection(), mc, info, null, false, null, null, null));
     }
 
     /**

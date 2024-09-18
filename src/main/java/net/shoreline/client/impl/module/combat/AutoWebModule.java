@@ -137,7 +137,7 @@ public class AutoWebModule extends BlockPlacerModule
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 set.getValue().setState(false);
-                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                int lineAlpha = (int) (120 * set.getValue().getFactor());
                 Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
                 BlockPos blockPos = set.getKey();
                 double x1 = blockPos.getX();

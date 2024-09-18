@@ -67,23 +67,6 @@ public abstract class MixinClientPlayerInteractionManager implements Globals
     }
 
     /**
-     * @param cir
-     */
-    @Inject(method = "getReachDistance", at = @At(value = "HEAD"),
-            cancellable = true)
-    private void hookGetReachDistance(CallbackInfoReturnable<Float> cir)
-    {
-        final ReachEvent reachEvent = new ReachEvent();
-        EventBus.INSTANCE.dispatch(reachEvent);
-        if (reachEvent.isCanceled())
-        {
-            cir.cancel();
-            float reach = gameMode.isCreative() ? 5.0f : 4.5f;
-            cir.setReturnValue(reach + reachEvent.getReach());
-        }
-    }
-
-    /**
      * @param player
      * @param hand
      * @param hitResult
@@ -149,26 +132,26 @@ public abstract class MixinClientPlayerInteractionManager implements Globals
             if (this.gameMode == GameMode.SPECTATOR)
             {
                 cir.setReturnValue(ActionResult.PASS);
+                return;
             }
             syncSelectedSlot();
-            MutableObject mutableObject = new MutableObject();
-            sendSequencedPacket(mc.world, sequence ->
-            {
-                PlayerInteractItemC2SPacket playerInteractItemC2SPacket = new PlayerInteractItemC2SPacket(hand, sequence);
+            MutableObject<ActionResult> mutableObject = new MutableObject();
+            this.sendSequencedPacket(mc.world, (sequence) -> {
+                PlayerInteractItemC2SPacket playerInteractItemC2SPacket = new PlayerInteractItemC2SPacket(hand, sequence, player.getYaw(), player.getPitch());
                 ItemStack itemStack = player.getStackInHand(hand);
-                if (player.getItemCooldownManager().isCoolingDown(itemStack.getItem()))
-                {
+                if (player.getItemCooldownManager().isCoolingDown(itemStack.getItem())) {
                     mutableObject.setValue(ActionResult.PASS);
                     return playerInteractItemC2SPacket;
+                } else {
+                    TypedActionResult<ItemStack> typedActionResult = itemStack.use(mc.world, player, hand);
+                    ItemStack itemStack2 = (ItemStack)typedActionResult.getValue();
+                    if (itemStack2 != itemStack) {
+                        player.setStackInHand(hand, itemStack2);
+                    }
+
+                    mutableObject.setValue(typedActionResult.getResult());
+                    return playerInteractItemC2SPacket;
                 }
-                TypedActionResult<ItemStack> typedActionResult = itemStack.use(mc.world, player, hand);
-                ItemStack itemStack2 = typedActionResult.getValue();
-                if (itemStack2 != itemStack)
-                {
-                    player.setStackInHand(hand, itemStack2);
-                }
-                mutableObject.setValue(typedActionResult.getResult());
-                return playerInteractItemC2SPacket;
             });
             cir.setReturnValue((ActionResult) mutableObject.getValue());
         }

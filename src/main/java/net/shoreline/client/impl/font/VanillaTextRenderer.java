@@ -2,9 +2,8 @@ package net.shoreline.client.impl.font;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.font.*;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.CharacterVisitor;
 import net.minecraft.text.Style;
@@ -17,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @Deprecated
@@ -25,9 +25,9 @@ public class VanillaTextRenderer implements Globals
 
     public static TextRenderer getTextRender(String fontName) throws IOException
     {
-        List<Font> list = Lists.newArrayList();
+        List<Font.FontFilterPair> list = Lists.newArrayList();
         TrueTypeFontLoader loader = new TrueTypeFontLoader(
-                new Identifier(String.format("shoreline:%s.ttf", fontName)),
+                Identifier.of(String.format("shoreline:%s.ttf", fontName)),
                 11,
                 20,
                 TrueTypeFontLoader.Shift.NONE,
@@ -35,9 +35,9 @@ public class VanillaTextRenderer implements Globals
         );
         FontLoader.Loadable loadable = loader.build().orThrow();
         Font font = loadable.load(mc.getResourceManager());
-        list.add(font);
-        FontStorage storage = new FontStorage(mc.getTextureManager(), new Identifier("shoreline:tr"));
-        storage.setFonts(list);
+        list.add(new Font.FontFilterPair(font, FontFilterType.FilterMap.NO_FILTER));
+        FontStorage storage = new FontStorage(mc.getTextureManager(), Identifier.of("shoreline:tr"));
+        storage.setFonts(list, Collections.emptySet());
         return new TextRenderer(id -> storage, true);
     }
 
@@ -59,8 +59,7 @@ public class VanillaTextRenderer implements Globals
         {
             return;
         }
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(
-                Tessellator.getInstance().getBuffer());
+        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(1536));
         draw(text, x, y, color, shadow, matrix,
                 immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xF000F0);
         immediate.draw();

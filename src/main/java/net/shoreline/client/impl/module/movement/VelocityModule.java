@@ -23,6 +23,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
 import net.shoreline.client.mixin.accessor.AccessorExplosionS2CPacket;
@@ -31,6 +32,8 @@ import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Gavin, linus
@@ -117,7 +120,7 @@ public class VelocityModule extends ToggleModule
         }
         if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet && knockbackConfig.getValue())
         {
-            if (packet.getId() != mc.player.getId())
+            if (packet.getEntityId() != mc.player.getId())
             {
                 return;
             }
@@ -196,30 +199,37 @@ public class VelocityModule extends ToggleModule
             {
                 // Dumb fix bc canceling explosion velocity removes explosion handling in 1.19
                 mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet.getX(), packet.getY(), packet.getZ(),
-                        SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS,
+                        SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
                         4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
             }
         }
-        else if (event.getPacket() instanceof BundleS2CPacket packet && modeConfig.getValue() == VelocityMode.GRIM_V3 && isPhased())
+        else if (event.getPacket() instanceof BundleS2CPacket packet)
         {
+            if (modeConfig.getValue() == VelocityMode.GRIM_V3 && !isPhased())
+            {
+                return;
+            }
+            List<Packet<?>> allowedBundle = new ArrayList<>();
             for (Packet<?> packet1 : packet.getPackets())
             {
                 if (packet1 instanceof ExplosionS2CPacket packet2)
                 {
-                    event.cancel();
                     mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
-                            SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS,
+                            SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
                             4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
-                    break;
+                    continue;
                 }
-                else if (packet1 instanceof EntityVelocityUpdateS2CPacket)
+                else if (packet1 instanceof EntityVelocityUpdateS2CPacket packet2 && packet2.getEntityId() == mc.player.getId())
                 {
-                    event.cancel();
-                    break;
+                    continue;
                 }
+                allowedBundle.add(packet1);
             }
+
+            ((AccessorBundlePacket) packet).setIterable(allowedBundle);
         }
-        else if (event.getPacket() instanceof EntityDamageS2CPacket packet && packet.entityId() == mc.player.getId() && modeConfig.getValue() == VelocityMode.GRIM_V3 && isPhased())
+        else if (event.getPacket() instanceof EntityDamageS2CPacket packet && packet.entityId() == mc.player.getId()
+                && modeConfig.getValue() == VelocityMode.GRIM_V3 && isPhased())
         {
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(false));
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));

@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.client.gui.screen.ingame.AnvilScreen;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -124,7 +125,7 @@ public final class AutoAnvilRenameModule extends ToggleModule
     {
         if (itemName.trim().isEmpty())
         {
-            return !itemStack.hasCustomName();
+            return itemStack.get(DataComponentTypes.CUSTOM_NAME) == null;
         }
         else
         {

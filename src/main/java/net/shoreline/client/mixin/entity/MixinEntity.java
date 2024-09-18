@@ -204,13 +204,6 @@ public abstract class MixinEntity implements Globals
         }
     }
 
-    @Inject(method = "emitGameEvent(Lnet/minecraft/world/event/GameEvent;Lnet/minecraft/entity/Entity;)V", at = @At(value = "HEAD"))
-    private void hookEmitGameEvent(GameEvent event, Entity entity, CallbackInfo ci)
-    {
-        EntityGameEvent entityGameEvent = new EntityGameEvent(event, entity);
-        EventBus.INSTANCE.dispatch(entityGameEvent);
-    }
-
     @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
     public void hookCameraPositionVec(float tickDelta, CallbackInfoReturnable<Vec3d> cir)
     {

@@ -105,7 +105,7 @@ public class MixinPlayerEntityRenderer
         // abstractClientPlayerEntity.setSneaking(prevSneaking);
     }
 
-    @Redirect(method = "setupTransforms(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;isFallFlying()Z"))
+    @Redirect(method = "setupTransforms(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;isFallFlying()Z"))
     private boolean hookSetupTransforms(AbstractClientPlayerEntity instance)
     {
         ElytraTransformEvent elytraTransformEvent = new ElytraTransformEvent(instance);

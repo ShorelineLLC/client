@@ -116,7 +116,7 @@ public class BedAuraModule extends ToggleModule
                 continue;
             }
 
-            if (this.armorCheckConfig.getValue() && !entity.getArmorItems().iterator().hasNext())
+            if (this.armorCheckConfig.getValue() && !playerEntity.getArmorItems().iterator().hasNext())
             {
                 continue;
             }

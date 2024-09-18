@@ -18,7 +18,7 @@ public enum SoundEvents
      */
     SoundEvents(String id)
     {
-        this.id = new Identifier("caspian", String.format("sounds/%s.ogg", id));
+        this.id = Identifier.of("caspian", String.format("sounds/%s.ogg", id));
     }
 
     /**

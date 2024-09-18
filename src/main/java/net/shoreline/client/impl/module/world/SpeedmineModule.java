@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
@@ -27,6 +28,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager;
+import net.shoreline.client.util.player.EnchantmentUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.eventbus.event.StageEvent;
@@ -268,7 +270,7 @@ public class SpeedmineModule extends RotationModule
         if (f > 1.0F)
         {
             ItemStack stack = mc.player.getInventory().getStack(tool);
-            int i = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
+            int i = EnchantmentUtil.getLevel(stack, Enchantments.EFFICIENCY);
             if (i > 0 && !stack.isEmpty())
             {
                 f += (float) (i * i + 1);
@@ -289,8 +291,7 @@ public class SpeedmineModule extends RotationModule
             };
             f *= g;
         }
-        if (mc.player.isSubmergedIn(FluidTags.WATER)
-                && !EnchantmentHelper.hasAquaAffinity(mc.player))
+        if (mc.player.isSubmergedIn(FluidTags.WATER) && EnchantmentUtil.getLevel(mc.player.getEquippedStack(EquipmentSlot.FEET), Enchantments.AQUA_AFFINITY) <= 0)
         {
             f /= 5.0f;
         }

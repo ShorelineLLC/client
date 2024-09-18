@@ -6,9 +6,11 @@ import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -102,24 +104,31 @@ public class NoSlowModule extends ToggleModule
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent event)
     {
-        if (event.getStage() == StageEvent.EventStage.PRE && grimConfig.getValue()
+        if (event.getStage() == StageEvent.EventStage.PRE
                 && mc.player.isUsingItem() && !mc.player.isSneaking() && itemsConfig.getValue())
         {
-            // Grim focuses on other hand noslow checks
-            if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack()))
+            if (grimConfig.getValue())
             {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+                // Grim focuses on other hand noslow checks
+                if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack()))
+                {
+                    Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+                }
+                else if (checkStack(mc.player.getOffHandStack()))
+                {
+                    Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+                }
             }
-            else if (checkStack(mc.player.getOffHandStack()))
+            if (grimNewConfig.getValue())
             {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id));
+
             }
         }
     }
 
     private boolean checkStack(ItemStack stack)
     {
-        return !stack.isFood() && stack.getItem() != Items.BOW && stack.getItem() != Items.CROSSBOW && stack.getItem() != Items.SHIELD;
+        return !stack.getComponents().contains(DataComponentTypes.FOOD) && stack.getItem() != Items.BOW && stack.getItem() != Items.CROSSBOW && stack.getItem() != Items.SHIELD;
     }
 
     @EventListener
@@ -127,8 +136,7 @@ public class NoSlowModule extends ToggleModule
     {
         if (event.getStage() == StageEvent.EventStage.PRE)
         {
-            if (airStrictConfig.getValue() && sneaking
-                    && !mc.player.isUsingItem())
+            if (airStrictConfig.getValue() && !mc.player.isUsingItem())
             {
                 sneaking = false;
                 Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player,
@@ -273,7 +281,12 @@ public class NoSlowModule extends ToggleModule
         {
             return;
         }
-        if (event.getPacket() instanceof PlayerMoveC2SPacket packet && packet.changesPosition()
+        if (event.getPacket() instanceof PlayerInteractItemC2SPacket && grimNewConfig.getValue())
+        {
+            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+        }
+        else if (event.getPacket() instanceof PlayerMoveC2SPacket packet && packet.changesPosition()
                 && strictConfig.getValue() && checkSlowed())
         {
             // Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(0));
@@ -297,10 +310,19 @@ public class NoSlowModule extends ToggleModule
                         ClientCommandC2SPacket.Mode.STOP_SPRINTING));
             }
         }
-        else if (event.getPacket() instanceof PlayerInteractItemC2SPacket && grimNewConfig.getValue())
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (mc.player == null || mc.world == null || mc.isInSingleplayer())
         {
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN, id));
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN, id));
+            return;
+        }
+        if (event.getPacket() instanceof EntityTrackerUpdateS2CPacket && mc.player.isUsingItem()
+                && mc.player.getItemUseTime() < mc.player.getActiveItem().getMaxUseTime(mc.player) && grimNewConfig.getValue())
+        {
+            event.cancel();
         }
     }
 

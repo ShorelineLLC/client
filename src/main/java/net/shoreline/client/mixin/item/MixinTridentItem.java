@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.item;
 
+import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
@@ -8,6 +9,7 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.TridentItem;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -33,7 +35,13 @@ public abstract class MixinTridentItem implements Globals
 {
 
     @Shadow
-    public abstract int getMaxUseTime(ItemStack stack);
+    public abstract int getMaxUseTime(ItemStack stack, LivingEntity user);
+
+    @Shadow
+    protected static boolean isAboutToBreak(ItemStack stack)
+    {
+        return false;
+    }
 
     @Inject(method = "use", at = @At(value = "HEAD"), cancellable = true)
     private void hookUse(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir)
@@ -57,14 +65,14 @@ public abstract class MixinTridentItem implements Globals
     @Inject(method = "onStoppedUsing", at = @At(value = "HEAD"), cancellable = true)
     private void hookOnStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks, CallbackInfo ci)
     {
-        if (!(user instanceof PlayerEntity))
+        if (!(user instanceof PlayerEntity playerEntity))
         {
             return;
         }
-        int i = getMaxUseTime(stack) - remainingUseTicks;
+        int var6 = this.getMaxUseTime(stack, user) - remainingUseTicks;
         TridentPullbackEvent tridentPullbackEvent = new TridentPullbackEvent();
         EventBus.INSTANCE.dispatch(tridentPullbackEvent);
-        if (!tridentPullbackEvent.isCanceled() && i < 10)
+        if (!tridentPullbackEvent.isCanceled() && var6 < 10)
         {
             return;
         }
@@ -73,46 +81,53 @@ public abstract class MixinTridentItem implements Globals
         if (tridentWaterEvent.isCanceled())
         {
             ci.cancel();
-            PlayerEntity playerEntity = (PlayerEntity) user;
-            int j = EnchantmentHelper.getRiptide(stack);
-            if (!mc.world.isClient)
+            if (var6 >= 10)
             {
-                stack.damage(1, playerEntity, p -> p.sendToolBreakStatus(user.getActiveHand()));
-                if (j == 0)
-                {
-                    TridentEntity tridentEntity = new TridentEntity(world, playerEntity, stack);
-                    tridentEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw(), 0.0f, 2.5f + (float) j * 0.5f, 1.0f);
-                    if (playerEntity.getAbilities().creativeMode)
-                    {
-                        tridentEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-                    }
-                    world.spawnEntity(tridentEntity);
-                    world.playSoundFromEntity(null, tridentEntity, SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
-                    if (!playerEntity.getAbilities().creativeMode)
-                    {
-                        playerEntity.getInventory().removeOne(stack);
+                float f = EnchantmentHelper.getTridentSpinAttackStrength(stack, playerEntity);
+                if (!(f > 0.0F) || playerEntity.isTouchingWaterOrRain()) {
+                    if (!isAboutToBreak(stack)) {
+                        RegistryEntry<SoundEvent> registryEntry = (RegistryEntry)EnchantmentHelper.getEffect(stack, EnchantmentEffectComponentTypes.TRIDENT_SOUND).orElse(SoundEvents.ITEM_TRIDENT_THROW);
+                        if (!world.isClient) {
+                            stack.damage(1, playerEntity, LivingEntity.getSlotForHand(user.getActiveHand()));
+                            if (f == 0.0F) {
+                                TridentEntity tridentEntity = new TridentEntity(world, playerEntity, stack);
+                                tridentEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw(), 0.0F, 2.5F, 1.0F);
+                                if (playerEntity.isInCreativeMode()) {
+                                    tridentEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+                                }
+
+                                world.spawnEntity(tridentEntity);
+                                world.playSoundFromEntity((PlayerEntity)null, tridentEntity, (SoundEvent)registryEntry.value(), SoundCategory.PLAYERS, 1.0F, 1.0F);
+                                if (!playerEntity.isInCreativeMode()) {
+                                    playerEntity.getInventory().removeOne(stack);
+                                }
+                            }
+                        }
+
+                        playerEntity.incrementStat(Stats.USED.getOrCreateStat((TridentItem) (Object) this));
+                        if (f > 0.0F)
+                        {
+                            float g = playerEntity.getYaw();
+                            float h = playerEntity.getPitch();
+                            float j = -MathHelper.sin(g * 0.017453292F) * MathHelper.cos(h * 0.017453292F);
+                            float k = -MathHelper.sin(h * 0.017453292F);
+                            float l = MathHelper.cos(g * 0.017453292F) * MathHelper.cos(h * 0.017453292F);
+                            float m = MathHelper.sqrt(j * j + k * k + l * l);
+                            j *= f / m;
+                            k *= f / m;
+                            l *= f / m;
+                            playerEntity.addVelocity((double)j, (double)k, (double)l);
+                            playerEntity.useRiptide(20, 8.0F, stack);
+                            if (playerEntity.isOnGround())
+                            {
+                                float n = 1.1999999F;
+                                playerEntity.move(MovementType.SELF, new Vec3d(0.0, 1.1999999284744263, 0.0));
+                            }
+
+                            world.playSoundFromEntity((PlayerEntity)null, playerEntity, (SoundEvent)registryEntry.value(), SoundCategory.PLAYERS, 1.0F, 1.0F);
+                        }
                     }
                 }
-            }
-            playerEntity.incrementStat(Stats.USED.getOrCreateStat((TridentItem) (Object) this));
-            if (j > 0)
-            {
-                float f = playerEntity.getYaw();
-                float g = playerEntity.getPitch();
-                float h = -MathHelper.sin(f * ((float) Math.PI / 180)) * MathHelper.cos(g * ((float) Math.PI / 180));
-                float k = -MathHelper.sin(g * ((float) Math.PI / 180));
-                float l = MathHelper.cos(f * ((float) Math.PI / 180)) * MathHelper.cos(g * ((float) Math.PI / 180));
-                float m = MathHelper.sqrt(h * h + k * k + l * l);
-                float n = 3.0f * ((1.0f + (float) j) / 4.0f);
-                playerEntity.addVelocity(h *= n / m, k *= n / m, l *= n / m);
-                playerEntity.useRiptide(20);
-                if (playerEntity.isOnGround())
-                {
-                    float o = 1.1999999f;
-                    playerEntity.move(MovementType.SELF, new Vec3d(0.0, 1.1999999284744263, 0.0));
-                }
-                SoundEvent soundEvent = j >= 3 ? SoundEvents.ITEM_TRIDENT_RIPTIDE_3 : (j == 2 ? SoundEvents.ITEM_TRIDENT_RIPTIDE_2 : SoundEvents.ITEM_TRIDENT_RIPTIDE_1);
-                world.playSoundFromEntity(null, playerEntity, soundEvent, SoundCategory.PLAYERS, 1.0f, 1.0f);
             }
         }
     }

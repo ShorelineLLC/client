@@ -59,7 +59,7 @@ public class AutoBowReleaseModule extends ToggleModule
                 }
             }
             else if (crossbowConfig.getValue() && mainhand.getItem() == Items.CROSSBOW
-                    && mc.player.getItemUseTime() / (float) CrossbowItem.getPullTime(mc.player.getMainHandStack()) > 1.0f)
+                    && mc.player.getItemUseTime() / (float) CrossbowItem.getPullTime(mc.player.getMainHandStack(), mc.player) > 1.0f)
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM,
                         BlockPos.ORIGIN, Direction.DOWN));

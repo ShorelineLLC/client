@@ -14,14 +14,13 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.network.InteractBorderEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.world.SneakBlocks;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +64,7 @@ public class FastPlaceModule extends ToggleModule
             if (ghostFixConfig.getValue())
             {
                 Managers.NETWORK.sendSequencedPacket(id ->
-                        new PlayerInteractItemC2SPacket(mc.player.getActiveHand(), id));
+                        new PlayerInteractItemC2SPacket(mc.player.getActiveHand(), id, mc.player.getYaw(), mc.player.getPitch()));
             }
             ((AccessorMinecraftClient) mc).hookSetItemUseCooldown(delayConfig.getValue());
         }

@@ -2,11 +2,11 @@ package net.shoreline.client.api.render.shader;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import ladysnake.satin.api.managed.ManagedShaderEffect;
-import ladysnake.satin.api.managed.ShaderEffectManager;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.api.render.satin.ManagedShaderEffect;
+import net.shoreline.client.api.render.satin.ShaderEffectManager;
 import net.shoreline.client.impl.imixin.IPostEffectProcessor;
 import net.shoreline.client.util.Globals;
 import org.lwjgl.opengl.GL30C;
@@ -33,11 +33,11 @@ public class ShaderManager implements Globals
     public void reloadShadersInternal()
     {
         framebuffer = new ShaderFramebuffer(mc.getFramebuffer().textureWidth, mc.getFramebuffer().textureHeight);
-        filledShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/outline.json"));
-        gradientShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/gradient.json"));
-        imageShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/image.json"));
-        glowingShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/glowing.json"));
-        flameShaderEffect = ShaderEffectManager.getInstance().manage(new Identifier("shoreline", "shaders/post/flame.json"));
+        filledShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/outline.json"));
+        gradientShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/gradient.json"));
+        imageShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/image.json"));
+        glowingShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/glowing.json"));
+        flameShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/flame.json"));
     }
 
     public void applyShader(ManagedShaderEffect shaderEffect, Runnable setup, Runnable runnable)

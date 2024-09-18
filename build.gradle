@@ -14,8 +14,8 @@ plugins {
     id 'com.github.gmazzo.buildconfig' version '5.3.5'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_21
+targetCompatibility = JavaVersion.VERSION_21
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -41,15 +41,6 @@ loom {
 }
 
 repositories {
-    maven {
-        name = 'Ladysnake Mods'
-        url = 'https://maven.ladysnake.org/releases'
-        content {
-            includeGroup 'io.github.ladysnake'
-            includeGroup 'org.ladysnake'
-            includeGroupByRegex 'dev\\.onyxstudios.*'
-        }
-    }
     mavenCentral() {
         url "https://jitpack.io"
         url "https://impactdevelopment.github.io/maven/"
@@ -62,8 +53,6 @@ dependencies {
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "org.ladysnake:satin:${project.satin_version}"
-    include "org.ladysnake:satin:${project.satin_version}"
     modImplementation "cabaletta:baritone-api:${baritone_api_version}"
 }
 
@@ -76,7 +65,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-    it.options.release = 17
+    it.options.release = 21
 
     // Make this run before the compileJava task
     dependsOn generateBuildConfig

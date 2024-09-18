@@ -31,9 +31,7 @@ public class MixinEnchantingTableBlockEntityRenderer
     @Inject(method = "render(Lnet/minecraft/block/entity/EnchantingTable" +
             "BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet" +
             "/minecraft/client/render/VertexConsumerProvider;II)V", at =
-    @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model" +
-            "/BookModel;renderBook(Lnet/minecraft/client/util/math/" +
-            "MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V",
+    @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/BookModel;renderBook(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V",
             shift = At.Shift.BEFORE), cancellable = true)
     private void hookRender(EnchantingTableBlockEntity enchantingTableBlockEntity,
                             float f, MatrixStack matrixStack,

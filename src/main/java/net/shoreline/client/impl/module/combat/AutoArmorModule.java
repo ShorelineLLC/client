@@ -2,12 +2,15 @@ package net.shoreline.client.impl.module.combat;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -70,7 +73,7 @@ public class AutoArmorModule extends ToggleModule
             {
                 continue;
             }
-            if (noBindingConfig.getValue() && EnchantmentHelper.hasBindingCurse(stack))
+            if (noBindingConfig.getValue() && hasEnchantment(stack, Enchantments.BINDING_CURSE))
             {
                 continue;
             }
@@ -184,17 +187,33 @@ public class AutoArmorModule extends ToggleModule
         PROJECTILE_PROTECTION(Enchantments.PROJECTILE_PROTECTION);
 
         //
-        private final Enchantment enchant;
+        private final RegistryKey<Enchantment> enchant;
 
-        Priority(Enchantment enchant)
+        Priority(RegistryKey<Enchantment> enchant)
         {
             this.enchant = enchant;
         }
 
-        public Enchantment getEnchantment()
+        public RegistryKey<Enchantment> getEnchantment()
         {
             return enchant;
         }
+    }
+
+    public boolean hasEnchantment(ItemStack armorStack, RegistryKey<Enchantment> enchantment)
+    {
+        if (armorStack.getComponents().contains(DataComponentTypes.ENCHANTMENTS))
+        {
+            for (RegistryEntry<Enchantment> entry : armorStack.getComponents()
+                    .get(DataComponentTypes.ENCHANTMENTS).getEnchantments())
+            {
+                if (entry.getKey().isPresent() && entry.getKey().get().equals(enchantment))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     //
@@ -222,33 +241,26 @@ public class AutoArmorModule extends ToggleModule
             final ItemStack otherStack = other.getArmorStack();
             ArmorItem armorItem = (ArmorItem) armorStack.getItem();
             ArmorItem otherItem = (ArmorItem) otherStack.getItem();
-            int durabilityDiff = armorItem.getMaterial().getProtection(armorItem.getType())
-                    - otherItem.getMaterial().getProtection(otherItem.getType());
+            int durabilityDiff = armorItem.getMaterial().value().getProtection(armorItem.getType())
+                    - otherItem.getMaterial().value().getProtection(otherItem.getType());
             if (durabilityDiff != 0)
             {
                 return durabilityDiff;
             }
-            Enchantment enchantment = priorityConfig.getValue().getEnchantment();
+            RegistryKey<Enchantment> enchantment = priorityConfig.getValue().getEnchantment();
             if (blastLeggingsConfig.getValue() && armorType == 2
-                    && hasEnchantment(Enchantments.BLAST_PROTECTION))
+                    && hasEnchantment(armorStack, Enchantments.BLAST_PROTECTION))
             {
                 return -1;
             }
-            if (hasEnchantment(enchantment))
+            if (hasEnchantment(armorStack, enchantment))
             {
-                return other.hasEnchantment(enchantment) ? 0 : -1;
+                return hasEnchantment(otherStack, enchantment) ? 0 : -1;
             }
             else
             {
-                return other.hasEnchantment(enchantment) ? 1 : 0;
+                return hasEnchantment(otherStack, enchantment) ? 1 : 0;
             }
-        }
-
-        public boolean hasEnchantment(Enchantment enchantment)
-        {
-            Object2IntMap<Enchantment> enchants =
-                    EnchantmentUtil.getEnchantments(armorStack);
-            return enchants.containsKey(enchantment);
         }
 
         public ItemStack getArmorStack()

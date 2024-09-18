@@ -84,7 +84,7 @@ public class BowAimModule extends RotationModule
 
     private float[] getBowRotationsTo(Entity entity)
     {
-        float duration = (float) (mc.player.getActiveItem().getMaxUseTime() - mc.player.getItemUseTime()) / 20.0f;
+        float duration = (float) (mc.player.getActiveItem().getMaxUseTime(mc.player) - mc.player.getItemUseTime()) / 20.0f;
         duration = (duration * duration + duration * 2.0f) / 3.0f;
         if (duration >= 1.0f)
         {

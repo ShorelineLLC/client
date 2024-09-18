@@ -5,6 +5,7 @@ import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourcePackInfo;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
@@ -25,12 +26,6 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
     public ResourcePackExt(ModNioResourcePack parent)
     {
         this.parent = parent;
-    }
-
-    @Override
-    public boolean isAlwaysStable()
-    {
-        return this.parent.isAlwaysStable();
     }
 
     @Nullable
@@ -81,9 +76,9 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
     }
 
     @Override
-    public String getName()
+    public ResourcePackInfo getInfo()
     {
-        return this.parent.getName();
+        return parent.getInfo();
     }
 
     @Override

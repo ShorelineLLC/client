@@ -1,7 +1,10 @@
 package net.shoreline.client.impl.module.movement;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FireworksComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.FireworkRocketItem;
 import net.minecraft.item.ItemStack;
@@ -485,13 +488,14 @@ public class ElytraFlyModule extends RotationModule
         if (slot != -1)
         {
             int i = 1;
-            if (stack.hasNbt())
+            FireworksComponent fireworksComponent = stack.get(DataComponentTypes.FIREWORKS);
+            if (fireworksComponent != null)
             {
-                i += stack.getOrCreateSubNbt("Fireworks").getByte("Flight");
+                i += fireworksComponent.flightDuration();
             }
             fireworkLifetime = i * 10;
             Managers.INVENTORY.setSlot(slot);
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
             Managers.INVENTORY.syncToClient();
         }
     }

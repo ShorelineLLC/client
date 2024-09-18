@@ -27,7 +27,7 @@ public class InventoryUtil implements Globals
     public static boolean isHolding32k(int lvl)
     {
         final ItemStack mainhand = mc.player.getMainHandStack();
-        return EnchantmentHelper.getLevel(Enchantments.SHARPNESS, mainhand) >= lvl;
+        return EnchantmentUtil.getLevel(mainhand, Enchantments.SHARPNESS) >= lvl;
     }
 
     public static boolean hasItemInInventory(final Item item, final boolean hotbar)

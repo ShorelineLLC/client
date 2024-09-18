@@ -559,7 +559,7 @@ public class SpeedModule extends ToggleModule
     {
         float forward = mc.player.input.movementForward;
         float strafe = mc.player.input.movementSideways;
-        float yaw = mc.player.prevYaw + (mc.player.getYaw() - mc.player.prevYaw) * mc.getTickDelta();
+        float yaw = mc.player.prevYaw + (mc.player.getYaw() - mc.player.prevYaw) * mc.getRenderTickCounter().getTickDelta(true);
         if (forward == 0.0f && strafe == 0.0f)
         {
             return Vec2f.ZERO;
@@ -623,7 +623,7 @@ public class SpeedModule extends ToggleModule
             // boostTicks = 0;
         }
         else if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet
-                && packet.getId() == mc.player.getId())
+                && packet.getEntityId() == mc.player.getId())
         {
             double x = packet.getVelocityX();
             double z = packet.getVelocityZ();

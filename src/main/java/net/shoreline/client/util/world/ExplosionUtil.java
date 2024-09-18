@@ -1,18 +1,27 @@
 package net.shoreline.client.util.world;
 
-import com.google.common.collect.Multimap;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.*;
-import net.minecraft.entity.attribute.*;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.DamageUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.DefaultAttributeRegistry;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.shoreline.client.util.Globals;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -273,44 +282,54 @@ public class ExplosionUtil implements Globals
                 case HARD -> damage *= 1.5f;
             }
         }
+
         if (entity instanceof LivingEntity livingEntity)
         {
-            damage = DamageUtil.getDamageLeft((float) damage, getArmor(livingEntity), (float) getAttributeValue(livingEntity, EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
-            damage = getProtectionReduction(entity, damage, damageSource);
+            damage = DamageUtil.getDamageLeft(livingEntity, (float) damage, damageSource, getArmor(livingEntity), (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
+            damage = getResistanceReduction(livingEntity, damage);
+            damage = getProtectionReduction(livingEntity, damage, damageSource);
         }
+
         return Math.max(damage, 0);
     }
 
     private static float getArmor(LivingEntity entity)
     {
-        return (float) Math.floor(getAttributeValue(entity, EntityAttributes.GENERIC_ARMOR));
+        return (float) Math.floor(entity.getAttributeValue(EntityAttributes.GENERIC_ARMOR));
     }
 
     private static float getProtectionReduction(Entity player, double damage, DamageSource source)
     {
-        int protLevel = EnchantmentHelper.getProtectionAmount(player.getArmorItems(), source);
-        return DamageUtil.getInflictedDamage((float) damage, protLevel);
-    }
-
-    public static double getAttributeValue(LivingEntity entity, EntityAttribute attribute)
-    {
-        return getAttributeInstance(entity, attribute).getValue();
-    }
-
-    public static EntityAttributeInstance getAttributeInstance(LivingEntity entity, EntityAttribute attribute)
-    {
-        double baseValue = getDefaultForEntity(entity).getBaseValue(attribute);
-        EntityAttributeInstance attributeInstance = new EntityAttributeInstance(attribute, o1 ->
+        if (player instanceof LivingEntity livingEntity)
         {
-        });
-        attributeInstance.setBaseValue(baseValue);
-        for (var equipmentSlot : EquipmentSlot.values())
-        {
-            ItemStack stack = entity.getEquippedStack(equipmentSlot);
-            Multimap<EntityAttribute, EntityAttributeModifier> modifiers = stack.getAttributeModifiers(equipmentSlot);
-            for (var modifier : modifiers.get(attribute)) attributeInstance.addTemporaryModifier(modifier);
+            float protLevel = getProtectionAmount(livingEntity.getArmorItems());
+            return DamageUtil.getInflictedDamage((float) damage, protLevel);
         }
-        return attributeInstance;
+        return 0.0f;
+    }
+
+    private static float getProtectionAmount(Iterable<ItemStack> equipment)
+    {
+        MutableInt mutableInt = new MutableInt();
+        equipment.forEach(i ->
+        {
+            int modifierBlast = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get(), i);
+            int modifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get(), i);
+            mutableInt.add(modifierBlast * 2 + modifier);
+        });
+        return mutableInt.intValue();
+    }
+
+    private static double getResistanceReduction(LivingEntity player, double damage)
+    {
+        StatusEffectInstance resistance = player.getStatusEffect(StatusEffects.RESISTANCE);
+        if (resistance != null)
+        {
+            int lvl = resistance.getAmplifier() + 1;
+            damage *= (1.0f - (lvl * 0.2f));
+        }
+
+        return Math.max(damage, 0.0f);
     }
 
     private static <T extends LivingEntity> DefaultAttributeContainer getDefaultForEntity(T entity)

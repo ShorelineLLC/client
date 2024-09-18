@@ -81,7 +81,7 @@ public class ChamsModelRenderer implements Globals
         if (abstractClientPlayerEntity.isFallFlying())
         {
             setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
-            float k = (float) abstractClientPlayerEntity.getRoll() + h;
+            float k = (float) abstractClientPlayerEntity.getFallFlyingTicks() + h;
             float l = MathHelper.clamp(k * k / 100.0f, 0.0f, 1.0f);
             if (!abstractClientPlayerEntity.isUsingRiptide())
             {
@@ -263,7 +263,7 @@ public class ChamsModelRenderer implements Globals
             model.animateModel(livingEntity, limbAngle, limbDistance, tickDelta);
             model.setAngles(livingEntity, limbAngle, limbDistance, animationProgress, yaw, pitch);
 
-            renderer.setupTransforms(livingEntity, matrices, animationProgress, bodyYaw, tickDelta);
+            renderer.setupTransforms(livingEntity, matrices, animationProgress, bodyYaw, tickDelta, 1.0f);
             matrices.scale(-1, -1, 1);
             renderer.scale(livingEntity, matrices, tickDelta);
             matrices.translate(0, -1.5010000467300415, 0);

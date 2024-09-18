@@ -31,7 +31,7 @@ public final class MixinLifecycledResourceManagerImpl
     public void addPack(NamespaceResourceManager instance,
                         ResourcePack pack)
     {
-        if (pack.getName().equals("shoreline"))
+        if (pack.getInfo().title().getString().equals("shoreline"))
         {
             pack = new ResourcePackExt((ModNioResourcePack) pack);
         }

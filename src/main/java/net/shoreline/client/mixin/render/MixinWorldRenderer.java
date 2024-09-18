@@ -1,10 +1,9 @@
 package net.shoreline.client.mixin.render;
 
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.WorldRenderer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.RotationAxis;
 import net.shoreline.client.impl.event.PerspectiveEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldBorderEvent;
@@ -26,27 +25,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinWorldRenderer implements Globals
 {
 
-    /**
-     * @param matrices
-     * @param tickDelta
-     * @param limitTime
-     * @param renderBlockOutline
-     * @param camera
-     * @param gameRenderer
-     * @param lightmapTextureManager
-     * @param positionMatrix
-     * @param ci
-     */
     @Inject(method = "render", at = @At(value = "RETURN"))
-    private void hookRender(MatrixStack matrices, float tickDelta,
-                            long limitTime, boolean renderBlockOutline,
-                            Camera camera, GameRenderer gameRenderer,
-                            LightmapTextureManager lightmapTextureManager,
-                            Matrix4f positionMatrix, CallbackInfo ci)
+    private void hookRender(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
     {
+        MatrixStack matrixStack = new MatrixStack();
+        RenderSystem.getModelViewStack().pushMatrix().mul(matrixStack.peek().getPositionMatrix());
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));
+        RenderSystem.applyModelViewMatrix();
         final RenderWorldEvent renderWorldEvent =
-                new RenderWorldEvent(matrices, tickDelta);
+                new RenderWorldEvent(matrixStack, tickCounter.getTickDelta(true));
         EventBus.INSTANCE.dispatch(renderWorldEvent);
+        RenderSystem.getModelViewStack().popMatrix();
+        RenderSystem.applyModelViewMatrix();
+    }
+
+    @Inject(method = "render", at = @At(value = "RETURN"))
+    private void hookRender$1(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci)
+    {
+        MatrixStack matrixStack = new MatrixStack();
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));
+        RenderShaderEvent renderOutlineShaderEvent = new RenderShaderEvent(matrixStack, tickCounter.getTickDelta(true));
+        EventBus.INSTANCE.dispatch(renderOutlineShaderEvent);
     }
 
     /**
@@ -76,14 +77,6 @@ public class MixinWorldRenderer implements Globals
             return true;
         }
         return instance.isThirdPerson();
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;applyModelViewMatrix()V", ordinal = 0, shift = At.Shift.BEFORE))
-    private void hookRender$1(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera,
-                              GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci)
-    {
-        RenderShaderEvent renderOutlineShaderEvent = new RenderShaderEvent(matrices, tickDelta);
-        EventBus.INSTANCE.dispatch(renderOutlineShaderEvent);
     }
 
 //    /**

@@ -81,7 +81,7 @@ public class AutoXPModule extends RotationModule
                 return;
             }
         }
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id));
+        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
         if (swingConfig.getValue())
         {
             mc.player.swingHand(Hand.MAIN_HAND);

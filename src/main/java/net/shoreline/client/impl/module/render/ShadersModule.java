@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
-import ladysnake.satin.api.managed.ManagedShaderEffect;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.EnderChestBlockEntity;
@@ -33,6 +32,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.satin.ManagedShaderEffect;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
@@ -171,7 +171,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                 }, () ->
                 {
                     renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
@@ -197,7 +197,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                     shaderTime += speedConfig.getValue();
                 }, () ->
                 {
@@ -222,7 +222,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                     shaderTime += marbleFactorConfig.getValue();
                 }, () ->
                 {
@@ -247,7 +247,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                     shaderTime += 0.005f;
                 }, () ->
                 {
@@ -273,7 +273,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                 }, () ->
                 {
                     renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
@@ -431,11 +431,11 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                 }, () ->
                 {
                     ignoreEntityRender = true;
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
                     ignoreEntityRender = false;
                 });
             }
@@ -459,12 +459,12 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                     shaderTime += speedConfig.getValue();
                 }, () ->
                 {
                     ignoreEntityRender = true;
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
                     ignoreEntityRender = false;
                 });
             }
@@ -486,12 +486,12 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                     shaderTime += marbleFactorConfig.getValue();
                 }, () ->
                 {
                     ignoreEntityRender = true;
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
                     ignoreEntityRender = false;
                 });
             }
@@ -513,12 +513,12 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                     shaderTime += 0.005f;
                 }, () ->
                 {
                     ignoreEntityRender = true;
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
                     ignoreEntityRender = false;
                 });
             }
@@ -541,11 +541,11 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getTickDelta());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
                 }, () ->
                 {
                     ignoreEntityRender = true;
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(event.getMatrices(), mc.gameRenderer.getCamera(), event.getTickDelta());
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
                     ignoreEntityRender = false;
                 });
             }
@@ -572,7 +572,7 @@ public class ShadersModule extends ToggleModule
                 }
                 else
                 {
-                    Optional<Resource> optional = mc.getResourceManager().getResource(new Identifier("shoreline", "shaders/shader." + fileFormat));
+                    Optional<Resource> optional = mc.getResourceManager().getResource(Identifier.of("shoreline", "shaders/shader." + fileFormat));
                     if (optional.isEmpty() || optional.get().getInputStream() == null)
                     {
                         continue;
