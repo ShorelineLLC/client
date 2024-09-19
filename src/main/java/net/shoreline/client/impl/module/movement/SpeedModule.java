@@ -693,7 +693,7 @@ public class SpeedModule extends ToggleModule
 
     public boolean isStrafe()
     {
-        return speedModeConfig.getValue() != Speed.FIREWORK && speedModeConfig.getValue() != Speed.GRIM_COLLIDE && speedModeConfig.getValue() != Speed.VANILLA;
+        return speedModeConfig.getValue() != Speed.GRIM_COLLIDE && speedModeConfig.getValue() != Speed.VANILLA;
     }
 
     private enum Speed
@@ -706,7 +706,6 @@ public class SpeedModule extends ToggleModule
         V_HOP,
         B_HOP,
         VANILLA,
-        GRIM_COLLIDE,
-        FIREWORK
+        GRIM_COLLIDE
     }
 }

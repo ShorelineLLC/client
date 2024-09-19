@@ -31,6 +31,7 @@ import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
+import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.client.util.world.ExplosionUtil;
@@ -76,6 +77,7 @@ public class AutoMineModule extends CombatModule
     Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
     Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
+    Config<Boolean> smoothColorConfig = register(new BooleanConfig("SmoothColor", "Interpolates from start to done color", false, () -> false));
 
     private final Map<MiningData, Animation> fadeList = new HashMap<>();
     private FirstOutQueue<MiningData> miningQueue = new FirstOutQueue<>(2);
@@ -551,8 +553,22 @@ public class AutoMineModule extends CombatModule
             set.getValue().setState(false);
             int boxAlpha = (int) (40 * set.getValue().getFactor());
             int lineAlpha = (int) (100 * set.getValue().getFactor());
-            int boxColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
-            int lineColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
+
+            int boxColor;
+            int lineColor;
+            if (smoothColorConfig.getValue())
+            {
+                boxColor = data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) :
+                        ColorUtil.interpolateColor(Math.min(data.getBlockDamage(), 1.0f), ((ColorConfig) colorDoneConfig).getValue(boxAlpha), ((ColorConfig) colorConfig).getValue(boxAlpha)).getRGB();
+                lineColor = data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) :
+                        ColorUtil.interpolateColor(Math.min(data.getBlockDamage(), 1.0f), ((ColorConfig) colorDoneConfig).getValue(lineAlpha), ((ColorConfig) colorConfig).getValue(lineAlpha)).getRGB();
+            }
+            else
+            {
+                boxColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
+                lineColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
+            }
+
             BlockPos mining = data.getPos();
             VoxelShape outlineShape = VoxelShapes.fullCube();
             if (!data.isInstantRemine())

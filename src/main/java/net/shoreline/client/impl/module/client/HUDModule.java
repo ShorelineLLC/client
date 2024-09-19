@@ -86,7 +86,7 @@ public class HUDModule extends ToggleModule
     Config<RainbowMode> rainbowModeConfig = register(new EnumConfig<>("Rainbow", "The rendering mode for rainbow", RainbowMode.OFF, RainbowMode.values()));
     Config<Color> gradientColorConfig = register(new ColorConfig("GradientColor", "The color of the rainbow gradient", Color.WHITE, false, false, () -> rainbowModeConfig.getValue() == RainbowMode.GRADIENT));
     Config<Float> rainbowSpeedConfig = register(new NumberConfig<>("Rainbow-Speed", "The speed for the rainbow color cycling", 0.1f, 50.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
-    Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.GRADIENT_ALPHA));
+    Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.GRADIENT));
     Config<Integer> rainbowBrightnessConfig = register(new NumberConfig<>("Rainbow-Brightness", "The brightness of rainbow colors", 0, 100, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.GRADIENT));
     Config<Float> rainbowDifferenceConfig = register(new NumberConfig<>("Rainbow-Difference", "The difference offset for rainbow colors", 0.1f, 40.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
 
@@ -518,7 +518,6 @@ public class HUDModule extends ToggleModule
             case OFF -> ColorsModule.getInstance().getRGB();
             case STATIC_HUE -> rainbow(1L);
             case GRADIENT_HUE -> rainbow(rainbowOffset);
-            case GRADIENT_ALPHA -> alpha(rainbowOffset);
             case GRADIENT ->
             {
                 float speed = 100.0f - rainbowSpeedConfig.getValue();
@@ -591,7 +590,6 @@ public class HUDModule extends ToggleModule
         OFF,
         GRADIENT,
         GRADIENT_HUE,
-        STATIC_HUE,
-        GRADIENT_ALPHA
+        STATIC_HUE
     }
 }

@@ -72,7 +72,7 @@ public class FastSwimModule extends ToggleModule
                 event.setX(event.getX() * speed);
                 event.setZ(event.getZ() * speed);
             }
-            case STRAFE ->
+            case NORMAL ->
             {
                 Vec2f strafe = SpeedModule.getInstance().handleStrafeMotion(speed / 10.0f);
                 event.setX(strafe.x);
@@ -97,6 +97,6 @@ public class FastSwimModule extends ToggleModule
     private enum SwimMode
     {
         VANILLA,
-        STRAFE
+        NORMAL
     }
 }
