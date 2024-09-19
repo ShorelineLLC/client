@@ -34,7 +34,6 @@ public class BreadcrumbsModule extends ToggleModule
     private final Map<Integer, List<TimedPosition>> positions = new ConcurrentHashMap<>();
     Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Renders breadcrumbs for all positions since toggle", true));
     Config<Float> maxTimeConfig = register(new NumberConfig<>("MaxPosition", "The maximum time for a given position", 1.0f, 2.0f, 20.0f));
-    Config<Boolean> fadeConfig = register(new BooleanConfig("Fade", "Fades the line render", false, () -> !infiniteConfig.getValue()));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 1000, 2000, () -> false));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the path", 1.0f, 1.0f, 5.0f));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Renders breadcrumbs on player", true));
@@ -103,7 +102,7 @@ public class BreadcrumbsModule extends ToggleModule
             for (int i = 0; i < timedPositions.size(); i++)
             {
                 TimedPosition timedPosition = timedPositions.get(i);
-                if (fadeConfig.getValue() && !infiniteConfig.getValue())
+                if (!infiniteConfig.getValue())
                 {
                     float fade = 1.0f - MathHelper.clamp((System.currentTimeMillis() - timedPosition.time()) / (float) fadeTimeConfig.getValue(), 0.0f, 1.0f);
                     RenderBuffers.LINES.color(ColorsModule.getInstance().getRGB((int) (fade * 255.0f)));

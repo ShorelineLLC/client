@@ -4,9 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.*;
 import net.minecraft.block.enums.ChestType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.*;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -58,6 +56,9 @@ public class StorageESPModule extends ToggleModule
             {
                 continue;
             }
+            Vec3d vec3d = blockEntity.getPos().toCenterPos();
+            double alpha = (100.0 - mc.player.squaredDistanceTo(vec3d)) / 100.0;
+            alpha = 1.0 - MathHelper.clamp(alpha, 0.0, 1.0);
             BlockPos blockPos = blockEntity.getPos();
             if (blockEntity instanceof ChestBlockEntity)
             {
@@ -92,8 +93,8 @@ public class StorageESPModule extends ToggleModule
                         {
                             z2 += direction.getOffsetZ();
                         }
-                        int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 30).getRGB();
-                        int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 72).getRGB();
+                        int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (30 * alpha)).getRGB();
+                        int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (72 * alpha)).getRGB();
                         Box chestBox = new Box(x1, y1, z1, x2, y2, z2);
                         if (fillConfig.getValue())
                         {
@@ -121,8 +122,8 @@ public class StorageESPModule extends ToggleModule
                         {
                             z2 += direction.getOffsetZ();
                         }
-                        int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 30).getRGB();
-                        int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 72).getRGB();
+                        int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (30 * alpha)).getRGB();
+                        int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (72 * alpha)).getRGB();
                         Box chestBox = new Box(x1, y1, z1, x2, y2, z2);
                         if (fillConfig.getValue())
                         {
@@ -132,8 +133,8 @@ public class StorageESPModule extends ToggleModule
                     }
                     else if (type == ChestType.SINGLE)
                     {
-                        int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60).getRGB();
-                        int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 145).getRGB();
+                        int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (60 * alpha)).getRGB();
+                        int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (145 * alpha)).getRGB();
                         Box chestBox = new Box(x1, y1, z1, x2, y2, z2);
                         if (fillConfig.getValue())
                         {
@@ -151,8 +152,8 @@ public class StorageESPModule extends ToggleModule
                 double x2 = blockPos.getX() + 0.94;
                 double y2 = blockPos.getY() + 0.875;
                 double z2 = blockPos.getZ() + 0.94;
-                int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60).getRGB();
-                int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 145).getRGB();
+                int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (60 * alpha)).getRGB();
+                int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (145 * alpha)).getRGB();
                 Box chestBox = new Box(x1, y1, z1, x2, y2, z2);
                 if (fillConfig.getValue())
                 {
@@ -162,8 +163,8 @@ public class StorageESPModule extends ToggleModule
             }
             else
             {
-                int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 60).getRGB();
-                int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 145).getRGB();
+                int fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (60 * alpha)).getRGB();
+                int outlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (145 * alpha)).getRGB();
                 if (fillConfig.getValue())
                 {
                     RenderManager.renderBox(event.getMatrices(), blockPos, fillColor);
