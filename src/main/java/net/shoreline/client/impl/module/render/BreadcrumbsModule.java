@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.util.math.MathHelper;
@@ -39,6 +40,7 @@ public class BreadcrumbsModule extends ToggleModule
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Renders breadcrumbs on player", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Renders breadcrumbs on other players", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders breadcrumbs on thrown pearls", false));
+    Config<Boolean> arrowsConfig = register(new BooleanConfig("Arrows", "Renders breadcrumbs on arrows", false));
     Config<Boolean> xpBottlesConfig = register(new BooleanConfig("XPBottles", "Renders breadcrumbs on thrown experience bottles", false));
 
     public BreadcrumbsModule()
@@ -130,6 +132,7 @@ public class BreadcrumbsModule extends ToggleModule
             return playersConfig.getValue() || entity == mc.player && selfConfig.getValue();
         }
         return entity instanceof EnderPearlEntity && pearlsConfig.getValue()
+                || entity instanceof ArrowEntity && arrowsConfig.getValue()
                 || entity instanceof ExperienceBottleEntity && xpBottlesConfig.getValue();
     }
 
