@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -24,7 +23,6 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
@@ -34,15 +32,16 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.manager.world.tick.TickSync;
+import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.EnchantmentUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.string.EnumFormatter;
-import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Comparator;
@@ -85,6 +84,7 @@ public class AuraModule extends RotationModule
     // Config<Boolean> autoBlockConfig = register(new BooleanConfig("AutoBlock", "Automatically blocks after attack", false);
     Config<Boolean> stopSprintConfig = register(new BooleanConfig("StopSprint", "Stops sprinting before attacking to maintain vanilla behavior", false));
     Config<Boolean> stopShieldConfig = register(new BooleanConfig("StopShield", "Automatically handles shielding before attacking", false));
+    Config<Boolean> maceBreachConfig = register(new BooleanConfig("MaceBreach", "Abuses vanilla exploit to apply breach enchantment to swords", false));
 
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Target players", true));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Target monsters", false));
@@ -248,9 +248,21 @@ public class AuraModule extends RotationModule
         {
             float ticks = 20.0f - Managers.TICK.getTickSync(tpsSyncConfig.getValue());
             float progress = mc.player.getAttackCooldownProgress(ticks);
+
+            int breachSlot = getBreachMaceSlot();
+            if (maceBreachConfig.getValue() && breachSlot != -1)
+            {
+                Managers.INVENTORY.setSlot(breachSlot);
+            }
+
             if (progress >= 1.0f && attackTarget(entityTarget))
             {
                 mc.player.resetLastAttackedTicks();
+            }
+
+            if (maceBreachConfig.getValue() && breachSlot != -1)
+            {
+                Managers.INVENTORY.syncToClient();
             }
         }
         else
@@ -260,10 +272,22 @@ public class AuraModule extends RotationModule
                 randomDelay = (long) RANDOM.nextFloat((randomSpeedConfig.getValue() * 10.0f) + 1.0f);
             }
             float delay = (attackSpeedConfig.getValue() * 50.0f) + randomDelay;
+
+            int breachSlot = getBreachMaceSlot();
+            if (maceBreachConfig.getValue() && breachSlot != -1)
+            {
+                Managers.INVENTORY.setSlot(breachSlot);
+            }
+
             if (attackTimer.passed(1000.0f - delay) && attackTarget(entityTarget))
             {
                 randomDelay = -1;
                 attackTimer.reset();
+            }
+
+            if (maceBreachConfig.getValue() && breachSlot != -1)
+            {
+                Managers.INVENTORY.syncToClient();
             }
         }
     }
@@ -395,6 +419,38 @@ public class AuraModule extends RotationModule
                     sharp = dmg;
                     slot = i;
                 }
+            }
+            else if (stack.getItem() instanceof MaceItem)
+            {
+                float sharpness = EnchantmentUtil.getLevel(stack,
+                        Enchantments.SHARPNESS) * 0.5f + 0.5f;
+                float dmg = 5.0f + sharpness;
+                if (dmg > sharp)
+                {
+                    sharp = dmg;
+                    slot = i;
+                }
+            }
+        }
+        return slot;
+    }
+
+    private int getBreachMaceSlot()
+    {
+        int slot = -1;
+        int maxBreach = 0;
+        for (int i = 0; i < 9; i++)
+        {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (!(stack.getItem() instanceof MaceItem))
+            {
+                continue;
+            }
+            int breach = EnchantmentUtil.getLevel(stack, Enchantments.BREACH);
+            if (breach > maxBreach)
+            {
+                slot = i;
+                maxBreach = breach;
             }
         }
         return slot;
@@ -595,7 +651,8 @@ public class AuraModule extends RotationModule
     {
         return !swordCheckConfig.getValue() || mc.player.getMainHandStack().getItem() instanceof SwordItem
                 || mc.player.getMainHandStack().getItem() instanceof AxeItem
-                || mc.player.getMainHandStack().getItem() instanceof TridentItem;
+                || mc.player.getMainHandStack().getItem() instanceof TridentItem
+                || mc.player.getMainHandStack().getItem() instanceof MaceItem;
     }
 
     private Vec3d getAttackRotateVec(Entity entity)
