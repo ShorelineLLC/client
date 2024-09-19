@@ -98,6 +98,7 @@
     "network.packet.c2s.MixinPlayerInteractEntityC2SPacket",
     "network.server.MixinServerPlayerInteractionManager",
     "option.MixinGameOptions",
+    "particle.MixinEmitterParticle",
     "particle.MixinParticle",
     "particle.MixinParticleManager",
     "particle.MixinTotemParticle",

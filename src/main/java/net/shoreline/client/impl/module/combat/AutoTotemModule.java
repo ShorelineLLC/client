@@ -24,8 +24,8 @@ import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.client.util.world.SneakBlocks;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.LinkedHashSet;
 import java.util.List;

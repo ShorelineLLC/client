@@ -64,10 +64,8 @@ public class MixinParticleManager
      * @param maxAge
      * @param ci
      */
-    @Inject(method = "addEmitter(Lnet/minecraft/entity/Entity;Lnet/minecraft" +
-            "/particle/ParticleEffect;I)V", at = @At(value = "HEAD"), cancellable = true)
-    private void hookAddEmitter(Entity entity, ParticleEffect parameters,
-                                int maxAge, CallbackInfo ci)
+    @Inject(method = "addEmitter(Lnet/minecraft/entity/Entity;Lnet/minecraft/particle/ParticleEffect;I)V", at = @At(value = "HEAD"), cancellable = true)
+    private void hookAddEmitter(Entity entity, ParticleEffect parameters, int maxAge, CallbackInfo ci)
     {
         ParticleEvent.Emitter particleEvent =
                 new ParticleEvent.Emitter(parameters);

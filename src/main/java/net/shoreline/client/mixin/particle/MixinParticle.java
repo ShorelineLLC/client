@@ -9,5 +9,8 @@ public abstract class MixinParticle
 {
 
     @Shadow
+    public abstract void markDead();
+
+    @Shadow
     public abstract void setColor(float red, float green, float blue);
 }

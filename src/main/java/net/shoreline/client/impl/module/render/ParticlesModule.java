@@ -6,9 +6,11 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
+import net.shoreline.client.impl.event.particle.EmitParticleEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.particle.TotemParticleEvent;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -24,6 +26,8 @@ public class ParticlesModule extends ToggleModule
 
     Config<TotemParticle> totemConfig = register(new EnumConfig<>("Totem", "Modify totem particle rendering", TotemParticle.OFF, TotemParticle.values()));
     Config<Color> totemColorConfig = register(new ColorConfig("TotemColor", "Color of the totem particles", new Color(25, 120, 0), false, false, () -> totemConfig.getValue() == TotemParticle.COLOR));
+    Config<Integer> totemParticlesConfig = register(new NumberConfig<>("TotemParticles", "Max totem particles", 3, 16, 16, () -> totemConfig.getValue() != TotemParticle.REMOVE));
+    Config<Integer> totemParticleTicksConfig = register(new NumberConfig<>("TotemParticleTicks", "Max totem particle ticks", 5, 30, 30, () -> totemConfig.getValue() != TotemParticle.REMOVE));
     Config<Boolean> explosionsConfig = register(new BooleanConfig("Explosions", "Prevents explosion particles from rendering", true));
     Config<Boolean> fireworkConfig = register(new BooleanConfig("Firework", "Prevents rendering of firework particles", false));
     Config<Boolean> potionConfig = register(new BooleanConfig("Effects", "Prevents rendering of potion effect particles", true));
@@ -63,6 +67,17 @@ public class ParticlesModule extends ToggleModule
         if (totemConfig.getValue() == TotemParticle.REMOVE && event.getParticleType() == ParticleTypes.TOTEM_OF_UNDYING)
         {
             event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onEmitParticle(EmitParticleEvent event)
+    {
+        if (totemConfig.getValue() != TotemParticle.REMOVE && event.getParticleType() == ParticleTypes.TOTEM_OF_UNDYING)
+        {
+            event.cancel();
+            event.setParticleCount(totemParticlesConfig.getValue());
+            event.setParticleTime(totemParticleTicksConfig.getValue());
         }
     }
 
