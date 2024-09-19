@@ -10,6 +10,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.TextColor;
 import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.mixin.accessor.AccessorTextRenderer;
 import net.shoreline.client.util.Globals;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +45,7 @@ public class VanillaTextRenderer implements Globals
     // Autism
     public void drawWithShadow(MatrixStack matrices, String text, float x, float y, int color)
     {
-        draw(matrices, text, x + 1.0f, y + 1.0f, color, true);
+        draw(matrices, text, x + (FontModule.getInstance().getShadow() ? 1.0f : 0.6f), y + (FontModule.getInstance().getShadow() ? 1.0f : 0.6f), color, true);
         draw(matrices, text, x, y, color, false);
     }
 

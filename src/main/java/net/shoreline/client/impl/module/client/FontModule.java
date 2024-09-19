@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.client;
 
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
@@ -18,7 +19,7 @@ public class FontModule extends ToggleModule
     private static FontModule INSTANCE;
 
     Config<Integer> sizeConfig = register(new NumberConfig<>("Size", "The font size", 5, 9, 12));
-    // Config<Boolean> shadowConfig = register(new BooleanConfig("Shadow", "Renders text with a shadow background", true));
+    Config<Boolean> shadowConfig = register(new BooleanConfig("VanillaShadow", "Renders vanilla text with a shadow background", true));
 
     /**
      *
@@ -48,6 +49,6 @@ public class FontModule extends ToggleModule
      */
     public boolean getShadow()
     {
-        return false;
+        return shadowConfig.getValue();
     }
 }

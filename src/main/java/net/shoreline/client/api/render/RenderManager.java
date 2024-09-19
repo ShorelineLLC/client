@@ -507,7 +507,7 @@ public class RenderManager implements Globals
             Fonts.CLIENT.drawStringWithShadow(context.getMatrices(), text, x, y, color);
             return;
         }
-        context.drawText(mc.textRenderer, text, (int) x, (int) y, color, true);
+        Fonts.VANILLA.drawWithShadow(context.getMatrices(), text, (int) x, (int) y, color);
     }
 
     /**
