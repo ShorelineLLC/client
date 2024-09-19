@@ -151,6 +151,7 @@ public class ShadersModule extends ToggleModule
     public void onRenderEntityWorld(RenderShaderEvent event)
     {
         VertexConsumerProvider vertexConsumerProvider = ((AccessorWorldRenderer) mc.worldRenderer).hookGetBufferBuilders().getEntityVertexConsumers();
+
         switch (modeConfig.getValue())
         {
             case DEFAULT, OFF ->
@@ -326,8 +327,6 @@ public class ShadersModule extends ToggleModule
     private void renderEntities(float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider)
     {
         ignoreEntityRender = true;
-        RenderBuffers.preRender();
-        // RenderSystem.enableDepthTest();
         for (Entity entity : mc.world.getEntities())
         {
             if (checkShaders(entity))

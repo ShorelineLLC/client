@@ -18,6 +18,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
@@ -78,6 +79,12 @@ public final class AutoTotemModule extends ToggleModule
         lastHotbarSlot = -1;
         lastHotbarItem = null;
         offhandItem = null;
+    }
+
+    @EventListener
+    public void onLoadWorld(LoadWorldEvent event)
+    {
+        lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING);
     }
 
     @EventListener

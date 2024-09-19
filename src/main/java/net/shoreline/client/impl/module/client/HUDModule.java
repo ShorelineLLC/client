@@ -23,6 +23,7 @@ import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.Module;
@@ -83,6 +84,7 @@ public class HUDModule extends ToggleModule
     Config<Rendering> renderingConfig = register(new EnumConfig<>("Rendering", "The rendering mode of the HUD", Rendering.UP, Rendering.values()));
     // Rainbow settings
     Config<RainbowMode> rainbowModeConfig = register(new EnumConfig<>("Rainbow", "The rendering mode for rainbow", RainbowMode.OFF, RainbowMode.values()));
+    Config<Color> gradientColorConfig = register(new ColorConfig("GradientColor", "The color of the rainbow gradient", Color.WHITE, false, false, () -> rainbowModeConfig.getValue() == RainbowMode.GRADIENT));
     Config<Float> rainbowSpeedConfig = register(new NumberConfig<>("Rainbow-Speed", "The speed for the rainbow color cycling", 0.1f, 50.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
     Config<Integer> rainbowSaturationConfig = register(new NumberConfig<>("Rainbow-Saturation", "The saturation of rainbow colors", 0, 35, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.GRADIENT_ALPHA));
     Config<Integer> rainbowBrightnessConfig = register(new NumberConfig<>("Rainbow-Brightness", "The brightness of rainbow colors", 0, 100, 100, () -> rainbowModeConfig.getValue() != RainbowMode.OFF && rainbowModeConfig.getValue() != RainbowMode.GRADIENT));
@@ -90,7 +92,7 @@ public class HUDModule extends ToggleModule
 
     private final DecimalFormat decimal = new DecimalFormat("0.0");
 
-    private int rainbowOffset;
+    private long rainbowOffset;
     private float topLeft, topRight, bottomLeft, bottomRight;
     private boolean renderingUp;
     private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
@@ -108,7 +110,7 @@ public class HUDModule extends ToggleModule
         return INSTANCE;
     }
 
-    private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule)
+    private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule, long drawnCount)
     {
         final Animation anim = toggleModule.getAnimation();
         float factor = (float) anim.getFactor();
@@ -120,7 +122,7 @@ public class HUDModule extends ToggleModule
         int width = RenderManager.textWidth(text);
         RenderManager.renderText(event.getContext(), text,
                 mc.getWindow().getScaledWidth() - width * factor - 1.0f,
-                renderingUp ? topRight : bottomRight, getHudColor(rainbowOffset));
+                renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));
         if (renderingUp)
         {
             topRight += RenderManager.textHeight();
@@ -166,11 +168,16 @@ public class HUDModule extends ToggleModule
             {
                 topRight += 27.0f;
             }
+
+            List<Module> modules = Managers.MODULE.getModules();
+            long drawnCount = modules.stream().filter(ToggleModule.class::isInstance)
+                    .map(ToggleModule.class::cast).filter(m -> !m.isHidden()).count();
+
             if (watermarkConfig.getValue())
             {
                 RenderManager.renderText(event.getContext(), String.format("%s %s (%s%s)",
                         ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER,
-                        ShorelineMod.MOD_BUILD_NUMBER, !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""), 2.0f, topLeft, getHudColor(rainbowOffset));
+                        ShorelineMod.MOD_BUILD_NUMBER, !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""), 2.0f, topLeft, getHudColor(drawnCount - rainbowOffset));
                 topLeft += RenderManager.textHeight();
             }
 
@@ -181,7 +188,7 @@ public class HUDModule extends ToggleModule
                         String.format("UID %s", Loader.SESSION.getUID()),
                         2.0F,
                         topLeft,
-                        getHudColor(rainbowOffset)
+                        getHudColor(drawnCount - rainbowOffset)
                 );
 
                 topLeft += RenderManager.textHeight();
@@ -189,19 +196,45 @@ public class HUDModule extends ToggleModule
 
             if (arraylistConfig.getValue())
             {
-                List<Module> modules = Managers.MODULE.getModules();
-
                 Stream<ToggleModule> moduleStream = modules.stream()
                         .filter(ToggleModule.class::isInstance)
                         .map(ToggleModule.class::cast);
-
                 moduleStream = switch (orderingConfig.getValue())
                 {
                     case ALPHABETICAL -> StreamUtils.sortCached(moduleStream, Module::getName);
                     case LENGTH ->
                             StreamUtils.sortCached(moduleStream, m -> -RenderManager.textWidth(getFormattedModule(m)));
                 };
-                moduleStream.forEach(t -> arrayListRenderModule(event, t));
+                moduleStream.forEach(t -> arrayListRenderModule(event, t, drawnCount));
+            }
+            if (coordsConfig.getValue())
+            {
+                double x = mc.player.getX();
+                double y = mc.player.getY();
+                double z = mc.player.getZ();
+                boolean nether = mc.world.getRegistryKey() == World.NETHER;
+                RenderManager.renderText(event.getContext(), String.format(
+                                "XYZ §f%s, %s, %s " + (netherCoordsConfig.getValue() ?
+                                        "§7[§f%s, %s§7]" : ""),
+                                decimal.format(x),
+                                decimal.format(y),
+                                decimal.format(z),
+                                nether ? decimal.format(x * 8) : decimal.format(x / 8),
+                                nether ? decimal.format(z * 8) : decimal.format(z / 8)),
+                        2, bottomLeft, getHudColor(rainbowOffset));
+                bottomLeft -= RenderManager.textHeight();
+            }
+            if (directionConfig.getValue())
+            {
+                final Direction direction = mc.player.getHorizontalFacing();
+                String dir = EnumFormatter.formatDirection(direction);
+                String axis = EnumFormatter.formatAxis(direction.getAxis());
+                boolean pos = direction.getDirection() == Direction.AxisDirection.POSITIVE;
+                RenderManager.renderText(event.getContext(),
+                        String.format("%s §7[§f%s%s§7]", dir, axis,
+                                pos ? "+" : "-"), 2, bottomLeft,
+                        getHudColor(rainbowOffset));
+                // bottomLeft -= RenderManager.textHeight();
             }
             if (potionEffectsConfig.getValue())
             {
@@ -387,37 +420,6 @@ public class HUDModule extends ToggleModule
                 // bottomRight -= RenderManager.textHeight();
                 rainbowOffset++;
             }
-            if (coordsConfig.getValue())
-            {
-                double x = mc.player.getX();
-                double y = mc.player.getY();
-                double z = mc.player.getZ();
-                boolean nether = mc.world.getRegistryKey() == World.NETHER;
-                RenderManager.renderText(event.getContext(), String.format(
-                                "XYZ §f%s, %s, %s " + (netherCoordsConfig.getValue() ?
-                                        "§7[§f%s, %s§7]" : ""),
-                                decimal.format(x),
-                                decimal.format(y),
-                                decimal.format(z),
-                                nether ? decimal.format(x * 8) : decimal.format(x / 8),
-                                nether ? decimal.format(z * 8) : decimal.format(z / 8)),
-                        2, bottomLeft, getHudColor(rainbowOffset));
-                bottomLeft -= RenderManager.textHeight();
-                rainbowOffset++;
-            }
-            if (directionConfig.getValue())
-            {
-                final Direction direction = mc.player.getHorizontalFacing();
-                String dir = EnumFormatter.formatDirection(direction);
-                String axis = EnumFormatter.formatAxis(direction.getAxis());
-                boolean pos = direction.getDirection() == Direction.AxisDirection.POSITIVE;
-                RenderManager.renderText(event.getContext(),
-                        String.format("%s §7[§f%s%s§7]", dir, axis,
-                                pos ? "+" : "-"), 2, bottomLeft,
-                        getHudColor(rainbowOffset));
-                // bottomLeft -= RenderManager.textHeight();
-                rainbowOffset++;
-            }
             if (armorConfig.getValue())
             {
                 final Entity riding = mc.player.getVehicle();
@@ -509,7 +511,7 @@ public class HUDModule extends ToggleModule
         }
     }
 
-    private int getHudColor(int rainbowOffset)
+    private int getHudColor(long rainbowOffset)
     {
         return switch (rainbowModeConfig.getValue())
         {
@@ -519,9 +521,11 @@ public class HUDModule extends ToggleModule
             case GRADIENT_ALPHA -> alpha(rainbowOffset);
             case GRADIENT ->
             {
-                double roundY = Math.sin(Math.toRadians((rainbowOffset * rainbowDifferenceConfig.getValue()) + ((double) System.currentTimeMillis() / (100.0f - rainbowSpeedConfig.getValue()))));
+                float speed = 100.0f - rainbowSpeedConfig.getValue();
+                float difference = 100.0f - rainbowDifferenceConfig.getValue();
+                double roundY = Math.sin(Math.toRadians((rainbowOffset * difference) + ((double) System.currentTimeMillis() / speed)));
                 roundY = Math.abs(roundY);
-                yield ColorUtil.interpolateColor((float) MathHelper.clamp(roundY, 0.0f, 1.0f), ColorsModule.getInstance().getColor(), Color.WHITE).getRGB();
+                yield ColorUtil.interpolateColor((float) MathHelper.clamp(roundY, 0.0f, 1.0f), ColorsModule.getInstance().getColor(), gradientColorConfig.getValue()).getRGB();
             }
         };
     }
