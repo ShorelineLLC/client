@@ -8,8 +8,9 @@ import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.chat.ChatUtil;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public final class OnlineCommand extends Command
 {
@@ -29,8 +30,8 @@ public final class OnlineCommand extends Command
                 return 1;
             }
 
-            Set<String> playersList = new HashSet<>();
-            List<OnlineUser> onlineUsers = IRCManager.getInstance().getAllOnlineUsers().stream().sorted(Comparator.comparingInt(u -> u.getUsertype().getRank())).toList();
+            List<String> playersList = new ArrayList<>();
+            List<OnlineUser> onlineUsers = IRCManager.getInstance().getAllOnlineUsers().stream().sorted(Comparator.comparingInt(u -> -u.getUsertype().getRank())).toList();
             for (OnlineUser onlineUser : onlineUsers)
             {
                 playersList.add(onlineUser.getUsertype().getColorCode() + onlineUser.getName());
