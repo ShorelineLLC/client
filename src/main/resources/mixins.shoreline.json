@@ -34,6 +34,7 @@
     "accessor.AccessorLimbAnimator",
     "accessor.AccessorMinecraftClient",
     "accessor.AccessorNativeImage",
+    "accessor.AccessorPlayerInteractEntityC2SPacket",
     "accessor.AccessorPlayerMoveC2SPacket",
     "accessor.AccessorPlayerPositionLookS2CPacket",
     "accessor.AccessorPlayerSkinProvider",
