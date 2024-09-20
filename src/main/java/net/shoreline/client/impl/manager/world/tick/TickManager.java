@@ -2,6 +2,7 @@ package net.shoreline.client.impl.manager.world.tick;
 
 import com.google.common.collect.Lists;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
+import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
 import net.shoreline.client.util.Globals;
@@ -34,6 +35,12 @@ public class TickManager implements Globals
     public TickManager()
     {
         EventBus.INSTANCE.subscribe(this);
+    }
+
+    @EventListener
+    public void onDisconnect(DisconnectEvent event)
+    {
+        ticks.clear();
     }
 
     /**
@@ -154,6 +161,11 @@ public class TickManager implements Globals
 
         }
         return min;
+    }
+
+    public boolean isTicksFilled()
+    {
+        return ticks.size() >= 20;
     }
 
     /**

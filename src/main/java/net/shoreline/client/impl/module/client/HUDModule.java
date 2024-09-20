@@ -91,6 +91,7 @@ public class HUDModule extends ToggleModule
     Config<Float> rainbowDifferenceConfig = register(new NumberConfig<>("Rainbow-Difference", "The difference offset for rainbow colors", 0.1f, 40.0f, 100.0f, () -> rainbowModeConfig.getValue() != RainbowMode.OFF));
 
     private final DecimalFormat decimal = new DecimalFormat("0.0");
+    private final DecimalFormat decimal2 = new DecimalFormat("0.0#");
 
     private long rainbowOffset;
     private float topLeft, topRight, bottomLeft, bottomRight;
@@ -293,7 +294,7 @@ public class HUDModule extends ToggleModule
                 float timer = TimerModule.getInstance().isEnabled() ? TimerModule.getInstance().getTimer() : 1.0f;
                 final double speed = dist / div * timer;
                 String text = String.format("Speed §f%skm/h",
-                        decimal.format(speed));
+                        decimal2.format(speed));
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
@@ -356,8 +357,8 @@ public class HUDModule extends ToggleModule
                 float curr = Managers.TICK.getTpsCurrent();
                 float avg = Managers.TICK.getTpsAverage();
                 String text = String.format("TPS §f%s §7[§f%s§7]",
-                        decimal.format(avg),
-                        decimal.format(curr));
+                        decimal2.format(curr) + (Managers.TICK.isTicksFilled() ? "" : "*"),
+                        decimal2.format(avg));
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
