@@ -48,6 +48,7 @@ public final class ModuleManager
                 // new AutoAnchorModule(),
                 new AutoArmorModule(),
                 new AutoBowReleaseModule(),
+                new AutoCrawlTrapModule(),
                 new AutoCrystalModule(),
                 new AutoLogModule(),
                 new AutoTotemModule(),
