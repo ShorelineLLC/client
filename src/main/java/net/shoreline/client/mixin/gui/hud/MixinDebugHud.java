@@ -23,9 +23,10 @@ public abstract class MixinDebugHud
     private List<String> redirectRightTextEarly(DebugHud instance)
     {
         List<String> list = getLeftText();
-        String modName = String.format("§s%s %s (%s%s)",
-                ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER,
-                ShorelineMod.MOD_BUILD_NUMBER, !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : "");
+        String modName = String.format("%s %s (%s%s%s)",
+                ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
+                !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
+                !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : "");
 
         list.add(1, modName);
         return list;

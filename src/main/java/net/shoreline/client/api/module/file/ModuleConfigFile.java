@@ -37,7 +37,10 @@ public class ModuleConfigFile extends ConfigFile
                 Files.createFile(filepath);
             }
             final JsonObject out = new JsonObject();
-            out.addProperty("version", ShorelineMod.MOD_NAME + " " + ShorelineMod.MOD_VER + " (" + ShorelineMod.MOD_BUILD_NUMBER + "-" + BuildConfig.HASH + ")");
+            out.addProperty("version", String.format("%s %s (%s%s%s)",
+                    ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
+                    !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
+                    !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""));
             final JsonArray array = new JsonArray();
             for (Module module : Managers.MODULE.getModules())
             {

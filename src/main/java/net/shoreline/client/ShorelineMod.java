@@ -11,8 +11,7 @@ public class ShorelineMod
 {
     public static final String MOD_NAME = "Shoreline";
     public static final String MOD_VER = BuildConfig.VERSION;
-    public static final String MOD_BUILD_NUMBER = BuildConfig.BUILD_IDENTIFIER + "-" + BuildConfig.BUILD_NUMBER;
-    public static final String MOD_MC_VER = "1.20.4";
+    public static final String MOD_MC_VER = "1.21.1";
 
     public ShorelineMod()
     {

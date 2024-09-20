@@ -79,10 +79,10 @@ public abstract class MixinTitleScreen extends Screen
         {
             return;
         }
-        context.drawTextWithShadow(client.textRenderer,
-                ShorelineMod.MOD_NAME + " " + ShorelineMod.MOD_VER
-                        + " (" + ShorelineMod.MOD_BUILD_NUMBER
-                        + "-" + BuildConfig.HASH + ")",
+        context.drawTextWithShadow(client.textRenderer, String.format("%s %s (%s%s%s)",
+                        ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
+                        !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
+                        !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""),
                 2, height - (client.textRenderer.fontHeight * 2) - 2, 0xffffff | i);
     }
 
