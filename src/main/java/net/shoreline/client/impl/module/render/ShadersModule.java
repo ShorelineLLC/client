@@ -97,6 +97,8 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", false));
     Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", false));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.4f)));
+    Config<Color> gradientConfig = register(new ColorConfig("GradientColor", "The gradient color of the shader", new Color(1.0f, 1.0f, 1.0f), false, false, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
+
 
     private float shaderTime;
 
@@ -191,8 +193,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    Color brighter = brighten(colorConfig.getValue(), 0.4);
-                    shaderEffect.setUniformValue("color1", brighter.getRed() / 255.0f, brighter.getGreen() / 255.0f, brighter.getBlue() / 255.0f, 0.0f);
+                    shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, 0.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
@@ -451,8 +452,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    Color brighter = brighten(colorConfig.getValue(), 0.4);
-                    shaderEffect.setUniformValue("color1", brighter.getRed() / 255.0f, brighter.getGreen() / 255.0f, brighter.getBlue() / 255.0f, 0.0f);
+                    shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, 0.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
@@ -649,15 +649,6 @@ public class ShadersModule extends ToggleModule
         return blockEntity instanceof ChestBlockEntity && chestsConfig.getValue()
                 || blockEntity instanceof EnderChestBlockEntity && echestsConfig.getValue()
                 || blockEntity instanceof ShulkerBoxBlockEntity && shulkersConfig.getValue();
-    }
-
-    public static Color brighten(Color color, double fraction)
-    {
-        int red = (int) Math.round(Math.min(255, color.getRed() + 255 * fraction));
-        int green = (int) Math.round(Math.min(255, color.getGreen() + 255 * fraction));
-        int blue = (int) Math.round(Math.min(255, color.getBlue() + 255 * fraction));
-        int alpha = color.getAlpha();
-        return new Color(red, green, blue, alpha);
     }
 
     private enum ShaderMode

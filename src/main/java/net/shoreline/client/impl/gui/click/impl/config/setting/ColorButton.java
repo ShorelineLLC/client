@@ -231,10 +231,14 @@ public class ColorButton extends ConfigButton<Color>
     @EventListener
     public void onConfigUpdate(ConfigUpdateEvent event)
     {
-        if (event.getConfig() == getConfig() && event.getStage() == StageEvent.EventStage.POST && !ignoreSetColor)
+        if (event.getConfig() == getConfig() && event.getStage() == StageEvent.EventStage.POST)
         {
-            float[] hsb = ((ColorConfig) config).getHsb();
-            selectedColor = new float[] {hsb[0], hsb[1], 1.0f - hsb[2], hsb[3]};
+            if (!ignoreSetColor)
+            {
+                float[] hsb = ((ColorConfig) config).getHsb();
+                selectedColor = new float[] {hsb[0], hsb[1], 1.0f - hsb[2], hsb[3]};
+            }
+            buffer = Integer.toHexString(((ColorConfig) config).getRgb()).toCharArray();
         }
     }
 
