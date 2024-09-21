@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * @author linus & hockeyl8
+ * @author linus
  * @since 1.0
  */
 public class HUDModule extends ToggleModule
@@ -523,8 +523,8 @@ public class HUDModule extends ToggleModule
             case GRADIENT_HUE -> rainbow(rainbowOffset);
             case GRADIENT ->
             {
-                float speed = 100.0f - rainbowSpeedConfig.getValue();
-                float difference = 100.0f - rainbowDifferenceConfig.getValue();
+                float speed = Math.max(100.0f - rainbowSpeedConfig.getValue(), 0.1f);
+                float difference = Math.max(100.0f - rainbowDifferenceConfig.getValue(), 0.1f);
                 double roundY = Math.sin(Math.toRadians((rainbowOffset * difference) + ((double) System.currentTimeMillis() / speed)));
                 roundY = Math.abs(roundY);
                 yield ColorUtil.interpolateColor((float) MathHelper.clamp(roundY, 0.0f, 1.0f), ColorsModule.getInstance().getColor(), gradientColorConfig.getValue()).getRGB();

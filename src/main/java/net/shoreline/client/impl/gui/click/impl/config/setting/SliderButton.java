@@ -270,7 +270,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     @Override
     public void charTyped(char character, int modifiers)
     {
-        if (typing)
+        if (typing && Character.isDigit(character))
         {
             buffer = ArrayUtils.add(buffer, character);
         }

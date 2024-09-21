@@ -142,11 +142,11 @@ public class VelocityModule extends ToggleModule
                 }
                 case GRIM ->
                 {
+                    event.cancel();
                     if (!Managers.ANTICHEAT.hasPassed(100))
                     {
                         return;
                     }
-                    event.cancel();
                     cancelVelocity = true;
                 }
                 case GRIM_V3 ->
@@ -180,11 +180,11 @@ public class VelocityModule extends ToggleModule
                 }
                 case GRIM ->
                 {
+                    event.cancel();
                     if (!Managers.ANTICHEAT.hasPassed(100))
                     {
                         return;
                     }
-                    event.cancel();
                     cancelVelocity = true;
                 }
                 case GRIM_V3 ->
@@ -214,14 +214,81 @@ public class VelocityModule extends ToggleModule
             {
                 if (packet1 instanceof ExplosionS2CPacket packet2)
                 {
+                    switch (modeConfig.getValue())
+                    {
+                        case NORMAL ->
+                        {
+                            if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                ((AccessorExplosionS2CPacket) packet2).setPlayerVelocityX(packet2.getPlayerVelocityX()
+                                        * (horizontalConfig.getValue() / 100.0f));
+                                ((AccessorExplosionS2CPacket) packet2).setPlayerVelocityY(packet2.getPlayerVelocityY()
+                                        * (verticalConfig.getValue() / 100.0f));
+                                ((AccessorExplosionS2CPacket) packet2).setPlayerVelocityZ(packet2.getPlayerVelocityZ()
+                                        * (horizontalConfig.getValue() / 100.0f));
+                            }
+                        }
+                        case GRIM ->
+                        {
+                            if (Managers.ANTICHEAT.hasPassed(100))
+                            {
+                                cancelVelocity = true;
+                            }
+                            continue;
+                        }
+                        case GRIM_V3 ->
+                        {
+                            if (isPhased())
+                            {
+                                continue;
+                            }
+                        }
+                    }
                     mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
                             SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
                             4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
-                    continue;
+
                 }
                 else if (packet1 instanceof EntityVelocityUpdateS2CPacket packet2 && packet2.getEntityId() == mc.player.getId())
                 {
-                    continue;
+                    switch (modeConfig.getValue())
+                    {
+                        case NORMAL ->
+                        {
+                            if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                ((AccessorEntityVelocityUpdateS2CPacket) packet2).setVelocityX((int) (packet2.getVelocityX()
+                                        * (horizontalConfig.getValue() / 100.0f)));
+                                ((AccessorEntityVelocityUpdateS2CPacket) packet2).setVelocityY((int) (packet2.getVelocityY()
+                                        * (verticalConfig.getValue() / 100.0f)));
+                                ((AccessorEntityVelocityUpdateS2CPacket) packet2).setVelocityZ((int) (packet2.getVelocityZ()
+                                        * (horizontalConfig.getValue() / 100.0f)));
+                            }
+                        }
+                        case GRIM ->
+                        {
+                            if (Managers.ANTICHEAT.hasPassed(100))
+                            {
+                                cancelVelocity = true;
+                            }
+                            continue;
+                        }
+                        case GRIM_V3 ->
+                        {
+                            if (isPhased())
+                            {
+                                continue;
+                            }
+                        }
+                    }
                 }
                 allowedBundle.add(packet1);
             }
