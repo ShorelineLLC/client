@@ -20,24 +20,6 @@ public abstract class MixinChatHudLine implements IChatHudLine, Globals
     @Unique
     private int id;
 
-    /**
-     * Change "Modules.BETTER_CHAT.getEasingConfig())" to
-     * Modules.BETTER_CHAT.getEasingConfig().getValue())
-     * when linus fixes enumconfig!
-     */
-    @Inject(
-            method = "<init>",
-            at = @At(value = "RETURN"))
-    private void hookCtr(int creationTick,
-                         Text text,
-                         MessageSignatureData messageSignatureData,
-                         MessageIndicator messageIndicator,
-                         CallbackInfo info)
-    {
-        ChatLineEvent chatLineEvent = new ChatLineEvent(ChatHudLine.class.cast(this), -mc.textRenderer.getWidth(text.getString()));
-        EventBus.INSTANCE.dispatch(chatLineEvent);
-    }
-
     @Override
     public int getId()
     {

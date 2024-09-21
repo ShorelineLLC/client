@@ -16,10 +16,7 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
-import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
-import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
-import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
-import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
+import net.shoreline.client.impl.event.gui.hud.*;
 import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.impl.imixin.IChatHudLineVisible;
@@ -28,6 +25,7 @@ import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -46,6 +44,7 @@ public abstract class MixinChatHud implements IChatHud, Globals
     @Shadow
     @Final
     private List<ChatHudLine> messages;
+
     @Shadow
     @Final
     private List<ChatHudLine.Visible> visibleMessages;
@@ -72,9 +71,12 @@ public abstract class MixinChatHud implements IChatHud, Globals
     private int scrolledLines;
 
     @Shadow
-    protected abstract boolean isChatFocused();
+    public abstract boolean isChatFocused();
 
-    private ChatHudLine current = null;
+    @Unique
+    private ChatHudLine.Visible current = null;
+
+    @Unique
     private int currentId;
 
     @Inject(
@@ -86,7 +88,7 @@ public abstract class MixinChatHud implements IChatHud, Globals
     {
         try
         {
-            current = messages.get(chatLineIndex);
+            current = visibleMessages.get(chatLineIndex);
         }
         catch (Exception ignored)
         {
