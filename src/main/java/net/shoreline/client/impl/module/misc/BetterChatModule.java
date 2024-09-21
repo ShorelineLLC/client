@@ -35,7 +35,7 @@ public class BetterChatModule extends ToggleModule
     Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Makes chat length infinite", false));
     Config<Boolean> keepChatConfig = register(new BooleanConfig("KeepChat", "Maintains chat history", false));
 
-    public final Map<ChatHudLine, TimeAnimation> animationMap = new HashMap<>();
+    public final Map<ChatHudLine.Visible, TimeAnimation> animationMap = new HashMap<>();
 
     public BetterChatModule()
     {

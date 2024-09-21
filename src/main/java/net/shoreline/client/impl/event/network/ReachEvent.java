@@ -18,11 +18,13 @@ public class ReachEvent extends Event
         this.reach = reach;
     }
 
+    @Cancelable
     public static class Block extends ReachEvent
     {
 
     }
 
+    @Cancelable
     public static class Entity extends ReachEvent
     {
 

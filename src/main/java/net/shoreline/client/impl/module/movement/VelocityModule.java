@@ -143,10 +143,6 @@ public class VelocityModule extends ToggleModule
                 case GRIM ->
                 {
                     event.cancel();
-                    if (!Managers.ANTICHEAT.hasPassed(100))
-                    {
-                        return;
-                    }
                     cancelVelocity = true;
                 }
                 case GRIM_V3 ->
@@ -181,10 +177,6 @@ public class VelocityModule extends ToggleModule
                 case GRIM ->
                 {
                     event.cancel();
-                    if (!Managers.ANTICHEAT.hasPassed(100))
-                    {
-                        return;
-                    }
                     cancelVelocity = true;
                 }
                 case GRIM_V3 ->
@@ -234,10 +226,7 @@ public class VelocityModule extends ToggleModule
                         }
                         case GRIM ->
                         {
-                            if (Managers.ANTICHEAT.hasPassed(100))
-                            {
-                                cancelVelocity = true;
-                            }
+                            cancelVelocity = true;
                             continue;
                         }
                         case GRIM_V3 ->
@@ -275,10 +264,7 @@ public class VelocityModule extends ToggleModule
                         }
                         case GRIM ->
                         {
-                            if (Managers.ANTICHEAT.hasPassed(100))
-                            {
-                                cancelVelocity = true;
-                            }
+                            cancelVelocity = true;
                             continue;
                         }
                         case GRIM_V3 ->

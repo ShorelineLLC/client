@@ -6,16 +6,16 @@ import net.shoreline.eventbus.event.Event;
 public class ChatLineEvent extends Event
 {
 
-    private final ChatHudLine chatHudLine;
+    private final ChatHudLine.Visible chatHudLine;
     private final double width;
 
-    public ChatLineEvent(ChatHudLine chatHudLine, double width)
+    public ChatLineEvent(ChatHudLine.Visible chatHudLine, double width)
     {
         this.chatHudLine = chatHudLine;
         this.width = width;
     }
 
-    public ChatHudLine getChatHudLine()
+    public ChatHudLine.Visible getChatHudLine()
     {
         return chatHudLine;
     }

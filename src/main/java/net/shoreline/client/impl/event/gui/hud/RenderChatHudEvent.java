@@ -7,11 +7,11 @@ import net.shoreline.eventbus.event.Event;
 @Cancelable
 public class RenderChatHudEvent extends Event
 {
-    private final ChatHudLine chatHudLine;
+    private final ChatHudLine.Visible chatHudLine;
     private double animation;
     private boolean animationMode;
 
-    public RenderChatHudEvent(ChatHudLine chatHudLine)
+    public RenderChatHudEvent(ChatHudLine.Visible chatHudLine)
     {
         this.chatHudLine = chatHudLine;
     }
@@ -31,7 +31,7 @@ public class RenderChatHudEvent extends Event
         this.animationMode = animationMode;
     }
 
-    public ChatHudLine getChatHudLine()
+    public ChatHudLine.Visible getChatHudLine()
     {
         return chatHudLine;
     }
