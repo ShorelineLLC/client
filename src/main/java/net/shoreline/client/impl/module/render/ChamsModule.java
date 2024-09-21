@@ -31,6 +31,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
+import net.shoreline.client.impl.event.render.entity.RenderThroughWallsEvent;
 import net.shoreline.client.impl.event.render.item.RenderArmEvent;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.entity.FakePlayerEntity;
@@ -86,9 +87,22 @@ public class ChamsModule extends ToggleModule
         fadeList.clear();
     }
 
+    @EventListener
+    public void onRenderThroughWalls(RenderThroughWallsEvent event)
+    {
+        if (modeConfig.getValue() == ChamsMode.NORMAL && checkChams(event.getEntity()))
+        {
+            event.cancel();
+        }
+    }
+
     @EventListener(priority = Integer.MAX_VALUE)
     public void onRenderWorld(RenderWorldEvent event)
     {
+        if (modeConfig.getValue() == ChamsMode.NORMAL)
+        {
+            return;
+        }
         // Pop chams
         RenderBuffers.preRender();
         RenderSystem.disableDepthTest();
@@ -100,8 +114,8 @@ public class ChamsModule extends ToggleModule
             int lineAlpha = (int) (145 * set.getValue().getFactor());
             int boxColor = ColorUtil.withAlpha(color.getRGB(), boxAlpha);
             int lineColor = ColorUtil.withAlpha(color.getRGB(), lineAlpha);
-            ChamsModelRenderer.renderStaticPlayerModel(event.getMatrices(), set.getKey(), set.getKey().getModel(), event.getTickDelta(), boxColor, lineColor,
-                    widthConfig.getValue(), modeConfig.getValue() != ChamsMode.FILL, modeConfig.getValue() != ChamsMode.WIREFRAME, false);
+            ChamsModelRenderer.renderStaticPlayerModel(event.getMatrices(), set.getKey(), set.getKey().getModel(), event.getTickDelta(),
+                    boxColor, lineColor, widthConfig.getValue(), true, true, false);
         }
         fadeList.entrySet().removeIf(e ->
                 e.getValue().getFactor() == 0.0);
@@ -151,6 +165,10 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderGame(RenderWorldEvent.Hand event)
     {
+        if (modeConfig.getValue() == ChamsMode.NORMAL)
+        {
+            return;
+        }
         if (ShadersModule.getInstance().isEnabled() && !ShadersModule.getInstance().textureConfig.getValue())
         {
             return;
@@ -199,6 +217,10 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderEntity(RenderEntityEvent event)
     {
+        if (modeConfig.getValue() == ChamsMode.NORMAL)
+        {
+            return;
+        }
         if (mc.player == null || textureConfig.getValue() || !checkChams(event.entity)
                 || mc.player.squaredDistanceTo(event.entity) > ((NumberConfig) rangeConfig).getValueSq())
         {
@@ -288,6 +310,10 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderArm(RenderArmEvent event)
     {
+        if (modeConfig.getValue() == ChamsMode.NORMAL)
+        {
+            return;
+        }
         if (handsConfig.getValue() && !textureConfig.getValue())
         {
             event.cancel();
@@ -336,6 +362,7 @@ public class ChamsModule extends ToggleModule
 
     public enum ChamsMode
     {
+        NORMAL,
         FILL,
         WIREFRAME,
         WIRE_FILL
