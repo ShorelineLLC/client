@@ -2,11 +2,14 @@ package net.shoreline.client.api.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShapes;
+import net.shoreline.client.impl.gui.click.component.ScissorStack;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.init.Fonts;
@@ -26,6 +29,7 @@ public class RenderManager implements Globals
 {
     //
     public static final Tessellator TESSELLATOR = RenderSystem.renderThreadTesselator();
+    public static final ScissorStack SCISSOR_STACK = new ScissorStack();
 
     /**
      * When rendering using vanilla methods, you should call this method in order to ensure the GL state does not get
@@ -376,10 +380,10 @@ public class RenderManager implements Globals
     public static void borderedRect(MatrixStack matrices, double x1, double y1,
                                     double x2, double y2, int borderColor, double thickness)
     {
-        rect(matrices, x1 - thickness, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
-        rect(matrices, x1 + x2, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
-        rect(matrices, x1 - thickness, y1 - thickness, x2 + (thickness * 2.0), thickness, borderColor);
-        rect(matrices, x1 - thickness, y1 + y2, x2 + (thickness * 2.0), thickness, borderColor);
+        rectLine(matrices, x1, y1, 0.0f, y2, borderColor);
+        rectLine(matrices, x1 + x2, y1, 0.0f, y2, borderColor);
+        rectLine(matrices, x1, y1, x2, 0.0f, borderColor);
+        rectLine(matrices, x1, y1 + y2, x2, 0.0f, borderColor);
     }
 
     /**
@@ -425,6 +429,49 @@ public class RenderManager implements Globals
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, (float) z)
                 .color(g, h, j, f);
         bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, (float) z)
+                .color(g, h, j, f);
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+    }
+
+    /**
+     * @param matrices
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param color
+     */
+    public static void rectLine(MatrixStack matrices, double x1, double y1,
+                                double x2, double y2, int color)
+    {
+        x2 += x1;
+        y2 += y1;
+        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
+        double i;
+        if (x1 < x2)
+        {
+            i = x1;
+            x1 = x2;
+            x2 = i;
+        }
+        if (y1 < y2)
+        {
+            i = y1;
+            y1 = y2;
+            y2 = i;
+        }
+        float f = ColorHelper.Argb.getAlpha(color) / 255.0f;
+        float g = ColorHelper.Argb.getRed(color) / 255.0f;
+        float h = ColorHelper.Argb.getGreen(color) / 255.0f;
+        float j = ColorHelper.Argb.getBlue(color) / 255.0f;
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        BufferBuilder bufferBuilder = TESSELLATOR.begin(VertexFormat.DrawMode.DEBUG_LINES,
+                VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, 0.0f)
+                .color(g, h, j, f);
+        bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0.0f)
                 .color(g, h, j, f);
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
@@ -491,6 +538,39 @@ public class RenderManager implements Globals
                 .color(red, green, blue, alpha).texture(u1, v0);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
         RenderSystem.disableBlend();
+    }
+
+    public static void enableScissor(double x1, double y1, double x2, double y2)
+    {
+        x1 = Math.floor(x1);
+        y1 = Math.floor(y1);
+        x2 = Math.ceil(x2);
+        y2 = Math.ceil(y2);
+        setScissor(SCISSOR_STACK.push(new ScreenRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1))));
+    }
+
+    public static void disableScissor()
+    {
+        setScissor(SCISSOR_STACK.pop());
+    }
+
+    private static void setScissor(ScreenRect rect)
+    {
+        if (rect != null)
+        {
+            Window window = mc.getWindow();
+            int i = window.getFramebufferHeight();
+            double d = window.getScaleFactor();
+            double e = (double) rect.getLeft() * d;
+            double f = (double) i - (double) rect.getBottom() * d;
+            double g = (double) rect.width() * d;
+            double h = (double) rect.height() * d;
+            RenderSystem.enableScissor((int) e, (int) f, Math.max(0, (int) g), Math.max(0, (int) h));
+        }
+        else
+        {
+            RenderSystem.disableScissor();
+        }
     }
 
     /**
