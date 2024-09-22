@@ -8,9 +8,7 @@ import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.chat.ChatUtil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public final class OnlineCommand extends Command
 {
@@ -36,7 +34,8 @@ public final class OnlineCommand extends Command
             {
                 playersList.add(onlineUser.getUsertype().getColorCode() + onlineUser.getName());
             }
-            IRCManager.getInstance().addToChat("Online Users: " + String.join(Formatting.GRAY + ", ", playersList));
+            LinkedHashSet<String> set = new LinkedHashSet<>(playersList);
+            IRCManager.getInstance().addToChat("Online Users: " + String.join(Formatting.GRAY + ", ", set));
 
             return 1;
         });
