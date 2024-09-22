@@ -503,9 +503,10 @@ public class AutoCrystalModule extends RotationModule
             {
                 if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
                 {
-                    RenderSystem.recordRenderCall(() ->
+                    mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
+                    mc.execute(() ->
                     {
-                        mc.world.removeEntity(entity.getId(), Entity.RemovalReason.KILLED);
+                        mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
                     });
                     antiStuckCrystals.remove(entity.getId());
                     Long attackTime = attackPackets.remove(entity.getId());
