@@ -102,6 +102,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         PlayerEntity trapTarget = getTrapTarget();
         if (trapTarget == null)
         {
+            surround.clear();
+            placements.clear();
             return;
         }
         BlockPos targetBlockPos = PositionUtil.getRoundedBlockPos(trapTarget.getX(), trapTarget.getY(), trapTarget.getZ());
@@ -146,11 +148,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 break;
             }
             BlockPos targetPos = placements.get(blocksPlaced);
-            double dist = mc.player.squaredDistanceTo(targetPos.toCenterPos());
-            if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
-            {
-                continue;
-            }
             blocksPlaced++;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
@@ -279,6 +276,11 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
+            double dist = mc.player.squaredDistanceTo(surroundPos.toCenterPos());
+            if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
+            {
+                continue;
+            }
             List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream()
                     .filter(e -> invalidEntity(e)).toList();
             boolean onlyCrystal = invalid.stream().allMatch(e -> e instanceof EndCrystalEntity);
@@ -312,6 +314,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 {
                     continue;
                 }
+
                 surroundBlocks.add(pos1);
                 surroundBlocks.add(pos1.up());
             }

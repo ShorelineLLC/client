@@ -88,11 +88,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 break;
             }
             BlockPos targetPos = placements.get(blocksPlaced);
-            double dist = mc.player.squaredDistanceTo(targetPos.toCenterPos());
-            if (dist > ((NumberConfig) rangeConfig).getValueSq())
-            {
-                continue;
-            }
             blocksPlaced++;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
@@ -179,6 +174,11 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 continue;
             }
             if (!mc.world.getBlockState(surroundPos).isReplaceable())
+            {
+                continue;
+            }
+            double dist = mc.player.squaredDistanceTo(surroundPos.toCenterPos());
+            if (dist > ((NumberConfig) rangeConfig).getValueSq())
             {
                 continue;
             }

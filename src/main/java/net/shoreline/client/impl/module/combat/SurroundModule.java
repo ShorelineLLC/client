@@ -148,11 +148,6 @@ public class SurroundModule extends ObsidianPlacerModule
                 break;
             }
             BlockPos targetPos = placements.get(blocksPlaced);
-            double dist = mc.player.squaredDistanceTo(targetPos.toCenterPos());
-            if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
-            {
-                continue;
-            }
             blocksPlaced++;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
@@ -264,6 +259,11 @@ public class SurroundModule extends ObsidianPlacerModule
                 continue;
             }
             if (!mc.world.getBlockState(surroundPos).isReplaceable())
+            {
+                continue;
+            }
+            double dist = mc.player.squaredDistanceTo(surroundPos.toCenterPos());
+            if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
             {
                 continue;
             }
