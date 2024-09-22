@@ -289,10 +289,15 @@ public class ColorButton extends ConfigButton<Color>
     @Override
     public void charTyped(char character, int modifiers)
     {
-        if (typing && buffer.length < 8)
+        if (typing && buffer.length < 8 && isHexDigit(character))
         {
             buffer = ArrayUtils.add(buffer, character);
         }
+    }
+
+    public boolean isHexDigit(char ch)
+    {
+        return (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f');
     }
 
     public float getPickerHeight()
