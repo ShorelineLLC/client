@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -503,7 +502,6 @@ public class AutoCrystalModule extends RotationModule
             {
                 if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
                 {
-                    mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
                     mc.execute(() ->
                     {
                         mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
