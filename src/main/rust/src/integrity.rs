@@ -106,7 +106,6 @@ unsafe fn internal_version_check(current_version: &str,
                                 .map_err(|_| obfstr!("Failed JNI call").to_string())?;
                             
                             let mut path_buf = PathBuf::from(path_str);
-                            path_buf.push(obfstr!("shoreline-loader.jar"));
 
                             match autoupdate::download_loader(path_buf.to_str().unwrap()).await
                             {
