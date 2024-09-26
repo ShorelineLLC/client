@@ -101,7 +101,6 @@ public class AutoCrystalModule extends RotationModule
     //
     Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
-    Config<Boolean> placeInstantConfig = register(new BooleanConfig("InstantPlace", "Places crystals in between ticks", true));
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
     Config<Float> placeWallRangeConfig = register(new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
@@ -435,7 +434,7 @@ public class AutoCrystalModule extends RotationModule
             attackRotate = time != null;
             if (attackRotate)
             {
-                crystalCounter.mark();
+                crystalCounter.updateCounter();
             }
             if (!instantConfig.getValue())
             {
@@ -502,10 +501,7 @@ public class AutoCrystalModule extends RotationModule
             {
                 if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
                 {
-                    mc.execute(() ->
-                    {
-                        mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
-                    });
+                    mc.execute(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
                     antiStuckCrystals.remove(entity.getId());
                     Long attackTime = attackPackets.remove(entity.getId());
                     if (attackTime != null)
@@ -529,7 +525,7 @@ public class AutoCrystalModule extends RotationModule
             }
         }
 
-        if (serverPacket instanceof BlockUpdateS2CPacket packet && packet.getState().isAir() && placeInstantConfig.getValue())
+        if (serverPacket instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
         {
             final BlockPos blockPos = packet.getPos();
             if (placeRangeCheck(blockPos))
@@ -694,10 +690,10 @@ public class AutoCrystalModule extends RotationModule
         {
             return;
         }
-
         hand = hand != null ? hand : Hand.MAIN_HAND;
-        PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(mc.player, mc.player.isSneaking());
-        ((AccessorPlayerInteractEntityC2SPacket) packet).hookSetEntityId(crystalEntity);
+        EndCrystalEntity entity2 = new EndCrystalEntity(mc.world, 0.0, 0.0, 0.0);
+        entity2.setId(crystalEntity);
+        PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity2, mc.player.isSneaking());
         Managers.NETWORK.sendPacket(packet);
         attackPackets.put(crystalEntity, System.currentTimeMillis());
         Integer antiStuckCount = antiStuckCrystals.get(crystalEntity);

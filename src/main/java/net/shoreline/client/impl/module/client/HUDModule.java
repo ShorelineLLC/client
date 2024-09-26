@@ -145,7 +145,7 @@ public class HUDModule extends ToggleModule
     @EventListener
     public void onRenderOverlayPost(RenderOverlayEvent.Post event)
     {
-        fpsCounter.mark();
+        fpsCounter.updateCounter();
         if (mc.player != null && mc.world != null)
         {
             if (mc.options.hudHidden)

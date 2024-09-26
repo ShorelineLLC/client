@@ -119,7 +119,7 @@ public class PacketLoggerModule extends ToggleModule
         }
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet && interactEntityConfig.getValue())
         {
-            logPacket("InteractEntity - %s", packet.getEntity().getName().getString());
+            logPacket("InteractEntity - %s", packet.getEntity() != null ? packet.getEntity().getName().getString() : "null");
         }
         if (event.getPacket() instanceof PlayerInteractBlockC2SPacket packet && interactBlockConfig.getValue())
         {

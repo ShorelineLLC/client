@@ -7,7 +7,7 @@ public class PerSecondCounter
 {
     private final Queue<Long> counter = new LinkedList<>();
 
-    public void mark()
+    public void updateCounter()
     {
         counter.add(System.currentTimeMillis() + 1000L);
     }
