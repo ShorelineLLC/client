@@ -17,6 +17,8 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -501,12 +503,32 @@ public class AutoCrystalModule extends RotationModule
             {
                 if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
                 {
-                    mc.execute(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
+                    mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
                     antiStuckCrystals.remove(entity.getId());
                     Long attackTime = attackPackets.remove(entity.getId());
                     if (attackTime != null)
                     {
                         attackLatency.add(System.currentTimeMillis() - attackTime);
+                    }
+                }
+            }
+        }
+
+        if (serverPacket instanceof PlaySoundS2CPacket packet)
+        {
+            if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE.value() && packet.getCategory() == SoundCategory.BLOCKS)
+            {
+                for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
+                {
+                    if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
+                    {
+                        mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
+                        antiStuckCrystals.remove(entity.getId());
+                        Long attackTime = attackPackets.remove(entity.getId());
+                        if (attackTime != null)
+                        {
+                            attackLatency.add(System.currentTimeMillis() - attackTime);
+                        }
                     }
                 }
             }

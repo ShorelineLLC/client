@@ -111,11 +111,6 @@ public final class AWTFontRenderer implements Closeable, Globals
         y -= 3.0f;
         stack.translate(x, y, 0.0f);
         stack.scale(1.0f / scale, 1.0f / scale, 0.0f);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableCull();
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         Tessellator tessellator = Tessellator.getInstance();
@@ -125,6 +120,7 @@ public final class AWTFontRenderer implements Closeable, Globals
         float yOffset = 0;
         boolean formatting = false;
         int lineStart = 0;
+        glyphs.clear();
         synchronized (cache)
         {
             for (int i = 0; i < chars.length; i++)
@@ -175,6 +171,11 @@ public final class AWTFontRenderer implements Closeable, Globals
             }
             for (Identifier identifier : cache.keySet())
             {
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.disableCull();
+                RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
                 try
                 {
                     RenderSystem.setShaderTexture(0, identifier);
@@ -202,12 +203,13 @@ public final class AWTFontRenderer implements Closeable, Globals
                     float v1 = (float) glyph.textureHeight() / owner.getHeight();
                     float u2 = (float) (glyph.textureWidth() + glyph.width()) / owner.getWidth();
                     float v2 = (float) (glyph.textureHeight() + glyph.height()) / owner.getHeight();
-                    bufferBuilder.vertex(matrix4f, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a);
-                    bufferBuilder.vertex(matrix4f, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a);
-                    bufferBuilder.vertex(matrix4f, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a);
-                    bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a);
+                    bufferBuilder.vertex(matrix4f, xo + 0, yo + h, 0).color(cr, cg, cb, a).texture(u1, v2);
+                    bufferBuilder.vertex(matrix4f, xo + w, yo + h, 0).color(cr, cg, cb, a).texture(u2, v2);
+                    bufferBuilder.vertex(matrix4f, xo + w, yo + 0, 0).color(cr, cg, cb, a).texture(u2, v1);
+                    bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).color(cr, cg, cb, a).texture(u1, v1);
                 }
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+                RenderSystem.disableBlend();
             }
 
             cache.clear();

@@ -5,12 +5,16 @@ import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.glfw.GLFW;
 
@@ -55,6 +59,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         {
             buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
         }
+        EventBus.INSTANCE.subscribe(this);
     }
 
     /**
@@ -270,9 +275,29 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
     @Override
     public void charTyped(char character, int modifiers)
     {
-        if (typing && Character.isDigit(character))
+        if (typing && (Character.isDigit(character) || character == '.'))
         {
             buffer = ArrayUtils.add(buffer, character);
+        }
+    }
+
+    @EventListener
+    public void onConfigUpdate(ConfigUpdateEvent event)
+    {
+        if (event.getConfig() == getConfig() && event.getStage() == StageEvent.EventStage.POST)
+        {
+            if (config.getValue() instanceof Integer)
+            {
+                buffer = String.valueOf(config.getValue().intValue()).toCharArray();
+            }
+            else if (config.getValue() instanceof Float)
+            {
+                buffer = String.valueOf(config.getValue().floatValue()).toCharArray();
+            }
+            else if (config.getValue() instanceof Double)
+            {
+                buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
+            }
         }
     }
 

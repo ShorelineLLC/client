@@ -336,10 +336,7 @@ public class RenderManager implements Globals
         float hwidth = mc.textRenderer.getWidth(text) / 2.0f;
         RenderManager.post(() ->
         {
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
             GL11.glDepthFunc(GL11.GL_ALWAYS);
-
             if (FontModule.getInstance().isEnabled())
             {
                 Fonts.CLIENT_UNSCALED.drawStringWithShadow(matrices, text, -hwidth, 0.0f, color);
@@ -348,9 +345,7 @@ public class RenderManager implements Globals
             {
                 Fonts.VANILLA.drawWithShadow(matrices, text, -hwidth, 0.0f, color);
             }
-
             GL11.glDepthFunc(GL11.GL_LEQUAL);
-            RenderSystem.disableBlend();
         });
     }
 

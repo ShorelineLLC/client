@@ -56,6 +56,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
@@ -223,7 +224,6 @@ public class NametagsModule extends ToggleModule
             }
         }
 
-        RenderSystem.enableBlend();
         RenderBuffers.postRender();
     }
 
@@ -257,11 +257,6 @@ public class NametagsModule extends ToggleModule
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.scale(-scaling, -scaling, 1.0f);
-
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
-
         if (backgroundConfig.getValue())
         {
             RenderManager.rect(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
@@ -282,10 +277,10 @@ public class NametagsModule extends ToggleModule
             RenderManager.rectTextured(matrices, identifier, (int) -width - 1.5f, (int) -width + 6.0f,
                     0.5f, 8.0f, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
         }
-        drawText(matrices, info, isOnlineUser(entity) ? -width + 10.0f : -width, 0.0f, color);
 
+        GL11.glDepthFunc(GL11.GL_ALWAYS);
+        drawText(matrices, info, isOnlineUser(entity) ? -width + 10.0f : -width, 0.0f, color);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
-        RenderSystem.disableBlend();
     }
 
     private boolean isOnlineUser(PlayerEntity entity)
