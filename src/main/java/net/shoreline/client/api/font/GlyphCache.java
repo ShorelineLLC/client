@@ -70,7 +70,6 @@ public class GlyphCache implements Globals
         List<Glyph> glyphs1 = new ArrayList<>();
         int range = end - start - 1;
         int ceiling = (int) (Math.ceil(Math.sqrt(range)) * 1.5);
-        glyphs.clear();
         int cached = 0;
         int charX = 0;
         int maxX = 0, maxY = 0;
@@ -173,6 +172,7 @@ public class GlyphCache implements Globals
             }
             NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
             texture.upload();
+            texture.setFilter(true, true);
             if (RenderSystem.isOnRenderThread())
             {
                 mc.getTextureManager().registerTexture(identifier, texture);

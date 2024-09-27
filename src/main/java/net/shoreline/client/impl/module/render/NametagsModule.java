@@ -247,6 +247,7 @@ public class NametagsModule extends ToggleModule
     private void renderInfo(String info, float width, PlayerEntity entity,
                             double x, double y, double z, Camera camera, float scaling)
     {
+        GL11.glDepthFunc(GL11.GL_ALWAYS);
         final Vec3d pos = camera.getPos();
         MatrixStack matrices = new MatrixStack();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
@@ -270,6 +271,7 @@ public class NametagsModule extends ToggleModule
 
         int color = getNametagColor(entity);
         renderItems(matrices, entity);
+
         OnlineUser onlineUser = IRCManager.getInstance().findOnlineUser(entity.getGameProfile().getName());
         if (onlineUsersConfig.getValue() && onlineUser != null)
         {
@@ -278,7 +280,6 @@ public class NametagsModule extends ToggleModule
                     0.5f, 8.0f, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
         }
 
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
         drawText(matrices, info, isOnlineUser(entity) ? -width + 10.0f : -width, 0.0f, color);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
     }
