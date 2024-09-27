@@ -2,6 +2,7 @@ package net.shoreline.client.api.render.chams;
 
 import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
@@ -461,7 +462,9 @@ public class ChamsModelRenderer implements Globals
         {
             return;
         }
-        mc.gameRenderer.loadProjectionMatrix(mc.gameRenderer.getBasicProjectionMatrix(mc.options.getFov().getValue() / 2.0f));
+        double d = mc.options.getFov().getValue();
+        matrixStack.multiplyPositionMatrix(mc.gameRenderer.getBasicProjectionMatrix(d));
+        // mc.gameRenderer.loadProjectionMatrix(mc.gameRenderer.getBasicProjectionMatrix(d));
         matrixStack.loadIdentity();
         // Bob view
         PlayerEntity playerEntity = (PlayerEntity) mc.getCameraEntity();
