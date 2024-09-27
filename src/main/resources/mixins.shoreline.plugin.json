@@ -1,7 +1,7 @@
 {
 	"required": true,
 	"minVersion": "0.8.5",
-	"compatibilityLevel": "JAVA_17",
+	"compatibilityLevel": "JAVA_21",
 	"priority": 2147483647,
 	"mixinPriority": 2147483647,
 	"plugin": "net.shoreline.loader.Loader"
