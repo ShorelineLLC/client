@@ -295,8 +295,7 @@ public class HUDModule extends ToggleModule
                 double div = 0.05 / 3600.0;
                 float timer = TimerModule.getInstance().isEnabled() ? TimerModule.getInstance().getTimer() : 1.0f;
                 final double speed = dist / div * timer;
-                String text = String.format("Speed §f%skm/h",
-                        decimal2.format(speed));
+                String text = String.format("Speed §f%skm/h", decimal2.format(speed));
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,

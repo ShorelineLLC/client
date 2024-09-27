@@ -57,7 +57,7 @@ public class ChamsModule extends ToggleModule
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the render", 1.0f, 1.5f, 5.0f, () -> modeConfig.getValue() != ChamsMode.FILL));
     Config<Boolean> wallsConfig = register(new BooleanConfig("ThroughWalls", "Renders chams through walls", true));
     // Config<Boolean> shineConfig = register(new BooleanConfig("Shine", "Adds enchantment glint", false));
-    Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", false));
+    Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", false, () -> wallsConfig.getValue()));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render chams on other players", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render chams on the player", true));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render chams on first-person hands", true));
@@ -207,7 +207,7 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderCrystal(RenderCrystalEvent event)
     {
-        if (mc.player != null && !textureConfig.getValue() && crystalsConfig.getValue() &&
+        if (mc.player != null && (!textureConfig.getValue() || !wallsConfig.getValue()) && crystalsConfig.getValue() &&
                 mc.player.squaredDistanceTo(event.endCrystalEntity) <= ((NumberConfig) rangeConfig).getValueSq())
         {
             event.cancel();
@@ -221,7 +221,7 @@ public class ChamsModule extends ToggleModule
         {
             return;
         }
-        if (mc.player == null || textureConfig.getValue() || !checkChams(event.entity)
+        if (mc.player == null || (textureConfig.getValue() && wallsConfig.getValue()) || !checkChams(event.entity)
                 || mc.player.squaredDistanceTo(event.entity) > ((NumberConfig) rangeConfig).getValueSq())
         {
             return;

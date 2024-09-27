@@ -10,6 +10,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.SprintCancelEvent;
 import net.shoreline.client.impl.module.RotationModule;
+import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
@@ -125,6 +126,10 @@ public class SprintModule extends RotationModule
         if (modeConfig.getValue() != SprintMode.RAGE_STRICT || modeConfig.getValue() != SprintMode.GRIM)
         {
             return false;
+        }
+        if (AutoCrystalModule.getInstance().isAttacking() || AutoCrystalModule.getInstance().isPlacing())
+        {
+            return true;
         }
         return Managers.ROTATION.isRotating() && !isRotationBlocked() && MathHelper.angleBetween(
                 modeConfig.getValue() == SprintMode.GRIM ? mc.player.getYaw() : sprintYaw, Managers.ROTATION.getRotationYaw()) <= 40.0f;
