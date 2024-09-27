@@ -11,6 +11,7 @@ import net.minecraft.util.Identifier;
 import net.shoreline.client.api.font.Glyph;
 import net.shoreline.client.api.font.GlyphCache;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.math.HexRandom;
 import org.joml.Matrix4f;
@@ -308,7 +309,8 @@ public final class AWTFontRenderer implements Closeable, Globals
             }
         }
         int base = 256 * (int) Math.floor((double) c / (double) 256);
-        GlyphCache glyphCache = new GlyphCache((char) base, (char) (base + 256), font, getGlyphIdentifier(), 5);
+        GlyphCache glyphCache = new GlyphCache((char) base, (char) (base + 256), font, getGlyphIdentifier(), 5,
+                FontModule.getInstance().getAntiAlias(), FontModule.getInstance().getFractionalMetrics());
         caches.add(glyphCache);
         return glyphCache.getGlyph(c);
     }

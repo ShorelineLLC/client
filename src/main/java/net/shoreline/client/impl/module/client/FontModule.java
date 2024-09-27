@@ -6,6 +6,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
@@ -18,8 +19,10 @@ public class FontModule extends ToggleModule
 {
     private static FontModule INSTANCE;
 
+    Config<Boolean> antiAliasConfig = register(new BooleanConfig("AntiAlias", "Applies antialiasing to font", true));
+    Config<Boolean> fractionalMetrics = register(new BooleanConfig("FractionalMetrics", "Applies fractional metrics to font", false));
     Config<Integer> sizeConfig = register(new NumberConfig<>("Size", "The font size", 5, 9, 12));
-    Config<Boolean> shadowConfig = register(new BooleanConfig("VanillaShadow", "Renders vanilla text with a shadow background", true));
+    Config<Boolean> shadowConfig = register(new BooleanConfig("VanillaShadow", "Renders vanilla text with a shadow background", true, () -> !isEnabled()));
 
     /**
      *
@@ -42,6 +45,26 @@ public class FontModule extends ToggleModule
         {
             Fonts.setSize(sizeConfig.getValue());
         }
+    }
+
+    @EventListener
+    public void onConfigUpdate(ConfigUpdateEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.POST
+                && (event.getConfig() == antiAliasConfig || event.getConfig() == fractionalMetrics))
+        {
+            Fonts.closeFonts();
+        }
+    }
+
+    public boolean getAntiAlias()
+    {
+        return antiAliasConfig.getValue();
+    }
+
+    public boolean getFractionalMetrics()
+    {
+        return fractionalMetrics.getValue();
     }
 
     /**

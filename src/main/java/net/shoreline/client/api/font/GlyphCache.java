@@ -31,13 +31,17 @@ public class GlyphCache implements Globals
     private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
     private boolean generated;
 
-    public GlyphCache(char from, char to, Font font, Identifier id, int padding)
+    private final boolean antiAlias, fractionalMetrics;
+
+    public GlyphCache(char from, char to, Font font, Identifier id, int padding, boolean antiAlias, boolean fractionalMetrics)
     {
         this.start = from;
         this.end = to;
         this.font = font;
         this.id = id;
         this.padding = padding;
+        this.antiAlias = antiAlias;
+        this.fractionalMetrics = fractionalMetrics;
     }
 
     public Glyph getGlyph(char c)
@@ -75,7 +79,7 @@ public class GlyphCache implements Globals
         int maxX = 0, maxY = 0;
         int currX = 0, currY = 0;
         int currentRowMaxY = 0;
-        FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, false);
+        FontRenderContext frc = new FontRenderContext(new AffineTransform(), antiAlias, fractionalMetrics);
         while (cached <= range)
         {
             char currentChar = (char) (start + cached);
@@ -104,9 +108,9 @@ public class GlyphCache implements Globals
         g2d.setColor(new Color(255, 255, 255, 0));
         g2d.fillRect(0, 0, width, height);
         g2d.setColor(Color.WHITE);
-        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, fractionalMetrics ? RenderingHints.VALUE_FRACTIONALMETRICS_ON : RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, antiAlias ? RenderingHints.VALUE_ANTIALIAS_ON : RenderingHints.VALUE_ANTIALIAS_OFF);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAlias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
         for (Glyph glyph : glyphs1)
         {
