@@ -11,6 +11,7 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -41,7 +42,6 @@ public class LongJumpModule extends ToggleModule
     //
     Config<JumpMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for long jump", JumpMode.NORMAL, JumpMode.values()));
     Config<Float> boostConfig = register(new NumberConfig<>("Boost", "The jump boost speed", 0.1f, 4.5f, 10.0f, () -> modeConfig.getValue() == JumpMode.NORMAL));
-    Config<Float> heightConfig = register(new NumberConfig<>("Height", "The jump height", 0.3f, 1.0f, 2.0f, () -> modeConfig.getValue() == JumpMode.GRIM));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Automatically disables when rubberband is detected", true));
     //
     private int stage;
@@ -111,21 +111,11 @@ public class LongJumpModule extends ToggleModule
             {
                 return;
             }
-            Box bb = mc.player.getBoundingBox();
-            boolean shouldFall = false;
-            for (double i = 0.0; i < heightConfig.getValue(); i += 0.01)
-            {
-                if (!mc.world.isSpaceEmpty(mc.player, bb.offset(0.0, -i, 0.0)))
-                {
-                    shouldFall = true;
-                    break;
-                }
-            }
             if (mc.player.isOnGround())
             {
                 mc.player.jump();
             }
-            else if (mc.player.getVelocity().y < 0.0 && shouldFall && !mc.player.isFallFlying())
+            else if (mc.player.getVelocity().y < 0.0 && !mc.player.isFallFlying())
             {
                 Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
                 Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
@@ -135,6 +125,18 @@ public class LongJumpModule extends ToggleModule
                 Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
                 Managers.INVENTORY.click(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot, 0, SlotActionType.PICKUP);
                 Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
+            }
+
+            if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || mc.player.getHungerManager().getFoodLevel() <= 6.0f)
+            {
+                return;
+            }
+            // event.cancel();
+            if (mc.player.getVelocity().y < 0.0)
+            {
+                Vec3d glide = ElytraFlyModule.getInstance().glideElytra(0.014f);
+                Vec3d motion = mc.player.getVelocity();
+                Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
             }
         }
     }

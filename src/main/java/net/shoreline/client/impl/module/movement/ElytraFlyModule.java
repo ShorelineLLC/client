@@ -50,6 +50,7 @@ import net.shoreline.eventbus.event.StageEvent;
  */
 public class ElytraFlyModule extends RotationModule
 {
+    private static ElytraFlyModule INSTANCE;
 
     Config<FlyMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for elytra flight", FlyMode.CONTROL, FlyMode.values()));
     Config<Float> pitchConfig = register(new NumberConfig<>("Pitch", "The pitch for bounce recast", 0.0f, 75.0f, 90.0f, () -> modeConfig.getValue() == FlyMode.BOUNCE));
@@ -79,10 +80,16 @@ public class ElytraFlyModule extends RotationModule
     public ElytraFlyModule()
     {
         super("ElytraFly", "Allows you to fly freely using an elytra", ModuleCategory.MOVEMENT);
+        INSTANCE = this;
         if (ShorelineMod.isBaritonePresent())
         {
             register(baritoneConfig);
         }
+    }
+
+    public static ElytraFlyModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -505,7 +512,7 @@ public class ElytraFlyModule extends RotationModule
         return fireworkLifetime > 0 || ExtendedFireworkModule.getInstance().isExtendingFirework();
     }
 
-    private Vec3d glideElytra(float speed)
+    public Vec3d glideElytra(float speed)
     {
         float f3 = mc.player.getYaw();
         final double d4 = speed * Math.cos(Math.toRadians(f3 + 90.0f));
