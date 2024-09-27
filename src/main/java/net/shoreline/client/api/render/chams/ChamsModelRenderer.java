@@ -2,7 +2,6 @@ package net.shoreline.client.api.render.chams;
 
 import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
