@@ -30,6 +30,7 @@ public class Fonts
         {
             return;
         }
+        Shoreline.CONFIG.loadFonts();
         loadFonts();
         Shoreline.info("Loaded fonts!");
         initialized = true;

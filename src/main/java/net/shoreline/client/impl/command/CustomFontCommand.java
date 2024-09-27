@@ -28,6 +28,7 @@ public class CustomFontCommand extends Command
             {
                 Fonts.FONT_FILE_PATH = Fonts.DEFAULT_FONT_FILE_PATH;
                 Fonts.loadFonts();
+                Shoreline.CONFIG.saveFonts();
                 ChatUtil.clientSendMessage("Set client font to " + font + "!");
                 return 0;
             }
@@ -43,6 +44,7 @@ public class CustomFontCommand extends Command
 
             Fonts.FONT_FILE_PATH = filePath;
             Fonts.loadFonts();
+            Shoreline.CONFIG.saveFonts();
             ChatUtil.clientSendMessage("Set client font to " + font + "!");
             return 0;
         }));

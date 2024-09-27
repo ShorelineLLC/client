@@ -1,6 +1,7 @@
 package net.shoreline.client.api.file;
 
 import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.font.FontFile;
 import net.shoreline.client.api.macro.MacroFile;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.file.ModuleConfigFile;
@@ -9,6 +10,7 @@ import net.shoreline.client.api.social.SocialFile;
 import net.shoreline.client.api.social.SocialRelation;
 import net.shoreline.client.api.waypoint.WaypointFile;
 import net.shoreline.client.impl.gui.click.ClickGuiFile;
+import net.shoreline.client.impl.module.combat.AutoRegearModule;
 import net.shoreline.client.impl.module.misc.InvCleanerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -37,6 +39,7 @@ public class ClientConfiguration implements Globals
     //
     private ModuleConfigFile file;
     private final ClickGuiFile clickGuiFile;
+    private final FontFile fontFile;
 
     /**
      *
@@ -108,6 +111,7 @@ public class ClientConfiguration implements Globals
             files.add(new SocialFile(clientDir, relation));
         }
         this.clickGuiFile = new ClickGuiFile(clientDir);
+        this.fontFile = new FontFile(clientDir);
     }
 
     /**
@@ -181,6 +185,16 @@ public class ClientConfiguration implements Globals
     public void loadClickGui()
     {
         clickGuiFile.load();
+    }
+
+    public void saveFonts()
+    {
+        fontFile.save();
+    }
+
+    public void loadFonts()
+    {
+        fontFile.load();
     }
 
     public Set<ConfigFile> getFiles()
