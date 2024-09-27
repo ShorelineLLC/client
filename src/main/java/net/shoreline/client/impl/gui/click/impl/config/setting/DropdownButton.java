@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.gui.click.impl.config.setting;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
@@ -45,7 +46,14 @@ public class DropdownButton extends ConfigButton<Enum<?>>
         x = ix;
         y = iy;
         String val = EnumFormatter.formatEnum(config.getValue());
-        rect(context, ClickGuiModule.getInstance().getColor());
+        boolean state = isWithin(mouseX, mouseY);
+        if (state != hoverAnimation.getState())
+        {
+            hoverAnimation.setState(state);
+        }
+        int hoverAlpha = (int) (50 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+
+        rect(context, ClickGuiModule.getInstance().getColor(100 + hoverAlpha));
 
         int whiteText = -1;
         drawStringScaled(context, config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);

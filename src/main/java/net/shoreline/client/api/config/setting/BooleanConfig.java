@@ -28,7 +28,10 @@ public class BooleanConfig extends Config<Boolean>
     public void setValue(Boolean in)
     {
         super.setValue(in);
-        configAnimation.setState(in);
+        if (in != configAnimation.getState())
+        {
+            configAnimation.setState(in);
+        }
     }
 
     /**

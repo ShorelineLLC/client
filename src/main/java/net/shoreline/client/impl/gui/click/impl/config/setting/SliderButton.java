@@ -76,6 +76,14 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         setHeight(RenderManager.textHeight() + 4.0f);
         x = ix;
         y = iy;
+
+        boolean state = isWithin(mouseX, mouseY);
+        if (state != hoverAnimation.getState())
+        {
+            hoverAnimation.setState(state);
+        }
+        int hoverAlpha = (int) (50 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+
         //
         Number min = ((NumberConfig<T>) config).getMin();
         Number max = ((NumberConfig<T>) config).getMax();
@@ -123,7 +131,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         {
             float fill = (config.getValue().floatValue() - min.floatValue())
                     / (max.floatValue() - min.floatValue());
-            fill(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor());
+            fill(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor(100 + hoverAlpha));
         }
 
         int whiteText = -1;

@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.gui.click.impl.config.setting;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.MacroConfig;
 import net.shoreline.client.api.macro.Macro;
@@ -8,6 +9,8 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+
+import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -49,7 +52,15 @@ public class BindButton extends ConfigButton<Macro>
         y = iy;
         final Macro macro = config.getValue();
         String val = listening ? "..." : macro.getKeyName();
-        rect(context, 0x00000000);
+
+        boolean state = isWithin(mouseX, mouseY);
+        if (state != hoverAnimation.getState())
+        {
+            hoverAnimation.setState(state);
+        }
+        int hoverAlpha = (int) (80 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+
+        rect(context, new Color(hoverAlpha, hoverAlpha, hoverAlpha, hoverAlpha).getRGB());
 
         int whiteText = -1;
         drawStringScaled(context, config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);

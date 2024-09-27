@@ -114,9 +114,19 @@ public class ClickGuiModule extends ToggleModule
         return ColorsModule.getInstance().getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
     }
 
+    public int getColor(int a)
+    {
+        return ColorsModule.getInstance().getColor((int) (a * openCloseAnimation.getFactor())).getRGB();
+    }
+
     public int getColor(float alpha)
     {
         return ColorsModule.getInstance().getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
+    }
+
+    public int getColor(int a, float alpha)
+    {
+        return ColorsModule.getInstance().getColor((int) (a * alpha * openCloseAnimation.getFactor())).getRGB();
     }
 
     // Applies a transparency to a color

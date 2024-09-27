@@ -68,6 +68,15 @@ public class ColorButton extends ConfigButton<Color>
         x = ix;
         y = iy;
         int originalColor = ((ColorConfig) config).getRgb();
+        boolean state = isWithin(mouseX, mouseY);
+        if (state != hoverAnimation.getState())
+        {
+            hoverAnimation.setState(state);
+        }
+        int hoverAlpha = (int) (80 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+
+        rect(context, new Color(hoverAlpha, hoverAlpha, hoverAlpha, hoverAlpha).getRGB());
+
         int modifiedTransparencyColor = ClickGuiModule.getInstance().fixTransparency(originalColor);
         fill(context, ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - (11.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), (10.0f * ClickGuiModule.CLICK_GUI_SCALE), (10.0f * ClickGuiModule.CLICK_GUI_SCALE), modifiedTransparencyColor);
         int whiteText = -1;

@@ -1,8 +1,7 @@
 package net.shoreline.client.impl.gui.click.component;
 
-import net.minecraft.client.gui.DrawContext;
-import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 
 /**
  * @author linus
@@ -12,6 +11,7 @@ public abstract class Button extends Component implements Interactable
 {
     //
     protected final Frame frame;
+    protected final Animation hoverAnimation = new Animation(false, 150, Easing.LINEAR);
 
     /**
      * @param frame

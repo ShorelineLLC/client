@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.gui.click.impl.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
@@ -9,6 +10,7 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.Button;
 import net.shoreline.client.impl.gui.click.impl.config.setting.*;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
@@ -128,9 +130,16 @@ public class ModuleButton extends Button
             scaledTime = 1.7f;
         }
 
-        int unfilledColor = ClickGuiModule.getInstance().fixTransparency(0x33000000);
+        boolean state = isWithin(mouseX, mouseY);
+        if (state != hoverAnimation.getState())
+        {
+            hoverAnimation.setState(state);
+        }
+        int hoverAlpha = (int) (60 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+        int hoverAlpha2 = (int) (50 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
 
-        rect(context, fill ? ClickGuiModule.getInstance().getColor(scaledTime) : unfilledColor);
+        int unfilledColor = ClickGuiModule.getInstance().fixTransparency(new Color(hoverAlpha, hoverAlpha, hoverAlpha, 51 + hoverAlpha).getRGB());
+        rect(context, fill ? ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime) : unfilledColor);
 
         int whiteText = -1;
         int grayText = 0xFFAAAAAA;

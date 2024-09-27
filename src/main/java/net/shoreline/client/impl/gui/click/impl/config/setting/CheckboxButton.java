@@ -1,12 +1,15 @@
 package net.shoreline.client.impl.gui.click.impl.config.setting;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.render.animation.Animation;
+
+import java.awt.*;
 
 /**
  * @author linus
@@ -42,7 +45,14 @@ public class CheckboxButton extends ConfigButton<Boolean>
         x = ix;
         y = iy;
         Animation checkboxAnimation = config.getAnimation();
-        rect(context, checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor((float) checkboxAnimation.getFactor()) : 0x00000000);
+        boolean state = isWithin(mouseX, mouseY);
+        if (state != hoverAnimation.getState())
+        {
+            hoverAnimation.setState(state);
+        }
+        int hoverAlpha = (int) (80 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+
+        rect(context, checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor(100 + hoverAlpha, (float) checkboxAnimation.getFactor()) : new Color(hoverAlpha, hoverAlpha, hoverAlpha, hoverAlpha).getRGB());
         int whiteText = -1;
         drawStringScaled(context, config.getName(), (ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE)), (iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE)), whiteText);
     }
