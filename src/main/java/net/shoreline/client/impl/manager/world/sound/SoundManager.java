@@ -26,7 +26,7 @@ public class SoundManager implements Globals
     {
         if (mc.player != null)
         {
-            mc.player.playSound(sound, volume, pitch);
+            mc.executeSync(() -> mc.player.playSound(sound, volume, pitch));
         }
     }
 

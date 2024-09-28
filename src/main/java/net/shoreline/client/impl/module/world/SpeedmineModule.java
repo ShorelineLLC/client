@@ -71,8 +71,12 @@ public class SpeedmineModule extends RotationModule
     @Override
     public String getModuleData()
     {
-        DecimalFormat decimal = new DecimalFormat("0.0");
-        return decimal.format(damage);
+        if (modeConfig.getValue() == SpeedmineMode.PACKET)
+        {
+            DecimalFormat decimal = new DecimalFormat("0.0");
+            return decimal.format(damage);
+        }
+        return super.getModuleData();
     }
 
     @Override
