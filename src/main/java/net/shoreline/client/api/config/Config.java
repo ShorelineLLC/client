@@ -50,7 +50,7 @@ public abstract class Config<T> implements Identifiable, Serializable<T>
     //
     private Supplier<Boolean> visible;
     //
-    protected final Animation configAnimation = new Animation(false, 300, Easing.LINEAR);
+    protected final Animation configAnimation = new Animation(false, 200, Easing.LINEAR);
 
     /**
      * Initializes the config with a default value. This constructor should

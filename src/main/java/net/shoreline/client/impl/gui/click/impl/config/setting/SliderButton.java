@@ -59,7 +59,6 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         {
             buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
         }
-        EventBus.INSTANCE.subscribe(this);
     }
 
     /**
@@ -82,7 +81,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         {
             hoverAnimation.setState(state);
         }
-        int hoverAlpha = (int) (50 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+        int hoverAlpha = (int) (80 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
 
         //
         Number min = ((NumberConfig<T>) config).getMin();
@@ -129,6 +128,18 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         // slider fill
         if (!typing)
         {
+            if (config.getValue() instanceof Integer)
+            {
+                buffer = String.valueOf(config.getValue().intValue()).toCharArray();
+            }
+            else if (config.getValue() instanceof Float)
+            {
+                buffer = String.valueOf(config.getValue().floatValue()).toCharArray();
+            }
+            else if (config.getValue() instanceof Double)
+            {
+                buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
+            }
             float fill = (config.getValue().floatValue() - min.floatValue())
                     / (max.floatValue() - min.floatValue());
             fill(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor(100 + hoverAlpha));
@@ -286,26 +297,6 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
         if (typing && (Character.isDigit(character) || character == '.'))
         {
             buffer = ArrayUtils.add(buffer, character);
-        }
-    }
-
-    @EventListener
-    public void onConfigUpdate(ConfigUpdateEvent event)
-    {
-        if (event.getConfig() == getConfig() && event.getStage() == StageEvent.EventStage.POST)
-        {
-            if (config.getValue() instanceof Integer)
-            {
-                buffer = String.valueOf(config.getValue().intValue()).toCharArray();
-            }
-            else if (config.getValue() instanceof Float)
-            {
-                buffer = String.valueOf(config.getValue().floatValue()).toCharArray();
-            }
-            else if (config.getValue() instanceof Double)
-            {
-                buffer = String.valueOf(config.getValue().doubleValue()).toCharArray();
-            }
         }
     }
 

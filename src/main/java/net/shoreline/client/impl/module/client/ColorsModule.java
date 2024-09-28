@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.client;
 
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -50,13 +51,13 @@ public class ColorsModule extends ConcurrentModule
     public Color getColor(float alpha)
     {
         ColorConfig config = (ColorConfig) colorConfig;
-        return new Color(config.getRed() / 255.0f, config.getGreen() / 255.0f, config.getBlue() / 255.0f, alpha);
+        return new Color(config.getRed() / 255.0f, config.getGreen() / 255.0f, config.getBlue() / 255.0f, MathHelper.clamp(alpha, 0.0f, 1.0f));
     }
 
     public Color getColor(int alpha)
     {
         ColorConfig config = (ColorConfig) colorConfig;
-        return new Color(config.getRed(), config.getGreen(), config.getBlue(), alpha);
+        return new Color(config.getRed(), config.getGreen(), config.getBlue(), MathHelper.clamp(alpha, 0, 255));
     }
 
     public Integer getRGB()

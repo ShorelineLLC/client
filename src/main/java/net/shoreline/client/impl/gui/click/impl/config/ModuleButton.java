@@ -180,9 +180,9 @@ public class ModuleButton extends Button
             }
             if (fill)
             {
-                fill(context, ix, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(scaledTime));
-                fill(context, ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(scaledTime));
-                fill(context, ix, off + ClickGuiModule.CLICK_GUI_SCALE, width * ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor(scaledTime));
+                fill(context, ix, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime));
+                fill(context, ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime));
+                fill(context, ix, off + ClickGuiModule.CLICK_GUI_SCALE, width * ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime));
             }
             if (canScissor)
             {
