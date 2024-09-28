@@ -4,7 +4,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.Button;
 import net.shoreline.client.impl.gui.click.component.Frame;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import org.apache.commons.lang3.ArrayUtils;
@@ -76,6 +78,10 @@ public class SearchButton extends Button
                 {
                     SEARCH_TEXT = null;
                     buffer = "".toCharArray();
+                }
+                if (ClickGuiModule.getInstance().getSounds())
+                {
+                    Managers.SOUND.playSound(SoundManager.GUI_CLICK);
                 }
             }
         }

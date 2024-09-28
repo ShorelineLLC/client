@@ -1,0 +1,10 @@
+{
+  "gui_click": {
+    "sounds": [
+      {
+        "name": "gui_click",
+        "stream": false
+      }
+    ]
+  }
+}

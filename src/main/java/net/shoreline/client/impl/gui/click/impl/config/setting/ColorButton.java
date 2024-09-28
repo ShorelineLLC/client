@@ -11,8 +11,10 @@ import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.animation.Animation;
@@ -202,6 +204,10 @@ public class ColorButton extends ConfigButton<Color>
         {
             open = !open;
             pickerAnimation.setState(open);
+            if (ClickGuiModule.getInstance().getSounds())
+            {
+                Managers.SOUND.playSound(SoundManager.GUI_CLICK);
+            }
         }
         if (button == 0)
         {
@@ -224,6 +230,11 @@ public class ColorButton extends ConfigButton<Color>
                 {
                     typing = true;
                 }
+
+                if (ClickGuiModule.getInstance().getSounds())
+                {
+                    Managers.SOUND.playSound(SoundManager.GUI_CLICK);
+                }
             }
 
             if (!config.getContainer().getName().equalsIgnoreCase("Colors") && isMouseOver(mouseX, mouseY, x + ClickGuiModule.CLICK_GUI_SCALE + (width * ClickGuiModule.CLICK_GUI_SCALE) - (15.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 26.0f * ClickGuiModule.CLICK_GUI_SCALE : 14.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE),
@@ -233,6 +244,10 @@ public class ColorButton extends ConfigButton<Color>
                 colorConfig.setGlobal(val);
                 float[] hsb = ((ColorConfig) config).getHsb();
                 selectedColor = new float[]{hsb[0], hsb[1], 1.0f - hsb[2], hsb[3]};
+                if (ClickGuiModule.getInstance().getSounds())
+                {
+                    Managers.SOUND.playSound(SoundManager.GUI_CLICK);
+                }
             }
         }
     }

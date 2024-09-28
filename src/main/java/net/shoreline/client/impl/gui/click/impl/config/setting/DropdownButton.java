@@ -6,7 +6,9 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.string.EnumFormatter;
 import org.lwjgl.glfw.GLFW;
 
@@ -87,6 +89,7 @@ public class DropdownButton extends ConfigButton<Enum<?>>
                 index = index - 1 < 0 ? values.length - 1 : index - 1;
                 config.setValue(Enum.valueOf(val.getClass(), values[index]));
             }
+            Managers.SOUND.playSound(SoundManager.GUI_CLICK);
         }
     }
 

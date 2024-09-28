@@ -13,6 +13,7 @@ import net.shoreline.client.impl.gui.click.component.Frame;
 import net.shoreline.client.impl.gui.click.impl.SearchButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ColorButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.ConfigButton;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.render.animation.Animation;
@@ -204,6 +205,11 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
         {
             open = !open;
             categoryAnimation.setState(open);
+
+            if (ClickGuiModule.getInstance().getSounds())
+            {
+                Managers.SOUND.playSound(SoundManager.GUI_CLICK);
+            }
         }
         if (isOpen())
         {

@@ -9,8 +9,9 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.Button;
 import net.shoreline.client.impl.gui.click.impl.config.setting.*;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
-import net.shoreline.client.util.render.ColorUtil;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
@@ -234,6 +235,11 @@ public class ModuleButton extends Button
             {
                 open = !open;
                 settingsAnimation.setState(open);
+            }
+
+            if (ClickGuiModule.getInstance().getSounds())
+            {
+                Managers.SOUND.playSound(SoundManager.GUI_CLICK);
             }
         }
         if (open)

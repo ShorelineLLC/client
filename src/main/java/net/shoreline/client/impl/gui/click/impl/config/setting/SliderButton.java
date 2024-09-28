@@ -9,7 +9,9 @@ import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.eventbus.EventBus;
@@ -197,6 +199,11 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
                 {
                     typing = true;
                 }
+            }
+
+            if (ClickGuiModule.getInstance().getSounds())
+            {
+                Managers.SOUND.playSound(SoundManager.GUI_CLICK);
             }
         }
         else

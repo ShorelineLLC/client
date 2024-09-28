@@ -50,6 +50,10 @@ public class FontModule extends ToggleModule
     @EventListener
     public void onConfigUpdate(ConfigUpdateEvent event)
     {
+        if (!Fonts.isInitialized())
+        {
+            return;
+        }
         if (event.getStage() == StageEvent.EventStage.POST
                 && (event.getConfig() == antiAliasConfig || event.getConfig() == fractionalMetrics))
         {

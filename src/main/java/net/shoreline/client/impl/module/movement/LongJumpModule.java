@@ -97,6 +97,20 @@ public class LongJumpModule extends ToggleModule
 
         if (modeConfig.getValue() == JumpMode.GRIM)
         {
+            Box bb = mc.player.getBoundingBox();
+            boolean shouldFall = false;
+            for (double i = 0.0; i < 2.0; i += 0.01)
+            {
+                if (!mc.world.isSpaceEmpty(mc.player, bb.offset(0.0, -i, 0.0)))
+                {
+                    shouldFall = true;
+                    break;
+                }
+            }
+            if (!shouldFall)
+            {
+                return;
+            }
             int elytraSlot = -1;
             for (int i = 0; i < 36; i++)
             {
