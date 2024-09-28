@@ -53,7 +53,7 @@ public class DropdownButton extends ConfigButton<Enum<?>>
         {
             hoverAnimation.setState(state);
         }
-        int hoverAlpha = (int) (50 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+        int hoverAlpha = (int) (80 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
 
         rect(context, ClickGuiModule.getInstance().getColor(100 + hoverAlpha));
 

@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.manager.world.sound;
 
-import net.minecraft.client.sound.WeightedSoundSet;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
@@ -20,14 +19,14 @@ public class SoundManager implements Globals
      */
     public void playSound(final SoundEvent sound)
     {
-        playSound(sound, 0.75f);
+        playSound(sound, 1.2f, 0.75f);
     }
 
-    public void playSound(final SoundEvent sound, float pitch)
+    public void playSound(final SoundEvent sound, float volume, float pitch)
     {
         if (mc.player != null)
         {
-            mc.player.playSound(sound, 1.0f, pitch);
+            mc.player.playSound(sound, volume, pitch);
         }
     }
 
