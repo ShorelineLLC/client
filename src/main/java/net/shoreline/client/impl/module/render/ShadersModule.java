@@ -40,6 +40,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderCrystalEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityEvent;
 import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
+import net.shoreline.client.impl.event.render.entity.RenderLabelEvent;
 import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorGameRenderer;
@@ -281,6 +282,15 @@ public class ShadersModule extends ToggleModule
                     renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
                 });
             }
+        }
+    }
+
+    @EventListener
+    public void onRenderLabel(RenderLabelEvent event)
+    {
+        if (event.getEntity() instanceof PlayerEntity && ignoreEntityRender)
+        {
+            event.cancel();
         }
     }
 

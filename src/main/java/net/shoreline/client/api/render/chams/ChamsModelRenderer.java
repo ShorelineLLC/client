@@ -2,8 +2,11 @@ package net.shoreline.client.api.render.chams;
 
 import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -11,6 +14,7 @@ import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityAttachmentType;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -18,7 +22,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -29,6 +35,8 @@ import net.shoreline.client.api.render.model.StaticBipedEntityModel;
 import net.shoreline.client.impl.module.misc.SwingModule;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
 import net.shoreline.client.impl.module.render.FreecamModule;
+import net.shoreline.client.impl.module.render.NametagsModule;
+import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorAnimalModel;
 import net.shoreline.client.util.Globals;
@@ -113,6 +121,35 @@ public class ChamsModelRenderer implements Globals
         {
             setupTransforms(abstractClientPlayerEntity, matrixStack, f, g, h);
         }
+    }
+
+    public static void renderLabel(Text text, MatrixStack matrices, Entity entity, float tickDelta)
+    {
+        double d = mc.getEntityRenderDispatcher().getSquaredDistanceToCamera(entity);
+        if (d > 4096.0)
+        {
+            return;
+        }
+        Vec3d vec3d = entity.getAttachments().getPointNullable(EntityAttachmentType.NAME_TAG, 0, entity.getYaw(tickDelta));
+        if (vec3d == null)
+        {
+            return;
+        }
+        boolean bl = !entity.isSneaky();
+        int i = text.getString().equals("deadmau5") ? -10 : 0;
+        matrices.push();
+        matrices.translate(vec3d.x, vec3d.y + 0.5, vec3d.z);
+        matrices.multiply(mc.getEntityRenderDispatcher().getRotation());
+        matrices.scale(0.025f, -0.025f, 0.025f);
+        float f = MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25f);
+        TextRenderer textRenderer = mc.textRenderer;
+        float g = -textRenderer.getWidth(text) / 2;
+        Fonts.VANILLA.draw(matrices, text.getString(), g, (float)i, 0x20FFFFFF, false);
+        if (bl)
+        {
+            Fonts.VANILLA.draw(matrices, text.getString(), g, (float)i, Colors.WHITE, false);
+        }
+        matrices.pop();
     }
 
     public static void setupTransforms(LivingEntity entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta)
@@ -451,6 +488,12 @@ public class ChamsModelRenderer implements Globals
             matrices.pop();
             matrices.pop();
         }
+
+//        if (!NametagsModule.getInstance().isEnabled() && (entity.shouldRenderName() || entity.hasCustomName() && entity == mc.getEntityRenderDispatcher().targetedEntity))
+//        {
+//            renderLabel(entity.getDisplayName(), matrices, entity, tickDelta);
+//        }
+
         matrices.pop();
     }
 
