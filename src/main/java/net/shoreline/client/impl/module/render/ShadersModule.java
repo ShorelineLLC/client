@@ -97,7 +97,7 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render players through walls", false));
     Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render players through walls", false));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.4f)));
-    Config<Color> gradientConfig = register(new ColorConfig("GradientColor", "The gradient color of the shader", new Color(1.0f, 1.0f, 1.0f), false, false, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
+    Config<Color> gradientConfig = register(new ColorConfig("GradientColor", "The gradient color of the shader", new Color(1.0f, 1.0f, 1.0f), true, false, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
 
 
     private float shaderTime;
@@ -193,7 +193,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, 0.0f);
+                    shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, gradientConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
@@ -452,7 +452,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, 0.0f);
+                    shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, gradientConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);

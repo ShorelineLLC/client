@@ -65,7 +65,8 @@ void main()
         float r = color.r * distance + color1.r * j;
         float g = color.g * distance + color1.g * j;
         float b = color.b * distance + color1.b * j;
-        fragColor = vec4(r, g, b, color.a);
+        float a = color.a * distance + color1.a * j;
+        fragColor = vec4(r, g, b, a);
     }
     else
     {
