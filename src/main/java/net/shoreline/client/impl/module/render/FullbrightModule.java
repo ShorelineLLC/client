@@ -25,8 +25,6 @@ import java.awt.*;
 public class FullbrightModule extends ToggleModule
 {
     Config<Brightness> brightnessConfig = register(new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values()));
-    Config<Boolean> ambienceConfig = register(new BooleanConfig("Ambience", "Colors the light", false));
-    Config<Color> ambienceColorConfig = register(new ColorConfig("AmbienceColor", "The color of the biome", Color.RED, false, true, () -> ambienceConfig.getValue()));
 
     public FullbrightModule()
     {
@@ -88,16 +86,6 @@ public class FullbrightModule extends ToggleModule
                 && !mc.player.hasStatusEffect(StatusEffects.NIGHT_VISION))
         {
             mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, -1, 0));
-        }
-    }
-
-    @EventListener
-    public void onBiomeColor(AmbientColorEvent event)
-    {
-        if (ambienceConfig.getValue())
-        {
-            event.cancel();
-            event.setColor(ambienceColorConfig.getValue());
         }
     }
 

@@ -122,6 +122,7 @@
     "render.block.entity.MixinSignBlockEntityRenderer",
     "render.block.MixinBlockRenderManager",
     "render.block.MixinEnchantingTableBlockEntityRenderer",
+    "render.block.MixinFluidRenderer",
     "render.entity.MixinArmorFeatureRenderer",
     "render.entity.MixinEndCrystalEntityRenderer",
     "render.entity.MixinEntityRenderDispatcher",

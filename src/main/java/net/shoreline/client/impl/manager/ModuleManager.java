@@ -151,6 +151,7 @@ public final class ModuleManager
                 new VelocityModule(),
                 new YawModule(),
                 // Render
+                new AmbienceModule(),
                 new AnimationsModule(),
                 new BlockHighlightModule(),
                 new BreadcrumbsModule(),
