@@ -32,6 +32,7 @@ public class HoleESPModule extends ToggleModule
     //
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Range to display holes", 3.0f, 5.0f, 25.0f));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Renders an outline around the hole", true));
+    Config<Boolean> crossConfig = register(new BooleanConfig("Cross", "Renders a cross on the floor of the hole", false));
     Config<Float> heightConfig = register(new NumberConfig<>("Size", "Render height of holes", -1.0f, 1.00f, 1.0f));
     Config<Boolean> ignoreSelfConfig = register(new BooleanConfig("IgnoreSelf", "Ignores the hole the player is standing in", false));
     Config<Boolean> obsidianCheckConfig = register(new BooleanConfig("Obsidian", "Displays obsidian holes", true));
@@ -158,6 +159,10 @@ public class HoleESPModule extends ToggleModule
         if (outlineConfig.getValue())
         {
             RenderManager.renderBoundingBox(matrixStack, render, 1.5f, color2);
+        }
+        if (crossConfig.getValue())
+        {
+            RenderManager.renderBoundingCross(matrixStack, render, 2.0f, color2);
         }
     }
 

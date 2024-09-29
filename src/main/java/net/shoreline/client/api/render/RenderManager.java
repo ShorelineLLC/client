@@ -166,6 +166,45 @@ public class RenderManager implements Globals
      * @param width
      * @param color
      */
+    public static void renderBoundingCross(MatrixStack matrices, BlockPos p,
+                                         float width, int color)
+    {
+        renderBoundingCross(matrices, new Box(p), width, color);
+    }
+
+    public static void renderBoundingCross(MatrixStack matrices, Box box,
+                                         float width, int color)
+    {
+        if (!isFrustumVisible(box))
+        {
+            return;
+        }
+        matrices.push();
+        RenderSystem.lineWidth(width);
+        drawBoundingCross(matrices, box, color);
+        matrices.pop();
+    }
+
+    public static void drawBoundingCross(MatrixStack matrices, Box box, int color)
+    {
+        drawBoundingCross(matrices, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
+    }
+
+    public static void drawBoundingCross(MatrixStack matrices, double x1, double y1,
+                                       double z1, double x2, double y2, double z2, int color)
+    {
+        LINES.begin(matrices);
+        LINES.color(color);
+        LINES.vertexLine(x1, y1, z1, x2, y1, z2);
+        LINES.vertexLine(x2, y1, z1, x1, y1, z2);
+        LINES.end();
+    }
+
+    /**
+     * @param p
+     * @param width
+     * @param color
+     */
     public static void renderBoundingBox(MatrixStack matrices, BlockPos p,
                                          float width, int color)
     {
