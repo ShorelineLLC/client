@@ -214,6 +214,9 @@ public class VelocityModule extends ToggleModule
             {
                 if (packet1 instanceof ExplosionS2CPacket packet2)
                 {
+                    mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
+                            SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
+                            4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
                     switch (modeConfig.getValue())
                     {
                         case NORMAL ->
@@ -248,10 +251,6 @@ public class VelocityModule extends ToggleModule
                             }
                         }
                     }
-                    mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
-                            SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
-                            4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
-
                 }
                 else if (packet1 instanceof EntityVelocityUpdateS2CPacket packet2 && packet2.getEntityId() == mc.player.getId())
                 {
