@@ -45,7 +45,7 @@ public class SpeedModule extends ToggleModule
     Config<Float> collisionDistanceConfig = register(new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f, () -> speedModeConfig.getValue() == Speed.VANILLA));
     Config<Boolean> timerConfig = register(new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false, () -> isStrafe()));
-    Config<Boolean> fastConfig = register(new BooleanConfig("FastFall", "Fast fall speed", false, () -> speedModeConfig.getValue() == Speed.STRAFE_STRICT));
+    Config<Boolean> fastConfig = register(new BooleanConfig("Fast", "Fast timer speed", false, () -> speedModeConfig.getValue() == Speed.STRAFE_STRICT && timerConfig.getValue()));
     Config<Boolean> strafeBoostConfig = register(new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false, () -> isStrafe()));
     Config<Integer> boostTicksConfig = register(new NumberConfig<>("BoostTicks", "The number of ticks to boost strafe", 10, 20, 40, () -> isStrafe() && strafeBoostConfig.getValue()));
     Config<Boolean> speedWaterConfig = register(new BooleanConfig("SpeedInWater", "Applies speed even in water and lava", false));
@@ -53,6 +53,7 @@ public class SpeedModule extends ToggleModule
     private int strafe = 4;
     private boolean accel;
     private int strictTicks;
+    private int strictFastTicks;
     private int boostTicks;
     //
     private double speed;
@@ -247,15 +248,26 @@ public class SpeedModule extends ToggleModule
                 {
                     return;
                 }
-                if (fastConfig.getValue() && MathUtil.round(mc.player.getY() - (int) mc.player.getY(), 3) == MathUtil.round(0.138, 3))
+                if (timerConfig.getValue())
                 {
-                    Managers.MOVEMENT.setMotionY(mc.player.getVelocity().y - 0.08);
-                    event.setY(event.getY() - 0.09316090325960147D);
-                    mc.player.setPos(mc.player.getX(), mc.player.getY() - 0.09316090325960147, mc.player.getZ());
+                    if (fastConfig.getValue())
+                    {
+                        ++strictFastTicks;
+                        if (strictFastTicks > 10)
+                        {
+                            strictFastTicks = 0;
+                        }
+                        float res = 1.0f + strictFastTicks / 100.0f;
+                        TimerModule.getInstance().setTimer(Math.max(1.0f, res));
+                    }
+                    else
+                    {
+                        TimerModule.getInstance().setTimer(1.0888f);
+                    }
                 }
                 if (strafe == 1)
                 {
-                    speed = (fastConfig.getValue() ? 1.38f : 1.35f) * base - 0.01f;
+                    speed = 1.35f * base - 0.01f;
                 }
                 else if (strafe == 2)
                 {
@@ -263,7 +275,7 @@ public class SpeedModule extends ToggleModule
                     {
                         return;
                     }
-                    float jump = (fastConfig.getValue() ? 0.41999998688697815f : 0.3999999463558197f) + jumpEffect;
+                    float jump = 0.3999999463558197f + jumpEffect;
                     event.setY(jump);
                     Managers.MOVEMENT.setMotionY(jump);
                     speed *= 2.149;
@@ -686,6 +698,7 @@ public class SpeedModule extends ToggleModule
     {
         strafe = 4;
         strictTicks = 0;
+        strictFastTicks = 0;
         speed = 0.0f;
         distance = 0.0;
         accel = false;
