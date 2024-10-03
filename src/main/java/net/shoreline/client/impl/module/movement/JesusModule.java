@@ -76,7 +76,7 @@ public class JesusModule extends ToggleModule
         {
             return;
         }
-        if (modeConfig.getValue() != JesusMode.DOLPHIN && ((state.getBlock() == Blocks.WATER
+        if (modeConfig.getValue() != JesusMode.DOLPHIN && state.getFluidState().isStill() && ((state.getBlock() == Blocks.WATER
                 || state.getFluidState().getFluid() == Fluids.WATER) || state.getBlock() == Blocks.LAVA))
         {
             event.cancel();
@@ -237,7 +237,7 @@ public class JesusModule extends ToggleModule
             for (int j = MathHelper.floor(mc.player.getBoundingBox().minZ); j < MathHelper.ceil(mc.player.getBoundingBox().maxZ); j++)
             {
                 BlockState state = mc.world.getBlockState(new BlockPos(i, minY, j));
-                if (state.getBlock() instanceof FluidBlock)
+                if (state.getBlock() instanceof FluidBlock && state.getFluidState().isStill())
                 {
                     return state;
                 }
@@ -263,10 +263,10 @@ public class JesusModule extends ToggleModule
         {
             for (int z = MathHelper.floor(bb.minZ); z < MathHelper.floor(bb.maxZ + 1.0); z++)
             {
-                final Block block = mc.world.getBlockState(new BlockPos(x, y, z)).getBlock();
-                if (block != Blocks.AIR)
+                final BlockState block = mc.world.getBlockState(new BlockPos(x, y, z));
+                if (block.getBlock() != Blocks.AIR)
                 {
-                    if (!(block instanceof FluidBlock))
+                    if (block.getBlock() instanceof FluidBlock && block.getFluidState().isStill())
                     {
                         return false;
                     }
