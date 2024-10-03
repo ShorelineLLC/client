@@ -7,6 +7,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.event.entity.FireworkTickEvent;
 import net.shoreline.client.impl.event.entity.projectile.FireworkVelocityEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.entity.projectile.RemoveFireworkEvent;
@@ -31,6 +32,17 @@ public class MixinFireworkRocketEntity implements Globals
 
     @Shadow
     private int lifeTime;
+
+    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
+    private void hookTick(CallbackInfo ci)
+    {
+        FireworkTickEvent event = new FireworkTickEvent();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
     private void hookSetVelocity(LivingEntity entity, Vec3d velocity)

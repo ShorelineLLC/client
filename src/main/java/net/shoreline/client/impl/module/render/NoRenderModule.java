@@ -13,6 +13,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.chunk.light.RenderSkylightEvent;
+import net.shoreline.client.impl.event.entity.FireworkTickEvent;
 import net.shoreline.client.impl.event.entity.ItemTickEvent;
 import net.shoreline.client.impl.event.entity.RenderFireEntityEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
@@ -224,6 +225,16 @@ public class NoRenderModule extends ToggleModule
 
     @EventListener
     public void onRenderFireworkRocket(RenderFireworkRocketEvent event)
+    {
+        if (fireworksConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+
+    @EventListener
+    public void onFireworkTick(FireworkTickEvent event)
     {
         if (fireworksConfig.getValue())
         {
