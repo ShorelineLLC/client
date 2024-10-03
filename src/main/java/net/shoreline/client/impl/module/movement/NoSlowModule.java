@@ -53,6 +53,7 @@ public class NoSlowModule extends ToggleModule
     Config<Boolean> inventoryMoveConfig = register(new BooleanConfig("InventoryMove", "Allows the player to move while in inventories or screens", true));
     Config<Boolean> arrowMoveConfig = register(new BooleanConfig("ArrowMove", "Allows the player to look while in inventories or screens by using the arrow keys", false));
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Removes the slowdown effect caused by using items", true));
+    Config<Boolean> sneakConfig = register(new BooleanConfig("Sneak", "Removes sneak slowdown", false));
     Config<Boolean> shieldsConfig = register(new BooleanConfig("Shields", "Removes the slowdown effect caused by shields", true));
     Config<Boolean> websConfig = register(new BooleanConfig("Webs", "Removes the slowdown caused when moving through webs", false));
     Config<Boolean> berryBushConfig = register(new BooleanConfig("BerryBush", "Removes the slowdown caused when moving through webs", false));
@@ -107,7 +108,8 @@ public class NoSlowModule extends ToggleModule
         if (event.getStage() == StageEvent.EventStage.PRE
                 && mc.player.isUsingItem() && !mc.player.isSneaking() && itemsConfig.getValue())
         {
-            if (grimConfig.getValue())
+
+            if (grimConfig.getValue() || grimNewConfig.getValue() && (mc.player.getItemUseTimeLeft() < 6 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0)))
             {
                 // Grim focuses on other hand noslow checks
                 if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack()))
@@ -118,10 +120,6 @@ public class NoSlowModule extends ToggleModule
                 {
                     Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
                 }
-            }
-            if (grimNewConfig.getValue())
-            {
-
             }
         }
     }
@@ -219,7 +217,7 @@ public class NoSlowModule extends ToggleModule
         if (block instanceof CobwebBlock && websConfig.getValue()
                 || block instanceof SweetBerryBushBlock && berryBushConfig.getValue())
         {
-            if (grimConfig.getValue())
+            if (grimConfig.getValue() || grimNewConfig.getValue())
             {
                 event.cancel();
             }
@@ -281,11 +279,6 @@ public class NoSlowModule extends ToggleModule
         {
             return;
         }
-        if (event.getPacket() instanceof PlayerInteractItemC2SPacket && grimNewConfig.getValue())
-        {
-            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
-            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
-        }
         else if (event.getPacket() instanceof PlayerMoveC2SPacket packet && packet.changesPosition()
                 && strictConfig.getValue() && checkSlowed())
         {
@@ -332,11 +325,19 @@ public class NoSlowModule extends ToggleModule
 //        if ((offHandStack.isFood() || offHandStack.getItem() == Items.BOW || offHandStack.getItem() == Items.CROSSBOW || offHandStack.getItem() == Items.SHIELD) && grimConfig.getValue()) {
 //            return false;
 //        }
+        if (sneakConfig.getValue() && mc.player.isSneaking())
+        {
+            return true;
+        }
         if (DisablerModule.getInstance().grimFireworkCheck2())
         {
             return true;
         }
-        return !mc.player.isRiding() && !mc.player.isSneaking() && (mc.player.isUsingItem() && itemsConfig.getValue() || mc.player.isBlocking() && shieldsConfig.getValue() && !grimConfig.getValue());
+        if (!grimNewConfig.getValue() || (mc.player.getItemUseTimeLeft() < 6 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0)))
+        {
+            return !mc.player.isRiding() && !mc.player.isSneaking() && (mc.player.isUsingItem() && itemsConfig.getValue() || mc.player.isBlocking() && shieldsConfig.getValue() && !grimNewConfig.getValue() && !grimConfig.getValue());
+        }
+        return false;
     }
 
     public boolean checkScreen()

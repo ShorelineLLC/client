@@ -48,6 +48,7 @@
     "accessor.AccessorWorldRenderer",
     "biome.MixinBiome",
     "biome.MixinBiomeEffects",
+    "biome.MixinFoliageColors",
     "block.MixinBlock",
     "block.MixinSlimeBlock",
     "chunk.light.MixinChunkSkylightProvider",

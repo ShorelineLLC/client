@@ -56,10 +56,12 @@ public class StorageESPModule extends ToggleModule
             {
                 continue;
             }
+
             Vec3d vec3d = blockEntity.getPos().toCenterPos();
             double alpha = (100.0 - mc.player.squaredDistanceTo(vec3d)) / 100.0;
             alpha = 1.0 - MathHelper.clamp(alpha, 0.0, 1.0);
             BlockPos blockPos = blockEntity.getPos();
+
             if (blockEntity instanceof ChestBlockEntity)
             {
                 double x1 = blockPos.getX() + 0.06;
