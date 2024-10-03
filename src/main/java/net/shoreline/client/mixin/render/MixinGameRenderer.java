@@ -77,6 +77,18 @@ public class MixinGameRenderer implements Globals
         EventBus.INSTANCE.dispatch(lightmapUpdateEvent);
     }
 
+    @Redirect(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
+    private float hookLerpNausea(float delta, float start, float end)
+    {
+        RenderNauseaEvent renderNauseaEvent = new RenderNauseaEvent();
+        EventBus.INSTANCE.dispatch(renderNauseaEvent);
+        if (renderNauseaEvent.isCanceled())
+        {
+            return 0.0f;
+        }
+        return MathHelper.lerp(delta, start, end);
+    }
+
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/LightmapTextureManager;tick()V"))
     private void hookTick(CallbackInfo ci)
     {
