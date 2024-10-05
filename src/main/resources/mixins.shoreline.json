@@ -130,6 +130,7 @@
     "render.entity.MixinEntityRenderer",
     "render.entity.MixinFireworkRocketEntityRenderer",
     "render.entity.MixinItemEntityRenderer",
+    "render.entity.MixinItemFrameEntityRenderer",
     "render.entity.MixinLivingEntityRenderer",
     "render.entity.MixinPlayerEntityRenderer",
     "render.entity.MixinWitherSkullEntityRenderer",

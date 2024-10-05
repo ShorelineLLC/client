@@ -20,10 +20,7 @@ import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.render.block.RenderTileEntityEvent;
 import net.shoreline.client.impl.event.render.block.entity.RenderSignTextEvent;
-import net.shoreline.client.impl.event.render.entity.RenderArmorEvent;
-import net.shoreline.client.impl.event.render.entity.RenderFireworkRocketEvent;
-import net.shoreline.client.impl.event.render.entity.RenderItemEvent;
-import net.shoreline.client.impl.event.render.entity.RenderWitherSkullEvent;
+import net.shoreline.client.impl.event.render.entity.*;
 import net.shoreline.client.impl.event.toast.RenderToastEvent;
 import net.shoreline.client.impl.event.world.BlindnessEvent;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -49,6 +46,7 @@ public class NoRenderModule extends ToggleModule
     Config<Boolean> frostbiteConfig = register(new BooleanConfig("Frostbite", "Prevents frostbite effect from rendering", false));
     Config<Boolean> skylightConfig = register(new BooleanConfig("Skylight", "Prevents skylight from rendering", true));
     Config<Boolean> witherSkullsConfig = register(new BooleanConfig("WitherSkulls", "Prevents flying wither skulls from rendering", false));
+    Config<Boolean> itemFramesConfig = register(new BooleanConfig("ItemFrames", "Prevents items on item frames from rendering", false));
     Config<Boolean> tileEntitiesConfig = register(new BooleanConfig("TileEntities", "Prevents special tile entity properties from rendering (i.e. enchantment table books or cutting table saws)", false));
     Config<Boolean> signTextConfig = register(new BooleanConfig("SignText", "Prevents the text on signs from rendering", false));
     Config<Boolean> fireEntityConfig = register(new BooleanConfig("FireEntities", "Prevents fire from rendering on entities", false));
@@ -200,6 +198,15 @@ public class NoRenderModule extends ToggleModule
     public void onRenderWitherSkull(RenderWitherSkullEvent event)
     {
         if (witherSkullsConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onRenderItemFrame(RenderItemFrameEvent event)
+    {
+        if (itemFramesConfig.getValue())
         {
             event.cancel();
         }
