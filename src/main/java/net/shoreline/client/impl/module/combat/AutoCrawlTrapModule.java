@@ -6,7 +6,9 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -107,7 +109,22 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
+        if (event.getPacket() instanceof BundleS2CPacket packet)
+        {
+            for (Packet<?> packet1 : packet.getPackets())
+            {
+                handlePackets(packet1);
+            }
+        }
+        else
+        {
+            handlePackets(event.getPacket());
+        }
+    }
+
+    private void handlePackets(Packet<?> serverPacket)
+    {
+        if (serverPacket instanceof BlockUpdateS2CPacket packet)
         {
             final BlockState blockState = packet.getState();
             final BlockPos targetPos = packet.getPos();
@@ -128,7 +145,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 }
             }
         }
-        if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        if (serverPacket instanceof EntitiesDestroyS2CPacket packet)
         {
             for (int id : packet.getEntityIds())
             {
