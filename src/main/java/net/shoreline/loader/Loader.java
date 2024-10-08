@@ -24,7 +24,7 @@ public class Loader implements
 		IMixinConfigPlugin // Sponge
 {
 	private static final Logger LOGGER = LogManager.getLogger("Shoreline");
-	public static final String VERSION = "r1.0.0";
+	public static final String VERSION = "r1.0.1";
 
 	public static final UserSession SESSION;
 
