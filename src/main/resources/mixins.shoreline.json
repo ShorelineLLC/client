@@ -1,7 +1,6 @@
 {
   "required": true,
   "package": "net.shoreline.client.mixin",
-  "minVersion": "0.8.5",
   "compatibilityLevel": "JAVA_21",
   "client": [
     "MixinKeyboard",

@@ -12,25 +12,45 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(JsonEffectShaderProgram.class)
 public class MixinJsonEffectGlShader
 {
-    @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "net/minecraft/util/Identifier.ofVanilla(Ljava/lang/String;)Lnet/minecraft/util/Identifier;", ordinal = 0))
-    private Identifier hookInitIdentifier(String arg, Operation<Identifier> original, ResourceFactory unused, String id)
+    @WrapOperation(
+            method = "<init>",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/Identifier;ofVanilla(Ljava/lang/String;)Lnet/minecraft/util/Identifier;"
+            )
+    )
+    private Identifier ofVanilla0(String path,
+                                  Operation<Identifier> original,
+                                  ResourceFactory unused,
+                                  String name)
     {
-        if (!id.contains(":"))
+        if (!name.contains(":"))
         {
-            return original.call(arg);
+            return original.call(path);
         }
-        Identifier split = Identifier.of(id);
+
+        Identifier split = Identifier.of(name);
         return Identifier.of(split.getNamespace(), "shaders/program/" + split.getPath() + ".json");
     }
 
-    @WrapOperation(method = "loadEffect", at = @At(value = "INVOKE", target = "net/minecraft/util/Identifier.ofVanilla(Ljava/lang/String;)Lnet/minecraft/util/Identifier;", ordinal = 0))
-    private static Identifier hookLoadEffect(String arg, Operation<Identifier> original, ResourceFactory unused, ShaderStage.Type shaderType, String id)
+    @WrapOperation(
+            method = "loadEffect",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/Identifier;ofVanilla(Ljava/lang/String;)Lnet/minecraft/util/Identifier;")
+    )
+    private static Identifier ofVanilla1(String path,
+                                         Operation<Identifier> original,
+                                         ResourceFactory unused,
+                                         ShaderStage.Type shaderType,
+                                         String name)
     {
-        if (!arg.contains(":"))
+        if (!name.contains(":"))
         {
-            return original.call(arg);
+            return original.call(path);
         }
-        Identifier split = Identifier.of(id);
+
+        Identifier split = Identifier.of(name);
         return Identifier.of(split.getNamespace(), "shaders/program/" + split.getPath() + shaderType.getFileExtension());
     }
 }

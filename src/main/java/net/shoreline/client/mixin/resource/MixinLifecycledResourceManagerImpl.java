@@ -4,7 +4,6 @@ import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
 import net.minecraft.resource.LifecycledResourceManagerImpl;
 import net.minecraft.resource.NamespaceResourceManager;
 import net.minecraft.resource.ResourcePack;
-import net.shoreline.loader.Loader;
 import net.shoreline.loader.resource.ResourcePackExt;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +30,7 @@ public final class MixinLifecycledResourceManagerImpl
     public void addPack(NamespaceResourceManager instance,
                         ResourcePack pack)
     {
-        if (pack.getInfo().title().getString().equals("shoreline"))
+        if (pack.getInfo().id().equals("shoreline"))
         {
             pack = new ResourcePackExt((ModNioResourcePack) pack);
         }

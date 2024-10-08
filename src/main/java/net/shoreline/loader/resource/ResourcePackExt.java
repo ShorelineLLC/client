@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.util.Set;
 
 /**
- * Allows dynamic resource loading by overwriting ModNioPack to
+ * Allows resource loading by overwriting ModNioPack to dynamically open resources
  */
 @SuppressWarnings("UnstableApiUsage")
 public final class ResourcePackExt implements ResourcePack, ModResourcePack
@@ -78,7 +78,7 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
     @Override
     public ResourcePackInfo getInfo()
     {
-        return parent.getInfo();
+        return this.parent.getInfo();
     }
 
     @Override
