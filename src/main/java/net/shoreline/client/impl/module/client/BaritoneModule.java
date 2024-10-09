@@ -9,7 +9,9 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
+import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.eventbus.event.StageEvent;
@@ -60,9 +62,9 @@ public class BaritoneModule extends ConcurrentModule
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onConfigUpdate(ConfigUpdateEvent event)
     {
-        if (event.getStage() != StageEvent.EventStage.POST)
+        if (event.getStage() != StageEvent.EventStage.POST || event.getConfig().getContainer() == this)
         {
             return;
         }
@@ -93,6 +95,49 @@ public class BaritoneModule extends ConcurrentModule
         BaritoneAPI.getSettings().colorCurrentPath.value = pathColor.getValue();
         BaritoneAPI.getSettings().colorMostRecentConsidered.value = pathColor.getValue();
         BaritoneAPI.getSettings().colorNextPath.value = nextPathColor.getValue();
+    }
+    
+    @EventListener
+    public void onChat(ChatMessageEvent event)
+    {
+        syncBaritoneSettings();
+    }
+
+    @EventListener
+    public void onLoadWorld(LoadWorldEvent event)
+    {
+        syncBaritoneSettings();
+    }
+
+    private void syncBaritoneSettings()
+    {
+        rangeConfig.setValue(BaritoneAPI.getSettings().blockReachDistance.value);
+        placeConfig.setValue(BaritoneAPI.getSettings().allowPlace.value);
+        breakConfig.setValue(BaritoneAPI.getSettings().allowBreak.value);
+        sprintConfig.setValue(BaritoneAPI.getSettings().allowSprint.value);
+        inventoryConfig.setValue(BaritoneAPI.getSettings().allowInventory.value);
+        vinesConfig.setValue(BaritoneAPI.getSettings().allowVines.value);
+        jump256Config.setValue(BaritoneAPI.getSettings().allowJumpAt256.value);
+        waterBucketFallConfig.setValue(BaritoneAPI.getSettings().allowWaterBucketFall.value);
+        parkourConfig.setValue(BaritoneAPI.getSettings().allowParkour.value);
+        parkourAscendConfig.setValue(BaritoneAPI.getSettings().allowParkourAscend.value);
+        parkourPlaceConfig.setValue(BaritoneAPI.getSettings().allowParkourPlace.value);
+        diagonalAscendConfig.setValue(BaritoneAPI.getSettings().allowDiagonalAscend.value);
+        diagonalDescendConfig.setValue(BaritoneAPI.getSettings().allowDiagonalDescend.value);
+        mineDownConfig.setValue(BaritoneAPI.getSettings().allowDownward.value);
+        legitMineConfig.setValue(BaritoneAPI.getSettings().legitMine.value);
+        logOnArrivalConfig.setValue(BaritoneAPI.getSettings().disconnectOnArrival.value);
+        freeLookConfig.setValue(BaritoneAPI.getSettings().freeLook.value);
+        antiCheatConfig.setValue(BaritoneAPI.getSettings().antiCheatCompatibility.value);
+        strictLiquidConfig.setValue(BaritoneAPI.getSettings().strictLiquidCheck.value);
+        censorCoordsConfig.setValue(BaritoneAPI.getSettings().censorCoordinates.value);
+        censorCommandsConfig.setValue(BaritoneAPI.getSettings().censorRanCommands.value);
+        chatControlConfig.setValue(BaritoneAPI.getSettings().chatControl.value);
+        debugConfig.setValue(BaritoneAPI.getSettings().chatDebug.value);
+        goalColor.setValue(BaritoneAPI.getSettings().colorGoalBox.value);
+        pathColor.setValue(BaritoneAPI.getSettings().colorCurrentPath.value);
+        pathColor.setValue(BaritoneAPI.getSettings().colorMostRecentConsidered.value);
+        nextPathColor.setValue(BaritoneAPI.getSettings().colorNextPath.value);
     }
 
     @EventListener

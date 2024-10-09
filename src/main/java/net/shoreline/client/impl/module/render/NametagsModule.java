@@ -371,9 +371,9 @@ public class NametagsModule extends ToggleModule
                 renderDurability(matrixStack, stack, n10 + 2.0f, m2 - 4.5f);
             }
             matrixStack.scale(2.0f, 2.0f, 2.0f);
+            n10 += 16;
             // int n4 = (n11 > 4) ? ((n11 - 4) * 8 / 2) : 0;
             // mc.getItemRenderer().renderInGui(matrixStack, mc.textRenderer, stack, n10, m2);
-            n10 += 16;
         }
         //
         ItemStack heldItem = player.getMainHandStack();
