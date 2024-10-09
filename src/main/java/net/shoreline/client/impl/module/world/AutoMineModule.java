@@ -4,10 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
@@ -500,24 +502,62 @@ public class AutoMineModule extends CombatModule
     {
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
         {
-            if (packet.getState().isAir())
+            handleBlockUpdatePacket(packet);
+        }
+
+        else if (event.getPacket() instanceof BundleS2CPacket packet)
+        {
+            for (Packet<?> packet1 : packet.getPackets())
             {
-                for (MiningData data : miningQueue)
+                if (packet1 instanceof BlockUpdateS2CPacket packet2)
                 {
-                    if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()))
-                    {
-                        data.setAttemptedBreak(false);
-                    }
+                    handleBlockUpdatePacket(packet2);
                 }
             }
-            else if (!instantConfig.getValue())
+        }
+    }
+
+    private void handleBlockUpdatePacket(BlockUpdateS2CPacket packet)
+    {
+        if (packet.getState().isAir())
+        {
+            for (MiningData data : miningQueue)
             {
-                for (MiningData data : miningQueue)
+                if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()))
                 {
-                    if (data.getPos().equals(packet.getPos()))
+                    data.setAttemptedBreak(false);
+                }
+            }
+            return;
+        }
+
+        if (instantConfig.getValue())
+        {
+            for (MiningData data : miningQueue)
+            {
+                if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()) && !isDataPacketMine(data)
+                        && (data.getBlockDamage() >= speedConfig.getValue() || data.isInstantRemine()))
+                {
+                    if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                     {
-                        startMining(data, false);
+                        return;
                     }
+                    stopMining(data);
+                    if (!data.hasAttemptedBreak())
+                    {
+                        data.setAttemptedBreak(true);
+                    }
+                    stopMiningTimer.reset();
+                }
+            }
+        }
+        else
+        {
+            for (MiningData data : miningQueue)
+            {
+                if (data.getPos().equals(packet.getPos()))
+                {
+                    startMining(data, false);
                 }
             }
         }
