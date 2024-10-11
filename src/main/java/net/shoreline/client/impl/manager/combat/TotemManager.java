@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 public class TotemManager implements Globals
 {
     //
-    private final ConcurrentMap<UUID, Integer> totems = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, TotemData> totems = new ConcurrentHashMap<>();
 
     /**
      *
@@ -35,16 +35,24 @@ public class TotemManager implements Globals
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (mc.world != null)
+        if (mc.world == null)
         {
-            if (event.getPacket() instanceof EntityStatusS2CPacket packet
-                    && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING)
+            return;
+        }
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet
+                && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING)
+        {
+            Entity entity = packet.getEntity(mc.world);
+            if (entity != null && entity.isAlive())
             {
-                Entity entity = packet.getEntity(mc.world);
-                if (entity != null && entity.isAlive())
+                if (totems.containsKey(entity.getUuid()))
                 {
-                    totems.put(entity.getUuid(), totems.containsKey(entity.getUuid()) ?
-                            totems.get(entity.getUuid()) + 1 : 1);
+                    totems.replace(entity.getUuid(), new TotemData(System.currentTimeMillis(),
+                            totems.get(entity.getUuid()).getPops() + 1));
+                }
+                else
+                {
+                    totems.put(entity.getUuid(), new TotemData(System.currentTimeMillis(), 1));
                 }
             }
         }
@@ -70,6 +78,33 @@ public class TotemManager implements Globals
      */
     public int getTotems(Entity entity)
     {
-        return totems.getOrDefault(entity.getUuid(), 0);
+        return totems.getOrDefault(entity.getUuid(), new TotemData(0, 0)).getPops();
+    }
+
+    public long getLastPopTime(Entity entity)
+    {
+        return totems.getOrDefault(entity.getUuid(), new TotemData(-1, 0)).getLastPopTime();
+    }
+
+    public static class TotemData
+    {
+        private final long lastPopTime;
+        private final int pops;
+
+        public TotemData(long lastPopTime, int pops)
+        {
+            this.lastPopTime = lastPopTime;
+            this.pops = pops;
+        }
+
+        public int getPops()
+        {
+            return pops;
+        }
+
+        public long getLastPopTime()
+        {
+            return lastPopTime;
+        }
     }
 }

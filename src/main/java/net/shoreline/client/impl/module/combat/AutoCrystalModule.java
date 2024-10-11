@@ -3,7 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import com.google.common.collect.Lists;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -70,7 +70,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instantly attacks crystals when they spawn", false));
     Config<Boolean> instantCalcConfig = register(new BooleanConfig("Instant-Calc", "Calculates a crystal when it spawns and attacks if it meets MINIMUM requirements, this will result in non-ideal crystal attacks", false, () -> false));
-    Config<Float> instantDamageConfig = register(new NumberConfig<>("InstantDamage", "Minimum damage to attack crystals instantly", 1.0f, 6.0f, 10.0f, () -> instantConfig.getValue() && instantCalcConfig.getValue()));
+    Config<Float> instantDamageConfig = register(new NumberConfig<>("InstantDamage", "Minimum damage to attack crystals instantly", 1.0f, 6.0f, 10.0f, () -> false));
     Config<Boolean> instantMaxConfig = register(new BooleanConfig("InstantMax", "Attacks crystals instantly if they exceed the previous max attack damage (Note: This is still not a perfect check because the next tick could have better damages)", true, () -> instantConfig.getValue()));
     Config<Boolean> raytraceConfig = register(new BooleanConfig("Raytrace", "Raytrace to crystal position", true));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when placing and attacking crystals", true));
@@ -109,9 +109,8 @@ public class AutoCrystalModule extends RotationModule
     Config<Float> placeWallRangeConfig = register(new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
     Config<Boolean> placeRangeEyeConfig = register(new BooleanConfig("PlaceRangeEye", "Calculates place ranges starting from the eye position of the player", false, () -> placeConfig.getValue()));
     Config<Boolean> placeRangeCenterConfig = register(new BooleanConfig("PlaceRangeCenter", "Calculates place ranges to the center of the block", true, () -> placeConfig.getValue()));
-    Config<Boolean> antiTotemConfig = register(new BooleanConfig("AntiTotem", "Predicts totems and places crystals to instantly double pop and kill the target", false, () -> placeConfig.getValue()));
     Config<Swap> autoSwapConfig = register(new EnumConfig<>("Swap", "Swaps to an end crystal before placing if the player is not holding one", Swap.OFF, Swap.values(), () -> placeConfig.getValue()));
-    Config<Float> alternateSpeedConfig = register(new NumberConfig<>("AlternateSpeed", "Speed for alternative swapping crystals", 1.0f, 18.0f, 20.0f, () -> placeConfig.getValue() && autoSwapConfig.getValue() == Swap.SILENT_ALT));
+    // Config<Float> alternateSpeedConfig = register(new NumberConfig<>("AlternateSpeed", "Speed for alternative swapping crystals", 1.0f, 18.0f, 20.0f, () -> placeConfig.getValue() && autoSwapConfig.getValue() == Swap.SILENT_ALT));
     Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
     Config<Boolean> breakValidConfig = register(new BooleanConfig("Strict", "Only places crystals that can be attacked", false, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
@@ -121,6 +120,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> armorBreakerConfig = register(new BooleanConfig("ArmorBreaker", "Attempts to break enemy armor with crystals", true));
     Config<Float> armorScaleConfig = register(new NumberConfig<>("ArmorScale", "Armor damage scale before attempting to break enemy armor with crystals", 1.0f, 5.0f, 20.0f, NumberDisplay.PERCENT, () -> armorBreakerConfig.getValue()));
     Config<Float> lethalMultiplier = register(new NumberConfig<>("LethalMultiplier", "If we can kill an enemy with this many crystals, disregard damage values", 0.0f, 1.5f, 4.0f));
+    Config<Boolean> antiTotemConfig = register(new BooleanConfig("Lethal-Totem", "Predicts totems and places crystals to instantly double pop and kill the target", false, () -> placeConfig.getValue()));
     Config<Boolean> lethalDamageConfig = register(new BooleanConfig("Lethal-DamageTick", "Places lethal crystals only on ticks where they damage entities", false));
     Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when attacking and placing crystals", true));
     Config<Boolean> safetyOverride = register(new BooleanConfig("SafetyOverride", "Overrides the safety checks if the crystal will kill an enemy", false));
@@ -1198,13 +1198,34 @@ public class AutoCrystalModule extends RotationModule
         return true;
     }
 
+    private boolean checkAntiTotem(DamageData<?> crystal, LivingEntity entity)
+    {
+        if (entity instanceof PlayerEntity p)
+        {
+            float phealth = EntityUtil.getHealth(p);
+            if (phealth <= 2.0f && phealth - crystal.getDamage() < 0.5f)
+            {
+                long time = Managers.TOTEM.getLastPopTime(p);
+                if (time != -1)
+                {
+                    return System.currentTimeMillis() - time <= 500;
+                }
+            }
+        }
+        return false;
+    }
+
     private boolean isCrystalLethalTo(DamageData<?> crystal, LivingEntity entity)
     {
-        if (lethalDamageConfig.getValue())
+        if (lethalDamageConfig.getValue() && lastAttackTimer.passed(500))
         {
-            return lastAttackTimer.passed(500);
+            return true;
         }
 
+        if (antiTotemConfig.getValue() && checkAntiTotem(crystal, entity))
+        {
+            return true;
+        }
         float health = entity.getHealth() + entity.getAbsorptionAmount();
         if (crystal.getDamage() * (1.0f + lethalMultiplier.getValue()) >= health + 0.5f)
         {
@@ -1218,6 +1239,19 @@ public class AutoCrystalModule extends RotationModule
                 int n1 = armorStack.getMaxDamage();
                 float durability = ((n1 - n) / (float) n1) * 100.0f;
                 if (durability < armorScaleConfig.getValue())
+                {
+                    return true;
+                }
+            }
+        }
+
+        // Antiregear
+        if (shulkersConfig.getValue() && entity instanceof PlayerEntity)
+        {
+            for (BlockPos pos : getSphere(3.0f, entity.getPos()))
+            {
+                BlockState state = mc.world.getBlockState(pos);
+                if (state.getBlock() instanceof ShulkerBoxBlock)
                 {
                     return true;
                 }
@@ -1358,8 +1392,13 @@ public class AutoCrystalModule extends RotationModule
 
     private List<BlockPos> getSphere(Vec3d origin)
     {
-        List<BlockPos> sphere = new ArrayList<>();
         double rad = Math.ceil(placeRangeConfig.getValue());
+        return getSphere(rad, origin);
+    }
+
+    private List<BlockPos> getSphere(double rad, Vec3d origin)
+    {
+        List<BlockPos> sphere = new ArrayList<>();
         for (double x = -rad; x <= rad; ++x)
         {
             for (double y = -rad; y <= rad; ++y)

@@ -100,7 +100,6 @@ public class ShadersModule extends ToggleModule
     Config<Color> colorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.4f)));
     Config<Color> gradientConfig = register(new ColorConfig("GradientColor", "The gradient color of the shader", new Color(1.0f, 1.0f, 1.0f), true, false, () -> modeConfig.getValue() == ShaderMode.GRADIENT));
 
-
     private float shaderTime;
 
     private int textureId;

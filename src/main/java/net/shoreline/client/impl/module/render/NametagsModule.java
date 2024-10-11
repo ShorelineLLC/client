@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
@@ -56,7 +55,6 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 

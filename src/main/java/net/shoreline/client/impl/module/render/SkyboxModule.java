@@ -38,59 +38,6 @@ public class SkyboxModule extends ToggleModule
         super("Skybox", "Changes the rendering of the world skybox", ModuleCategory.RENDER);
     }
 
-//    @Override
-//    public void onEnable()
-//    {
-//        if (mc.player == null || mc.worldRenderer == null)
-//        {
-//            return;
-//        }
-//        if (ambientConfig.getValue())
-//        {
-//            ((AccessorLightmapTextureManager) mc.gameRenderer.getLightmapTextureManager()).setUpdateLightmap(true);
-//            RenderUtil.reloadRenders(true);
-//        }
-//    }
-
-//    @Override
-//    public void onDisable()
-//    {
-//        if (mc.player == null || mc.worldRenderer == null)
-//        {
-//            return;
-//        }
-//        if (ambientConfig.getValue())
-//        {
-//            RenderUtil.reloadRenders(true);
-//        }
-//    }
-
-//    @EventListener
-//    public void onConfigUpdate(ConfigUpdateEvent event)
-//    {
-//        if (event.getStage() != StageEvent.EventStage.POST || mc.player == null
-//                || mc.worldRenderer == null)
-//        {
-//            return;
-//        }
-//        if (event.getConfig() == ambientConfig)
-//        {
-//            if (ambientConfig.getValue())
-//            {
-//                ((AccessorLightmapTextureManager) mc.gameRenderer.getLightmapTextureManager()).setUpdateLightmap(true);
-//                RenderUtil.reloadRenders(true);
-//            }
-//            else
-//            {
-//                RenderUtil.reloadRenders(true);
-//            }
-//        }
-//        else if (event.getConfig() == ambientColorConfig)
-//        {
-//            RenderUtil.reloadRenders(true);
-//        }
-//    }
-
     @EventListener
     public void onTick(TickEvent event)
     {
@@ -149,14 +96,4 @@ public class SkyboxModule extends ToggleModule
             event.setEnd(fogEndConfig.getValue());
         }
     }
-
-//    @EventListener
-//    public void onAmbientColor(AmbientColorEvent event)
-//    {
-//        if (ambientConfig.getValue())
-//        {
-//            event.cancel();
-//            event.setColor(ambientColorConfig.getValue());
-//        }
-//    }
 }
