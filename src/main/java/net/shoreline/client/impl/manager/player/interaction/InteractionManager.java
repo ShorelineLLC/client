@@ -38,6 +38,17 @@ public final class InteractionManager implements Globals
                               final boolean clientSwing,
                               final RotationCallback rotationCallback)
     {
+        return placeBlock(pos, slot, grim, strictDirection, clientSwing, rotationCallback, false);
+    }
+
+    public boolean placeBlock(final BlockPos pos,
+                              final int slot,
+                              final boolean grim,
+                              final boolean strictDirection,
+                              final boolean clientSwing,
+                              final RotationCallback rotationCallback,
+                              final boolean airPlace)
+    {
         // TODO: should this be a thing
         if (!mc.world.getBlockState(pos).isReplaceable())
         {
@@ -45,7 +56,7 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, grim, strictDirection);
-        if (AirInteractModule.getInstance().isEnabled() && direction == null)
+        if (airPlace || AirInteractModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
             if (grim)
@@ -77,6 +88,18 @@ public final class InteractionManager implements Globals
                               final boolean packet,
                               final RotationCallback rotationCallback)
     {
+        return placeBlock(pos, slot, grim, strictDirection, clientSwing, packet, false, rotationCallback);
+    }
+
+    public boolean placeBlock(final BlockPos pos,
+                              final int slot,
+                              final boolean grim,
+                              final boolean strictDirection,
+                              final boolean clientSwing,
+                              final boolean packet,
+                              final boolean airPlace,
+                              final RotationCallback rotationCallback)
+    {
         // TODO: should this be a thing
         if (!mc.world.getBlockState(pos).isReplaceable())
         {
@@ -84,7 +107,7 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, grim, strictDirection);
-        if (AirInteractModule.getInstance().isEnabled() && direction == null)
+        if (airPlace || AirInteractModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
             if (grim)

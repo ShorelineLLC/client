@@ -10,7 +10,6 @@ import net.shoreline.client.api.social.SocialFile;
 import net.shoreline.client.api.social.SocialRelation;
 import net.shoreline.client.api.waypoint.WaypointFile;
 import net.shoreline.client.impl.gui.click.ClickGuiFile;
-import net.shoreline.client.impl.module.combat.AutoRegearModule;
 import net.shoreline.client.impl.module.misc.InvCleanerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -37,7 +36,8 @@ public class ClientConfiguration implements Globals
     // configurations for the client.
     private Path clientDir;
     //
-    private ModuleConfigFile file;
+    private ModuleConfigFile modulesFile;
+    private MacroFile macrosFile;
     private final ClickGuiFile clickGuiFile;
     private final FontFile fontFile;
 
@@ -84,16 +84,18 @@ public class ClientConfiguration implements Globals
                 }
             }
             Path configDir = clientDir.resolve("Configs");
+            Path keybindsDir = clientDir.resolve("Macros");
             if (!Files.exists(configDir))
             {
                 try
                 {
                     Files.createDirectory(configDir);
+                    Files.createDirectory(keybindsDir);
                 }
                 // write error
                 catch (IOException e)
                 {
-                    Shoreline.error("Could not create config dir");
+                    Shoreline.error("Could not create config/macro dir");
                     e.printStackTrace();
                 }
             }
@@ -160,20 +162,40 @@ public class ClientConfiguration implements Globals
 
     public void saveModuleConfiguration(String configFile)
     {
-        file = new ModuleConfigFile(clientDir.resolve("Configs"), configFile);
-        file.save();
+        modulesFile = new ModuleConfigFile(clientDir.resolve("Configs"), configFile);
+        modulesFile.save();
     }
 
     public boolean loadModuleConfiguration(String configFile)
     {
         Path configDir = clientDir.resolve("Configs");
-        file = new ModuleConfigFile(configDir, configFile);
+        modulesFile = new ModuleConfigFile(configDir, configFile);
         if (!Files.exists(configDir.resolve(configFile + ".json")))
         {
             ChatUtil.error("Could not find config file: " + configFile);
             return false;
         }
-        file.load();
+        modulesFile.load();
+        return true;
+    }
+
+
+    public void saveKeybindConfiguration(String configFile)
+    {
+        macrosFile = new MacroFile(clientDir.resolve("Macros"), configFile);
+        macrosFile.save();
+    }
+
+    public boolean loadKeybindConfiguration(String configFile)
+    {
+        Path macrosDir = clientDir.resolve("Macros");
+        macrosFile = new MacroFile(macrosDir, configFile);
+        if (!Files.exists(macrosDir.resolve(configFile + ".json")))
+        {
+            ChatUtil.error("Could not find config file: " + configFile);
+            return false;
+        }
+        macrosFile.load();
         return true;
     }
 

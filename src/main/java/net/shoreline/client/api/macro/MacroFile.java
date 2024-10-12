@@ -24,6 +24,11 @@ public class MacroFile extends ConfigFile
         super(dir, "macros");
     }
 
+    public MacroFile(Path dir, String path)
+    {
+        super(dir, path);
+    }
+
     @Override
     public void save()
     {

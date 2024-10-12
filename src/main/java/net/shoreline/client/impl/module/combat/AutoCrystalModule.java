@@ -131,7 +131,6 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the current placement", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
     Config<Boolean> breakDebugConfig = register(new BooleanConfig("Break-Debug", "Debugs break ms in data", false, () -> renderConfig.getValue()));
-    //
     Config<Boolean> disableDeathConfig = register(new BooleanConfig("DisableOnDeath", "Disables during disconnect/death", false));
     //
     private DamageData<EndCrystalEntity> attackCrystal;
@@ -235,6 +234,7 @@ public class AutoCrystalModule extends RotationModule
                 stuckCrystals.remove(d);
             }
         }
+
         if (mc.player.isUsingItem() && mc.player.getActiveHand() == Hand.MAIN_HAND
                 || mc.options.attackKey.isPressed() || PlayerUtil.isHotbarKeysPressed())
         {

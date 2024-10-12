@@ -115,6 +115,7 @@ public class FlightModule extends ToggleModule
         {
             disableVanillaFly();
         }
+
         boolean stopVerticalMovement = false;
         if (floating)
         {
@@ -140,6 +141,7 @@ public class FlightModule extends ToggleModule
                 floating = false;
             }
         }
+
         if (modeConfig.getValue() == FlightMode.NORMAL)
         {
             Managers.MOVEMENT.setMotionY(0.0);
@@ -187,17 +189,16 @@ public class FlightModule extends ToggleModule
                 }
                 floating = floatingCheck(packet);
                 lastY = packetY;
+                return;
             }
-            else
+
+            if (modifyY)
             {
-                if (modifyY)
-                {
-                    PlayerMoveC2SPacket packet1 = packet.changesLook() ? new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround()) :
-                            new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), packet.isOnGround());
-                    event.cancel();
-                    Managers.NETWORK.sendQuietPacket(packet1);
-                    modifyY = false;
-                }
+                PlayerMoveC2SPacket packet1 = packet.changesLook() ? new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround()) :
+                        new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), packet.isOnGround());
+                event.cancel();
+                Managers.NETWORK.sendQuietPacket(packet1);
+                modifyY = false;
             }
         }
     }

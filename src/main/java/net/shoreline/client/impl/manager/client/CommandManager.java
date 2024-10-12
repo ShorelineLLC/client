@@ -79,6 +79,7 @@ public class CommandManager implements Globals
                 new HistoryCommand(),
                 new LeaveCommand(),
                 new LoadCommand(),
+                new MacroCommand(),
                 new ModulesCommand(),
                 new NbtCommand(),
                 new NotifyCommand(),

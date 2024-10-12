@@ -24,7 +24,6 @@ public class SelfWebModule extends BlockPlacerModule
         final BlockPos pos = mc.player.getBlockPos();
         if (mc.world.getBlockState(pos).isAir())
         {
-
             int slot = getBlockItemSlot(Blocks.COBWEB);
             if (slot == -1)
             {
