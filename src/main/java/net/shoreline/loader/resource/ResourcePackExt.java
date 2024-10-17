@@ -3,16 +3,15 @@ package net.shoreline.loader.resource;
 import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.resource.InputSupplier;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourcePackInfo;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.resource.*;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -21,6 +20,7 @@ import java.util.Set;
 @SuppressWarnings("UnstableApiUsage")
 public final class ResourcePackExt implements ResourcePack, ModResourcePack
 {
+    public static final Set<String> REGISTERED_SOUND_FILES = new HashSet<>();
     private final ModNioResourcePack parent;
 
     public ResourcePackExt(ModNioResourcePack parent)
@@ -59,8 +59,25 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
                               String prefix,
                               ResultConsumer consumer)
     {
+        if (prefix.equals("sounds"))
+        {
+            for (String soundFile : REGISTERED_SOUND_FILES)
+            {
+                String formattedName = String.format("assets/shoreline/sounds/%s", soundFile);
+
+                InputStream is;
+                if ((is = (InputStream) getResourceInternal(formattedName)) != null)
+                {
+                    Identifier id = Identifier.of("shoreline", String.format("sounds/%s", soundFile));
+                    consumer.accept(id, () -> is);
+                }
+            }
+        }
+
         this.parent.findResources(type, namespace, prefix, consumer);
     }
+
+
 
     @Override
     public Set<String> getNamespaces(ResourceType type)

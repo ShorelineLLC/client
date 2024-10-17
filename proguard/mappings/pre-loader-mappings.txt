@@ -31,3 +31,6 @@ net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
 
 net.shoreline.loader.session.UserSession -> net.shoreline.loader.c:
     java.lang.Object getUserInfo(java.lang.Object) -> a
+
+net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
+    java.util.Set REGISTERED_SOUND_FILES -> d

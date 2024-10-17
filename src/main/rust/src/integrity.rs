@@ -14,24 +14,27 @@ pub unsafe extern "system" fn perform_version_check<'a>(mut env: JNIEnv,
                                                         _class: JClass,
                                                         current_version: JObject) -> JObject<'a>
 {
-    let str_message = JString::from(current_version);
-    let java_str = env.get_string(&str_message).unwrap();
-    let loader_current_version = java_str.to_str().unwrap();
-
-    match internal_version_check(loader_current_version, &mut env)
+    if obfuscation::IS_OBFUSCATED_ENVIRONMENT
     {
-        Ok(()) => {},
-        Err(e) => {
-            let msg = format! {
-                "{}{}",
-                obfstr!("Error during version check/autoupdate:\n\n"),
-                e
-            };
+        let str_message = JString::from(current_version);
+        let java_str = env.get_string(&str_message).unwrap();
+        let loader_current_version = java_str.to_str().unwrap();
 
-            notifs::error(&mut env, &e);
-            notifs::display_error_msg(&msg);
+        match internal_version_check(loader_current_version, &mut env)
+        {
+            Ok(()) => {},
+            Err(e) => {
+                let msg = format! {
+                    "{}{}",
+                    obfstr!("Error during version check/autoupdate:\n\n"),
+                    e
+                };
 
-            exit(-1)
+                notifs::error(&mut env, &e);
+                notifs::display_error_msg(&msg);
+
+                exit(-1)
+            }
         }
     }
 

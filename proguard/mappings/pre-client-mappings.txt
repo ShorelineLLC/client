@@ -33,6 +33,9 @@ net.shoreline.eventbus.EventBus$InvokerNode -> net.shoreline.client.n:
     java.lang.Object subscriber -> c
     java.lang.Integer priority -> d
 
+net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
+    java.util.Set REGISTERED_SOUND_FILES -> d
+
 # Manually mapped, important classes for anti-crack native obfuscation
 
 net.shoreline.client.Shoreline -> net.shoreline.client.b:

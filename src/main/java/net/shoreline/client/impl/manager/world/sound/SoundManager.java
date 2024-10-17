@@ -5,6 +5,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.util.Globals;
+import net.shoreline.loader.resource.ResourcePackExt;
 
 /**
  * @author linus
@@ -12,7 +13,7 @@ import net.shoreline.client.util.Globals;
  */
 public class SoundManager implements Globals
 {
-    public static final SoundEvent GUI_CLICK = registerSound("gui_click");
+    public static final SoundEvent GUI_CLICK = registerSound("gui_click", ".ogg");
 
     /**
      * @param sound
@@ -30,9 +31,12 @@ public class SoundManager implements Globals
         }
     }
 
-    private static SoundEvent registerSound(String name)
+    private static SoundEvent registerSound(String name,
+                                            String extension)
     {
-        Identifier id = Identifier.of(name);
+        ResourcePackExt.REGISTERED_SOUND_FILES.add(name + extension);
+
+        Identifier id = Identifier.of("shoreline", name);
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
     }
 }

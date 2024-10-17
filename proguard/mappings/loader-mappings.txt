@@ -30,26 +30,28 @@ net.shoreline.loader.mixin.MixinServiceExt -> net.shoreline.loader.a:
     java.lang.Object getInternalClassBytes(java.lang.Object) -> a
     java.lang.Object getInternalInputStream(java.lang.Object) -> b
 net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
-    net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack parent -> d
+    java.util.Set REGISTERED_SOUND_FILES -> d
+    net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack parent -> e
     void <init>(net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack) -> <init>
-    boolean method_45178() -> method_45178
     net.minecraft.class_7367 method_14410(java.lang.String[]) -> method_14410
     net.minecraft.class_7367 method_14405(net.minecraft.class_3264,net.minecraft.class_2960) -> method_14405
     java.lang.Object getResourceInternal(java.lang.Object) -> a
     void method_14408(net.minecraft.class_3264,java.lang.String,java.lang.String,net.minecraft.class_3262$class_7664) -> method_14408
     java.util.Set method_14406(net.minecraft.class_3264) -> method_14406
     java.lang.Object method_14407(net.minecraft.class_3270) -> method_14407
-    java.lang.String method_14409() -> method_14409
+    net.minecraft.class_9224 method_56926() -> method_56926
     net.fabricmc.loader.api.metadata.ModMetadata getFabricModMetadata() -> getFabricModMetadata
     net.fabricmc.fabric.api.resource.ModResourcePack createOverlay(java.lang.String) -> createOverlay
     void close() -> close
+    java.io.InputStream lambda$findResources$1(java.io.InputStream) -> lambda$findResources$1
     java.io.InputStream lambda$open$0(java.io.InputStream) -> lambda$open$0
+    void <clinit>() -> <clinit>
 net.shoreline.loader.session.UserSession -> net.shoreline.loader.c:
-    java.lang.String hardwareId -> e
-    java.lang.String username -> f
-    java.lang.String uid -> g
-    java.lang.String usertype -> h
-    java.util.List runningMods -> i
+    java.lang.String hardwareId -> f
+    java.lang.String username -> g
+    java.lang.String uid -> h
+    java.lang.String usertype -> i
+    java.util.List runningMods -> j
     void <init>(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.util.List) -> <init>
     java.lang.String getHardwareID() -> c
     java.lang.String getUsername() -> d
