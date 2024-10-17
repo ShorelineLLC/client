@@ -202,7 +202,11 @@ impl IRC
 
     pub fn send_message(&self, message: String)
     {
-        self.outgoing_tx.unbounded_send(Message::text(message)).unwrap();
+        match self.outgoing_tx.unbounded_send(Message::text(message))
+        {
+            Ok(()) => {},
+            Err(_) => {}
+        }
     }
 
     pub fn get_new_messages(&mut self) -> Vec<String>

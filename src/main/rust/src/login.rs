@@ -180,6 +180,13 @@ fn login_internal(auth: Auth,
                         }.to_string())
                     }
 
+                    406 => {
+                        Err(obfstr! {
+                            "Your account has been permanently banned. \
+                            If you believe this is a mistake, please contact support."
+                        }.to_string())
+                    }
+
                     _ => {
                         let formatted = format! {
                             "{}{}{}",

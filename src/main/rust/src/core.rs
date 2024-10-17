@@ -129,8 +129,8 @@ fn request_token_internal(loader_hash: String) -> Result<Token, String>
 
                     406 => {
                         Err(obfstr! {
-                            "Shoreline has detected that your loader has been tampered with. \
-                            Your account has been banned."
+                            "Your account has been permanently banned for violating the Terms of Service. \
+                            If you believe this is a mistake, please contact support."
                         }.to_string())
                     }
 
