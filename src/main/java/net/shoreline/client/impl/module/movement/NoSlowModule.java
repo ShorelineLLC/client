@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.*;
@@ -28,7 +29,9 @@ import net.shoreline.client.impl.event.entity.VelocityMultiplierEvent;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.mixin.accessor.AccessorEntityTrackerUpdateS2CPacket;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
+import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 import org.lwjgl.glfw.GLFW;
@@ -312,10 +315,15 @@ public class NoSlowModule extends ToggleModule
         {
             return;
         }
-        if (event.getPacket() instanceof EntityTrackerUpdateS2CPacket && mc.player.isUsingItem()
-                && mc.player.getItemUseTime() < mc.player.getActiveItem().getMaxUseTime(mc.player) && grimNewConfig.getValue())
+        if (event.getPacket() instanceof EntityTrackerUpdateS2CPacket packet && packet.id() == mc.player.getId() && grimNewConfig.getValue())
         {
-            event.cancel();
+            boolean usingItem = mc.player.isUsingItem() && mc.player.getItemUseTime() < mc.player.getActiveItem().getMaxUseTime(mc.player);
+            if (usingItem)
+            {
+                List<DataTracker.SerializedEntry<?>> trackedValues = packet.trackedValues();
+                trackedValues.removeIf(d -> d.id() == 8);
+                ((AccessorEntityTrackerUpdateS2CPacket) event.getPacket()).hookSetTrackedValues(trackedValues);
+            }
         }
     }
 

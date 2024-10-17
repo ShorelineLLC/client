@@ -22,6 +22,7 @@
     "accessor.AccessorClientWorld",
     "accessor.AccessorCustomPayloadC2SPacket",
     "accessor.AccessorEntity",
+    "accessor.AccessorEntityTrackerUpdateS2CPacket",
     "accessor.AccessorEntityVelocityUpdateS2CPacket",
     "accessor.AccessorExplosionS2CPacket",
     "accessor.AccessorFireworkRocketEntity",

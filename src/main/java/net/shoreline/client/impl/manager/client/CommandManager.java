@@ -38,6 +38,7 @@ public class CommandManager implements Globals
     // Command prefix, used to identify a command in the chat
     private String prefix = ".";
     private int prefixKey = GLFW.GLFW_KEY_PERIOD;
+
     private final CommandDispatcher<CommandSource> dispatcher = new CommandDispatcher<>();
     private final CommandSource source = new ClientCommandSource(null, mc);
 
