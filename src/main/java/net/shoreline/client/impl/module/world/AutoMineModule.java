@@ -365,8 +365,11 @@ public class AutoMineModule extends CombatModule
                 {
                     return;
                 }
-                Managers.INVENTORY.setSlot(data.getSlot());
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+
+                if (data.getSlot() != Managers.INVENTORY.getServerSlot())
+                {
+                    Managers.INVENTORY.setSlot(data.getSlot());
+                }
 
                 if (!data.hasAttemptedBreak())
                 {
@@ -923,7 +926,7 @@ public class AutoMineModule extends CombatModule
             }
         }
         int slot = data.getSlot();
-        boolean canSwap = slot != -1;
+        boolean canSwap = slot != -1 && slot != Managers.INVENTORY.getServerSlot();
         if (canSwap)
         {
             swapTo(slot);

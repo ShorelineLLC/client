@@ -738,7 +738,7 @@ public class AutoCrystalModule extends RotationModule
             }
             if (slot != -1)
             {
-                boolean canSwap = antiWeaknessConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500);
+                boolean canSwap = slot != Managers.INVENTORY.getServerSlot() && (antiWeaknessConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500));
                 if (antiWeaknessConfig.getValue() != Swap.OFF && canSwap)
                 {
                     if (antiWeaknessConfig.getValue() == Swap.SILENT_ALT)
@@ -839,7 +839,7 @@ public class AutoCrystalModule extends RotationModule
             int crystalSlot = getCrystalSlot();
             if (crystalSlot != -1)
             {
-                boolean canSwap = autoSwapConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500);
+                boolean canSwap = crystalSlot != Managers.INVENTORY.getServerSlot() && (autoSwapConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500));
                 if (canSwap)
                 {
                     if (autoSwapConfig.getValue() == Swap.SILENT_ALT)
