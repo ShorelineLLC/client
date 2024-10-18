@@ -4,8 +4,8 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.shoreline.client.impl.event.network.PacketSneakingEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY;
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY;

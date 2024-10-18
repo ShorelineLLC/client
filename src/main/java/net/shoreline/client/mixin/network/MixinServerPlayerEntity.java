@@ -2,7 +2,6 @@ package net.shoreline.client.mixin.network;
 
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;

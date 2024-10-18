@@ -9,9 +9,9 @@ import net.shoreline.client.impl.module.render.HoleESPModule;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.client.util.world.BlockUtil;
-import net.shoreline.eventbus.event.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;

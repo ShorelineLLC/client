@@ -8,10 +8,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.gui.beacon.BeaconSelectorScreen;
-import net.shoreline.client.mixin.accessor.AccessorUpdateBeaconC2SPacket;
 import net.shoreline.eventbus.annotation.EventListener;
-
-import java.util.Optional;
 
 /**
  * @author linus

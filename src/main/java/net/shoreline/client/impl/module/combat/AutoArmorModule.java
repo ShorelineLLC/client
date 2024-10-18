@@ -1,10 +1,8 @@
 package net.shoreline.client.impl.module.combat;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
@@ -20,7 +18,6 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.player.EnchantmentUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.PriorityQueue;

@@ -2,7 +2,8 @@ package net.shoreline.client.impl.font;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.font.*;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.CharacterVisitor;

@@ -1,8 +1,8 @@
 package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.render.RenderTickCounter;
-import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

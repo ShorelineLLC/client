@@ -7,7 +7,6 @@ import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.OnlineUserArgumentType;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.client.CPacketDirectMessage;
-import net.shoreline.client.impl.irc.packet.client.CPacketDirectServerMsg;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.chat.ChatUtil;
 

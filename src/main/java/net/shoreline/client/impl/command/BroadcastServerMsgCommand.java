@@ -6,7 +6,6 @@ import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.client.CPacketBroadcastServerMsg;
-import net.shoreline.client.impl.irc.packet.client.CPacketCloak;
 import net.shoreline.client.util.chat.ChatUtil;
 
 public final class BroadcastServerMsgCommand extends Command

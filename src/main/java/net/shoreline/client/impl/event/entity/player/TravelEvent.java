@@ -2,7 +2,6 @@ package net.shoreline.client.impl.event.entity.player;
 
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.eventbus.annotation.Cancelable;
-import net.shoreline.eventbus.event.Event;
 import net.shoreline.eventbus.event.StageEvent;
 
 @Cancelable

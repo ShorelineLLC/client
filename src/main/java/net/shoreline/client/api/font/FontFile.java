@@ -1,6 +1,5 @@
 package net.shoreline.client.api.font;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.init.Fonts;

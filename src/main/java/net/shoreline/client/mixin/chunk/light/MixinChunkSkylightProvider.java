@@ -1,8 +1,8 @@
 package net.shoreline.client.mixin.chunk.light;
 
 import net.minecraft.world.chunk.light.ChunkSkyLightProvider;
-import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.chunk.light.RenderSkylightEvent;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

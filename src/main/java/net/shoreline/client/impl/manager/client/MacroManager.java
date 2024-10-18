@@ -5,8 +5,8 @@ import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.impl.event.MouseClickEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Collection;

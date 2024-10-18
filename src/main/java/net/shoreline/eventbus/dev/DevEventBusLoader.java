@@ -1,6 +1,5 @@
 package net.shoreline.eventbus.dev;
 
-import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.event.Event;
 import net.shoreline.loader.Loader;

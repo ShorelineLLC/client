@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.movement;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ElytraItem;

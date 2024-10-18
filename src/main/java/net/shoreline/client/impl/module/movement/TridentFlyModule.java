@@ -13,8 +13,8 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.item.TridentPullbackEvent;
 import net.shoreline.client.impl.event.item.TridentWaterEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author Shoreline

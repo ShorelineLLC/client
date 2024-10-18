@@ -7,9 +7,6 @@ import net.shoreline.client.api.command.Command;
 import net.shoreline.client.util.DesktopUtil;
 import net.shoreline.client.util.chat.ChatUtil;
 
-import java.awt.*;
-import java.io.IOException;
-
 /**
  * @author linus
  * @since 1.0

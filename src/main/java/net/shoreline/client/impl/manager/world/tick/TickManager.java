@@ -7,8 +7,8 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.TickCounterEvent;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.collection.EvictingQueue;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
 import java.util.Deque;

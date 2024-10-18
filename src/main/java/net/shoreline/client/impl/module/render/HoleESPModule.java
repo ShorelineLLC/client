@@ -16,10 +16,11 @@ import net.shoreline.client.impl.manager.combat.hole.HoleType;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
-import org.joml.Matrix4f;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author linus

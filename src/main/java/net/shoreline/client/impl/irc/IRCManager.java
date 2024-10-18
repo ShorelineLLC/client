@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.irc;
 
-import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.irc.packet.IRCPacket;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.packet.client.CPacketPing;

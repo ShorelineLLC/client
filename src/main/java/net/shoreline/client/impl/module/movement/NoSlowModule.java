@@ -32,7 +32,6 @@ import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorEntityTrackerUpdateS2CPacket;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
-import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 import org.lwjgl.glfw.GLFW;

@@ -2,11 +2,11 @@ package net.shoreline.client.mixin.render;
 
 import net.minecraft.block.enums.CameraSubmersionType;
 import net.minecraft.client.render.Camera;
-import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.camera.CameraPositionEvent;
 import net.shoreline.client.impl.event.camera.CameraRotationEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.render.CameraClipEvent;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

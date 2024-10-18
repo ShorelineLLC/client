@@ -4,8 +4,8 @@ import net.shoreline.client.impl.event.FinishLoadingEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 
 public class EventManager
 {

@@ -1,12 +1,8 @@
 package net.shoreline.client.api.waypoint;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigContainer;
-import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;

@@ -5,7 +5,6 @@ import net.shoreline.client.api.file.ClientConfiguration;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.init.Managers;
 import net.shoreline.loader.Loader;
-import org.objectweb.asm.ClassReader;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;

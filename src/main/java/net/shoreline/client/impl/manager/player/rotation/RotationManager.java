@@ -1,8 +1,6 @@
 package net.shoreline.client.impl.manager.player.rotation;
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.render.Interpolation;
@@ -18,9 +16,9 @@ import net.shoreline.client.impl.imixin.IClientPlayerEntity;
 import net.shoreline.client.impl.module.client.RotationsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
-import net.shoreline.eventbus.event.StageEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,8 @@
 package net.shoreline.client.mixin.entity.passive;
 
 import net.minecraft.entity.passive.PigEntity;
-import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.entity.passive.EntitySteerEvent;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

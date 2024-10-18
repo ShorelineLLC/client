@@ -2,7 +2,6 @@ package net.shoreline.client.impl.module.client;
 
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;

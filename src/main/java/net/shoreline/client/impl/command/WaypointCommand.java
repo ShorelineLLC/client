@@ -6,8 +6,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.waypoint.UserWaypoint;
-import net.shoreline.client.api.waypoint.Waypoint;
-import net.shoreline.client.impl.module.render.WaypointsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.world.DimensionUtil;

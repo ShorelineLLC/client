@@ -3,8 +3,6 @@ package net.shoreline.client.impl.irc.user;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.module.client.CapesModule;
 
-import java.text.Format;
-
 public final class OnlineUser
 {
     private final String name;

@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.misc;
 
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.item.ItemStack;
@@ -12,7 +11,6 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**

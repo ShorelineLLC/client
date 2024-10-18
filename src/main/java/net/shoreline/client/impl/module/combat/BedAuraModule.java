@@ -1,22 +1,12 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BedBlock;
-import net.minecraft.block.entity.BedBlockEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.block.entity.BedBlockEntityRenderer;
-import net.minecraft.datafixer.fix.BedBlockEntityFix;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -25,13 +15,11 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * @author bon

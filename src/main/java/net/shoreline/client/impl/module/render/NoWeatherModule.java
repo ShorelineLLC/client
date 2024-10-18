@@ -11,8 +11,8 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.biome.BiomeEffectsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.util.string.EnumFormatter;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus

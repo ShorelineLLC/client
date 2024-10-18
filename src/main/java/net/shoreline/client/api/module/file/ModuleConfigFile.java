@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.shoreline.client.BuildConfig;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.file.ConfigFile;
 import net.shoreline.client.api.module.Module;

@@ -11,8 +11,8 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.world.BlockCollisionEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.BlockUtil;
-import net.shoreline.eventbus.event.StageEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus

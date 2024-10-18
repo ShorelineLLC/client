@@ -2,7 +2,6 @@ package net.shoreline.client.impl.module.world;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
@@ -10,7 +9,6 @@ import net.minecraft.item.ToolItem;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
-import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.EnchantmentUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 

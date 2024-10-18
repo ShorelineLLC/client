@@ -3,10 +3,12 @@ package net.shoreline.loader.resource;
 import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.resource.*;
+import net.minecraft.resource.InputSupplier;
+import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourcePackInfo;
+import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;

@@ -2,7 +2,6 @@ package net.shoreline.client.impl.irc.packet.server;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.loader.Loader;

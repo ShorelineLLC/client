@@ -4,8 +4,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.init.Managers;
 
 public class SelfWebModule extends BlockPlacerModule

@@ -1,7 +1,6 @@
 package net.shoreline.client.util.player;
 
 import net.minecraft.client.input.Input;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.util.math.MathHelper;

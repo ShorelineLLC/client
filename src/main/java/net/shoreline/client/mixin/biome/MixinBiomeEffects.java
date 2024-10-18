@@ -2,9 +2,9 @@ package net.shoreline.client.mixin.biome;
 
 import net.minecraft.world.biome.BiomeEffects;
 import net.minecraft.world.biome.BiomeParticleConfig;
-import net.shoreline.eventbus.EventBus;
 import net.shoreline.client.impl.event.biome.BiomeEffectsEvent;
 import net.shoreline.client.impl.event.world.SkyboxEvent;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

@@ -2,7 +2,6 @@ package net.shoreline.client.impl.event.world;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
 import net.shoreline.eventbus.event.Event;
 
 public class LoadChunkBlockEvent extends Event

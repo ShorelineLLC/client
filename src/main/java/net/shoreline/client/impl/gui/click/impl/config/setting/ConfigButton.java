@@ -2,7 +2,6 @@ package net.shoreline.client.impl.gui.click.impl.config.setting;
 
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.Button;
 import net.shoreline.client.impl.gui.click.impl.config.CategoryFrame;
 import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;

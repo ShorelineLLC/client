@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.client.particle.FireworksSparkParticle;
-import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
