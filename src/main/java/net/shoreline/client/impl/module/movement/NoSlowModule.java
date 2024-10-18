@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -57,6 +58,7 @@ public class NoSlowModule extends ToggleModule
     Config<Boolean> arrowMoveConfig = register(new BooleanConfig("ArrowMove", "Allows the player to look while in inventories or screens by using the arrow keys", false));
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Removes the slowdown effect caused by using items", true));
     Config<Boolean> sneakConfig = register(new BooleanConfig("Sneak", "Removes sneak slowdown", false));
+    Config<Boolean> crawlConfig = register(new BooleanConfig("Crawl", "Removes crawl slowdown", false));
     Config<Boolean> shieldsConfig = register(new BooleanConfig("Shields", "Removes the slowdown effect caused by shields", true));
     Config<Boolean> websConfig = register(new BooleanConfig("Webs", "Removes the slowdown caused when moving through webs", false));
     Config<Boolean> berryBushConfig = register(new BooleanConfig("BerryBush", "Removes the slowdown caused when moving through webs", false));
@@ -112,7 +114,7 @@ public class NoSlowModule extends ToggleModule
                 && mc.player.isUsingItem() && !mc.player.isSneaking() && itemsConfig.getValue())
         {
 
-            if (grimConfig.getValue() || grimNewConfig.getValue() && (mc.player.getItemUseTimeLeft() < 6 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0)))
+            if (grimConfig.getValue() || grimNewConfig.getValue() && checkGrimNew())
             {
                 // Grim focuses on other hand noslow checks
                 if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack()))
@@ -238,6 +240,13 @@ public class NoSlowModule extends ToggleModule
     @EventListener
     public void onMovementSlowdown(MovementSlowdownEvent event)
     {
+        if (sneakConfig.getValue() && mc.player.isSneaking() || crawlConfig.getValue() && mc.player.isCrawling())
+        {
+            float f = 1.0f / (float) mc.player.getAttributeValue(EntityAttributes.PLAYER_SNEAKING_SPEED);
+            event.input.movementForward *= f;
+            event.input.movementSideways *= f;
+        }
+
         if (checkSlowed())
         {
             event.input.movementForward *= 5.0f;
@@ -327,23 +336,26 @@ public class NoSlowModule extends ToggleModule
         }
     }
 
+    private boolean checkGrimNew()
+    {
+        return !mc.player.isSneaking() && !mc.player.isCrawling() && !mc.player.isRiding() &&
+                mc.player.getItemUseTimeLeft() < 6 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
+    }
+
     public boolean checkSlowed()
     {
 //        ItemStack offHandStack = mc.player.getOffHandStack();
 //        if ((offHandStack.isFood() || offHandStack.getItem() == Items.BOW || offHandStack.getItem() == Items.CROSSBOW || offHandStack.getItem() == Items.SHIELD) && grimConfig.getValue()) {
 //            return false;
 //        }
-        if (sneakConfig.getValue() && mc.player.isSneaking())
-        {
-            return true;
-        }
         if (DisablerModule.getInstance().grimFireworkCheck2())
         {
             return true;
         }
-        if (!grimNewConfig.getValue() || (mc.player.getItemUseTimeLeft() < 6 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0)))
+        if (!grimNewConfig.getValue() || checkGrimNew())
         {
-            return !mc.player.isRiding() && !mc.player.isSneaking() && (mc.player.isUsingItem() && itemsConfig.getValue() || mc.player.isBlocking() && shieldsConfig.getValue() && !grimNewConfig.getValue() && !grimConfig.getValue());
+            return !mc.player.isRiding() && !mc.player.isSneaking() && (mc.player.isUsingItem() && itemsConfig.getValue()
+                    || mc.player.isBlocking() && shieldsConfig.getValue() && !grimNewConfig.getValue() && !grimConfig.getValue());
         }
         return false;
     }
