@@ -229,9 +229,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     /**
      * @param ci
      */
-    @Inject(method = "tickMovement", at = @At(value = "FIELD", target =
-            "Lnet/minecraft/client/network/ClientPlayerEntity;" +
-                    "ticksLeftToDoubleTapSprint:I", shift = At.Shift.AFTER))
+    @Inject(method = "tickMovement", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/input/Input;tick(ZF)V", shift = At.Shift.AFTER))
     private void hookTickMovementPost(CallbackInfo ci)
     {
         MovementSlowdownEvent movementUpdateEvent =

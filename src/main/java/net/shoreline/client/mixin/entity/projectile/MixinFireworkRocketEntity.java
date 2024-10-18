@@ -36,7 +36,7 @@ public class MixinFireworkRocketEntity implements Globals
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     private void hookTick(CallbackInfo ci)
     {
-        FireworkTickEvent event = new FireworkTickEvent();
+        FireworkTickEvent event = new FireworkTickEvent((FireworkRocketEntity) (Object) this);
         EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {

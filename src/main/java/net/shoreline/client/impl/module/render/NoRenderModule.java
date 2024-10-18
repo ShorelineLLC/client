@@ -23,6 +23,7 @@ import net.shoreline.client.impl.event.render.block.entity.RenderSignTextEvent;
 import net.shoreline.client.impl.event.render.entity.*;
 import net.shoreline.client.impl.event.toast.RenderToastEvent;
 import net.shoreline.client.impl.event.world.BlindnessEvent;
+import net.shoreline.client.mixin.accessor.AccessorFireworkRocketEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
@@ -243,7 +244,7 @@ public class NoRenderModule extends ToggleModule
     @EventListener
     public void onFireworkTick(FireworkTickEvent event)
     {
-        if (fireworksConfig.getValue())
+        if (fireworksConfig.getValue() && !((AccessorFireworkRocketEntity) event.getFireworkRocketEntity()).hookWasShotByEntity())
         {
             event.cancel();
         }
