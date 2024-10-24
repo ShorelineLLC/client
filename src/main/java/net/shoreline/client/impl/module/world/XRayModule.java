@@ -32,4 +32,6 @@ public class XRayModule extends ToggleModule
     {
         super("XRay", "Allows you to see through solid blocks", ModuleCategory.WORLD);
     }
+
+    
 }
