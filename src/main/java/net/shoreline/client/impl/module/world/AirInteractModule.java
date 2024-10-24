@@ -37,7 +37,6 @@ public final class AirInteractModule extends ToggleModule
 {
     public static AirInteractModule INSTANCE;
 
-    Config<Boolean> manualConfig = register(new BooleanConfig("Click", "Allow manual air place", true));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to air place", 1.0f, 4.0f, 6.0f, NumberDisplay.DEFAULT));
     Config<Boolean> fluidsConfig = register(new BooleanConfig("Fluids", "Place against fluids", false));
@@ -64,8 +63,7 @@ public final class AirInteractModule extends ToggleModule
     @EventListener
     public void onPlayerTick(final TickEvent event)
     {
-        if (mc.player == null || mc.interactionManager == null || !manualConfig.getValue()
-                || event.getStage() != StageEvent.EventStage.PRE)
+        if (mc.player == null || mc.interactionManager == null || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
         }
@@ -109,7 +107,7 @@ public final class AirInteractModule extends ToggleModule
     @EventListener
     public void onItemUse(final ItemUseEvent event)
     {
-        if (airPlaceTicks > 0 && manualConfig.getValue())
+        if (airPlaceTicks > 0)
         {
             event.cancel();
         }
@@ -118,7 +116,7 @@ public final class AirInteractModule extends ToggleModule
     @EventListener
     public void onRenderWorld(final RenderWorldEvent event)
     {
-        if (mc.player == null || !manualConfig.getValue())
+        if (mc.player == null)
         {
             return;
         }

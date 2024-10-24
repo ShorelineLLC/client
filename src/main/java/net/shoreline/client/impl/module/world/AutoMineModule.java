@@ -176,7 +176,7 @@ public class AutoMineModule extends CombatModule
                 BlockPos crawlingMine = getCrawlingMine(playerTarget);
                 clearMiningQueue();
                 manualOverride = true;
-                startAutoMine(crawlingMine, Direction.DOWN);
+                queueMiningData(new AutoMiningData(crawlingMine, Direction.DOWN));
             }
             else
             {
@@ -245,11 +245,13 @@ public class AutoMineModule extends CombatModule
                                     }
                                     if (full2)
                                     {
-                                        startAutoMine(miningPos2.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP);
+                                        queueMiningData(new AutoMiningData(miningPos2.pos(),
+                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP));
                                     }
                                     if (full)
                                     {
-                                        startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP);
+                                        queueMiningData(new AutoMiningData(miningPos.pos(),
+                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP));
                                     }
                                 }
                             }
@@ -273,7 +275,8 @@ public class AutoMineModule extends CombatModule
                                 {
                                     if (!mc.world.isAir(miningPos.pos()))
                                     {
-                                        startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP);
+                                        queueMiningData(new AutoMiningData(miningPos.pos(),
+                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP));
                                     }
                                 }
                             }
@@ -295,7 +298,8 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else
                                 {
-                                    startAutoMine(miningPos2.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP);
+                                    queueMiningData(new AutoMiningData(miningPos2.pos(),
+                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP));
                                 }
                             }
                         }
@@ -321,7 +325,8 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
                                 {
-                                    startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP);
+                                    queueMiningData(new AutoMiningData(miningPos.pos(),
+                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP));
                                 }
                             }
                         }
@@ -643,20 +648,11 @@ public class AutoMineModule extends CombatModule
 
     private void startManualMine(BlockPos pos, Direction direction)
     {
-        startAndQueueMine(new ManualMiningData(pos, direction));
-    }
-
-    private void startAutoMine(BlockPos pos, Direction direction)
-    {
-        startAndQueueMine(new AutoMiningData(pos, direction));
-    }
-
-    private void startAndQueueMine(MiningData data)
-    {
-        if (!isBlockDelayGrim())
+        if (isBlockDelayGrim())
         {
-            queueMiningData(data);
+            return;
         }
+        queueMiningData(new ManualMiningData(pos, direction));
     }
 
     private void queueMiningData(MiningData data)

@@ -148,9 +148,7 @@ public class LongJumpModule extends ToggleModule
             // event.cancel();
             if (mc.player.getVelocity().y < 0.0)
             {
-                final double d4 = 0.014f * Math.cos(Math.toRadians(mc.player.getYaw() + 90.0f));
-                final double d5 = 0.014f * Math.sin(Math.toRadians(mc.player.getYaw() + 90.0f));
-                Vec3d glide = new Vec3d(d4, 0.0, d5);
+                Vec3d glide = ElytraFlyModule.getInstance().glideElytra(0.014f);
                 Vec3d motion = mc.player.getVelocity();
                 Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
             }
