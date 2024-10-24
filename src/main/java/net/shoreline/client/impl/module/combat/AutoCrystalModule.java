@@ -117,6 +117,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> exposedDirectionConfig = register(new BooleanConfig("StrictDirection-Exposed", "Interacts with only exposed directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Placements> placementsConfig = register(new EnumConfig<>("Placements", "Version standard for placing end crystals", Placements.NATIVE, Placements.values(), () -> placeConfig.getValue()));
     Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider attacking or placing an end crystal", 1.0f, 4.0f, 10.0f));
+    // Damage settings
     Config<Boolean> armorBreakerConfig = register(new BooleanConfig("ArmorBreaker", "Attempts to break enemy armor with crystals", true));
     Config<Float> armorScaleConfig = register(new NumberConfig<>("ArmorScale", "Armor damage scale before attempting to break enemy armor with crystals", 1.0f, 5.0f, 20.0f, NumberDisplay.PERCENT, () -> armorBreakerConfig.getValue()));
     Config<Float> lethalMultiplier = register(new NumberConfig<>("LethalMultiplier", "If we can kill an enemy with this many crystals, disregard damage values", 0.0f, 1.5f, 4.0f));
@@ -128,6 +129,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
     Config<Boolean> selfExtrapolateConfig = register(new BooleanConfig("SelfExtrapolate", "Accounts for motion when calculating self damage", false));
     Config<Integer> extrapolateTicksConfig = register(new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10));
+    // Render settings
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the current placement", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
     Config<Boolean> breakDebugConfig = register(new BooleanConfig("Break-Debug", "Debugs break ms in data", false, () -> renderConfig.getValue()));
