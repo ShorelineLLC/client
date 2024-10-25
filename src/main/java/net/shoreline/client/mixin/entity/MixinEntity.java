@@ -58,6 +58,8 @@ public abstract class MixinEntity implements Globals
 
     @Shadow private Vec3d velocity;
 
+    @Shadow protected Vec3d movementMultiplier;
+
     /**
      * @param tickDelta
      * @param info
@@ -103,6 +105,7 @@ public abstract class MixinEntity implements Globals
         if (slowMovementEvent.isCanceled())
         {
             ci.cancel();
+            movementMultiplier = multiplier.multiply(slowMovementEvent.getMultiplier());
         }
     }
 

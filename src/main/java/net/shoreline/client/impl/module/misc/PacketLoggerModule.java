@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.misc;
 import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket;
 import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.util.hit.BlockHitResult;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -10,6 +11,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.loader.Loader;
 
 public class PacketLoggerModule extends ToggleModule
 {
@@ -39,16 +41,29 @@ public class PacketLoggerModule extends ToggleModule
         super("PacketLogger", "Logs client packets", ModuleCategory.MISCELLANEOUS);
     }
 
+    @Override
+    public void onEnable()
+    {
+        Loader.info("PacketLogger enabled ...");
+    }
+
+    @Override
+    public void onDisable()
+    {
+        Loader.info("PacketLogger disabled ...");
+    }
+
     private void logPacket(String msg, Object... args)
     {
         String s = String.format(msg, args);
         if (chatConfig.getValue())
         {
             sendModuleMessage(s);
+            Loader.info(s);
         }
         else
         {
-            System.out.println(s);
+            Loader.info(s);
         }
     }
 

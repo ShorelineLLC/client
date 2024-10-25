@@ -41,6 +41,7 @@ import java.util.List;
 
 /**
  * @author linus
+ * @author lnus
  * @since 1.0
  */
 public class NoSlowModule extends ToggleModule
@@ -61,7 +62,7 @@ public class NoSlowModule extends ToggleModule
     Config<Boolean> shieldsConfig = register(new BooleanConfig("Shields", "Removes the slowdown effect caused by shields", true));
     Config<Boolean> websConfig = register(new BooleanConfig("Webs", "Removes the slowdown caused when moving through webs", false));
     Config<Boolean> berryBushConfig = register(new BooleanConfig("BerryBush", "Removes the slowdown caused when moving through webs", false));
-    Config<Float> webSpeedConfig = register(new NumberConfig<>("WebSpeed", "Speed to fall through webs", 0.0f, 3.5f, 20.0f, () -> websConfig.getValue()));
+    Config<Float> webSpeedConfig = register(new NumberConfig<>("WebMultiplier", "Speed to fall through webs", 0.0f, 1.0f, 1.0f, () -> websConfig.getValue() || berryBushConfig.getValue()));
     Config<Boolean> soulsandConfig = register(new BooleanConfig("SoulSand", "Removes the slowdown effect caused by walking over SoulSand blocks", false));
     Config<Boolean> honeyblockConfig = register(new BooleanConfig("HoneyBlock", "Removes the slowdown effect caused by walking over Honey blocks", false));
     Config<Boolean> slimeblockConfig = register(new BooleanConfig("SlimeBlock", "Removes the slowdown effect caused by walking over Slime blocks", false));
@@ -221,18 +222,8 @@ public class NoSlowModule extends ToggleModule
         if (block instanceof CobwebBlock && websConfig.getValue()
                 || block instanceof SweetBerryBushBlock && berryBushConfig.getValue())
         {
-            if (grimConfig.getValue() || grimNewConfig.getValue())
-            {
-                event.cancel();
-            }
-            else if (mc.player.isOnGround())
-            {
-                Managers.TICK.setClientTick(1.0f);
-            }
-            else
-            {
-                Managers.TICK.setClientTick(webSpeedConfig.getValue() / 2.0f);
-            }
+            event.cancel();
+            event.setMultiplier(webSpeedConfig.getValue() >= 1.0f ? 0.0f : webSpeedConfig.getValue() * 2.0f);
         }
     }
 
