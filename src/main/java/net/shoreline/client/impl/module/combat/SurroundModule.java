@@ -48,6 +48,7 @@ public class SurroundModule extends ObsidianPlacerModule
 {
     private static SurroundModule INSTANCE;
 
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
@@ -109,6 +110,11 @@ public class SurroundModule extends ObsidianPlacerModule
         if (jumpDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5)
         {
             disable();
+            return;
+        }
+
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        {
             return;
         }
 

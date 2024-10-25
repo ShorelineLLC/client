@@ -39,6 +39,7 @@ import java.util.Map;
 public class HoleFillModule extends ObsidianPlacerModule
 {
     //
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Boolean> obsidianConfig = register(new BooleanConfig("Obsidian", "Fills obsidian holes", true));
     Config<Boolean> doublesConfig = register(new BooleanConfig("Doubles", "Fills double holes", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f));
@@ -83,6 +84,12 @@ public class HoleFillModule extends ObsidianPlacerModule
     {
         //
         int blocksPlaced = 0;
+
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        {
+            return;
+        }
+
         final int slot = websConfig.getValue() ? getBlockItemSlot(Blocks.COBWEB) : getResistantBlockItem();
         if (slot == -1)
         {

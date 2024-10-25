@@ -35,6 +35,7 @@ import java.util.*;
 
 public class AutoCrawlTrapModule extends ObsidianPlacerModule
 {
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to trap enemies", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
@@ -66,6 +67,11 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     public void onPlayerTick(PlayerTickEvent event)
     {
         blocksPlaced = 0;
+
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        {
+            return;
+        }
 
         final int slot = getResistantBlockItem();
         if (slot == -1)

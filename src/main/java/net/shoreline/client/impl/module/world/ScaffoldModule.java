@@ -43,6 +43,7 @@ import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.
  */
 public final class ScaffoldModule extends RotationModule
 {
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
     Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT, Blocks.OBSIDIAN));
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
@@ -90,6 +91,12 @@ public final class ScaffoldModule extends RotationModule
     @EventListener
     public void onPlayerTick(final PlayerTickEvent event)
     {
+
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        {
+            return;
+        }
+
         int slot = getBlockSlot();
         if (slot == -1)
         {

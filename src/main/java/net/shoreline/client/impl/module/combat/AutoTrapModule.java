@@ -50,6 +50,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 {
     private static AutoTrapModule INSTANCE;
 
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for trap", 0.0f, 4.0f, 6.0f));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
@@ -95,6 +96,11 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     public void onPlayerTick(PlayerTickEvent event)
     {
         blocksPlaced = 0;
+
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        {
+            return;
+        }
 
         final int slot = getResistantBlockItem();
         if (slot == -1)
