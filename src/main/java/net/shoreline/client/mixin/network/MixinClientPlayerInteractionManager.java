@@ -63,7 +63,7 @@ public abstract class MixinClientPlayerInteractionManager implements Globals
         if (attackBlockEvent.isCanceled())
         {
             cir.cancel();
-            // cir.setReturnValue(false);
+            cir.setReturnValue(false);
         }
     }
 

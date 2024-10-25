@@ -62,7 +62,7 @@ public class NoSlowModule extends ToggleModule
     Config<Boolean> shieldsConfig = register(new BooleanConfig("Shields", "Removes the slowdown effect caused by shields", true));
     Config<Boolean> websConfig = register(new BooleanConfig("Webs", "Removes the slowdown caused when moving through webs", false));
     Config<Boolean> berryBushConfig = register(new BooleanConfig("BerryBush", "Removes the slowdown caused when moving through webs", false));
-    Config<Float> webSpeedConfig = register(new NumberConfig<>("WebMultiplier", "Speed to fall through webs", 0.0f, 1.0f, 1.0f, () -> websConfig.getValue() || berryBushConfig.getValue()));
+    Config<Float> webSpeedConfig = register(new NumberConfig<>("WebMultiplier", "Speed to fall through webs", 0.00f, 1.00f, 1.00f, () -> websConfig.getValue() || berryBushConfig.getValue()));
     Config<Boolean> soulsandConfig = register(new BooleanConfig("SoulSand", "Removes the slowdown effect caused by walking over SoulSand blocks", false));
     Config<Boolean> honeyblockConfig = register(new BooleanConfig("HoneyBlock", "Removes the slowdown effect caused by walking over Honey blocks", false));
     Config<Boolean> slimeblockConfig = register(new BooleanConfig("SlimeBlock", "Removes the slowdown effect caused by walking over Slime blocks", false));
@@ -184,6 +184,7 @@ public class NoSlowModule extends ToggleModule
                     mc.player.setPitch(MathHelper.clamp(pitch, -90.0f, 90.0f));
                 }
             }
+
             if (grimConfig.getValue() && (websConfig.getValue() || berryBushConfig.getValue()))
             {
                 for (BlockPos pos : getIntersectingWebs())

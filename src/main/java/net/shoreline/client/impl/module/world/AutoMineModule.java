@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -72,6 +73,7 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true));
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
+    Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
@@ -437,48 +439,14 @@ public class AutoMineModule extends CombatModule
         {
             return;
         }
-        event.cancel();
         // Do not try to break unbreakable blocks
         if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir())
         {
             return;
         }
-        int queueSize = miningQueue.size();
-        if (queueSize == 0)
-        {
-            startManualMine(event.getPos(), event.getDirection());
-        }
-        else if (queueSize == 1)
-        {
-            MiningData data = miningQueue.getFirst();
-            if (data.getPos().equals(event.getPos()))
-            {
-                // abortMining(miningData);
-                return;
-            }
-            if (data instanceof AutoMiningData)
-            {
-                clearMiningQueue();
-                manualOverride = true;
-            }
-            startManualMine(event.getPos(), event.getDirection());
-        }
-        else if (queueSize == 2)
-        {
-            MiningData data1 = miningQueue.getFirst();
-            MiningData data2 = miningQueue.getLast();
-            if (data1.getPos().equals(event.getPos()) || data2.getPos().equals(event.getPos()))
-            {
-                // abortMining(miningData);
-                return;
-            }
-            if (data1 instanceof AutoMiningData && data2 instanceof AutoMiningData)
-            {
-                removeQueuedMine();
-                manualOverride = true;
-            }
-            startManualMine(event.getPos(), event.getDirection());
-        }
+        event.cancel();
+
+        startManualMine(event.getPos(), event.getDirection());
         mc.player.swingHand(Hand.MAIN_HAND);
     }
 
@@ -643,25 +611,62 @@ public class AutoMineModule extends CombatModule
 
     private void startManualMine(BlockPos pos, Direction direction)
     {
-        startAndQueueMine(new ManualMiningData(pos, direction));
+        clickMine(new ManualMiningData(pos, direction));
     }
 
     private void startAutoMine(BlockPos pos, Direction direction)
     {
-        startAndQueueMine(new AutoMiningData(pos, direction));
+        if (grimNewConfig.getValue())
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                queueMiningData(new AutoMiningData(pos, direction));
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            }
+        }
+        else
+        {
+            queueMiningData(new AutoMiningData(pos, direction));
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        }
     }
 
-    private void startAndQueueMine(MiningData data)
+    public void clickMine(MiningData miningData)
     {
-        if (!isBlockDelayGrim())
+        int queueSize = miningQueue.size();
+        if (queueSize == 0)
         {
-            queueMiningData(data);
+            queueMiningData(miningData);
+        }
+        else if (queueSize == 1)
+        {
+            MiningData data = miningQueue.getFirst();
+
+            if (data instanceof AutoMiningData)
+            {
+                clearMiningQueue();
+                manualOverride = true;
+            }
+            queueMiningData(miningData);
+        }
+        else if (queueSize == 2)
+        {
+            MiningData data1 = miningQueue.getFirst();
+            MiningData data2 = miningQueue.getLast();
+
+            if (data1 instanceof AutoMiningData && data2 instanceof AutoMiningData)
+            {
+                removeQueuedMine();
+                manualOverride = true;
+            }
+            queueMiningData(miningData);
         }
     }
 
     private void queueMiningData(MiningData data)
     {
-        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())))
+        boolean b1 = miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos()));
+        if (b1 && !grimNewConfig.getValue())
         {
             return;
         }
@@ -674,8 +679,13 @@ public class AutoMineModule extends CombatModule
         {
             return;
         }
-        if (startMining(data, floor))
+        if (startMining(data, floor) || grimNewConfig.getValue() && (miningQueue.isEmpty() || !data.getPos().equals(miningQueue.getFirst().getPos())
+                && (miningQueue.size() != 2 || !data.getPos().equals(miningQueue.getLast().getPos()))))
         {
+            if (b1)
+            {
+                return;
+            }
             miningQueue.addFirst(data);
         }
     }
@@ -849,37 +859,50 @@ public class AutoMineModule extends CombatModule
 
     private boolean startMining(MiningData data, boolean floor)
     {
-        if (data.isStarted())
+        if (data.isStarted() && !grimNewConfig.getValue())
         {
             return false;
         }
+
         if (doubleBreakConfig.getValue() && !floor)
         {
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            if (grimNewConfig.getValue())
+            {
+                startPacketMineGrimNew(data);
+            }
+            else
+            {
+                startPacketMine(data);
+            }
+
             packetMines.add(data.getPos());
         }
         else
         {
+            if (floor)
+            {
+                data.setFloorMine();
+                manualOverride = true;
+            }
+
             if (Managers.NETWORK.is2b2t())
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                if (grimNewConfig.getValue())
+                {
+                    startPacketMineGrimNew(data);
+                }
+                else
+                {
+                    startPacketMine(data);
+                }
             }
             else
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+
                 if (!grimConfig.getValue())
                 {
                     Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
@@ -888,15 +911,30 @@ public class AutoMineModule extends CombatModule
                             PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 }
             }
-
-            if (floor)
-            {
-                data.setFloorMine();
-                manualOverride = true;
-            }
         }
+
         data.setStarted();
         return true;
+    }
+
+    private void startPacketMine(MiningData data)
+    {
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+    }
+
+    private void startPacketMineGrimNew(MiningData data)
+    {
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
     }
 
     private void abortMining(MiningData data)
@@ -970,7 +1008,7 @@ public class AutoMineModule extends CombatModule
         if (grimConfig.getValue())
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, new BlockPos(data.getPos().getX(), 1341, data.getPos().getZ()), data.getDirection()));
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos().up(500), data.getDirection()));
         }
         Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
