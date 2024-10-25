@@ -18,6 +18,7 @@ uniform vec4 color1;
 uniform float factor;
 uniform float time;
 
+uniform int fastOutline;
 uniform float radius;
 uniform int glow;
 uniform float glowRadius;
@@ -25,6 +26,28 @@ uniform float glowRadius;
 // Computes the distance from a vec2 to the nearest texture edge
 float computeEdgeDistance(vec2 coords)
 {
+    if (fastOutline != 1)
+    {
+        float closest = radius * 2.0f + 2.0f;
+        for (float x = -radius; x <= radius; x++)
+        {
+            for (float y = -radius; y <= radius; y++)
+            {
+                vec4 currentColor = texture(DiffuseSampler, texCoord + vec2(texelSize.x * x, texelSize.y * y));
+                if (currentColor.a > 0)
+                {
+                    float currentDist = sqrt(x * x + y * y);
+                    if (currentDist < closest)
+                    {
+                        closest = currentDist;
+                    }
+                }
+            }
+        }
+
+        return closest;
+    }
+
     float minDist = radius * 2.0f;
     float stepSize = radius / float(steps);
     for (float r = stepSize; r < radius; r += stepSize)

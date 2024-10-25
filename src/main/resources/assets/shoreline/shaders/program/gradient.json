@@ -77,6 +77,12 @@
       "values": [ 1.0 ]
     },
     {
+      "name": "fastOutline",
+      "type": "int",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
       "name": "radius",
       "type": "float",
       "count": 1,

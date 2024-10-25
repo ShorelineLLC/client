@@ -74,8 +74,9 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", true));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1.0f, 1.5f, 10.0f, () -> outlineConfig.getValue()));
-    Config<Integer> qualityConfig = register(new NumberConfig<>("Quality", "The outline pixel quality", 2, 10, 32, () -> outlineConfig.getValue()));
-    Config<Integer> stepsConfig = register(new NumberConfig<>("Steps", "The number of steps for finding edges", 2, 4, 32, () -> outlineConfig.getValue()));
+    Config<Boolean> fastOutlineConfig = register(new BooleanConfig("FastOutline", "Faster outline calculations", false, () -> outlineConfig.getValue()));
+    Config<Integer> qualityConfig = register(new NumberConfig<>("Quality", "The outline pixel quality", 2, 10, 32, () -> fastOutlineConfig.getValue() && outlineConfig.getValue()));
+    Config<Integer> stepsConfig = register(new NumberConfig<>("Steps", "The number of steps for finding edges", 2, 4, 32, () -> fastOutlineConfig.getValue() && outlineConfig.getValue()));
     Config<Boolean> glowConfig = register(new BooleanConfig("Glow", "Glow outline", false, () -> outlineConfig.getValue()));
     Config<Float> glowRadiusConfig = register(new NumberConfig<>("GlowFactor", "The glow radius", 0.1f, 1.0f, 3.0f, () -> glowConfig.getValue() && outlineConfig.getValue()));
     Config<ShaderMode> modeConfig = register(new EnumConfig<>("Fill", "The shader mode", ShaderMode.OFF, ShaderMode.values()));
@@ -171,6 +172,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("dots", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? 1 : 0);
                     shaderEffect.setUniformValue("dotRadius", dotRadiusConfig.getValue());
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
@@ -196,6 +198,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, gradientConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
@@ -221,6 +224,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
@@ -231,31 +235,32 @@ public class ShadersModule extends ToggleModule
                     renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
                 });
             }
-            case FLAME ->
-            {
-                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFlameShaderEffect();
-                if (shaderEffect == null)
-                {
-                    return;
-                }
-                Managers.SHADER.applyShader(shaderEffect, () ->
-                {
-                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
-                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
-                    shaderEffect.setUniformValue("time", shaderTime);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
-                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
-                    shaderTime += 0.005f;
-                }, () ->
-                {
-                    renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
-                });
-            }
+//            case FLAME ->
+//            {
+//                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFlameShaderEffect();
+//                if (shaderEffect == null)
+//                {
+//                    return;
+//                }
+//                Managers.SHADER.applyShader(shaderEffect, () ->
+//                {
+//                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+//                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+//                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
+//                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
+//                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+//                    shaderEffect.setUniformValue("time", shaderTime);
+//                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
+//                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+//                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
+//                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
+//                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
+//                    shaderTime += 0.005f;
+//                }, () ->
+//                {
+//                    renderEntities(event.getTickDelta(), event.getMatrices(), vertexConsumerProvider);
+//                });
+//            }
             case IMAGE ->
             {
                 final ManagedShaderEffect shaderEffect = Managers.SHADER.getImageShaderEffect();
@@ -272,6 +277,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("imageTexture", 1);
                     shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
@@ -437,6 +443,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("dots", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? 1 : 0);
                     shaderEffect.setUniformValue("dotRadius", dotRadiusConfig.getValue());
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
@@ -464,6 +471,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, gradientConfig.getValue().getAlpha() / 255.0f);
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
@@ -503,33 +511,34 @@ public class ShadersModule extends ToggleModule
                     ignoreEntityRender = false;
                 });
             }
-            case FLAME ->
-            {
-                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFlameShaderEffect();
-                if (shaderEffect == null)
-                {
-                    return;
-                }
-                Managers.SHADER.applyShader(shaderEffect, () ->
-                {
-                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
-                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
-                    shaderEffect.setUniformValue("time", shaderTime);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
-                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
-                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
-                    shaderTime += 0.005f;
-                }, () ->
-                {
-                    ignoreEntityRender = true;
-                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
-                    ignoreEntityRender = false;
-                });
-            }
+//            case FLAME ->
+//            {
+//                final ManagedShaderEffect shaderEffect = Managers.SHADER.getFlameShaderEffect();
+//                if (shaderEffect == null)
+//                {
+//                    return;
+//                }
+//                Managers.SHADER.applyShader(shaderEffect, () ->
+//                {
+//                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+//                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+//                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
+//                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
+//                    shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+//                    shaderEffect.setUniformValue("time", shaderTime);
+//                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
+//                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+//                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
+//                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
+//                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
+//                    shaderTime += 0.005f;
+//                }, () ->
+//                {
+//                    ignoreEntityRender = true;
+//                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
+//                    ignoreEntityRender = false;
+//                });
+//            }
             case IMAGE ->
             {
                 final ManagedShaderEffect shaderEffect = Managers.SHADER.getImageShaderEffect();
@@ -546,6 +555,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("imageTexture", 1);
                     shaderEffect.setUniformValue("color", colorConfig.getValue().getRed() / 255.0f, colorConfig.getValue().getGreen() / 255.0f, colorConfig.getValue().getBlue() / 255.0f, colorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
@@ -665,7 +675,7 @@ public class ShadersModule extends ToggleModule
         DEFAULT,
         GRADIENT,
         MARBLE,
-        FLAME,
+        // FLAME,
         IMAGE,
         OFF
     }
