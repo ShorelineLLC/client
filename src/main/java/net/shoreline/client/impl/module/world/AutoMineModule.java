@@ -346,7 +346,7 @@ public class AutoMineModule extends CombatModule
                 data.resetBreakTime();
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak()
-                    && data.passedAttemptedBreakTime(1000)))
+                    && data.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000)))
             {
                 Managers.INVENTORY.syncToClient();
                 removeQueuedMine(data);
@@ -409,7 +409,7 @@ public class AutoMineModule extends CombatModule
         }
         // Something went wrong, remove and remine
         if (miningData2.getBlockDamage() >= speedConfig.getValue() && miningData2.hasAttemptedBreak()
-                && miningData2.passedAttemptedBreakTime(1000))
+                && miningData2.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000))
         {
             abortMining(miningData2);
             removeQueuedMine(miningData2);
