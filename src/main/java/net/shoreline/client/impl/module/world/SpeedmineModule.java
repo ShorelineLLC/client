@@ -188,12 +188,13 @@ public class SpeedmineModule extends RotationModule
     @EventListener
     public void onAttackBlock(AttackBlockEvent event)
     {
-        if (modeConfig.getValue() != SpeedmineMode.PACKET)
+        if (modeConfig.getValue() != SpeedmineMode.PACKET || mc.player == null || mc.world == null || mc.player.isCreative() ||
+                event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir())
         {
             return;
         }
-        if (mc.player == null || mc.world == null
-                || mc.player.isCreative() || mining != null && event.getPos() == mining)
+        event.cancel();
+        if (event.getPos().equals(mining))
         {
             return;
         }
@@ -208,12 +209,6 @@ public class SpeedmineModule extends RotationModule
         damage = 0.0f;
         if (mining != null && direction != null)
         {
-            int slot = AutoToolModule.getInstance().getBestTool(event.getState());
-            if (grimConfig.getValue())
-            {
-                Managers.INVENTORY.setSlot(slot);
-            }
-            event.cancel();
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
                     mining, direction));
@@ -221,10 +216,6 @@ public class SpeedmineModule extends RotationModule
                     PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, mining, direction));
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, mining, direction));
-            if (grimConfig.getValue())
-            {
-                Managers.INVENTORY.syncToClient();
-            }
         }
     }
 

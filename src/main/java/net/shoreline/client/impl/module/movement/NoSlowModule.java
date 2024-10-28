@@ -114,7 +114,7 @@ public class NoSlowModule extends ToggleModule
                 && mc.player.isUsingItem() && !mc.player.isSneaking() && itemsConfig.getValue())
         {
 
-            if (grimConfig.getValue() || grimNewConfig.getValue() && checkGrimNew())
+            if (grimConfig.getValue() || grimNewConfig.getValue())
             {
                 // Grim focuses on other hand noslow checks
                 if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack()))
