@@ -114,7 +114,7 @@ public class AutoMineModule extends CombatModule
     @Override
     protected void onDisable()
     {
-        clearMiningQueue();
+        miningQueue.clear();
         fadeList.clear();
         manualOverride = false;
         Managers.INVENTORY.syncToClient();
@@ -176,7 +176,7 @@ public class AutoMineModule extends CombatModule
             if (mc.player.isCrawling() && crawlingConfig.getValue() && getCrawlingMine(playerTarget) != null)
             {
                 BlockPos crawlingMine = getCrawlingMine(playerTarget);
-                clearMiningQueue();
+                miningQueue.clear();
                 manualOverride = true;
                 startAutoMine(crawlingMine, Direction.DOWN);
             }
@@ -243,7 +243,7 @@ public class AutoMineModule extends CombatModule
                                     boolean full = !mc.world.isAir(miningPos.pos());
                                     if (full && full2)
                                     {
-                                        clearMiningQueue();
+                                        miningQueue.clear();
                                     }
                                     if (full2)
                                     {
@@ -644,7 +644,7 @@ public class AutoMineModule extends CombatModule
 
             if (data instanceof AutoMiningData)
             {
-                clearMiningQueue();
+                miningQueue.clear();
                 manualOverride = true;
             }
             queueMiningData(miningData);
@@ -673,7 +673,7 @@ public class AutoMineModule extends CombatModule
         boolean floor = isMiningFloor(data);
         if (floor && !miningQueue.isEmpty() || miningQueue.stream().anyMatch(d -> d.isFloor()))
         {
-            clearMiningQueue();
+            miningQueue.clear();
         }
         if (data.getState().isAir())
         {
@@ -792,31 +792,6 @@ public class AutoMineModule extends CombatModule
             return crawlingPos.up();
         }
         return null;
-    }
-
-    private record AutoMineCalc(BlockPos pos, double entityDamage, boolean phase) implements Comparable<AutoMineCalc>
-    {
-        @Override
-        public int compareTo(@NotNull AutoMineCalc o)
-        {
-            return Double.compare(-entityDamage(), -o.entityDamage());
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (o instanceof AutoMineCalc calc)
-            {
-                return calc.pos().equals(pos);
-            }
-            return false;
-        }
-    }
-
-    private void clearMiningQueue()
-    {
-        // Need to abort blocks here??
-        miningQueue.clear();
     }
 
     private void removeQueuedMine()
@@ -1035,14 +1010,6 @@ public class AutoMineModule extends CombatModule
         };
     }
 
-    public Set<BlockPos> getCompletedMines()
-    {
-        return miningQueue.stream()
-                .filter(d -> d.getBlockDamage() > 0.5f)
-                .map(MiningData::getPos)
-                .collect(Collectors.toUnmodifiableSet());
-    }
-
     public static class ManualMiningData extends MiningData
     {
         public ManualMiningData(BlockPos pos, Direction direction)
@@ -1194,5 +1161,24 @@ public class AutoMineModule extends CombatModule
         WHITELIST,
         BLACKLIST,
         ALL
+    }
+
+    private record AutoMineCalc(BlockPos pos, double entityDamage, boolean phase) implements Comparable<AutoMineCalc>
+    {
+        @Override
+        public int compareTo(@NotNull AutoMineCalc o)
+        {
+            return Double.compare(-entityDamage(), -o.entityDamage());
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (o instanceof AutoMineCalc calc)
+            {
+                return calc.pos().equals(pos);
+            }
+            return false;
+        }
     }
 }

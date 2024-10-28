@@ -330,9 +330,11 @@ public class NametagsModule extends ToggleModule
         Collections.reverse(displayItems);
         float n10 = 0;
         int n11 = 0;
+        boolean gapple = true;
         for (ItemStack stack : displayItems)
         {
-            n10 -= 8;
+            n10 -= gapple ? 9 : 8;
+            gapple = false;
             if (stack.getEnchantments().getEnchantments().size() > n11)
             {
                 n11 = stack.getEnchantments().getEnchantments().size();
@@ -357,7 +359,11 @@ public class NametagsModule extends ToggleModule
                 renderItemOverlay(matrixStack, stack, (int) n10, (int) y);
 
                 matrixStack.scale(0.5f, 0.5f, 0.5f);
-                if (enchantmentsConfig.getValue())
+                if (stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                {
+                    drawText(matrixStack, "God", (n10 + 2.0f) * 2, (m2 + 1.0f) * 2, 0xffc34e41);
+                }
+                else if (enchantmentsConfig.getValue())
                 {
                     renderEnchants(matrixStack, stack, n10 + 2.0f, m2);
                 }
@@ -512,15 +518,15 @@ public class NametagsModule extends ToggleModule
         {
             String string = String.valueOf(stack.getCount());
             // this.matrices.translate(0.0f, 0.0f, 200.0f);
-            drawText(matrixStack, string, x + 17 - mc.textRenderer.getWidth(string), y + 9.0f, -1);
+            Fonts.VANILLA.drawWithShadow(matrixStack, string, x + 17 - mc.textRenderer.getWidth(string), y + 9.0f, -1);
         }
         if (stack.isItemBarVisible())
         {
-            int i = stack.getItemBarStep();
+            int i = (int) Math.clamp(stack.getItemBarStep() * 0.923076923, 0, 12);
             int j = stack.getItemBarColor();
-            int k = x + 2;
+            int k = x + 3;
             int l = y + 13;
-            RenderManager.rect(matrixStack, k, l, 13, 1, Colors.BLACK);
+            RenderManager.rect(matrixStack, k, l, 12, 1, Colors.BLACK);
             RenderManager.rect(matrixStack, k, l, i, 1, j | Colors.BLACK);
         }
         matrixStack.pop();
@@ -541,11 +547,7 @@ public class NametagsModule extends ToggleModule
 
     private void renderEnchants(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
     {
-        if (itemStack.getItem() == Items.ENCHANTED_GOLDEN_APPLE)
-        {
-            drawText(matrixStack, "God", x * 2, y * 2, 0xffc34e41);
-            return;
-        }
+
         if (!itemStack.hasEnchantments())
         {
             return;
