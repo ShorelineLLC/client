@@ -6,14 +6,14 @@ import net.shoreline.eventbus.event.Event;
 @Cancelable
 public class ReachEvent extends Event
 {
-    private float reach;
+    private double reach;
 
-    public float getReach()
+    public double getReach()
     {
         return reach;
     }
 
-    public void setReach(float reach)
+    public void setReach(double reach)
     {
         this.reach = reach;
     }
