@@ -79,8 +79,6 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
         this.parent.findResources(type, namespace, prefix, consumer);
     }
 
-
-
     @Override
     public Set<String> getNamespaces(ResourceType type)
     {
