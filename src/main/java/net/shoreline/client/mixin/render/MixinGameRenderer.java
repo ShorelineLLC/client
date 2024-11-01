@@ -182,7 +182,7 @@ public class MixinGameRenderer implements Globals
     {
         TargetEntityEvent targetEntityEvent = new TargetEntityEvent();
         EventBus.INSTANCE.dispatch(targetEntityEvent);
-        if (targetEntityEvent.isCanceled() && client.crosshairTarget.getType() == HitResult.Type.BLOCK)
+        if (targetEntityEvent.isCanceled() && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.BLOCK)
         {
             client.getProfiler().pop();
             info.cancel();
