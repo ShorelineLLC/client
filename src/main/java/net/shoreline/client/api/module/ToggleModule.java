@@ -31,6 +31,7 @@ public class ToggleModule extends Module implements Hideable
 {
     //
     private final Animation animation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
+
     // Config representing the module enabled state. Cannot interact with
     // this configuration unless using #toggle() #enable() or #disable().
     Config<Boolean> enabledConfig = register(new ToggleConfig("Enabled", "The module" +
