@@ -646,7 +646,7 @@ public class HUDModule extends ToggleModule
             }
 
             double animationProgress = Math.min((System.currentTimeMillis() - startTime) / (float) animTimeConfig.getValue(), 1.0);
-            double factor = Easing.LINEAR.ease(animationProgress);
+            double factor = Easing.BOUNCE_IN_OUT.ease(animationProgress);
             this.x = this.x * (1.0 - factor) + (endpoint * factor);
 
             RenderManager.renderText(context, getFormattedModule(module),
