@@ -13,15 +13,15 @@ import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
-import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
-import net.shoreline.client.impl.event.gui.hud.ChatTextEvent;
-import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
-import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
+import net.shoreline.client.impl.event.gui.hud.*;
 import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.impl.imixin.IChatHudLineVisible;
+import net.shoreline.client.init.Fonts;
+import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
@@ -113,10 +113,19 @@ public abstract class MixinChatHud implements IChatHud, Globals
     {
         RenderChatHudEvent renderChatHudEvent = new RenderChatHudEvent(current);
         EventBus.INSTANCE.dispatch(renderChatHudEvent);
+
+        ChatTextRenderEvent chatTextRenderEvent = new ChatTextRenderEvent();
+        EventBus.INSTANCE.dispatch(chatTextRenderEvent);
+
         if (renderChatHudEvent.isCanceled())
         {
             if (renderChatHudEvent.getAnimationMode())
             {
+                if (chatTextRenderEvent.isCanceled())
+                {
+                    RenderManager.renderText(instance, FormattingUtil.toString(text), (int) renderChatHudEvent.getAnimation(), y, color);
+                    return RenderManager.textWidth(FormattingUtil.toString(text));
+                }
                 return instance.drawTextWithShadow(textRenderer, text, (int) renderChatHudEvent.getAnimation(), y, color);
             }
             else
@@ -126,8 +135,20 @@ public abstract class MixinChatHud implements IChatHud, Globals
                 float colorAlpha = (color >> 24) & 0xFF;
                 alpha = Math.max(0.0f, Math.min(1.0f, alpha));
                 int colorAlphaInt = Math.max(10, (int) (colorAlpha * alpha));
-                return instance.drawTextWithShadow(textRenderer, text, 0, y, alpha == 1.0f ? color : (colorAlphaInt << 24) | (color & 0xFFFFFF));
+
+                int color1 = alpha == 1.0f ? color : (colorAlphaInt << 24) | (color & 0xFFFFFF);
+                if (chatTextRenderEvent.isCanceled())
+                {
+                    RenderManager.renderText(instance, FormattingUtil.toString(text), 0, y, color1);
+                    return RenderManager.textWidth(FormattingUtil.toString(text));
+                }
+                return instance.drawTextWithShadow(textRenderer, text, 0, y, color1);
             }
+        }
+        if (chatTextRenderEvent.isCanceled())
+        {
+            RenderManager.renderText(instance, FormattingUtil.toString(text), 0, y, color);
+            return RenderManager.textWidth(FormattingUtil.toString(text));
         }
         return instance.drawTextWithShadow(textRenderer, text, 0, y, color);
     }

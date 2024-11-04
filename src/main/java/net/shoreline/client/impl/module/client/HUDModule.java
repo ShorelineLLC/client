@@ -650,15 +650,7 @@ public class HUDModule extends ToggleModule
             boolean drawing = module.isEnabled() && !module.isHidden();
             if (drawing != wasDrawing || prevTextWidth != textWidth)
             {
-                if (prevTextWidth != textWidth)
-                {
-                    animationProgress = 0.125;
-                }
-
-                if (drawing != wasDrawing)
-                {
-                    animationProgress = 0.0;
-                }
+                animationProgress = 0.0;
 
                 if (drawing)
                 {
@@ -672,7 +664,7 @@ public class HUDModule extends ToggleModule
                 prevTextWidth = textWidth;
             }
 
-            double factor = Easing.BOUNCE_IN_OUT.ease(animationProgress);
+            double factor = Easing.SINE_IN_OUT.ease(animationProgress);
             this.x = this.x * (1.0 - factor) + (endpoint * factor);
         }
     }

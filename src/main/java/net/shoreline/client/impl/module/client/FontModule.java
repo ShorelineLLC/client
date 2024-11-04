@@ -7,6 +7,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
+import net.shoreline.client.impl.event.gui.hud.ChatTextRenderEvent;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
@@ -23,6 +24,7 @@ public class FontModule extends ToggleModule
     Config<Boolean> fractionalMetrics = register(new BooleanConfig("FractionalMetrics", "Applies fractional metrics to font", false));
     Config<Integer> sizeConfig = register(new NumberConfig<>("Size", "The font size", 5, 9, 12));
     Config<Boolean> shadowConfig = register(new BooleanConfig("VanillaShadow", "Renders vanilla text with a shadow background", true, () -> !isEnabled()));
+    Config<Boolean> chatFontConfig = register(new BooleanConfig("ChatFont", "Uses custom font for chat text", false));
 
     /**
      *
@@ -58,6 +60,15 @@ public class FontModule extends ToggleModule
                 && (event.getConfig() == antiAliasConfig || event.getConfig() == fractionalMetrics))
         {
             Fonts.closeFonts();
+        }
+    }
+
+    @EventListener
+    public void onChatTextRender(ChatTextRenderEvent event)
+    {
+        if (chatFontConfig.getValue())
+        {
+            event.cancel();
         }
     }
 

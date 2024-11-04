@@ -1,9 +1,12 @@
 package net.shoreline.client.util;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.loader.Loader;
 
 import java.util.Map;
 import java.util.Optional;
@@ -13,7 +16,7 @@ import java.util.stream.Stream;
 public class FormattingUtil
 {
     private static final Map<Integer, Formatting> COLOR_TO_FORMATTING = Stream.of(Formatting.values()).filter(Formatting::isColor)
-            .collect(ImmutableMap.toImmutableMap(formatting -> formatting.getColorValue(), Function.identity()));
+            .collect(ImmutableMap.toImmutableMap(Formatting::getColorValue, Function.identity()));
 
     // Fuck minecraft
     public static String toString(Text text)
@@ -25,10 +28,18 @@ public class FormattingUtil
             {
                 if (styleOverride.getColor() != null)
                 {
-                    Formatting formatting = COLOR_TO_FORMATTING.get(styleOverride.getColor().getRgb());
-                    if (formatting != null)
+                    int rgb = styleOverride.getColor().getRgb();
+                    if (rgb == (ColorsModule.getInstance().getRGB() & 0xFFFFFF))
                     {
-                        builder.append(Formatting.FORMATTING_CODE_PREFIX).append(formatting.getCode());
+                        builder.append(Formatting.FORMATTING_CODE_PREFIX).append("s");
+                    }
+                    else
+                    {
+                        Formatting formatting = COLOR_TO_FORMATTING.get(rgb);
+                        if (formatting != null)
+                        {
+                            builder.append(Formatting.FORMATTING_CODE_PREFIX).append(formatting.getCode());
+                        }
                     }
                 }
                 else if (styleOverride.isObfuscated())
@@ -59,6 +70,57 @@ public class FormattingUtil
             }
             return Optional.empty();
         }, Style.EMPTY);
+        return builder.toString();
+    }
+
+    public static String toString(OrderedText text)
+    {
+        StringBuilder builder = new StringBuilder();
+        text.accept((index, style, codePoint) ->
+        {
+            if (style.getColor() != null)
+            {
+                int rgb = style.getColor().getRgb();
+                if (rgb == (ColorsModule.getInstance().getRGB() & 0xFFFFFF))
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("s");
+                }
+                else
+                {
+                    Formatting formatting = COLOR_TO_FORMATTING.get(rgb);
+                    if (formatting != null)
+                    {
+                        builder.append(Formatting.FORMATTING_CODE_PREFIX).append(formatting.getCode());
+                    }
+                }
+            }
+            else if (style.isObfuscated())
+            {
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("k");
+            }
+            else if (style.isBold())
+            {
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("l");
+            }
+            else if (style.isStrikethrough())
+            {
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("m");
+            }
+            else if (style.isUnderlined())
+            {
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("n");
+            }
+            else if (style.isItalic())
+            {
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("o");
+            }
+            else
+            {
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("r");
+            }
+            builder.appendCodePoint(codePoint);
+            return true;
+        });
         return builder.toString();
     }
 }
