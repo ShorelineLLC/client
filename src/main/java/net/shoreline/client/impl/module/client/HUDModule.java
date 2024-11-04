@@ -83,6 +83,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
     Config<Boolean> fpsConfig = register(new BooleanConfig("FPS", "Displays game FPS", true));
     Config<Boolean> arraylistConfig = register(new BooleanConfig("Arraylist", "Displays a list of all active modules", true));
+    Config<Integer> animTimeConfig = register(new NumberConfig<>("Anim-Time", "Timer for the animation", 0, 700, 1000, () -> false));
     Config<Ordering> orderingConfig = register(new EnumConfig<>("Ordering", "The ordering of the arraylist", Ordering.LENGTH, Ordering.values(), () -> arraylistConfig.getValue()));
     Config<Rendering> renderingConfig = register(new EnumConfig<>("Rendering", "The rendering mode of the HUD", Rendering.UP, Rendering.values()));
     // Rainbow settings
@@ -610,10 +611,10 @@ public class HUDModule extends ToggleModule
         private final ToggleModule module;
         private double x;
 
-        private double animationProgress = 0;
+        private long startTime;
 
         private double endpoint;
-        private float prevTextWidth;
+        private int prevTextWidth;
 
         private boolean wasDrawing;
 
@@ -624,14 +625,29 @@ public class HUDModule extends ToggleModule
 
         public void draw(DrawContext context, long drawnCount)
         {
-            if (animationProgress < 1.0)
-            {
-                final double animationSpeed = 0.003;
-                animationProgress = Math.min(animationProgress + animationSpeed, 1.0);
-            }
-
             String text = getFormattedModule(module);
             int textWidth = RenderManager.textWidth(text);
+
+            boolean drawing = module.isEnabled() && !module.isHidden();
+            if (drawing != wasDrawing || prevTextWidth != textWidth)
+            {
+                startTime = System.currentTimeMillis();
+
+                if (drawing)
+                {
+                    endpoint = -textWidth;
+                }
+                else
+                {
+                    endpoint = 1.0f;
+                }
+                wasDrawing = drawing;
+                prevTextWidth = textWidth;
+            }
+
+            double animationProgress = Math.min((System.currentTimeMillis() - startTime) / (float) animTimeConfig.getValue(), 1.0);
+            double factor = Easing.LINEAR.ease(animationProgress);
+            this.x = this.x * (1.0 - factor) + (endpoint * factor);
 
             RenderManager.renderText(context, getFormattedModule(module),
                      mc.getWindow().getScaledWidth() + (float) this.x,
@@ -646,26 +662,6 @@ public class HUDModule extends ToggleModule
                 bottomRight -= RenderManager.textHeight();
             }
             rainbowOffset++;
-
-            boolean drawing = module.isEnabled() && !module.isHidden();
-            if (drawing != wasDrawing || prevTextWidth != textWidth)
-            {
-                animationProgress = 0.0;
-
-                if (drawing)
-                {
-                    endpoint = -textWidth;
-                }
-                else
-                {
-                    endpoint = 1.0f;
-                }
-                wasDrawing = drawing;
-                prevTextWidth = textWidth;
-            }
-
-            double factor = Easing.BOUNCE_IN_OUT.ease(animationProgress);
-            this.x = this.x * (1.0 - factor) + (endpoint * factor);
         }
     }
 }
