@@ -262,7 +262,7 @@ public class HUDModule extends ToggleModule
                     int width = RenderManager.textWidth(text);
                     RenderManager.renderText(event.getContext(), text,
                             res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
-                            potionColorsConfig.getValue() ? effect.getColor() : getHudColor(rainbowOffset));
+                            potionColorsConfig.getValue() ? ColorUtil.withAlpha(effect.getColor(), 255) : getHudColor(rainbowOffset));
                     if (renderingUp)
                     {
                         bottomRight -= RenderManager.textHeight();
@@ -664,7 +664,7 @@ public class HUDModule extends ToggleModule
                 prevTextWidth = textWidth;
             }
 
-            double factor = Easing.SINE_IN_OUT.ease(animationProgress);
+            double factor = Easing.BOUNCE_IN_OUT.ease(animationProgress);
             this.x = this.x * (1.0 - factor) + (endpoint * factor);
         }
     }
