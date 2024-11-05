@@ -121,7 +121,7 @@ public class ChatModule extends ToggleModule
     }
 
     @EventListener
-    public void onRenderOverlay(RenderOverlayEvent.Post event)
+    public void onRenderOverlay(RenderOverlayEvent.Hotbar event)
     {
         if (dmsOnly.getValue())
         {
@@ -133,8 +133,8 @@ public class ChatModule extends ToggleModule
             float height = mc.getWindow().getScaledHeight();
             float width = mc.getWindow().getScaledWidth();
             float anim = HUDModule.getInstance().isEnabled() ? HUDModule.getInstance().getChatAnimation() : 1.0f;
-            RenderManager.borderedRect(event.getContext().getMatrices(), 2, (int) (height - 1.0f),
-                    width - 4, -14.0f * anim, ColorsModule.getInstance().getRGB((int) (255.0f * ircAnimation.getFactor())), 1.0f);
+            RenderManager.borderedRect(event.getContext().getMatrices(), 2, (int) height,
+                    width - 4, -16.0f * anim, ColorsModule.getInstance().getRGB((int) (255.0f * ircAnimation.getFactor())), 1.0f);
         }
     }
 
