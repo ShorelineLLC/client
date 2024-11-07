@@ -67,6 +67,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> watermarkConfig = register(new BooleanConfig("Watermark", "Displays client name and version watermark", true));
     Config<Boolean> userInfo = register(new BooleanConfig("UserInfo", "Displays your user information", true));
     Config<Boolean> directionConfig = register(new BooleanConfig("Direction", "Displays facing direction", true));
+    Config<Boolean> rotationConfig = register(new BooleanConfig("Rotation", "Displays player yaw and pitch", false, () -> directionConfig.getValue()));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays player equipped armor and durability", true));
     Config<Boolean> armorDurabilityConfig = register(new BooleanConfig("ArmorDurability", "Displays player equipped armor durability", false, () -> armorConfig.getValue()));
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
@@ -239,9 +240,10 @@ public class HUDModule extends ToggleModule
                 String dir = EnumFormatter.formatDirection(direction);
                 String axis = EnumFormatter.formatAxis(direction.getAxis());
                 boolean pos = direction.getDirection() == Direction.AxisDirection.POSITIVE;
+                String rotationText = String.format(", %s", (int) MathHelper.wrapDegrees(Managers.ROTATION.getServerYaw()));
                 RenderManager.renderText(event.getContext(),
-                        String.format("%s §7[§f%s%s§7]", dir, axis,
-                                pos ? "+" : "-"), 2, bottomLeft,
+                        String.format("%s §7[§f%s%s%s§7]", dir, axis,
+                                pos ? "+" : "-", rotationConfig.getValue() ? rotationText : ""),2, bottomLeft,
                         getHudColor(rainbowOffset));
                 // bottomLeft -= RenderManager.textHeight();
             }

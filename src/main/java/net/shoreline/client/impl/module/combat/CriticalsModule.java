@@ -148,11 +148,7 @@ public class CriticalsModule extends ToggleModule
                 if (mc.player.isOnGround() && !mc.player.input.jumping)
                 {
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.05f, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.03f, z, false));
+                            x, y + 0.0625f, z, false));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                             x, y, z, false));
                     mc.player.addCritParticles(e);
