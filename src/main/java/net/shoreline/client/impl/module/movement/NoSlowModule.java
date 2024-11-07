@@ -110,21 +110,18 @@ public class NoSlowModule extends ToggleModule
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent event)
     {
-        if (event.getStage() == StageEvent.EventStage.PRE
+        if (event.getStage() == StageEvent.EventStage.PRE && grimConfig.getValue()
                 && mc.player.isUsingItem() && !mc.player.isSneaking() && itemsConfig.getValue())
         {
 
-            if (grimConfig.getValue() || grimNewConfig.getValue())
+            // Grim focuses on other hand noslow checks
+            if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack()))
             {
-                // Grim focuses on other hand noslow checks
-                if (mc.player.getActiveHand() == Hand.OFF_HAND && checkStack(mc.player.getMainHandStack()))
-                {
-                    Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
-                }
-                else if (checkStack(mc.player.getOffHandStack()))
-                {
-                    Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
-                }
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+            }
+            else if (checkStack(mc.player.getOffHandStack()))
+            {
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
             }
         }
     }
