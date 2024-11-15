@@ -10,10 +10,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
 import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
-import net.shoreline.client.impl.event.gui.hud.ChatLineEvent;
-import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
-import net.shoreline.client.impl.event.gui.hud.RenderChatHudEvent;
-import net.shoreline.client.impl.event.gui.hud.SignatureIndicatorEvent;
+import net.shoreline.client.impl.event.gui.hud.*;
 import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.render.animation.Easing;
@@ -28,6 +25,7 @@ import java.util.Map;
 //TODO: add easing when linus fixes enumconfig...
 public class BetterChatModule extends ToggleModule
 {
+    Config<Boolean> chatFontConfig = register(new BooleanConfig("ChatFont", "Uses custom font for chat text", false));
     Config<Timestamp> timestampConfig = register(new EnumConfig<>("Timestamp", "Shows chat timestamps", Timestamp.OFF, Timestamp.values()));
     Config<AnimationMode> animationConfig = register(new EnumConfig<>("Animation", "Animates the chat", AnimationMode.OFF, AnimationMode.values()));
     Config<Integer> timeConfig = register(new NumberConfig<>("Anim-Time", "Time for the animation", 0, 200, 1000, () -> false));
@@ -124,6 +122,15 @@ public class BetterChatModule extends ToggleModule
     public void onChatLength(ChatLengthEvent event)
     {
         if (infiniteConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onChatTextRender(ChatTextRenderEvent event)
+    {
+        if (chatFontConfig.getValue())
         {
             event.cancel();
         }

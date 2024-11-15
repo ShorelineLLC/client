@@ -158,4 +158,11 @@ public class MixinInGameHud implements Globals
         }
         return instance.drawText(mc.textRenderer, text, x, y, color, true);
     }
+
+    @Inject(method = "renderMainHud", at = @At(value = "TAIL"))
+    private void hookRenderHotbar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    {
+        RenderOverlayEvent.Hotbar hotbar = new RenderOverlayEvent.Hotbar(context);
+        EventBus.INSTANCE.dispatch(hotbar);
+    }
 }

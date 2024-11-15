@@ -65,6 +65,19 @@ public class MixinClientConnection
         }
     }
 
+    @Inject(method = "sendImmediately", at = @At(value = "TAIL"), cancellable = true)
+    private void hookSendImmediately$2(Packet<?> packet, @Nullable PacketCallbacks callbacks,
+                                       boolean flush, CallbackInfo ci)
+    {
+        PacketEvent.OutboundPost packetOutboundEvent =
+                new PacketEvent.OutboundPost(packet);
+        EventBus.INSTANCE.dispatch(packetOutboundEvent);
+        if (packetOutboundEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
     /**
      * @param channelHandlerContext
      * @param packet

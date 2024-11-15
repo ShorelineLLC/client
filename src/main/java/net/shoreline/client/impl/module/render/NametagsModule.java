@@ -89,7 +89,6 @@ public class NametagsModule extends ToggleModule
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Renders nametags on invisible players", true));
     Config<Boolean> backgroundConfig = register(new BooleanConfig("Background", "Renders a background behind the nametag", true));
     Config<Boolean> borderedConfig = register(new BooleanConfig("Border", "Renders a border around the nametag", false));
-    Config<Float> thicknessConfig = register(new NumberConfig<>("Thickness", "The border thickness", 0.1f, 0.5f, 1.0f, () -> borderedConfig.getValue()));
     Config<Boolean> tamedConfig = register(new BooleanConfig("MobOwner", "Renders nametags on tamed mobs", false));
     Config<Boolean> pearlsConfig = register(new BooleanConfig("Pearls", "Renders nametags on thrown ender pearls", false));
     Config<Boolean> droppedItemsConfig = register(new BooleanConfig("DroppedItems", "Renders nametags on dropped items", false));
@@ -263,8 +262,8 @@ public class NametagsModule extends ToggleModule
         }
         if (borderedConfig.getValue())
         {
-            RenderManager.borderedRect(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
-                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB(), thicknessConfig.getValue());
+            RenderManager.borderedRectLine(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
+                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB());
         }
 
         int color = getNametagColor(entity);

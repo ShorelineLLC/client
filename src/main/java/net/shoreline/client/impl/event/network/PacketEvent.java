@@ -81,4 +81,16 @@ public class PacketEvent extends Event
             return cached;
         }
     }
+
+    @Cancelable
+    public static class OutboundPost extends PacketEvent
+    {
+        /**
+         * @param packet
+         */
+        public OutboundPost(Packet<?> packet)
+        {
+            super(packet);
+        }
+    }
 }

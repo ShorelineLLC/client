@@ -1,12 +1,15 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -15,6 +18,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.network.InteractType;
@@ -72,8 +76,7 @@ public class CriticalsModule extends ToggleModule
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet
                 && packet.getType() == InteractType.ATTACK)
         {
-            if (mc.player.isRiding()
-                    || mc.player.isFallFlying()
+            if (mc.player.isRiding() || mc.player.isFallFlying()
                     || mc.player.isTouchingWater()
                     || mc.player.isInLava()
                     || mc.player.isHoldingOntoLadder()
@@ -82,6 +85,7 @@ public class CriticalsModule extends ToggleModule
             {
                 return;
             }
+
             // Attacked entity
             final Entity e = packet.getEntity();
             if (e == null || !e.isAlive() || !(e instanceof LivingEntity))
@@ -101,9 +105,22 @@ public class CriticalsModule extends ToggleModule
                 }
                 return;
             }
+
+            boolean sprinting = mc.player.isSprinting();
+            if (sprinting)
+            {
+                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+            }
+
             attackSpoofJump(e);
+
+            if (sprinting)
+            {
+                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+            }
         }
     }
+
 
     public void attackSpoofJump(Entity e)
     {
@@ -131,11 +148,7 @@ public class CriticalsModule extends ToggleModule
                 if (mc.player.isOnGround() && !mc.player.input.jumping)
                 {
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.05f, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.03f, z, false));
+                            x, y + 0.0625f, z, false));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                             x, y, z, false));
                     mc.player.addCritParticles(e);
@@ -176,6 +189,18 @@ public class CriticalsModule extends ToggleModule
 //                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
 //                        x, y + 0.001150000001304f, z, mc.player.getYaw(), mc.player.getPitch(), false));
             }
+            case GRIM_V3 ->
+            {
+                if (!mc.player.isCrawling() && isDoublePhased())
+                {
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.00001058293536f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.00000916580235f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.00000010371854f, z, false));
+                }
+            }
             case LOW_HOP ->
             {
                 // mc.player.jump();
@@ -189,12 +214,27 @@ public class CriticalsModule extends ToggleModule
         return modeConfig.getValue() == CritMode.GRIM;
     }
 
+    public boolean isDoublePhased()
+    {
+        for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
+        {
+            BlockState state = mc.world.getBlockState(pos);
+            BlockState state2 = mc.world.getBlockState(pos.up());
+            if (!state.isReplaceable() && !state2.isReplaceable())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public enum CritMode
     {
         PACKET,
         PACKET_STRICT,
         VANILLA,
         GRIM,
+        GRIM_V3,
         LOW_HOP
     }
 }

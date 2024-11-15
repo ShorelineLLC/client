@@ -162,7 +162,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
     }
 
     @Inject(method = "getBlockInteractionRange", at = @At(value = "HEAD"), cancellable = true)
-    private void hookGetBlockInteractionRange(CallbackInfoReturnable<Float> cir)
+    private void hookGetBlockInteractionRange(CallbackInfoReturnable<Double> cir)
     {
         final ReachEvent.Block reachEvent = new ReachEvent.Block();
         EventBus.INSTANCE.dispatch(reachEvent);
@@ -174,7 +174,7 @@ public abstract class MixinPlayerEntity extends LivingEntity implements Globals
     }
 
     @Inject(method = "getEntityInteractionRange", at = @At(value = "HEAD"), cancellable = true)
-    private void hookGetEntityInteractionRange(CallbackInfoReturnable<Float> cir)
+    private void hookGetEntityInteractionRange(CallbackInfoReturnable<Double> cir)
     {
         final ReachEvent.Entity reachEvent = new ReachEvent.Entity();
         EventBus.INSTANCE.dispatch(reachEvent);

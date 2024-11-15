@@ -5,6 +5,7 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.enums.ChestType;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.Entity;
@@ -48,7 +49,9 @@ import net.shoreline.loader.Loader;
 
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -64,6 +67,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> watermarkConfig = register(new BooleanConfig("Watermark", "Displays client name and version watermark", true));
     Config<Boolean> userInfo = register(new BooleanConfig("UserInfo", "Displays your user information", true));
     Config<Boolean> directionConfig = register(new BooleanConfig("Direction", "Displays facing direction", true));
+    Config<Boolean> rotationConfig = register(new BooleanConfig("Rotation", "Displays player yaw and pitch", false, () -> directionConfig.getValue()));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays player equipped armor and durability", true));
     Config<Boolean> armorDurabilityConfig = register(new BooleanConfig("ArmorDurability", "Displays player equipped armor durability", false, () -> armorConfig.getValue()));
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
@@ -80,6 +84,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
     Config<Boolean> fpsConfig = register(new BooleanConfig("FPS", "Displays game FPS", true));
     Config<Boolean> arraylistConfig = register(new BooleanConfig("Arraylist", "Displays a list of all active modules", true));
+    Config<Integer> animTimeConfig = register(new NumberConfig<>("Anim-Time", "Timer for the animation", 0, 700, 1000, () -> false));
     Config<Ordering> orderingConfig = register(new EnumConfig<>("Ordering", "The ordering of the arraylist", Ordering.LENGTH, Ordering.values(), () -> arraylistConfig.getValue()));
     Config<Rendering> renderingConfig = register(new EnumConfig<>("Rendering", "The rendering mode of the HUD", Rendering.UP, Rendering.values()));
     // Rainbow settings
@@ -98,6 +103,7 @@ public class HUDModule extends ToggleModule
     private boolean renderingUp;
     private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
     private final PerSecondCounter fpsCounter = new PerSecondCounter();
+    private final Map<String, HudRenderModule> hudRenderModules = new HashMap<>();
 
     public HUDModule()
     {
@@ -113,26 +119,15 @@ public class HUDModule extends ToggleModule
 
     private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule, long drawnCount)
     {
-        final Animation anim = toggleModule.getAnimation();
-        float factor = (float) anim.getFactor();
-        if (factor <= 0.01f || toggleModule.isHidden())
+        if (toggleModule.getAnimation().getFactor() <= 0.01f || toggleModule.isHidden())
         {
             return;
         }
-        String text = getFormattedModule(toggleModule);
-        int width = RenderManager.textWidth(text);
-        RenderManager.renderText(event.getContext(), text,
-                mc.getWindow().getScaledWidth() - width * factor - 1.0f,
-                renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));
-        if (renderingUp)
+        HudRenderModule hudRender = hudRenderModules.get(toggleModule.getId());
+        if (hudRender != null)
         {
-            topRight += RenderManager.textHeight();
+            hudRender.draw(event.getContext(), drawnCount);
         }
-        else
-        {
-            bottomRight -= RenderManager.textHeight();
-        }
-        rainbowOffset++;
     }
 
     @EventListener
@@ -145,6 +140,18 @@ public class HUDModule extends ToggleModule
     @EventListener
     public void onRenderOverlayPost(RenderOverlayEvent.Post event)
     {
+        if (hudRenderModules.isEmpty())
+        {
+            for (Module module : Managers.MODULE.getModules())
+            {
+                if (!(module instanceof ToggleModule toggleModule))
+                {
+                    continue;
+                }
+                hudRenderModules.put(module.getId(), new HudRenderModule(toggleModule));
+            }
+        }
+
         fpsCounter.updateCounter();
         if (mc.player != null && mc.world != null)
         {
@@ -233,9 +240,10 @@ public class HUDModule extends ToggleModule
                 String dir = EnumFormatter.formatDirection(direction);
                 String axis = EnumFormatter.formatAxis(direction.getAxis());
                 boolean pos = direction.getDirection() == Direction.AxisDirection.POSITIVE;
+                String rotationText = String.format(", %s", (int) MathHelper.wrapDegrees(Managers.ROTATION.getServerYaw()));
                 RenderManager.renderText(event.getContext(),
-                        String.format("%s §7[§f%s%s§7]", dir, axis,
-                                pos ? "+" : "-"), 2, bottomLeft,
+                        String.format("%s §7[§f%s%s%s§7]", dir, axis,
+                                pos ? "+" : "-", rotationConfig.getValue() ? rotationText : ""),2, bottomLeft,
                         getHudColor(rainbowOffset));
                 // bottomLeft -= RenderManager.textHeight();
             }
@@ -257,7 +265,7 @@ public class HUDModule extends ToggleModule
                     int width = RenderManager.textWidth(text);
                     RenderManager.renderText(event.getContext(), text,
                             res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
-                            potionColorsConfig.getValue() ? effect.getColor() : getHudColor(rainbowOffset));
+                            potionColorsConfig.getValue() ? ColorUtil.withAlpha(effect.getColor(), 255) : getHudColor(rainbowOffset));
                     if (renderingUp)
                     {
                         bottomRight -= RenderManager.textHeight();
@@ -533,13 +541,16 @@ public class HUDModule extends ToggleModule
 
     private String getFormattedModule(final Module module)
     {
-        final String metadata = module.getModuleData();
+        return module.getName() + getFormattedModuleData(module.getModuleData());
+    }
+
+    private String getFormattedModuleData(final String metadata)
+    {
         if (!metadata.equals("ARRAYLIST_INFO"))
         {
-            return String.format("%s §7[§f%s§7]", module.getName(),
-                    module.getModuleData());
+            return " §7[§f" + metadata + "§7]";
         }
-        return module.getName();
+        return "";
     }
 
     private int rainbow(long offset)
@@ -593,5 +604,66 @@ public class HUDModule extends ToggleModule
         GRADIENT,
         GRADIENT_HUE,
         STATIC_HUE
+    }
+
+    // Thanks lolwut
+
+    public class HudRenderModule
+    {
+        private final ToggleModule module;
+        private double x;
+
+        private long startTime;
+
+        private double endpoint;
+        private int prevTextWidth;
+
+        private boolean wasDrawing;
+
+        public HudRenderModule(ToggleModule module)
+        {
+            this.module = module;
+        }
+
+        public void draw(DrawContext context, long drawnCount)
+        {
+            String text = getFormattedModule(module);
+            int textWidth = RenderManager.textWidth(text);
+
+            boolean drawing = module.isEnabled() && !module.isHidden();
+            if (drawing != wasDrawing || prevTextWidth != textWidth)
+            {
+                startTime = System.currentTimeMillis();
+
+                if (drawing)
+                {
+                    endpoint = -textWidth;
+                }
+                else
+                {
+                    endpoint = 1.0f;
+                }
+                wasDrawing = drawing;
+                prevTextWidth = textWidth;
+            }
+
+            double animationProgress = Math.min((System.currentTimeMillis() - startTime) / (float) animTimeConfig.getValue(), 1.0);
+            double factor = Easing.BOUNCE_IN_OUT.ease(animationProgress);
+            this.x = this.x * (1.0 - factor) + (endpoint * factor);
+
+            RenderManager.renderText(context, getFormattedModule(module),
+                     mc.getWindow().getScaledWidth() + (float) this.x,
+                    renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));
+
+            if (renderingUp)
+            {
+                topRight += RenderManager.textHeight();
+            }
+            else
+            {
+                bottomRight -= RenderManager.textHeight();
+            }
+            rainbowOffset++;
+        }
     }
 }

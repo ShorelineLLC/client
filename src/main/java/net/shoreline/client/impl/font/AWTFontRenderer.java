@@ -82,7 +82,7 @@ public final class AWTFontRenderer implements Closeable, Globals
         float r = ((color >> 16) & 0xff) / 255.0f * brightnessMultiplier;
         float g = ((color >> 8) & 0xff) / 255.0f * brightnessMultiplier;
         float b = ((color) & 0xff) / 255.0f * brightnessMultiplier;
-        float a = (color & 0xff000000) != 0xff000000 ? 1.0f : ((color >> 24) & 0xff) / 255.0f;
+        float a = ((color >> 24) & 0xff) / 255.0f;
         drawString(stack, text, (float) x, (float) y, r, g, b, a, brightnessMultiplier);
     }
 

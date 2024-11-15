@@ -209,4 +209,16 @@ public class RenderOverlayEvent extends Event
             super(context);
         }
     }
+
+    @Cancelable
+    public static class Hotbar extends RenderOverlayEvent
+    {
+        /**
+         * @param context
+         */
+        public Hotbar(DrawContext context)
+        {
+            super(context);
+        }
+    }
 }
