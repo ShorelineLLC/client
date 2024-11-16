@@ -88,7 +88,6 @@ public final class ModuleManager
                 new PacketFlyModule(),
                 new PhaseModule(),
                 new PortalGodModeModule(),
-                new RaytraceResolverModule(),
                 new ReachModule(),
                 // Misc
                 new AntiAFKModule(),
