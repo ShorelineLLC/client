@@ -616,6 +616,11 @@ public class AutoMineModule extends CombatModule
 
     private void startAutoMine(BlockPos pos, Direction direction)
     {
+        BlockState state = mc.world.getBlockState(pos);
+        if (state.getBlock().getHardness() == -1.0f || state.isAir())
+        {
+            return;
+        }
         if (grimNewConfig.getValue())
         {
             for (int i = 0; i < 3; ++i)

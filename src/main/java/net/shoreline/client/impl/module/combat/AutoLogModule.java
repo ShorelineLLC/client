@@ -12,6 +12,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.FakePlayerEntity;
+import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
@@ -55,7 +56,7 @@ public class AutoLogModule extends ToggleModule
             }
         }
         float health = mc.player.getHealth() + mc.player.getAbsorptionAmount();
-        int totems = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING);
+        int totems = InventoryUtil.count(Items.TOTEM_OF_UNDYING);
         boolean b2 = totems <= totemsConfig.getValue();
         if (health <= healthConfig.getValue())
         {

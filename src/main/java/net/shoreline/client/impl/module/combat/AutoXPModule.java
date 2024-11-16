@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ExperienceBottleItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.Config;
@@ -14,6 +15,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.timer.TickTimer;
+import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 /**
@@ -35,6 +37,12 @@ public class AutoXPModule extends RotationModule
     public AutoXPModule()
     {
         super("AutoXP", "Automatically throws xp silently.", ModuleCategory.COMBAT, 850);
+    }
+
+    @Override
+    public String getModuleData()
+    {
+        return String.valueOf(InventoryUtil.count(Items.EXPERIENCE_BOTTLE));
     }
 
     @EventListener

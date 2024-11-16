@@ -45,6 +45,7 @@ public final class AutoTotemModule extends ToggleModule
     Config<Boolean> crappleConfig = register(new BooleanConfig("Crapple", "Uses a normal golden apple if Absorption is present", true));
     Config<Boolean> lethalConfig = register(new BooleanConfig("Lethal", "Calculates lethal damage sources", false, () -> itemConfig.getValue() != OffhandItem.TOTEM));
     Config<Boolean> fastConfig = register(new BooleanConfig("FastSwap", "Swaps items to offhand", true));
+    Config<Boolean> mainhandTotemConfig = register(new BooleanConfig("MainhandTotem", "Swaps to a totem in your mainhand", false));
     Config<Boolean> alternativeConfig = register(new BooleanConfig("Alternative", "Replaces totem using the swap packet", false));
     Config<Boolean> debugConfig = register(new BooleanConfig("Debug", "Debug on death", false));
 
@@ -68,7 +69,7 @@ public final class AutoTotemModule extends ToggleModule
     @Override
     public String getModuleData()
     {
-        return String.valueOf(Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING));
+        return String.valueOf(InventoryUtil.count(Items.TOTEM_OF_UNDYING));
     }
 
     @Override
@@ -84,7 +85,7 @@ public final class AutoTotemModule extends ToggleModule
     @EventListener
     public void onLoadWorld(LoadWorldEvent event)
     {
-        lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING);
+        lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING);
     }
 
     @EventListener
@@ -122,6 +123,24 @@ public final class AutoTotemModule extends ToggleModule
                 {
                     offhandItem = getGoldenAppleType();
                 }
+            }
+        }
+
+        if (mainhandTotemConfig.getValue() && checkMainhandTotem())
+        {
+            int totemSlot = -1;
+            for (int i = 0; i < 9; i++)
+            {
+                ItemStack stack = mc.player.getInventory().getStack(i);
+                if (stack.getItem() == Items.TOTEM_OF_UNDYING)
+                {
+                    totemSlot = i;
+                    break;
+                }
+            }
+            if (totemSlot != -1)
+            {
+                Managers.INVENTORY.setClientSlot(totemSlot);
             }
         }
 
@@ -166,7 +185,7 @@ public final class AutoTotemModule extends ToggleModule
                     if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
                     {
                         mc.interactionManager.clickSlot(0, 45, 0, SlotActionType.PICKUP, mc.player);
-                        lastTotemCount = Managers.INVENTORY.count(Items.TOTEM_OF_UNDYING) - 1;
+                        lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING) - 1;
                     }
                     replacing = false;
                     if (!mc.player.currentScreenHandler.getCursorStack().isEmpty() && mc.player.getOffHandStack().getItem() == offhandItem)
@@ -235,36 +254,31 @@ public final class AutoTotemModule extends ToggleModule
     {
         // If the player's health (+absorption) falls below the "safe" amount, equip a totem
         final float health = PlayerUtil.getLocalPlayerHealth();
-        if (health <= healthConfig.getValue())
+        return health <= healthConfig.getValue() || lethalConfig.getValue() && checkLethalCrystal(health) ||
+                PlayerUtil.computeFallDamage(mc.player.fallDistance, 1.0f) + 0.5f > mc.player.getHealth();
+    }
+
+    private boolean checkLethalCrystal(float health)
+    {
+        final List<Entity> entities = Lists.newArrayList(mc.world.getEntities());
+        for (Entity e : entities)
         {
-            return true;
-        }
-        // Check fall damage
-        if (PlayerUtil.computeFallDamage(mc.player.fallDistance, 1.0f) + 0.5f > mc.player.getHealth())
-        {
-            return true;
-        }
-        if (lethalConfig.getValue())
-        {
-            final List<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-            for (Entity e : entities)
+            if (e == null || !e.isAlive() || !(e instanceof EndCrystalEntity crystal))
             {
-                if (e == null || !e.isAlive() || !(e instanceof EndCrystalEntity crystal))
-                {
-                    continue;
-                }
-                if (mc.player.squaredDistanceTo(e) > 144.0)
-                {
-                    continue;
-                }
-                double potential = ExplosionUtil.getDamageTo(mc.player, crystal.getPos());
-                if (health + 0.5 > potential)
-                {
-                    continue;
-                }
-                return true;
+                continue;
             }
+            if (mc.player.squaredDistanceTo(e) > 144.0)
+            {
+                continue;
+            }
+            double potential = ExplosionUtil.getDamageTo(mc.player, crystal.getPos());
+            if (health + 0.5 > potential)
+            {
+                continue;
+            }
+            return true;
         }
+
         return false;
     }
 
@@ -277,6 +291,15 @@ public final class AutoTotemModule extends ToggleModule
             return Items.GOLDEN_APPLE;
         }
         return Items.ENCHANTED_GOLDEN_APPLE;
+    }
+
+    private boolean checkMainhandTotem()
+    {
+        if (offhandItem == Items.TOTEM_OF_UNDYING)
+        {
+            return mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING || checkLethalCrystal(PlayerUtil.getLocalPlayerHealth());
+        }
+        return false;
     }
 
     public boolean isReplacing()

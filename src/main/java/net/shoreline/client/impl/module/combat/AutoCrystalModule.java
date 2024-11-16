@@ -46,6 +46,7 @@ import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.PerSecondCounter;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -834,7 +835,7 @@ public class AutoCrystalModule extends RotationModule
         BlockHitResult result = new BlockHitResult(blockPos.toCenterPos(), sidePlace, blockPos, false);
         if (autoSwapConfig.getValue() != Swap.OFF && hand != Hand.OFF_HAND && getCrystalHand() == null)
         {
-            if (isSilentSwap(autoSwapConfig.getValue()) && Managers.INVENTORY.count(Items.END_CRYSTAL) == 0)
+            if (isSilentSwap(autoSwapConfig.getValue()) && InventoryUtil.count(Items.END_CRYSTAL) == 0)
             {
                 return;
             }
