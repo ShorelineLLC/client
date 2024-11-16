@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.HealthUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.screen.slot.SlotActionType;
@@ -19,7 +20,10 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.world.LoadWorldEvent;
+import net.shoreline.client.impl.module.exploit.ChorusInvincibilityModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
@@ -89,7 +93,7 @@ public final class AutoTotemModule extends ToggleModule
         lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING);
     }
 
-    @EventListener
+    @EventListener(priority = Integer.MAX_VALUE)
     public void onTick(final TickEvent event)
     {
         if (mc.player == null || event.getStage() != StageEvent.EventStage.PRE)
@@ -131,6 +135,7 @@ public final class AutoTotemModule extends ToggleModule
         {
             int totemSlot1 = totemSlotConfig.getValue() - 1;
             ItemStack totemSlotStack = mc.player.getInventory().getStack(totemSlot1);
+            totemSlot1 += 36;
             if (totemSlotStack.getItem() != Items.TOTEM_OF_UNDYING)
             {
                 int n = 35;
@@ -142,7 +147,7 @@ public final class AutoTotemModule extends ToggleModule
                         replacing = true;
                         if (alternativeConfig.getValue())
                         {
-                            mc.interactionManager.clickSlot(0, slot, totemSlot1 + 36, SlotActionType.SWAP, mc.player);
+                            mc.interactionManager.clickSlot(0, slot, totemSlot1, SlotActionType.SWAP, mc.player);
                             replacing = false;
                         }
                         else
@@ -153,7 +158,7 @@ public final class AutoTotemModule extends ToggleModule
                             }
                             if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
                             {
-                                mc.interactionManager.clickSlot(0, totemSlot1 + 36, 0, SlotActionType.PICKUP, mc.player);
+                                mc.interactionManager.clickSlot(0, totemSlot1, 0, SlotActionType.PICKUP, mc.player);
                                 lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING) - 1;
                             }
                             replacing = false;
@@ -338,9 +343,15 @@ public final class AutoTotemModule extends ToggleModule
 
     private boolean checkMainhandTotem()
     {
+        if (mc.player.getMainHandStack().getItem() == Items.TOTEM_OF_UNDYING
+                || ChorusInvincibilityModule.getInstance().isUsingChorus())
+        {
+            return false;
+        }
         if (offhandItem == Items.TOTEM_OF_UNDYING)
         {
-            return mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING || checkLethalCrystal(PlayerUtil.getLocalPlayerHealth());
+            return mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING
+                    || checkLethalCrystal(PlayerUtil.getLocalPlayerHealth());
         }
         return false;
     }
