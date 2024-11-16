@@ -46,6 +46,7 @@ public final class AutoTotemModule extends ToggleModule
     Config<Boolean> lethalConfig = register(new BooleanConfig("Lethal", "Calculates lethal damage sources", false, () -> itemConfig.getValue() != OffhandItem.TOTEM));
     Config<Boolean> fastConfig = register(new BooleanConfig("FastSwap", "Swaps items to offhand", true));
     Config<Boolean> mainhandTotemConfig = register(new BooleanConfig("MainhandTotem", "Swaps to a totem in your mainhand", false));
+    Config<Integer> totemSlotConfig = register(new NumberConfig<>("TotemSlot", "Slot to use for mainhand totem", 1, 1, 9, () -> mainhandTotemConfig.getValue()));
     Config<Boolean> alternativeConfig = register(new BooleanConfig("Alternative", "Replaces totem using the swap packet", false));
     Config<Boolean> debugConfig = register(new BooleanConfig("Debug", "Debug on death", false));
 
@@ -141,6 +142,45 @@ public final class AutoTotemModule extends ToggleModule
             if (totemSlot != -1)
             {
                 Managers.INVENTORY.setClientSlot(totemSlot);
+            }
+
+            int totemSlot1 = totemSlotConfig.getValue() - 1;
+            ItemStack totemSlotStack = mc.player.getInventory().getStack(totemSlot1);
+            if (totemSlotStack.getItem() != Items.TOTEM_OF_UNDYING)
+            {
+                int n = 35;
+                while (n >= 0)
+                {
+                    if (mc.player.getInventory().getStack(n).getItem() == offhandItem)
+                    {
+                        int slot = n < 9 ? n + 36 : n;
+                        replacing = true;
+                        if (alternativeConfig.getValue())
+                        {
+                            mc.interactionManager.clickSlot(0, slot, totemSlot1, SlotActionType.SWAP, mc.player);
+                            replacing = false;
+                        }
+                        else
+                        {
+                            if (mc.player.currentScreenHandler.getCursorStack().getItem() != offhandItem)
+                            {
+                                mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                            }
+                            if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
+                            {
+                                mc.interactionManager.clickSlot(0, totemSlot1, 0, SlotActionType.PICKUP, mc.player);
+                                lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING) - 1;
+                            }
+                            replacing = false;
+                            if (!mc.player.currentScreenHandler.getCursorStack().isEmpty() && mc.player.getOffHandStack().getItem() == offhandItem)
+                            {
+                                mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                                return;
+                            }
+                        }
+                    }
+                    n--;
+                }
             }
         }
 
