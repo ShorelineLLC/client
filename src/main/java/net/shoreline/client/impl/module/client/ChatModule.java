@@ -133,8 +133,9 @@ public class ChatModule extends ToggleModule
             float height = mc.getWindow().getScaledHeight();
             float width = mc.getWindow().getScaledWidth();
             float anim = HUDModule.getInstance().isEnabled() ? HUDModule.getInstance().getChatAnimation() : 1.0f;
-            RenderManager.borderedRect(event.getContext().getMatrices(), 2, (int) height,
-                    width - 4, -16.0f * anim, ColorsModule.getInstance().getRGB((int) (255.0f * ircAnimation.getFactor())), 1.0f);
+            RenderManager.borderedRectGradient(event.getContext().getMatrices(), 2, (int) height,
+                    width - 4, -16.0f * anim, ColorsModule.getInstance().getRGB((int) (255.0f * ircAnimation.getFactor())),
+                    ColorsModule.getInstance().getGradientRGB((int) (255.0f * ircAnimation.getFactor())), 1.0f);
         }
     }
 

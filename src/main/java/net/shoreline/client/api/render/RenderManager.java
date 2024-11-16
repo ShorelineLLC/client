@@ -411,13 +411,13 @@ public class RenderManager implements Globals
         rect(matrices, x1, y1, x2, y2, 0.0, color);
     }
 
-    public static void borderedRect(MatrixStack matrices, double x1, double y1,
-                                    double x2, double y2, int borderColor, double thickness)
+    public static void borderedRectGradient(MatrixStack matrices, double x1, double y1,
+                                    double x2, double y2, int borderColor, int borderColor2, double thickness)
     {
         rect(matrices, x1 - thickness, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
-        rect(matrices, x1 + x2, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
-        rect(matrices, x1, y1 - thickness, x2, thickness, borderColor);
-        rect(matrices, x1, y1 + y2, x2, thickness, borderColor);
+        rect(matrices, x1 + x2, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor2);
+        rectGradient(matrices, (float) x1, (float) (y1 - thickness - 1.0f), (float) x2, (float) thickness, borderColor, borderColor2);
+        rectGradient(matrices,(float) x1, (float) (y1 + y2 + 1.0f), (float) x2, (float) thickness, borderColor, borderColor2);
     }
 
     public static void borderedRectLine(MatrixStack matrices, double x1, double y1, double x2, double y2, int borderColor)
@@ -519,7 +519,40 @@ public class RenderManager implements Globals
         RenderSystem.disableBlend();
     }
 
+    public static void rectGradient(MatrixStack matrices, double x1, double y1,
+                                    double x2, double y2, int color, int color1)
+    {
+        x2 += x1;
+        y2 += y1;
+        double i;
+        if (x1 < x2)
+        {
+            i = x1;
+            x1 = x2;
+            x2 = i;
+        }
+        if (y1 < y2)
+        {
+            i = y1;
+            y1 = y2;
+            y2 = i;
+        }
+        fillGradientQuad(matrices, (float) x1, (float) y1, (float) x2, (float) y2, color1, color, true);
+    }
+
     public static void fillGradientQuad(DrawContext context,
+                                        float x1,
+                                        float y1,
+                                        float x2,
+                                        float y2,
+                                        int startColor,
+                                        int endColor,
+                                        boolean sideways)
+    {
+        fillGradientQuad(context.getMatrices(), x1, y1, x2, y2, startColor, endColor, sideways);
+    }
+
+    public static void fillGradientQuad(MatrixStack matrixStack,
                                         float x1,
                                         float y1,
                                         float x2,
@@ -536,7 +569,7 @@ public class RenderManager implements Globals
         float f5 = (endColor >> 16 & 255) / 255.0F;
         float f6 = (endColor >> 8 & 255) / 255.0F;
         float f7 = (endColor & 255) / 255.0F;
-        Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
+        Matrix4f posMatrix = matrixStack.peek().getPositionMatrix();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();

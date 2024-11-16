@@ -327,7 +327,7 @@ public class NoSlowModule extends ToggleModule
     private boolean checkGrimNew()
     {
         return !mc.player.isSneaking() && !mc.player.isCrawling() && !mc.player.isRiding() &&
-                mc.player.getItemUseTimeLeft() < 6 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
+                mc.player.getItemUseTimeLeft() < 5 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
     }
 
     public boolean checkSlowed()
