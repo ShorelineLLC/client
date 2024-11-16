@@ -127,23 +127,8 @@ public final class AutoTotemModule extends ToggleModule
             }
         }
 
-        if (mainhandTotemConfig.getValue() && checkMainhandTotem())
+        if (mainhandTotemConfig.getValue())
         {
-            int totemSlot = -1;
-            for (int i = 0; i < 9; i++)
-            {
-                ItemStack stack = mc.player.getInventory().getStack(i);
-                if (stack.getItem() == Items.TOTEM_OF_UNDYING)
-                {
-                    totemSlot = i;
-                    break;
-                }
-            }
-            if (totemSlot != -1)
-            {
-                Managers.INVENTORY.setClientSlot(totemSlot);
-            }
-
             int totemSlot1 = totemSlotConfig.getValue() - 1;
             ItemStack totemSlotStack = mc.player.getInventory().getStack(totemSlot1);
             if (totemSlotStack.getItem() != Items.TOTEM_OF_UNDYING)
@@ -157,7 +142,7 @@ public final class AutoTotemModule extends ToggleModule
                         replacing = true;
                         if (alternativeConfig.getValue())
                         {
-                            mc.interactionManager.clickSlot(0, slot, totemSlot1, SlotActionType.SWAP, mc.player);
+                            mc.interactionManager.clickSlot(0, slot, totemSlot1 + 36, SlotActionType.SWAP, mc.player);
                             replacing = false;
                         }
                         else
@@ -168,7 +153,7 @@ public final class AutoTotemModule extends ToggleModule
                             }
                             if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
                             {
-                                mc.interactionManager.clickSlot(0, totemSlot1, 0, SlotActionType.PICKUP, mc.player);
+                                mc.interactionManager.clickSlot(0, totemSlot1 + 36, 0, SlotActionType.PICKUP, mc.player);
                                 lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING) - 1;
                             }
                             replacing = false;
@@ -180,6 +165,24 @@ public final class AutoTotemModule extends ToggleModule
                         }
                     }
                     n--;
+                }
+            }
+
+            if (checkMainhandTotem())
+            {
+                int totemSlot = -1;
+                for (int i = 0; i < 9; i++)
+                {
+                    ItemStack stack = mc.player.getInventory().getStack(i);
+                    if (stack.getItem() == Items.TOTEM_OF_UNDYING)
+                    {
+                        totemSlot = i;
+                        break;
+                    }
+                }
+                if (totemSlot != -1)
+                {
+                    Managers.INVENTORY.setClientSlot(totemSlot);
                 }
             }
         }
