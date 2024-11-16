@@ -154,7 +154,7 @@ public class ColorButton extends ConfigButton<Color>
                     fill(context, x1, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (19.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), width1, 4.0f * ClickGuiModule.CLICK_GUI_SCALE, flip ? 0xff909090 : 0xffffffff);
                     flip = !flip;
                 }
-                fillGradient(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (15.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), x + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (23.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), color, 0x00000000);
+                fillGradient(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (15.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0 * ClickGuiModule.CLICK_GUI_SCALE), 8.0f * ClickGuiModule.CLICK_GUI_SCALE, color, 0x00000000);
                 fill(context, x + ClickGuiModule.CLICK_GUI_SCALE + (((width * ClickGuiModule.CLICK_GUI_SCALE) - (2.0f * ClickGuiModule.CLICK_GUI_SCALE)) * hsb[3]), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (15.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, 8.0f * ClickGuiModule.CLICK_GUI_SCALE, -1);
             }
             String renderText = typing ? new String(buffer) + getInsertionPoint() : new String(buffer);

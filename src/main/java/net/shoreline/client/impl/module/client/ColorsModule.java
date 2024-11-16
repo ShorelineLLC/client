@@ -19,8 +19,8 @@ public class ColorsModule extends ConcurrentModule
     private static ColorsModule INSTANCE;
 
     //
-    Config<Color> colorConfig = register(new ColorConfig("Color", "The primary client color", new Color(255, 0, 0), false, false));
-    // Config<Color> color1Config = register(new ColorConfig("Accent-Color", "The accent client color", new Color());
+    Config<Color> colorConfig = register(new ColorConfig("Global", "The primary client color", new Color(50, 100, 205), false, false));
+    Config<Color> gradientColorConfig = register(new ColorConfig("Gradient", "The primary client color", new Color(0, 0, 165), false, false));
 
     /**
      *
@@ -67,5 +67,32 @@ public class ColorsModule extends ConcurrentModule
     public int getRGB(int a)
     {
         return getColor(a).getRGB();
+    }
+
+    public Color getGradient()
+    {
+        return gradientColorConfig.getValue();
+    }
+
+    public Color getGradient(float alpha)
+    {
+        ColorConfig config = (ColorConfig) gradientColorConfig;
+        return new Color(config.getRed() / 255.0f, config.getGreen() / 255.0f, config.getBlue() / 255.0f, MathHelper.clamp(alpha, 0.0f, 1.0f));
+    }
+
+    public Color getGradient(int alpha)
+    {
+        ColorConfig config = (ColorConfig) gradientColorConfig;
+        return new Color(config.getRed(), config.getGreen(), config.getBlue(), MathHelper.clamp(alpha, 0, 255));
+    }
+
+    public Integer getGradientRGB()
+    {
+        return getGradient().getRGB();
+    }
+
+    public int getGradientRGB(int a)
+    {
+        return getGradient(a).getRGB();
     }
 }

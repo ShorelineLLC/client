@@ -59,7 +59,7 @@ public abstract class Component implements Drawable, Globals
      */
     protected void rectGradient(DrawContext context, int color1, int color2)
     {
-        fillGradient(context, x, y, x + (width * ClickGuiModule.CLICK_GUI_SCALE), y + (height * ClickGuiModule.CLICK_GUI_SCALE), color1, color2);
+        fillGradient(context, x, y, width * ClickGuiModule.CLICK_GUI_SCALE, height * ClickGuiModule.CLICK_GUI_SCALE, color1, color2);
     }
 
     protected void scale(DrawContext context, float scale)
@@ -234,10 +234,25 @@ public abstract class Component implements Drawable, Globals
     }
 
     protected void fillGradient(Matrix4f matrix, BufferBuilder builder,
-                                double startX, double startY, double endX,
-                                double endY, double z, int colorStart,
+                                double x1, double y1, double x2,
+                                double y2, double z, int colorStart,
                                 int colorEnd)
     {
+        x2 += x1;
+        y2 += y1;
+        double i2;
+        if (x1 < x2)
+        {
+            i2 = x1;
+            x1 = x2;
+            x2 = i2;
+        }
+        if (y1 < y2)
+        {
+            i2 = y1;
+            y1 = y2;
+            y2 = i2;
+        }
         float f = (float) ColorHelper.Argb.getAlpha(colorStart) / 255.0f;
         float g = (float) ColorHelper.Argb.getRed(colorStart) / 255.0f;
         float h = (float) ColorHelper.Argb.getGreen(colorStart) / 255.0f;
@@ -246,13 +261,13 @@ public abstract class Component implements Drawable, Globals
         float k = (float) ColorHelper.Argb.getRed(colorEnd) / 255.0f;
         float l = (float) ColorHelper.Argb.getGreen(colorEnd) / 255.0f;
         float m = (float) ColorHelper.Argb.getBlue(colorEnd) / 255.0f;
-        builder.vertex(matrix, (float) startX, (float) startY, (float) z)
+        builder.vertex(matrix, (float) x1, (float) y1, (float) z)
                 .color(k, l, m, j);
-        builder.vertex(matrix, (float) startX, (float) endY, (float) z)
+        builder.vertex(matrix, (float) x1, (float) y2, (float) z)
                 .color(k, l, m, j);
-        builder.vertex(matrix, (float) endX, (float) endY, (float) z)
+        builder.vertex(matrix, (float) x2, (float) y2, (float) z)
                 .color(g, h, i, f);
-        builder.vertex(matrix, (float) endX, (float) startY, (float) z)
+        builder.vertex(matrix, (float) x2, (float) y1, (float) z)
                 .color(g, h, i, f);
     }
 
@@ -271,7 +286,6 @@ public abstract class Component implements Drawable, Globals
         Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
 
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         if (sideways)
         {

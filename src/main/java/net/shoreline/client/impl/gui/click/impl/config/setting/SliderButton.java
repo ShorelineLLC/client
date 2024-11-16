@@ -140,7 +140,7 @@ public class SliderButton<T extends Number> extends ConfigButton<T>
             }
             float fill = (config.getValue().floatValue() - min.floatValue())
                     / (max.floatValue() - min.floatValue());
-            fill(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor(100 + hoverAlpha));
+            fillGradient(context, ix, iy, (fill * width * ClickGuiModule.CLICK_GUI_SCALE), height * ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(100 + hoverAlpha), ClickGuiModule.getInstance().getGradient(100 + hoverAlpha));
         }
 
         int whiteText = -1;

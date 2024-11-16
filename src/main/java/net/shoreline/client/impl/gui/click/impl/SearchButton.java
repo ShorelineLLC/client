@@ -49,9 +49,9 @@ public class SearchButton extends Button
         y = iy;
         int unfilledColor = ClickGuiModule.getInstance().fixTransparency(0x33000000);
         fill(context, ix + 1.0f, iy, 1.0f, getHeight(), ClickGuiModule.getInstance().getColor(1.7f));
-        fill(context, ix + getWidth() - 2.0f, iy, 1.0f, getHeight(), ClickGuiModule.getInstance().getColor(1.7f));
-        fill(context, ix + 1.0f, iy - 1.0f, getWidth() - 2.0f, 1.0f, ClickGuiModule.getInstance().getColor(1.7f));
-        fill(context, ix + 1.0f, iy + getHeight(), getWidth() - 2.0f, 1.0f, ClickGuiModule.getInstance().getColor(1.7f));
+        fill(context, ix + getWidth() - 2.0f, iy, 1.0f, getHeight(), ClickGuiModule.getInstance().getGradient(1.7f));
+        fillGradient(context, ix + 1.0f, iy - 1.0f, getWidth() - 2.0f, 1.0f, ClickGuiModule.getInstance().getColor(1.7f), ClickGuiModule.getInstance().getGradient(1.7f));
+        fillGradient(context, ix + 1.0f, iy + getHeight(), getWidth() - 2.0f, 1.0f, ClickGuiModule.getInstance().getColor(1.7f), ClickGuiModule.getInstance().getGradient(1.7f));
         rect(context, unfilledColor);
 
         // drawBorder(context, ix + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (3.5f * ClickGuiModule.CLICK_GUI_SCALE), getWidth(), getHeight(), ClickGuiModule.getInstance().getColor());

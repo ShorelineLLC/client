@@ -140,7 +140,8 @@ public class ModuleButton extends Button
         int hoverAlpha2 = (int) (50 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
 
         int unfilledColor = ClickGuiModule.getInstance().fixTransparency(new Color(hoverAlpha, hoverAlpha, hoverAlpha, 51 + hoverAlpha).getRGB());
-        rect(context, fill ? ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime) : unfilledColor);
+        rectGradient(context, fill ? ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime) : unfilledColor,
+                fill ? ClickGuiModule.getInstance().getGradient(100 + hoverAlpha2, scaledTime) : unfilledColor);
 
         int whiteText = -1;
         int grayText = 0xFFAAAAAA;
@@ -182,8 +183,8 @@ public class ModuleButton extends Button
             if (fill)
             {
                 fill(context, ix, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime));
-                fill(context, ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime));
-                fill(context, ix, off + ClickGuiModule.CLICK_GUI_SCALE, width * ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, 0.0, ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime));
+                fill(context, ix + (width * ClickGuiModule.CLICK_GUI_SCALE) - ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE), ClickGuiModule.CLICK_GUI_SCALE, off - (y + (height * ClickGuiModule.CLICK_GUI_SCALE)) + ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getGradient(100 + hoverAlpha2, scaledTime));
+                fillGradient(context, ix, off + ClickGuiModule.CLICK_GUI_SCALE, width * ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime), ClickGuiModule.getInstance().getGradient(100 + hoverAlpha2, scaledTime));
             }
             if (canScissor)
             {

@@ -28,14 +28,7 @@ public class ClickGuiModule extends ToggleModule
     Config<Integer> scrollSpeedConfig = register(new NumberConfig<>("ScrollSpeed", "The speed of GUI scrolling", 5, 30, 100));
     Config<Boolean> soundsConfig = register(new BooleanConfig("Sounds", "Click sounds", true));
     public Config<Boolean> underGlow = register(new BooleanConfig("UnderGlow", "GUI underglow", false));
-    //    Config<Integer> hueConfig = register(new NumberConfig<>("Hue", "The saturation of colors", 0, 0, 360);
-//    Config<Integer> saturationConfig = register(new NumberConfig<>("Saturation", "The saturation of colors", 0, 50, 100);
-//    Config<Integer> brightnessConfig = register(new NumberConfig<>("Brightness", "The brightness of colors", 0, 50, 100);
-//    Config<Integer> hue1Config = register(new NumberConfig<>("Hue1", "The saturation of colors", 0, 0, 360);
-//    Config<Integer> saturation1Config = register(new NumberConfig<>("Saturation1", "The saturation of colors", 0, 50, 100);
-//    Config<Integer> brightness1Config = register(new NumberConfig<>("Brightness1", "The brightness of colors", 0, 50, 100);
-//    Config<Integer> alphaConfig = register(new NumberConfig<>("Alpha", "The alpha of colors", 0, 100, 100);
-    //
+
     public static ClickGuiScreen CLICK_GUI_SCREEN;
     public static float CLICK_GUI_SCALE = 1.0f;
     private final Animation openCloseAnimation = new Animation(false, 400, Easing.BACK_OUT);
@@ -128,6 +121,26 @@ public class ClickGuiModule extends ToggleModule
     public int getColor(int a, float alpha)
     {
         return ColorsModule.getInstance().getColor((int) (a * alpha * openCloseAnimation.getFactor())).getRGB();
+    }
+
+    public int getGradient()
+    {
+        return ColorsModule.getInstance().getGradient((int) (100 * openCloseAnimation.getFactor())).getRGB();
+    }
+
+    public int getGradient(int a)
+    {
+        return ColorsModule.getInstance().getGradient((int) (a * openCloseAnimation.getFactor())).getRGB();
+    }
+
+    public int getGradient(float alpha)
+    {
+        return ColorsModule.getInstance().getGradient((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
+    }
+
+    public int getGradient(int a, float alpha)
+    {
+        return ColorsModule.getInstance().getGradient((int) (a * alpha * openCloseAnimation.getFactor())).getRGB();
     }
 
     // Applies a transparency to a color

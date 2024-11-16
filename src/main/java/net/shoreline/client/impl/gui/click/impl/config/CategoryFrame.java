@@ -139,7 +139,7 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
                 }
             }
         }
-        rect(context, ClickGuiModule.getInstance().getColor(1.7f));
+        rectGradient(context, ClickGuiModule.getInstance().getColor(1.7f), ClickGuiModule.getInstance().getGradient(1.7f));
 
         int whiteText = -1;
         drawStringScaled(context, name, x + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
