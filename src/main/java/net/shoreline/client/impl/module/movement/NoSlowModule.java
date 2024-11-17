@@ -182,7 +182,7 @@ public class NoSlowModule extends ToggleModule
                 }
             }
 
-            if (grimConfig.getValue() && (websConfig.getValue() || berryBushConfig.getValue()))
+            if ((grimConfig.getValue() || grimNewConfig.getValue()) && (websConfig.getValue() || berryBushConfig.getValue()))
             {
                 for (BlockPos pos : getIntersectingWebs())
                 {
