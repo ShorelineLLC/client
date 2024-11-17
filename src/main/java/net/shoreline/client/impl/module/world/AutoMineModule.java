@@ -1007,6 +1007,10 @@ public class AutoMineModule extends CombatModule
 
     private boolean validAutoMineBlock(Block block)
     {
+        if (BlastResistantBlocks.isUnbreakable(block))
+        {
+            return false;
+        }
         return switch (selectionConfig.getValue())
         {
             case WHITELIST -> ((BlockListConfig<?>) whitelistConfig).contains(block);
