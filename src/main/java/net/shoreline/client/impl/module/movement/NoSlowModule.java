@@ -305,25 +305,6 @@ public class NoSlowModule extends ToggleModule
         }
     }
 
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (mc.player == null || mc.world == null || mc.isInSingleplayer())
-        {
-            return;
-        }
-        if (event.getPacket() instanceof EntityTrackerUpdateS2CPacket packet && packet.id() == mc.player.getId() && grimNewConfig.getValue())
-        {
-            boolean usingItem = mc.player.isUsingItem() && mc.player.getItemUseTime() < mc.player.getActiveItem().getMaxUseTime(mc.player);
-            if (usingItem)
-            {
-                List<DataTracker.SerializedEntry<?>> trackedValues = packet.trackedValues();
-                trackedValues.removeIf(d -> d.id() == 8);
-                ((AccessorEntityTrackerUpdateS2CPacket) event.getPacket()).hookSetTrackedValues(trackedValues);
-            }
-        }
-    }
-
     private boolean checkGrimNew()
     {
         return !mc.player.isSneaking() && !mc.player.isCrawling() && !mc.player.isRiding() &&
