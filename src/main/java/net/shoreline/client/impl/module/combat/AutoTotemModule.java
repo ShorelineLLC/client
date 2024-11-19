@@ -101,6 +101,67 @@ public final class AutoTotemModule extends ToggleModule
             return;
         }
 
+        if (mainhandTotemConfig.getValue())
+        {
+            int totemSlot1 = totemSlotConfig.getValue() - 1;
+            ItemStack totemSlotStack = mc.player.getInventory().getStack(totemSlot1);
+            totemSlot1 += 36;
+            if (totemSlotStack.getItem() != Items.TOTEM_OF_UNDYING)
+            {
+                int n = 35;
+                while (n >= 0)
+                {
+                    if (mc.player.getInventory().getStack(n).getItem() == Items.TOTEM_OF_UNDYING)
+                    {
+                        int slot = n < 9 ? n + 36 : n;
+                        replacing = true;
+                        if (alternativeConfig.getValue())
+                        {
+                            mc.interactionManager.clickSlot(0, slot, totemSlot1, SlotActionType.SWAP, mc.player);
+                            replacing = false;
+                        }
+                        else
+                        {
+                            if (mc.player.currentScreenHandler.getCursorStack().getItem() != Items.TOTEM_OF_UNDYING)
+                            {
+                                mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                            }
+                            if (mc.player.currentScreenHandler.getCursorStack().getItem() == Items.TOTEM_OF_UNDYING)
+                            {
+                                mc.interactionManager.clickSlot(0, totemSlot1, 0, SlotActionType.PICKUP, mc.player);
+                                lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING) - 1;
+                            }
+                            replacing = false;
+                            if (!mc.player.currentScreenHandler.getCursorStack().isEmpty() && mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING)
+                            {
+                                mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                                return;
+                            }
+                        }
+                    }
+                    n--;
+                }
+            }
+
+            if (checkMainhandTotem())
+            {
+                int totemSlot = -1;
+                for (int i = 0; i < 9; i++)
+                {
+                    ItemStack stack = mc.player.getInventory().getStack(i);
+                    if (stack.getItem() == Items.TOTEM_OF_UNDYING)
+                    {
+                        totemSlot = i;
+                        break;
+                    }
+                }
+                if (totemSlot != -1)
+                {
+                    Managers.INVENTORY.setClientSlot(totemSlot);
+                }
+            }
+        }
+
         offhandItem = itemConfig.getValue().getItem();
         if (checkLethal())
         {
@@ -127,67 +188,6 @@ public final class AutoTotemModule extends ToggleModule
                 else
                 {
                     offhandItem = getGoldenAppleType();
-                }
-            }
-        }
-
-        if (mainhandTotemConfig.getValue())
-        {
-            int totemSlot1 = totemSlotConfig.getValue() - 1;
-            ItemStack totemSlotStack = mc.player.getInventory().getStack(totemSlot1);
-            totemSlot1 += 36;
-            if (totemSlotStack.getItem() != Items.TOTEM_OF_UNDYING)
-            {
-                int n = 35;
-                while (n >= 0)
-                {
-                    if (mc.player.getInventory().getStack(n).getItem() == offhandItem)
-                    {
-                        int slot = n < 9 ? n + 36 : n;
-                        replacing = true;
-                        if (alternativeConfig.getValue())
-                        {
-                            mc.interactionManager.clickSlot(0, slot, totemSlot1, SlotActionType.SWAP, mc.player);
-                            replacing = false;
-                        }
-                        else
-                        {
-                            if (mc.player.currentScreenHandler.getCursorStack().getItem() != offhandItem)
-                            {
-                                mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
-                            }
-                            if (mc.player.currentScreenHandler.getCursorStack().getItem() == offhandItem)
-                            {
-                                mc.interactionManager.clickSlot(0, totemSlot1, 0, SlotActionType.PICKUP, mc.player);
-                                lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING) - 1;
-                            }
-                            replacing = false;
-                            if (!mc.player.currentScreenHandler.getCursorStack().isEmpty() && mc.player.getOffHandStack().getItem() == offhandItem)
-                            {
-                                mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
-                                return;
-                            }
-                        }
-                    }
-                    n--;
-                }
-            }
-
-            if (checkMainhandTotem())
-            {
-                int totemSlot = -1;
-                for (int i = 0; i < 9; i++)
-                {
-                    ItemStack stack = mc.player.getInventory().getStack(i);
-                    if (stack.getItem() == Items.TOTEM_OF_UNDYING)
-                    {
-                        totemSlot = i;
-                        break;
-                    }
-                }
-                if (totemSlot != -1)
-                {
-                    Managers.INVENTORY.setClientSlot(totemSlot);
                 }
             }
         }
@@ -332,9 +332,9 @@ public final class AutoTotemModule extends ToggleModule
 
     private Item getGoldenAppleType()
     {
-        if (crappleConfig.getValue()
-                && mc.player.hasStatusEffect(StatusEffects.ABSORPTION)
-                && InventoryUtil.hasItemInInventory(Items.GOLDEN_APPLE, true))
+        if (crappleConfig.getValue() && InventoryUtil.hasItemInInventory(Items.GOLDEN_APPLE, true)
+                && (mc.player.hasStatusEffect(StatusEffects.ABSORPTION)
+                || !InventoryUtil.hasItemInInventory(Items.ENCHANTED_GOLDEN_APPLE, true)))
         {
             return Items.GOLDEN_APPLE;
         }
