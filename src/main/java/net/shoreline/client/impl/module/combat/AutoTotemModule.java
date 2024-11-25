@@ -348,12 +348,7 @@ public final class AutoTotemModule extends ToggleModule
         {
             return false;
         }
-        if (offhandItem == Items.TOTEM_OF_UNDYING)
-        {
-            return mc.player.getOffHandStack().getItem() != Items.TOTEM_OF_UNDYING
-                    || checkLethalCrystal(PlayerUtil.getLocalPlayerHealth());
-        }
-        return false;
+        return checkLethalCrystal(PlayerUtil.getLocalPlayerHealth());
     }
 
     public boolean isReplacing()
