@@ -93,7 +93,7 @@ public final class AutoTotemModule extends ToggleModule
         lastTotemCount = InventoryUtil.count(Items.TOTEM_OF_UNDYING);
     }
 
-    @EventListener(priority = Integer.MAX_VALUE)
+    @EventListener(priority = Integer.MAX_VALUE - 1)
     public void onTick(final TickEvent event)
     {
         if (mc.player == null || event.getStage() != StageEvent.EventStage.PRE)

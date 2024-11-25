@@ -29,7 +29,7 @@ public class TickTimer implements Timer
     /**
      * @param event
      */
-    @EventListener
+    @EventListener(priority = Integer.MAX_VALUE)
     public void onTick(TickEvent event)
     {
         if (event.getStage() == StageEvent.EventStage.PRE)
