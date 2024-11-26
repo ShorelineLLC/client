@@ -32,13 +32,17 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.gui.screen.RenderOpenChatEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.StreamUtils;
 import net.shoreline.client.util.math.PerSecondCounter;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
@@ -65,6 +69,7 @@ public class HUDModule extends ToggleModule
     // private static final HudScreen HUD_SCREEN = new HudScreen();
     //
     Config<Boolean> watermarkConfig = register(new BooleanConfig("Watermark", "Displays client name and version watermark", true));
+    Config<Boolean> serverStatusConfig = register(new BooleanConfig("ServerStatus", "Displays warning for server connection status", true));
     Config<Boolean> userInfo = register(new BooleanConfig("UserInfo", "Displays your user information", true));
     Config<Boolean> directionConfig = register(new BooleanConfig("Direction", "Displays facing direction", true));
     Config<Boolean> rotationConfig = register(new BooleanConfig("Rotation", "Displays player yaw and pitch", false, () -> directionConfig.getValue()));
@@ -104,6 +109,9 @@ public class HUDModule extends ToggleModule
     private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
     private final PerSecondCounter fpsCounter = new PerSecondCounter();
     private final Map<String, HudRenderModule> hudRenderModules = new HashMap<>();
+
+    private final Timer serverStatus = new CacheTimer();
+    private final Animation statusAnimation = new Animation(false, 300L, Easing.LINEAR);
 
     public HUDModule()
     {
@@ -160,6 +168,18 @@ public class HUDModule extends ToggleModule
                 return;
             }
             Window res = mc.getWindow();
+
+            if (serverStatusConfig.getValue())
+            {
+                statusAnimation.setState(serverStatus.passed(300));
+                String warning = String.format("§fServer not responding §7(§r%s.s§7)",
+                        decimal.format(serverStatus.getElapsedTime() / 1000.0));
+                int width = RenderManager.textWidth(warning);
+                Color color = ColorUtil.interpolateColor(MathHelper.clamp(serverStatus.getElapsedTime() / 5000.0f, 0.0f, 1.0f), Color.RED, Color.GREEN);
+                RenderManager.renderText(event.getContext(), warning,
+                        (res.getScaledWidth() / 2.0f) - (width / 2.0f), 4.0f, ColorUtil.withAlpha(color.getRGB(), (int) (255 * statusAnimation.getFactor())));
+            }
+
             //
             rainbowOffset = 0;
             // Render offsets for each corner of the screen.
@@ -470,6 +490,21 @@ public class HUDModule extends ToggleModule
                     x += 18;
                 }
             }
+        }
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        serverStatus.reset();
+    }
+
+    @EventListener
+    public void onTick(TickEvent event)
+    {
+        if (mc.world == null)
+        {
+            serverStatus.reset();
         }
     }
 
