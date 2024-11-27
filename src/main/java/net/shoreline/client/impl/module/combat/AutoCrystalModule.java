@@ -549,48 +549,6 @@ public class AutoCrystalModule extends RotationModule
                 }
             }
         }
-
-        if (serverPacket instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
-        {
-            final BlockPos blockPos = packet.getPos();
-            if (placeRangeCheck(blockPos))
-            {
-                return;
-            }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalDamageVec(blockPos),
-                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
-            if (playerDamageCheck(selfDamage))
-            {
-                return;
-            }
-            for (Entity entity : mc.world.getEntities())
-            {
-                if (entity == null || !entity.isAlive() || entity == mc.player
-                        || !isValidTarget(entity)
-                        || Managers.SOCIAL.isFriend(entity.getName()))
-                {
-                    continue;
-                }
-                double dist = mc.player.squaredDistanceTo(entity);
-                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
-                {
-                    continue;
-                }
-                double damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(blockPos),
-                        blockDestructionConfig.getValue(), Set.of(blockPos), extrapolateTicksConfig.getValue());
-                DamageData<BlockPos> data = new DamageData<>(blockPos,
-                        entity, damage, selfDamage);
-                boolean placeRotate = placeCrystal == null && damage > minDamageConfig.getValue() || placeCrystal != null
-                        && damage >= placeCrystal.getDamage()
-                        || entity instanceof LivingEntity entity1 && isCrystalLethalTo(data, entity1);
-                if (placeRotate)
-                {
-                    placeCrystal(blockPos, getCrystalHand());
-                    lastPlaceTimer.reset();
-                    break;
-                }
-            }
-        }
     }
 
     @EventListener
