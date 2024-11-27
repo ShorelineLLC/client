@@ -15,6 +15,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Map;
@@ -73,6 +74,11 @@ public class ReplenishModule extends ToggleModule
                     continue;
                 }
 
+                if (!stack.isStackable())
+                {
+                    continue;
+                }
+
                 double percentage = ((double) stack.getCount() / stack.getMaxCount()) * 100.0;
                 if (percentage <= percentConfig.getValue())
                 {
@@ -119,6 +125,11 @@ public class ReplenishModule extends ToggleModule
 
     private void replenishStack(int slot, ItemStack stack)
     {
+        if (!InventoryUtil.hasItemInInventory(stack.getItem(), false))
+        {
+            return;
+        }
+        // sendModuleError("slot: " + slot + ", stack:" + stack.getName().getString());
         int slot1 = -1;
         for (int i = 9; i < 36; ++i)
         {
@@ -147,9 +158,18 @@ public class ReplenishModule extends ToggleModule
 
         if (slot1 != -1)
         {
-            mc.interactionManager.clickSlot(0, slot1, 0, SlotActionType.PICKUP, mc.player);
-            mc.interactionManager.clickSlot(0, slot + 36, 0, SlotActionType.PICKUP, mc.player);
-            mc.interactionManager.clickSlot(0, slot1, 0, SlotActionType.PICKUP, mc.player);
+            if (mc.player.currentScreenHandler.getCursorStack().getItem() != stack.getItem())
+            {
+                mc.interactionManager.clickSlot(0, slot1, 0, SlotActionType.PICKUP, mc.player);
+            }
+            if (mc.player.currentScreenHandler.getCursorStack().getItem() == stack.getItem())
+            {
+                mc.interactionManager.clickSlot(0, slot + 36, 0, SlotActionType.PICKUP, mc.player);
+            }
+            if (!mc.player.currentScreenHandler.getCursorStack().isEmpty())
+            {
+                mc.interactionManager.clickSlot(0, slot1, 0, SlotActionType.PICKUP, mc.player);
+            }
         }
     }
 }
