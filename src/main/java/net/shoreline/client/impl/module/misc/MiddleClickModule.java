@@ -89,13 +89,19 @@ public class MiddleClickModule extends ToggleModule
                         break;
                     }
                 }
+
+                if (slot == -1)
+                {
+                    return;
+                }
+
                 if (slot < 9)
                 {
                     Managers.INVENTORY.setSlot(slot);
                     mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                     Managers.INVENTORY.syncToClient();
                 }
-                else if (InventoryUtil.hasItemInInventory(item, false))
+                else
                 {
                     mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
                     mc.interactionManager.clickSlot(0, mc.player.getInventory().selectedSlot + 36, 0, SlotActionType.PICKUP, mc.player);
