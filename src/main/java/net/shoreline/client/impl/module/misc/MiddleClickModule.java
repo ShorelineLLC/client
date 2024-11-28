@@ -4,6 +4,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -14,6 +15,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.MouseClickEvent;
 import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.RayCastUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.lwjgl.glfw.GLFW;
@@ -78,7 +80,7 @@ public class MiddleClickModule extends ToggleModule
                     return;
                 }
                 int slot = -1;
-                for (int i = 0; i < 9; i++)
+                for (int i = 0; i < 45; i++)
                 {
                     ItemStack stack = mc.player.getInventory().getStack(i);
                     if (stack.getItem() == item)
@@ -87,11 +89,21 @@ public class MiddleClickModule extends ToggleModule
                         break;
                     }
                 }
-                if (slot != -1)
+                if (slot < 9)
                 {
                     Managers.INVENTORY.setSlot(slot);
                     mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
                     Managers.INVENTORY.syncToClient();
+                }
+                else if (InventoryUtil.hasItemInInventory(item, false))
+                {
+                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(0, mc.player.getInventory().selectedSlot + 36, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(0, mc.player.getInventory().selectedSlot + 36, 0, SlotActionType.PICKUP, mc.player);
+                    mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
                 }
             }
         }
