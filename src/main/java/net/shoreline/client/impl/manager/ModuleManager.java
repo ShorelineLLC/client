@@ -113,6 +113,7 @@ public final class ModuleManager
                 new NoPacketKickModule(),
                 new NoSoundLagModule(),
                 new PacketLoggerModule(),
+                new PMSoundModule(),
                 new ShulkerceptionModule(),
                 new SkinBlinkModule(),
                 new SpammerModule(),
