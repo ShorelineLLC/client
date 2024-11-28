@@ -47,7 +47,7 @@ public final class ChatNotifierModule extends ToggleModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (mc.world == null)
+        if (mc.player == null || mc.world == null)
         {
             return;
         }
@@ -67,6 +67,29 @@ public final class ChatNotifierModule extends ToggleModule
             }
             ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + playerName + "§f popped §s" + totems + "§f totems", entity.hashCode());
         }
+        if (event.getPacket() instanceof PlayerListS2CPacket packet && joinConfig.getValue())
+        {
+            if (!(packet.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER)) || mc.player.age < 20)
+            {
+                return;
+            }
+            packet.getEntries().stream()
+                    .filter(data -> data != null && data.profile() != null)
+                    .filter(data -> data.profile().getName() != null && !data.profile().getName().isEmpty() || data.profile().getId() != null)
+                    .forEach(data ->
+                    {
+                        String name = data.profile().getName();
+                        if (name != null)
+                        {
+                            boolean isFriend = Managers.SOCIAL.isFriend(name);
+                            if (!friendsConfig.getValue() && isFriend)
+                            {
+                                return;
+                            }
+                            ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + name + "§f has joined the server", name.hashCode());
+                        }
+                    });
+        }
         if (event.getPacket() instanceof PlayerRemoveS2CPacket packet && leaveConfig.getValue())
         {
             if (mc.getNetworkHandler() == null)
@@ -76,7 +99,6 @@ public final class ChatNotifierModule extends ToggleModule
             for (UUID uuid : packet.profileIds())
             {
                 String name = null;
-                PlayerEntity playerEntity = mc.world.getPlayerByUuid(uuid);
                 for (PlayerListEntry info : new ArrayList<>(mc.getNetworkHandler().getPlayerList()))
                 {
                     if (info == null)
@@ -89,41 +111,16 @@ public final class ChatNotifierModule extends ToggleModule
                         name = gameProfile.getName();
                     }
                 }
-                if (name != null && playerEntity != null)
+                if (name != null)
                 {
                     boolean isFriend = Managers.SOCIAL.isFriend(name);
                     if (!friendsConfig.getValue() && isFriend)
                     {
                         return;
                     }
-                    ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + name + "§f has left the server", playerEntity.hashCode());
+                    ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + name + "§f has left the server", name.hashCode());
                 }
             }
-        }
-        if (event.getPacket() instanceof PlayerListS2CPacket packet && joinConfig.getValue())
-        {
-            if (!(packet.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER)))
-            {
-                return;
-            }
-            packet.getEntries().stream()
-                    .filter(data -> data != null && data.profile() != null)
-                    .filter(data -> data.profile().getName() != null && !data.profile().getName().isEmpty() || data.profile().getId() != null)
-                    .forEach(data ->
-                    {
-                        String name = data.profile().getName();
-                        UUID uuid = data.profile().getId();
-                        PlayerEntity playerEntity = mc.world.getPlayerByUuid(uuid);
-                        if (name != null && playerEntity != null)
-                        {
-                            boolean isFriend = Managers.SOCIAL.isFriend(name);
-                            if (!friendsConfig.getValue() && isFriend)
-                            {
-                                return;
-                            }
-                            ChatUtil.clientSendMessage((isFriend ? "§b" : "§7") + hashCode() + "§f has joined the server", playerEntity.hashCode());
-                        }
-                    });
         }
     }
 
