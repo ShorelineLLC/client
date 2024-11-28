@@ -143,8 +143,11 @@ public class InventoryManager implements Globals
         {
             setSlotForced(mc.player.getInventory().selectedSlot);
             // send packet to sync inventory
-            Managers.NETWORK.sendPacket(new ClickSlotC2SPacket(0, 0, findEmptySlot(), 0,
-                    SlotActionType.QUICK_CRAFT, ItemStack.EMPTY, new Int2ObjectOpenHashMap<>()));
+            if (!Managers.NETWORK.isCrystalPvpCC())
+            {
+                Managers.NETWORK.sendPacket(new ClickSlotC2SPacket(0, 0, findEmptySlot(), 0,
+                        SlotActionType.QUICK_CRAFT, ItemStack.EMPTY, new Int2ObjectOpenHashMap<>()));
+            }
         }
     }
 
