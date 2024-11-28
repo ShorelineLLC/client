@@ -15,6 +15,12 @@ public class SoundManager implements Globals
 {
     public static final SoundEvent GUI_CLICK = registerSound("gui_click", ".ogg");
 
+    // PM Sounds
+    public static final SoundEvent TWITTER = registerSound("twitter", ".ogg");
+    public static final SoundEvent IOS = registerSound("ios", ".ogg");
+    public static final SoundEvent DISCORD = registerSound("discord", ".ogg");
+    public static final SoundEvent STEAM = registerSound("steam", ".ogg");
+
     /**
      * @param sound
      */

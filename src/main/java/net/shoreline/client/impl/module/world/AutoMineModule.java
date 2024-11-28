@@ -1007,7 +1007,7 @@ public class AutoMineModule extends CombatModule
 
     private boolean validAutoMineBlock(Block block)
     {
-        if (BlastResistantBlocks.isUnbreakable(block))
+        if (block == Blocks.AIR || BlastResistantBlocks.isUnbreakable(block))
         {
             return false;
         }

@@ -171,11 +171,11 @@ public class HUDModule extends ToggleModule
 
             if (serverStatusConfig.getValue())
             {
-                statusAnimation.setState(serverStatus.passed(300));
+                statusAnimation.setState(serverStatus.passed(1000));
                 String warning = String.format("§fServer not responding §7(§r%s.s§7)",
                         decimal.format(serverStatus.getElapsedTime() / 1000.0));
                 int width = RenderManager.textWidth(warning);
-                Color color = ColorUtil.interpolateColor(MathHelper.clamp(serverStatus.getElapsedTime() / 5000.0f, 0.0f, 1.0f), Color.RED, Color.GREEN);
+                Color color = ColorUtil.interpolateColor(MathHelper.clamp((serverStatus.getElapsedTime() - 1000.0f) / 5000.0f, 0.0f, 1.0f), Color.RED, Color.GREEN);
                 RenderManager.renderText(event.getContext(), warning,
                         (res.getScaledWidth() / 2.0f) - (width / 2.0f), 4.0f, ColorUtil.withAlpha(color.getRGB(), (int) (255 * statusAnimation.getFactor())));
             }
