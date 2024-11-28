@@ -5,17 +5,14 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Map;
@@ -56,7 +53,12 @@ public class ReplenishModule extends ToggleModule
             return;
         }
 
-        boolean pauseReplenish = isInInventory() || !lastDroppedTimer.passed(100);
+        if (mc.options.dropKey.isPressed())
+        {
+            lastDroppedTimer.reset();
+        }
+
+        boolean pauseReplenish = isInInventoryScreen() || !lastDroppedTimer.passed(100);
 
         if (!pauseReplenish)
         {
@@ -107,29 +109,13 @@ public class ReplenishModule extends ToggleModule
         }
     }
 
-    @EventListener
-    public void onPacketOutbound(PacketEvent.Outbound event)
-    {
-        if (event.getPacket() instanceof PlayerActionC2SPacket packet
-                && (packet.getAction() == PlayerActionC2SPacket.Action.DROP_ITEM
-                || packet.getAction() == PlayerActionC2SPacket.Action.DROP_ALL_ITEMS))
-        {
-            lastDroppedTimer.reset();
-        }
-    }
-
-    private boolean isInInventory()
+    private boolean isInInventoryScreen()
     {
         return mc.currentScreen instanceof GenericContainerScreen || mc.currentScreen instanceof ShulkerBoxScreen || mc.currentScreen instanceof InventoryScreen;
     }
 
     private void replenishStack(int slot, ItemStack stack)
     {
-        if (!InventoryUtil.hasItemInInventory(stack.getItem(), false))
-        {
-            return;
-        }
-        // sendModuleError("slot: " + slot + ", stack:" + stack.getName().getString());
         int slot1 = -1;
         for (int i = 9; i < 36; ++i)
         {
@@ -158,6 +144,7 @@ public class ReplenishModule extends ToggleModule
 
         if (slot1 != -1)
         {
+            // sendModuleError("slot: " + slot + ", stack:" + stack.getName().getString());
             if (mc.player.currentScreenHandler.getCursorStack().getItem() != stack.getItem())
             {
                 mc.interactionManager.clickSlot(0, slot1, 0, SlotActionType.PICKUP, mc.player);
