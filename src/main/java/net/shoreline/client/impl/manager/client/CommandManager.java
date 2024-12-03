@@ -78,6 +78,7 @@ public class CommandManager implements Globals
                 new HelpCommand(),
                 new HideAllCommand(),
                 new HistoryCommand(),
+                new LastCommand(),
                 new LeaveCommand(),
                 new LoadCommand(),
                 new MacroCommand(),
@@ -92,6 +93,7 @@ public class CommandManager implements Globals
                 new ResetGuiCommand(),
                 new SaveCommand(),
                 new ReloadSoundCommand(),
+                new ReplyCommand(),
                 new SkinGrabCommand(),
                 new ToggleCommand(),
                 new VanishCommand(),
@@ -99,7 +101,7 @@ public class CommandManager implements Globals
                 new WaypointCommand(),
                 new YawCommand()
         );
-        //
+
         for (Module module : Managers.MODULE.getModules())
         {
             register(new ModuleCommand(module));

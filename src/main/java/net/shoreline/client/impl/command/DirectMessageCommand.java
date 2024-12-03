@@ -14,7 +14,7 @@ public final class DirectMessageCommand extends Command
 {
     public DirectMessageCommand()
     {
-        super("DirectMessageCommand", "Directs a message to an online Shoreline user", literal("dm"));
+        super("DirectMessageCommand", "Directs a message to an online Shoreline user", literal("msg"));
     }
 
     @Override
@@ -28,6 +28,7 @@ public final class DirectMessageCommand extends Command
                                     OnlineUser user = c.getArgument("username", OnlineUser.class);
                                     String message = c.getArgument("message", String.class);
 
+                                    IRCManager.getInstance().setLastMessagedUser(user);
                                     CPacketDirectMessage packet = new CPacketDirectMessage(user, message);
                                     IRCManager.getInstance().sendPacket(packet);
 

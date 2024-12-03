@@ -63,5 +63,6 @@ public final class SPacketDirectMessage extends ServerPacket
                 + "§s: " + this.message;
 
         ircManager.addToChat(message);
+        ircManager.setLastMessageReceivedUser(sender);
     }
 }

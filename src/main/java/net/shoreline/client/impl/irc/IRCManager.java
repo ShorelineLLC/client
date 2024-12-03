@@ -22,6 +22,9 @@ public final class IRCManager implements Globals
 
     private String backupToken;
 
+    private OnlineUser lastMessagedUser;
+    private OnlineUser lastMessageReceivedUser;
+
     // Default as disconnected until the server sends an SPacketSuccessfulConnection
     public boolean CONNECTED = false;
     public boolean DID_EVER_CONNECT = false;
@@ -30,6 +33,7 @@ public final class IRCManager implements Globals
     public boolean FULLY_KILLED = false;
 
     public boolean MUTED = false;
+
 
     private final Queue<IRCPacket> sendQueue = new ConcurrentLinkedQueue<>();
 
@@ -159,6 +163,26 @@ public final class IRCManager implements Globals
                 ChatUtil.clientSendMessageRaw("§s[IRC/Server]§7 %s", message);
             }
         });
+    }
+
+    public void setLastMessagedUser(OnlineUser onlineUser)
+    {
+        this.lastMessagedUser = onlineUser;
+    }
+
+    public OnlineUser getLastMessagedUser()
+    {
+        return lastMessagedUser;
+    }
+
+    public void setLastMessageReceivedUser(OnlineUser onlineUser)
+    {
+        this.lastMessageReceivedUser = onlineUser;
+    }
+
+    public OnlineUser getLastMessageReceivedUser()
+    {
+        return lastMessageReceivedUser;
     }
 
     public void setBackupToken(String token)
