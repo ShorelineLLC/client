@@ -220,7 +220,8 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         List<BlockPos> trapBlocks = new ArrayList<>();
         for (Entity entity : mc.world.getEntities())
         {
-            if (entity == mc.player || !(entity instanceof PlayerEntity playerEntity))
+            if (entity == mc.player || !(entity instanceof PlayerEntity playerEntity)
+                    || Managers.SOCIAL.isFriend(entity.getName()))
             {
                 continue;
             }

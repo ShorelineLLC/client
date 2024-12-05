@@ -144,7 +144,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 {
                     continue;
                 }
-                Direction direction = Managers.INTERACT.getInteractDirection(block, grimConfig.getValue(), strictDirectionConfig.getValue());
+                Direction direction = Managers.INTERACT.getInteractDirection(block, strictDirectionConfig.getValue());
                 if (direction == null)
                 {
                     placements.add(block.down());

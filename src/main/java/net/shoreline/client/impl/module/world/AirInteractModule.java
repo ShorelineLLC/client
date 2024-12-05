@@ -83,7 +83,7 @@ public final class AirInteractModule extends ToggleModule
                 && result instanceof BlockHitResult blockHitResult)
         {
             final BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
-            final Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
+            final Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false);
             if (direction != null || isEntityInBlockPos(blockPos))
             {
                 return;
@@ -133,7 +133,7 @@ public final class AirInteractModule extends ToggleModule
             return;
         }
         final BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
-        final Direction direction = Managers.INTERACT.getInteractDirection(blockPos, false, false);
+        final Direction direction = Managers.INTERACT.getInteractDirection(blockPos,  false);
         if (direction != null || isEntityInBlockPos(blockPos))
         {
             return;

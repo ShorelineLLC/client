@@ -141,7 +141,7 @@ public class SurroundModule extends ObsidianPlacerModule
         {
             for (BlockPos block : new ArrayList<>(placements))
             {
-                Direction direction = Managers.INTERACT.getInteractDirection(block, grimConfig.getValue(), strictDirectionConfig.getValue());
+                Direction direction = Managers.INTERACT.getInteractDirection(block, strictDirectionConfig.getValue());
                 if (direction == null)
                 {
                     placements.add(block.down());

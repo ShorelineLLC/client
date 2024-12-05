@@ -502,7 +502,7 @@ public class HUDModule extends ToggleModule
     @EventListener
     public void onTick(TickEvent event)
     {
-        if (mc.world == null)
+        if (mc.world == null || mc.isPaused())
         {
             serverStatus.reset();
         }

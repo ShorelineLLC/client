@@ -153,30 +153,6 @@ public class AutoArmorModule extends ToggleModule
         }
     }
 
-    public float getPriority(int i, ItemStack armorStack)
-    {
-        /*
-        float j = 1.0f;
-        if (armorStack.hasEnchantments())
-        {
-            j += 1.5f;
-        }
-        if (hasEnchantment(Enchantments.BLAST_PROTECTION))
-        {
-
-        }
-        if (hasEnchantment(Enchantments.PROTECTION))
-        {
-
-        }
-        if (hasEnchantment(Enchantments.PROJECTILE_PROTECTION))
-        {
-
-        }
-         */
-        return 1.0f;
-    }
-
     public enum Priority
     {
         BLAST_PROTECTION(Enchantments.BLAST_PROTECTION),

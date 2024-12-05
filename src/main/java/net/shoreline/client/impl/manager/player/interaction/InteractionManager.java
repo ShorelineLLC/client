@@ -271,10 +271,9 @@ public final class InteractionManager implements Globals
      * @param strictDirection
      * @return
      */
-    public Direction getInteractDirection(final BlockPos blockPos, final boolean grim, final boolean strictDirection)
+    public Direction getInteractDirection(final BlockPos blockPos, final boolean strictDirection)
     {
-        Set<Direction> validDirections = grim ? getPlaceDirectionsGrim(mc.player.getEyePos(), blockPos) :
-                getPlaceDirectionsNCP(mc.player.getEyePos(), blockPos.toCenterPos());
+        Set<Direction> validDirections = getPlaceDirectionsNCP(mc.player.getEyePos(), blockPos.toCenterPos());
         Direction interactDirection = null;
         for (final Direction direction : Direction.values())
         {
@@ -322,76 +321,6 @@ public final class InteractionManager implements Globals
     public Set<Direction> getPlaceDirectionsNCP(Vec3d eyePos, Vec3d blockPos)
     {
         return getPlaceDirectionsNCP(eyePos.x, eyePos.y, eyePos.z, blockPos.x, blockPos.y, blockPos.z);
-    }
-
-    public Direction getPlaceDirectionGrim(BlockPos blockPos)
-    {
-        Set<Direction> directions = getPlaceDirectionsGrim(mc.player.getPos(), blockPos);
-        return directions.stream().findAny().orElse(Direction.UP);
-    }
-
-    public Set<Direction> getPlaceDirectionsGrim(Vec3d eyePos, BlockPos blockPos)
-    {
-        return getPlaceDirectionsGrim(eyePos.x, eyePos.y, eyePos.z, blockPos);
-    }
-
-    public Set<Direction> getPlaceDirectionsGrim(final double x, final double y, final double z, BlockPos pos)
-    {
-        final Set<Direction> dirs = new HashSet<>(6);
-        Box combined = getCombinedBox(pos);
-        Box eyePositions = new Box(x, y + 0.4, z, x, y + 1.62, z).expand(0.0002);
-        if (eyePositions.minZ <= combined.minZ)
-        {
-            dirs.add(Direction.NORTH);
-        }
-        if (eyePositions.maxZ >= combined.maxZ)
-        {
-            dirs.add(Direction.SOUTH);
-        }
-        if (eyePositions.maxX >= combined.maxX)
-        {
-            dirs.add(Direction.EAST);
-        }
-        if (eyePositions.minX <= combined.minX)
-        {
-            dirs.add(Direction.WEST);
-        }
-        if (eyePositions.maxY >= combined.maxY)
-        {
-            dirs.add(Direction.UP);
-        }
-        if (eyePositions.minY <= combined.minY)
-        {
-            dirs.add(Direction.DOWN);
-        }
-        return dirs;
-    }
-
-    private Box getCombinedBox(BlockPos pos)
-    {
-        VoxelShape shape = mc.world.getBlockState(pos).getCollisionShape(mc.world, pos).offset(pos.getX(), pos.getY(), pos.getZ());
-        Box combined = new Box(pos);
-        for (Box box : shape.getBoundingBoxes())
-        {
-            double minX = Math.max(box.minX, combined.minX);
-            double minY = Math.max(box.minY, combined.minY);
-            double minZ = Math.max(box.minZ, combined.minZ);
-            double maxX = Math.min(box.maxX, combined.maxX);
-            double maxY = Math.min(box.maxY, combined.maxY);
-            double maxZ = Math.min(box.maxZ, combined.maxZ);
-            combined = new Box(minX, minY, minZ, maxX, maxY, maxZ);
-        }
-        return combined;
-    }
-
-    private boolean isIntersected(Box bb, Box other)
-    {
-        return other.maxX - MathConstants.EPSILON > bb.minX
-                && other.minX + MathConstants.EPSILON < bb.maxX
-                && other.maxY - MathConstants.EPSILON > bb.minY
-                && other.minY + MathConstants.EPSILON < bb.maxY
-                && other.maxZ - MathConstants.EPSILON > bb.minZ
-                && other.minZ + MathConstants.EPSILON < bb.maxZ;
     }
 
     public Set<Direction> getPlaceDirectionsNCP(final double x, final double y, final double z,
