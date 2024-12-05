@@ -55,9 +55,9 @@ public class ChamsModule extends ToggleModule
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The chams render range", 10.0f, 50.0f, 200.0f));
     Config<ChamsMode> modeConfig = register(new EnumConfig<>("Mode", "The rendering mode for the chams", ChamsMode.FILL, ChamsMode.values()));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the render", 1.0f, 1.5f, 5.0f, () -> modeConfig.getValue() != ChamsMode.FILL));
-    Config<Boolean> wallsConfig = register(new BooleanConfig("ThroughWalls", "Renders chams through walls", true));
+    Config<Boolean> wallsConfig = register(new BooleanConfig("ThroughWalls", "Renders chams through walls", true, () -> modeConfig.getValue() != ChamsMode.NORMAL));
     // Config<Boolean> shineConfig = register(new BooleanConfig("Shine", "Adds enchantment glint", false));
-    Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", false, () -> wallsConfig.getValue()));
+    Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", false, () -> wallsConfig.getValue() && modeConfig.getValue() != ChamsMode.NORMAL));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render chams on other players", true));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render chams on the player", true));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render chams on first-person hands", true));
@@ -99,10 +99,6 @@ public class ChamsModule extends ToggleModule
     @EventListener(priority = Integer.MAX_VALUE)
     public void onRenderWorld(RenderWorldEvent event)
     {
-        if (modeConfig.getValue() == ChamsMode.NORMAL)
-        {
-            return;
-        }
         // Pop chams
         RenderBuffers.preRender();
         RenderSystem.disableDepthTest();
@@ -115,12 +111,17 @@ public class ChamsModule extends ToggleModule
             int boxColor = ColorUtil.withAlpha(color.getRGB(), boxAlpha);
             int lineColor = ColorUtil.withAlpha(color.getRGB(), lineAlpha);
             ChamsModelRenderer.renderStaticPlayerModel(event.getMatrices(), set.getKey(), set.getKey().getModel(), event.getTickDelta(),
-                    boxColor, lineColor, widthConfig.getValue(), true, true, false);
+                    boxColor, lineColor, widthConfig.getValue(), modeConfig.getValue() != ChamsMode.FILL, true, false);
         }
         fadeList.entrySet().removeIf(e ->
                 e.getValue().getFactor() == 0.0);
 
         RenderBuffers.postRender();
+
+        if (modeConfig.getValue() == ChamsMode.NORMAL)
+        {
+            return;
+        }
 
         // Entity chams
         RenderBuffers.preRender();
@@ -207,6 +208,10 @@ public class ChamsModule extends ToggleModule
     @EventListener
     public void onRenderCrystal(RenderCrystalEvent event)
     {
+        if (modeConfig.getValue() == ChamsMode.NORMAL)
+        {
+            return;
+        }
         if (mc.player != null && (!textureConfig.getValue() || !wallsConfig.getValue()) && crystalsConfig.getValue() &&
                 mc.player.squaredDistanceTo(event.endCrystalEntity) <= ((NumberConfig) rangeConfig).getValueSq())
         {

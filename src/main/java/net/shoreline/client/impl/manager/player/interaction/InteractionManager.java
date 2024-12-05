@@ -55,7 +55,7 @@ public final class InteractionManager implements Globals
             return false;
         }
 
-        Direction direction = getInteractDirection(pos, grim, strictDirection);
+        Direction direction = getInteractDirection(pos, strictDirection);
         if (airPlace || AirInteractModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
@@ -106,7 +106,7 @@ public final class InteractionManager implements Globals
             return false;
         }
 
-        Direction direction = getInteractDirection(pos, grim, strictDirection);
+        Direction direction = getInteractDirection(pos, strictDirection);
         if (airPlace || AirInteractModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
