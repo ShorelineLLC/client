@@ -25,6 +25,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -232,7 +233,10 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             }
             if (playerEntity.isCrawling())
             {
-                trapBlocks.add(playerEntity.getBlockPos().up());
+                for (BlockPos targetPos : PositionUtil.getAllInBox(entity.getBoundingBox(), entity.getBlockPos()))
+                {
+                    trapBlocks.add(targetPos.up());
+                }
             }
         }
         return trapBlocks;
