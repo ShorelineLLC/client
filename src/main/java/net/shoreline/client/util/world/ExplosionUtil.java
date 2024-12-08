@@ -323,19 +323,16 @@ public class ExplosionUtil implements Globals
 
     private static float getProtectionAmount(Iterable<ItemStack> equipment, boolean assumeBestArmor)
     {
+        if (assumeBestArmor)
+        {
+            return 20.0f;
+        }
         MutableInt mutableInt = new MutableInt();
         equipment.forEach(i ->
         {
             int modifierBlast = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get(), i);
-            if (EnchantmentUtil.hasEnchantment(i, Enchantments.BLAST_PROTECTION))
-            {
-                mutableInt.add(assumeBestArmor && modifierBlast == 0 ? 8 : modifierBlast * 2);
-            }
             int modifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get(), i);
-            if (EnchantmentUtil.hasEnchantment(i, Enchantments.PROTECTION))
-            {
-                mutableInt.add(assumeBestArmor && modifier == 0 ? 4 : modifier);
-            }
+            mutableInt.add(modifierBlast * 2 + modifier);
         });
         return mutableInt.intValue();
     }

@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.combat;
 
-import com.google.common.collect.Lists;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
@@ -17,7 +16,10 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
@@ -26,13 +28,15 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class AutoAnchorModule extends BlockPlacerModule
 {
-
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when exploding anchors", true));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate before exploding", false));
@@ -45,12 +49,14 @@ public class AutoAnchorModule extends BlockPlacerModule
     Config<Float> explodeSpeedConfig = register(new NumberConfig<>("ExplodeSpeed", "Speed to place anchors", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false, () -> rotateConfig.getValue() && placeConfig.getValue()));
+    Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
     Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider exploding anchors", 1.0f, 4.0f, 10.0f));
     Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when exploding anchors", true));
     Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
     Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
     //
     private BlockPos anchorPos;
+    private BlockPos placePos;
     private final Timer explodeTimer = new CacheTimer();
 
     public AutoAnchorModule()
@@ -62,14 +68,18 @@ public class AutoAnchorModule extends BlockPlacerModule
     public void onDisable()
     {
         anchorPos = null;
+        placePos = null;
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event)
+    public void onPlayerTick(TickEvent event)
     {
-        ArrayList<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-        List<BlockPos> blocks = getSphere(mc.player.getPos());
-        anchorPos = calculateAnchorExplosion(blocks, entities);
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
+        anchorPos = calculateAnchorExplosion();
+        placePos = calculateAnchorPlacement();
         if (anchorPos != null)
         {
             if (rotateConfig.getValue())
@@ -79,17 +89,52 @@ public class AutoAnchorModule extends BlockPlacerModule
             }
             if (explodeTimer.passed(1000.0f - explodeSpeedConfig.getValue() * 50.0f))
             {
-                BlockState state = mc.world.getBlockState(anchorPos);
-                if (state.getBlock() instanceof RespawnAnchorBlock)
-                {
-                    setAnchor(anchorPos);
-                }
-                else
-                {
-                    placeAnchor(anchorPos);
-                }
+                setAnchor(anchorPos);
                 explodeTimer.reset();
             }
+        }
+        if (placePos != null)
+        {
+            if (mc.world.getBlockState(placePos).getBlock() == Blocks.RESPAWN_ANCHOR)
+            {
+                return;
+            }
+            int slot = getBlockItemSlot(Blocks.RESPAWN_ANCHOR);
+            if (slot == -1)
+            {
+                return;
+            }
+            Managers.INVENTORY.setSlot(slot);
+            Managers.INTERACT.placeBlock(placePos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+            {
+                if (rotateConfig.getValue())
+                {
+                    if (state)
+                    {
+                        Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
+                    }
+                    else
+                    {
+                        if (grimConfig.getValue())
+                        {
+                            Managers.ROTATION.setRotationSilentSync();
+                        }
+                    }
+                }
+            });
+            Managers.INVENTORY.syncToClient();
+        }
+    }
+
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent event)
+    {
+        if (anchorPos != null)
+        {
+            RenderBuffers.preRender();
+            RenderManager.renderBox(event.getMatrices(), anchorPos, new Color(0, 255, 0, 70).getRGB());
+            RenderManager.renderBoundingBox(event.getMatrices(), anchorPos, 1.0f, new Color(0, 255, 0, 144).getRGB());
+            RenderBuffers.postRender();
         }
     }
 
@@ -101,8 +146,11 @@ public class AutoAnchorModule extends BlockPlacerModule
             return;
         }
         Managers.INVENTORY.setSlot(slot);
-        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(),
-                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(pos) : Direction.UP, pos, true));
+        for (int i = 0; i < 4; i++)
+        {
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(),
+                    strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true));
+        }
         if (swingConfig.getValue())
         {
             mc.player.swingHand(Hand.MAIN_HAND);
@@ -114,44 +162,66 @@ public class AutoAnchorModule extends BlockPlacerModule
         Managers.INVENTORY.syncToClient();
     }
 
-    private void placeAnchor(BlockPos pos)
+    // Most of the below code is stolen from the ca
+    private BlockPos calculateAnchorExplosion()
     {
-        int slot = getBlockItemSlot(Blocks.RESPAWN_ANCHOR);
-        if (slot == -1)
+        BlockPos data = null;
+        double bestAnchorDamage = 0.0f;
+        for (BlockPos pos : getSphere(mc.player.getPos()))
         {
-            return;
-        }
-        Managers.INVENTORY.setSlot(slot);
-        Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
-        {
-            if (rotateConfig.getValue())
+            BlockState state = mc.world.getBlockState(pos);
+            if (!rangeCheck(pos) || !(state.getBlock() instanceof RespawnAnchorBlock))
             {
-                if (state)
+                continue;
+            }
+            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
+                    pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, false); // Anchor explosions power = 10
+            boolean unsafeToPlayer = playerDamageCheck(selfDamage);
+            if (unsafeToPlayer)
+            {
+                continue;
+            }
+            for (Entity entity : mc.world.getEntities())
+            {
+                if (entity == null || !entity.isAlive() || entity == mc.player
+                        || !isValidTarget(entity)
+                        || Managers.SOCIAL.isFriend(entity.getName()))
                 {
-                    Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
+                    continue;
                 }
-                else
+
+                double blockDist = pos.getSquaredDistance(entity.getPos());
+                if (blockDist > 144.0f)
                 {
-                    if (grimConfig.getValue())
-                    {
-                        Managers.ROTATION.setRotationSilentSync();
-                    }
+                    continue;
+                }
+                double dist = mc.player.squaredDistanceTo(entity);
+                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
+                {
+                    continue;
+                }
+                double damage = ExplosionUtil.getDamageTo(entity,
+                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, assumeArmorConfig.getValue());
+                if (damage > bestAnchorDamage)
+                {
+                    data = pos;
+                    bestAnchorDamage = damage;
                 }
             }
-        });
-        Managers.INVENTORY.syncToClient();
-    }
-
-    // Most of the below code is stolen from the ca
-    private BlockPos calculateAnchorExplosion(List<BlockPos> placeBlocks, List<Entity> entities)
-    {
-        if (placeBlocks.isEmpty() || entities.isEmpty())
+        }
+        if (data == null || bestAnchorDamage < minDamageConfig.getValue())
         {
+            System.out.println("lol1 " + bestAnchorDamage);
             return null;
         }
+        return data;
+    }
+
+    private BlockPos calculateAnchorPlacement()
+    {
         BlockPos data = null;
-        double dmg = 0.0f;
-        for (BlockPos pos : placeBlocks)
+        double bestAnchorDamage = 0.0f;
+        for (BlockPos pos : getSphere(mc.player.getPos()))
         {
             BlockState state = mc.world.getBlockState(pos);
             if (!rangeCheck(pos) || !state.isReplaceable() && !(state.getBlock() instanceof RespawnAnchorBlock))
@@ -159,13 +229,13 @@ public class AutoAnchorModule extends BlockPlacerModule
                 continue;
             }
             double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                    pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0); // Anchor explosions power = 10
+                    pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, false); // Anchor explosions power = 10
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer)
             {
                 continue;
             }
-            for (Entity entity : entities)
+            for (Entity entity : mc.world.getEntities())
             {
                 if (entity == null || !entity.isAlive() || entity == mc.player
                         || !isValidTarget(entity)
@@ -184,15 +254,15 @@ public class AutoAnchorModule extends BlockPlacerModule
                     continue;
                 }
                 double damage = ExplosionUtil.getDamageTo(entity,
-                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0);
-                if (data == null || damage > dmg)
+                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, assumeArmorConfig.getValue());
+                if (damage > bestAnchorDamage)
                 {
                     data = pos;
-                    dmg = damage;
+                    bestAnchorDamage = damage;
                 }
             }
         }
-        if (data == null || dmg < minDamageConfig.getValue())
+        if (data == null || bestAnchorDamage < minDamageConfig.getValue())
         {
             return null;
         }
