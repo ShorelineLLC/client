@@ -327,14 +327,14 @@ public class ExplosionUtil implements Globals
         equipment.forEach(i ->
         {
             int modifierBlast = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get(), i);
-            if (!assumeBestArmor || EnchantmentUtil.hasEnchantment(i, Enchantments.BLAST_PROTECTION) && modifierBlast == 0)
+            if (EnchantmentUtil.hasEnchantment(i, Enchantments.BLAST_PROTECTION))
             {
-                mutableInt.add(modifierBlast * 2);
+                mutableInt.add(assumeBestArmor && modifierBlast == 0 ? 8 : modifierBlast * 2);
             }
             int modifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get(), i);
-            if (!assumeBestArmor || EnchantmentUtil.hasEnchantment(i, Enchantments.PROTECTION) && modifier == 0)
+            if (EnchantmentUtil.hasEnchantment(i, Enchantments.PROTECTION))
             {
-                mutableInt.add(modifier);
+                mutableInt.add(assumeBestArmor && modifier == 0 ? 4 : modifier);
             }
         });
         return mutableInt.intValue();
