@@ -319,7 +319,7 @@ public final class AutoTotemModule extends ToggleModule
             {
                 continue;
             }
-            double potential = ExplosionUtil.getDamageTo(mc.player, crystal.getPos());
+            double potential = ExplosionUtil.getDamageTo(mc.player, crystal.getPos(), false);
             if (health + 0.5 > potential)
             {
                 continue;

@@ -5,9 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.minecraft.util.Hand;
@@ -75,7 +73,7 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
     Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
-    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
+    Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
     Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
     Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
@@ -247,11 +245,11 @@ public class AutoMineModule extends CombatModule
                                     }
                                     if (full2)
                                     {
-                                        startAutoMine(miningPos2.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP);
+                                        startAutoMine(miningPos2.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP);
                                     }
                                     if (full)
                                     {
-                                        startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP);
+                                        startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP);
                                     }
                                 }
                             }
@@ -275,7 +273,7 @@ public class AutoMineModule extends CombatModule
                                 {
                                     if (!mc.world.isAir(miningPos.pos()))
                                     {
-                                        startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP);
+                                        startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP);
                                     }
                                 }
                             }
@@ -297,7 +295,7 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else
                                 {
-                                    startAutoMine(miningPos2.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos2.pos()) : Direction.UP);
+                                    startAutoMine(miningPos2.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP);
                                 }
                             }
                         }
@@ -323,7 +321,7 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
                                 {
-                                    startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionGrim(miningPos.pos()) : Direction.UP);
+                                    startAutoMine(miningPos.pos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP);
                                 }
                             }
                         }
@@ -366,7 +364,6 @@ public class AutoMineModule extends CombatModule
                 {
                     Managers.INVENTORY.setSlot(data.getSlot());
                 }
-
                 if (!data.hasAttemptedBreak())
                 {
                     data.setAttemptedBreak(true);
@@ -758,7 +755,7 @@ public class AutoMineModule extends CombatModule
                 }
 
                 double damage = ExplosionUtil.getDamageTo(entity, off.toCenterPos(),
-                        ExplosionUtil.IgnoreTerrain.NONE, Set.of(off));
+                        ExplosionUtil.IgnoreTerrain.NONE, Set.of(off), assumeArmorConfig.getValue());
                 if (damage > bestDamage)
                 {
                     bestDamage = damage;

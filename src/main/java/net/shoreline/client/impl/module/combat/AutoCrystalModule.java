@@ -119,6 +119,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Placements> placementsConfig = register(new EnumConfig<>("Placements", "Version standard for placing end crystals", Placements.NATIVE, Placements.values(), () -> placeConfig.getValue()));
     Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider attacking or placing an end crystal", 1.0f, 4.0f, 10.0f));
     // Damage settings
+    Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
     Config<Boolean> armorBreakerConfig = register(new BooleanConfig("ArmorBreaker", "Attempts to break enemy armor with crystals", true));
     Config<Float> armorScaleConfig = register(new NumberConfig<>("ArmorScale", "Armor damage scale before attempting to break enemy armor with crystals", 1.0f, 5.0f, 20.0f, NumberDisplay.PERCENT, () -> armorBreakerConfig.getValue()));
     Config<Float> lethalMultiplier = register(new NumberConfig<>("LethalMultiplier", "If we can kill an enemy with this many crystals, disregard damage values", 0.0f, 1.5f, 4.0f));
@@ -259,7 +260,7 @@ public class AutoCrystalModule extends RotationModule
                 if (crystalEntity != null)
                 {
                     double self = ExplosionUtil.getDamageTo(mc.player, crystalEntity.getPos(),
-                            blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
+                            blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
                     if (!safetyConfig.getValue() || !playerDamageCheck(self))
                     {
                         attackCrystal = new DamageData<>(crystalEntity, placeCrystal.getAttackTarget(),
@@ -458,7 +459,7 @@ public class AutoCrystalModule extends RotationModule
                     return;
                 }
                 double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalPos,
-                        blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
+                        blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
                 if (playerDamageCheck(selfDamage))
                 {
                     return;
@@ -482,7 +483,7 @@ public class AutoCrystalModule extends RotationModule
                         continue;
                     }
                     double damage = ExplosionUtil.getDamageTo(entity,
-                            crystalPos, blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
+                            crystalPos, blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                     // TODO: Test this
                     DamageData<Integer> data = new DamageData<>(packet2.getEntityId(),
                             entity, damage, selfDamage, blockPos);
@@ -584,7 +585,7 @@ public class AutoCrystalModule extends RotationModule
                 return;
             }
             double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalPos,
-                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
+                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
             if (playerDamageCheck(selfDamage))
             {
                 return;
@@ -608,7 +609,7 @@ public class AutoCrystalModule extends RotationModule
                     continue;
                 }
                 double damage = ExplosionUtil.getDamageTo(entity,
-                        crystalPos, blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
+                        crystalPos, blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 // TODO: Test this
                 DamageData<EndCrystalEntity> data = new DamageData<>(crystalEntity,
                         entity, damage, selfDamage, crystalEntity.getBlockPos().down());
@@ -944,7 +945,7 @@ public class AutoCrystalModule extends RotationModule
                 continue;
             }
             double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystal.getPos(),
-                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
+                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer && !safetyOverride.getValue())
             {
@@ -969,7 +970,7 @@ public class AutoCrystalModule extends RotationModule
                     continue;
                 }
                 double damage = ExplosionUtil.getDamageTo(entity,
-                        crystal.getPos(), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
+                        crystal.getPos(), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
@@ -1032,7 +1033,7 @@ public class AutoCrystalModule extends RotationModule
                 continue;
             }
             double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalDamageVec(pos),
-                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0);
+                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
             boolean unsafeToPlayer = playerDamageCheck(selfDamage);
             if (unsafeToPlayer && !safetyOverride.getValue())
             {
@@ -1058,7 +1059,7 @@ public class AutoCrystalModule extends RotationModule
                 }
                 double damage;
                 damage = ExplosionUtil.getDamageTo(entity,
-                        crystalDamageVec(pos), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue());
+                        crystalDamageVec(pos), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;

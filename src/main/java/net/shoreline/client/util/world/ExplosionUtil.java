@@ -20,6 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.player.EnchantmentUtil;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Set;
@@ -37,9 +38,10 @@ public class ExplosionUtil implements Globals
      * @return
      */
     public static double getDamageTo(final Entity entity,
-                                     final Vec3d explosion)
+                                     final Vec3d explosion,
+                                     boolean assumeBestArmor)
     {
-        return getDamageTo(entity, explosion, false);
+        return getDamageTo(entity, explosion, false, assumeBestArmor);
     }
 
     /**
@@ -50,39 +52,44 @@ public class ExplosionUtil implements Globals
      */
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
-                                     final boolean ignoreTerrain)
+                                     final boolean ignoreTerrain,
+                                     boolean assumeBestArmor)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, 0);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, 0, assumeBestArmor);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final boolean ignoreTerrain,
-                                     int extrapolationTicks)
+                                     int extrapolationTicks,
+                                     boolean assumeBestArmor)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, extrapolationTicks);
-    }
-
-    public static double getDamageTo(final Entity entity,
-                                     final Vec3d explosion,
-                                     final IgnoreTerrain ignoreTerrain)
-    {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, 0);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, extrapolationTicks, assumeBestArmor);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain,
-                                     int extrapolationTicks)
+                                     boolean assumeBestArmor)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, extrapolationTicks);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, 0, assumeBestArmor);
+    }
+
+    public static double getDamageTo(final Entity entity,
+                                     final Vec3d explosion,
+                                     final IgnoreTerrain ignoreTerrain,
+                                     int extrapolationTicks,
+                                     boolean assumeBestArmor)
+    {
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, extrapolationTicks, assumeBestArmor);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain,
                                      float power,
-                                     int extrapolationTicks)
+                                     int extrapolationTicks,
+                                     boolean assumeBestArmor)
     {
         double x = entity.getX();
         double y = entity.getY();
@@ -106,25 +113,27 @@ public class ExplosionUtil implements Globals
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
-        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg, assumeBestArmor);
         return Math.max(0.0, dmg);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final boolean ignoreTerrain,
-                                     final Set<BlockPos> ignoreBlocks)
+                                     final Set<BlockPos> ignoreBlocks,
+                                     boolean assumeBestArmor)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, 0);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, 0, assumeBestArmor);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final boolean ignoreTerrain,
                                      final Set<BlockPos> ignoreBlocks,
-                                     int extrapolationTicks)
+                                     int extrapolationTicks,
+                                     boolean assumeBestArmor)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, extrapolationTicks);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, extrapolationTicks, assumeBestArmor);
     }
 
     public static double getDamageTo(final Entity entity,
@@ -132,7 +141,8 @@ public class ExplosionUtil implements Globals
                                      final boolean ignoreTerrain,
                                      float power,
                                      final Set<BlockPos> ignoreBlocks,
-                                     int extrapolationTicks)
+                                     int extrapolationTicks,
+                                     boolean assumeBestArmor)
     {
         double x = entity.getX();
         double y = entity.getY();
@@ -156,16 +166,17 @@ public class ExplosionUtil implements Globals
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
-        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg, assumeBestArmor);
         return Math.max(0.0, dmg);
     }
 
     public static double getDamageTo(final Entity entity,
                                      final Vec3d explosion,
                                      final IgnoreTerrain ignoreTerrain,
-                                     final Set<BlockPos> ignoreBlocks)
+                                     final Set<BlockPos> ignoreBlocks,
+                                     boolean assumeBestArmor)
     {
-        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, 0);
+        return getDamageTo(entity, explosion, ignoreTerrain, 12.0f, ignoreBlocks, 0, assumeBestArmor);
     }
 
     public static double getDamageTo(final Entity entity,
@@ -173,7 +184,8 @@ public class ExplosionUtil implements Globals
                                      final IgnoreTerrain ignoreTerrain,
                                      float power,
                                      final Set<BlockPos> ignoreBlocks,
-                                     int extrapolationTicks)
+                                     int extrapolationTicks,
+                                     boolean assumeBestArmor)
     {
         double x = entity.getX();
         double y = entity.getY();
@@ -197,7 +209,7 @@ public class ExplosionUtil implements Globals
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
-        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg, assumeBestArmor);
         return Math.max(0.0, dmg);
     }
 
@@ -210,7 +222,8 @@ public class ExplosionUtil implements Globals
                                      final Vec3d explosion,
                                      final boolean ignoreTerrain,
                                      float power,
-                                     int extrapolationTicks)
+                                     int extrapolationTicks,
+                                     boolean assumeBestArmor)
     {
         double x = entity.getX();
         double y = entity.getY();
@@ -234,7 +247,7 @@ public class ExplosionUtil implements Globals
         double w = d / power;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
-        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg, assumeBestArmor);
         return Math.max(0.0, dmg);
     }
 
@@ -248,7 +261,8 @@ public class ExplosionUtil implements Globals
     public static double getDamageToPos(final Vec3d pos,
                                         final Entity entity,
                                         final Vec3d explosion,
-                                        final boolean ignoreTerrain)
+                                        final boolean ignoreTerrain,
+                                        boolean assumeBestArmor)
     {
         final Box bb = entity.getBoundingBox();
         double dx = pos.getX() - bb.minX;
@@ -261,7 +275,7 @@ public class ExplosionUtil implements Globals
         double w = Math.sqrt(pos.squaredDistanceTo(explosion)) / 12.0;
         double ac = (1.0 - w) * ab;
         double dmg = (float) ((int) ((ac * ac + ac) / 2.0 * 7.0 * 12.0 + 1.0));
-        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg);
+        dmg = getReduction(entity, mc.world.getDamageSources().explosion(null), dmg, assumeBestArmor);
         return Math.max(0.0, dmg);
     }
 
@@ -270,7 +284,7 @@ public class ExplosionUtil implements Globals
      * @param damage
      * @return
      */
-    private static double getReduction(Entity entity, DamageSource damageSource, double damage)
+    private static double getReduction(Entity entity, DamageSource damageSource, double damage, boolean assumeBestArmor)
     {
         if (damageSource.isScaledWithDifficulty())
         {
@@ -286,7 +300,7 @@ public class ExplosionUtil implements Globals
         {
             damage = DamageUtil.getDamageLeft(livingEntity, (float) damage, damageSource, getArmor(livingEntity), (float) livingEntity.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
             damage = getResistanceReduction(livingEntity, damage);
-            damage = getProtectionReduction(livingEntity, damage, damageSource);
+            damage = getProtectionReduction(livingEntity, damage, damageSource, assumeBestArmor);
         }
 
         return Math.max(damage, 0);
@@ -297,24 +311,31 @@ public class ExplosionUtil implements Globals
         return (float) Math.floor(entity.getAttributeValue(EntityAttributes.GENERIC_ARMOR));
     }
 
-    private static float getProtectionReduction(Entity player, double damage, DamageSource source)
+    private static float getProtectionReduction(Entity player, double damage, DamageSource source, boolean assumeBestArmor)
     {
         if (player instanceof LivingEntity livingEntity)
         {
-            float protLevel = getProtectionAmount(livingEntity.getArmorItems());
+            float protLevel = getProtectionAmount(livingEntity.getArmorItems(), assumeBestArmor);
             return DamageUtil.getInflictedDamage((float) damage, protLevel);
         }
         return 0.0f;
     }
 
-    private static float getProtectionAmount(Iterable<ItemStack> equipment)
+    private static float getProtectionAmount(Iterable<ItemStack> equipment, boolean assumeBestArmor)
     {
         MutableInt mutableInt = new MutableInt();
         equipment.forEach(i ->
         {
             int modifierBlast = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get(), i);
+            if (!assumeBestArmor || EnchantmentUtil.hasEnchantment(i, Enchantments.BLAST_PROTECTION) && modifierBlast == 0)
+            {
+                mutableInt.add(modifierBlast * 2);
+            }
             int modifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get(), i);
-            mutableInt.add(modifierBlast * 2 + modifier);
+            if (!assumeBestArmor || EnchantmentUtil.hasEnchantment(i, Enchantments.PROTECTION) && modifier == 0)
+            {
+                mutableInt.add(modifier);
+            }
         });
         return mutableInt.intValue();
     }
