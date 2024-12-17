@@ -13,6 +13,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -323,16 +324,19 @@ public class ExplosionUtil implements Globals
 
     private static float getProtectionAmount(Iterable<ItemStack> equipment, boolean assumeBestArmor)
     {
-        if (assumeBestArmor)
-        {
-            return 20.0f;
-        }
         MutableInt mutableInt = new MutableInt();
         equipment.forEach(i ->
         {
-            int modifierBlast = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get(), i);
-            int modifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get(), i);
-            mutableInt.add(modifierBlast * 2 + modifier);
+            if (assumeBestArmor && EnchantmentUtil.isFakeEnchant2b2t(i))
+            {
+                mutableInt.add(i.getItem() instanceof ArmorItem armorItem && armorItem.getType() == ArmorItem.Type.LEGGINGS ? 8 : 4);
+            }
+            else
+            {
+                int modifierBlast = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.BLAST_PROTECTION.getRegistryRef()).getEntry(Enchantments.BLAST_PROTECTION).get(), i);
+                int modifier = EnchantmentHelper.getLevel(mc.world.getRegistryManager().get(Enchantments.PROTECTION.getRegistryRef()).getEntry(Enchantments.PROTECTION).get(), i);
+                mutableInt.add(modifierBlast * 2 + modifier);
+            }
         });
         return mutableInt.intValue();
     }

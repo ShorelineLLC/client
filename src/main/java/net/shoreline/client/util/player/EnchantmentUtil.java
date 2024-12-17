@@ -3,10 +3,13 @@ package net.shoreline.client.util.player;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+
+import java.util.Set;
 
 public class EnchantmentUtil
 {
@@ -28,16 +31,18 @@ public class EnchantmentUtil
         return 0;
     }
 
-    public static boolean hasEnchantment(ItemStack itemStack, RegistryKey<Enchantment> enchantment)
+    public static boolean isFakeEnchant2b2t(ItemStack itemStack)
     {
-        if (!itemStack.getComponents().contains(DataComponentTypes.ENCHANTMENTS))
+        Set<Object2IntMap.Entry<RegistryEntry<Enchantment>>> enchants = EnchantmentHelper.getEnchantments(itemStack).getEnchantmentEntries();
+        if (enchants.size() > 1)
         {
             return false;
         }
-        for (Object2IntMap.Entry<RegistryEntry<Enchantment>> e : itemStack.getComponents()
-                .get(DataComponentTypes.ENCHANTMENTS).getEnchantmentEntries())
+        for (Object2IntMap.Entry<RegistryEntry<Enchantment>> e : enchants)
         {
-            if (e.getKey().getKey().isPresent() && e.getKey().getKey().get().equals(enchantment))
+            RegistryEntry<Enchantment> enchantment = e.getKey();
+            int lvl = e.getIntValue();
+            if (lvl == 0 && enchantment.getKey().isPresent() && enchantment.getKey().get() == Enchantments.PROTECTION)
             {
                 return true;
             }

@@ -124,7 +124,16 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
         float yaw = movementPacketsEvent.getYaw();
         float pitch = movementPacketsEvent.getPitch();
         boolean ground = movementPacketsEvent.getOnGround();
-        if (movementPacketsEvent.isCanceled())
+
+        EncodeYawEvent encodeYawEvent = new EncodeYawEvent();
+        EventBus.INSTANCE.dispatch(encodeYawEvent);
+        if (encodeYawEvent.isCanceled())
+        {
+            // yaw overflow, yes grim is retarded
+            yaw += 36000000.0f;
+        }
+
+        if (movementPacketsEvent.isCanceled() || encodeYawEvent.isCanceled())
         {
             ci.cancel();
             sendSprintingPacket();
