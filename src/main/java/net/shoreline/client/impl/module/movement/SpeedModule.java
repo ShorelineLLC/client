@@ -43,7 +43,7 @@ public class SpeedModule extends ToggleModule
     //
     Config<Speed> speedModeConfig = register(new EnumConfig<>("Mode", "Speed mode", Speed.STRAFE, Speed.values()));
     Config<Float> collisionDistanceConfig = register(new NumberConfig<>("CollisionDistance", "The distance to apply collision speed", 0.5f, 1.5f, 2.0f, () -> speedModeConfig.getValue() == Speed.GRIM_COLLIDE));
-    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 10.0f, () -> speedModeConfig.getValue() == Speed.VANILLA));
+    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed for alternative modes", 0.1f, 4.0f, 50.0f, () -> speedModeConfig.getValue() == Speed.VANILLA));
     Config<Boolean> timerConfig = register(new BooleanConfig("UseTimer", "Uses timer to increase acceleration", false, () -> isStrafe()));
     Config<Boolean> fastConfig = register(new BooleanConfig("Fast", "Fast timer speed", false, () -> speedModeConfig.getValue() == Speed.STRAFE_STRICT && timerConfig.getValue()));
     Config<Boolean> strafeBoostConfig = register(new BooleanConfig("StrafeBoost", "Uses explosion velocity to boost Strafe", false, () -> isStrafe()));

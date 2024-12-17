@@ -13,6 +13,7 @@ import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 import net.shoreline.client.util.math.position.DirectionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -95,7 +96,7 @@ public class RotationsModule extends ConcurrentModule
 
     public boolean getMovementFix()
     {
-        return movementFixConfig.getValue();
+        return movementFixConfig.getValue() && !(DisablerModule.getInstance().isEnabled() && DisablerModule.getInstance().isYawOverflow());
     }
 
     public boolean getMouseSensFix()
