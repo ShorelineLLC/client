@@ -48,7 +48,7 @@ public class VelocityModule extends ToggleModule
     Config<VelocityMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for velocity", VelocityMode.NORMAL, VelocityMode.values()));
     Config<Float> horizontalConfig = register(new NumberConfig<>("Horizontal", "How much horizontal knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
     Config<Float> verticalConfig = register(new NumberConfig<>("Vertical", "How much vertical knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
-    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only applies velocity in walls", false, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM))
+    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only applies velocity in walls", false, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM));
     Config<Boolean> pushEntitiesConfig = register(new BooleanConfig("NoPush-Entities", "Prevents being pushed away from entities", true));
     Config<Boolean> pushBlocksConfig = register(new BooleanConfig("NoPush-Blocks", "Prevents being pushed out of blocks", true));
     Config<Boolean> pushLiquidsConfig = register(new BooleanConfig("NoPush-Liquids", "Prevents being pushed by flowing liquids", true));
