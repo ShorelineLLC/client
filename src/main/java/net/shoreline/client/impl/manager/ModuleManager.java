@@ -45,7 +45,7 @@ public final class ModuleManager
                 new SocialsModule(),
                 // Combat
                 new AuraModule(),
-                // new AutoAnchorModule(),
+                new AutoAnchorModule(),
                 new AutoArmorModule(),
                 new AutoBowReleaseModule(),
                 new AutoCrawlTrapModule(),

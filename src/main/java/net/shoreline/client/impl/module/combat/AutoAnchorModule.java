@@ -6,6 +6,7 @@ import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -21,22 +22,24 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.BlockPlacerModule;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
+import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 public class AutoAnchorModule extends BlockPlacerModule
 {
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows exploding while using items", false));
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when exploding anchors", true));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate before exploding", false));
@@ -45,8 +48,9 @@ public class AutoAnchorModule extends BlockPlacerModule
     Config<Boolean> neutralsConfig = register(new BooleanConfig("Neutrals", "Target neutrals", false));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Target animals", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Range to explode anchors", 0.1f, 4.0f, 6.0f));
+    Config<Float> explodeSpeedConfig = register(new NumberConfig<>("ExplodeSpeed", "Speed to explode anchors", 0.1f, 18.0f, 20.0f));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places anchors to damage enemies", true));
-    Config<Float> explodeSpeedConfig = register(new NumberConfig<>("ExplodeSpeed", "Speed to place anchors", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
+    Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place anchors", 0.1f, 12.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false, () -> rotateConfig.getValue() && placeConfig.getValue()));
     Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
@@ -54,10 +58,14 @@ public class AutoAnchorModule extends BlockPlacerModule
     Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when exploding anchors", true));
     Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
     Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
+    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where anchors will be placed", true));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
     //
     private BlockPos anchorPos;
     private BlockPos placePos;
     private final Timer explodeTimer = new CacheTimer();
+    private final Timer placeTimer = new CacheTimer();
+    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
 
     public AutoAnchorModule()
     {
@@ -75,6 +83,11 @@ public class AutoAnchorModule extends BlockPlacerModule
     public void onPlayerTick(TickEvent event)
     {
         if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
+
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
             return;
         }
@@ -104,53 +117,81 @@ public class AutoAnchorModule extends BlockPlacerModule
             {
                 return;
             }
-            Managers.INVENTORY.setSlot(slot);
-            Managers.INTERACT.placeBlock(placePos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+            if (placeTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f))
             {
-                if (rotateConfig.getValue())
+                Managers.INVENTORY.setSlot(slot);
+                Managers.INTERACT.placeBlock(placePos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
                 {
-                    if (state)
+                    if (rotateConfig.getValue())
                     {
-                        Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
-                    }
-                    else
-                    {
-                        if (grimConfig.getValue())
+                        if (state)
                         {
-                            Managers.ROTATION.setRotationSilentSync();
+                            Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
+                        }
+                        else
+                        {
+                            if (grimConfig.getValue())
+                            {
+                                Managers.ROTATION.setRotationSilentSync();
+                            }
                         }
                     }
-                }
-            });
-            Managers.INVENTORY.syncToClient();
+                });
+                Managers.INVENTORY.syncToClient();
+                placeTimer.reset();
+            }
         }
     }
 
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
-        if (anchorPos != null)
+        if (renderConfig.getValue())
         {
             RenderBuffers.preRender();
-            RenderManager.renderBox(event.getMatrices(), anchorPos, new Color(0, 255, 0, 70).getRGB());
-            RenderManager.renderBoundingBox(event.getMatrices(), anchorPos, 1.0f, new Color(0, 255, 0, 144).getRGB());
+            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
+            {
+                if (set.getKey() == anchorPos)
+                {
+                    continue;
+                }
+                set.getValue().setState(false);
+                int boxAlpha = (int) (40 * set.getValue().getFactor());
+                int lineAlpha = (int) (100 * set.getValue().getFactor());
+                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
+                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
+                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
+                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
+            }
             RenderBuffers.postRender();
+
+
+            fadeList.entrySet().removeIf(e ->
+                    e.getValue().getFactor() == 0.0);
+
+            if (anchorPos != null)
+            {
+                Animation animation = new Animation(true, fadeTimeConfig.getValue());
+                fadeList.put(anchorPos, animation);
+            }
         }
     }
 
     private void setAnchor(BlockPos pos)
     {
+        BlockState state = mc.world.getBlockState(pos);
+        if (!(state.getBlock() instanceof RespawnAnchorBlock) || state.get(RespawnAnchorBlock.CHARGES) > 4)
+        {
+            return;
+        }
         int slot = getBlockItemSlot(Blocks.GLOWSTONE);
         if (slot == -1)
         {
             return;
         }
         Managers.INVENTORY.setSlot(slot);
-        for (int i = 0; i < 4; i++)
-        {
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(),
-                    strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true));
-        }
+        BlockHitResult result = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
+        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, id));
         if (swingConfig.getValue())
         {
             mc.player.swingHand(Hand.MAIN_HAND);
@@ -211,7 +252,6 @@ public class AutoAnchorModule extends BlockPlacerModule
         }
         if (data == null || bestAnchorDamage < minDamageConfig.getValue())
         {
-            System.out.println("lol1 " + bestAnchorDamage);
             return null;
         }
         return data;
