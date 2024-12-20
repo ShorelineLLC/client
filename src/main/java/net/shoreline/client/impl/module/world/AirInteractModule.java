@@ -92,10 +92,10 @@ public final class AirInteractModule extends ToggleModule
             airPlaceTicks = 4;
             if (grimConfig.getValue())
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, blockHitResult.getBlockPos(), blockHitResult.getSide()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                 Managers.NETWORK.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, blockHitResult, 0));
                 Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, blockHitResult.getBlockPos(), blockHitResult.getSide()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
             else

@@ -61,15 +61,14 @@ public final class InteractionManager implements Globals
             direction = Direction.DOWN;
             if (grim)
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
-                boolean result = placeBlock(pos, direction, slot, clientSwing, rotationCallback);
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+                boolean result = placeBlock(pos, Hand.OFF_HAND, direction, slot, clientSwing, rotationCallback);
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                 return result;
             }
             else
             {
-                return placeBlock(pos, direction, slot, clientSwing, rotationCallback);
+                return placeBlock(pos, Hand.MAIN_HAND, direction, slot, clientSwing, rotationCallback);
             }
         }
         if (direction == null)
@@ -77,7 +76,7 @@ public final class InteractionManager implements Globals
             return false;
         }
         final BlockPos neighbor = pos.offset(direction.getOpposite());
-        return placeBlock(neighbor, direction, slot, clientSwing, rotationCallback);
+        return placeBlock(neighbor, Hand.MAIN_HAND, direction, slot, clientSwing, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
@@ -112,15 +111,14 @@ public final class InteractionManager implements Globals
             direction = Direction.DOWN;
             if (grim)
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
-                boolean result = placeBlock(pos, direction, slot, clientSwing, packet, rotationCallback);
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, pos, Direction.DOWN));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+                boolean result = placeBlock(pos, Hand.OFF_HAND, direction, slot, clientSwing, packet, rotationCallback);
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
                 return result;
             }
             else
             {
-                return placeBlock(pos, direction, slot, clientSwing, packet, rotationCallback);
+                return placeBlock(pos, Hand.MAIN_HAND, direction, slot, clientSwing, packet, rotationCallback);
             }
         }
         if (direction == null)
@@ -128,10 +126,11 @@ public final class InteractionManager implements Globals
             return false;
         }
         final BlockPos neighbor = pos.offset(direction.getOpposite());
-        return placeBlock(neighbor, direction, slot, clientSwing, packet, rotationCallback);
+        return placeBlock(neighbor, Hand.MAIN_HAND, direction, slot, clientSwing, packet, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
+                              final Hand hand,
                               final Direction direction,
                               final int slot,
                               final boolean clientSwing,
@@ -139,22 +138,24 @@ public final class InteractionManager implements Globals
                               final RotationCallback rotationCallback)
     {
         Vec3d hitVec = pos.toCenterPos().add(new Vec3d(direction.getUnitVector()).multiply(0.5));
-        return placeBlock(new BlockHitResult(hitVec, direction, pos, false),
+        return placeBlock(new BlockHitResult(hitVec, direction, pos, false), hand,
                 slot, clientSwing, packet, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
+                              final Hand hand,
                               final Direction direction,
                               final int slot,
                               final boolean clientSwing,
                               final RotationCallback rotationCallback)
     {
         Vec3d hitVec = pos.toCenterPos().add(new Vec3d(direction.getUnitVector()).multiply(0.5));
-        return placeBlock(new BlockHitResult(hitVec, direction, pos, false),
+        return placeBlock(new BlockHitResult(hitVec, direction, pos, false), hand,
                 slot, clientSwing, rotationCallback);
     }
 
     public boolean placeBlock(final BlockHitResult hitResult,
+                              final Hand hand,
                               final int slot,
                               final boolean clientSwing,
                               final boolean packet,
@@ -174,7 +175,7 @@ public final class InteractionManager implements Globals
             rotationCallback.handleRotation(true, angles);
         }
 
-        final boolean result = placeBlockImmediately(hitResult, clientSwing, packet);
+        final boolean result = placeBlockImmediately(hitResult, hand, clientSwing, packet);
         if (isRotating)
         {
             float[] angles = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitResult.getPos());
@@ -191,6 +192,7 @@ public final class InteractionManager implements Globals
     }
 
     public boolean placeBlock(final BlockHitResult hitResult,
+                              final Hand hand,
                               final int slot,
                               final boolean clientSwing,
                               final RotationCallback rotationCallback)
@@ -209,7 +211,7 @@ public final class InteractionManager implements Globals
             rotationCallback.handleRotation(true, angles);
         }
 
-        final boolean result = placeBlockImmediately(hitResult, clientSwing, true);
+        final boolean result = placeBlockImmediately(hitResult, hand, clientSwing, true);
         if (isRotating)
         {
             float[] angles = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitResult.getPos());
@@ -225,7 +227,10 @@ public final class InteractionManager implements Globals
         return result;
     }
 
-    public boolean placeBlockImmediately(final BlockHitResult result, final boolean clientSwing, final boolean packet)
+    public boolean placeBlockImmediately(final BlockHitResult result,
+                                         final Hand hand,
+                                         final boolean clientSwing,
+                                         final boolean packet)
     {
         final BlockState state = mc.world.getBlockState(result.getBlockPos());
         final boolean shouldSneak = SneakBlocks.isSneakBlock(state) && !mc.player.isSneaking();
@@ -234,7 +239,7 @@ public final class InteractionManager implements Globals
             Managers.MOVEMENT.setPacketSneaking(true);
             MovementUtil.applySneak();
         }
-        final ActionResult actionResult = packet ? placeBlockPacket(result) : placeBlockInternally(result);
+        final ActionResult actionResult = packet ? placeBlockPacket(result, hand) : placeBlockInternally(result, hand);
         if (actionResult.isAccepted() && actionResult.shouldSwingHand())
         {
             if (clientSwing)
@@ -253,16 +258,18 @@ public final class InteractionManager implements Globals
         return actionResult.isAccepted();
     }
 
-    private ActionResult placeBlockInternally(final BlockHitResult hitResult)
+    private ActionResult placeBlockInternally(final BlockHitResult hitResult,
+                                              final Hand hand)
     {
-        return mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
+        return mc.interactionManager.interactBlock(mc.player, hand, hitResult);
         // Managers.NETWORK.sendSequencedPacket(sequence -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, sequence));
         // return ((AccessorClientPlayerInteractionManager) mc.interactionManager).hookInteractBlockInternal(mc.player, Hand.MAIN_HAND, hitResult);
     }
 
-    public ActionResult placeBlockPacket(final BlockHitResult hitResult)
+    public ActionResult placeBlockPacket(final BlockHitResult hitResult,
+                                         final Hand hand)
     {
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, id));
+        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, hitResult, id));
         return ActionResult.SUCCESS;
     }
 
