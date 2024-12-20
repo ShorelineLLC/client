@@ -70,7 +70,7 @@ public class ShadersModule extends ToggleModule
 {
     private static ShadersModule INSTANCE;
 
-    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The shader render range", 10.0f, 50.0f, 200.0f));
+    Config<Float> rangeConfig = register(new NumberConfig<>("RenderDistance", "The shader render range", 10.0f, 50.0f, 200.0f));
     Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", true));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
     Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1.0f, 1.5f, 10.0f, () -> outlineConfig.getValue()));

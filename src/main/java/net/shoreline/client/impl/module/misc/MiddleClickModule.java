@@ -52,16 +52,20 @@ public class MiddleClickModule extends ToggleModule
                 && event.getAction() == GLFW.GLFW_PRESS && mc.currentScreen == null)
         {
             double d = mc.player.getEntityInteractionRange();
-            HitResult result = FreecamModule.getInstance().isEnabled() ? RayCastUtil.raycastEntity(d, FreecamModule.getInstance().getCameraPosition(), FreecamModule.getInstance().getCameraRotations()) : RayCastUtil.raycastEntity(d);
-            if (friendConfig.getValue() && result != null && result.getType() == HitResult.Type.ENTITY && ((EntityHitResult) result).getEntity() instanceof PlayerEntity target)
+            HitResult result = FreecamModule.getInstance().isEnabled() ? RayCastUtil.raycastEntity(d,
+                    FreecamModule.getInstance().getCameraPosition(), FreecamModule.getInstance().getCameraRotations()) : RayCastUtil.raycastEntity(d);
+            if (result != null && result.getType() == HitResult.Type.ENTITY)
             {
-                if (Managers.SOCIAL.isFriend(target.getName()))
+                if (friendConfig.getValue() && ((EntityHitResult) result).getEntity() instanceof PlayerEntity target)
                 {
-                    Managers.SOCIAL.remove(target.getName());
-                }
-                else
-                {
-                    Managers.SOCIAL.addFriend(target.getName());
+                    if (Managers.SOCIAL.isFriend(target.getName()))
+                    {
+                        Managers.SOCIAL.remove(target.getName());
+                    }
+                    else
+                    {
+                        Managers.SOCIAL.addFriend(target.getName());
+                    }
                 }
             }
             else
