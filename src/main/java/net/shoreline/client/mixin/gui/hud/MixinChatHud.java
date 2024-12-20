@@ -20,10 +20,10 @@ import net.shoreline.client.impl.event.gui.hud.*;
 import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.impl.imixin.IChatHudLineVisible;
-import net.shoreline.client.init.Fonts;
 import net.shoreline.client.util.FormattingUtil;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,9 +51,6 @@ public abstract class MixinChatHud implements IChatHud, Globals
     private List<ChatHudLine.Visible> visibleMessages;
 
     @Shadow
-    public abstract void addMessage(Text message);
-
-    @Shadow
     public abstract double getChatScale();
 
     @Shadow
@@ -73,6 +70,9 @@ public abstract class MixinChatHud implements IChatHud, Globals
 
     @Shadow
     public abstract boolean isChatFocused();
+
+    @Shadow
+    public abstract void addMessage(Text message, @Nullable MessageSignatureData signatureData, @Nullable MessageIndicator indicator);
 
     @Unique
     private ChatHudLine.Visible current = null;
@@ -153,8 +153,8 @@ public abstract class MixinChatHud implements IChatHud, Globals
         return instance.drawTextWithShadow(textRenderer, text, 0, y, color);
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/" +
-            "ChatHudLine$Visible;indicator()Lnet/minecraft/client/gui/hud/MessageIndicator;"))
+    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target =
+            "Lnet/minecraft/client/gui/hud/ChatHudLine$Visible;indicator()Lnet/minecraft/client/gui/hud/MessageIndicator;"))
     private MessageIndicator hookRender(MessageIndicator original)
     {
         SignatureIndicatorEvent signatureIndicatorEvent = new SignatureIndicatorEvent();
@@ -222,10 +222,10 @@ public abstract class MixinChatHud implements IChatHud, Globals
     }
 
     @Override
-    public void addMessage(Text message, int id)
+    public void addMessage(Text message, MessageIndicator messageIndicator, int id)
     {
         currentId = id;
-        addMessage(message);
+        addMessage(message, null, messageIndicator);
         currentId = 0;
     }
 }

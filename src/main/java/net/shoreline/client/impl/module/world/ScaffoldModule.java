@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -131,7 +132,8 @@ public final class ScaffoldModule extends RotationModule
         {
             Managers.INVENTORY.setSlot(slot);
         }
-        boolean result = Managers.INTERACT.placeBlock(blockData.getHitResult(), slot, false, false, (state, angles) ->
+        boolean result = Managers.INTERACT.placeBlock(blockData.getHitResult(), Hand.MAIN_HAND,
+                slot, false, false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {

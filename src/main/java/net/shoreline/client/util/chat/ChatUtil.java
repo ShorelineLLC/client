@@ -1,9 +1,11 @@
 package net.shoreline.client.util.chat;
 
+import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.imixin.IChatHud;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.util.Globals;
 
 /**
@@ -28,7 +30,8 @@ public class ChatUtil implements Globals
 
     public static void clientSendMessage(String message, int id)
     {
-        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(PREFIX + message), id);
+        MessageIndicator messageIndicator = new MessageIndicator(ColorsModule.getInstance().getRGB(), null, Text.empty(), "Shoreline");
+        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(PREFIX + message), messageIndicator, id);
     }
 
     /**
@@ -50,7 +53,8 @@ public class ChatUtil implements Globals
 
     public static void clientSendMessageRaw(String message, int id)
     {
-        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(message), id);
+        MessageIndicator messageIndicator = new MessageIndicator(ColorsModule.getInstance().getRGB(), null, Text.empty(), "Shoreline");
+        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(message), messageIndicator, id);
     }
 
     /**
