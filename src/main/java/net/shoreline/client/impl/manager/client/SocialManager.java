@@ -1,9 +1,11 @@
 package net.shoreline.client.impl.manager.client;
 
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.social.SocialRelation;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.chat.ChatUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,11 +86,27 @@ public class SocialManager implements Globals
     public void addFriend(String name)
     {
         addRelation(name, SocialRelation.FRIEND);
+        if (SocialsModule.getInstance().shouldNotify() && mc.world != null)
+        {
+            Collection<PlayerListEntry> playerListEntries = mc.player.networkHandler.getPlayerList();
+            for (PlayerListEntry playerListEntry : playerListEntries)
+            {
+                String playerName = playerListEntry.getProfile().getName();
+                String[] names = playerName.split(" ");
+                for (String name1 : names)
+                {
+                    if (name1.equals(name))
+                    {
+                        ChatUtil.serverSendCommand("w " + name + " I just added you as a friend!");
+                    }
+                }
+            }
+        }
     }
 
     public void addFriend(Text name)
     {
-        addRelation(name.getString(), SocialRelation.FRIEND);
+        addFriend(name.getString());
     }
 
     public SocialRelation remove(String playerName)

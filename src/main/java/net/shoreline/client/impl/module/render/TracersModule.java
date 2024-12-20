@@ -20,6 +20,7 @@ import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorCamera;
 import net.shoreline.client.util.entity.EntityUtil;
@@ -122,7 +123,7 @@ public class TracersModule extends ToggleModule
         {
             if (Managers.SOCIAL.isFriend(player.getName()))
             {
-                return new Color(0xff66ffff);
+                return SocialsModule.getInstance().getFriendColor();
             }
             return playersColorConfig.getValue();
         }

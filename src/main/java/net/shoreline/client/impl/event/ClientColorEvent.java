@@ -16,4 +16,9 @@ public class ClientColorEvent extends Event
     {
         return rgb;
     }
+
+    public static class Friend extends ClientColorEvent
+    {
+
+    }
 }

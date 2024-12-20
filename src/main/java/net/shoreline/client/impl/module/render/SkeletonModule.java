@@ -19,6 +19,7 @@ import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Quaternionf;
@@ -101,7 +102,7 @@ public class SkeletonModule extends ToggleModule
                 Color skeletonColor = ColorsModule.getInstance().getColor();
                 if (Managers.SOCIAL.isFriend(playerEntity.getName()))
                 {
-                    skeletonColor = new Color(0xff66ffff);
+                    skeletonColor = SocialsModule.getInstance().getFriendColor();
                 }
                 RenderBuffers.LINES.color(skeletonColor.getRGB());
                 RenderBuffers.LINES.vertexLine(0, sneaking ? 0.6f : 0.7f, sneaking ? 0.23f : 0, 0, sneaking ? 1.05f : 1.4f, 0);

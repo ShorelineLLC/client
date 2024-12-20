@@ -83,6 +83,12 @@ public abstract class MixinTextVisitFactory implements Globals
                     EventBus.INSTANCE.dispatch(clientColorEvent);
                     style = style.withColor(clientColorEvent.getClientRgb());
                 }
+                else if (d == 'g')
+                { // Friend color
+                    ClientColorEvent.Friend clientColorEvent = new ClientColorEvent.Friend();
+                    EventBus.INSTANCE.dispatch(clientColorEvent);
+                    style = style.withColor(clientColorEvent.getClientRgb());
+                }
                 else
                 {
                     Formatting formatting = Formatting.byCode(d);

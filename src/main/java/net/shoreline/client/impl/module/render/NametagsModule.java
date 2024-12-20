@@ -46,6 +46,7 @@ import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.FontModule;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorItemRenderer;
@@ -712,7 +713,7 @@ public class NametagsModule extends ToggleModule
         }
         if (Managers.SOCIAL.isFriend(player.getName()))
         {
-            return 0xff66ffff;
+            return SocialsModule.getInstance().getFriendRGB();
         }
         if (player.isInvisible())
         {

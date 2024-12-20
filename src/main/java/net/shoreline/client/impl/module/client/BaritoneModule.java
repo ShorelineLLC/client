@@ -142,7 +142,8 @@ public class BaritoneModule extends ConcurrentModule
     @EventListener
     public void onChatText(ChatMessageEvent event)
     {
-        if (event.getText().getString().startsWith("[Baritone]"))
+        String text = event.getText().getString();
+        if (text.startsWith("[Baritone]"))
         {
             event.cancel();
             event.setText(Text.of(ChatUtil.PREFIX + FormattingUtil.toString(event.getText())));

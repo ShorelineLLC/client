@@ -61,7 +61,7 @@ public class ExtraTabModule extends ToggleModule
                 if (Managers.SOCIAL.isFriend(name1))
                 {
                     event.cancel();
-                    event.setPlayerName(Text.of("§b" + event.getPlayerName().getString()));
+                    event.setPlayerName(Text.of("§g" + event.getPlayerName().getString()));
                     break;
                 }
             }
