@@ -6,6 +6,10 @@ public final class JumpRotationEvent extends Event
 {
     private float yaw;
 
+    public JumpRotationEvent(float yaw)
+    {
+        this.yaw = yaw;
+    }
 
     public float getYaw()
     {

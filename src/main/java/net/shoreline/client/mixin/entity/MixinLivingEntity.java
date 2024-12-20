@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.entity;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -8,7 +9,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
@@ -61,27 +61,22 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
         }
     }
 
-    @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
-    private void hookJump$getYaw(CallbackInfo ci)
+    @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
+    private float hookJump$getYaw(float original)
     {
         if ((Object) this != mc.player)
         {
-            return;
+            return original;
         }
-        final JumpRotationEvent event = new JumpRotationEvent();
-        EventBus.INSTANCE.dispatch(event);
-        if (event.isCanceled())
+
+        JumpRotationEvent jumpRotationEvent = new JumpRotationEvent(original);
+        EventBus.INSTANCE.dispatch(jumpRotationEvent);
+        if (jumpRotationEvent.isCanceled())
         {
-            ci.cancel();
-            Vec3d vec3d = this.getVelocity();
-            setVelocity(new Vec3d(vec3d.x, getJumpVelocity(), vec3d.z));
-            if (isSprinting())
-            {
-                float f = event.getYaw() * ((float) Math.PI / 180);
-                setVelocity(getVelocity().add(-MathHelper.sin(f) * 0.2f, 0.0, MathHelper.cos(f) * 0.2f));
-            }
-            velocityDirty = true;
+            return jumpRotationEvent.getYaw();
         }
+
+        return original;
     }
 
     /**

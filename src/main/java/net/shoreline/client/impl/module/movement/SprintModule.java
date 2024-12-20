@@ -3,9 +3,11 @@ package net.shoreline.client.impl.module.movement;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.JumpRotationEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.SprintCancelEvent;
 import net.shoreline.client.impl.module.RotationModule;
@@ -24,6 +26,7 @@ public class SprintModule extends RotationModule
 {
     //
     Config<SprintMode> modeConfig = register(new EnumConfig<>("Mode", "Sprinting mode. Rage allows for multi-directional sprinting.", SprintMode.LEGIT, SprintMode.values()));
+    Config<Boolean> jumpFixConfig = register(new BooleanConfig("JumpFix", "Fixes jumping slowdown in Rage sprint", true, () -> modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT));
 
     /**
      *
@@ -120,6 +123,29 @@ public class SprintModule extends RotationModule
                 return;
             }
             setRotation(sprintYaw, mc.player.getPitch());
+        }
+    }
+
+    @EventListener
+    public void onJumpYaw(JumpRotationEvent event)
+    {
+        if (jumpFixConfig.getValue() && (modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT))
+        {
+            float yaw = event.getYaw();
+            float forward = Math.signum(mc.player.input.movementForward);
+            float strafe = 90.0f * Math.signum(mc.player.input.movementSideways);
+            if (forward != 0.0f)
+            {
+                strafe *= (forward * 0.5f);
+            }
+            yaw -= strafe;
+            if (forward < 0.0f)
+            {
+                yaw -= 180.0f;
+            }
+
+            event.cancel();
+            event.setYaw(yaw);
         }
     }
 
