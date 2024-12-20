@@ -16,7 +16,7 @@ public class SocialsModule extends ConcurrentModule
 
     Config<Boolean> friendsConfig = register(new BooleanConfig("Friends", "Allows friend system to function", true));
     Config<Boolean> addNotifyConfig = register(new BooleanConfig("AddNotify", "Notifies players when you add them as a friend", false, () -> friendsConfig.getValue()));
-    Config<Color> friendsColorConfig = register(new ColorConfig("FriendsColor", "The color for friends in the client", new Color(0xff66ffff), () -> friendsConfig.getValue()));
+    Config<Color> friendsColorConfig = register(new ColorConfig("FriendsColor", "The color for friends in the client", new Color(0xff66ffff), false, false, () -> friendsConfig.getValue()));
 
     public SocialsModule()
     {
