@@ -98,6 +98,7 @@ public class SocialManager implements Globals
                     if (name1.equals(name))
                     {
                         ChatUtil.serverSendCommand("w " + name + " I just added you as a friend!");
+                        break;
                     }
                 }
             }
