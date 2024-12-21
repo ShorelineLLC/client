@@ -33,9 +33,9 @@ import net.shoreline.eventbus.event.StageEvent;
  * @author xgraza, linus, hockeyl8
  * @since 1.0
  */
-public final class AirInteractModule extends ToggleModule
+public final class AirPlaceModule extends ToggleModule
 {
-    public static AirInteractModule INSTANCE;
+    public static AirPlaceModule INSTANCE;
 
     Config<Boolean> manualConfig = register(new BooleanConfig("Click", "Allow manual air place", true));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));
@@ -44,13 +44,13 @@ public final class AirInteractModule extends ToggleModule
 
     private int airPlaceTicks;
 
-    public AirInteractModule()
+    public AirPlaceModule()
     {
-        super("AirInteract", "Allows you to place blocks in the air", ModuleCategory.WORLD);
+        super("AirPlace", "Allows you to place blocks in the air", ModuleCategory.WORLD);
         INSTANCE = this;
     }
 
-    public static AirInteractModule getInstance()
+    public static AirPlaceModule getInstance()
     {
         return INSTANCE;
     }
@@ -83,7 +83,7 @@ public final class AirInteractModule extends ToggleModule
                 && result instanceof BlockHitResult blockHitResult)
         {
             final BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
-            if (isEntityInBlockPos(blockPos))
+            if (!mc.world.isAir(blockPos) || isEntityInBlockPos(blockPos))
             {
                 return;
             }
@@ -132,7 +132,7 @@ public final class AirInteractModule extends ToggleModule
             return;
         }
         final BlockPos blockPos = BlockPos.ofFloored(blockHitResult.getPos());
-        if (isEntityInBlockPos(blockPos))
+        if (!mc.world.isAir(blockPos) || isEntityInBlockPos(blockPos))
         {
             return;
         }

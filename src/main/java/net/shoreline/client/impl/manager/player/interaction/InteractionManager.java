@@ -8,8 +8,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.shoreline.client.impl.module.world.AirInteractModule;
+import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.player.MovementUtil;
@@ -56,27 +55,17 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, strictDirection);
-        if (airPlace || AirInteractModule.getInstance().isEnabled() && direction == null)
+        if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
-            if (grim)
-            {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                boolean result = placeBlock(pos, Hand.OFF_HAND, direction, slot, clientSwing, rotationCallback);
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                return result;
-            }
-            else
-            {
-                return placeBlock(pos, Hand.MAIN_HAND, direction, slot, clientSwing, rotationCallback);
-            }
+            return placeBlock(pos, direction, slot, clientSwing, grim, rotationCallback);
         }
         if (direction == null)
         {
             return false;
         }
         final BlockPos neighbor = pos.offset(direction.getOpposite());
-        return placeBlock(neighbor, Hand.MAIN_HAND, direction, slot, clientSwing, rotationCallback);
+        return placeBlock(neighbor, direction, slot, clientSwing, false, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
@@ -106,58 +95,48 @@ public final class InteractionManager implements Globals
         }
 
         Direction direction = getInteractDirection(pos, strictDirection);
-        if (airPlace || AirInteractModule.getInstance().isEnabled() && direction == null)
+        if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
-            if (grim)
-            {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                boolean result = placeBlock(pos, Hand.OFF_HAND, direction, slot, clientSwing, packet, rotationCallback);
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                return result;
-            }
-            else
-            {
-                return placeBlock(pos, Hand.MAIN_HAND, direction, slot, clientSwing, packet, rotationCallback);
-            }
+            return placeBlock(pos, direction, slot, clientSwing, grim, rotationCallback);
         }
         if (direction == null)
         {
             return false;
         }
         final BlockPos neighbor = pos.offset(direction.getOpposite());
-        return placeBlock(neighbor, Hand.MAIN_HAND, direction, slot, clientSwing, packet, rotationCallback);
+        return placeBlock(neighbor, direction, slot, clientSwing, false, packet, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
-                              final Hand hand,
                               final Direction direction,
                               final int slot,
                               final boolean clientSwing,
+                              final boolean grimAirPlace,
                               final boolean packet,
                               final RotationCallback rotationCallback)
     {
         Vec3d hitVec = pos.toCenterPos().add(new Vec3d(direction.getUnitVector()).multiply(0.5));
-        return placeBlock(new BlockHitResult(hitVec, direction, pos, false), hand,
-                slot, clientSwing, packet, rotationCallback);
+        return placeBlock(new BlockHitResult(hitVec, direction, pos, false),
+                slot, clientSwing, grimAirPlace, packet, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
-                              final Hand hand,
                               final Direction direction,
                               final int slot,
                               final boolean clientSwing,
+                              final boolean grimAirPlace,
                               final RotationCallback rotationCallback)
     {
         Vec3d hitVec = pos.toCenterPos().add(new Vec3d(direction.getUnitVector()).multiply(0.5));
-        return placeBlock(new BlockHitResult(hitVec, direction, pos, false), hand,
-                slot, clientSwing, rotationCallback);
+        return placeBlock(new BlockHitResult(hitVec, direction, pos, false),
+                slot, clientSwing, grimAirPlace, rotationCallback);
     }
 
     public boolean placeBlock(final BlockHitResult hitResult,
-                              final Hand hand,
                               final int slot,
                               final boolean clientSwing,
+                              final boolean grimAirPlace,
                               final boolean packet,
                               final RotationCallback rotationCallback)
     {
@@ -168,6 +147,11 @@ public final class InteractionManager implements Globals
             // mc.player.getInventory().selectedSlot = slot;
         }
 
+        if (grimAirPlace)
+        {
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+        }
+
         final boolean isRotating = rotationCallback != null;
         if (isRotating)
         {
@@ -175,11 +159,16 @@ public final class InteractionManager implements Globals
             rotationCallback.handleRotation(true, angles);
         }
 
-        final boolean result = placeBlockImmediately(hitResult, hand, clientSwing, packet);
+        final boolean result = placeBlockImmediately(hitResult, grimAirPlace ? Hand.OFF_HAND : Hand.MAIN_HAND, clientSwing, packet);
         if (isRotating)
         {
             float[] angles = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitResult.getPos());
             rotationCallback.handleRotation(false, angles);
+        }
+
+        if (grimAirPlace)
+        {
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
         }
 
         if (isSpoofing)
@@ -192,9 +181,9 @@ public final class InteractionManager implements Globals
     }
 
     public boolean placeBlock(final BlockHitResult hitResult,
-                              final Hand hand,
                               final int slot,
                               final boolean clientSwing,
+                              final boolean grimAirPlace,
                               final RotationCallback rotationCallback)
     {
         final boolean isSpoofing = slot != Managers.INVENTORY.getServerSlot();
@@ -204,6 +193,11 @@ public final class InteractionManager implements Globals
             // mc.player.getInventory().selectedSlot = slot;
         }
 
+        if (grimAirPlace)
+        {
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+        }
+
         final boolean isRotating = rotationCallback != null;
         if (isRotating)
         {
@@ -211,11 +205,16 @@ public final class InteractionManager implements Globals
             rotationCallback.handleRotation(true, angles);
         }
 
-        final boolean result = placeBlockImmediately(hitResult, hand, clientSwing, true);
+        final boolean result = placeBlockImmediately(hitResult, grimAirPlace ? Hand.OFF_HAND : Hand.MAIN_HAND, clientSwing, true);
         if (isRotating)
         {
             float[] angles = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitResult.getPos());
             rotationCallback.handleRotation(false, angles);
+        }
+
+        if (grimAirPlace)
+        {
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
         }
 
         if (isSpoofing)

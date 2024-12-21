@@ -132,8 +132,8 @@ public final class ScaffoldModule extends RotationModule
         {
             Managers.INVENTORY.setSlot(slot);
         }
-        boolean result = Managers.INTERACT.placeBlock(blockData.getHitResult(), Hand.MAIN_HAND,
-                slot, false, false, (state, angles) ->
+        boolean result = Managers.INTERACT.placeBlock(blockData.getHitResult(),
+                slot, false, false, false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {

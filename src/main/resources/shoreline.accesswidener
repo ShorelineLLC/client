@@ -80,3 +80,4 @@ accessible field net/minecraft/client/render/item/HeldItemRenderer prevEquipProg
 accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgressMainHand F
 accessible field net/minecraft/client/render/item/HeldItemRenderer prevEquipProgressOffHand F
 accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgressOffHand F
+accessible field net/minecraft/block/spawner/MobSpawnerLogic spawnDelay I

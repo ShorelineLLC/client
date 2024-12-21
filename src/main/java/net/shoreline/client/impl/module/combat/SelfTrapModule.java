@@ -27,7 +27,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.world.AirInteractModule;
+import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -343,7 +343,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 }
                 headBlocks.add(headPos);
             }
-            if (!AirInteractModule.getInstance().isEnabled())
+            if (!AirPlaceModule.getInstance().isEnabled())
             {
                 BlockPos supportingPos = null;
                 double min = Double.MAX_VALUE;

@@ -12,6 +12,7 @@ import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.command.*;
+import net.shoreline.client.impl.command.irc.*;
 import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.screen.SuggestChatEvent;
 import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
