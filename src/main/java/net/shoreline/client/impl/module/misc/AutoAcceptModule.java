@@ -47,7 +47,7 @@ public class AutoAcceptModule extends ToggleModule
                 {
                     if (text.contains(friend))
                     {
-                        ChatUtil.serverSendMessage("/tpaccept");
+                        ChatUtil.serverSendCommand("tpaccept");
                         break;
                     }
                 }
