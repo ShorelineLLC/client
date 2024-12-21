@@ -89,6 +89,7 @@ public final class ModuleManager
                 new PhaseModule(),
                 new PortalGodModeModule(),
                 new ReachModule(),
+                new SpawnerTrackerModule(),
                 // Misc
                 new AntiAFKModule(),
                 new AntiAimModule(),
@@ -187,7 +188,7 @@ public final class ModuleManager
                 new WaypointsModule(),
                 new ZoomModule(),
                 // World
-                new AirInteractModule(),
+                new AirPlaceModule(),
                 new AntiInteractModule(),
                 new AutoMineModule(),
                 new AutoToolModule(),
