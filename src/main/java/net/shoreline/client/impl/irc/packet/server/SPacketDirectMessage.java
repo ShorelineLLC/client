@@ -58,9 +58,8 @@ public final class SPacketDirectMessage extends ServerPacket
             return;
         }
 
-        String message = Formatting.ITALIC + "§sFrom "
-                + this.sender.getUsertype().getColorCode() + Formatting.ITALIC + this.sender.getName()
-                + "§s: " + this.message;
+        String message = Formatting.ITALIC + "§7From " + this.sender.getUsertype().getColorCode()
+                + this.sender.getName() + Formatting.ITALIC + "§7: " + this.message;
 
         ircManager.addToChat(message);
         ircManager.setLastMessageReceivedUser(sender);
