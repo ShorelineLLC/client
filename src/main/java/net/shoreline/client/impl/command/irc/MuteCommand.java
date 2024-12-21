@@ -1,30 +1,31 @@
-package net.shoreline.client.impl.command;
+package net.shoreline.client.impl.command.irc;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.command.Command;
+import net.shoreline.client.api.command.OnlineUserArgumentType;
 import net.shoreline.client.impl.irc.IRCManager;
-import net.shoreline.client.impl.irc.packet.client.CPacketBroadcastServerMsg;
+import net.shoreline.client.impl.irc.packet.client.CPacketMute;
+import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.chat.ChatUtil;
 
-public final class BroadcastServerMsgCommand extends Command
+public final class MuteCommand extends Command
 {
-    public BroadcastServerMsgCommand()
+    public MuteCommand()
     {
-        super("BroadcastServerMsg", "Broadcasts a server message in the IRC", literal("broadcastservermsg"));
+        super("Mute", "Mutes an IRC user.", literal("mute"));
     }
 
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
         builder.then(
-                argument("message", StringArgumentType.greedyString())
+                argument("username", OnlineUserArgumentType.user())
                         .executes(c ->
                         {
-                            String argument = c.getArgument("message", String.class);
+                            OnlineUser user = c.getArgument("username", OnlineUser.class);
 
-                            CPacketBroadcastServerMsg packet = new CPacketBroadcastServerMsg(argument);
+                            CPacketMute packet = new CPacketMute(user, true);
                             IRCManager.getInstance().sendPacket(packet);
 
                             return 1;

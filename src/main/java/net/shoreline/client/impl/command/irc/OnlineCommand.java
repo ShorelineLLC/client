@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.command;
+package net.shoreline.client.impl.command.irc;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;

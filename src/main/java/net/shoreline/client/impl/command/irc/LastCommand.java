@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.command;
+package net.shoreline.client.impl.command.irc;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

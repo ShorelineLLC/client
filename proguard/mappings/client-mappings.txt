@@ -1095,12 +1095,12 @@ net.shoreline.client.impl.command.BindCommand -> net.shoreline.client.bb:
     61:62:int lambda$buildCommand$2(com.mojang.brigadier.context.CommandContext) -> a
     57:58:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
     35:53:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
-net.shoreline.client.impl.command.BroadcastServerMsgCommand -> net.shoreline.client.bc:
+net.shoreline.client.impl.command.irc.BroadcastServerMsgCommand -> net.shoreline.client.bc:
     15:16:void <init>() -> <init>
     21:37:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     34:35:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
     25:30:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
-net.shoreline.client.impl.command.CloakCommand -> net.shoreline.client.bd:
+net.shoreline.client.impl.command.irc.CloakCommand -> net.shoreline.client.bd:
     java.lang.String userType -> T
     java.util.List VALID_ARGS -> c
     21:23:void <init>() -> <init>
@@ -1129,13 +1129,13 @@ net.shoreline.client.impl.command.CustomFontCommand -> net.shoreline.client.bh:
     18:19:void <init>() -> <init>
     24:51:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     26:49:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
-net.shoreline.client.impl.command.DirectMessageCommand -> net.shoreline.client.bi:
+net.shoreline.client.impl.command.irc.DirectMessageCommand -> net.shoreline.client.bi:
     17:18:void <init>() -> <init>
     23:45:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     42:43:int lambda$buildCommand$2(com.mojang.brigadier.context.CommandContext) -> a
     37:38:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
     28:34:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
-net.shoreline.client.impl.command.DirectServerMsgCommand -> net.shoreline.client.bj:
+net.shoreline.client.impl.command.irc.DirectServerMsgCommand -> net.shoreline.client.bj:
     17:18:void <init>() -> <init>
     23:45:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     42:43:int lambda$buildCommand$2(com.mojang.brigadier.context.CommandContext) -> a
@@ -1206,7 +1206,7 @@ net.shoreline.client.impl.command.ModulesCommand -> net.shoreline.client.bw:
     18:19:void <init>() -> <init>
     24:35:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     26:33:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
-net.shoreline.client.impl.command.MuteCommand -> net.shoreline.client.bx:
+net.shoreline.client.impl.command.irc.MuteCommand -> net.shoreline.client.bx:
     16:17:void <init>() -> <init>
     22:38:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     35:36:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
@@ -1219,7 +1219,7 @@ net.shoreline.client.impl.command.NotifyCommand -> net.shoreline.client.bz:
     15:16:void <init>() -> <init>
     21:40:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     23:38:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
-net.shoreline.client.impl.command.OnlineCommand -> net.shoreline.client.bA:
+net.shoreline.client.impl.command.irc.OnlineCommand -> net.shoreline.client.bA:
     20:21:void <init>() -> <init>
     26:45:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     28:43:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
@@ -1268,7 +1268,7 @@ net.shoreline.client.impl.command.ToggleCommand -> net.shoreline.client.bK:
     25:39:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     36:37:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
     27:33:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
-net.shoreline.client.impl.command.UnmuteCommand -> net.shoreline.client.bL:
+net.shoreline.client.impl.command.irc.UnmuteCommand -> net.shoreline.client.bL:
     16:17:void <init>() -> <init>
     22:38:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
     35:36:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
@@ -6620,15 +6620,15 @@ net.shoreline.client.impl.module.render.ZoomModule -> net.shoreline.client.mA:
     35:39:void onKey(net.shoreline.client.impl.event.keyboard.KeyboardInputEvent) -> b
     44:67:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     20:20:void lambda$new$0() -> w
-net.shoreline.client.impl.module.world.AirInteractModule -> net.shoreline.client.mB:
-    net.shoreline.client.impl.module.world.AirInteractModule INSTANCE -> a
+net.shoreline.client.impl.module.world.AirPlaceModule -> net.shoreline.client.mB:
+    net.shoreline.client.impl.module.world.AirPlaceModule INSTANCE -> a
     net.shoreline.client.api.config.Config manualConfig -> jb
     net.shoreline.client.api.config.Config grimConfig -> h
     net.shoreline.client.api.config.Config rangeConfig -> i
     net.shoreline.client.api.config.Config fluidsConfig -> jc
     int airPlaceTicks -> aI
     40:51:void <init>() -> <init>
-    55:55:net.shoreline.client.impl.module.world.AirInteractModule getInstance() -> a
+    55:55:net.shoreline.client.impl.module.world.AirPlaceModule getInstance() -> a
     61:62:void onEnable() -> u
     67:107:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
     112:116:void onItemUse(net.shoreline.client.impl.event.ItemUseEvent) -> a
