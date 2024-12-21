@@ -1,7 +1,9 @@
 package net.shoreline.client.impl.event.entity;
 
+import net.shoreline.eventbus.annotation.Cancelable;
 import net.shoreline.eventbus.event.Event;
 
+@Cancelable
 public final class JumpRotationEvent extends Event
 {
     private float yaw;
