@@ -161,7 +161,7 @@ public class ColorButton extends ConfigButton<Color>
             drawStringScaled(context, "#" + renderText, x + (3.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (height  * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 28.0f * ClickGuiModule.CLICK_GUI_SCALE : 18.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE), whiteText);
             fill(context, x + ClickGuiModule.CLICK_GUI_SCALE, y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 26.0f * ClickGuiModule.CLICK_GUI_SCALE : 14.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE),
                     (width * ClickGuiModule.CLICK_GUI_SCALE) - (17.0f * ClickGuiModule.CLICK_GUI_SCALE), 12.0f * ClickGuiModule.CLICK_GUI_SCALE, 0x30909090);
-            double globalAnimation = config.getContainer().getName().equalsIgnoreCase("Colors") ? 1.0f : colorConfig.getAnimation().getFactor();
+            double globalAnimation = config.getName().equalsIgnoreCase("Global") ? 1.0f : colorConfig.getAnimation().getFactor();
             if (globalAnimation > 0.01)
             {
                 fill(context, x + ClickGuiModule.CLICK_GUI_SCALE + (width * ClickGuiModule.CLICK_GUI_SCALE) - (15.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 26.0f * ClickGuiModule.CLICK_GUI_SCALE : 14.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE),
@@ -237,7 +237,7 @@ public class ColorButton extends ConfigButton<Color>
                 }
             }
 
-            if (!config.getContainer().getName().equalsIgnoreCase("Colors") && isMouseOver(mouseX, mouseY, x + ClickGuiModule.CLICK_GUI_SCALE + (width * ClickGuiModule.CLICK_GUI_SCALE) - (15.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 26.0f * ClickGuiModule.CLICK_GUI_SCALE : 14.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE),
+            if (!config.getName().equalsIgnoreCase("Global") && isMouseOver(mouseX, mouseY, x + ClickGuiModule.CLICK_GUI_SCALE + (width * ClickGuiModule.CLICK_GUI_SCALE) - (15.0f * ClickGuiModule.CLICK_GUI_SCALE), y + (height * ClickGuiModule.CLICK_GUI_SCALE) + (colorConfig.allowAlpha() ? 26.0f * ClickGuiModule.CLICK_GUI_SCALE : 14.0f * ClickGuiModule.CLICK_GUI_SCALE) + (width * ClickGuiModule.CLICK_GUI_SCALE),
                     13.0f * ClickGuiModule.CLICK_GUI_SCALE, 12.0f * ClickGuiModule.CLICK_GUI_SCALE))
             {
                 boolean val = !colorConfig.isGlobal();
