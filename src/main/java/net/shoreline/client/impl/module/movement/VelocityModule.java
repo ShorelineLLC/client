@@ -119,6 +119,12 @@ public class VelocityModule extends ToggleModule
         {
             return;
         }
+
+        if (wallsOnlyConfig.getValue() && !isPhased())
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet && knockbackConfig.getValue())
         {
             if (packet.getEntityId() != mc.player.getId())
@@ -129,10 +135,6 @@ public class VelocityModule extends ToggleModule
             {
                 case NORMAL ->
                 {
-                    if (wallsOnlyConfig.getValue() && !isPhased())
-                    {
-                        return;
-                    }
                     if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
                     {
                         event.cancel();
@@ -147,10 +149,6 @@ public class VelocityModule extends ToggleModule
                 }
                 case GRIM ->
                 {
-                    if (wallsOnlyConfig.getValue() && !isPhased())
-                    {
-                        return;
-                    }
                     if (!Managers.ANTICHEAT.hasPassed(100))
                     {
                         return;
@@ -173,10 +171,6 @@ public class VelocityModule extends ToggleModule
             {
                 case NORMAL ->
                 {
-                    if (wallsOnlyConfig.getValue() && !isPhased())
-                    {
-                        return;
-                    }
                     if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
                     {
                         event.cancel();
@@ -193,10 +187,6 @@ public class VelocityModule extends ToggleModule
                 }
                 case GRIM ->
                 {
-                    if (wallsOnlyConfig.getValue() && !isPhased())
-                    {
-                        return;
-                    }
                     if (!Managers.ANTICHEAT.hasPassed(100))
                     {
                         return;
@@ -222,10 +212,6 @@ public class VelocityModule extends ToggleModule
         }
         else if (event.getPacket() instanceof BundleS2CPacket packet)
         {
-            if ((modeConfig.getValue() == VelocityMode.GRIM_V3 || wallsOnlyConfig.getValue()) && !isPhased())
-            {
-                return;
-            }
             List<Packet<?>> allowedBundle = new ArrayList<>();
             for (Packet<?> packet1 : packet.getPackets())
             {
