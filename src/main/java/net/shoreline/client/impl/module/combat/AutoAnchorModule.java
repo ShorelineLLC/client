@@ -54,7 +54,7 @@ public class AutoAnchorModule extends BlockPlacerModule
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Range to explode anchors", 0.1f, 4.0f, 6.0f));
     Config<Float> explodeSpeedConfig = register(new NumberConfig<>("ExplodeSpeed", "Speed to explode anchors", 0.1f, 18.0f, 20.0f));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places anchors to damage enemies", true));
-    Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place anchors", 0.1f, 12.0f, 20.0f, () -> placeConfig.getValue()));
+    Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place anchors", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false, () -> placeConfig.getValue()));
     Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
@@ -65,8 +65,7 @@ public class AutoAnchorModule extends BlockPlacerModule
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where anchors will be placed", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
     //
-    private BlockPos anchorPos;
-    private BlockPos placePos;
+    private AnchorCalc anchorCalc;
     private final Timer explodeTimer = new CacheTimer();
     private final Timer placeTimer = new CacheTimer();
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
@@ -85,8 +84,8 @@ public class AutoAnchorModule extends BlockPlacerModule
     @Override
     public void onDisable()
     {
-        anchorPos = null;
-        placePos = null;
+        anchorCalc = null;
+        fadeList.clear();
     }
 
     @EventListener
@@ -99,18 +98,24 @@ public class AutoAnchorModule extends BlockPlacerModule
 
         if (!InventoryUtil.hasItemInHotbar(Items.RESPAWN_ANCHOR) || !InventoryUtil.hasItemInHotbar(Items.GLOWSTONE))
         {
+            anchorCalc = null;
             return;
         }
 
         if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
+            anchorCalc = null;
             return;
         }
 
-        final AnchorCalc anchorCalc = calculateAnchorExplosion();
-        anchorPos = anchorCalc.explosion();
-        placePos = anchorCalc.placement();
-        if (anchorPos != null)
+        anchorCalc = calculateAnchorExplosion();
+        if (anchorCalc == null)
+        {
+            return;
+        }
+
+        final BlockPos anchorPos = anchorCalc.pos();
+        if (anchorCalc.isAnchor())
         {
             if (rotateConfig.getValue())
             {
@@ -123,9 +128,9 @@ public class AutoAnchorModule extends BlockPlacerModule
                 explodeTimer.reset();
             }
         }
-        if (placePos != null)
+        else
         {
-            if (mc.world.getBlockState(placePos).getBlock() == Blocks.RESPAWN_ANCHOR)
+            if (mc.world.getBlockState(anchorPos).getBlock() == Blocks.RESPAWN_ANCHOR)
             {
                 return;
             }
@@ -137,7 +142,7 @@ public class AutoAnchorModule extends BlockPlacerModule
             if (placeTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f))
             {
                 Managers.INVENTORY.setSlot(slot);
-                Managers.INTERACT.placeBlock(placePos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+                Managers.INTERACT.placeBlock(anchorPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
                 {
                     if (rotateConfig.getValue())
                     {
@@ -168,7 +173,7 @@ public class AutoAnchorModule extends BlockPlacerModule
             RenderBuffers.preRender();
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
-                if (set.getKey() == anchorPos)
+                if (anchorCalc != null && set.getKey() == anchorCalc.pos())
                 {
                     continue;
                 }
@@ -182,14 +187,13 @@ public class AutoAnchorModule extends BlockPlacerModule
             }
             RenderBuffers.postRender();
 
-
             fadeList.entrySet().removeIf(e ->
                     e.getValue().getFactor() == 0.0);
 
-            if (anchorPos != null)
+            if (anchorCalc != null)
             {
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
-                fadeList.put(anchorPos, animation);
+                fadeList.put(anchorCalc.pos(), animation);
             }
         }
     }
@@ -220,16 +224,12 @@ public class AutoAnchorModule extends BlockPlacerModule
         Managers.INVENTORY.syncToClient();
     }
 
-    // Most of the below code is stolen from the ca
     private AnchorCalc calculateAnchorExplosion()
     {
         // explosion
         BlockPos data = null;
         double bestAnchorDamage = 0.0f;
-
-        // placements
-        BlockPos placeData = null;
-        double bestPlaceDamage = 0.0f;
+        boolean isAnchor = false;
 
         for (BlockPos pos : getSphere(mc.player.getPos()))
         {
@@ -240,7 +240,8 @@ public class AutoAnchorModule extends BlockPlacerModule
                 continue;
             }
 
-            if (state.getBlock() instanceof RespawnAnchorBlock)
+            boolean explosion = state.getBlock() instanceof RespawnAnchorBlock;
+            if (state.isReplaceable() || explosion)
             {
                 double selfDamage = ExplosionUtil.getDamageTo(mc.player,
                         pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, false); // Anchor explosions power = 10
@@ -274,61 +275,18 @@ public class AutoAnchorModule extends BlockPlacerModule
                     {
                         data = pos;
                         bestAnchorDamage = damage;
-                    }
-                }
-            }
-
-            else if (state.isReplaceable())
-            {
-                double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, false); // Anchor explosions power = 10
-                boolean unsafeToPlayer = playerDamageCheck(selfDamage);
-                if (unsafeToPlayer)
-                {
-                    continue;
-                }
-                for (Entity entity : mc.world.getEntities())
-                {
-                    if (entity == null || !entity.isAlive() || entity == mc.player
-                            || !isValidTarget(entity)
-                            || Managers.SOCIAL.isFriend(entity.getName()))
-                    {
-                        continue;
-                    }
-                    double blockDist = pos.getSquaredDistance(entity.getPos());
-                    if (blockDist > 144.0f)
-                    {
-                        continue;
-                    }
-                    double dist = mc.player.squaredDistanceTo(entity);
-                    if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
-                    {
-                        continue;
-                    }
-                    double damage = ExplosionUtil.getDamageTo(entity,
-                            pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, assumeArmorConfig.getValue());
-                    if (damage > bestPlaceDamage)
-                    {
-                        placeData = pos;
-                        bestPlaceDamage = damage;
+                        isAnchor = explosion;
                     }
                 }
             }
         }
 
-        BlockPos explosion = null;
-        BlockPos placement = null;
         if (data != null && bestAnchorDamage >= minDamageConfig.getValue())
         {
-            explosion = data;
+            return new AnchorCalc(data, isAnchor);
         }
 
-        if (placeData != null && bestPlaceDamage >= minDamageConfig.getValue())
-        {
-            placement = placeData;
-        }
-
-        return new AnchorCalc(explosion, placement);
+        return null;
     }
 
     private boolean playerDamageCheck(double playerDamage)
@@ -373,5 +331,5 @@ public class AutoAnchorModule extends BlockPlacerModule
                 || EntityUtil.isPassive(e) && animalsConfig.getValue();
     }
 
-    private record AnchorCalc(BlockPos explosion, BlockPos placement) {}
+    private record AnchorCalc(BlockPos pos, boolean isAnchor) {}
 }
