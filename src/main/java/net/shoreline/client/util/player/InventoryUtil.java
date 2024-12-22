@@ -43,6 +43,19 @@ public class InventoryUtil implements Globals
         return false;
     }
 
+    public static boolean hasItemInHotbar(final Item item)
+    {
+        for (int i = 0; i < 9; ++i)
+        {
+            final ItemStack itemStack = mc.player.getInventory().getStack(i);
+            if (!itemStack.isEmpty() && itemStack.getItem() == item)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * @param item
      * @return

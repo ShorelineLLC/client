@@ -230,6 +230,7 @@ public class AutoCrystalModule extends RotationModule
         {
             return;
         }
+
         for (AntiStuckData d : stuckCrystals)
         {
             double dist = mc.player.squaredDistanceTo(d.pos());

@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
@@ -27,6 +28,7 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.ExplosionUtil;
@@ -83,6 +85,11 @@ public class AutoAnchorModule extends BlockPlacerModule
     public void onPlayerTick(TickEvent event)
     {
         if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
+
+        if (!InventoryUtil.hasItemInHotbar(Items.RESPAWN_ANCHOR) || !InventoryUtil.hasItemInHotbar(Items.GLOWSTONE))
         {
             return;
         }

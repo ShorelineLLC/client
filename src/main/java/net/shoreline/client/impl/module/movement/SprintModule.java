@@ -49,15 +49,7 @@ public class SprintModule extends RotationModule
         {
             return;
         }
-        if (MovementUtil.isInputtingMovement()
-                && !mc.player.isSneaking()
-                && !mc.player.isRiding()
-                && !mc.player.isFallFlying()
-                && !mc.player.isTouchingWater()
-                && !mc.player.isInLava()
-                && !mc.player.isHoldingOntoLadder()
-                && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                && mc.player.getHungerManager().getFoodLevel() > 6.0F)
+        if (canSprint())
         {
             float sprintYaw = getSprintYaw(mc.player.getYaw());
             if (checkSprintAngle(sprintYaw))
@@ -83,16 +75,7 @@ public class SprintModule extends RotationModule
     @EventListener
     public void onSprintCancel(SprintCancelEvent event)
     {
-        if (MovementUtil.isInputtingMovement()
-                && !mc.player.isSneaking()
-                && !mc.player.isRiding()
-                && !mc.player.isFallFlying()
-                && !mc.player.isTouchingWater()
-                && !mc.player.isInLava()
-                && !mc.player.isHoldingOntoLadder()
-                && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                && mc.player.getHungerManager().getFoodLevel() > 6.0F
-                && (modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT))
+        if (canSprint() && (modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT))
         {
             float sprintYaw = getSprintYaw(mc.player.getYaw());
             if (checkSprintAngle(sprintYaw))
@@ -106,16 +89,7 @@ public class SprintModule extends RotationModule
     @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
-        if (MovementUtil.isInputtingMovement()
-                && !mc.player.isSneaking()
-                && !mc.player.isRiding()
-                && !mc.player.isFallFlying()
-                && !mc.player.isTouchingWater()
-                && !mc.player.isInLava()
-                && !mc.player.isHoldingOntoLadder()
-                && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                && mc.player.getHungerManager().getFoodLevel() > 6.0F
-                && modeConfig.getValue() == SprintMode.RAGE_STRICT)
+        if (canSprint() && modeConfig.getValue() == SprintMode.RAGE_STRICT)
         {
             float sprintYaw = getSprintYaw(mc.player.getYaw());
             if (checkSprintAngle(sprintYaw))
@@ -147,6 +121,19 @@ public class SprintModule extends RotationModule
             event.cancel();
             event.setYaw(yaw);
         }
+    }
+
+    private boolean canSprint()
+    {
+        return MovementUtil.isInputtingMovement()
+                && !mc.player.isSneaking()
+                && !mc.player.isRiding()
+                && !mc.player.isFallFlying()
+                && !mc.player.isTouchingWater()
+                && !mc.player.isInLava()
+                && !mc.player.isHoldingOntoLadder()
+                && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
+                && mc.player.getHungerManager().getFoodLevel() > 6.0F;
     }
 
     private boolean checkSprintAngle(float sprintYaw)
