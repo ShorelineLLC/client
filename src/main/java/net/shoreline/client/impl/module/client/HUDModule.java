@@ -89,7 +89,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
     Config<Boolean> fpsConfig = register(new BooleanConfig("FPS", "Displays game FPS", true));
     Config<Boolean> arraylistConfig = register(new BooleanConfig("Arraylist", "Displays a list of all active modules", true));
-    Config<Integer> animTimeConfig = register(new NumberConfig<>("Anim-Time", "Timer for the animation", 0, 700, 1000, () -> false));
+    Config<Integer> animTimeConfig = register(new NumberConfig<>("Arraylist-Time", "Timer for the animation", 0, 1000, 2000, () -> false));
     Config<Ordering> orderingConfig = register(new EnumConfig<>("Ordering", "The ordering of the arraylist", Ordering.LENGTH, Ordering.values(), () -> arraylistConfig.getValue()));
     Config<Rendering> renderingConfig = register(new EnumConfig<>("Rendering", "The rendering mode of the HUD", Rendering.UP, Rendering.values()));
     // Rainbow settings

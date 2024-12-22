@@ -106,8 +106,10 @@ public class AutoAnchorModule extends BlockPlacerModule
         {
             return;
         }
-        anchorPos = calculateAnchorExplosion();
-        placePos = calculateAnchorPlacement();
+
+        final AnchorCalc anchorCalc = calculateAnchorExplosion();
+        anchorPos = anchorCalc.explosion();
+        placePos = anchorCalc.placement();
         if (anchorPos != null)
         {
             if (rotateConfig.getValue())
@@ -219,109 +221,114 @@ public class AutoAnchorModule extends BlockPlacerModule
     }
 
     // Most of the below code is stolen from the ca
-    private BlockPos calculateAnchorExplosion()
+    private AnchorCalc calculateAnchorExplosion()
     {
+        // explosion
         BlockPos data = null;
         double bestAnchorDamage = 0.0f;
+
+        // placements
+        BlockPos placeData = null;
+        double bestPlaceDamage = 0.0f;
+
         for (BlockPos pos : getSphere(mc.player.getPos()))
         {
             BlockState state = mc.world.getBlockState(pos);
-            if (!rangeCheck(pos) || !(state.getBlock() instanceof RespawnAnchorBlock))
+            double dist1 = mc.player.getEyePos().squaredDistanceTo(pos.toCenterPos());
+            if (dist1 > ((NumberConfig) rangeConfig).getValueSq())
             {
                 continue;
             }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                    pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, false); // Anchor explosions power = 10
-            boolean unsafeToPlayer = playerDamageCheck(selfDamage);
-            if (unsafeToPlayer)
-            {
-                continue;
-            }
-            for (Entity entity : mc.world.getEntities())
-            {
-                if (entity == null || !entity.isAlive() || entity == mc.player
-                        || !isValidTarget(entity)
-                        || Managers.SOCIAL.isFriend(entity.getName()))
-                {
-                    continue;
-                }
 
-                double blockDist = pos.getSquaredDistance(entity.getPos());
-                if (blockDist > 144.0f)
+            if (state.getBlock() instanceof RespawnAnchorBlock)
+            {
+                double selfDamage = ExplosionUtil.getDamageTo(mc.player,
+                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, false); // Anchor explosions power = 10
+                boolean unsafeToPlayer = playerDamageCheck(selfDamage);
+                if (unsafeToPlayer)
                 {
                     continue;
                 }
-                double dist = mc.player.squaredDistanceTo(entity);
-                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
+                for (Entity entity : mc.world.getEntities())
                 {
-                    continue;
-                }
-                double damage = ExplosionUtil.getDamageTo(entity,
-                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, assumeArmorConfig.getValue());
-                if (damage > bestAnchorDamage)
-                {
-                    data = pos;
-                    bestAnchorDamage = damage;
-                }
-            }
-        }
-        if (data == null || bestAnchorDamage < minDamageConfig.getValue())
-        {
-            return null;
-        }
-        return data;
-    }
+                    if (entity == null || !entity.isAlive() || entity == mc.player
+                            || !isValidTarget(entity)
+                            || Managers.SOCIAL.isFriend(entity.getName()))
+                    {
+                        continue;
+                    }
 
-    private BlockPos calculateAnchorPlacement()
-    {
-        BlockPos data = null;
-        double bestAnchorDamage = 0.0f;
-        for (BlockPos pos : getSphere(mc.player.getPos()))
-        {
-            BlockState state = mc.world.getBlockState(pos);
-            if (!rangeCheck(pos) || !state.isReplaceable() && !(state.getBlock() instanceof RespawnAnchorBlock))
-            {
-                continue;
+                    double blockDist = pos.getSquaredDistance(entity.getPos());
+                    if (blockDist > 144.0f)
+                    {
+                        continue;
+                    }
+                    double dist = mc.player.squaredDistanceTo(entity);
+                    if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
+                    {
+                        continue;
+                    }
+                    double damage = ExplosionUtil.getDamageTo(entity,
+                            pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, assumeArmorConfig.getValue());
+                    if (damage > bestAnchorDamage)
+                    {
+                        data = pos;
+                        bestAnchorDamage = damage;
+                    }
+                }
             }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                    pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, false); // Anchor explosions power = 10
-            boolean unsafeToPlayer = playerDamageCheck(selfDamage);
-            if (unsafeToPlayer)
+
+            else if (state.isReplaceable())
             {
-                continue;
-            }
-            for (Entity entity : mc.world.getEntities())
-            {
-                if (entity == null || !entity.isAlive() || entity == mc.player
-                        || !isValidTarget(entity)
-                        || Managers.SOCIAL.isFriend(entity.getName()))
+                double selfDamage = ExplosionUtil.getDamageTo(mc.player,
+                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, false); // Anchor explosions power = 10
+                boolean unsafeToPlayer = playerDamageCheck(selfDamage);
+                if (unsafeToPlayer)
                 {
                     continue;
                 }
-                double blockDist = pos.getSquaredDistance(entity.getPos());
-                if (blockDist > 144.0f)
+                for (Entity entity : mc.world.getEntities())
                 {
-                    continue;
-                }
-                double dist = mc.player.squaredDistanceTo(entity);
-                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
-                {
-                    continue;
-                }
-                double damage = ExplosionUtil.getDamageTo(entity,
-                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, assumeArmorConfig.getValue());
-                if (damage > bestAnchorDamage)
-                {
-                    data = pos;
-                    bestAnchorDamage = damage;
+                    if (entity == null || !entity.isAlive() || entity == mc.player
+                            || !isValidTarget(entity)
+                            || Managers.SOCIAL.isFriend(entity.getName()))
+                    {
+                        continue;
+                    }
+                    double blockDist = pos.getSquaredDistance(entity.getPos());
+                    if (blockDist > 144.0f)
+                    {
+                        continue;
+                    }
+                    double dist = mc.player.squaredDistanceTo(entity);
+                    if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
+                    {
+                        continue;
+                    }
+                    double damage = ExplosionUtil.getDamageTo(entity,
+                            pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, 0, assumeArmorConfig.getValue());
+                    if (damage > bestPlaceDamage)
+                    {
+                        placeData = pos;
+                        bestPlaceDamage = damage;
+                    }
                 }
             }
         }
-        if (data == null || bestAnchorDamage < minDamageConfig.getValue())
+
+        BlockPos explosion = null;
+        BlockPos placement = null;
+        if (data != null && bestAnchorDamage >= minDamageConfig.getValue())
         {
-            return null;
+            explosion = data;
         }
-        return data;
+
+        if (placeData != null && bestPlaceDamage >= minDamageConfig.getValue())
+        {
+            placement = placeData;
+        }
+
+        return new AnchorCalc(explosion, placement);
     }
 
     private boolean playerDamageCheck(double playerDamage)
@@ -336,12 +343,6 @@ public class AutoAnchorModule extends BlockPlacerModule
             return playerDamage > maxLocalDamageConfig.getValue();
         }
         return false;
-    }
-
-    private boolean rangeCheck(BlockPos pos)
-    {
-        double dist = mc.player.getEyePos().squaredDistanceTo(pos.toCenterPos());
-        return dist > ((NumberConfig) rangeConfig).getValueSq();
     }
 
     private List<BlockPos> getSphere(Vec3d origin)
@@ -371,4 +372,6 @@ public class AutoAnchorModule extends BlockPlacerModule
                 || EntityUtil.isNeutral(e) && neutralsConfig.getValue()
                 || EntityUtil.isPassive(e) && animalsConfig.getValue();
     }
+
+    private record AnchorCalc(BlockPos explosion, BlockPos placement) {}
 }
