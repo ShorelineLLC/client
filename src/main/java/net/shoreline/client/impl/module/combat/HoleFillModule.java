@@ -38,6 +38,8 @@ import java.util.Map;
  */
 public class HoleFillModule extends ObsidianPlacerModule
 {
+    private static HoleFillModule INSTANCE;
+
     //
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Boolean> obsidianConfig = register(new BooleanConfig("Obsidian", "Fills obsidian holes", true));
@@ -64,6 +66,12 @@ public class HoleFillModule extends ObsidianPlacerModule
     public HoleFillModule()
     {
         super("HoleFill", "Fills in nearby holes with blocks", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static HoleFillModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override

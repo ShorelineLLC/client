@@ -41,6 +41,8 @@ import java.util.List;
 
 public class AutoAnchorModule extends BlockPlacerModule
 {
+    private static AutoAnchorModule INSTANCE;
+
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows exploding while using items", false));
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when exploding anchors", true));
@@ -54,7 +56,7 @@ public class AutoAnchorModule extends BlockPlacerModule
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places anchors to damage enemies", true));
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place anchors", 0.1f, 12.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
-    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false, () -> rotateConfig.getValue() && placeConfig.getValue()));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false, () -> placeConfig.getValue()));
     Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
     Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider exploding anchors", 1.0f, 4.0f, 10.0f));
     Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when exploding anchors", true));
@@ -72,6 +74,12 @@ public class AutoAnchorModule extends BlockPlacerModule
     public AutoAnchorModule()
     {
         super("AutoAnchor", "Automatically places and explodes respawn anchors", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static AutoAnchorModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override

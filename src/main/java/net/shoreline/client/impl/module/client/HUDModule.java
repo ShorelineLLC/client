@@ -169,11 +169,11 @@ public class HUDModule extends ToggleModule
             }
         }
 
-        if (arraylistThread == null)
-        {
-            arraylistThread = getArraylistThread();
-            arraylistThread.start();
-        }
+//        if (arraylistThread == null)
+//        {
+//            arraylistThread = getArraylistThread();
+//            arraylistThread.start();
+//        }
 
         fpsCounter.updateCounter();
         if (mc.player != null && mc.world != null)
@@ -740,6 +740,7 @@ public class HUDModule extends ToggleModule
 
         public void draw(DrawContext context, long drawnCount)
         {
+            updateAnimation();
             RenderManager.renderText(context, getFormattedModule(module),
                      mc.getWindow().getScaledWidth() + (float) this.x,
                     renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));

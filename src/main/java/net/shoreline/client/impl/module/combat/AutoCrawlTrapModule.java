@@ -36,6 +36,8 @@ import java.util.*;
 
 public class AutoCrawlTrapModule extends ObsidianPlacerModule
 {
+    private static AutoCrawlTrapModule INSTANCE;
+
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to trap enemies", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
@@ -54,6 +56,12 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     public AutoCrawlTrapModule()
     {
         super("AutoCrawlTrap", "Automatically places blocks to keep enemies in crawl", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static AutoCrawlTrapModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override

@@ -24,6 +24,7 @@ import net.shoreline.eventbus.annotation.EventListener;
  */
 public class AutoXPModule extends RotationModule
 {
+    private static AutoXPModule INSTANCE;
 
     Config<Boolean> multiTaskConfig = register(new BooleanConfig("MultiTask", "Allows you to throw xp while using items", false));
     Config<Float> delayConfig = register(new NumberConfig<>("Delay", "Delay to throw xp in ticks.", 1.0f, 1.0f, 10.0f, NumberDisplay.DEFAULT));
@@ -37,6 +38,12 @@ public class AutoXPModule extends RotationModule
     public AutoXPModule()
     {
         super("AutoXP", "Automatically throws xp silently.", ModuleCategory.COMBAT, 850);
+        INSTANCE = this;
+    }
+
+    public static AutoXPModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
