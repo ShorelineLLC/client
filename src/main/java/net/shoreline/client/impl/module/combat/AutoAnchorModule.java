@@ -252,6 +252,11 @@ public class AutoAnchorModule extends BlockPlacerModule
                 }
                 for (Entity entity : mc.world.getEntities())
                 {
+                    if (entity.getBlockPos().equals(pos))
+                    {
+                        continue;
+                    }
+
                     if (entity == null || !entity.isAlive() || entity == mc.player
                             || !isValidTarget(entity)
                             || Managers.SOCIAL.isFriend(entity.getName()))
