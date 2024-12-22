@@ -723,11 +723,11 @@ public class HUDModule extends ToggleModule
 
                 if (drawing)
                 {
-                    endpoint = -textWidth;
+                    endpoint = -textWidth - 2.0f;
                 }
                 else
                 {
-                    endpoint = 1.0f;
+                    endpoint = 2.0f;
                 }
                 wasDrawing = drawing;
                 prevTextWidth = textWidth;
