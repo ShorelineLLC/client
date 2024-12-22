@@ -169,11 +169,11 @@ public class HUDModule extends ToggleModule
             }
         }
 
-//        if (arraylistThread == null)
-//        {
-//            arraylistThread = getArraylistThread();
-//            arraylistThread.start();
-//        }
+        if (arraylistThread == null)
+        {
+            arraylistThread = getArraylistThread();
+            arraylistThread.start();
+        }
 
         fpsCounter.updateCounter();
         if (mc.player != null && mc.world != null)
@@ -631,7 +631,7 @@ public class HUDModule extends ToggleModule
 
     private Thread getArraylistThread()
     {
-        final long interval = 1000L / 360; // 360 FPS
+        final long interval = 1000L / 240; // 240 FPS
         Runnable task = () ->
         {
             long lastTime = System.currentTimeMillis();
@@ -740,7 +740,6 @@ public class HUDModule extends ToggleModule
 
         public void draw(DrawContext context, long drawnCount)
         {
-            updateAnimation();
             RenderManager.renderText(context, getFormattedModule(module),
                      mc.getWindow().getScaledWidth() + (float) this.x,
                     renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));

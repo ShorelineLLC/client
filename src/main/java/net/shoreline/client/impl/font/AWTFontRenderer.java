@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public final class AWTFontRenderer implements Closeable, Globals
@@ -35,7 +36,7 @@ public final class AWTFontRenderer implements Closeable, Globals
     private static final Pattern PATTERN_CONTROL_CODE = Pattern.compile("(?i)\\u00A7[0-9A-FK-OG]");
 
     private final ObjectList<GlyphCache> caches = new ObjectArrayList<>();
-    private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
+    private final Map<Character, Glyph> glyphs = new ConcurrentHashMap<>();
     private final Map<Identifier, ObjectList<CharLocation>> cache = new Object2ObjectOpenHashMap<>();
 
     public AWTFontRenderer(InputStream inputStream, float size)
