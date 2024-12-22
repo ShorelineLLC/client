@@ -159,16 +159,23 @@ public final class AWTFontRenderer implements Closeable, Globals
                     lineStart = i + 1;
                     continue;
                 }
-                Glyph glyph = glyphs.computeIfAbsent(c, g1 -> getGlyphFromChar(g1));
-                if (glyph != null)
+                try
                 {
-                    if (glyph.value() != ' ')
+                    Glyph glyph = glyphs.computeIfAbsent(c, g1 -> getGlyphFromChar(g1));
+                    if (glyph != null)
                     {
-                        Identifier i1 = glyph.owner().getId();
-                        CharLocation entry = new CharLocation(xOffset, yOffset, r2, g2, b2, glyph);
-                        cache.computeIfAbsent(i1, integer -> new ObjectArrayList<>()).add(entry);
+                        if (glyph.value() != ' ')
+                        {
+                            Identifier i1 = glyph.owner().getId();
+                            CharLocation entry = new CharLocation(xOffset, yOffset, r2, g2, b2, glyph);
+                            cache.computeIfAbsent(i1, integer -> new ObjectArrayList<>()).add(entry);
+                        }
+                        xOffset += glyph.width();
                     }
-                    xOffset += glyph.width();
+                }
+                catch (NullPointerException e)
+                {
+
                 }
             }
             for (Identifier identifier : cache.keySet())
@@ -250,17 +257,24 @@ public final class AWTFontRenderer implements Closeable, Globals
         char[] c = stripControlCodes(text).toCharArray();
         float currentLine = 0;
         float maxPreviousLines = 0;
-        for (char c1 : c)
+        try
         {
-            if (c1 == '\n')
+            for (char c1 : c)
             {
-                maxPreviousLines = Math.max(currentLine, maxPreviousLines);
-                currentLine = 0;
-                continue;
+                if (c1 == '\n')
+                {
+                    maxPreviousLines = Math.max(currentLine, maxPreviousLines);
+                    currentLine = 0;
+                    continue;
+                }
+                Glyph glyph = glyphs.computeIfAbsent(c1, g1 -> getGlyphFromChar(g1));
+                float w = glyph == null ? 0 : glyph.width();
+                currentLine += w / (float) this.scale;
             }
-            Glyph glyph = glyphs.computeIfAbsent(c1, g1 -> getGlyphFromChar(g1));
-            float w = glyph == null ? 0 : glyph.width();
-            currentLine += w / (float) this.scale;
+        }
+        catch (NullPointerException e)
+        {
+
         }
         return Math.max(currentLine, maxPreviousLines);
     }
