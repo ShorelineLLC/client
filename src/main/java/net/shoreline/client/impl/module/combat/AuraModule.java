@@ -1,11 +1,16 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.item.*;
@@ -43,6 +48,7 @@ import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
+import org.apache.commons.lang3.mutable.MutableDouble;
 
 import java.util.Comparator;
 import java.util.stream.Stream;
@@ -71,7 +77,7 @@ public class AuraModule extends RotationModule
     // Config<Integer> packetsConfig = register(new NumberConfig<>("Packets", "Maximum attack packets to send in a single tick", 0, 1, 20);
     Config<Float> swapDelayConfig = register(new NumberConfig<>("SwapPenalty", "Delay for attacking after swapping items which prevents NCP flags", 0.0f, 0.0f, 10.0f));
     Config<TickSync> tpsSyncConfig = register(new EnumConfig<>("TPS-Sync", "Syncs the attacks with the server TPS", TickSync.NONE, TickSync.values()));
-    Config<Boolean> autoSwapConfig = register(new BooleanConfig("AutoSwap", "Automatically swaps to a weapon before attacking", true));
+    Config<Swap> autoSwapConfig = register(new EnumConfig<>("AutoSwap", "Automatically swaps to a weapon before attacking", Swap.OFF, Swap.values()));
     Config<Boolean> swordCheckConfig = register(new BooleanConfig("Sword-Check", "Checks if a weapon is in the hand before attacking", true));
     // ROTATE
     Config<Vector> hitVectorConfig = register(new EnumConfig<>("HitVector", "The vector to aim for when attacking entities", Vector.FEET, Vector.values()));
@@ -101,7 +107,7 @@ public class AuraModule extends RotationModule
     private boolean sneaking;
     private boolean sprinting;
 
-    private final Timer attackTimer = new CacheTimer();
+    private long lastAttackTime;
     private final Timer critTimer = new CacheTimer();
     private final Timer autoSwapTimer = new CacheTimer();
     private final Timer switchTimer = new CacheTimer();
@@ -183,17 +189,34 @@ public class AuraModule extends RotationModule
         {
             autoSwapTimer.reset();
         }
-        // END PRE
-        boolean sword = mc.player.getMainHandStack().getItem() instanceof SwordItem;
-        if (autoSwapConfig.getValue() && autoSwapTimer.passed(500) && !sword)
+
+        int slot = getSwordSlot();
+        if (slot == -1)
         {
-            int slot = getSwordSlot();
-            if (slot != -1)
+            return;
+        }
+
+        // END PRE
+        boolean silentSwapped = false;
+        if (!(mc.player.getMainHandStack().getItem() instanceof SwordItem))
+        {
+            switch (autoSwapConfig.getValue())
             {
-                Managers.INVENTORY.setClientSlot(slot);
+                case NORMAL ->
+                {
+                    if (autoSwapTimer.passed(500))
+                    {
+                        Managers.INVENTORY.setClientSlot(slot);
+                    }
+                }
+                case SILENT ->
+                {
+                    Managers.INVENTORY.setSlot(slot);
+                    silentSwapped = true;
+                }
             }
         }
-        if (!isHoldingSword())
+        if (!isHoldingSword() && autoSwapConfig.getValue() != Swap.SILENT)
         {
             return;
         }
@@ -246,8 +269,26 @@ public class AuraModule extends RotationModule
         }
         if (attackDelayConfig.getValue())
         {
-            float ticks = 20.0f - Managers.TICK.getTickSync(tpsSyncConfig.getValue());
-            float progress = mc.player.getAttackCooldownProgress(ticks);
+            PlayerInventory inventory = mc.player.getInventory();
+            ItemStack itemStack = inventory.getStack(slot);
+
+            MutableDouble attackSpeed = new MutableDouble(
+                    mc.player.getAttributeBaseValue(EntityAttributes.GENERIC_ATTACK_SPEED));
+
+            AttributeModifiersComponent attributeModifiers =
+                    itemStack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+            if (attributeModifiers != null)
+            {
+                attributeModifiers.applyModifiers(EquipmentSlot.MAINHAND, (entry, modifier) ->
+                {
+                    if (entry == EntityAttributes.GENERIC_ATTACK_SPEED)
+                    {
+                        attackSpeed.add(modifier.value());
+                    }
+                });
+            }
+
+            double attackCooldownTicks = 1.0 / attackSpeed.getValue() * 20.0;
 
             int breachSlot = getBreachMaceSlot();
             if (maceBreachConfig.getValue() && breachSlot != -1)
@@ -255,9 +296,11 @@ public class AuraModule extends RotationModule
                 Managers.INVENTORY.setSlot(breachSlot);
             }
 
-            if (progress >= 1.0f && attackTarget(entityTarget))
+            float ticks = 20.0f - Managers.TICK.getTickSync(tpsSyncConfig.getValue());
+            float currentTime = (System.currentTimeMillis() - lastAttackTime) + (ticks * 50.0f);
+            if ((currentTime / 50.0f) >= attackCooldownTicks && attackTarget(entityTarget))
             {
-                mc.player.resetLastAttackedTicks();
+                lastAttackTime = System.currentTimeMillis();
             }
 
             if (maceBreachConfig.getValue() && breachSlot != -1)
@@ -279,16 +322,22 @@ public class AuraModule extends RotationModule
                 Managers.INVENTORY.setSlot(breachSlot);
             }
 
-            if (attackTimer.passed(1000.0f - delay) && attackTarget(entityTarget))
+            long currentTime = System.currentTimeMillis() - lastAttackTime;
+            if (currentTime >= 1000.0f - delay && attackTarget(entityTarget))
             {
                 randomDelay = -1;
-                attackTimer.reset();
+                lastAttackTime = System.currentTimeMillis();
             }
 
             if (maceBreachConfig.getValue() && breachSlot != -1)
             {
                 Managers.INVENTORY.syncToClient();
             }
+        }
+
+        if (autoSwapConfig.getValue() == Swap.SILENT && silentSwapped)
+        {
+            Managers.INVENTORY.syncToClient();
         }
     }
 
@@ -313,20 +362,12 @@ public class AuraModule extends RotationModule
         {
             return;
         }
-        if (entityTarget != null && renderConfig.getValue() && isHoldingSword())
+        if (entityTarget != null && renderConfig.getValue() && (isHoldingSword() || autoSwapConfig.getValue() == Swap.SILENT))
         {
-            int attackDelay;
             float delay = (attackSpeedConfig.getValue() * 50.0f) + randomDelay;
-            if (attackDelayConfig.getValue())
-            {
-                float animFactor = 1.0f - mc.player.getAttackCooldownProgress(0.0f);
-                attackDelay = (int) (70.0 * animFactor);
-            }
-            else
-            {
-                float animFactor = 1.0f - MathHelper.clamp(attackTimer.getElapsedTime() / (1000f - delay), 0.0f, 1.0f);
-                attackDelay = (int) (70.0 * animFactor);
-            }
+            long currentTime = System.currentTimeMillis() - lastAttackTime;
+            float animFactor = 1.0f - MathHelper.clamp(currentTime / (1000f - delay), 0.0f, 1.0f);
+            int attackDelay = (int) (70.0 * animFactor);
             RenderBuffers.preRender();
             RenderManager.renderBox(event.getMatrices(),
                     Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.getInstance().getRGB(40 + attackDelay));
@@ -697,6 +738,13 @@ public class AuraModule extends RotationModule
     {
         SWITCH,
         SINGLE
+    }
+
+    public enum Swap
+    {
+        NORMAL,
+        SILENT,
+        OFF
     }
 
     public enum Vector
