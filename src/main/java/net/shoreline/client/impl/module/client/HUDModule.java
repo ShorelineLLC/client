@@ -109,7 +109,6 @@ public class HUDModule extends ToggleModule
     private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
     private final PerSecondCounter fpsCounter = new PerSecondCounter();
     private final Map<String, HudRenderModule> hudRenderModules = new HashMap<>();
-    private Thread arraylistThread;
 
     private final Timer serverStatus = new CacheTimer();
     private final Animation statusAnimation = new Animation(false, 300L, Easing.LINEAR);
@@ -124,13 +123,6 @@ public class HUDModule extends ToggleModule
     public static HUDModule getInstance()
     {
         return INSTANCE;
-    }
-
-    @Override
-    public void onDisable()
-    {
-        arraylistThread.interrupt();
-        arraylistThread = null;
     }
 
     private void arrayListRenderModule(RenderOverlayEvent.Post event, ToggleModule toggleModule, long drawnCount)
@@ -169,10 +161,13 @@ public class HUDModule extends ToggleModule
             }
         }
 
-        if (arraylistThread == null)
+        int updates = Math.max(Math.round(240.0f / mc.getCurrentFps()), 1);
+        for (int i = 0; i < updates; i++)
         {
-            arraylistThread = getArraylistThread();
-            arraylistThread.start();
+            for (HudRenderModule hudRenderModule : hudRenderModules.values())
+            {
+                hudRenderModule.updateAnimation();
+            }
         }
 
         fpsCounter.updateCounter();
@@ -627,44 +622,6 @@ public class HUDModule extends ToggleModule
     public float getChatAnimation()
     {
         return (float) chatOpenAnimation.getFactor();
-    }
-
-    private Thread getArraylistThread()
-    {
-        final long interval = 1000L / 240; // 240 FPS
-        Runnable task = () ->
-        {
-            long lastTime = System.currentTimeMillis();
-            while (true)
-            {
-                for (HudRenderModule hudRenderModule : hudRenderModules.values())
-                {
-                    hudRenderModule.updateAnimation();
-                }
-
-                long currentTime = System.currentTimeMillis();
-                long elapsedTime = currentTime - lastTime;
-                long sleepTime = interval - elapsedTime;
-
-                if (sleepTime > 0)
-                {
-                    try
-                    {
-                        Thread.sleep(sleepTime);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-
-                lastTime = currentTime;
-            }
-        };
-
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        return thread;
     }
 
     public enum VanillaHud

@@ -22,7 +22,6 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public final class AWTFontRenderer implements Closeable, Globals
@@ -36,7 +35,7 @@ public final class AWTFontRenderer implements Closeable, Globals
     private static final Pattern PATTERN_CONTROL_CODE = Pattern.compile("(?i)\\u00A7[0-9A-FK-OG]");
 
     private final ObjectList<GlyphCache> caches = new ObjectArrayList<>();
-    private final Map<Character, Glyph> glyphs = new ConcurrentHashMap<>();
+    private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
     private final Map<Identifier, ObjectList<CharLocation>> cache = new Object2ObjectOpenHashMap<>();
 
     public AWTFontRenderer(InputStream inputStream, float size)
@@ -159,23 +158,16 @@ public final class AWTFontRenderer implements Closeable, Globals
                     lineStart = i + 1;
                     continue;
                 }
-                try
+                Glyph glyph = glyphs.computeIfAbsent(c, g1 -> getGlyphFromChar(g1));
+                if (glyph != null)
                 {
-                    Glyph glyph = glyphs.computeIfAbsent(c, g1 -> getGlyphFromChar(g1));
-                    if (glyph != null)
+                    if (glyph.value() != ' ')
                     {
-                        if (glyph.value() != ' ')
-                        {
-                            Identifier i1 = glyph.owner().getId();
-                            CharLocation entry = new CharLocation(xOffset, yOffset, r2, g2, b2, glyph);
-                            cache.computeIfAbsent(i1, integer -> new ObjectArrayList<>()).add(entry);
-                        }
-                        xOffset += glyph.width();
+                        Identifier i1 = glyph.owner().getId();
+                        CharLocation entry = new CharLocation(xOffset, yOffset, r2, g2, b2, glyph);
+                        cache.computeIfAbsent(i1, integer -> new ObjectArrayList<>()).add(entry);
                     }
-                }
-                catch (NullPointerException e)
-                {
-
+                    xOffset += glyph.width();
                 }
             }
             for (Identifier identifier : cache.keySet())
@@ -257,24 +249,17 @@ public final class AWTFontRenderer implements Closeable, Globals
         char[] c = stripControlCodes(text).toCharArray();
         float currentLine = 0;
         float maxPreviousLines = 0;
-        try
+        for (char c1 : c)
         {
-            for (char c1 : c)
+            if (c1 == '\n')
             {
-                if (c1 == '\n')
-                {
-                    maxPreviousLines = Math.max(currentLine, maxPreviousLines);
-                    currentLine = 0;
-                    continue;
-                }
-                Glyph glyph = glyphs.computeIfAbsent(c1, g1 -> getGlyphFromChar(g1));
-                float w = glyph == null ? 0 : glyph.width();
-                currentLine += w / (float) this.scale;
+                maxPreviousLines = Math.max(currentLine, maxPreviousLines);
+                currentLine = 0;
+                continue;
             }
-        }
-        catch (NullPointerException e)
-        {
-
+            Glyph glyph = glyphs.computeIfAbsent(c1, g1 -> getGlyphFromChar(g1));
+            float w = glyph == null ? 0 : glyph.width();
+            currentLine += w / (float) this.scale;
         }
         return Math.max(currentLine, maxPreviousLines);
     }
