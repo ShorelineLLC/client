@@ -24,6 +24,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -201,7 +202,8 @@ public class AutoAnchorModule extends BlockPlacerModule
     private void setAnchor(BlockPos pos)
     {
         BlockState state = mc.world.getBlockState(pos);
-        if (!(state.getBlock() instanceof RespawnAnchorBlock) || state.get(RespawnAnchorBlock.CHARGES) > 4)
+        int charges = state.get(RespawnAnchorBlock.CHARGES);
+        if (!(state.getBlock() instanceof RespawnAnchorBlock) || charges > 4)
         {
             return;
         }
@@ -210,7 +212,10 @@ public class AutoAnchorModule extends BlockPlacerModule
         {
             return;
         }
-        Managers.INVENTORY.setSlot(slot);
+        if (charges == 0)
+        {
+            Managers.INVENTORY.setSlot(slot);
+        }
         BlockHitResult result = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
         Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, id));
         if (swingConfig.getValue())
@@ -221,7 +226,10 @@ public class AutoAnchorModule extends BlockPlacerModule
         {
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
-        Managers.INVENTORY.syncToClient();
+        if (charges == 0)
+        {
+            Managers.INVENTORY.syncToClient();
+        }
     }
 
     private AnchorCalc calculateAnchorExplosion()
@@ -250,6 +258,13 @@ public class AutoAnchorModule extends BlockPlacerModule
                 {
                     continue;
                 }
+
+                if (!AirPlaceModule.getInstance().isEnabled()
+                        && Managers.INTERACT.getInteractDirection(pos, false) == null)
+                {
+                    continue;
+                }
+
                 for (Entity entity : mc.world.getEntities())
                 {
                     if (entity.getBlockPos().equals(pos))
