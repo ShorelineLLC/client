@@ -84,7 +84,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> netherCoordsConfig = register(new BooleanConfig("NetherCoords", "Displays nether coordinates", true, () -> coordsConfig.getValue()));
     Config<Boolean> serverBrandConfig = register(new BooleanConfig("ServerBrand", "Displays the current server brand", false));
     Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Displays the amount of chests in your render distance", false));
-    Config<Boolean> speedConfig = register(new BooleanConfig("Speed", "Displays the current movement speed of the player in kmh", true));
+    Config<SpeedHud> speedConfig = register(new EnumConfig<>("Speed", "Displays the current movement speed of the player", SpeedHud.K_M_H, SpeedHud.values()));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Display server response time in ms", true));
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
     Config<Boolean> fpsConfig = register(new BooleanConfig("FPS", "Displays game FPS", true));
@@ -324,16 +324,27 @@ public class HUDModule extends ToggleModule
                 }
                 rainbowOffset++;
             }
-            if (speedConfig.getValue())
+            if (speedConfig.getValue() != SpeedHud.OFF)
             {
+                double speed;
                 double x = mc.player.getX() - mc.player.prevX;
                 // double y = mc.player.getY() - mc.player.prevY;
                 double z = mc.player.getZ() - mc.player.prevZ;
-                double dist = Math.sqrt(x * x + z * z) / 1000.0;
-                double div = 0.05 / 3600.0;
                 float timer = TimerModule.getInstance().isEnabled() ? TimerModule.getInstance().getTimer() : 1.0f;
-                final double speed = dist / div * timer;
-                String text = String.format("Speed §f%skm/h", decimal2.format(speed));
+                if (speedConfig.getValue() == SpeedHud.K_M_H)
+                {
+                    double dist = Math.sqrt(x * x + z * z) / 1000.0;
+                    double div = 0.05 / 3600.0;
+                    speed = dist / div * timer;
+                }
+                else
+                {
+                    x *= 20.0;
+                    z *= 20.0;
+                    double dist = Math.sqrt(x * x + z * z);
+                    speed = Math.abs(dist) * timer;
+                }
+                String text = String.format("Speed §f%s%s", decimal2.format(speed), speedConfig.getValue() == SpeedHud.K_M_H ? "km/h" : "b/s");
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
@@ -649,6 +660,13 @@ public class HUDModule extends ToggleModule
         GRADIENT,
         GRADIENT_HUE,
         STATIC_HUE
+    }
+
+    public enum SpeedHud
+    {
+        K_M_H,
+        B_P_S,
+        OFF
     }
 
     public class HudRenderModule
