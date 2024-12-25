@@ -69,6 +69,12 @@ public final class AirPlaceModule extends ToggleModule
         {
             return;
         }
+
+        if (mc.crosshairTarget instanceof BlockHitResult result && !mc.world.isAir(result.getBlockPos()))
+        {
+            return;
+        }
+
         if (airPlaceTicks > 0)
         {
             airPlaceTicks--;
@@ -121,6 +127,12 @@ public final class AirPlaceModule extends ToggleModule
         {
             return;
         }
+
+        if (mc.crosshairTarget instanceof BlockHitResult result && !mc.world.isAir(result.getBlockPos()))
+        {
+            return;
+        }
+
         final ItemStack stack = mc.player.getMainHandStack();
         if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem))
         {
