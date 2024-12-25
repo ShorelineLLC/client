@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -86,11 +87,12 @@ public class HoleESPModule extends ToggleModule
         {
             Hole hole = set.getKey();
             double dist = hole.squaredDistanceTo(mc.player);
+
             if (dist > ((NumberConfig) rangeConfig).getValueSq())
             {
                 set.getValue().setState(false);
             }
-            else if (ignoreSelfConfig.getValue() && hole.getHoleOffsets().contains(mc.player.getBlockPos()))
+            else if (ignoreSelfConfig.getValue() && mc.player.getBoundingBox().intersects(hole.getBoundingBox(0.5)))
             {
                 set.getValue().setState(false);
             }
@@ -124,38 +126,7 @@ public class HoleESPModule extends ToggleModule
 
     private void renderHole(MatrixStack matrixStack, Hole hole, int color1, int color2)
     {
-        double x = hole.getX();
-        double y = hole.getY();
-        double z = hole.getZ();
-        Box render = null;
-        if (hole.getSafety() == HoleType.VOID)
-        {
-            render = new Box(x, y, z, x + 1.0, y + 1.0, z + 1.0);
-        }
-        else if (hole.isDoubleX())
-        {
-            render = new Box(x, y, z, x + 2.0,
-                    y + heightConfig.getValue(), z + 1.0);
-        }
-        else if (hole.isDoubleZ())
-        {
-            render = new Box(x, y, z, x + 1.0,
-                    y + heightConfig.getValue(), z + 2.0);
-        }
-        else if (hole.isQuad())
-        {
-            render = new Box(x, y, z, x + 2.0,
-                    y + heightConfig.getValue(), z + 2.0);
-        }
-        else if (hole.isStandard())
-        {
-            render = new Box(x, y, z, x + 1.0,
-                    y + heightConfig.getValue(), z + 1.0);
-        }
-        if (render == null)
-        {
-            return;
-        }
+        Box render = hole.getBoundingBox(heightConfig.getValue());
         RenderManager.renderBox(matrixStack, render, color1);
         if (outlineConfig.getValue())
         {

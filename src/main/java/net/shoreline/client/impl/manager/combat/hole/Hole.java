@@ -3,9 +3,11 @@ package net.shoreline.client.impl.manager.combat.hole;
 import com.google.common.collect.Lists;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -118,6 +120,32 @@ public class Hole implements Position
             return origin.toCenterPos();
         }
         return Vec3d.of(center);
+    }
+
+    public Box getBoundingBox(double height)
+    {
+        Box render = null;
+        if (getSafety() == HoleType.VOID)
+        {
+            render = new Box(getX(), getY(), getZ(), getX() + 1.0, getY() + 1.0, getZ() + 1.0);
+        }
+        else if (isDoubleX())
+        {
+            render = new Box(getX(), getY(), getZ(), getX() + 2.0, getY() + height, getZ() + 1.0);
+        }
+        else if (isDoubleZ())
+        {
+            render = new Box(getX(), getY(), getZ(), getX() + 1.0, getY() + height, getZ() + 2.0);
+        }
+        else if (isQuad())
+        {
+            render = new Box(getX(), getY(), getZ(), getX() + 2.0, getY() + height, getZ() + 2.0);
+        }
+        else if (isStandard())
+        {
+            render = new Box(getX(), getY(), getZ(), getX() + 1.0, getY() + height, getZ() + 1.0);
+        }
+        return render;
     }
 
     @Override

@@ -10,10 +10,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
@@ -267,7 +264,7 @@ public class AutoAnchorModule extends BlockPlacerModule
 
                 for (Entity entity : mc.world.getEntities())
                 {
-                    if (entity.getBlockPos().equals(pos))
+                    if (entity.getBoundingBox().intersects(new Box(pos)))
                     {
                         continue;
                     }
