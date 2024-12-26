@@ -194,9 +194,9 @@ net.shoreline.client.api.command.ConfigArgumentType -> net.shoreline.client.y:
     37:56:net.shoreline.client.api.config.Config parse(com.mojang.brigadier.StringReader) -> a
     63:72:java.util.concurrent.CompletableFuture listSuggestions(com.mojang.brigadier.context.CommandContext,com.mojang.brigadier.suggestion.SuggestionsBuilder) -> listSuggestions
     14:14:java.lang.Object parse(com.mojang.brigadier.StringReader) -> parse
-net.shoreline.client.api.command.ItemArgumentType -> net.shoreline.client.z:
+net.shoreline.client.api.command.ListArgumentType -> net.shoreline.client.z:
     18:18:void <init>() -> <init>
-    23:23:net.shoreline.client.api.command.ItemArgumentType item() -> a
+    23:23:net.shoreline.client.api.command.ListArgumentType item() -> a
     28:28:java.lang.Object getItem(com.mojang.brigadier.context.CommandContext,java.lang.String) -> a
     34:45:java.lang.Object parse(com.mojang.brigadier.StringReader) -> parse
     51:59:java.util.concurrent.CompletableFuture listSuggestions(com.mojang.brigadier.context.CommandContext,com.mojang.brigadier.suggestion.SuggestionsBuilder) -> listSuggestions

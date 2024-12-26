@@ -7,7 +7,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.item.Item;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.ConfigArgumentType;
-import net.shoreline.client.api.command.ItemArgumentType;
+import net.shoreline.client.api.command.ListArgumentType;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BlockListConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -76,12 +76,12 @@ public class ModuleCommand extends Command
                             }
                             return updateValue(config, value);
                         })
-                        .then(argument("item", ItemArgumentType.item())
+                        .then(argument("list", ListArgumentType.list())
                                 .executes(c ->
                                 {
                                     Config<?> config = ConfigArgumentType.getConfig(c, "setting");
                                     String action = StringArgumentType.getString(c, "value");
-                                    Object value = ItemArgumentType.getItem(c, "item");
+                                    Object value = ListArgumentType.getItem(c, "list");
                                     return addDeleteItem(config, action, value);
                                 })))
                 .executes(c ->
