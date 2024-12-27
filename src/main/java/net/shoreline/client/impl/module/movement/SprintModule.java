@@ -33,7 +33,7 @@ public class SprintModule extends RotationModule
      */
     public SprintModule()
     {
-        super("Sprint", "Automatically sprints", ModuleCategory.MOVEMENT, 10);
+        super("Sprint", "Automatically sprints", ModuleCategory.MOVEMENT, 110);
     }
 
     @Override
@@ -91,12 +91,7 @@ public class SprintModule extends RotationModule
     {
         if (canSprint() && modeConfig.getValue() == SprintMode.RAGE_STRICT)
         {
-            float sprintYaw = getSprintYaw(mc.player.getYaw());
-            if (checkSprintAngle(sprintYaw))
-            {
-                return;
-            }
-            setRotation(sprintYaw, mc.player.getPitch());
+            setRotation(getSprintYaw(mc.player.getYaw()), mc.player.getPitch());
         }
     }
 
@@ -138,16 +133,15 @@ public class SprintModule extends RotationModule
 
     private boolean checkSprintAngle(float sprintYaw)
     {
-        if (modeConfig.getValue() != SprintMode.RAGE_STRICT || modeConfig.getValue() != SprintMode.GRIM)
+        if (modeConfig.getValue() == SprintMode.RAGE_STRICT)
         {
-            return false;
+            return MathHelper.angleBetween(sprintYaw, Managers.ROTATION.getServerYaw()) != 0.0f;
         }
-        if (AutoCrystalModule.getInstance().isAttacking() || AutoCrystalModule.getInstance().isPlacing())
+        else if (modeConfig.getValue() == SprintMode.GRIM)
         {
-            return true;
+            return MathHelper.angleBetween(mc.player.getYaw(), Managers.ROTATION.getServerYaw()) != 0.0f;
         }
-        return Managers.ROTATION.isRotating() && !isRotationBlocked() && MathHelper.angleBetween(
-                modeConfig.getValue() == SprintMode.GRIM ? mc.player.getYaw() : sprintYaw, Managers.ROTATION.getRotationYaw()) <= 40.0f;
+        return false;
     }
 
     private float getSprintYaw(float yaw)

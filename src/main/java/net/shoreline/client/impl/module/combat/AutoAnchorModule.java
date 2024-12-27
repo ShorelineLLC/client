@@ -70,7 +70,7 @@ public class AutoAnchorModule extends BlockPlacerModule
 
     public AutoAnchorModule()
     {
-        super("AutoAnchor", "Automatically places and explodes respawn anchors", ModuleCategory.COMBAT);
+        super("AutoAnchor", "Automatically places and explodes respawn anchors", ModuleCategory.COMBAT, 740);
         INSTANCE = this;
     }
 
