@@ -5,7 +5,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.minecraft.util.Hand;
@@ -428,19 +430,16 @@ public class AutoMineModule extends CombatModule
                 data.resetDamage();
             }
         }
-
-        if (doubleBreakConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
-                && packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK
-                && miningQueue.stream().anyMatch(d -> d.getPos() == packet.getPos()))
-        {
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos(), packet.getDirection()));
-        }
     }
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
         {
             handleBlockUpdatePacket(packet);
@@ -792,7 +791,8 @@ public class AutoMineModule extends CombatModule
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             if (grimNewConfig.getValue())
             {
-                startPacketMineGrimNew(data);
+                startPacketMine(data);
+                startPacketMine(data);
             }
             else
             {
@@ -805,7 +805,8 @@ public class AutoMineModule extends CombatModule
         {
             if (grimNewConfig.getValue())
             {
-                startPacketMineGrimNew(data);
+                startPacketMine(data);
+                startPacketMine(data);
             }
             else
             {
@@ -825,23 +826,6 @@ public class AutoMineModule extends CombatModule
                 PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
         Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-    }
-
-    private void startPacketMineGrimNew(MiningData data)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-        }
     }
 
     private void abortMining(MiningData data)
