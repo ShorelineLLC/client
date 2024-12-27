@@ -135,11 +135,11 @@ public class SprintModule extends RotationModule
     {
         if (modeConfig.getValue() == SprintMode.RAGE_STRICT)
         {
-            return MathHelper.angleBetween(sprintYaw, Managers.ROTATION.getServerYaw()) != 0.0f;
+            return MathHelper.angleBetween(sprintYaw, Managers.ROTATION.getServerYaw()) > 0.0f;
         }
         else if (modeConfig.getValue() == SprintMode.GRIM)
         {
-            return MathHelper.angleBetween(mc.player.getYaw(), Managers.ROTATION.getServerYaw()) != 0.0f;
+            return MathHelper.angleBetween(mc.player.getYaw(), Managers.ROTATION.getServerYaw()) > 0.0f;
         }
         return false;
     }
