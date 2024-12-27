@@ -345,6 +345,10 @@ public class ShadersModule extends ToggleModule
         ignoreEntityRender = true;
         for (Entity entity : mc.world.getEntities())
         {
+            if (NoRenderModule.getInstance().isEnabled() && NoRenderModule.getInstance().shouldSkipEntity(entity))
+            {
+                continue;
+            }
             if (checkShaders(entity))
             {
                 if (mc.player.squaredDistanceTo(entity) > ((NumberConfig) rangeConfig).getValueSq())

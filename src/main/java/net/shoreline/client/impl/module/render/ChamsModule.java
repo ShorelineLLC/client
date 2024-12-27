@@ -123,17 +123,23 @@ public class ChamsModule extends ToggleModule
             return;
         }
 
+        if (ShadersModule.getInstance().isEnabled() && !ShadersModule.getInstance().textureConfig.getValue())
+        {
+            return;
+        }
+
         // Entity chams
         RenderBuffers.preRender();
         if (!wallsConfig.getValue())
         {
             RenderSystem.enableDepthTest();
         }
+
         for (Entity entity : mc.world.getEntities())
         {
-            if (ShadersModule.getInstance().isEnabled() && !ShadersModule.getInstance().textureConfig.getValue())
+            if (NoRenderModule.getInstance().isEnabled() && NoRenderModule.getInstance().shouldSkipEntity(entity))
             {
-                return;
+                continue;
             }
             double x = Math.abs(mc.gameRenderer.getCamera().getPos().x - entity.getX());
             double z = Math.abs(mc.gameRenderer.getCamera().getPos().z - entity.getZ());

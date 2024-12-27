@@ -3,8 +3,11 @@ package net.shoreline.client.mixin.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.math.RotationAxis;
 import net.shoreline.client.impl.event.PerspectiveEvent;
+import net.shoreline.client.impl.event.render.RenderEntityInWorldEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldBorderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
@@ -77,6 +80,18 @@ public class MixinWorldRenderer implements Globals
             return true;
         }
         return instance.isThirdPerson();
+    }
+
+    @Inject(method = "renderEntity", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ,
+                                  float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci)
+    {
+        RenderEntityInWorldEvent renderEntityInWorldEvent = new RenderEntityInWorldEvent(entity);
+        EventBus.INSTANCE.dispatch(renderEntityInWorldEvent);
+        if (renderEntityInWorldEvent.isCanceled())
+        {
+            ci.cancel();
+        }
     }
 
 //    /**

@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.Config;
@@ -13,6 +12,7 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,21 +20,16 @@ import java.util.List;
  * @author linus
  * @since 1.0
  */
-public class EntityListConfig<T extends List<EntityType<?>>> extends Config<T>
+public class EntityListConfig<T extends List<EntityType>> extends Config<T>
 {
 
     @SuppressWarnings("unchecked")
-    public EntityListConfig(String name, String desc, EntityType<?>... values)
+    public EntityListConfig(String name, String desc, EntityType... values)
     {
-        super(name, desc, (T) List.of(values));
+        super(name, desc, (T) new ArrayList<>(Arrays.asList(values)));
     }
 
-    public EntityListConfig(String name, String desc, T values)
-    {
-        super(name, desc, values);
-    }
-
-    public void add(EntityType<?> entityType)
+    public void add(EntityType entityType)
     {
         ConfigUpdateEvent configUpdateEvent = new ConfigUpdateEvent(this);
         configUpdateEvent.setStage(StageEvent.EventStage.PRE);
@@ -70,7 +65,7 @@ public class EntityListConfig<T extends List<EntityType<?>>> extends Config<T>
      */
     public boolean contains(Object obj)
     {
-        if (obj instanceof EntityType<?>)
+        if (obj instanceof EntityType)
         {
             return value.contains(obj);
         }
@@ -87,7 +82,7 @@ public class EntityListConfig<T extends List<EntityType<?>>> extends Config<T>
     {
         JsonObject jsonObj = super.toJson();
         JsonArray array = new JsonArray();
-        for (EntityType<?> entityType : getValue())
+        for (EntityType entityType : getValue())
         {
             Identifier id = Registries.ENTITY_TYPE.getId(entityType);
             array.add(id.toString());
@@ -110,11 +105,11 @@ public class EntityListConfig<T extends List<EntityType<?>>> extends Config<T>
         if (jsonObj.has("value"))
         {
             JsonElement element = jsonObj.get("value");
-            List<EntityType<?>> temp = new ArrayList<>();
+            List<EntityType> temp = new ArrayList<>();
             for (JsonElement je : element.getAsJsonArray())
             {
                 String val = je.getAsString();
-                EntityType<?> entityType = Registries.ENTITY_TYPE.get(Identifier.of(val));
+                EntityType entityType = Registries.ENTITY_TYPE.get(Identifier.of(val));
                 temp.add(entityType);
             }
             return (T) temp;

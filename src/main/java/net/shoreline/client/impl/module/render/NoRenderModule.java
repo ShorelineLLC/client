@@ -2,12 +2,14 @@ package net.shoreline.client.impl.module.render;
 
 import com.google.common.collect.Lists;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.FluidTags;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.EntityListConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
@@ -27,12 +29,16 @@ import net.shoreline.client.mixin.accessor.AccessorFireworkRocketEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
+import java.util.List;
+
 /**
  * @author linus
  * @since 1.0
  */
 public class NoRenderModule extends ToggleModule
 {
+    private static NoRenderModule INSTANCE;
+
     Config<Boolean> hurtCamConfig = register(new BooleanConfig("NoHurtCam", "Prevents the hurt camera shake effect from rendering", true));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Prevents armor pieces from rendering", false));
     Config<Boolean> fireOverlayConfig = register(new BooleanConfig("Overlay-Fire", "Prevents the fire Hud overlay from rendering", true));
@@ -48,6 +54,8 @@ public class NoRenderModule extends ToggleModule
     Config<Boolean> skylightConfig = register(new BooleanConfig("Skylight", "Prevents skylight from rendering", true));
     Config<Boolean> witherSkullsConfig = register(new BooleanConfig("WitherSkulls", "Prevents flying wither skulls from rendering", false));
     Config<Boolean> itemFramesConfig = register(new BooleanConfig("ItemFrames", "Prevents items on item frames from rendering", false));
+    Config<Boolean> entitiesConfig = register(new BooleanConfig("Entities", "Prevents entities from rendering", false));
+    Config<List<EntityType>> entitiesListConfig = register(new EntityListConfig<>("EntityList", "The render entity list"));
     Config<Boolean> tileEntitiesConfig = register(new BooleanConfig("TileEntities", "Prevents special tile entity properties from rendering (i.e. enchantment table books or cutting table saws)", false));
     Config<Boolean> signTextConfig = register(new BooleanConfig("SignText", "Prevents the text on signs from rendering", false));
     Config<Boolean> fireEntityConfig = register(new BooleanConfig("FireEntities", "Prevents fire from rendering on entities", false));
@@ -61,6 +69,12 @@ public class NoRenderModule extends ToggleModule
     public NoRenderModule()
     {
         super("NoRender", "Prevents certain game elements from rendering", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static NoRenderModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @EventListener
@@ -223,6 +237,15 @@ public class NoRenderModule extends ToggleModule
     }
 
     @EventListener
+    public void onRenderEntityInWorld(RenderEntityInWorldEvent event)
+    {
+        if (shouldSkipEntity(event.getEntity()))
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
     public void onRenderSignText(RenderSignTextEvent event)
     {
         if (signTextConfig.getValue())
@@ -320,6 +343,11 @@ public class NoRenderModule extends ToggleModule
         {
             event.cancel();
         }
+    }
+
+    public boolean shouldSkipEntity(Entity entity)
+    {
+        return entitiesConfig.getValue() && entitiesListConfig.getValue().contains(entity.getType());
     }
 
     public enum FogRender

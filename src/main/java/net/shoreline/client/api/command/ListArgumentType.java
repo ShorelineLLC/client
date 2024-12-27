@@ -29,7 +29,7 @@ public class ListArgumentType implements ArgumentType<Object>
         return new ListArgumentType();
     }
 
-    public static Object getItem(final CommandContext<?> context, final String name)
+    public static Object getListItem(final CommandContext<?> context, final String name)
     {
         return context.getArgument(name, Object.class);
     }
@@ -49,7 +49,7 @@ public class ListArgumentType implements ArgumentType<Object>
             return block;
         }
         EntityType<?> entityType = Registries.ENTITY_TYPE.get(Identifier.of("minecraft", string));
-        if (entityType != null)
+        if (string.equalsIgnoreCase("pig") || entityType != EntityType.PIG)
         {
             return entityType;
         }

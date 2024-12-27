@@ -12,6 +12,7 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class BlockListConfig<T extends List<Block>> extends Config<T>
     @SuppressWarnings("unchecked")
     public BlockListConfig(String name, String desc, Block... values)
     {
-        super(name, desc, (T) List.of(values));
+        super(name, desc, (T) new ArrayList<>(Arrays.asList(values)));
     }
 
     public void add(Block block)

@@ -4,15 +4,13 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.ConfigArgumentType;
 import net.shoreline.client.api.command.ListArgumentType;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BlockListConfig;
-import net.shoreline.client.api.config.setting.ColorConfig;
-import net.shoreline.client.api.config.setting.ItemListConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
+import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ToggleModule;
@@ -47,6 +45,19 @@ public class ModuleCommand extends Command
     {
         builder.then(argument("setting", ConfigArgumentType.config(module))
                 .then(argument("value", StringArgumentType.string())
+                        .suggests((c, b) ->
+                        {
+                            Config<?> config = ConfigArgumentType.getConfig(c, "setting");
+                            if (config instanceof BlockListConfig || config instanceof ItemListConfig || config instanceof EntityListConfig)
+                            {
+                                b.suggest("add");
+                                b.suggest("del");
+                                b.suggest("remove");
+                                b.suggest("clear");
+                                b.suggest("list");
+                            }
+                            return b.buildFuture();
+                        })
                         .executes(c ->
                         {
                             Config<?> config = ConfigArgumentType.getConfig(c, "setting");
@@ -71,6 +82,10 @@ public class ModuleCommand extends Command
                                 {
                                     ((BlockListConfig) config).clear();
                                 }
+                                else if (config instanceof EntityListConfig<?>)
+                                {
+                                    ((EntityListConfig) config).clear();
+                                }
                                 ChatUtil.clientSendMessage("§7%s§f was cleared", config.getName());
                                 return 1;
                             }
@@ -80,9 +95,13 @@ public class ModuleCommand extends Command
                                 .executes(c ->
                                 {
                                     Config<?> config = ConfigArgumentType.getConfig(c, "setting");
-                                    String action = StringArgumentType.getString(c, "value");
-                                    Object value = ListArgumentType.getItem(c, "list");
-                                    return addDeleteItem(config, action, value);
+                                    if (config instanceof BlockListConfig || config instanceof ItemListConfig || config instanceof EntityListConfig)
+                                    {
+                                        String action = StringArgumentType.getString(c, "value");
+                                        Object value = ListArgumentType.getListItem(c, "list");
+                                        return addDeleteItem(config, action, value);
+                                    }
+                                    return 0;
                                 })))
                 .executes(c ->
                 {
@@ -141,6 +160,24 @@ public class ModuleCommand extends Command
                 ChatUtil.clientSendMessage("Removed §c" + block.getName().getString() + "§f from §7" + config.getName());
             }
         }
+        else if (config instanceof EntityListConfig)
+        {
+            if (!(value instanceof EntityType entity))
+            {
+                ChatUtil.error("Not an entity type!");
+                return 0;
+            }
+            if (action.equalsIgnoreCase("add"))
+            {
+                ((EntityListConfig) config).add(entity);
+                ChatUtil.clientSendMessage("Added §s" + entity.getName().getString() + "§f to §7" + config.getName());
+            }
+            else if (action.equalsIgnoreCase("del") || action.equalsIgnoreCase("remove"))
+            {
+                ((EntityListConfig) config).remove(entity);
+                ChatUtil.clientSendMessage("Removed §c" + entity.getName().getString() + "§f from §7" + config.getName());
+            }
+        }
         return 1;
     }
 
@@ -182,6 +219,25 @@ public class ModuleCommand extends Command
                 ChatUtil.clientSendMessage("§7" + config.getName() + "§f: " + String.join(", ", listString));
             }
         }
+        else if (config instanceof EntityListConfig)
+        {
+            List<EntityType> list = ((List<EntityType>) config.getValue());
+            if (action.equalsIgnoreCase("list"))
+            {
+                if (list.isEmpty())
+                {
+                    ChatUtil.error("There are no entities in the list!");
+                    return 1;
+                }
+                List<String> listString = new ArrayList<>();
+                for (EntityType entityType : list)
+                {
+                    listString.add(entityType.getName().getString());
+                }
+                ChatUtil.clientSendMessage("§7" + config.getName() + "§f: " + String.join(", ", listString));
+            }
+        }
+
         return 1;
     }
 

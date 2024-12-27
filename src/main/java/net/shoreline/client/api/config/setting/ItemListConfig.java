@@ -12,6 +12,7 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class ItemListConfig<T extends List<Item>> extends Config<T>
     @SuppressWarnings("unchecked")
     public ItemListConfig(String name, String desc, Item... values)
     {
-        super(name, desc, (T) List.of(values));
+        super(name, desc, (T) new ArrayList<>(Arrays.asList(values)));
     }
 
     @SuppressWarnings("unchecked")
