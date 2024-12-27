@@ -61,6 +61,7 @@ public class AuraModule extends RotationModule
 {
     private static AuraModule INSTANCE;
 
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows attacking while using items", true));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swings the hand after attacking", true));
     Config<TargetMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for targeting entities to attack", TargetMode.SWITCH, TargetMode.values()));
     Config<Priority> priorityConfig = register(new EnumConfig<>("Priority", "The value to prioritize when searching for targets", Priority.HEALTH, Priority.values()));
@@ -90,7 +91,7 @@ public class AuraModule extends RotationModule
     // Config<Boolean> autoBlockConfig = register(new BooleanConfig("AutoBlock", "Automatically blocks after attack", false);
     Config<Boolean> stopSprintConfig = register(new BooleanConfig("StopSprint", "Stops sprinting before attacking to maintain vanilla behavior", false));
     Config<Boolean> stopShieldConfig = register(new BooleanConfig("StopShield", "Automatically handles shielding before attacking", false));
-    Config<Boolean> maceBreachConfig = register(new BooleanConfig("MaceBreach", "Abuses vanilla exploit to apply breach enchantment to swords", false));
+    Config<Boolean> maceBreachConfig = register(new BooleanConfig("MaceBreach", "Abuses vanilla exploit to apply breach enchantment to swords", false, () -> autoSwapConfig.getValue() != Swap.SILENT));
 
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Target players", true));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Target monsters", false));
@@ -165,6 +166,12 @@ public class AuraModule extends RotationModule
         {
             return;
         }
+
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        {
+            return;
+        }
+
         final Vec3d eyepos = Managers.POSITION.getEyePos();
         entityTarget = switch (modeConfig.getValue())
         {
@@ -265,6 +272,7 @@ public class AuraModule extends RotationModule
         }
         if (isRotationBlocked() || !rotated && rotateConfig.getValue() || !isInAttackRange(eyepos, entityTarget))
         {
+            Managers.INVENTORY.syncToClient();
             return;
         }
         if (attackDelayConfig.getValue())
@@ -291,7 +299,7 @@ public class AuraModule extends RotationModule
             double attackCooldownTicks = 1.0 / attackSpeed.getValue() * 20.0;
 
             int breachSlot = getBreachMaceSlot();
-            if (maceBreachConfig.getValue() && breachSlot != -1)
+            if (autoSwapConfig.getValue() != Swap.SILENT && maceBreachConfig.getValue() && breachSlot != -1)
             {
                 Managers.INVENTORY.setSlot(breachSlot);
             }
@@ -303,7 +311,7 @@ public class AuraModule extends RotationModule
                 lastAttackTime = System.currentTimeMillis();
             }
 
-            if (maceBreachConfig.getValue() && breachSlot != -1)
+            if (autoSwapConfig.getValue() != Swap.SILENT && maceBreachConfig.getValue() && breachSlot != -1)
             {
                 Managers.INVENTORY.syncToClient();
             }
@@ -317,7 +325,7 @@ public class AuraModule extends RotationModule
             float delay = (attackSpeedConfig.getValue() * 50.0f) + randomDelay;
 
             int breachSlot = getBreachMaceSlot();
-            if (maceBreachConfig.getValue() && breachSlot != -1)
+            if (autoSwapConfig.getValue() != Swap.SILENT && maceBreachConfig.getValue() && breachSlot != -1)
             {
                 Managers.INVENTORY.setSlot(breachSlot);
             }
@@ -329,7 +337,7 @@ public class AuraModule extends RotationModule
                 lastAttackTime = System.currentTimeMillis();
             }
 
-            if (maceBreachConfig.getValue() && breachSlot != -1)
+            if (autoSwapConfig.getValue() != Swap.SILENT && maceBreachConfig.getValue() && breachSlot != -1)
             {
                 Managers.INVENTORY.syncToClient();
             }
