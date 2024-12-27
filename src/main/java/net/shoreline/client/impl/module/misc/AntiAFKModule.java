@@ -42,7 +42,7 @@ public class AntiAFKModule extends RotationModule
         super("AntiAFK", "Prevents the player from being kicked for AFK", ModuleCategory.MISCELLANEOUS);
     }
 
-    @EventListener
+    @Override
     public void onEnable()
     {
         afkTimer.reset();
