@@ -70,11 +70,6 @@ public class BreakHighlightModule extends ToggleModule
         RenderBuffers.preRender();
         for (Map.Entry<BlockBreakingProgressS2CPacket, Long> mine : breakingProgress.entrySet())
         {
-            Entity entity = mc.world.getEntityById(mine.getKey().getEntityId());
-            if (entity != null && Managers.SOCIAL.isFriend(entity.getName()))
-            {
-                continue;
-            }
             BlockPos mining = mine.getKey().getPos();
             long elapsedTime = System.currentTimeMillis() - mine.getValue();
             long count = breakingProgress.keySet().stream().filter(p -> p.getEntityId() == mine.getKey().getEntityId()).count();
