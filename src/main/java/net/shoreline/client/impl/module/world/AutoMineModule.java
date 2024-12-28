@@ -84,7 +84,6 @@ public class AutoMineModule extends CombatModule
 
     private final Map<MiningData, Animation> fadeList = new HashMap<>();
     private FirstOutQueue<MiningData> miningQueue = new FirstOutQueue<>(2);
-    private final List<BlockPos> packetMines = new ArrayList<>();
     private long lastBreak;
     private boolean manualOverride;
     private final Timer stopMiningTimer = new CacheTimer();
@@ -785,40 +784,13 @@ public class AutoMineModule extends CombatModule
             return false;
         }
 
-        if (doubleBreakConfig.getValue())
-        {
-            // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
-            // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
-            if (grimNewConfig.getValue())
-            {
-                startPacketMine(data);
-                startPacketMine(data);
-            }
-            else
-            {
-                startPacketMine(data);
-            }
-
-            packetMines.add(data.getPos());
-        }
-        else
-        {
-            if (grimNewConfig.getValue())
-            {
-                startPacketMine(data);
-                startPacketMine(data);
-            }
-            else
-            {
-                startPacketMine(data);
-            }
-        }
-
+        // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
+        // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
         data.setStarted();
-        return true;
+        return grimNewConfig.getValue() ? startPacketMineAlt(data) : startPacketMine(data);
     }
 
-    private void startPacketMine(MiningData data)
+    private boolean startPacketMine(MiningData data)
     {
         Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
@@ -826,6 +798,24 @@ public class AutoMineModule extends CombatModule
                 PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
         Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        return true;
+    }
+
+    private boolean startPacketMineAlt(MiningData data)
+    {
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+        return true;
     }
 
     private void abortMining(MiningData data)
