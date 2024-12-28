@@ -112,7 +112,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> placeRangeCenterConfig = register(new BooleanConfig("PlaceRangeCenter", "Calculates place ranges to the center of the block", true, () -> placeConfig.getValue()));
     Config<Swap> autoSwapConfig = register(new EnumConfig<>("Swap", "Swaps to an end crystal before placing if the player is not holding one", Swap.OFF, Swap.values(), () -> placeConfig.getValue()));
     // Config<Float> alternateSpeedConfig = register(new NumberConfig<>("AlternateSpeed", "Speed for alternative swapping crystals", 1.0f, 18.0f, 20.0f, () -> placeConfig.getValue() && autoSwapConfig.getValue() == Swap.SILENT_ALT));
-    Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
+    // Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
     Config<Boolean> breakValidConfig = register(new BooleanConfig("Strict", "Only places crystals that can be attacked", false, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Boolean> exposedDirectionConfig = register(new BooleanConfig("StrictDirection-Exposed", "Interacts with only exposed directions when placing crystals", false, () -> placeConfig.getValue()));
@@ -639,9 +639,9 @@ public class AutoCrystalModule extends RotationModule
         {
             lastSwapTimer.reset();
         }
-        else if (event.getPacket() instanceof PlayerActionC2SPacket packet && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
-                && antiSurroundConfig.getValue() && canUseCrystalOnBlock(packet.getPos()))
-        {
+//        else if (event.getPacket() instanceof PlayerActionC2SPacket packet && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
+//                && antiSurroundConfig.getValue() && canUseCrystalOnBlock(packet.getPos()))
+//        {
 //            Vec3d crystalPos = crystalDamageVec(packet.getPos());
 //            for (Entity entity : mc.world.getEntities()) {
 //                if (entity == null || !entity.isAlive() || entity == mc.player
@@ -664,7 +664,7 @@ public class AutoCrystalModule extends RotationModule
 //                    break;
 //                }
 //            }
-        }
+//        }
     }
 
     public boolean isAttacking()

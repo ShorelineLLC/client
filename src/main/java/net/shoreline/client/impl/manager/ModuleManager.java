@@ -102,7 +102,7 @@ public final class ModuleManager
                 new AutoMountModule(),
                 new AutoReconnectModule(),
                 new AutoRespawnModule(),
-                new BeaconSelectorModule(),
+                // new BeaconSelectorModule(),
                 new BetterChatModule(),
                 new BetterInvModule(),
                 new ChatNotifierModule(),
