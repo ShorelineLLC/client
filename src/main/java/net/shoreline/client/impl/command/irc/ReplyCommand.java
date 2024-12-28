@@ -9,7 +9,7 @@ import net.shoreline.client.impl.irc.packet.client.CPacketDirectMessage;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.chat.ChatUtil;
 
-public class ReplyCommand extends Command
+public final class ReplyCommand extends Command
 {
     public ReplyCommand()
     {
@@ -19,21 +19,33 @@ public class ReplyCommand extends Command
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
-        builder.then(argument("message", StringArgumentType.greedyString()).executes(c ->
-        {
-            OnlineUser user = IRCManager.getInstance().getLastMessageReceivedUser();
-            String message = c.getArgument("message", String.class);
+        builder.then(argument("message", StringArgumentType.greedyString())
+                .executes(c ->
+                {
+                    OnlineUser user = IRCManager.getInstance().getLastMessageReceivedUser();
+                    String message = c.getArgument("message", String.class);
 
-            if (user == null)
-            {
-                ChatUtil.error("You have not received any messages.");
-                return 0;
-            }
+                    if (user == null)
+                    {
+                        ChatUtil.error("You have not received any messages.");
+                        return 0;
+                    }
 
-            CPacketDirectMessage packet = new CPacketDirectMessage(user, message);
-            IRCManager.getInstance().sendPacket(packet);
-            return 1;
-        }
-        ));
+                    if (!IRCManager.getInstance().getAllOnlineUsers().contains(user))
+                    {
+                        ChatUtil.error(user.getName() + " is no longer online!");
+                        return 0;
+                    }
+
+                    CPacketDirectMessage packet = new CPacketDirectMessage(user, message);
+                    IRCManager.getInstance().sendPacket(packet);
+                    return 1;
+                })
+                .executes(context ->
+                {
+                    ChatUtil.error("Invalid usage! Usage: " + getUsage());
+                    return 1;
+                })
+        );
     }
 }

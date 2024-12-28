@@ -9,7 +9,7 @@ import net.shoreline.client.impl.irc.packet.client.CPacketDirectMessage;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.util.chat.ChatUtil;
 
-public class LastCommand extends Command
+public final class LastCommand extends Command
 {
     public LastCommand()
     {
@@ -19,7 +19,8 @@ public class LastCommand extends Command
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
     {
-        builder.then(argument("message", StringArgumentType.greedyString()).executes(c ->
+        builder.then(argument("message", StringArgumentType.greedyString())
+                .executes(c ->
                 {
                     OnlineUser user = IRCManager.getInstance().getLastMessagedUser();
                     String message = c.getArgument("message", String.class);
@@ -30,10 +31,21 @@ public class LastCommand extends Command
                         return 0;
                     }
 
+                    if (!IRCManager.getInstance().getAllOnlineUsers().contains(user))
+                    {
+                        ChatUtil.error(user.getName() + " is no longer online!");
+                        return 0;
+                    }
+
                     CPacketDirectMessage packet = new CPacketDirectMessage(user, message);
                     IRCManager.getInstance().sendPacket(packet);
                     return 1;
-                }
-        ));
+                })
+                .executes(context ->
+                {
+                    ChatUtil.error("Invalid usage! Usage: " + getUsage());
+                    return 1;
+                })
+        );
     }
 }
