@@ -1,11 +1,16 @@
 package net.shoreline.client.impl.module.render;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -16,6 +21,7 @@ import net.shoreline.client.api.waypoint.Waypoint;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
@@ -25,7 +31,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.text.DecimalFormat;
-import java.util.Set;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author linus
@@ -40,7 +47,9 @@ public class WaypointsModule extends ToggleModule
     Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Shows the coordinates of the waypoint", true));
     Config<Boolean> distanceConfig = register(new BooleanConfig("Distance", "Shows the distance to the waypoint", true));
     DecimalFormat format = new DecimalFormat("0.0");
-    private final Set<EntryPos> entries = Sets.newConcurrentHashSet();
+
+    private final Map<UUID, PlayerEntity> loginPlayers = Maps.newConcurrentMap();
+    private final Map<UUID, PlayerEntity> logoutPlayers = Maps.newConcurrentMap();
 
     public WaypointsModule()
     {
@@ -57,7 +66,8 @@ public class WaypointsModule extends ToggleModule
     public void onDisable()
     {
         Managers.WAYPOINT.clear();
-        entries.clear();
+        loginPlayers.clear();
+        logoutPlayers.clear();
     }
 
     @EventListener
@@ -73,36 +83,81 @@ public class WaypointsModule extends ToggleModule
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (!logoutsConfig.getValue() || mc.getNetworkHandler() == null
-                || event.getStage() != StageEvent.EventStage.POST)
+        if (mc.player == null || !logoutsConfig.getValue())
         {
             return;
         }
-        for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList())
+
+        if (event.getPacket() instanceof BundleS2CPacket packet)
         {
-            if (entries.stream().noneMatch(e -> e.entry.getProfile().getName().equals(entry.getProfile().getName())))
+            for (Packet<?> packet1 : packet.getPackets())
             {
-                PlayerEntity player = mc.world.getPlayerByUuid(entry.getProfile().getId());
-                if (player == null)
-                {
-                    continue;
-                }
-                entries.add(new EntryPos(entry, player));
-                Managers.WAYPOINT.removeContains(entry.getProfile().getName());
+                handlePlayerListPackets(packet1);
             }
         }
-        for (EntryPos pos : entries)
+
+        else
         {
-            PlayerListEntry entry = pos.entry();
-            if (mc.getNetworkHandler().getPlayerList().stream().noneMatch(e -> e.getProfile().getName().equals(entry.getProfile().getName())))
+            handlePlayerListPackets(event.getPacket());
+        }
+    }
+
+    public void handlePlayerListPackets(Packet<?> packet1)
+    {
+        if (packet1 instanceof PlayerListS2CPacket packet
+                && packet.getActions().contains(PlayerListS2CPacket.Action.ADD_PLAYER))
+        {
+            for (PlayerListS2CPacket.Entry player : packet.getPlayerAdditionEntries())
             {
-                entries.removeIf(e -> e.entry.getProfile().getName().equals(entry.getProfile().getName()));
-                PlayerEntity player = pos.player();
-                String serverIp = mc.isInSingleplayer() ? "Singleplayer" : Managers.NETWORK.getServerIp();
-                Managers.WAYPOINT.register(new Waypoint(player.getGameProfile().getName() + "'s Logout", serverIp, DimensionUtil.getDimension(), player.getX(), player.getY(), player.getZ()));
+                for (UUID uuid : logoutPlayers.keySet())
+                {
+                    if (!uuid.equals(player.profile().getId()))
+                    {
+                        continue;
+                    }
+                    logoutPlayers.remove(uuid);
+                }
             }
+            loginPlayers.clear();
+        }
+
+        else if (packet1 instanceof PlayerRemoveS2CPacket packet)
+        {
+            for (UUID uuid2 : packet.profileIds())
+            {
+                for (UUID uuid : loginPlayers.keySet())
+                {
+                    if (!uuid.equals(uuid2))
+                    {
+                        continue;
+                    }
+                    final PlayerEntity player = loginPlayers.get(uuid);
+                    if (!logoutPlayers.containsKey(uuid))
+                    {
+                        logoutPlayers.put(uuid, player);
+                    }
+                }
+            }
+            loginPlayers.clear();
+        }
+    }
+
+    @EventListener
+    public void onTick(TickEvent event)
+    {
+        if (event.getStage() != StageEvent.EventStage.POST)
+        {
+            return;
+        }
+        for (PlayerEntity player : mc.world.getPlayers())
+        {
+            if (player == null || player.equals(mc.player))
+            {
+                continue;
+            }
+            loginPlayers.put(player.getGameProfile().getId(), player);
         }
     }
 
@@ -132,18 +187,39 @@ public class WaypointsModule extends ToggleModule
             {
                 continue;
             }
-            Box waypointBox = EntityDimensions.fixed(0.6f, 2.2f).getBoxAt(waypoint.getPos());
-            double center = (waypointBox.maxX - waypointBox.minX) / 2.0f;
-            RenderManager.renderBoundingBox(event.getMatrices(), waypointBox, 1.5f, ColorsModule.getInstance().getRGB(255));
-            int dist = (int) Math.sqrt(mc.player.squaredDistanceTo(waypoint.getX(), waypoint.getY(), waypoint.getZ()));
-            String waypointTag = "§7" + waypoint.getName() + (coordsConfig.getValue() ? String.format(" XYZ %s %s %s", format.format(waypoint.getX()), format.format(waypoint.getY()), format.format(waypoint.getZ())) : "") + (distanceConfig.getValue() ? String.format(" %sm", dist) : "");
-            RenderManager.renderSign(waypointTag, waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
+            renderWaypointBox(event.getMatrices(), waypoint.getPos(), waypoint.getName());
         }
+
+        if (logoutsConfig.getValue())
+        {
+            for (UUID uuid : logoutPlayers.keySet())
+            {
+                final PlayerEntity data = logoutPlayers.get(uuid);
+                if (data == null)
+                {
+                    continue;
+                }
+                renderWaypointBox(event.getMatrices(), data.getPos(),
+                        data.getName().getString() + "'s Logout", data.isCrawling());
+            }
+        }
+
         RenderBuffers.postRender();
     }
 
-    private record EntryPos(PlayerListEntry entry, PlayerEntity player)
+    private void renderWaypointBox(MatrixStack matrixStack, Vec3d pos, String tag)
     {
+        renderWaypointBox(matrixStack, pos, tag, false);
+    }
 
+    private void renderWaypointBox(MatrixStack matrixStack, Vec3d pos, String tag, boolean crawlHitbox)
+    {
+        Box waypointBox = crawlHitbox ? EntityDimensions.changing(0.6f, 0.6f).withEyeHeight(0.4f).getBoxAt(pos) : EntityDimensions.fixed(0.6f, 2.2f).getBoxAt(pos);
+        double center = (waypointBox.maxX - waypointBox.minX) / 2.0f;
+        RenderManager.renderBoundingBox(matrixStack, waypointBox, 1.5f, ColorsModule.getInstance().getRGB(255));
+        int dist = (int) Math.sqrt(mc.player.squaredDistanceTo(pos));
+        String waypointTag = "§7" + tag + (coordsConfig.getValue() ? String.format(" XYZ %s %s %s", format.format(pos.getX()), format.format(pos.getY()), format.format(pos.getZ())) : "")
+                + (distanceConfig.getValue() ? String.format(" %sm", dist) : "");
+        RenderManager.renderSign(waypointTag, waypointBox.minX + center, waypointBox.maxY + 0.4, waypointBox.minZ + center, -1);
     }
 }
