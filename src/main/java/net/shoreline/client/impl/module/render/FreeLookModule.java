@@ -48,7 +48,7 @@ public class FreeLookModule extends ToggleModule
     @EventListener
     public void onPerspectiveUpdate(PerspectiveUpdateEvent event)
     {
-        if (event.getPerspective() != Perspective.FIRST_PERSON)
+        if (mc.options.getPerspective() != event.getPerspective() && event.getPerspective() != Perspective.FIRST_PERSON)
         {
             cameraYaw = mc.player.getYaw();
             cameraPitch = mc.player.getPitch();
