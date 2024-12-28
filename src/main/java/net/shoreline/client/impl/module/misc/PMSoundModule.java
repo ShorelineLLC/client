@@ -11,12 +11,19 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class PMSoundModule extends ToggleModule
 {
+    private static PMSoundModule INSTANCE;
     Config<PMSounds> soundsConfig = register(new EnumConfig<>("Sounds",
             "The sound to play for PM", PMSounds.TWITTER, PMSounds.values()));
 
     public PMSoundModule()
     {
         super("PMSound", "Plays a sound for private messages", ModuleCategory.MISCELLANEOUS);
+        INSTANCE = this;
+    }
+
+    public static PMSoundModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @EventListener
@@ -37,7 +44,12 @@ public class PMSoundModule extends ToggleModule
         }
     }
 
-    private enum PMSounds
+    public PMSounds getPMSound()
+    {
+        return soundsConfig.getValue();
+    }
+
+    public enum PMSounds
     {
         TWITTER,
         IOS,

@@ -6,8 +6,11 @@ import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.irc.IRCManager;
 import net.shoreline.client.impl.irc.packet.ServerPacket;
 import net.shoreline.client.impl.irc.user.OnlineUser;
+import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.CapesModule;
 import net.shoreline.client.impl.module.client.ChatModule;
+import net.shoreline.client.impl.module.misc.PMSoundModule;
+import net.shoreline.client.init.Managers;
 
 public final class SPacketDirectMessage extends ServerPacket
 {
@@ -60,8 +63,19 @@ public final class SPacketDirectMessage extends ServerPacket
 
         String message = Formatting.ITALIC + "§7From " + this.sender.getUsertype().getColorCode()
                 + this.sender.getName() + Formatting.ITALIC + "§7: " + this.message;
-
         ircManager.addToChat(message);
+
         ircManager.setLastMessageReceivedUser(sender);
+
+        if (PMSoundModule.getInstance().isEnabled())
+        {
+            Managers.SOUND.playSound(switch (PMSoundModule.getInstance().getPMSound())
+            {
+                case TWITTER -> SoundManager.TWITTER;
+                case IOS -> SoundManager.IOS;
+                case DISCORD -> SoundManager.DISCORD;
+                case STEAM -> SoundManager.STEAM;
+            });
+        }
     }
 }
