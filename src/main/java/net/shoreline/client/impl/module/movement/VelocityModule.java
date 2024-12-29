@@ -92,6 +92,10 @@ public class VelocityModule extends ToggleModule
     @Override
     public void onDisable()
     {
+        if (wallsOnlyConfig.getValue() && !isPhased())
+        {
+            return;
+        }
         if (cancelVelocity)
         {
             if (modeConfig.getValue() == VelocityMode.GRIM)
@@ -338,6 +342,11 @@ public class VelocityModule extends ToggleModule
                         mc.player.getY(), mc.player.getZ(), yaw, pitch, mc.player.isOnGround()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
                         mc.player.isCrawling() ? mc.player.getBlockPos() : mc.player.getBlockPos().up(), Direction.DOWN));
+                if (Managers.NETWORK.isCrystalPvpCC())
+                {
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK,
+                            mc.player.isCrawling() ? mc.player.getBlockPos() : mc.player.getBlockPos().up(), Direction.DOWN));
+                }
             }
             cancelVelocity = false;
         }
