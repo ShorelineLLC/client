@@ -9,6 +9,9 @@ import net.minecraft.command.CommandSource;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author linus
  * @since 1.0
@@ -18,7 +21,7 @@ public abstract class Command implements Globals
     //
     private final String name;
     private final String desc;
-    private final LiteralArgumentBuilder<CommandSource> builder;
+    private final List<LiteralArgumentBuilder<CommandSource>> builders = new ArrayList<>();
 
     /**
      * @param name
@@ -29,7 +32,14 @@ public abstract class Command implements Globals
     {
         this.name = name;
         this.desc = desc;
-        this.builder = builder;
+        builders.add(builder);
+    }
+
+    public Command(String name, String desc, List<LiteralArgumentBuilder<CommandSource>> builder)
+    {
+        this.name = name;
+        this.desc = desc;
+        builders.addAll(builder);
     }
 
     public abstract void buildCommand(LiteralArgumentBuilder<CommandSource> builder);
@@ -37,6 +47,16 @@ public abstract class Command implements Globals
     protected static LiteralArgumentBuilder<CommandSource> literal(String name)
     {
         return LiteralArgumentBuilder.literal(name);
+    }
+
+    protected static List<LiteralArgumentBuilder<CommandSource>> literal(String... name)
+    {
+        List<LiteralArgumentBuilder<CommandSource>> builders = Lists.newArrayList();
+        for (String s : name)
+        {
+            builders.add(LiteralArgumentBuilder.literal(s));
+        }
+        return builders;
     }
 
     protected static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type)
@@ -52,9 +72,9 @@ public abstract class Command implements Globals
     /**
      * @return
      */
-    public LiteralArgumentBuilder<CommandSource> getCommandBuilder()
+    public List<LiteralArgumentBuilder<CommandSource>> getCommandBuilders()
     {
-        return builder;
+        return builders;
     }
 
     public String getName()
@@ -75,6 +95,7 @@ public abstract class Command implements Globals
      */
     public String getUsage()
     {
+        LiteralArgumentBuilder<CommandSource> builder = builders.getFirst();
         return Managers.COMMAND.getDispatcher().getAllUsage(builder.build(), Managers.COMMAND.getSource(), false)[0];
     }
 }

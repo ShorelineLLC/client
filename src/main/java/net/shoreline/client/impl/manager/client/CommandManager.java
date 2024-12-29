@@ -112,8 +112,11 @@ public class CommandManager implements Globals
         Shoreline.info("Registered {} commands!", commands.size());
         for (Command command : commands)
         {
-            command.buildCommand(command.getCommandBuilder());
-            dispatcher.register(command.getCommandBuilder());
+            for (LiteralArgumentBuilder<CommandSource> builder : command.getCommandBuilders())
+            {
+                command.buildCommand(builder);
+                dispatcher.register(builder);
+            }
         }
     }
 

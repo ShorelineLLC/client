@@ -13,7 +13,7 @@ public final class LastCommand extends Command
 {
     public LastCommand()
     {
-        super("Last", "Send another message to the last user you messaged.", literal("last"));
+        super("Last", "Send another message to the last user you messaged.", literal("last", "l"));
     }
 
     @Override

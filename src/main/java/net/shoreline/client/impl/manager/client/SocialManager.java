@@ -51,6 +51,11 @@ public class SocialManager implements Globals
         return isRelation(name, SocialRelation.FRIEND);
     }
 
+    public boolean isFriendInternal(String name)
+    {
+        return isRelation(name, SocialRelation.FRIEND);
+    }
+
     public boolean isFriend(Text name)
     {
         if (!SocialsModule.getInstance().isFriendsEnabled())

@@ -13,7 +13,7 @@ public final class ReplyCommand extends Command
 {
     public ReplyCommand()
     {
-        super("Reply", "Reply to the user who last messaged you.", literal("reply"));
+        super("Reply", "Reply to the user who last messaged you.", literal("reply", "r"));
     }
 
     @Override
