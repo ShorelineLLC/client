@@ -30,7 +30,7 @@ public class ChatUtil implements Globals
 
     public static void clientSendMessage(String message, int id)
     {
-        MessageIndicator messageIndicator = new MessageIndicator(ColorsModule.getInstance().getRGB(), null, Text.empty(), "Shoreline");
+        MessageIndicator messageIndicator = new MessageIndicator(ColorsModule.getInstance().getRGB(), MessageIndicator.Icon.CHAT_MODIFIED, Text.empty(), "Shoreline");
         ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(PREFIX + message), messageIndicator, id);
     }
 
@@ -53,7 +53,7 @@ public class ChatUtil implements Globals
 
     public static void clientSendMessageRaw(String message, int id)
     {
-        MessageIndicator messageIndicator = new MessageIndicator(ColorsModule.getInstance().getRGB(), null, Text.empty(), "Shoreline");
+        MessageIndicator messageIndicator = new MessageIndicator(ColorsModule.getInstance().getRGB(), MessageIndicator.Icon.CHAT_MODIFIED, Text.empty(), "Shoreline");
         ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(message), messageIndicator, id);
     }
 

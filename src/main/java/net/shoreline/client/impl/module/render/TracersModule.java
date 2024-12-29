@@ -35,9 +35,9 @@ import java.awt.*;
  */
 public class TracersModule extends ToggleModule
 {
+    Config<RenderMode> modeConfig = register(new EnumConfig<>("Mode", "Render tracers to entities not visible on the screen", RenderMode.NORMAL, RenderMode.values()));
     Config<Target> targetConfig = register(new EnumConfig<>("Target", "The body part of the entity to target", Target.FEET, Target.values()));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.0f, 5.0f));
-    Config<Boolean> offscreenConfig = register(new BooleanConfig("Offscreen", "Render tracers to entities not visible on the screen", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render tracers to player", true));
     Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue()));
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render tracers to invisible entities", false));
@@ -95,7 +95,13 @@ public class TracersModule extends ToggleModule
                 .add(new Vec3d(x1, y1, z1));
         for (Entity entity : mc.world.getEntities())
         {
-            if (entity == null || !entity.isAlive() || entity == mc.player || !offscreenConfig.getValue() && !RenderManager.isFrustumVisible(entity.getBoundingBox()))
+            boolean shouldDraw = switch (modeConfig.getValue())
+            {
+                case NORMAL -> true;
+                case ON_SCREEN -> RenderManager.isFrustumVisible(entity.getBoundingBox());
+                case OFF_SCREEN -> !RenderManager.isFrustumVisible(entity.getBoundingBox());
+            };
+            if (entity == null || !entity.isAlive() || entity == mc.player || !shouldDraw)
             {
                 continue;
             }
@@ -155,6 +161,13 @@ public class TracersModule extends ToggleModule
             case TORSO -> entity.getHeight() / 2.0;
             case HEAD -> entity.getEyeHeight(entity.getPose());
         };
+    }
+
+    public enum RenderMode
+    {
+        ON_SCREEN,
+        OFF_SCREEN,
+        NORMAL
     }
 
     public enum Target
