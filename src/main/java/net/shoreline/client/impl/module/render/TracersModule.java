@@ -40,6 +40,7 @@ public class TracersModule extends ToggleModule
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the tracer", 1.0f, 1.0f, 5.0f));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render tracers to player", true));
     Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue()));
+    Config<Boolean> friendsConfig = register(new BooleanConfig("Friends", "Render tracers to players that are friended", false, () -> playersConfig.getValue()));
     Config<Boolean> invisiblesConfig = register(new BooleanConfig("Invisibles", "Render tracers to invisible entities", false));
     Config<Color> invisiblesColorConfig = register(new ColorConfig("InvisiblesColor", "The render color for invisibles", new Color(200, 100, 0), false, () -> invisiblesConfig.getValue()));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render tracers to monsters", false));
@@ -101,7 +102,7 @@ public class TracersModule extends ToggleModule
                 case ON_SCREEN -> RenderManager.isFrustumVisible(entity.getBoundingBox());
                 case OFF_SCREEN -> !RenderManager.isFrustumVisible(entity.getBoundingBox());
             };
-            if (entity == null || !entity.isAlive() || entity == mc.player || !shouldDraw)
+            if (entity == null || !entity.isAlive() || entity == mc.player || !shouldDraw || Managers.SOCIAL.isFriend(entity.getDisplayName()) && !friendsConfig.getValue())
             {
                 continue;
             }
