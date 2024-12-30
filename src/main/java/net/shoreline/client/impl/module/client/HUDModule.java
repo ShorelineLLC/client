@@ -84,12 +84,12 @@ public class HUDModule extends ToggleModule
     Config<Boolean> netherCoordsConfig = register(new BooleanConfig("NetherCoords", "Displays nether coordinates", true, () -> coordsConfig.getValue()));
     Config<Boolean> serverBrandConfig = register(new BooleanConfig("ServerBrand", "Displays the current server brand", false));
     Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Displays the amount of chests in your render distance", false));
-    Config<Boolean> speedConfig = register(new BooleanConfig("Speed", "Displays the current movement speed of the player in kmh", true));
+    Config<SpeedHud> speedConfig = register(new EnumConfig<>("Speed", "Displays the current movement speed of the player", SpeedHud.K_M_H, SpeedHud.values()));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Display server response time in ms", true));
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
     Config<Boolean> fpsConfig = register(new BooleanConfig("FPS", "Displays game FPS", true));
     Config<Boolean> arraylistConfig = register(new BooleanConfig("Arraylist", "Displays a list of all active modules", true));
-    Config<Integer> animTimeConfig = register(new NumberConfig<>("Anim-Time", "Timer for the animation", 0, 700, 1000, () -> false));
+    Config<Integer> animTimeConfig = register(new NumberConfig<>("Arraylist-Time", "Timer for the animation", 0, 1000, 2000, () -> false));
     Config<Ordering> orderingConfig = register(new EnumConfig<>("Ordering", "The ordering of the arraylist", Ordering.LENGTH, Ordering.values(), () -> arraylistConfig.getValue()));
     Config<Rendering> renderingConfig = register(new EnumConfig<>("Rendering", "The rendering mode of the HUD", Rendering.UP, Rendering.values()));
     // Rainbow settings
@@ -148,6 +148,7 @@ public class HUDModule extends ToggleModule
     @EventListener
     public void onRenderOverlayPost(RenderOverlayEvent.Post event)
     {
+        // Setup arraylist
         if (hudRenderModules.isEmpty())
         {
             for (Module module : Managers.MODULE.getModules())
@@ -160,18 +161,18 @@ public class HUDModule extends ToggleModule
             }
         }
 
+        int updates = Math.max(Math.round(240.0f / mc.getCurrentFps()), 1);
+        for (int i = 0; i < updates; i++)
+        {
+            for (HudRenderModule hudRenderModule : hudRenderModules.values())
+            {
+                hudRenderModule.updateAnimation();
+            }
+        }
+
         fpsCounter.updateCounter();
         if (mc.player != null && mc.world != null)
         {
-            int updates = Math.max(Math.round(240.0f / mc.getCurrentFps()), 1);
-            for (int i = 0; i < updates; i++)
-            {
-                for (HudRenderModule hudRenderModule : hudRenderModules.values())
-                {
-                    hudRenderModule.updateAnimation();
-                }
-            }
-
             if (mc.options.hudHidden)
             {
                 return;
@@ -213,7 +214,7 @@ public class HUDModule extends ToggleModule
             if (watermarkConfig.getValue())
             {
                 RenderManager.renderText(event.getContext(), String.format("%s %s (%s%s%s)",
-                                ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
+                        ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
                                 !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
                                 !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : ""),
                         2.0f, topLeft, getHudColor(drawnCount - rainbowOffset));
@@ -323,16 +324,27 @@ public class HUDModule extends ToggleModule
                 }
                 rainbowOffset++;
             }
-            if (speedConfig.getValue())
+            if (speedConfig.getValue() != SpeedHud.OFF)
             {
+                double speed;
                 double x = mc.player.getX() - mc.player.prevX;
                 // double y = mc.player.getY() - mc.player.prevY;
                 double z = mc.player.getZ() - mc.player.prevZ;
-                double dist = Math.sqrt(x * x + z * z) / 1000.0;
-                double div = 0.05 / 3600.0;
                 float timer = TimerModule.getInstance().isEnabled() ? TimerModule.getInstance().getTimer() : 1.0f;
-                final double speed = dist / div * timer;
-                String text = String.format("Speed §f%skm/h", decimal2.format(speed));
+                if (speedConfig.getValue() == SpeedHud.K_M_H)
+                {
+                    double dist = Math.sqrt(x * x + z * z) / 1000.0;
+                    double div = 0.05 / 3600.0;
+                    speed = dist / div * timer;
+                }
+                else
+                {
+                    x *= 20.0;
+                    z *= 20.0;
+                    double dist = Math.sqrt(x * x + z * z);
+                    speed = Math.abs(dist) * timer;
+                }
+                String text = String.format("Speed §f%s%s", decimal2.format(speed), speedConfig.getValue() == SpeedHud.K_M_H ? "km/h" : "b/s");
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
@@ -650,7 +662,12 @@ public class HUDModule extends ToggleModule
         STATIC_HUE
     }
 
-    // Thanks lolwut
+    public enum SpeedHud
+    {
+        K_M_H,
+        B_P_S,
+        OFF
+    }
 
     public class HudRenderModule
     {
@@ -669,23 +686,6 @@ public class HUDModule extends ToggleModule
             this.module = module;
         }
 
-        public void draw(DrawContext context, long drawnCount)
-        {
-            RenderManager.renderText(context, getFormattedModule(module),
-                    mc.getWindow().getScaledWidth() + (float) this.x,
-                    renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));
-
-            if (renderingUp)
-            {
-                topRight += RenderManager.textHeight();
-            }
-            else
-            {
-                bottomRight -= RenderManager.textHeight();
-            }
-            rainbowOffset++;
-        }
-
         public void updateAnimation()
         {
             String text = getFormattedModule(module);
@@ -698,11 +698,11 @@ public class HUDModule extends ToggleModule
 
                 if (drawing)
                 {
-                    endpoint = -textWidth;
+                    endpoint = -textWidth - 2.0f;
                 }
                 else
                 {
-                    endpoint = 1.0f;
+                    endpoint = 2.0f;
                 }
                 wasDrawing = drawing;
                 prevTextWidth = textWidth;
@@ -711,7 +711,23 @@ public class HUDModule extends ToggleModule
             double animationProgress = Math.min((System.currentTimeMillis() - startTime) / (float) animTimeConfig.getValue(), 1.0);
             double factor = Easing.BOUNCE_IN_OUT.ease(animationProgress);
             this.x = this.x * (1.0 - factor) + (endpoint * factor);
+        }
 
+        public void draw(DrawContext context, long drawnCount)
+        {
+            RenderManager.renderText(context, getFormattedModule(module),
+                     mc.getWindow().getScaledWidth() + (float) this.x,
+                    renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));
+
+            if (renderingUp)
+            {
+                topRight += RenderManager.textHeight();
+            }
+            else
+            {
+                bottomRight -= RenderManager.textHeight();
+            }
+            rainbowOffset++;
         }
     }
 }
