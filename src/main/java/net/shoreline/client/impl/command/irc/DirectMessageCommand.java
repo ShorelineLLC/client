@@ -14,7 +14,7 @@ public final class DirectMessageCommand extends Command
 {
     public DirectMessageCommand()
     {
-        super("DirectMessageCommand", "Directs a message to an online Shoreline user", literal("msg", "dm", "pm"));
+        super("DirectMessageCommand", "Directs a message to an online Shoreline user", literal("msg", "dm", "pm", "w", "whisper"));
     }
 
     @Override
