@@ -6,6 +6,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.loader.Loader;
 
 import java.util.Map;
@@ -32,6 +33,10 @@ public class FormattingUtil
                     if (rgb == (ColorsModule.getInstance().getRGB() & 0xFFFFFF))
                     {
                         builder.append(Formatting.FORMATTING_CODE_PREFIX).append("s");
+                    }
+                    else if (rgb == (SocialsModule.getInstance().getFriendRGB() & 0xFFFFFF))
+                    {
+                        builder.append(Formatting.FORMATTING_CODE_PREFIX).append("g");
                     }
                     else
                     {
@@ -84,6 +89,10 @@ public class FormattingUtil
                 if (rgb == (ColorsModule.getInstance().getRGB() & 0xFFFFFF))
                 {
                     builder.append(Formatting.FORMATTING_CODE_PREFIX).append("s");
+                }
+                else if (rgb == (SocialsModule.getInstance().getFriendRGB() & 0xFFFFFF))
+                {
+                    builder.append(Formatting.FORMATTING_CODE_PREFIX).append("g");
                 }
                 else
                 {

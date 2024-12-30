@@ -12,6 +12,7 @@ import net.shoreline.client.api.font.Glyph;
 import net.shoreline.client.api.font.GlyphCache;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.FontModule;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.math.HexRandom;
 import org.joml.Matrix4f;
@@ -367,8 +368,8 @@ public final class AWTFontRenderer implements Closeable, Globals
             case 'd' -> 0xffFF55FF;
             case 'e' -> 0xffFFFF55;
             case 'f' -> 0xffffffff;
-            case 'g' -> 0xffDDD605;
             case 's' -> ColorsModule.getInstance().getRGB();
+            case 'g' -> SocialsModule.getInstance().getFriendRGB();
             default -> -1;
         };
     }
