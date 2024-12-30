@@ -161,7 +161,7 @@ public class HUDModule extends ToggleModule
             }
         }
 
-        int updates = Math.max(Math.round(240.0f / mc.getCurrentFps()), 1);
+        int updates = MathHelper.clamp(Math.round(240.0f / mc.getCurrentFps()), 1, 10);
         for (int i = 0; i < updates; i++)
         {
             for (HudRenderModule hudRenderModule : hudRenderModules.values())
