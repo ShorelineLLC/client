@@ -5,6 +5,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -23,6 +25,7 @@ import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -60,6 +63,8 @@ public class AutoAnchorModule extends BlockPlacerModule
     Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when exploding anchors", true));
     Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
     Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
+    Config<Boolean> selfExtrapolateConfig = register(new BooleanConfig("SelfExtrapolate", "Accounts for motion when calculating self damage", false));
+    Config<Integer> extrapolateTicksConfig = register(new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where anchors will be placed", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
     //
@@ -199,22 +204,28 @@ public class AutoAnchorModule extends BlockPlacerModule
     private void setAnchor(BlockPos pos)
     {
         BlockState state = mc.world.getBlockState(pos);
+        if (!(state.getBlock() instanceof RespawnAnchorBlock))
+        {
+            return;
+        }
         int charges = state.get(RespawnAnchorBlock.CHARGES);
-        if (!(state.getBlock() instanceof RespawnAnchorBlock) || charges > 4)
+        if (charges > 0)
         {
             return;
         }
         int slot = getBlockItemSlot(Blocks.GLOWSTONE);
-        if (slot == -1)
+        int slot1 = findNonBlockSlot();
+        if (slot == -1 || slot1 == -1)
         {
             return;
         }
-        if (charges == 0)
-        {
-            Managers.INVENTORY.setSlot(slot);
-        }
+        Managers.INVENTORY.setSlot(slot);
         BlockHitResult result = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
         Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, id));
+        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        Managers.INVENTORY.setSlot(slot1);
+        BlockHitResult result1 = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
+        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result1, id));
         if (swingConfig.getValue())
         {
             mc.player.swingHand(Hand.MAIN_HAND);
@@ -223,10 +234,7 @@ public class AutoAnchorModule extends BlockPlacerModule
         {
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
-        if (charges == 0)
-        {
-            Managers.INVENTORY.syncToClient();
-        }
+        Managers.INVENTORY.syncToClient();
     }
 
     private AnchorCalc calculateAnchorExplosion()
@@ -249,7 +257,7 @@ public class AutoAnchorModule extends BlockPlacerModule
             if (state.isReplaceable() || explosion)
             {
                 double selfDamage = ExplosionUtil.getDamageTo(mc.player,
-                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, false); // Anchor explosions power = 10
+                        pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false); // Anchor explosions power = 10
                 boolean unsafeToPlayer = playerDamageCheck(selfDamage);
                 if (unsafeToPlayer)
                 {
@@ -287,7 +295,7 @@ public class AutoAnchorModule extends BlockPlacerModule
                         continue;
                     }
                     double damage = ExplosionUtil.getDamageTo(entity,
-                            pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), 0, assumeArmorConfig.getValue());
+                            pos.toCenterPos(), blockDestructionConfig.getValue(), 10.0f, Set.of(pos), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                     if (damage > bestAnchorDamage)
                     {
                         data = pos;
@@ -346,6 +354,22 @@ public class AutoAnchorModule extends BlockPlacerModule
                 || EntityUtil.isMonster(e) && monstersConfig.getValue()
                 || EntityUtil.isNeutral(e) && neutralsConfig.getValue()
                 || EntityUtil.isPassive(e) && animalsConfig.getValue();
+    }
+
+    private int findNonBlockSlot()
+    {
+        int slot = -1;
+        for (int i = 0; i < 9; i++)
+        {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (stack.getItem() instanceof BlockItem)
+            {
+                continue;
+            }
+            slot = i;
+            break;
+        }
+        return slot;
     }
 
     private record AnchorCalc(BlockPos pos, boolean isAnchor) {}
