@@ -507,13 +507,16 @@ public class ChamsModelRenderer implements Globals
         // mc.gameRenderer.loadProjectionMatrix(mc.gameRenderer.getBasicProjectionMatrix(d));
         matrixStack.loadIdentity();
         // Bob view
-        PlayerEntity playerEntity = (PlayerEntity) mc.getCameraEntity();
-        float f = playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed;
-        float g = -(playerEntity.horizontalSpeed + f * tickDelta);
-        float h = MathHelper.lerp(tickDelta, playerEntity.prevStrideDistance, playerEntity.strideDistance);
-        matrixStack.translate(MathHelper.sin(g * (float)Math.PI) * h * 0.5f, -Math.abs(MathHelper.cos(g * (float)Math.PI) * h), 0.0f);
-        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float)Math.PI) * h * 3.0f));
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float)Math.PI - 0.2f) * h) * 5.0f));
+        if (mc.options.getBobView().getValue())
+        {
+            PlayerEntity playerEntity = (PlayerEntity) mc.getCameraEntity();
+            float f = playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed;
+            float g = -(playerEntity.horizontalSpeed + f * tickDelta);
+            float h = MathHelper.lerp(tickDelta, playerEntity.prevStrideDistance, playerEntity.strideDistance);
+            matrixStack.translate(MathHelper.sin(g * (float) Math.PI) * h * 0.5f, -Math.abs(MathHelper.cos(g * (float) Math.PI) * h), 0.0f);
+            matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(g * (float) Math.PI) * h * 3.0f));
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(g * (float) Math.PI - 0.2f) * h) * 5.0f));
+        }
         //
         float h1 = MathHelper.lerp(tickDelta, mc.player.lastRenderPitch, mc.player.renderPitch);
         float i1 = MathHelper.lerp(tickDelta, mc.player.lastRenderYaw, mc.player.renderYaw);
