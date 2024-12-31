@@ -98,10 +98,10 @@ public final class AirPlaceModule extends ToggleModule
             if (grimConfig.getValue())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                Managers.NETWORK.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, blockHitResult, 0));
+                mc.interactionManager.interactBlock(mc.player, Hand.OFF_HAND, blockHitResult);
+                mc.player.swingHand(Hand.MAIN_HAND, false);
                 Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.OFF_HAND));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                mc.player.swingHand(Hand.MAIN_HAND);
             }
             else
             {
