@@ -31,21 +31,14 @@ public final class LastCommand extends Command
                         return 0;
                     }
 
-                    if (!IRCManager.getInstance().getAllOnlineUsers().contains(user))
-                    {
-                        ChatUtil.error(user.getName() + " is no longer online!");
-                        return 0;
-                    }
-
                     CPacketDirectMessage packet = new CPacketDirectMessage(user, message);
                     IRCManager.getInstance().sendPacket(packet);
                     return 1;
                 })
-                .executes(context ->
-                {
-                    ChatUtil.error("Invalid usage! Usage: " + getUsage());
-                    return 1;
-                })
-        );
+        ).executes(context ->
+        {
+            ChatUtil.error("Invalid usage! Usage: " + getUsage());
+            return 1;
+        });
     }
 }
