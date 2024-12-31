@@ -82,4 +82,16 @@ public class ColorUtil
         int green = 0xFF & (color >> 8);
         return (alpha << 24) | (red << 16) | (green << 8) | blue;
     }
+
+    public static int fixTransparency(int color, float alpha)
+    {
+        if (alpha == 1.0F)
+        {
+            return color;
+        }
+        float colorAlpha = (color >> 24) & 0xFF;
+        alpha = Math.max(0.0F, Math.min(1.0F, alpha));
+        int colorAlphaInt = Math.max(10, (int) (colorAlpha * alpha));
+        return (colorAlphaInt << 24) | (color & 0xFFFFFF);
+    }
 }

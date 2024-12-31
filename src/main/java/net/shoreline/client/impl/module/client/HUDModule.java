@@ -186,8 +186,9 @@ public class HUDModule extends ToggleModule
                         decimal.format(serverStatus.getElapsedTime() / 1000.0));
                 int width = RenderManager.textWidth(warning);
                 Color color = ColorUtil.interpolateColor(MathHelper.clamp((serverStatus.getElapsedTime() - 1000.0f) / 5000.0f, 0.0f, 1.0f), Color.RED, Color.GREEN);
+                int alpha = (int) (255 * statusAnimation.getFactor());
                 RenderManager.renderText(event.getContext(), warning,
-                        (res.getScaledWidth() / 2.0f) - (width / 2.0f), 4.0f, ColorUtil.withAlpha(color.getRGB(), (int) (255 * statusAnimation.getFactor())));
+                        (res.getScaledWidth() / 2.0f) - (width / 2.0f), 4.0f, ColorUtil.fixTransparency(color.getRGB(), alpha));
             }
 
             //

@@ -46,7 +46,7 @@ public class VanillaTextRenderer implements Globals
     // Autism
     public void drawWithShadow(MatrixStack matrices, String text, float x, float y, int color)
     {
-        draw(matrices, text, x + (FontModule.getInstance().getShadow() ? 1.0f : 0.6f), y + (FontModule.getInstance().getShadow() ? 1.0f : 0.6f), color, true);
+        draw(matrices, text, x + 1.0f, y + 1.0f, color, true);
         draw(matrices, text, x, y, color, false);
     }
 

@@ -23,7 +23,6 @@ public class FontModule extends ToggleModule
     Config<Boolean> antiAliasConfig = register(new BooleanConfig("AntiAlias", "Applies antialiasing to font", true));
     Config<Boolean> fractionalMetrics = register(new BooleanConfig("FractionalMetrics", "Applies fractional metrics to font", false));
     Config<Integer> sizeConfig = register(new NumberConfig<>("Size", "The font size", 5, 9, 12));
-    Config<Boolean> shadowConfig = register(new BooleanConfig("VanillaShadow", "Renders vanilla text with a shadow background", true, () -> !isEnabled()));
 
     /**
      *
@@ -70,13 +69,5 @@ public class FontModule extends ToggleModule
     public boolean getFractionalMetrics()
     {
         return fractionalMetrics.getValue();
-    }
-
-    /**
-     * @return
-     */
-    public boolean getShadow()
-    {
-        return shadowConfig.getValue();
     }
 }
