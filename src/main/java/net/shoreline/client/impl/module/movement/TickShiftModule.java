@@ -39,6 +39,12 @@ public class TickShiftModule extends ToggleModule
         return String.valueOf(packets);
     }
 
+    @Override
+    public void onDisable()
+    {
+        Managers.TICK.setClientTick(1.0f);
+    }
+
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent event)
     {
