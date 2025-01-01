@@ -67,6 +67,12 @@ public class StepModule extends ToggleModule
         Managers.TICK.setClientTick(1.0f);
     }
 
+    @Override
+    public void onDisable()
+    {
+        Managers.TICK.setClientTick(1.0f);
+    }
+
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent event)
     {
@@ -139,6 +145,11 @@ public class StepModule extends ToggleModule
     @EventListener
     public void onPacketInbound(PacketEvent event)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket)
         {
             disable();

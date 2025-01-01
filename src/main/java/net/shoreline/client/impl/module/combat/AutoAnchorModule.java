@@ -9,7 +9,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
@@ -25,7 +24,6 @@ import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -37,8 +35,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class AutoAnchorModule extends BlockPlacerModule
 {
@@ -241,7 +239,7 @@ public class AutoAnchorModule extends BlockPlacerModule
         {
             Managers.INVENTORY.setSlot(slot1);
             BlockHitResult result1 = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result1, id));
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result1);
             if (swingConfig.getValue())
             {
                 mc.player.swingHand(Hand.MAIN_HAND);
