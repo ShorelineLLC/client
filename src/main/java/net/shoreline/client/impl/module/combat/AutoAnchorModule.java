@@ -208,33 +208,50 @@ public class AutoAnchorModule extends BlockPlacerModule
         {
             return;
         }
-        int charges = state.get(RespawnAnchorBlock.CHARGES);
-        if (charges > 0)
-        {
-            return;
-        }
-        int slot = getBlockItemSlot(Blocks.GLOWSTONE);
         int slot1 = findNonBlockSlot();
-        if (slot == -1 || slot1 == -1)
+        if (slot1 == -1)
         {
             return;
         }
-        Managers.INVENTORY.setSlot(slot);
-        BlockHitResult result = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result, id));
-        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-        Managers.INVENTORY.setSlot(slot1);
-        BlockHitResult result1 = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result1, id));
-        if (swingConfig.getValue())
+        int charges = state.get(RespawnAnchorBlock.CHARGES);
+        if (charges <= 0)
         {
-            mc.player.swingHand(Hand.MAIN_HAND);
+            int slot = getBlockItemSlot(Blocks.GLOWSTONE);
+            if (slot == -1)
+            {
+                return;
+            }
+            Managers.INVENTORY.setSlot(slot);
+            BlockHitResult result = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            Managers.INVENTORY.setSlot(slot1);
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+            if (swingConfig.getValue())
+            {
+                mc.player.swingHand(Hand.MAIN_HAND);
+            }
+            else
+            {
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            }
+            Managers.INVENTORY.syncToClient();
         }
         else
         {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            Managers.INVENTORY.setSlot(slot1);
+            BlockHitResult result1 = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, result1, id));
+            if (swingConfig.getValue())
+            {
+                mc.player.swingHand(Hand.MAIN_HAND);
+            }
+            else
+            {
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            }
+            Managers.INVENTORY.syncToClient();
         }
-        Managers.INVENTORY.syncToClient();
     }
 
     private AnchorCalc calculateAnchorExplosion()
