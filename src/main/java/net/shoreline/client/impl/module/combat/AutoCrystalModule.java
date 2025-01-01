@@ -40,6 +40,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.EvictingQueue;
 import net.shoreline.client.util.entity.EntityUtil;
@@ -226,7 +227,7 @@ public class AutoCrystalModule extends RotationModule
     @EventListener
     public void onPlayerUpdate(PlayerTickEvent event)
     {
-        if (mc.player.isSpectator())
+        if (mc.player.isSpectator() || isSilentSwap(autoSwapConfig.getValue()) && AutoMineModule.getInstance().isSilentSwapping())
         {
             return;
         }

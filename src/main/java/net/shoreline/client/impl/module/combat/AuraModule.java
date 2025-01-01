@@ -39,6 +39,7 @@ import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.manager.world.tick.TickSync;
 import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -162,7 +163,9 @@ public class AuraModule extends RotationModule
     public void onPlayerUpdate(PlayerTickEvent event)
     {
         if (AutoCrystalModule.getInstance().isAttacking()
-                || AutoCrystalModule.getInstance().isPlacing() || mc.player.isSpectator())
+                || AutoCrystalModule.getInstance().isPlacing()
+                || autoSwapConfig.getValue() == Swap.SILENT && AutoMineModule.getInstance().isSilentSwapping()
+                || mc.player.isSpectator())
         {
             return;
         }
