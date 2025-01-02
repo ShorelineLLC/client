@@ -30,9 +30,8 @@ public final class CPacketDirectMessage extends IRCPacket
     @Override
     public void onSend(IRCManager ircManager)
     {
-        String message = Formatting.ITALIC + "§sTo "
-                + this.onlineUser.getUsertype().getColorCode() + Formatting.ITALIC + this.onlineUser.getName()
-                + "§s: " + this.message;
+        String message = Formatting.ITALIC + "§7To " + this.onlineUser.getUsertype().getColorCode()
+                + this.onlineUser.getName() + Formatting.ITALIC + "§7: " + this.message;
 
         ircManager.addToChat(message);
     }
