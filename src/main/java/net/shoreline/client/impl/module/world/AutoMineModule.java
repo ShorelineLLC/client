@@ -199,6 +199,8 @@ public class AutoMineModule extends CombatModule
                         MiningData instantMine = miningDataLast == null ? miningData : miningDataLast;
                         if (mine1 && mine2)
                         {
+                            Direction miningDir = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP;
+                            Direction miningDir2 = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP;
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos()) && miningQueue.size() < 2;
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
@@ -221,19 +223,18 @@ public class AutoMineModule extends CombatModule
                                     }
                                     if (full2)
                                     {
-                                        queueMiningData(new AutoMiningData(miningPos2.pos(),
-                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP));
+                                        queueMiningData(new AutoMiningData(miningPos2.pos(), miningDir2), true);
                                     }
                                     if (full)
                                     {
-                                        queueMiningData(new AutoMiningData(miningPos.pos(),
-                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP));
+                                        queueMiningData(new AutoMiningData(miningPos.pos(), miningDir), true);
                                     }
                                 }
                             }
                         }
                         else if (mine1)
                         {
+                            Direction miningDir = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP;
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos());
                             if (instantMineIncorrect)
                             {
@@ -251,14 +252,14 @@ public class AutoMineModule extends CombatModule
                                 {
                                     if (!mc.world.isAir(miningPos.pos()))
                                     {
-                                        queueMiningData(new AutoMiningData(miningPos.pos(),
-                                                strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP));
+                                        queueMiningData(new AutoMiningData(miningPos.pos(), miningDir), true);
                                     }
                                 }
                             }
                         }
                         else if (mine2)
                         {
+                            Direction miningDir2 = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP;
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos2.pos());
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
@@ -274,8 +275,7 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else
                                 {
-                                    queueMiningData(new AutoMiningData(miningPos2.pos(),
-                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP));
+                                    queueMiningData(new AutoMiningData(miningPos2.pos(), miningDir2), false);
                                 }
                             }
                         }
@@ -286,6 +286,7 @@ public class AutoMineModule extends CombatModule
                                 autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
                         if (miningPos != null)
                         {
+                            Direction miningDir = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP;
                             boolean instantMineIncorrect = miningData != null && miningData.getPos() != miningPos.pos();
                             if (instantMineIncorrect || miningQueue.isEmpty())
                             {
@@ -301,8 +302,7 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
                                 {
-                                    queueMiningData(new AutoMiningData(miningPos.pos(),
-                                            strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP));
+                                    queueMiningData(new AutoMiningData(miningPos.pos(), miningDir), true);
                                 }
                             }
                         }
@@ -635,17 +635,22 @@ public class AutoMineModule extends CombatModule
 
     private void queueMiningData(MiningData data)
     {
-        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())))
-        {
-            return;
-        }
-        if (data.getState().isAir())
+        queueMiningData(data, false);
+    }
+
+    private void queueMiningData(MiningData data, boolean swing)
+    {
+        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())) || data.getState().isAir())
         {
             return;
         }
         if (startMining(data))
         {
             miningQueue.addFirst(data);
+            if (swing)
+            {
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            }
         }
     }
 
@@ -810,6 +815,10 @@ public class AutoMineModule extends CombatModule
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             if (grimNewConfig.getValue())
             {
+                if (data.getSlot() != -1)
+                {
+                    Managers.INVENTORY.setSlot(data.getSlot());
+                }
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
@@ -822,7 +831,10 @@ public class AutoMineModule extends CombatModule
                         PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                if (data.getSlot() != -1)
+                {
+                    Managers.INVENTORY.syncToClient();
+                }
             }
             else
             {
