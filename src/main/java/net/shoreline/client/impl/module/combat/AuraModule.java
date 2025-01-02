@@ -201,7 +201,7 @@ public class AuraModule extends RotationModule
         }
 
         int slot = getSwordSlot();
-        if (slot == -1)
+        if (slot == -1 && swordCheckConfig.getValue())
         {
             return;
         }

@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -810,17 +811,18 @@ public class AutoMineModule extends CombatModule
             if (grimNewConfig.getValue())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             }
             else
             {
