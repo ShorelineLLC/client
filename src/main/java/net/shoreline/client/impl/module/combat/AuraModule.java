@@ -201,14 +201,9 @@ public class AuraModule extends RotationModule
         }
 
         int slot = getSwordSlot();
-        if (slot == -1 && swordCheckConfig.getValue())
-        {
-            return;
-        }
-
         // END PRE
         boolean silentSwapped = false;
-        if (!(mc.player.getMainHandStack().getItem() instanceof SwordItem))
+        if (!(mc.player.getMainHandStack().getItem() instanceof SwordItem) && slot != -1)
         {
             switch (autoSwapConfig.getValue())
             {
@@ -281,7 +276,7 @@ public class AuraModule extends RotationModule
         if (attackDelayConfig.getValue())
         {
             PlayerInventory inventory = mc.player.getInventory();
-            ItemStack itemStack = inventory.getStack(slot);
+            ItemStack itemStack = inventory.getStack(slot == -1 ? mc.player.getInventory().selectedSlot : slot);
 
             MutableDouble attackSpeed = new MutableDouble(
                     mc.player.getAttributeBaseValue(EntityAttributes.GENERIC_ATTACK_SPEED));
