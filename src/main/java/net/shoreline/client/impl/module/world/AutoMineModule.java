@@ -85,11 +85,12 @@ public class AutoMineModule extends CombatModule
 
     private final Map<MiningData, Animation> fadeList = new HashMap<>();
     private FirstOutQueue<MiningData> miningQueue = new FirstOutQueue<>(2);
-    private final List<BlockPos> packetMines = new ArrayList<>();
+    private  final Queue<AutoMiningData> autoMiningQueue = new ArrayDeque<>();
     private long lastBreak;
     private boolean manualOverride;
     private boolean silentSwapping;
     private final Timer stopMiningTimer = new CacheTimer();
+    private int tickDelay;
 
     public AutoMineModule()
     {
@@ -116,10 +117,12 @@ public class AutoMineModule extends CombatModule
     @Override
     protected void onDisable()
     {
-        miningQueue.clear();
+        clearMiningQueue();
+        autoMiningQueue.clear();
         fadeList.clear();
         manualOverride = false;
         silentSwapping = false;
+        tickDelay = 0;
         Managers.INVENTORY.syncToClient();
     }
 
@@ -144,15 +147,25 @@ public class AutoMineModule extends CombatModule
             return;
         }
 
-        if (autoConfig.getValue() && !manualOverride)
+        if (!autoMiningQueue.isEmpty() && tickDelay <= 0)
+        {
+            AutoMiningData nextMine = autoMiningQueue.poll();
+            if (nextMine != null)
+            {
+                queueMiningData(new AutoMiningData(nextMine.getPos(), nextMine.getDirection()));
+                tickDelay = 2;
+            }
+        }
+
+        if (autoConfig.getValue() && !manualOverride && autoMiningQueue.isEmpty())
         {
             PlayerEntity playerTarget = getClosestPlayer(e -> !Managers.SOCIAL.isFriend(e.getName().getString()), enemyRangeConfig.getValue());
             if (mc.player.isCrawling() && crawlingConfig.getValue() && getCrawlingMine(playerTarget) != null)
             {
                 BlockPos crawlingMine = getCrawlingMine(playerTarget);
-                miningQueue.clear();
+                clearMiningQueue();
                 manualOverride = true;
-                queueMiningData(new AutoMiningData(crawlingMine, Direction.DOWN));
+                startAutoMine(crawlingMine, Direction.DOWN);
             }
             else
             {
@@ -215,15 +228,15 @@ public class AutoMineModule extends CombatModule
                                     boolean full = !mc.world.isAir(miningPos.pos());
                                     if (full && full2)
                                     {
-                                        miningQueue.clear();
+                                        clearMiningQueue();
                                     }
                                     if (full2)
                                     {
-                                        queueMiningData(new AutoMiningData(miningPos2.pos(), miningDir2));
+                                        startAutoMine(miningPos2.pos(), miningDir2);
                                     }
                                     if (full)
                                     {
-                                        queueMiningData(new AutoMiningData(miningPos.pos(), miningDir));
+                                        startAutoMine(miningPos.pos(), miningDir);
                                     }
                                 }
                             }
@@ -247,7 +260,7 @@ public class AutoMineModule extends CombatModule
                                 {
                                     if (!mc.world.isAir(miningPos.pos()))
                                     {
-                                        queueMiningData(new AutoMiningData(miningPos.pos(), miningDir));
+                                        startAutoMine(miningPos.pos(), miningDir);
                                     }
                                 }
                             }
@@ -269,7 +282,7 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else
                                 {
-                                    queueMiningData(new AutoMiningData(miningPos2.pos(), miningDir2));
+                                    startAutoMine(miningPos2.pos(), miningDir2);
                                 }
                             }
                         }
@@ -294,7 +307,7 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
                                 {
-                                    queueMiningData(new AutoMiningData(miningPos.pos(), miningDir));
+                                    startAutoMine(miningPos.pos(), miningDir);
                                 }
                             }
                         }
@@ -314,6 +327,7 @@ public class AutoMineModule extends CombatModule
                 }
             }
         }
+        tickDelay--;
         if (miningQueue.isEmpty())
         {
             return;
@@ -435,7 +449,7 @@ public class AutoMineModule extends CombatModule
             }
             if (data instanceof AutoMiningData)
             {
-                miningQueue.clear();
+                clearMiningQueue();
                 manualOverride = true;
             }
             startManualMine(event.getPos(), event.getDirection());
@@ -627,6 +641,23 @@ public class AutoMineModule extends CombatModule
         queueMiningData(new ManualMiningData(pos, direction));
     }
 
+    private void startAutoMine(BlockPos pos, Direction miningDir)
+    {
+        if (tickDelay <= 0)
+        {
+            queueMiningData(new AutoMiningData(pos, miningDir));
+            // Need small tick delay between mines
+            if (grimConfig.getValue())
+            {
+                tickDelay = 2;
+            }
+        }
+        else
+        {
+            autoMiningQueue.offer(new AutoMiningData(pos, miningDir));
+        }
+    }
+
     private void queueMiningData(MiningData data)
     {
         if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())))
@@ -784,6 +815,15 @@ public class AutoMineModule extends CombatModule
         }
     }
 
+    private void clearMiningQueue()
+    {
+        for (MiningData data : miningQueue)
+        {
+            abortMining(data);
+        }
+        miningQueue.clear();
+    }
+
     private boolean startMining(MiningData data)
     {
         if (data.isStarted())
@@ -829,8 +869,6 @@ public class AutoMineModule extends CombatModule
                 }
                 Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             }
-
-            packetMines.add(data.getPos());
         }
         else
         {
