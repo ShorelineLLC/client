@@ -152,7 +152,7 @@ public class AutoMineModule extends CombatModule
             AutoMiningData nextMine = autoMiningQueue.poll();
             if (nextMine != null)
             {
-                queueMiningData(new AutoMiningData(nextMine.getPos(), nextMine.getDirection()));
+                queueMiningData(nextMine);
                 tickDelay = 2;
             }
         }
