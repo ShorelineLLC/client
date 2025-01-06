@@ -85,7 +85,7 @@ public class AutoMineModule extends CombatModule
 
     private final Map<MiningData, Animation> fadeList = new HashMap<>();
     private FirstOutQueue<MiningData> miningQueue = new FirstOutQueue<>(2);
-    private  final Queue<AutoMiningData> autoMiningQueue = new ArrayDeque<>();
+    private final Queue<AutoMiningData> autoMiningQueue = new ArrayDeque<>();
     private long lastBreak;
     private boolean manualOverride;
     private boolean silentSwapping;
@@ -647,7 +647,7 @@ public class AutoMineModule extends CombatModule
         {
             queueMiningData(new AutoMiningData(pos, miningDir));
             // Need small tick delay between mines
-            if (grimConfig.getValue())
+            if (grimConfig.getValue() || grimNewConfig.getValue())
             {
                 tickDelay = 2;
             }
@@ -836,8 +836,14 @@ public class AutoMineModule extends CombatModule
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             if (grimNewConfig.getValue())
             {
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 3; i++)
                 {
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
