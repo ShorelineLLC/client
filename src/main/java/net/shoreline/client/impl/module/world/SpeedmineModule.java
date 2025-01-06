@@ -135,6 +135,11 @@ public class SpeedmineModule extends CombatModule
             return;
         }
 
+        if (AutoMineModule.getInstance().isEnabled())
+        {
+            return;
+        }
+
         if (miningQueue.isEmpty())
         {
             return;
@@ -211,6 +216,12 @@ public class SpeedmineModule extends CombatModule
         {
             return;
         }
+
+        if (AutoMineModule.getInstance().isEnabled())
+        {
+            return;
+        }
+
         // Do not try to break unbreakable blocks
         if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir())
         {
@@ -247,6 +258,11 @@ public class SpeedmineModule extends CombatModule
     public void onPacketInbound(PacketEvent.Inbound event)
     {
         if (mc.player == null || modeConfig.getValue() != SpeedmineMode.PACKET)
+        {
+            return;
+        }
+
+        if (AutoMineModule.getInstance().isEnabled())
         {
             return;
         }
@@ -306,6 +322,12 @@ public class SpeedmineModule extends CombatModule
         {
             return;
         }
+
+        if (AutoMineModule.getInstance().isEnabled())
+        {
+            return;
+        }
+
         RenderBuffers.preRender();
         for (Map.Entry<MiningData, Animation> set : fadeList.entrySet())
         {

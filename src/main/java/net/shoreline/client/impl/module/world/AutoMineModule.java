@@ -980,7 +980,12 @@ public class AutoMineModule extends CombatModule
         return System.currentTimeMillis() - lastBreak <= 280 && grimConfig.getValue();
     }
 
-    private boolean isDataPacketMine(MiningData data)
+    public List<BlockPos> getInstantMines()
+    {
+        return miningQueue.stream().filter(d -> !isDataPacketMine(d)).map(MiningData::getPos).toList();
+    }
+
+    public boolean isDataPacketMine(MiningData data)
     {
         return miningQueue.size() == 2 && data == miningQueue.getLast();
     }

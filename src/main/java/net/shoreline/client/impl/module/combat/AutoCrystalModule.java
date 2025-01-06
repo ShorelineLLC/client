@@ -113,7 +113,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Boolean> placeRangeCenterConfig = register(new BooleanConfig("PlaceRangeCenter", "Calculates place ranges to the center of the block", true, () -> placeConfig.getValue()));
     Config<Swap> autoSwapConfig = register(new EnumConfig<>("Swap", "Swaps to an end crystal before placing if the player is not holding one", Swap.OFF, Swap.values(), () -> placeConfig.getValue()));
     // Config<Float> alternateSpeedConfig = register(new NumberConfig<>("AlternateSpeed", "Speed for alternative swapping crystals", 1.0f, 18.0f, 20.0f, () -> placeConfig.getValue() && autoSwapConfig.getValue() == Swap.SILENT_ALT));
-    // Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
+    Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
     Config<Boolean> breakValidConfig = register(new BooleanConfig("Strict", "Only places crystals that can be attacked", false, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Boolean> exposedDirectionConfig = register(new BooleanConfig("StrictDirection-Exposed", "Interacts with only exposed directions when placing crystals", false, () -> placeConfig.getValue()));
@@ -484,8 +484,13 @@ public class AutoCrystalModule extends RotationModule
                     {
                         continue;
                     }
-                    double damage = ExplosionUtil.getDamageTo(entity,
-                            crystalPos, blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
+                    Set<BlockPos> ignoredBlocks = new HashSet<>();
+                    if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                    {
+                        ignoredBlocks.addAll(AutoMineModule.getInstance().getInstantMines());
+                    }
+                    double damage = ExplosionUtil.getDamageTo(entity, crystalPos, blockDestructionConfig.getValue(),
+                            ignoredBlocks, extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                     // TODO: Test this
                     DamageData<Integer> data = new DamageData<>(packet2.getEntityId(),
                             entity, damage, selfDamage, blockPos);
@@ -610,8 +615,13 @@ public class AutoCrystalModule extends RotationModule
                 {
                     continue;
                 }
-                double damage = ExplosionUtil.getDamageTo(entity,
-                        crystalPos, blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
+                Set<BlockPos> ignoredBlocks = new HashSet<>();
+                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                {
+                    ignoredBlocks.addAll(AutoMineModule.getInstance().getInstantMines());
+                }
+                double damage = ExplosionUtil.getDamageTo(entity, crystalPos, blockDestructionConfig.getValue(),
+                        ignoredBlocks, extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 // TODO: Test this
                 DamageData<EndCrystalEntity> data = new DamageData<>(crystalEntity,
                         entity, damage, selfDamage, crystalEntity.getBlockPos().down());
@@ -971,8 +981,13 @@ public class AutoCrystalModule extends RotationModule
                 {
                     continue;
                 }
-                double damage = ExplosionUtil.getDamageTo(entity,
-                        crystal.getPos(), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
+                Set<BlockPos> ignoredBlocks = new HashSet<>();
+                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                {
+                    ignoredBlocks.addAll(AutoMineModule.getInstance().getInstantMines());
+                }
+                double damage = ExplosionUtil.getDamageTo(entity, crystal.getPos(), blockDestructionConfig.getValue(),
+                        ignoredBlocks, extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
@@ -1059,9 +1074,14 @@ public class AutoCrystalModule extends RotationModule
                 {
                     continue;
                 }
+                Set<BlockPos> ignoredBlocks = new HashSet<>();
+                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                {
+                    ignoredBlocks.addAll(AutoMineModule.getInstance().getInstantMines());
+                }
                 double damage;
-                damage = ExplosionUtil.getDamageTo(entity,
-                        crystalDamageVec(pos), blockDestructionConfig.getValue(), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
+                damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos), blockDestructionConfig.getValue(), ignoredBlocks,
+                        extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
