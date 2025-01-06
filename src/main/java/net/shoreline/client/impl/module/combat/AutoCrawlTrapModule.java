@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -185,7 +187,8 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
 
     private void placeBlock(BlockPos pos, int slot)
     {
-        Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(),
+                false, true, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {
@@ -239,12 +242,21 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            if (playerEntity.isCrawling())
+            Box bb = playerEntity.getBoundingBox().expand(0.5, 0.0, 0.5);
+            Box feetBox = new Box(bb.minX, playerEntity.getY(), bb.minZ, bb.maxX,
+                    playerEntity.getY() + 0.1, bb.maxZ);
+            for (BlockPos pos : BlockPos.iterate((int) Math.floor(feetBox.minX),
+                    (int) Math.floor(feetBox.minY), (int) Math.floor(feetBox.minZ),
+                    (int) Math.floor(feetBox.maxX), (int) Math.floor(feetBox.maxY),
+                    (int) Math.floor(feetBox.maxZ)))
             {
-                for (BlockPos targetPos : PositionUtil.getAllInBox(entity.getBoundingBox(), entity.getBlockPos()))
+                BlockPos blockPos = pos.add(0, 1, 0);
+                if (!mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(),
+                        blockPos, ShapeContext.absent()))
                 {
-                    trapBlocks.add(targetPos.up());
+                    continue;
                 }
+                trapBlocks.add(blockPos);
             }
         }
         return trapBlocks;
