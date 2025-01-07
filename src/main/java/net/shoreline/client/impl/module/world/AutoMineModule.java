@@ -982,7 +982,7 @@ public class AutoMineModule extends CombatModule
 
     public List<BlockPos> getInstantMines()
     {
-        return miningQueue.stream().filter(d -> !isDataPacketMine(d)).map(MiningData::getPos).toList();
+        return miningQueue.stream().filter(d -> !isDataPacketMine(d) && d.getBlockDamage() > 0.5f).map(MiningData::getPos).toList();
     }
 
     public boolean isDataPacketMine(MiningData data)
