@@ -19,10 +19,10 @@ import net.shoreline.client.api.config.setting.*;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.CombatModule;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
@@ -118,7 +118,7 @@ public class AutoMineModule extends CombatModule
     @Override
     protected void onDisable()
     {
-        clearMiningQueue();
+        miningQueue.clear();
         autoMiningQueue.clear();
         fadeList.clear();
         manualOverride = false;
@@ -142,9 +142,9 @@ public class AutoMineModule extends CombatModule
     }
 
     @EventListener
-    public void onPlayerTick(final PlayerTickEvent event)
+    public void onPlayerTick(final TickEvent event)
     {
-        if (mc.player.isCreative() || mc.player.isSpectator())
+        if (mc.player.isCreative() || mc.player.isSpectator() || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
         }
@@ -188,7 +188,9 @@ public class AutoMineModule extends CombatModule
                     }
                     List<AutoMineCalc> phasePositions = getPhasePosition(playerTarget);
                     PriorityQueue<AutoMineCalc> miningPositions = getMiningPosition(playerTarget);
-                    PriorityQueue<AutoMineCalc> miningPositions2 = miningPositions.stream().filter(c -> !mc.world.isAir(c.pos())).collect(Collectors.toCollection(PriorityQueue::new));
+                    PriorityQueue<AutoMineCalc> miningPositions2 = miningPositions.stream()
+                            .filter(c -> !mc.world.isAir(c.pos()))
+                            .collect(Collectors.toCollection(PriorityQueue::new));
                     if (doubleBreakConfig.getValue())
                     {
                         AutoMineCalc miningPos;
@@ -196,8 +198,9 @@ public class AutoMineModule extends CombatModule
                         boolean miningPhasePos = !phasePositions.isEmpty();
                         if (miningPhasePos)
                         {
-                            miningPos2 = phasePositions.remove(0);
-                            miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) : autoRemineConfig.getValue() && miningPos2 == null ? miningPositions.peek() : miningPositions2.peek();
+                            miningPos2 = phasePositions.removeFirst();
+                            miningPos = !phasePositions.isEmpty() ? phasePositions.removeFirst() : autoRemineConfig.getValue()
+                                    && miningPos2 == null ? miningPositions.peek() : miningPositions2.peek();
                         }
                         else
                         {
@@ -219,7 +222,8 @@ public class AutoMineModule extends CombatModule
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos()) && miningQueue.size() < 2;
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -233,7 +237,7 @@ public class AutoMineModule extends CombatModule
                                     boolean full = !mc.world.isAir(miningPos.pos());
                                     if (full && full2)
                                     {
-                                        clearMiningQueue();
+                                        miningQueue.clear();
                                     }
                                     if (full2)
                                     {
@@ -253,7 +257,8 @@ public class AutoMineModule extends CombatModule
                             if (instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -277,7 +282,8 @@ public class AutoMineModule extends CombatModule
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -294,7 +300,8 @@ public class AutoMineModule extends CombatModule
                     }
                     else
                     {
-                        AutoMineCalc miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) : autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
+                        AutoMineCalc miningPos = !phasePositions.isEmpty() ? phasePositions.remove(0) :
+                                autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
                         if (miningPos != null)
                         {
                             Direction miningDir = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP;
@@ -302,7 +309,8 @@ public class AutoMineModule extends CombatModule
                             if (instantMineIncorrect || miningQueue.isEmpty())
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine() && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     stopMining(miningData);
                                     if (!miningData.hasAttemptedBreak())
@@ -320,15 +328,7 @@ public class AutoMineModule extends CombatModule
                 }
                 else
                 {
-                    removeIfQueuedMine(d ->
-                    {
-                        if (d instanceof AutoMiningData)
-                        {
-                            abortMining(d);
-                            return true;
-                        }
-                        return false;
-                    });
+                    removeIfQueuedMine(d -> d instanceof AutoMiningData);
                 }
             }
         }
@@ -343,8 +343,8 @@ public class AutoMineModule extends CombatModule
             {
                 data.resetBreakTime();
             }
-            if (isDataPacketMine(data) && (data.getState().isAir()
-                    || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000)))
+            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak()
+                    && data.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000)))
             {
                 Managers.INVENTORY.syncToClient();
                 silentSwapping = false;
@@ -360,8 +360,13 @@ public class AutoMineModule extends CombatModule
                 {
                     return;
                 }
-                Managers.INVENTORY.setSlot(data.getSlot());
-                silentSwapping = true;
+
+                if (data.getSlot() != Managers.INVENTORY.getServerSlot())
+                {
+                    Managers.INVENTORY.setSlot(data.getSlot());
+                    silentSwapping = true;
+                }
+
                 if (!data.hasAttemptedBreak())
                 {
                     data.setAttemptedBreak(true);
@@ -386,7 +391,6 @@ public class AutoMineModule extends CombatModule
                 miningQueue.remove(miningData2);
                 return;
             }
-
             if (instantConfig.getValue())
             {
                 if (miningData2 instanceof AutoMiningData && !autoRemineConfig.getValue())
@@ -404,9 +408,10 @@ public class AutoMineModule extends CombatModule
             return;
         }
         // Something went wrong, remove and remine
-        if (miningData2.getBlockDamage() >= speedConfig.getValue()
-                && miningData2.hasAttemptedBreak() && miningData2.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000))
+        if (miningData2.getBlockDamage() >= speedConfig.getValue() && miningData2.hasAttemptedBreak()
+                && miningData2.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000))
         {
+            abortMining(miningData2);
             removeQueuedMine(miningData2);
         }
         if (miningData2.getBlockDamage() >= speedConfig.getValue() || miningData2.isInstantRemine())
@@ -455,7 +460,7 @@ public class AutoMineModule extends CombatModule
             }
             if (data instanceof AutoMiningData)
             {
-                clearMiningQueue();
+                miningQueue.clear();
                 manualOverride = true;
             }
             startManualMine(event.getPos(), event.getDirection());
@@ -667,11 +672,7 @@ public class AutoMineModule extends CombatModule
 
     private void queueMiningData(MiningData data)
     {
-        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())))
-        {
-            return;
-        }
-        if (data.getState().isAir())
+        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())) || data.getState().isAir())
         {
             return;
         }
@@ -754,6 +755,17 @@ public class AutoMineModule extends CombatModule
             // Check surrounding positions
             miningPositions.add(new AutoMineCalc(blockPos, bestDamage, false));
         }
+        if (miningPositions.isEmpty())
+        {
+//            if (headConfig.getValue())
+//            {
+//                BlockPos headPos = entity.getBlockPos().up(2);
+//                if (!mc.world.getBlockState(headPos).isReplaceable())
+//                {
+//                    miningPositions.add(new AutoMineCalc(headPos, Double.MAX_VALUE, false));
+//                }
+//            }
+        }
 
         return miningPositions;
     }
@@ -800,40 +812,28 @@ public class AutoMineModule extends CombatModule
 
     private void removeQueuedMine()
     {
-        MiningData data = miningQueue.remove();
-        abortMining(data);
-        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
-        {
-            manualOverride = false;
-        }
+        miningQueue.remove();
+        updateManualOverride();
     }
 
     private void removeQueuedMine(MiningData data)
     {
         miningQueue.remove(data);
-        abortMining(data);
-        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
-        {
-            manualOverride = false;
-        }
+        updateManualOverride();
     }
 
     private void removeIfQueuedMine(Predicate<MiningData> dataPredicate)
     {
         miningQueue.removeIf(dataPredicate);
+        updateManualOverride();
+    }
+
+    private void updateManualOverride()
+    {
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
             manualOverride = false;
         }
-    }
-
-    private void clearMiningQueue()
-    {
-        for (MiningData data : miningQueue)
-        {
-            abortMining(data);
-        }
-        miningQueue.clear();
     }
 
     private boolean startMining(MiningData data)
@@ -899,7 +899,6 @@ public class AutoMineModule extends CombatModule
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             }
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
         data.setStarted();
         return true;
@@ -907,14 +906,9 @@ public class AutoMineModule extends CombatModule
 
     private void abortMining(MiningData data)
     {
-        if (data.getState().isAir() || data.isInstantRemine())
+        if (!data.isStarted() || data.getState().isAir() || data.isInstantRemine())
         {
             return;
-        }
-        if (grimConfig.getValue() || grimNewConfig.getValue())
-        {
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
         }
         Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
@@ -940,7 +934,7 @@ public class AutoMineModule extends CombatModule
             }
         }
         int slot = data.getSlot();
-        boolean canSwap = slot != -1;
+        boolean canSwap = slot != -1 && slot != Managers.INVENTORY.getServerSlot();
         if (canSwap)
         {
             swapTo(slot);
@@ -978,13 +972,13 @@ public class AutoMineModule extends CombatModule
 
     private void stopMiningInternal(MiningData data)
     {
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
         if (grimConfig.getValue())
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos().up(500), data.getDirection()));
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, new BlockPos(data.getPos().getX(), 1341, data.getPos().getZ()), data.getDirection()));
         }
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
     }
 
     // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L80
@@ -993,12 +987,7 @@ public class AutoMineModule extends CombatModule
         return System.currentTimeMillis() - lastBreak <= 280 && grimConfig.getValue();
     }
 
-    public List<BlockPos> getInstantMines()
-    {
-        return miningQueue.stream().filter(d -> !isDataPacketMine(d) && d.getBlockDamage() > 0.5f).map(MiningData::getPos).toList();
-    }
-
-    public boolean isDataPacketMine(MiningData data)
+    private boolean isDataPacketMine(MiningData data)
     {
         return miningQueue.size() == 2 && data == miningQueue.getLast();
     }
@@ -1011,6 +1000,11 @@ public class AutoMineModule extends CombatModule
             case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
             case ALL -> true;
         };
+    }
+
+    public List<BlockPos> getInstantMines()
+    {
+        return miningQueue.stream().filter(d -> !isDataPacketMine(d) && d.getBlockDamage() > 0.5f).map(MiningData::getPos).toList();
     }
 
     public boolean isSilentSwapping()
