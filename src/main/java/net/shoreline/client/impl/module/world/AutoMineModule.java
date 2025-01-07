@@ -163,16 +163,13 @@ public class AutoMineModule extends CombatModule
         {
             PlayerEntity playerTarget = getClosestPlayer(e -> !Managers.SOCIAL.isFriend(e.getName().getString()), enemyRangeConfig.getValue());
             BlockPos crawlingMine = getCrawlingMine(playerTarget);
-            if (crawlingMine == null)
+            if (mc.player.isCrawling() && crawlingConfig.getValue() && crawlingMine != null)
             {
-                crawlingOverride = false;
-            }
-            if (crawlingConfig.getValue() && crawlingMine != null)
-            {
-                crawlingOverride = true;
+                miningQueue.clear();
+                manualOverride = true;
                 startAutoMine(crawlingMine, Direction.DOWN);
             }
-            else if (!crawlingOverride)
+            else
             {
                 if (playerTarget != null)
                 {
@@ -773,11 +770,6 @@ public class AutoMineModule extends CombatModule
     private BlockPos getCrawlingMine(PlayerEntity playerTarget)
     {
         BlockPos crawlingPos = mc.player.getBlockPos();
-        BlockState state = mc.world.getBlockState(crawlingPos.up());
-        if (state.isAir())
-        {
-            return null;
-        }
         // We want to be same level as our opponent
         if (playerTarget != null && playerTarget.getBlockPos().getY() < crawlingPos.getY()
                 && !BlastResistantBlocks.isUnbreakable(crawlingPos.down()) && !mc.world.isAir(crawlingPos.down()))
