@@ -88,6 +88,7 @@ public class AutoMineModule extends CombatModule
     private final Queue<AutoMiningData> autoMiningQueue = new ArrayDeque<>();
     private long lastBreak;
     private boolean manualOverride;
+    private boolean crawlingOverride;
     private boolean silentSwapping;
     private final Timer stopMiningTimer = new CacheTimer();
     private int tickDelay;
@@ -121,6 +122,7 @@ public class AutoMineModule extends CombatModule
         autoMiningQueue.clear();
         fadeList.clear();
         manualOverride = false;
+        crawlingOverride = false;
         silentSwapping = false;
         tickDelay = 0;
         Managers.INVENTORY.syncToClient();
@@ -160,14 +162,17 @@ public class AutoMineModule extends CombatModule
         if (autoConfig.getValue() && !manualOverride && autoMiningQueue.isEmpty())
         {
             PlayerEntity playerTarget = getClosestPlayer(e -> !Managers.SOCIAL.isFriend(e.getName().getString()), enemyRangeConfig.getValue());
-            if (mc.player.isCrawling() && crawlingConfig.getValue() && getCrawlingMine(playerTarget) != null)
+            BlockPos crawlingMine = getCrawlingMine(playerTarget);
+            if (crawlingMine == null)
             {
-                BlockPos crawlingMine = getCrawlingMine(playerTarget);
-                clearMiningQueue();
-                manualOverride = true;
+                crawlingOverride = false;
+            }
+            if (crawlingConfig.getValue() && crawlingMine != null)
+            {
+                crawlingOverride = true;
                 startAutoMine(crawlingMine, Direction.DOWN);
             }
-            else
+            else if (!crawlingOverride)
             {
                 if (playerTarget != null)
                 {
@@ -381,6 +386,7 @@ public class AutoMineModule extends CombatModule
                 miningQueue.remove(miningData2);
                 return;
             }
+
             if (instantConfig.getValue())
             {
                 if (miningData2 instanceof AutoMiningData && !autoRemineConfig.getValue())
@@ -643,9 +649,10 @@ public class AutoMineModule extends CombatModule
 
     private void startAutoMine(BlockPos pos, Direction miningDir)
     {
+        AutoMiningData miningData = new AutoMiningData(pos, miningDir);
         if (tickDelay <= 0)
         {
-            queueMiningData(new AutoMiningData(pos, miningDir));
+            queueMiningData(miningData);
             // Need small tick delay between mines
             if (grimConfig.getValue() || grimNewConfig.getValue())
             {
@@ -654,7 +661,7 @@ public class AutoMineModule extends CombatModule
         }
         else
         {
-            autoMiningQueue.offer(new AutoMiningData(pos, miningDir));
+            autoMiningQueue.offer(miningData);
         }
     }
 
@@ -754,6 +761,11 @@ public class AutoMineModule extends CombatModule
     private BlockPos getCrawlingMine(PlayerEntity playerTarget)
     {
         BlockPos crawlingPos = mc.player.getBlockPos();
+        BlockState state = mc.world.getBlockState(crawlingPos.up());
+        if (state.isAir())
+        {
+            return null;
+        }
         // We want to be same level as our opponent
         if (playerTarget != null && playerTarget.getBlockPos().getY() < crawlingPos.getY()
                 && !BlastResistantBlocks.isUnbreakable(crawlingPos.down()) && !mc.world.isAir(crawlingPos.down()))
@@ -899,7 +911,7 @@ public class AutoMineModule extends CombatModule
         {
             return;
         }
-        if (grimConfig.getValue())
+        if (grimConfig.getValue() || grimNewConfig.getValue())
         {
             Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
