@@ -11,11 +11,13 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
+import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.position.PositionUtil;
@@ -36,6 +38,7 @@ public class CriticalsModule extends ToggleModule
 
     //
     Config<CritMode> modeConfig = register(new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values()));
+    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only attempts criticals in walls", false, () -> modeConfig.getValue() == CritMode.GRIM_V3));
     //
     private final Timer attackTimer = new CacheTimer();
 
@@ -191,7 +194,11 @@ public class CriticalsModule extends ToggleModule
             }
             case GRIM_V3 ->
             {
-                if (!mc.player.isCrawling() && isDoublePhased())
+                if (wallsOnlyConfig.getValue() && !isDoublePhased())
+                {
+                    return;
+                }
+                if (!mc.player.isCrawling())
                 {
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                             x, y + 0.00001058293536f, z, false));
