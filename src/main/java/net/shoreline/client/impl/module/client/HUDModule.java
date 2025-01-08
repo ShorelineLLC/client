@@ -12,11 +12,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.EntityStatusEffectS2CPacket;
+import net.minecraft.network.packet.s2c.play.RemoveEntityStatusEffectS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.text.Text;
+import net.minecraft.util.StringHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -56,6 +58,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Stream;
 
 /**
@@ -109,6 +112,7 @@ public class HUDModule extends ToggleModule
     private final Animation chatOpenAnimation = new Animation(false, 200L, Easing.LINEAR);
     private final PerSecondCounter fpsCounter = new PerSecondCounter();
     private final Map<String, HudRenderModule> hudRenderModules = new HashMap<>();
+    private final Map<PotionData, Animation> hudRenderPotions = new ConcurrentSkipListMap<>();
 
     private final Timer serverStatus = new CacheTimer();
     private final Animation statusAnimation = new Animation(false, 300L, Easing.LINEAR);
@@ -173,6 +177,16 @@ public class HUDModule extends ToggleModule
         fpsCounter.updateCounter();
         if (mc.player != null && mc.world != null)
         {
+            for (Map.Entry<PotionData, Animation> entry : hudRenderPotions.entrySet())
+            {
+                PotionData effectInstance = entry.getKey();
+                Animation animation = entry.getValue();
+                effectInstance.update();
+                if (mc.player.getStatusEffect(effectInstance.getType()) == null && animation.getFactor() < 0.01f)
+                {
+                    hudRenderPotions.remove(effectInstance);
+                }
+            }
             if (mc.options.hudHidden)
             {
                 return;
@@ -280,22 +294,35 @@ public class HUDModule extends ToggleModule
             }
             if (potionEffectsConfig.getValue())
             {
-                for (StatusEffectInstance e : mc.player.getStatusEffects())
+                for (Map.Entry<PotionData, Animation> e1 : hudRenderPotions.entrySet())
                 {
-                    final StatusEffect effect = e.getEffectType().value();
+                    PotionData e = e1.getKey();
+                    Animation animation = e1.getValue();
+                    final StatusEffect effect = e.getType().value();
                     if (effect == StatusEffects.NIGHT_VISION)
                     {
                         continue;
                     }
-                    boolean amplifier = e.getAmplifier() + 1 > 1 && !e.isInfinite();
-                    Text duration = StatusEffectUtil.getDurationText(e, 1.0f, mc.world.getTickManager().getTickRate());
+                    boolean infinite = e.getDuration() == -1;
+                    boolean amplifier = e.getAmplifier() + 1 > 1 && !infinite;
+                    String duration;
+                    if (infinite)
+                    {
+                        duration = "Inf";
+                    }
+                    else
+                    {
+                        int i = MathHelper.floor((float) e.getDuration());
+                        duration = StringHelper.formatTicks(i, mc.world.getTickManager().getTickRate());
+                    }
+
                     String text = String.format("%s %s§f%s",
                             effect.getName().getString(),
-                            amplifier ? e.getAmplifier() + 1 + " " : "",
-                            e.isInfinite() ? "Inf" : duration.getString());
+                            amplifier ? e.getAmplifier() + 1 + " " : "", duration);
                     int width = RenderManager.textWidth(text);
+                    float x = (width + 1.0f) * (float) animation.getFactor();
                     RenderManager.renderText(event.getContext(), text,
-                            res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
+                            res.getScaledWidth() - x, renderingUp ? bottomRight : topRight,
                             potionColorsConfig.getValue() ? ColorUtil.withAlpha(effect.getColor(), 255) : getHudColor(rainbowOffset));
                     if (renderingUp)
                     {
@@ -519,6 +546,33 @@ public class HUDModule extends ToggleModule
     public void onPacketInbound(PacketEvent.Inbound event)
     {
         serverStatus.reset();
+
+        if (event.getPacket() instanceof EntityStatusEffectS2CPacket packet)
+        {
+            PotionData data = new PotionData(packet.getEffectId(), packet.getAmplifier(), packet.getDuration());
+            if (hudRenderPotions.keySet().removeIf(d -> data.getType() == d.getType()))
+            {
+                hudRenderPotions.put(data, new Animation(true, 300, Easing.SINE_IN_OUT));
+            }
+            else
+            {
+                Animation anim = new Animation(false, 300, Easing.SINE_IN_OUT);
+                anim.setState(true);
+                hudRenderPotions.put(data, anim);
+            }
+        }
+
+        if (event.getPacket() instanceof RemoveEntityStatusEffectS2CPacket packet)
+        {
+            for (PotionData data : hudRenderPotions.keySet())
+            {
+                if (data.getType().equals(packet.effect()))
+                {
+                    hudRenderPotions.get(data).setState(false);
+                    break;
+                }
+            }
+        }
     }
 
     @EventListener
@@ -729,6 +783,55 @@ public class HUDModule extends ToggleModule
                 bottomRight -= RenderManager.textHeight();
             }
             rainbowOffset++;
+        }
+    }
+
+    public static class PotionData implements Comparable<PotionData>
+    {
+        private final RegistryEntry<StatusEffect> type;
+        private final int amplifier;
+        private int duration;
+
+        public PotionData(RegistryEntry<StatusEffect> type, int amplifier, int duration)
+        {
+            this.type = type;
+            this.amplifier = amplifier;
+            this.duration = duration;
+        }
+
+        public void update()
+        {
+            StatusEffectInstance instance = mc.player.getStatusEffect(type);
+            if (instance != null)
+            {
+                duration = instance.getDuration();
+            }
+        }
+
+        public String getPotionName()
+        {
+            return getType().value().getName().getString();
+        }
+
+        public RegistryEntry<StatusEffect> getType()
+        {
+            return type;
+        }
+
+        public int getAmplifier()
+        {
+            return amplifier;
+        }
+
+        public int getDuration()
+        {
+            return duration;
+        }
+
+        @Override
+        public int compareTo(HUDModule.PotionData other)
+        {
+            return other.getPotionName().compareTo(getPotionName());
         }
     }
 }
