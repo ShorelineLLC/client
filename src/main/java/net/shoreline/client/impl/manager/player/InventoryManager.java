@@ -5,9 +5,12 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -17,11 +20,13 @@ import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author xgraza & linus
@@ -62,6 +67,20 @@ public class InventoryManager implements Globals
         if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket packet)
         {
             slot = packet.getSlot();
+        }
+
+        if (event.getPacket() instanceof BundleS2CPacket packet)
+        {
+            List<Packet<?>> allowedBundle = new ArrayList<>();
+            for (Packet<?> packet1 : packet.getPackets())
+            {
+                if (packet1 instanceof ScreenHandlerSlotUpdateS2CPacket)
+                {
+                    continue;
+                }
+                allowedBundle.add(packet1);
+            }
+            ((AccessorBundlePacket) packet).setIterable(allowedBundle);
         }
     }
 

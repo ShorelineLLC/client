@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -586,32 +585,6 @@ public class AutoCrystalModule extends RotationModule
         {
             lastSwapTimer.reset();
         }
-//        else if (event.getPacket() instanceof PlayerActionC2SPacket packet && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
-//                && antiSurroundConfig.getValue() && canUseCrystalOnBlock(packet.getPos()))
-//        {
-//            Vec3d crystalPos = crystalDamageVec(packet.getPos());
-//            for (Entity entity : mc.world.getEntities()) {
-//                if (entity == null || !entity.isAlive() || entity == mc.player
-//                        || !isValidTarget(entity)
-//                        || Managers.SOCIAL.isFriend(entity.getUuid())) {
-//                    continue;
-//                }
-//                double crystalDist = crystalPos.squaredDistanceTo(entity.getPos());
-//                if (crystalDist > 144.0f) {
-//                    continue;
-//                }
-//                double dist = mc.player.squaredDistanceTo(entity);
-//                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue()) {
-//                    continue;
-//                }
-//                double damage = EndCrystalUtil.getDamageTo(entity,
-//                        crystalPos, blockDestructionConfig.getValue());
-//                if (!targetDamageCheck(damage, entity)) {
-//                    placeCrystal(packet.getPos(), getCrystalHand());
-//                    break;
-//                }
-//            }
-//        }
     }
 
     public boolean isAttacking()
