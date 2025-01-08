@@ -105,6 +105,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Float> swapDelayConfig = register(new NumberConfig<>("SwapPenalty", "Delay for attacking after swapping items which prevents NCP flags", 0.0f, 0.0f, 10.0f));
     //
     Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
+    Config<Boolean> sequentialConfig = register(new BooleanConfig("Sequential", "Places a crystal after spawn", false));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
@@ -410,7 +411,7 @@ public class AutoCrystalModule extends RotationModule
         }
     }
 
-    @EventListener
+    @EventListener(priority = Integer.MAX_VALUE)
     public void onPacketInbound(PacketEvent.Inbound event)
     {
         if (mc.player == null || mc.world == null)
@@ -450,7 +451,12 @@ public class AutoCrystalModule extends RotationModule
             }
             if (attackRotate)
             {
-                attackInternal(packet2.getEntityId(), getCrystalHand());
+                final Hand hand = getCrystalHand();
+                attackInternal(packet2.getEntityId(), hand);
+                if (sequentialConfig.getValue() && placeCrystal != null)
+                {
+                    placeCrystal(placeCrystal.getBlockPos(), hand);
+                }
                 setStage("ATTACKING");
                 lastAttackTimer.reset();
             }
@@ -499,7 +505,12 @@ public class AutoCrystalModule extends RotationModule
                             || entity instanceof LivingEntity entity1 && isCrystalLethalTo(data, entity1);
                     if (attackRotate)
                     {
-                        attackInternal(packet2.getEntityId(), getCrystalHand());
+                        final Hand hand = getCrystalHand();
+                        attackInternal(packet2.getEntityId(), hand);
+                        if (sequentialConfig.getValue() && placeCrystal != null)
+                        {
+                            placeCrystal(placeCrystal.getBlockPos(), hand);
+                        }
                         setStage("ATTACKING");
                         lastAttackTimer.reset();
                         break;
@@ -581,7 +592,12 @@ public class AutoCrystalModule extends RotationModule
         }
         if (attackRotate)
         {
-            attackInternal(crystalEntity, getCrystalHand());
+            final Hand hand = getCrystalHand();
+            attackInternal(crystalEntity, hand);
+            if (sequentialConfig.getValue() && placeCrystal != null)
+            {
+                placeCrystal(placeCrystal.getBlockPos(), hand);
+            }
             setStage("ATTACKING");
             lastAttackTimer.reset();
         }
@@ -630,7 +646,12 @@ public class AutoCrystalModule extends RotationModule
                         || entity instanceof LivingEntity entity1 && isCrystalLethalTo(data, entity1);
                 if (attackRotate)
                 {
-                    attackInternal(crystalEntity, getCrystalHand());
+                    final Hand hand = getCrystalHand();
+                    attackInternal(crystalEntity, hand);
+                    if (sequentialConfig.getValue() && placeCrystal != null)
+                    {
+                        placeCrystal(placeCrystal.getBlockPos(), hand);
+                    }
                     setStage("ATTACKING");
                     lastAttackTimer.reset();
                     break;
