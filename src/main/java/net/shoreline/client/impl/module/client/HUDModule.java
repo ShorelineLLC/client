@@ -548,11 +548,11 @@ public class HUDModule extends ToggleModule
         PotionData data = new PotionData(instance.getEffectType(), instance.getAmplifier(), instance.getDuration());
         if (hudRenderPotions.keySet().removeIf(d -> data.getType() == d.getType()))
         {
-            hudRenderPotions.put(data, new Animation(true, 300, Easing.SINE_IN_OUT));
+            hudRenderPotions.put(data, new Animation(true, 250, Easing.SINE_IN_OUT));
         }
         else
         {
-            Animation anim = new Animation(false, 300, Easing.SINE_IN_OUT);
+            Animation anim = new Animation(false, 250, Easing.SINE_IN_OUT);
             anim.setState(true);
             hudRenderPotions.put(data, anim);
         }

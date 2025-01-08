@@ -370,13 +370,12 @@ public class AuraModule extends RotationModule
         }
         if (entityTarget != null && renderConfig.getValue() && (isHoldingSword() || autoSwapConfig.getValue() == Swap.SILENT))
         {
-            float delay = (attackSpeedConfig.getValue() * 50.0f) + randomDelay;
             long currentTime = System.currentTimeMillis() - lastAttackTime;
-            float animFactor = 1.0f - MathHelper.clamp(currentTime / (1000f - delay), 0.0f, 1.0f);
+            float animFactor = 1.0f - MathHelper.clamp(currentTime / 1000f, 0.0f, 1.0f);
             int attackDelay = (int) (70.0 * animFactor);
             RenderBuffers.preRender();
             RenderManager.renderBox(event.getMatrices(),
-                    Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.getInstance().getRGB(40 + attackDelay));
+                    Interpolation.getInterpolatedEntityBox(entityTarget), ColorsModule.getInstance().getRGB(30 + attackDelay));
             RenderManager.renderBoundingBox(event.getMatrices(),
                     Interpolation.getInterpolatedEntityBox(entityTarget), 1.5f, ColorsModule.getInstance().getRGB(100));
             RenderBuffers.postRender();
