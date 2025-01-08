@@ -14,8 +14,6 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.EntityStatusEffectS2CPacket;
-import net.minecraft.network.packet.s2c.play.RemoveEntityStatusEffectS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.StringHelper;
@@ -35,6 +33,7 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.StatusEffectEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.gui.screen.RenderOpenChatEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -543,36 +542,39 @@ public class HUDModule extends ToggleModule
     }
 
     @EventListener
+    public void onStatusEffectAdd(StatusEffectEvent.Add event)
+    {
+        StatusEffectInstance instance = event.getStatusEffect();
+        PotionData data = new PotionData(instance.getEffectType(), instance.getAmplifier(), instance.getDuration());
+        if (hudRenderPotions.keySet().removeIf(d -> data.getType() == d.getType()))
+        {
+            hudRenderPotions.put(data, new Animation(true, 300, Easing.SINE_IN_OUT));
+        }
+        else
+        {
+            Animation anim = new Animation(false, 300, Easing.SINE_IN_OUT);
+            anim.setState(true);
+            hudRenderPotions.put(data, anim);
+        }
+    }
+
+    @EventListener
+    public void onStatusEffectRemove(StatusEffectEvent.Remove event)
+    {
+        for (PotionData data : hudRenderPotions.keySet())
+        {
+            if (data.getType().equals(event.getType()))
+            {
+                hudRenderPotions.get(data).setState(false);
+                break;
+            }
+        }
+    }
+
+    @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
         serverStatus.reset();
-
-        if (event.getPacket() instanceof EntityStatusEffectS2CPacket packet)
-        {
-            PotionData data = new PotionData(packet.getEffectId(), packet.getAmplifier(), packet.getDuration());
-            if (hudRenderPotions.keySet().removeIf(d -> data.getType() == d.getType()))
-            {
-                hudRenderPotions.put(data, new Animation(true, 300, Easing.SINE_IN_OUT));
-            }
-            else
-            {
-                Animation anim = new Animation(false, 300, Easing.SINE_IN_OUT);
-                anim.setState(true);
-                hudRenderPotions.put(data, anim);
-            }
-        }
-
-        if (event.getPacket() instanceof RemoveEntityStatusEffectS2CPacket packet)
-        {
-            for (PotionData data : hudRenderPotions.keySet())
-            {
-                if (data.getType().equals(packet.effect()))
-                {
-                    hudRenderPotions.get(data).setState(false);
-                    break;
-                }
-            }
-        }
     }
 
     @EventListener

@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.event.entity;
 
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.shoreline.eventbus.event.Event;
 
 public class StatusEffectEvent extends Event
@@ -29,10 +31,17 @@ public class StatusEffectEvent extends Event
 
     public static class Remove extends StatusEffectEvent
     {
+        private final RegistryEntry<StatusEffect> type;
 
-        public Remove(StatusEffectInstance statusEffectInstance)
+        public Remove(RegistryEntry<StatusEffect> type)
         {
-            super(statusEffectInstance);
+            super(null);
+            this.type = type;
+        }
+
+        public RegistryEntry<StatusEffect> getType()
+        {
+            return type;
         }
     }
 }

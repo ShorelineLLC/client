@@ -124,8 +124,8 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
         }
     }
 
-    @Inject(method = "onStatusEffectApplied", at = @At(value = "HEAD"))
-    private void hookAddStatusEffect(StatusEffectInstance effect, Entity source, CallbackInfo ci)
+    @Inject(method = "addStatusEffect(Lnet/minecraft/entity/effect/StatusEffectInstance;Lnet/minecraft/entity/Entity;)Z", at = @At(value = "HEAD"))
+    private void hookAddStatusEffect(StatusEffectInstance effect, Entity source, CallbackInfoReturnable<Boolean> cir)
     {
         if ((Object) this != mc.player)
         {
@@ -135,8 +135,19 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
         EventBus.INSTANCE.dispatch(statusEffectEvent);
     }
 
-    @Inject(method = "onStatusEffectRemoved", at = @At(value = "HEAD"))
-    private void hookRemoveStatusEffect(StatusEffectInstance effect, CallbackInfo ci)
+    @Inject(method = "setStatusEffect", at = @At(value = "HEAD"))
+    private void hookAddStatusEffect$1(StatusEffectInstance effect, Entity source, CallbackInfo ci)
+    {
+        if ((Object) this != mc.player)
+        {
+            return;
+        }
+        StatusEffectEvent.Add statusEffectEvent = new StatusEffectEvent.Add(effect);
+        EventBus.INSTANCE.dispatch(statusEffectEvent);
+    }
+
+    @Inject(method = "removeStatusEffectInternal", at = @At(value = "HEAD"))
+    private void hookRemoveStatusEffect(RegistryEntry<StatusEffect> effect, CallbackInfoReturnable<StatusEffectInstance> cir)
     {
         if ((Object) this != mc.player)
         {
