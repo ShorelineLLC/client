@@ -423,7 +423,7 @@ public class NametagsModule extends ToggleModule
         else
         {
             renderBakedItemModel(bakedModel, stack, light, overlay, matrices,
-                    getItemGlintConsumer(vertexConsumers, RenderLayers.getItemLayer(stack, false), stack.hasGlint()));
+                    getItemGlintConsumer(vertexConsumers, RenderLayersClient.ENTITY_TRANSLUCENT_CULL.apply(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE), stack.hasGlint()));
         }
     }
 
