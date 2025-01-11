@@ -525,7 +525,7 @@ public class SpeedmineModule extends CombatModule
         return miningQueue.size() == 2 && data == miningQueue.getLast();
     }
 
-    float calcBlockBreakingDelta(BlockState state, BlockView world, BlockPos pos)
+    public float calcBlockBreakingDelta(BlockState state, BlockView world, BlockPos pos)
     {
         if (swapConfig.getValue() == Swap.OFF)
         {

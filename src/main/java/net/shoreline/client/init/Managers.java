@@ -20,6 +20,7 @@ import net.shoreline.client.impl.manager.player.MovementManager;
 import net.shoreline.client.impl.manager.player.PositionManager;
 import net.shoreline.client.impl.manager.player.interaction.InteractionManager;
 import net.shoreline.client.impl.manager.player.rotation.RotationManager;
+import net.shoreline.client.impl.manager.world.BlockManager;
 import net.shoreline.client.impl.manager.world.WaypointManager;
 import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.manager.world.tick.TickManager;
@@ -55,6 +56,7 @@ public class Managers
     public static ShaderManager SHADER;
     public static LookupManager LOOKUP;
     public static LightmapManager LIGHT_MAP;
+    public static BlockManager BLOCK;
     // The initialized state of the managers. If this is true, all managers
     // have been initialized and the init process is complete. As a general
     // rule, it is good practice to check this state before accessing instances.
@@ -81,6 +83,7 @@ public class Managers
             INVENTORY = new InventoryManager();
             POSITION = new PositionManager();
             ROTATION = new RotationManager();
+            BLOCK = new BlockManager();
             ANTICHEAT = new AntiCheatManager();
             MOVEMENT = new MovementManager();
             HOLE = new HoleManager();

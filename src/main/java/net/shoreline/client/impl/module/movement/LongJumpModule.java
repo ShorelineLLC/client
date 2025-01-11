@@ -42,6 +42,7 @@ public class LongJumpModule extends ToggleModule
     //
     Config<JumpMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for long jump", JumpMode.NORMAL, JumpMode.values()));
     Config<Float> boostConfig = register(new NumberConfig<>("Boost", "The jump boost speed", 0.1f, 4.5f, 10.0f, () -> modeConfig.getValue() == JumpMode.NORMAL));
+    Config<Boolean> elytraBoostConfig = register(new BooleanConfig("VanillaBoost", "Uses vanilla elytra boost", false, () -> modeConfig.getValue() == JumpMode.GRIM));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Automatically disables when rubberband is detected", true));
     //
     private int stage;
@@ -141,18 +142,21 @@ public class LongJumpModule extends ToggleModule
                 Managers.INVENTORY.click(6, 0, SlotActionType.PICKUP);
             }
 
-            if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || mc.player.getHungerManager().getFoodLevel() <= 6.0f)
+            if (elytraBoostConfig.getValue())
             {
-                return;
-            }
-            // event.cancel();
-            if (mc.player.getVelocity().y < 0.0)
-            {
-                final double d4 = 0.014f * Math.cos(Math.toRadians(mc.player.getYaw() + 90.0f));
-                final double d5 = 0.014f * Math.sin(Math.toRadians(mc.player.getYaw() + 90.0f));
-                Vec3d glide = new Vec3d(d4, 0.0, d5);
-                Vec3d motion = mc.player.getVelocity();
-                Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
+                if (!mc.player.isFallFlying() || mc.player.isTouchingWater() || mc.player.isInLava() || mc.player.getHungerManager().getFoodLevel() <= 6.0f)
+                {
+                    return;
+                }
+                // event.cancel();
+                if (mc.player.getVelocity().y < 0.0)
+                {
+                    final double d4 = 0.014f * Math.cos(Math.toRadians(mc.player.getYaw() + 90.0f));
+                    final double d5 = 0.014f * Math.sin(Math.toRadians(mc.player.getYaw() + 90.0f));
+                    Vec3d glide = new Vec3d(d4, 0.0, d5);
+                    Vec3d motion = mc.player.getVelocity();
+                    Managers.MOVEMENT.setMotionXZ(motion.x + glide.x, motion.z + glide.z);
+                }
             }
         }
     }
