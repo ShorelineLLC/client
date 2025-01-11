@@ -10,6 +10,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -17,7 +18,6 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
-import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.position.PositionUtil;
@@ -41,6 +41,8 @@ public class CriticalsModule extends ToggleModule
     Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only attempts criticals in walls", false, () -> modeConfig.getValue() == CritMode.GRIM_V3));
     //
     private final Timer attackTimer = new CacheTimer();
+    private boolean postUpdateGround;
+    private boolean postUpdateSprint;
 
     /**
      *
@@ -63,6 +65,13 @@ public class CriticalsModule extends ToggleModule
     public String getModuleData()
     {
         return EnumFormatter.formatEnum(modeConfig.getValue());
+    }
+
+    @Override
+    public void onDisable()
+    {
+        postUpdateGround = false;
+        postUpdateSprint = false;
     }
 
     /**
@@ -109,18 +118,13 @@ public class CriticalsModule extends ToggleModule
                 return;
             }
 
-            boolean sprinting = mc.player.isSprinting();
-            if (sprinting)
+            postUpdateSprint = mc.player.isSprinting();
+            if (postUpdateSprint)
             {
                 Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
             }
 
             attackSpoofJump(e);
-
-            if (sprinting)
-            {
-                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
-            }
         }
     }
 
@@ -161,14 +165,12 @@ public class CriticalsModule extends ToggleModule
             {
                 if (attackTimer.passed(500) && mc.player.isOnGround() && !mc.player.input.jumping)
                 {
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.11f, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.1100013579f, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.0000013579f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y + 1.1e-7f, z, mc.player.getYaw(), mc.player.getPitch(), false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y + 1.0e-8f, z, mc.player.getYaw(), mc.player.getPitch(), false));
+                    postUpdateGround = true;
                     attackTimer.reset();
-                    mc.player.addCritParticles(e);
                 }
             }
             case GRIM ->
@@ -198,20 +200,48 @@ public class CriticalsModule extends ToggleModule
                 {
                     return;
                 }
-                if (!mc.player.isCrawling())
+                if (mc.player.isOnGround() && !mc.player.isCrawling())
                 {
+//                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+//                            x, y + 0.00001058293536f, z, false));
+//                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+//                            x, y + 0.00000916580235f, z, false));
+//                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+//                            x, y + 0.00000010371854f, z, false));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.00001058293536f, z, false));
+                            x, y + 0.0625f, z, false));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.00000916580235f, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.00000010371854f, z, false));
+                            x, y + 0.04535f, z, false));
                 }
             }
             case LOW_HOP ->
             {
                 // mc.player.jump();
                 Managers.MOVEMENT.setMotionY(0.3425);
+            }
+        }
+    }
+
+    @EventListener
+    public void onPacketOutboundPost(PacketEvent.OutboundPost event)
+    {
+        if (mc.player == null)
+        {
+            return;
+        }
+
+        if (event.getPacket() instanceof PlayerInteractEntityC2SPacket)
+        {
+            if (postUpdateGround)
+            {
+                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), false));
+                postUpdateGround = false;
+            }
+
+            if (postUpdateSprint)
+            {
+                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+                postUpdateSprint = false;
             }
         }
     }
@@ -223,15 +253,16 @@ public class CriticalsModule extends ToggleModule
 
     public boolean isDoublePhased()
     {
-        for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
+        Box bb = mc.player.getBoundingBox().shrink(0.0, 1.2, 0.0)
+                .offset(0.0, 1.0, 0.0).expand(0.01, 0.0, 0.01);
+        for (BlockPos pos : PositionUtil.getAllInBox(bb))
         {
-            BlockState state = mc.world.getBlockState(pos);
-            BlockState state2 = mc.world.getBlockState(pos.up());
-            if (!state.isReplaceable() && !state2.isReplaceable())
+            if (mc.world.getBlockState(pos).blocksMovement())
             {
                 return true;
             }
         }
+
         return false;
     }
 
