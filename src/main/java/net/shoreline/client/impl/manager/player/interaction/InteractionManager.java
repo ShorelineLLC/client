@@ -48,12 +48,6 @@ public final class InteractionManager implements Globals
                               final RotationCallback rotationCallback,
                               final boolean airPlace)
     {
-        // TODO: should this be a thing
-        if (!mc.world.getBlockState(pos).isReplaceable())
-        {
-            return false;
-        }
-
         Direction direction = getInteractDirection(pos, strictDirection);
         if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {
@@ -88,12 +82,6 @@ public final class InteractionManager implements Globals
                               final boolean airPlace,
                               final RotationCallback rotationCallback)
     {
-        // TODO: should this be a thing
-        if (!mc.world.getBlockState(pos).isReplaceable())
-        {
-            return false;
-        }
-
         Direction direction = getInteractDirection(pos, strictDirection);
         if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {

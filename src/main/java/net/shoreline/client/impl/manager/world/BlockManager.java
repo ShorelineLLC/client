@@ -1,9 +1,7 @@
 package net.shoreline.client.impl.manager.world;
 
 import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
-import net.minecraft.resource.metadata.BlockEntry;
 import net.minecraft.util.math.BlockPos;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.module.world.SpeedmineModule;
@@ -32,7 +30,6 @@ public class BlockManager implements Globals
             breakPositions.clear();
             return;
         }
-
 
         for (BreakEntry blockEntry : breakPositions)
         {

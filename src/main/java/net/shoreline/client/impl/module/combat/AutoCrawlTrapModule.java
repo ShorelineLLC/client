@@ -1,8 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -27,7 +25,8 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.position.PositionUtil;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -46,6 +45,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
+    Config<Integer> extrapolateTicksConfig = register(new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders trap placements", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
 
@@ -53,6 +53,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     private List<BlockPos> placements = new ArrayList<>();
     private final Map<BlockPos, Long> packets = new HashMap<>();
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
+    private PlayerEntity target;
     private int blocksPlaced;
 
     public AutoCrawlTrapModule()
@@ -72,6 +73,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         surround.clear();
         placements.clear();
         fadeList.clear();
+        target = null;
     }
 
     @EventListener
@@ -89,7 +91,12 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         {
             return;
         }
-        surround = getCrawlTrap();
+        target = getClosestPlayer(enemyRangeConfig.getValue());
+        if (target == null)
+        {
+            return;
+        }
+        surround = getCrawlTrap(target);
         if (surround.isEmpty())
         {
             return;
@@ -208,7 +215,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            if (!mc.world.getBlockState(surroundPos).isReplaceable())
+            if (!mc.world.getBlockState(surroundPos).isReplaceable() && !Managers.BLOCK.isPassed(surroundPos, 0.7f))
             {
                 continue;
             }
@@ -217,49 +224,38 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream()
-                    .filter(e -> invalidEntity(e)).toList();
-            if (invalid.isEmpty())
+            List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream().filter(e -> invalidEntity(e)).toList();
+            if (!invalid.isEmpty())
             {
-                placements.add(surroundPos);
+                continue;
             }
+            placements.add(surroundPos);
         }
         return placements;
     }
 
-    public List<BlockPos> getCrawlTrap()
+    public List<BlockPos> getCrawlTrap(PlayerEntity entity)
     {
-        List<BlockPos> trapBlocks = new ArrayList<>();
-        for (Entity entity : mc.world.getEntities())
+        final List<BlockPos> crawlTrap = new ArrayList<>();
+        crawlTrap.add(entity.getBlockPos().up());
+
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+
+        int ticks = 0;
+        while (ticks <= extrapolateTicksConfig.getValue())
         {
-            if (entity == mc.player || !(entity instanceof PlayerEntity playerEntity)
-                    || Managers.SOCIAL.isFriend(entity.getName()))
+            double ox = (x - entity.prevX) * ticks;
+            double oz = (z - entity.prevZ) * ticks;
+            BlockPos blockPos = BlockPos.ofFloored(x + ox, y, z + oz);
+            if (!crawlTrap.contains(blockPos.up()))
             {
-                continue;
+                crawlTrap.add(blockPos.up());
             }
-            double dist = mc.player.squaredDistanceTo(playerEntity);
-            if (dist > enemyRangeConfig.getValue() * enemyRangeConfig.getValue())
-            {
-                continue;
-            }
-            Box bb = playerEntity.getBoundingBox().expand(0.5, 0.0, 0.5);
-            Box feetBox = new Box(bb.minX, playerEntity.getY(), bb.minZ, bb.maxX,
-                    playerEntity.getY() + 0.1, bb.maxZ);
-            for (BlockPos pos : BlockPos.iterate((int) Math.floor(feetBox.minX),
-                    (int) Math.floor(feetBox.minY), (int) Math.floor(feetBox.minZ),
-                    (int) Math.floor(feetBox.maxX), (int) Math.floor(feetBox.maxY),
-                    (int) Math.floor(feetBox.maxZ)))
-            {
-                BlockPos blockPos = pos.add(0, 1, 0);
-                if (!mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(),
-                        blockPos, ShapeContext.absent()))
-                {
-                    continue;
-                }
-                trapBlocks.add(blockPos);
-            }
+            ticks++;
         }
-        return trapBlocks;
+        return crawlTrap;
     }
 
     public boolean invalidEntity(Entity entity)
