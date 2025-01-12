@@ -216,8 +216,8 @@ public class AutoMineModule extends CombatModule
                         MiningData instantMine = miningDataLast == null ? miningData : miningDataLast;
                         if (mine1 && mine2)
                         {
-                            Direction miningDir = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP;
-                            Direction miningDir2 = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP;
+                            Direction miningDir = Managers.INTERACT.getInteractDirection(miningPos.pos(), strictDirectionConfig.getValue());
+                            Direction miningDir2 = Managers.INTERACT.getInteractDirection(miningPos2.pos(), strictDirectionConfig.getValue());
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos()) && miningQueue.size() < 2;
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
@@ -251,7 +251,7 @@ public class AutoMineModule extends CombatModule
                         }
                         else if (mine1)
                         {
-                            Direction miningDir = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP;
+                            Direction miningDir = Managers.INTERACT.getInteractDirection(miningPos.pos(), strictDirectionConfig.getValue());
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos());
                             if (instantMineIncorrect)
                             {
@@ -276,7 +276,7 @@ public class AutoMineModule extends CombatModule
                         }
                         else if (mine2)
                         {
-                            Direction miningDir2 = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos2.pos(), false) : Direction.UP;
+                            Direction miningDir2 = Managers.INTERACT.getInteractDirection(miningPos2.pos(), strictDirectionConfig.getValue());
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos2.pos());
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
@@ -303,7 +303,7 @@ public class AutoMineModule extends CombatModule
                                 autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
                         if (miningPos != null)
                         {
-                            Direction miningDir = strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(miningPos.pos(), false) : Direction.UP;
+                            Direction miningDir = Managers.INTERACT.getInteractDirection(miningPos.pos(), strictDirectionConfig.getValue());
                             boolean instantMineIncorrect = miningData != null && miningData.getPos() != miningPos.pos();
                             if (instantMineIncorrect || miningQueue.isEmpty())
                             {

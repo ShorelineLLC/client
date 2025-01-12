@@ -220,7 +220,7 @@ public class AutoAnchorModule extends BlockPlacerModule
                 return;
             }
             Managers.INVENTORY.setSlot(slot);
-            BlockHitResult result = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
+            BlockHitResult result = new BlockHitResult(pos.toCenterPos(), Managers.INTERACT.getInteractDirection(pos, strictDirectionConfig.getValue()), pos, true);
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             Managers.INVENTORY.setSlot(slot1);
@@ -238,7 +238,7 @@ public class AutoAnchorModule extends BlockPlacerModule
         else
         {
             Managers.INVENTORY.setSlot(slot1);
-            BlockHitResult result1 = new BlockHitResult(pos.toCenterPos(), strictDirectionConfig.getValue() ? Managers.INTERACT.getPlaceDirectionNCP(pos, false) : Direction.UP, pos, true);
+            BlockHitResult result1 = new BlockHitResult(pos.toCenterPos(), Managers.INTERACT.getInteractDirection(pos, strictDirectionConfig.getValue()), pos, true);
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result1);
             if (swingConfig.getValue())
             {
