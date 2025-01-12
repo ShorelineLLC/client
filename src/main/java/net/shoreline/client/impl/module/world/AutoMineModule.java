@@ -76,7 +76,8 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
     // Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
-    Config<AntiCrawl> crawlingConfig = register(new EnumConfig<>("AntiCrawl", "Attempts to stop player from crawling", AntiCrawl.OFF, AntiCrawl.values()));
+    Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
+    Config<Boolean> crawlExtrapolateConfig = register(new BooleanConfig("ExtrapolateCrawl", "Predicts attempts to crawl you", false, () -> crawlingConfig.getValue()));
     Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
     Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
     Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
@@ -163,8 +164,8 @@ public class AutoMineModule extends CombatModule
         {
             PlayerEntity playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
             BlockPos crawlingMine = getCrawlingMine(playerTarget);
-            boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlingConfig.getValue() == AntiCrawl.EXTRAPOLATE;
-            if (crawling && crawlingConfig.getValue() != AntiCrawl.OFF && crawlingMine != null)
+            boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlExtrapolateConfig.getValue();
+            if (crawling && crawlingConfig.getValue() && crawlingMine != null)
             {
                 miningQueue.clear();
                 manualOverride = true;
