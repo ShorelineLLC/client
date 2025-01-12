@@ -4,6 +4,7 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.init.Managers;
 
 import java.util.Comparator;
 import java.util.function.Predicate;
@@ -25,6 +26,7 @@ public class CombatModule extends RotationModule
     {
         return mc.world.getPlayers().stream().filter(e -> !(e instanceof ClientPlayerEntity) && !e.isSpectator())
                 .filter(e -> mc.player.squaredDistanceTo(e) <= range * range)
+                .filter(e -> !Managers.SOCIAL.isFriend(e.getName().getString()))
                 .min(Comparator.comparingDouble(e -> mc.player.squaredDistanceTo(e))).orElse(null);
     }
 
@@ -33,6 +35,7 @@ public class CombatModule extends RotationModule
         return mc.world.getPlayers().stream().filter(e -> !(e instanceof ClientPlayerEntity) && !e.isSpectator())
                 .filter(entityPredicate)
                 .filter(e -> mc.player.squaredDistanceTo(e) <= range * range)
+                .filter(e -> !Managers.SOCIAL.isFriend(e.getName().getString()))
                 .min(Comparator.comparingDouble(e -> mc.player.squaredDistanceTo(e))).orElse(null);
     }
 }

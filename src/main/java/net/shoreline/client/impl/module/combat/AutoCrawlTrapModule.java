@@ -25,8 +25,6 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -42,6 +40,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to trap enemies", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
+    Config<Boolean> downConfig = register(new BooleanConfig("PreventDownwards", "Prevents digging downwards", true));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
@@ -238,6 +237,10 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     {
         final List<BlockPos> crawlTrap = new ArrayList<>();
         crawlTrap.add(entity.getBlockPos().up());
+        if (downConfig.getValue())
+        {
+            crawlTrap.add(entity.getBlockPos().down());
+        }
 
         double x = entity.getX();
         double y = entity.getY();
@@ -252,6 +255,10 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             if (!crawlTrap.contains(blockPos.up()))
             {
                 crawlTrap.add(blockPos.up());
+            }
+            if (downConfig.getValue() && !crawlTrap.contains(blockPos.down()))
+            {
+                crawlTrap.add(blockPos.down());
             }
             ticks++;
         }

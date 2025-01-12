@@ -161,7 +161,7 @@ public class AutoMineModule extends CombatModule
 
         if (autoConfig.getValue() && !manualOverride && autoMiningQueue.isEmpty())
         {
-            PlayerEntity playerTarget = getClosestPlayer(e -> !Managers.SOCIAL.isFriend(e.getName().getString()), enemyRangeConfig.getValue());
+            PlayerEntity playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
             BlockPos crawlingMine = getCrawlingMine(playerTarget);
             boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlingConfig.getValue() == AntiCrawl.EXTRAPOLATE;
             if (crawling && crawlingConfig.getValue() != AntiCrawl.OFF && crawlingMine != null)
