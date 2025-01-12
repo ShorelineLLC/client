@@ -78,6 +78,7 @@ public class AutoMineModule extends CombatModule
     // Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
     Config<Boolean> crawlExtrapolateConfig = register(new BooleanConfig("ExtrapolateCrawl", "Predicts attempts to crawl you", false, () -> crawlingConfig.getValue()));
+    Config<Float> crawlResetConfig = register(new NumberConfig<>("CrawlResetTime", "The anticrawl reset timer", 0.0f, 5.0f, 10.0f, () -> false));
     Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
     Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
     Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
@@ -90,6 +91,7 @@ public class AutoMineModule extends CombatModule
     private long lastBreak;
     private boolean manualOverride;
     private boolean crawlingOverride;
+    private final Timer antiCrawlTimer = new CacheTimer();
     private boolean silentSwapping;
     private final Timer stopMiningTimer = new CacheTimer();
     private int tickDelay;
@@ -160,15 +162,25 @@ public class AutoMineModule extends CombatModule
             }
         }
 
-        if (autoConfig.getValue() && !manualOverride && autoMiningQueue.isEmpty())
+        boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlExtrapolateConfig.getValue();
+        if (crawling)
+        {
+            antiCrawlTimer.reset();
+        }
+
+        if (antiCrawlTimer.passed(crawlResetConfig.getValue() * 100.0f))
+        {
+            crawlingOverride = false;
+        }
+
+        if (autoConfig.getValue() && !manualOverride && !crawlingOverride && autoMiningQueue.isEmpty())
         {
             PlayerEntity playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
             BlockPos crawlingMine = getCrawlingMine(playerTarget);
-            boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlExtrapolateConfig.getValue();
             if (crawling && crawlingConfig.getValue() && crawlingMine != null)
             {
                 miningQueue.clear();
-                manualOverride = true;
+                crawlingOverride = true;
                 startAutoMine(crawlingMine, Direction.DOWN);
             }
             else
@@ -498,6 +510,11 @@ public class AutoMineModule extends CombatModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
+        if (mc.player == null)
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
         {
             handleBlockUpdatePacket(packet);
@@ -527,6 +544,11 @@ public class AutoMineModule extends CombatModule
                 }
             }
             return;
+        }
+
+        if (packet.getPos().equals(mc.player.getBlockPos().up()))
+        {
+            antiCrawlTimer.reset();
         }
 
         if (instantConfig.getValue())
