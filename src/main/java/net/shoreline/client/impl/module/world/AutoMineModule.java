@@ -85,6 +85,7 @@ public class AutoMineModule extends CombatModule
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
     Config<Boolean> smoothColorConfig = register(new BooleanConfig("SmoothColor", "Interpolates from start to done color", false, () -> false));
 
+    private PlayerEntity playerTarget;
     private final Map<MiningData, Animation> fadeList = new HashMap<>();
     private FirstOutQueue<MiningData> miningQueue = new FirstOutQueue<>(2);
     private final Queue<AutoMiningData> autoMiningQueue = new ArrayDeque<>();
@@ -121,6 +122,7 @@ public class AutoMineModule extends CombatModule
     @Override
     protected void onDisable()
     {
+        playerTarget = null;
         miningQueue.clear();
         autoMiningQueue.clear();
         fadeList.clear();
@@ -162,6 +164,7 @@ public class AutoMineModule extends CombatModule
             }
         }
 
+        playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
         boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlExtrapolateConfig.getValue();
         if (crawling)
         {
@@ -175,7 +178,6 @@ public class AutoMineModule extends CombatModule
 
         if (autoConfig.getValue() && !manualOverride && !crawlingOverride && autoMiningQueue.isEmpty())
         {
-            PlayerEntity playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
             BlockPos crawlingMine = getCrawlingMine(playerTarget);
             if (crawling && crawlingConfig.getValue() && crawlingMine != null)
             {
@@ -546,7 +548,7 @@ public class AutoMineModule extends CombatModule
             return;
         }
 
-        if (packet.getPos().equals(mc.player.getBlockPos().up()))
+        if (packet.getPos().equals(getCrawlingMine(playerTarget)))
         {
             antiCrawlTimer.reset();
         }
