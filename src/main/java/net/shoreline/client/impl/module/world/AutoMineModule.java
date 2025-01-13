@@ -166,19 +166,28 @@ public class AutoMineModule extends CombatModule
 
         playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
         boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlExtrapolateConfig.getValue();
+        BlockPos crawlingMine = getCrawlingMine(playerTarget);
         if (crawling)
         {
             antiCrawlTimer.reset();
         }
 
-        if (antiCrawlTimer.passed(crawlResetConfig.getValue() * 100.0f))
+        if (crawlingOverride)
         {
-            crawlingOverride = false;
+            MiningData miningData1 = null;
+            if (!miningQueue.isEmpty())
+            {
+                miningData1 = miningQueue.getFirst();
+            }
+            boolean crawlingIncorrect = miningData1 != null && crawlingMine != null && !miningData1.getPos().equals(crawlingMine);
+            if (antiCrawlTimer.passed(crawlResetConfig.getValue() * 100.0f) || crawlingIncorrect)
+            {
+                crawlingOverride = false;
+            }
         }
 
         if (autoConfig.getValue() && !manualOverride && !crawlingOverride && autoMiningQueue.isEmpty())
         {
-            BlockPos crawlingMine = getCrawlingMine(playerTarget);
             if (crawling && crawlingConfig.getValue() && crawlingMine != null)
             {
                 miningQueue.clear();
@@ -565,10 +574,6 @@ public class AutoMineModule extends CombatModule
                         return;
                     }
                     stopMining(data);
-                    if (!data.hasAttemptedBreak())
-                    {
-                        data.setAttemptedBreak(true);
-                    }
                     stopMiningTimer.reset();
                 }
             }
