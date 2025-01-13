@@ -48,7 +48,7 @@ public final class InteractionManager implements Globals
                               final RotationCallback rotationCallback,
                               final boolean airPlace)
     {
-        Direction direction = getInteractDirection(pos, strictDirection);
+        Direction direction = getInteractDirectionInternal(pos, strictDirection);
         if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
@@ -82,7 +82,7 @@ public final class InteractionManager implements Globals
                               final boolean airPlace,
                               final RotationCallback rotationCallback)
     {
-        Direction direction = getInteractDirection(pos, strictDirection);
+        Direction direction = getInteractDirectionInternal(pos, strictDirection);
         if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
@@ -266,6 +266,16 @@ public final class InteractionManager implements Globals
      * @return
      */
     public Direction getInteractDirection(final BlockPos blockPos, final boolean strictDirection)
+    {
+        Direction dir = getInteractDirectionInternal(blockPos, strictDirection);
+        if (dir != null)
+        {
+            return dir;
+        }
+        return Direction.UP;
+    }
+
+    public Direction getInteractDirectionInternal(final BlockPos blockPos, final boolean strictDirection)
     {
         Direction interactDirection = null;
         for (final Direction direction : Direction.values())

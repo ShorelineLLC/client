@@ -280,7 +280,7 @@ public class AutoAnchorModule extends BlockPlacerModule
                 }
 
                 if (!AirPlaceModule.getInstance().isEnabled()
-                        && Managers.INTERACT.getInteractDirection(pos, false) == null)
+                        && Managers.INTERACT.getInteractDirectionInternal(pos, false) == null)
                 {
                     continue;
                 }
