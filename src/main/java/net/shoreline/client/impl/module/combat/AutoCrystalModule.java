@@ -52,8 +52,10 @@ import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.loader.Loader;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
@@ -93,7 +95,7 @@ public class AutoCrystalModule extends RotationModule
     Config<Float> attackDelayConfig = register(new NumberConfig<>("AttackDelay", "Added delays", 0.0f, 0.0f, 5.0f));
     Config<Integer> attackFactorConfig = register(new NumberConfig<>("AttackFactor", "Factor of attack delay", 0, 0, 3, () -> attackDelayConfig.getValue() > 0.0));
     Config<Float> attackLimitConfig = register(new NumberConfig<>("AttackLimit", "Attacks before considering a crystal unbreakable", 0.5f, 1.5f, 20.0f));
-    Config<Float> randomSpeedConfig = register(new NumberConfig<>("RandomSpeed", "Randomized delay for breaking crystals", 0.0f, 0.0f, 10.0f));
+    // Config<Float> randomSpeedConfig = register(new NumberConfig<>("RandomSpeed", "Randomized delay for breaking crystals", 0.0f, 0.0f, 10.0f));
     Config<Boolean> breakDelayConfig = register(new BooleanConfig("BreakDelay", "Uses attack latency to calculate break delays", false));
     Config<Float> breakTimeoutConfig = register(new NumberConfig<>("BreakTimeout", "Time after waiting for the average break time before considering a crystal attack failed", 0.0f, 3.0f, 10.0f, () -> breakDelayConfig.getValue()));
     Config<Float> minTimeoutConfig = register(new NumberConfig<>("MinTimeout", "Minimum time before considering a crystal break/place failed", 0.0f, 5.0f, 20.0f, () -> breakDelayConfig.getValue()));
@@ -135,7 +137,8 @@ public class AutoCrystalModule extends RotationModule
     // Render settings
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the current placement", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
-    Config<Boolean> breakDebugConfig = register(new BooleanConfig("Break-Debug", "Debugs break ms in data", false, () -> renderConfig.getValue()));
+    Config<Boolean> debugConfig = new BooleanConfig("Debug", "Adds extra debug info to arraylist", false);
+    Config<Boolean> debugDamageConfig = new BooleanConfig("Debug-Damage", "Renders damage", false, () -> renderConfig.getValue() && debugConfig.getValue());
     Config<Boolean> disableDeathConfig = register(new BooleanConfig("DisableOnDeath", "Disables during disconnect/death", false));
     //
     private DamageData<EndCrystalEntity> attackCrystal;
@@ -148,10 +151,11 @@ public class AutoCrystalModule extends RotationModule
     private boolean attackRotate;
     private boolean rotated;
     private float[] silentRotations;
+    private float calculatePlaceCrystalTime = 0;
     //
     private static final Box FULL_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 2.0, 1.0);
     private static final Box HALF_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-    private final Timer lastAttackTimer = new CacheTimer();
+    private final CacheTimer lastAttackTimer = new CacheTimer();
     private final Timer lastPlaceTimer = new CacheTimer();
     private final Timer lastSwapTimer = new CacheTimer();
     private final Timer autoSwapTimer = new CacheTimer();
@@ -177,6 +181,12 @@ public class AutoCrystalModule extends RotationModule
         super("AutoCrystal", "Attacks entities with end crystals",
                 ModuleCategory.COMBAT, 750);
         INSTANCE = this;
+
+        if (Loader.SESSION.getUserType().equals("dev") || Loader.SESSION.getUserType().equals("beta"))
+        {
+            register(debugConfig);
+            register(debugDamageConfig);
+        }
     }
 
     public static AutoCrystalModule getInstance()
@@ -187,11 +197,21 @@ public class AutoCrystalModule extends RotationModule
     @Override
     public String getModuleData()
     {
-        if (breakDebugConfig.getValue())
+        if (debugConfig.getValue())
         {
-            return String.format("%dms, %d", lastAttackTimer.passed(((20.0f - breakSpeedConfig.getValue()) * 50.0f) + 2000.0f) ? 0 : getBreakMs(), crystalCounter.getPerSecond());
+            return String.format("%sms, %.0f, %dms, %d".formatted(
+                    new DecimalFormat("0.00")
+                            .format(calculatePlaceCrystalTime / 1E6),
+                    placeCrystal == null ? 0 : lastAttackTimer.getLastResetTime() / 1E6,
+                    lastAttackTimer.passed(((20.0f - breakSpeedConfig.getValue()) * 50.0f) + 2000.0f) ? 0 : getBreakMs(),
+                    crystalCounter.getPerSecond()));
         }
-        return super.getModuleData();
+        else
+        {
+            return String.format("%dms, %d",
+                    lastAttackTimer.passed(((20.0f - breakSpeedConfig.getValue()) * 50.0f) + 2000.0f) ? 0 : getBreakMs(),
+                    crystalCounter.getPerSecond());
+        }
     }
 
     @Override
@@ -202,6 +222,7 @@ public class AutoCrystalModule extends RotationModule
         placeCrystal = null;
         crystalRotation = null;
         silentRotations = null;
+        calculatePlaceCrystalTime = 0;
         stuckCrystals.clear();
         attackPackets.clear();
         antiStuckCrystals.clear();
@@ -249,6 +270,7 @@ public class AutoCrystalModule extends RotationModule
         renderPos = null;
         ArrayList<Entity> entities = Lists.newArrayList(mc.world.getEntities());
         List<BlockPos> blocks = getSphere(mc.player.getPos());
+        long timePre = System.nanoTime();
         if (placeConfig.getValue())
         {
             placeCrystal = calculatePlaceCrystal(blocks, entities);
@@ -270,6 +292,8 @@ public class AutoCrystalModule extends RotationModule
                     }
                 }
             }
+            long timePost = System.nanoTime() - timePre;
+            calculatePlaceCrystalTime = timePost;
         }
         float breakDelay = getBreakDelay();
         if (breakDelayConfig.getValue())
@@ -407,6 +431,7 @@ public class AutoCrystalModule extends RotationModule
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(renderPos, animation);
             }
+
         }
     }
 

@@ -12,6 +12,8 @@ public class CacheTimer implements Timer
     // the last timer reset
     private long time;
 
+    private long lastResetTime;
+
     /**
      * Default constructor which will initialize the time to the current time
      * which means {@link #passed(Number)} and {@link #passed(Number, TimeUnit)}
@@ -82,13 +84,21 @@ public class CacheTimer implements Timer
         return unit.convert(getElapsedTime(), TimeUnit.MILLISECONDS);
     }
 
+    public long getLastResetTime()
+    {
+        return lastResetTime;
+    }
+
     /**
      * Sets the cached time since the last reset to the current time
      */
     @Override
     public void reset()
     {
-        this.time = System.nanoTime();
+        long currentNanoTime = System.nanoTime();
+        lastResetTime = currentNanoTime - this.time;
+
+        this.time = currentNanoTime;
     }
 
     /**
