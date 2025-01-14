@@ -292,8 +292,7 @@ public class AutoCrystalModule extends RotationModule
                     }
                 }
             }
-            long timePost = System.nanoTime() - timePre;
-            calculatePlaceCrystalTime = timePost;
+            calculatePlaceCrystalTime = System.nanoTime() - timePre;
         }
         float breakDelay = getBreakDelay();
         if (breakDelayConfig.getValue())
