@@ -196,11 +196,7 @@ public class CriticalsModule extends ToggleModule
             }
             case GRIM_V3 ->
             {
-                if (wallsOnlyConfig.getValue() && !isDoublePhased())
-                {
-                    return;
-                }
-                if (mc.player.isOnGround() && !mc.player.isCrawling())
+                if (mc.player.isOnGround() && !mc.player.isCrawling() && (wallsOnlyConfig.getValue() ? isDoublePhased() : isPhased()))
                 {
 //                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 //                            x, y + 0.00001058293536f, z, false));
@@ -252,6 +248,20 @@ public class CriticalsModule extends ToggleModule
     }
 
     public boolean isDoublePhased()
+    {
+        for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox(), mc.player.getBlockPos()))
+        {
+            BlockState state = mc.world.getBlockState(pos);
+            BlockState state2 = mc.world.getBlockState(pos.up());
+            if (!state.isReplaceable() && !state2.isReplaceable())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPhased()
     {
         Box bb = mc.player.getBoundingBox().shrink(0.0, 1.2, 0.0)
                 .offset(0.0, 1.0, 0.0).expand(0.01, 0.0, 0.01);
