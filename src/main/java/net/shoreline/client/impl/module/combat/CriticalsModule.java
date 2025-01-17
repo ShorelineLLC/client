@@ -196,7 +196,11 @@ public class CriticalsModule extends ToggleModule
             }
             case GRIM_V3 ->
             {
-                if (mc.player.isOnGround() && !mc.player.isCrawling() && (wallsOnlyConfig.getValue() ? isDoublePhased() : isPhased()))
+                if (wallsOnlyConfig.getValue() && !isDoublePhased())
+                {
+                    return;
+                }
+                if (mc.player.isOnGround() && !mc.player.isCrawling())
                 {
 //                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 //                            x, y + 0.00001058293536f, z, false));
