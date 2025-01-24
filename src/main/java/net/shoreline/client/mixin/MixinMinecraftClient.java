@@ -104,6 +104,13 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
         EventBus.INSTANCE.dispatch(runTickEvent);
     }
 
+    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;overlay:Lnet/minecraft/client/gui/screen/Overlay;"))
+    private void hookTick(CallbackInfo ci)
+    {
+        ClientTickEvent tickEvent = new ClientTickEvent();
+        EventBus.INSTANCE.dispatch(tickEvent);
+    }
+
     /**
      * @param loadingContext
      * @param cir
