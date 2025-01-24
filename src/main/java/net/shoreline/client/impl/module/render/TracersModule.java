@@ -102,7 +102,7 @@ public class TracersModule extends ToggleModule
                 case ON_SCREEN -> RenderManager.isFrustumVisible(entity.getBoundingBox());
                 case OFF_SCREEN -> !RenderManager.isFrustumVisible(entity.getBoundingBox());
             };
-            if (entity == null || !entity.isAlive() || entity == mc.player || !shouldDraw || Managers.SOCIAL.isFriend(entity.getDisplayName()) && !friendsConfig.getValue())
+            if (entity == null || !entity.isAlive() || entity == mc.player || !shouldDraw || entity instanceof PlayerEntity && Managers.SOCIAL.isFriend(entity.getDisplayName()) && !friendsConfig.getValue())
             {
                 continue;
             }
