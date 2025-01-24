@@ -366,7 +366,7 @@ public class AutoMineModule extends CombatModule
                 data.resetBreakTime();
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak()
-                    && data.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000)))
+                    && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
                 silentSwapping = false;
@@ -380,14 +380,11 @@ public class AutoMineModule extends CombatModule
             {
                 if (mc.player.isUsingItem() && !multitaskConfig.getValue())
                 {
-                    return;
+                    continue;
                 }
 
-                if (data.getSlot() != Managers.INVENTORY.getServerSlot())
-                {
-                    Managers.INVENTORY.setSlot(data.getSlot());
-                    silentSwapping = true;
-                }
+                Managers.INVENTORY.setSlot(data.getSlot());
+                silentSwapping = true;
 
                 if (!data.hasAttemptedBreak())
                 {
@@ -431,7 +428,7 @@ public class AutoMineModule extends CombatModule
         }
         // Something went wrong, remove and remine
         if (miningData2.getBlockDamage() >= speedConfig.getValue() && miningData2.hasAttemptedBreak()
-                && miningData2.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000))
+                && miningData2.passedAttemptedBreakTime(500))
         {
             abortMining(miningData2);
             removeQueuedMine(miningData2);
@@ -740,6 +737,7 @@ public class AutoMineModule extends CombatModule
     private PriorityQueue<AutoMineCalc> getMiningPosition(PlayerEntity entity)
     {
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
+
         List<AutoMineCalc> phasePositions = getPhasePosition(mc.player);
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
         for (BlockPos blockPos : surroundBlocks)
@@ -893,17 +891,11 @@ public class AutoMineModule extends CombatModule
                 if (grimConfig.getValue())
                 {
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 }
                 else
                 {
