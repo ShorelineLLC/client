@@ -67,6 +67,7 @@ public class AutoWebModule extends BlockPlacerModule
     {
         if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
+            webs.clear();
             return;
         }
 
@@ -74,8 +75,10 @@ public class AutoWebModule extends BlockPlacerModule
         int slot = getBlockItemSlot(Blocks.COBWEB);
         if (slot == -1)
         {
+            webs.clear();
             return;
         }
+
         if (shiftDelay < shiftDelayConfig.getValue())
         {
             shiftDelay++;

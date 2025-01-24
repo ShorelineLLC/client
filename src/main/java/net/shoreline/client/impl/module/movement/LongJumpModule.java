@@ -18,6 +18,7 @@ import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.player.PlayerMoveEvent;
 import net.shoreline.client.impl.event.entity.player.TravelEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -86,9 +87,9 @@ public class LongJumpModule extends ToggleModule
     }
 
     @EventListener
-    public void onTravel(TravelEvent event)
+    public void onTravel(TickEvent event)
     {
-        if (mc.player == null)
+        if (mc.player == null || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
         }

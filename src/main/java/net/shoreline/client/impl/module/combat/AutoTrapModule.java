@@ -99,12 +99,16 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
         if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
+            surround.clear();
+            placements.clear();
             return;
         }
 
         final int slot = getResistantBlockItem();
         if (slot == -1)
         {
+            surround.clear();
+            placements.clear();
             return;
         }
         PlayerEntity trapTarget = getTrapTarget();
@@ -114,6 +118,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             placements.clear();
             return;
         }
+
         BlockPos targetBlockPos = PositionUtil.getRoundedBlockPos(trapTarget.getX(), trapTarget.getY(), trapTarget.getZ());
         surround = getSurround(targetBlockPos, trapTarget);
         if (surround.isEmpty())

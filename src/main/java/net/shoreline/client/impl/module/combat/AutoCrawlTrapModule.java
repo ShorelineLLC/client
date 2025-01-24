@@ -82,19 +82,26 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
 
         if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
+            surround.clear();
+            placements.clear();
             return;
         }
 
         final int slot = getResistantBlockItem();
         if (slot == -1)
         {
+            surround.clear();
+            placements.clear();
             return;
         }
         target = getClosestPlayer(enemyRangeConfig.getValue());
         if (target == null)
         {
+            surround.clear();
+            placements.clear();
             return;
         }
+
         surround = getCrawlTrap(target);
         if (surround.isEmpty())
         {

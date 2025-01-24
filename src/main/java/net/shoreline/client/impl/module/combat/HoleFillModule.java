@@ -95,14 +95,17 @@ public class HoleFillModule extends ObsidianPlacerModule
 
         if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
+            fills.clear();
             return;
         }
 
         final int slot = websConfig.getValue() ? getBlockItemSlot(Blocks.COBWEB) : getResistantBlockItem();
         if (slot == -1)
         {
+            fills.clear();
             return;
         }
+
         if (shiftDelayConfig.getValue() > 0 && shiftDelay < shiftDelayConfig.getValue())
         {
             shiftDelay++;

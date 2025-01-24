@@ -113,14 +113,19 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
         if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
+            surround.clear();
+            placements.clear();
             return;
         }
 
         final int slot = getResistantBlockItem();
         if (slot == -1)
         {
+            surround.clear();
+            placements.clear();
             return;
         }
+
         BlockPos playerPos = PositionUtil.getRoundedBlockPos(mc.player.getX(), mc.player.getY(), mc.player.getZ());
         surround = getSurround(playerPos, mc.player);
         if (surround.isEmpty())

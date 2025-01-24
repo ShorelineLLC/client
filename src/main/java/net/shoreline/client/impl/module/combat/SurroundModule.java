@@ -115,14 +115,19 @@ public class SurroundModule extends ObsidianPlacerModule
 
         if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
+            surround.clear();
+            placements.clear();
             return;
         }
 
         final int slot = getResistantBlockItem();
         if (slot == -1)
         {
+            surround.clear();
+            placements.clear();
             return;
         }
+
         surround = getSurround(mc.player);
         if (surround.isEmpty())
         {
