@@ -80,7 +80,7 @@ public class HUDModule extends ToggleModule
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
     Config<VanillaHud> itemNameConfig = register(new EnumConfig<>("ItemName", "Renders the Minecraft item name display", VanillaHud.HIDE, VanillaHud.values()));
     Config<Boolean> potionEffectsConfig = register(new BooleanConfig("PotionEffects", "Displays active potion effects", true));
-    Config<Boolean> potionColorsConfig = register(new BooleanConfig("PotionColors", "Displays active potion colors", true, () -> potionEffectsConfig.getValue()));
+    Config<PotionColors> potionColorsConfig = register(new EnumConfig<>("PotionColors", "Displays active potion colors", PotionColors.NORMAL, PotionColors.values(), () -> potionEffectsConfig.getValue()));
     Config<Boolean> durabilityConfig = register(new BooleanConfig("Durability", "Displays the current held items durability", false));
     Config<Boolean> coordsConfig = register(new BooleanConfig("Coords", "Displays world coordinates", true));
     Config<Boolean> netherCoordsConfig = register(new BooleanConfig("NetherCoords", "Displays nether coordinates", true, () -> coordsConfig.getValue()));
@@ -89,6 +89,7 @@ public class HUDModule extends ToggleModule
     Config<SpeedHud> speedConfig = register(new EnumConfig<>("Speed", "Displays the current movement speed of the player", SpeedHud.K_M_H, SpeedHud.values()));
     Config<Boolean> pingConfig = register(new BooleanConfig("Ping", "Display server response time in ms", true));
     Config<Boolean> tpsConfig = register(new BooleanConfig("TPS", "Displays server ticks per second", true));
+    Config<Boolean> packetsConfig = register(new BooleanConfig("Packets", "Displays outbound packets per second", false));
     Config<Boolean> fpsConfig = register(new BooleanConfig("FPS", "Displays game FPS", true));
     Config<Boolean> arraylistConfig = register(new BooleanConfig("Arraylist", "Displays a list of all active modules", true));
     Config<Integer> animTimeConfig = register(new NumberConfig<>("Arraylist-Time", "Timer for the animation", 0, 1000, 2000, () -> false));
@@ -320,9 +321,14 @@ public class HUDModule extends ToggleModule
                             amplifier ? e.getAmplifier() + 1 + " " : "", duration);
                     int width = RenderManager.textWidth(text);
                     float x = (width + 1.0f) * (float) animation.getFactor();
+                    int potionColor = switch (potionColorsConfig.getValue())
+                    {
+                        case NORMAL -> ColorUtil.withAlpha(effect.getColor(), 255);
+                        case OLD -> ColorUtil.withAlpha(getLiquidColor(e.getType().getIdAsString(), effect), 255);
+                        case OFF -> getHudColor(rainbowOffset);
+                    };
                     RenderManager.renderText(event.getContext(), text,
-                            res.getScaledWidth() - x, renderingUp ? bottomRight : topRight,
-                            potionColorsConfig.getValue() ? ColorUtil.withAlpha(effect.getColor(), 255) : getHudColor(rainbowOffset));
+                            res.getScaledWidth() - x, renderingUp ? bottomRight : topRight, potionColor);
                     if (renderingUp)
                     {
                         bottomRight -= RenderManager.textHeight();
@@ -415,6 +421,23 @@ public class HUDModule extends ToggleModule
             {
                 int latency = FastLatencyModule.getInstance().isEnabled() ? (int) FastLatencyModule.getInstance().getLatency() : Managers.NETWORK.getClientLatency();
                 String text = String.format("Ping §f%dms", latency);
+                int width = RenderManager.textWidth(text);
+                RenderManager.renderText(event.getContext(), text,
+                        res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
+                        getHudColor(rainbowOffset));
+                if (renderingUp)
+                {
+                    bottomRight -= RenderManager.textHeight();
+                }
+                else
+                {
+                    topRight += RenderManager.textHeight();
+                }
+                rainbowOffset++;
+            }
+            if (packetsConfig.getValue())
+            {
+                String text = String.format("Packets §f%s<-%s", Managers.NETWORK.getOutgoingPPS(), Managers.NETWORK.getIncomingPPS());
                 int width = RenderManager.textWidth(text);
                 RenderManager.renderText(event.getContext(), text,
                         res.getScaledWidth() - width - 1.0f, renderingUp ? bottomRight : topRight,
@@ -666,6 +689,41 @@ public class HUDModule extends ToggleModule
         return "";
     }
 
+    public int getLiquidColor(String name, StatusEffect effect)
+    {
+        return switch (name.replace("minecraft:", ""))
+        {
+            case "speed" -> 8171462;
+            case "slowness" -> 5926017;
+            case "haste" -> 14270531;
+            case "mining_fatigue" -> 4866583;
+            case "strength" -> 9643043;
+            case "instant_health" -> 16262179;
+            case "instant_damage" -> 4393481;
+            case "jump_boost" -> 2293580;
+            case "nausea" -> 5578058;
+            case "regeneration" -> 13458603;
+            case "resistance" -> 10044730;
+            case "fire_resistance" -> 14981690;
+            case "water_breathing" -> 3035801;
+            case "invisibility" -> 8356754;
+            case "blindness" -> 2039587;
+            case "night_vision" -> 2039713;
+            case "hunger" -> 5797459;
+            case "weakness" -> 4738376;
+            case "poison" -> 5149489;
+            case "wither" -> 3484199;
+            case "health_boost" -> 16284963;
+            case "absorption" -> 2445989;
+            case "saturation" -> 16262179;
+            case "glowing" -> 9740385;
+            case "levitation" -> 13565951;
+            case "luck" -> 3381504;
+            case "unluck" -> 12624973;
+            default -> effect.getColor();
+        };
+    }
+
     private int rainbow(long offset)
     {
         float hue = (float) (((double) System.currentTimeMillis() * (rainbowSpeedConfig.getValue() / 10)
@@ -723,6 +781,13 @@ public class HUDModule extends ToggleModule
     {
         K_M_H,
         B_P_S,
+        OFF
+    }
+
+    public enum PotionColors
+    {
+        NORMAL,
+        OLD,
         OFF
     }
 

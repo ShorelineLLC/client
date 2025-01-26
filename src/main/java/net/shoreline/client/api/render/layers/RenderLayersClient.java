@@ -22,7 +22,7 @@ public class RenderLayersClient implements Globals
 
     public static final RenderLayer GLINT = RenderLayer.of("glint", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS, 256, RenderLayer.MultiPhaseParameters.builder()
             .program(RenderPhase.GLINT_PROGRAM).texture(new RenderPhase.Texture(ItemRenderer.ITEM_ENCHANTMENT_GLINT, true, false))
-            .writeMaskState(RenderPhase.COLOR_MASK).cull(RenderPhase.DISABLE_CULLING).depthTest(new DepthTest()).transparency(RenderPhase.GLINT_TRANSPARENCY).texturing(RenderPhase.GLINT_TEXTURING).build(false));
+            .writeMaskState(RenderPhase.COLOR_MASK).cull(RenderPhase.ENABLE_CULLING).depthTest(new DepthTest()).transparency(RenderPhase.GLINT_TRANSPARENCY).texturing(RenderPhase.GLINT_TEXTURING).build(false));
     // Using custom lightmap for 3d rendering
     public static final Function<Identifier, RenderLayer> ENTITY_NO_OUTLINE = Util.memoize((texture) -> {
         RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder().program(RenderLayer.ENTITY_NO_OUTLINE_PROGRAM).texture(new RenderPhase.Texture(texture, false, false)).transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY).cull(RenderLayer.DISABLE_CULLING).lightmap(new Lightmap()).overlay(RenderLayer.ENABLE_OVERLAY_COLOR).writeMaskState(RenderLayer.COLOR_MASK).build(false);
@@ -88,7 +88,6 @@ public class RenderLayersClient implements Globals
         public void startDrawing()
         {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glDepthMask(true);
             GL11.glDepthFunc(GL11.GL_EQUAL);
         }
 
@@ -96,7 +95,6 @@ public class RenderLayersClient implements Globals
         public void endDrawing()
         {
             GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glDepthMask(false);
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             GL11.glDepthFunc(GL11.GL_ALWAYS);
             // GL11.glClearDepth(1.0);

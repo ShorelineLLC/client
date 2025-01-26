@@ -5,9 +5,11 @@ import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.shoreline.client.impl.event.gui.screen.ConnectScreenEvent;
 import net.shoreline.client.impl.event.network.DisconnectEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.math.PerSecondCounter;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -25,6 +27,9 @@ public class NetworkManager implements Globals
     private ServerAddress address;
     private ServerInfo info;
 
+    private final PerSecondCounter outgoingCounter = new PerSecondCounter();
+    private final PerSecondCounter incomingCounter = new PerSecondCounter();
+
     public NetworkManager()
     {
         EventBus.INSTANCE.subscribe(this);
@@ -41,6 +46,18 @@ public class NetworkManager implements Globals
     public void onDisconnect(DisconnectEvent event)
     {
         PACKET_CACHE.clear();
+    }
+
+    @EventListener
+    public void onPacketOutbound(PacketEvent.Outbound event)
+    {
+        outgoingCounter.updateCounter();
+    }
+
+    @EventListener
+    public void onPacketOutbound(PacketEvent.Inbound event)
+    {
+        incomingCounter.updateCounter();
     }
 
     public void connect(final ServerAddress address, final ServerInfo info)
@@ -158,6 +175,16 @@ public class NetworkManager implements Globals
     public boolean is2b2t()
     {
         return getServerIp().contains("2b2t.org");
+    }
+
+    public int getOutgoingPPS()
+    {
+        return outgoingCounter.getPerSecond();
+    }
+
+    public int getIncomingPPS()
+    {
+        return incomingCounter.getPerSecond();
     }
 
     public String getServerIp()

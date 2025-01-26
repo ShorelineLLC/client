@@ -6,7 +6,6 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
@@ -423,7 +422,7 @@ public class NametagsModule extends ToggleModule
         else
         {
             renderBakedItemModel(bakedModel, stack, light, overlay, matrices,
-                    getItemGlintConsumer(vertexConsumers, RenderLayersClient.ENTITY_TRANSLUCENT_CULL.apply(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE), stack.hasGlint()));
+                    getItemGlintConsumer(vertexConsumers, RenderLayers.getItemLayer(stack, false), stack.hasGlint()));
         }
     }
 

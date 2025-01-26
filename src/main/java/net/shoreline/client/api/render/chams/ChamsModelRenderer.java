@@ -121,35 +121,6 @@ public class ChamsModelRenderer implements Globals
         }
     }
 
-    public static void renderLabel(Text text, MatrixStack matrices, Entity entity, float tickDelta)
-    {
-        double d = mc.getEntityRenderDispatcher().getSquaredDistanceToCamera(entity);
-        if (d > 4096.0)
-        {
-            return;
-        }
-        Vec3d vec3d = entity.getAttachments().getPointNullable(EntityAttachmentType.NAME_TAG, 0, entity.getYaw(tickDelta));
-        if (vec3d == null)
-        {
-            return;
-        }
-        boolean bl = !entity.isSneaky();
-        int i = text.getString().equals("deadmau5") ? -10 : 0;
-        matrices.push();
-        matrices.translate(vec3d.x, vec3d.y + 0.5, vec3d.z);
-        matrices.multiply(mc.getEntityRenderDispatcher().getRotation());
-        matrices.scale(0.025f, -0.025f, 0.025f);
-        float f = MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25f);
-        TextRenderer textRenderer = mc.textRenderer;
-        float g = -textRenderer.getWidth(text) / 2;
-        Fonts.VANILLA.draw(matrices, text.getString(), g, (float)i, 0x20FFFFFF, false);
-        if (bl)
-        {
-            Fonts.VANILLA.draw(matrices, text.getString(), g, (float)i, Colors.WHITE, false);
-        }
-        matrices.pop();
-    }
-
     public static void setupTransforms(LivingEntity entity, MatrixStack matrices, float animationProgress, float bodyYaw, float tickDelta)
     {
         if (entity.isFrozen())
