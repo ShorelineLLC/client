@@ -54,6 +54,7 @@ public class SurroundModule extends ObsidianPlacerModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true));
+    Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the block is being mined", false));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the surround if there is none", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
@@ -323,6 +324,29 @@ public class SurroundModule extends ObsidianPlacerModule
                 continue;
             }
             surroundBlocks.add(playerPos.down());
+        }
+        if (mineExtendConfig.getValue())
+        {
+            for (BlockPos surroundPos : new ArrayList<>(surroundBlocks))
+            {
+                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f))
+                {
+                    continue;
+                }
+                for (Direction direction : Direction.values())
+                {
+                    if (direction == Direction.DOWN)
+                    {
+                        continue;
+                    }
+                    BlockPos blockerPos = surroundPos.offset(direction);
+                    if (playerBlocks.contains(blockerPos))
+                    {
+                        continue;
+                    }
+                    surroundBlocks.add(blockerPos);
+                }
+            }
         }
         return surroundBlocks;
     }

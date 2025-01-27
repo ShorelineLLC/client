@@ -55,6 +55,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true));
+    Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the block is being mined", false));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap if there is none", false));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
@@ -382,6 +383,33 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 continue;
             }
             surroundBlocks.add(pos2.down());
+        }
+        if (mineExtendConfig.getValue())
+        {
+            for (BlockPos surroundPos : new ArrayList<>(surroundBlocks))
+            {
+                if (surroundPos.getY() != playerPos.getY())
+                {
+                    continue;
+                }
+                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f))
+                {
+                    continue;
+                }
+                for (Direction direction : Direction.values())
+                {
+                    if (direction == Direction.DOWN)
+                    {
+                        continue;
+                    }
+                    BlockPos blockerPos = surroundPos.offset(direction);
+                    if (playerBlocks.contains(blockerPos))
+                    {
+                        continue;
+                    }
+                    surroundBlocks.add(blockerPos);
+                }
+            }
         }
         return surroundBlocks;
     }
