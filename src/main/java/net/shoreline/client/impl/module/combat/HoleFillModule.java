@@ -21,6 +21,7 @@ import net.shoreline.client.impl.manager.combat.hole.Hole;
 import net.shoreline.client.impl.manager.combat.hole.HoleType;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -93,7 +94,7 @@ public class HoleFillModule extends ObsidianPlacerModule
         //
         int blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem() || AutoMineModule.getInstance().isSilentSwapping())
         {
             fills.clear();
             return;

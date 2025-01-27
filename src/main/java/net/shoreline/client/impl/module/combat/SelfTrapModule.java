@@ -28,6 +28,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -111,7 +112,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             return;
         }
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem() || AutoMineModule.getInstance().isSilentSwapping())
         {
             surround.clear();
             placements.clear();

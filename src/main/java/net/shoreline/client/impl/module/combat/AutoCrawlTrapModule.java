@@ -24,6 +24,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
@@ -80,7 +81,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     {
         blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem() || AutoMineModule.getInstance().isSilentSwapping())
         {
             surround.clear();
             placements.clear();
