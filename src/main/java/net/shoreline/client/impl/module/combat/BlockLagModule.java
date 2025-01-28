@@ -68,6 +68,12 @@ public class BlockLagModule extends ObsidianPlacerModule
             disable();
             return;
         }
+
+        if (checkMultitask() && !multitaskConfig.getValue())
+        {
+            return;
+        }
+
         final BlockPos pos = mc.player.getBlockPos();
         if (!isInsideBlock())
         {
@@ -121,7 +127,7 @@ public class BlockLagModule extends ObsidianPlacerModule
             }
         }
 
-        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, false, strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
