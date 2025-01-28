@@ -42,7 +42,6 @@ public class AutoAnchorModule extends BlockPlacerModule
 {
     private static AutoAnchorModule INSTANCE;
 
-    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows exploding while using items", false));
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when exploding anchors", true));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate before exploding", false));
@@ -103,7 +102,7 @@ public class AutoAnchorModule extends BlockPlacerModule
             return;
         }
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        if (!multitaskConfig.getValue() && checkMultitask())
         {
             anchorCalc = null;
             return;

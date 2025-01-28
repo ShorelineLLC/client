@@ -37,6 +37,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.manager.world.tick.TickSync;
+import net.shoreline.client.impl.module.CombatModule;
 import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AutoMineModule;
@@ -58,11 +59,10 @@ import java.util.stream.Stream;
  * @author linus
  * @since 1.0
  */
-public class AuraModule extends RotationModule
+public class AuraModule extends CombatModule
 {
     private static AuraModule INSTANCE;
 
-    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows attacking while using items", true));
     Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swings the hand after attacking", true));
     Config<TargetMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for targeting entities to attack", TargetMode.SWITCH, TargetMode.values()));
     Config<Priority> priorityConfig = register(new EnumConfig<>("Priority", "The value to prioritize when searching for targets", Priority.HEALTH, Priority.values()));
@@ -170,7 +170,7 @@ public class AuraModule extends RotationModule
             return;
         }
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        if (!multitaskConfig.getValue() && checkMultitask(true))
         {
             return;
         }

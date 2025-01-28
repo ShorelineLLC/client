@@ -38,7 +38,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
 {
     private static AutoCrawlTrapModule INSTANCE;
 
-    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to trap enemies", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
     Config<Boolean> downConfig = register(new BooleanConfig("PreventDownwards", "Prevents digging downwards", true));
@@ -81,7 +80,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     {
         blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem() || AutoMineModule.getInstance().isSilentSwapping())
+        if (!multitaskConfig.getValue() && checkMultitask() || AutoMineModule.getInstance().isSilentSwapping())
         {
             surround.clear();
             placements.clear();

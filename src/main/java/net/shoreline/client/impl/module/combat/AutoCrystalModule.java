@@ -37,7 +37,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
-import net.shoreline.client.impl.module.RotationModule;
+import net.shoreline.client.impl.module.CombatModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
@@ -64,15 +64,14 @@ import java.util.concurrent.*;
  * @author linus
  * @since 1.0
  */
-public class AutoCrystalModule extends RotationModule
+public class AutoCrystalModule extends CombatModule
 {
     private static AutoCrystalModule INSTANCE;
 
-    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows attacking while using items", false));
     Config<Boolean> whileMiningConfig = register(new BooleanConfig("WhileMining", "Allows attacking while mining blocks", false));
     Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instantly attacks crystals when they spawn", false));
-    Config<Boolean> sequentialConfig = register(new BooleanConfig("Sequential", "Places a crystal after spawn", false));
+    Config<Sequential> sequentialConfig = register(new EnumConfig<>("Sequential", "Places a crystal after spawn", Sequential.NONE, Sequential.values()));
     Config<Boolean> idPredictConfig = register(new BooleanConfig("PredictID", "Attempts to predict crystal entity ids", false));
     Config<Boolean> instantCalcConfig = register(new BooleanConfig("Instant-Calc", "Calculates a crystal when it spawns and attacks if it meets MINIMUM requirements, this will result in non-ideal crystal attacks", false, () -> false));
     Config<Float> instantDamageConfig = register(new NumberConfig<>("InstantDamage", "Minimum damage to attack crystals instantly", 1.0f, 6.0f, 10.0f, () -> false));
@@ -546,6 +545,10 @@ public class AutoCrystalModule extends RotationModule
             attackInternal(crystalEntity, hand);
             setStage("ATTACKING");
             lastAttackTimer.reset();
+            if (sequentialConfig.getValue() == Sequential.NORMAL && placeCrystal != null)
+            {
+                placeCrystal(placeCrystal.getBlockPos(), hand);
+            }
         }
         else if (instantCalcConfig.getValue())
         {
@@ -596,7 +599,7 @@ public class AutoCrystalModule extends RotationModule
                     attackInternal(crystalEntity, hand);
                     setStage("ATTACKING");
                     lastAttackTimer.reset();
-                    if (sequentialConfig.getValue() && placeCrystal != null)
+                    if (sequentialConfig.getValue() == Sequential.NORMAL && placeCrystal != null)
                     {
                         placeCrystal(placeCrystal.getBlockPos(), hand);
                     }
@@ -683,11 +686,20 @@ public class AutoCrystalModule extends RotationModule
                         Managers.INVENTORY.syncToClient();
                     }
                 }
+
+                if (sequentialConfig.getValue() == Sequential.STRICT && placeCrystal != null)
+                {
+                    placeCrystal(placeCrystal.getBlockPos(), hand);
+                }
             }
         }
         else
         {
             attackInternal(entity, hand);
+            if (sequentialConfig.getValue() == Sequential.STRICT && placeCrystal != null)
+            {
+                placeCrystal(placeCrystal.getBlockPos(), hand);
+            }
         }
     }
 
@@ -724,11 +736,6 @@ public class AutoCrystalModule extends RotationModule
         {
             antiStuckCrystals.put(crystalEntity, 1);
         }
-
-        if (sequentialConfig.getValue() && placeCrystal != null)
-        {
-            placeCrystal(placeCrystal.getBlockPos(), hand);
-        }
     }
 
     private void placeCrystal(BlockPos blockPos, Hand hand)
@@ -738,7 +745,7 @@ public class AutoCrystalModule extends RotationModule
             return;
         }
 
-        if (checkMultitask())
+        if (checkCanUseCrystal())
         {
             return;
         }
@@ -1215,20 +1222,20 @@ public class AutoCrystalModule extends RotationModule
         }
         if (hand == Hand.MAIN_HAND)
         {
-            return checkMultitask();
+            return checkCanUseCrystal();
         }
         return false;
     }
 
-    private boolean checkMultitask()
+    private boolean checkCanUseCrystal()
     {
-        return !multitaskConfig.getValue() && mc.player.isUsingItem()
+        return !multitaskConfig.getValue() && checkMultitask()
                 || !whileMiningConfig.getValue() && mc.interactionManager.isBreakingBlock();
     }
 
     private boolean isHoldingCrystal()
     {
-        if (!checkMultitask() && (autoSwapConfig.getValue() == Swap.SILENT || autoSwapConfig.getValue() == Swap.SILENT_ALT))
+        if (!checkCanUseCrystal() && (autoSwapConfig.getValue() == Swap.SILENT || autoSwapConfig.getValue() == Swap.SILENT_ALT))
         {
             return true;
         }
