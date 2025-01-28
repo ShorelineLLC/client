@@ -57,7 +57,6 @@ public class AutoMineModule extends CombatModule
 {
     private static AutoMineModule INSTANCE;
 
-    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows mining while using items", false));
     Config<Boolean> autoConfig = register(new BooleanConfig("Auto", "Automatically mines nearby players feet", false));
     Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks mine", Selection.ALL, Selection.values(), () -> autoConfig.getValue()));
     Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.OBSIDIAN, Blocks.ENDER_CHEST));
@@ -247,10 +246,13 @@ public class AutoMineModule extends CombatModule
                                 if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
-                                    stopMining(miningData);
-                                    if (!miningData.hasAttemptedBreak())
+                                    if (multitaskConfig.getValue() && !checkMultitask())
                                     {
-                                        miningData.setAttemptedBreak(true);
+                                        stopMining(miningData);
+                                        if (!miningData.hasAttemptedBreak())
+                                        {
+                                            miningData.setAttemptedBreak(true);
+                                        }
                                     }
                                 }
                                 else
@@ -282,10 +284,13 @@ public class AutoMineModule extends CombatModule
                                 if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
-                                    stopMining(miningData);
-                                    if (!miningData.hasAttemptedBreak())
+                                    if (multitaskConfig.getValue() && !checkMultitask())
                                     {
-                                        miningData.setAttemptedBreak(true);
+                                        stopMining(miningData);
+                                        if (!miningData.hasAttemptedBreak())
+                                        {
+                                            miningData.setAttemptedBreak(true);
+                                        }
                                     }
                                 }
                                 else
@@ -307,10 +312,13 @@ public class AutoMineModule extends CombatModule
                                 if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
-                                    stopMining(miningData);
-                                    if (!miningData.hasAttemptedBreak())
+                                    if (multitaskConfig.getValue() && !checkMultitask())
                                     {
-                                        miningData.setAttemptedBreak(true);
+                                        stopMining(miningData);
+                                        if (!miningData.hasAttemptedBreak())
+                                        {
+                                            miningData.setAttemptedBreak(true);
+                                        }
                                     }
                                 }
                                 else
@@ -334,10 +342,13 @@ public class AutoMineModule extends CombatModule
                                 if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
-                                    stopMining(miningData);
-                                    if (!miningData.hasAttemptedBreak())
+                                    if (multitaskConfig.getValue() && !checkMultitask())
                                     {
-                                        miningData.setAttemptedBreak(true);
+                                        stopMining(miningData);
+                                        if (!miningData.hasAttemptedBreak())
+                                        {
+                                            miningData.setAttemptedBreak(true);
+                                        }
                                     }
                                 }
                                 else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
@@ -378,7 +389,7 @@ public class AutoMineModule extends CombatModule
             data.damage(damageDelta);
             if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f && data.getSlot() != -1)
             {
-                if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+                if (checkMultitask() && !multitaskConfig.getValue())
                 {
                     continue;
                 }
@@ -435,7 +446,7 @@ public class AutoMineModule extends CombatModule
         }
         if (miningData2.getBlockDamage() >= speedConfig.getValue() || miningData2.isInstantRemine())
         {
-            if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+            if (checkMultitask() && !multitaskConfig.getValue())
             {
                 return;
             }
@@ -561,28 +572,14 @@ public class AutoMineModule extends CombatModule
 
         if (instantConfig.getValue())
         {
-            for (MiningData data : miningQueue)
-            {
-                if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()) && !isDataPacketMine(data)
-                        && (data.getBlockDamage() >= speedConfig.getValue() || data.isInstantRemine()))
-                {
-                    if (mc.player.isUsingItem() && !multitaskConfig.getValue())
-                    {
-                        return;
-                    }
-                    stopMining(data);
-                    stopMiningTimer.reset();
-                }
-            }
+            return;
         }
-        else
+
+        for (MiningData data : miningQueue)
         {
-            for (MiningData data : miningQueue)
+            if (data.getPos().equals(packet.getPos()))
             {
-                if (data.getPos().equals(packet.getPos()))
-                {
-                    startMining(data);
-                }
+                startMining(data);
             }
         }
     }
