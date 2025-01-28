@@ -2,7 +2,9 @@ package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.encryption.NetworkEncryptionUtils;
+import net.minecraft.network.message.LastSeenMessageList;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -18,6 +20,9 @@ import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
+
+import java.time.Instant;
+import java.util.BitSet;
 
 /**
  * @author linus
@@ -101,7 +106,12 @@ public class AutoLogModule extends ToggleModule
     {
         if (illegalDisconnectConfig.getValue())
         {
-            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(mc.player, false)); // Illegal packet
+            Managers.NETWORK.sendPacket(new ChatMessageC2SPacket(
+                    "§",
+                    Instant.now(),
+                    NetworkEncryptionUtils.SecureRandomUtil.nextLong(),
+                    null,
+                    new LastSeenMessageList.Acknowledgment(1, new BitSet(2)))); // Illegal packet
             disable();
             return;
         }
