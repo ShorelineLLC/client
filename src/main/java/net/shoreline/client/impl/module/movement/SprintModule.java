@@ -11,9 +11,11 @@ import net.shoreline.client.impl.event.entity.JumpRotationEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.SprintCancelEvent;
 import net.shoreline.client.impl.module.RotationModule;
+import net.shoreline.client.impl.module.client.RotationsModule;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.MovementUtil;
+import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
@@ -120,6 +122,10 @@ public class SprintModule extends RotationModule
 
     private boolean canSprint()
     {
+        if (RotationsModule.getInstance().getWebJumpFix() && PlayerUtil.inWeb(1.0))
+        {
+            return false;
+        }
         return MovementUtil.isInputtingMovement()
                 && !mc.player.isSneaking()
                 && !mc.player.isRiding()

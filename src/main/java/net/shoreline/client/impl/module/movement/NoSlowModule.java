@@ -8,13 +8,12 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
@@ -30,8 +29,8 @@ import net.shoreline.client.impl.event.entity.VelocityMultiplierEvent;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.mixin.accessor.AccessorEntityTrackerUpdateS2CPacket;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
+import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 import org.lwjgl.glfw.GLFW;
@@ -182,14 +181,15 @@ public class NoSlowModule extends ToggleModule
                 }
             }
 
-            if ((grimConfig.getValue() || grimNewConfig.getValue()) && (websConfig.getValue() || berryBushConfig.getValue()))
+            if ((grimConfig.getValue() || grimNewConfig.getValue()) && websConfig.getValue())
             {
-                for (BlockPos pos : getIntersectingWebs())
+                Box bb = grimConfig.getValue() ? mc.player.getBoundingBox().expand(1.0) : mc.player.getBoundingBox();
+                for (BlockPos pos : getIntersectingWebs(bb))
                 {
-                    // Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    //        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, Direction.DOWN));
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, Direction.DOWN));
+                    // Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    //        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, Direction.DOWN));
                 }
             }
         }
@@ -220,8 +220,13 @@ public class NoSlowModule extends ToggleModule
         if (block instanceof CobwebBlock && websConfig.getValue()
                 || block instanceof SweetBerryBushBlock && berryBushConfig.getValue())
         {
+            float multiplier = webSpeedConfig.getValue();
+            if (webSpeedConfig.getValue() == 1.0f)
+            {
+                multiplier = 0.0f;
+            }
             event.cancel();
-            event.setMultiplier(webSpeedConfig.getValue() >= 1.0f ? 0.0f : webSpeedConfig.getValue() * 2.0f);
+            event.setMultiplier(multiplier);
         }
     }
 
@@ -335,25 +340,15 @@ public class NoSlowModule extends ToggleModule
                 || mc.currentScreen instanceof SignEditScreen || mc.currentScreen instanceof DeathScreen);
     }
 
-    public List<BlockPos> getIntersectingWebs()
+    public List<BlockPos> getIntersectingWebs(Box boundingBox)
     {
-        int radius = 2;
         final List<BlockPos> blocks = new ArrayList<>();
-        for (int x = radius; x > -radius; --x)
+        for (BlockPos blockPos : PositionUtil.getAllInBox(boundingBox))
         {
-            for (int y = radius; y > -radius; --y)
+            BlockState state = mc.world.getBlockState(blockPos);
+            if (state.getBlock() instanceof CobwebBlock)
             {
-                for (int z = radius; z > -radius; --z)
-                {
-                    BlockPos blockPos = BlockPos.ofFloored(mc.player.getX() + x,
-                            mc.player.getY() + y, mc.player.getZ() + z);
-                    BlockState state = mc.world.getBlockState(blockPos);
-                    if (state.getBlock() instanceof CobwebBlock && websConfig.getValue()
-                            || state.getBlock() instanceof SweetBerryBushBlock && berryBushConfig.getValue())
-                    {
-                        blocks.add(blockPos);
-                    }
-                }
+                blocks.add(blockPos);
             }
         }
         return blocks;

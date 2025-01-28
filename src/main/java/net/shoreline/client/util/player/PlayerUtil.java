@@ -1,13 +1,17 @@
 package net.shoreline.client.util.player;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CobwebBlock;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.EntityTypeTags;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.math.position.PositionUtil;
 
 /**
  * @author linus & xgraza
@@ -51,6 +55,19 @@ public final class PlayerUtil implements Globals
         for (KeyBinding binding : mc.options.hotbarKeys)
         {
             if (binding.isPressed())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean inWeb(double expandBb)
+    {
+        for (BlockPos blockPos : PositionUtil.getAllInBox(mc.player.getBoundingBox().expand(expandBb)))
+        {
+            BlockState state = mc.world.getBlockState(blockPos);
+            if (state.getBlock() instanceof CobwebBlock)
             {
                 return true;
             }

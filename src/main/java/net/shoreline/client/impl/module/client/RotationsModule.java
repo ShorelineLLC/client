@@ -33,6 +33,7 @@ public class RotationsModule extends ConcurrentModule
     Config<Float> preserveTicksConfig = register(new NumberConfig<>("PreserveTicks", "Time to preserve rotations after reaching the target rotations", 0.0f, 10.0f, 20.0f));
     Config<Boolean> movementFixConfig = register(new BooleanConfig("MovementFix", "Fixes movement on Grim when rotating", false));
     Config<Boolean> mouseSensFixConfig = register(new BooleanConfig("MouseSensFix", "Fixes movement on Grim when applying mouse sensitivity", false));
+    Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false));
     Config<Boolean> raytraceSpoofConfig = register(new BooleanConfig("RaytraceSpoof", "Allows you to spoof your raytrace", false));
     //
     private float prevYaw;
@@ -97,6 +98,11 @@ public class RotationsModule extends ConcurrentModule
     public boolean getMovementFix()
     {
         return movementFixConfig.getValue() && !(DisablerModule.getInstance().isEnabled() && DisablerModule.getInstance().isYawOverflow());
+    }
+
+    public boolean getWebJumpFix()
+    {
+        return webJumpFixConfig.getValue();
     }
 
     public boolean getMouseSensFix()

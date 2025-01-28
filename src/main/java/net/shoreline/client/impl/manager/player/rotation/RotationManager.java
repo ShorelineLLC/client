@@ -16,6 +16,7 @@ import net.shoreline.client.impl.imixin.IClientPlayerEntity;
 import net.shoreline.client.impl.module.client.RotationsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
@@ -40,6 +41,10 @@ public class RotationManager implements Globals
     // The current in use rotation
     private Rotation rotation;
     private int rotateTicks;
+
+    // Sprint jump fix for webs
+    private boolean webJumpFix;
+    private boolean preJumpFix;
 
     /**
      *
@@ -68,6 +73,8 @@ public class RotationManager implements Globals
     @EventListener(priority = MIN_VALUE)
     public void onUpdate(PlayerTickEvent event)
     {
+        webJumpFix = PlayerUtil.inWeb(1.0);
+
         if (requests.isEmpty())
         {
             rotation = null;
@@ -172,10 +179,19 @@ public class RotationManager implements Globals
             {
                 prevJumpYaw = mc.player.getYaw();
                 mc.player.setYaw(rotation.getYaw());
+                if (RotationsModule.getInstance().getWebJumpFix() && webJumpFix)
+                {
+                    preJumpFix = mc.player.isSprinting();
+                    mc.player.setSprinting(false);
+                }
             }
             else
             {
                 mc.player.setYaw(prevJumpYaw);
+                if (webJumpFix)
+                {
+                    mc.player.setSprinting(preJumpFix);
+                }
             }
         }
     }
