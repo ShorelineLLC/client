@@ -295,6 +295,24 @@ public class AutoCrystalModule extends CombatModule
             }
             calculatePlaceCrystalTime = System.nanoTime() - timePre;
         }
+
+        if (inhibitConfig.getValue() && attackCrystal != null
+                && attackPackets.containsKey(attackCrystal.getDamageData().getId()))
+        {
+            float delay;
+            if (attackDelayConfig.getValue() > 0.0)
+            {
+                float attackFactor = 50.0f / Math.max(1.0f, attackFactorConfig.getValue());
+                delay = attackDelayConfig.getValue() * attackFactor;
+            }
+            else
+            {
+                delay = 1000.0f - breakSpeedConfig.getValue() * 50.0f;
+            }
+            lastAttackTimer.setDelay(delay + 100.0f);
+            attackPackets.remove(attackCrystal.getDamageData().getId());
+        }
+
         float breakDelay = getBreakDelay();
         if (breakDelayConfig.getValue())
         {
@@ -706,12 +724,10 @@ public class AutoCrystalModule extends CombatModule
     private void attackInternal(EndCrystalEntity crystalEntity, Hand hand)
     {
         attackInternal(crystalEntity.getId(), hand);
-
     }
 
     private void attackInternal(int crystalEntity, Hand hand)
     {
-
         hand = hand != null ? hand : Hand.MAIN_HAND;
         EndCrystalEntity entity2 = new EndCrystalEntity(mc.world, 0.0, 0.0, 0.0);
         entity2.setId(crystalEntity);
@@ -805,22 +821,6 @@ public class AutoCrystalModule extends CombatModule
             placeInternal(result, hand);
             placePackets.put(blockPos, System.currentTimeMillis());
         }
-
-        // Entity ID predict
-        if (idPredictConfig.getValue())
-        {
-            int id = (int) (predictId + 1);
-            if (attackPackets.containsKey(id))
-            {
-                return;
-            }
-            EndCrystalEntity entity2 = new EndCrystalEntity(mc.world, 0.0, 0.0, 0.0);
-            entity2.setId(id);
-            PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity2, false);
-            Managers.NETWORK.sendPacket(packet);
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            attackPackets.put(id, System.currentTimeMillis());
-        }
     }
 
     private void placeInternal(BlockHitResult result, Hand hand)
@@ -837,6 +837,27 @@ public class AutoCrystalModule extends CombatModule
         else
         {
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+        }
+
+        // Entity ID predict
+        if (idPredictConfig.getValue())
+        {
+            int id = (int) (predictId + 1);
+            if (attackPackets.containsKey(id))
+            {
+                return;
+            }
+            Entity entity = mc.world.getEntityById(id);
+            if (entity != null && !(entity instanceof EndCrystalEntity))
+            {
+                return;
+            }
+            EndCrystalEntity entity2 = new EndCrystalEntity(mc.world, 0.0, 0.0, 0.0);
+            entity2.setId(id);
+            PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity2, false);
+            Managers.NETWORK.sendPacket(packet);
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            attackPackets.put(id, System.currentTimeMillis());
         }
     }
 

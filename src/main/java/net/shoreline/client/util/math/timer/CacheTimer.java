@@ -76,6 +76,11 @@ public class CacheTimer implements Timer
                 System.nanoTime() - time.longValue();
     }
 
+    public void setDelay(Number delay)
+    {
+        this.time += delay.longValue();
+    }
+
     /**
      * @return
      */
