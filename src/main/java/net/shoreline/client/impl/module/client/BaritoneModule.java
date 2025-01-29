@@ -25,7 +25,7 @@ import java.awt.*;
 public class BaritoneModule extends ConcurrentModule
 {
 
-    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Baritone block reach distance", 1.0f, 4.0f, 5.0f));
+    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "Baritone block reach distance", 0.0f, 4.0f, 5.0f));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Allow baritone to place blocks", true));
     Config<Boolean> breakConfig = register(new BooleanConfig("Break", "Allow baritone to break blocks", true));
     Config<Boolean> sprintConfig = register(new BooleanConfig("Sprint", "Allow baritone to sprint", true));

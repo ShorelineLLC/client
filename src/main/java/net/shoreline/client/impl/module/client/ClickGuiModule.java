@@ -27,7 +27,7 @@ public class ClickGuiModule extends ToggleModule
     Config<Float> scaleConfig = register(new NumberConfig<>("Scale", "The gui scale", 0.5f, 1.0f, 3.0f));
     Config<Integer> scrollSpeedConfig = register(new NumberConfig<>("ScrollSpeed", "The speed of GUI scrolling", 5, 30, 100));
     Config<Boolean> soundsConfig = register(new BooleanConfig("Sounds", "Click sounds", true));
-    public Config<Boolean> underGlow = register(new BooleanConfig("UnderGlow", "GUI underglow", false));
+    Config<Boolean> descriptionsConfig = register(new BooleanConfig("Descriptions", "Shows feature descriptions", true));
 
     public static ClickGuiScreen CLICK_GUI_SCREEN;
     public static float CLICK_GUI_SCALE = 1.0f;
@@ -165,6 +165,11 @@ public class ClickGuiModule extends ToggleModule
     public boolean getSounds()
     {
         return soundsConfig.getValue();
+    }
+
+    public boolean getDescriptions()
+    {
+        return descriptionsConfig.getValue();
     }
 
     public float getAlpha()

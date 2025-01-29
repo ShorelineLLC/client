@@ -12,8 +12,12 @@ import net.shoreline.client.impl.gui.click.impl.config.ModuleButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.*;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.render.ColorUtil;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -39,6 +43,9 @@ public class ClickGuiScreen extends Screen implements Globals
     public static final ScissorStack SCISSOR_STACK = new ScissorStack();
     private final List<CategoryFrame> frames = new CopyOnWriteArrayList<>();
     private final ClickGuiModule module;
+    //
+    private String text;
+    private final Animation animation = new Animation(false, 200L, Easing.LINEAR);
 
     private boolean shouldCloseOnEsc = true;
 
@@ -67,7 +74,9 @@ public class ClickGuiScreen extends Screen implements Globals
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta)
     {
+        context.getMatrices().push();
         renderAndScaleGUI(context);
+        boolean hovering = false;
         for (CategoryFrame frame : frames)
         {
             if (frame.isWithin(mouseX, mouseY) && MOUSE_LEFT_HOLD && checkDragging())
@@ -75,7 +84,50 @@ public class ClickGuiScreen extends Screen implements Globals
                 frame.setDragging(true);
             }
             frame.render(context, mouseX, mouseY, delta);
+
+            for (ModuleButton moduleButton : frame.getModuleButtons())
+            {
+                if (moduleButton.isWithin(mouseX, mouseY))
+                {
+                    text = moduleButton.getModule().getDescription();
+                    hovering = true;
+                    break;
+                }
+
+                if (!moduleButton.isOpen())
+                {
+                    continue;
+                }
+
+                for (ConfigButton<?> configButton : moduleButton.getConfigButtons())
+                {
+                    if (configButton.isWithin(mouseX, mouseY))
+                    {
+                        text = configButton.getConfig().getDescription();
+                        hovering = true;
+                        break;
+                    }
+                }
+            }
         }
+        context.getMatrices().pop();
+
+        if (ClickGuiModule.getInstance().getDescriptions())
+        {
+            animation.setState(hovering);
+            if (animation.getFactor() > 0.01f)
+            {
+                context.getMatrices().scale(ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, 0.0f);
+                float j = 1.0f / ClickGuiModule.CLICK_GUI_SCALE;
+                int width = RenderManager.textWidth(text);
+                int hoverAlpha = (int) (60 * animation.getFactor());
+                int unfilledColor = ClickGuiModule.getInstance().fixTransparency(new Color(0, 0, 0, 50 + hoverAlpha).getRGB());
+                RenderManager.rect(context.getMatrices(), (mouseX + 10.0f) * j, (mouseY - 8.0f) * j, (width + 4.0f), (RenderManager.textHeight() + 2.0f) * j, unfilledColor);
+                RenderManager.renderText(context, text, (mouseX + 12.0f) * j, (mouseY - 6.0f) * j, ColorUtil.fixTransparency(-1, (float) animation.getFactor()));
+                context.getMatrices().scale(j, j, 0.0f);
+            }
+        }
+
         // update mouse state
         MOUSE_LEFT_CLICK = false;
         MOUSE_RIGHT_CLICK = false;
@@ -249,28 +301,6 @@ public class ClickGuiScreen extends Screen implements Globals
                 context.getScaledWindowHeight(),
                 backgroundColor
         );
-
-        if (ClickGuiModule.getInstance().underGlow.getValue())
-        {
-            int fadeColor = ClickGuiModule.getInstance().getColor();
-            fadeColor = ClickGuiModule.getInstance().fixTransparency(fadeColor);
-
-            float progress = ClickGuiModule.getInstance().getScaleFactor();
-            int startHeight = context.getScaledWindowHeight() / 3;
-
-            float yOffset = 300 - (300 * progress);
-
-            RenderManager.fillGradientQuad(
-                    context,
-                    0.0F,
-                    startHeight - yOffset,
-                    context.getScaledWindowWidth(),
-                    context.getScaledWindowHeight() - yOffset,
-                    0x0,
-                    fadeColor,
-                    false
-            );
-        }
 
         float currentProgress = ClickGuiModule.getInstance().getScaleFactor(); // [0.0 .. 1.0]
 
