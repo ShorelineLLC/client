@@ -1033,7 +1033,12 @@ public class AutoMineModule extends CombatModule
 
     public Set<BlockPos> getInstantMines()
     {
-        return miningQueue.stream().filter(d -> !isDataPacketMine(d) && d.getBlockDamage() > 0.5f).map(MiningData::getPos).collect(Collectors.toSet());
+        return miningQueue.stream().filter(d ->
+        {
+            double damage = d.getBlockDamage() / speedConfig.getValue();
+            return !isDataPacketMine(d) && damage > 0.75;
+        })
+                .map(MiningData::getPos).collect(Collectors.toSet());
     }
 
     public boolean isSilentSwapping()
