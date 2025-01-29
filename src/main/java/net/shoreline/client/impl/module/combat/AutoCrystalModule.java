@@ -289,7 +289,7 @@ public class AutoCrystalModule extends CombatModule
                     if (!safetyConfig.getValue() || !playerDamageCheck(self))
                     {
                         attackCrystal = new DamageData<>(crystalEntity, placeCrystal.getAttackTarget(),
-                                placeCrystal.getDamage(), self, crystalEntity.getBlockPos().down());
+                                placeCrystal.getDamage(), self, crystalEntity.getBlockPos().down(), false);
                     }
                 }
             }
@@ -598,16 +598,15 @@ public class AutoCrystalModule extends CombatModule
                 {
                     continue;
                 }
-                Set<BlockPos> ignoredBlocks = new HashSet<>();
-                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
-                {
-                    ignoredBlocks.addAll(AutoMineModule.getInstance().getInstantMines());
-                }
+                Set<BlockPos> instantMines = AutoMineModule.getInstance().getInstantMines();
+                boolean antiSurround = AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue() && !instantMines.isEmpty();
+
                 double damage = ExplosionUtil.getDamageTo(entity, crystalPos, blockDestructionConfig.getValue(),
-                        ignoredBlocks, extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
+                        antiSurround ? instantMines : Set.of(),
+                        extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 // TODO: Test this
                 DamageData<EndCrystalEntity> data = new DamageData<>(crystalEntity,
-                        entity, damage, selfDamage, crystalEntity.getBlockPos().down());
+                        entity, damage, selfDamage, crystalEntity.getBlockPos().down(), antiSurround);
                 attackRotate = damage > instantDamageConfig.getValue() || attackCrystal != null
                         && damage >= attackCrystal.getDamage() && instantMaxConfig.getValue()
                         || entity instanceof LivingEntity entity1 && isCrystalLethalTo(data, entity1);
@@ -972,13 +971,12 @@ public class AutoCrystalModule extends CombatModule
                 {
                     continue;
                 }
-                Set<BlockPos> ignoredBlocks = new HashSet<>();
-                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
-                {
-                    ignoredBlocks.addAll(AutoMineModule.getInstance().getInstantMines());
-                }
+                Set<BlockPos> instantMines = AutoMineModule.getInstance().getInstantMines();
+                boolean antiSurround = AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue() && !instantMines.isEmpty();
+
                 double damage = ExplosionUtil.getDamageTo(entity, crystal.getPos(), blockDestructionConfig.getValue(),
-                        ignoredBlocks, extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
+                        antiSurround ? instantMines : Set.of(),
+                        extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
@@ -986,7 +984,7 @@ public class AutoCrystalModule extends CombatModule
                 if (data == null || damage > data.getDamage())
                 {
                     data = new DamageData<>(crystal1, entity,
-                            damage, selfDamage, crystal1.getBlockPos().down());
+                            damage, selfDamage, crystal1.getBlockPos().down(), antiSurround);
                 }
             }
         }
@@ -1065,13 +1063,12 @@ public class AutoCrystalModule extends CombatModule
                 {
                     continue;
                 }
-                Set<BlockPos> ignoredBlocks = new HashSet<>();
-                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
-                {
-                    ignoredBlocks.addAll(AutoMineModule.getInstance().getInstantMines());
-                }
+                Set<BlockPos> instantMines = AutoMineModule.getInstance().getInstantMines();
+                boolean antiSurround = AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue() && !instantMines.isEmpty();
+
                 double damage;
-                damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos), blockDestructionConfig.getValue(), ignoredBlocks,
+                damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos), blockDestructionConfig.getValue(),
+                        antiSurround ? instantMines : Set.of(),
                         extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
@@ -1079,7 +1076,7 @@ public class AutoCrystalModule extends CombatModule
                 }
                 if (data == null || damage > data.getDamage())
                 {
-                    data = new DamageData<>(pos, entity, damage, selfDamage);
+                    data = new DamageData<>(pos, entity, damage, selfDamage, antiSurround);
                 }
             }
         }
@@ -1130,7 +1127,7 @@ public class AutoCrystalModule extends CombatModule
     private boolean targetDamageCheck(DamageData<?> crystal)
     {
         double minDmg = minDamageConfig.getValue();
-        if (crystal.getAttackTarget() instanceof LivingEntity entity && isCrystalLethalTo(crystal, entity))
+        if (crystal.isAntiSurround() || crystal.getAttackTarget() instanceof LivingEntity entity && isCrystalLethalTo(crystal, entity))
         {
             minDmg = 2.0f;
         }
@@ -1485,6 +1482,7 @@ public class AutoCrystalModule extends CombatModule
         private BlockPos blockPos;
         //
         private double damage, selfDamage;
+        private boolean antiSurround;
 
         //
         public DamageData()
@@ -1492,28 +1490,26 @@ public class AutoCrystalModule extends CombatModule
 
         }
 
-        public DamageData(BlockPos damageData, Entity attackTarget, double damage, double selfDamage)
+        public DamageData(BlockPos damageData, Entity attackTarget, double damage,
+                          double selfDamage, boolean antiSurround)
         {
             this.damageData = (T) damageData;
             this.attackTarget = attackTarget;
             this.damage = damage;
             this.selfDamage = selfDamage;
             this.blockPos = damageData;
+            this.antiSurround = antiSurround;
         }
 
-        public DamageData(T damageData, Entity attackTarget, double damage, double selfDamage, BlockPos blockPos)
+        public DamageData(T damageData, Entity attackTarget, double damage,
+                          double selfDamage, BlockPos blockPos, boolean antiSurround)
         {
             this.damageData = damageData;
             this.attackTarget = attackTarget;
             this.damage = damage;
             this.selfDamage = selfDamage;
             this.blockPos = blockPos;
-        }
-
-        //
-        public void addTag(String tag)
-        {
-            tags.add(tag);
+            this.antiSurround = antiSurround;
         }
 
         public void setDamageData(T damageData, Entity attackTarget, double damage, double selfDamage)
@@ -1547,6 +1543,11 @@ public class AutoCrystalModule extends CombatModule
         public BlockPos getBlockPos()
         {
             return blockPos;
+        }
+
+        public boolean isAntiSurround()
+        {
+            return antiSurround;
         }
     }
 
