@@ -20,7 +20,7 @@ public class ColorsModule extends ConcurrentModule
 
     //
     Config<Color> colorConfig = register(new ColorConfig("Global", "The primary client color", new Color(50, 100, 205), false, false));
-    Config<Color> gradientColorConfig = register(new ColorConfig("Gradient", "The primary client color", new Color(0, 0, 165), false, false));
+    Config<Color> gradientColorConfig = register(new ColorConfig("Gradient", "The secondary client color", new Color(0, 0, 165), false, false));
 
     /**
      *

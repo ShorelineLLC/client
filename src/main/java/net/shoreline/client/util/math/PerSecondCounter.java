@@ -1,11 +1,10 @@
 package net.shoreline.client.util.math;
 
 import java.util.LinkedList;
-import java.util.Queue;
 
 public class PerSecondCounter
 {
-    private final Queue<Long> counter = new LinkedList<>();
+    private final LinkedList<Long> counter = new LinkedList<>();
 
     public void updateCounter()
     {
@@ -23,7 +22,8 @@ public class PerSecondCounter
             }
         } catch (Exception e)
         {
-            // empty catch block
+            counter.clear();
+            e.printStackTrace();
         }
         return counter.size();
     }

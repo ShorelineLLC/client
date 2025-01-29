@@ -263,7 +263,7 @@ public class HUDModule extends ToggleModule
                 };
                 moduleStream.forEach(t -> arrayListRenderModule(event, t, drawnCount));
             }
-            if (coordsConfig.getValue() && !(mc.currentScreen instanceof ClickGuiScreen))
+            if (coordsConfig.getValue())
             {
                 double x = mc.player.getX();
                 double y = mc.player.getY();
@@ -280,7 +280,7 @@ public class HUDModule extends ToggleModule
                         2, bottomLeft, getHudColor(rainbowOffset));
                 bottomLeft -= RenderManager.textHeight();
             }
-            if (directionConfig.getValue() && !(mc.currentScreen instanceof ClickGuiScreen))
+            if (directionConfig.getValue())
             {
                 final Direction direction = mc.player.getHorizontalFacing();
                 String dir = EnumFormatter.formatDirection(direction);

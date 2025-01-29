@@ -161,6 +161,14 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
             int fillColor = ClickGuiModule.getInstance().fixTransparency(0x77000000);
             fill(context, x, y + (height * ClickGuiModule.CLICK_GUI_SCALE), (width * ClickGuiModule.CLICK_GUI_SCALE), fheight, fillColor);
 
+            if (ClickGuiModule.getInstance().getBlur() && ClickGuiModule.getInstance().getScaleFactor() == 1.0f)
+            {
+                mc.options.getMenuBackgroundBlurriness().setValue(7);
+                mc.gameRenderer.renderBlur(delta);
+                mc.getFramebuffer().beginWrite(false);
+                mc.options.getMenuBackgroundBlurriness().setValue(5);
+            }
+
             if (searchButton != null)
             {
                 searchButton.render(context, x + ClickGuiModule.CLICK_GUI_SCALE,
