@@ -24,7 +24,7 @@ public class ClickGuiModule extends ToggleModule
 
     private static ClickGuiModule INSTANCE;
 
-    Config<Boolean> blurConfig = register(new BooleanConfig("Blur", "Adds a blur background to the panels", true));
+    Config<Boolean> blurConfig = register(new BooleanConfig("Blur", "Adds a blur background to the panels", false));
     Config<Float> scaleConfig = register(new NumberConfig<>("Scale", "The gui scale", 0.5f, 1.0f, 3.0f));
     Config<Integer> scrollSpeedConfig = register(new NumberConfig<>("ScrollSpeed", "The speed of GUI scrolling", 5, 30, 100));
     Config<Boolean> soundsConfig = register(new BooleanConfig("Sounds", "Click sounds", true));

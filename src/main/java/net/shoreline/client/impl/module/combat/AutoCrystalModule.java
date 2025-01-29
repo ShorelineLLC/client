@@ -1127,7 +1127,11 @@ public class AutoCrystalModule extends CombatModule
     private boolean targetDamageCheck(DamageData<?> crystal)
     {
         double minDmg = minDamageConfig.getValue();
-        if (crystal.isAntiSurround() || crystal.getAttackTarget() instanceof LivingEntity entity && isCrystalLethalTo(crystal, entity))
+        if (crystal.isAntiSurround())
+        {
+            minDmg = 3.0f;
+        }
+        if (crystal.getAttackTarget() instanceof LivingEntity entity && isCrystalLethalTo(crystal, entity))
         {
             minDmg = 2.0f;
         }
