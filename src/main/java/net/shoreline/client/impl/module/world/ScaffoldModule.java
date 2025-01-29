@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -34,8 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.START_SPRINTING;
-
 /**
  * @author xgraza, Shoreline
  * @since 1.0
@@ -56,7 +53,6 @@ public final class ScaffoldModule extends BlockPlacerModule
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
 
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
-    private boolean stoppedServerSprint;
     private BlockData blockData;
     private BlockData renderData;
     private float[] lastAngles;
@@ -72,15 +68,9 @@ public final class ScaffoldModule extends BlockPlacerModule
     {
         if (mc.player != null)
         {
-            if (stoppedServerSprint && mc.player.isSprinting())
-            {
-                Managers.NETWORK.sendQuietPacket(new ClientCommandC2SPacket(
-                        mc.player, START_SPRINTING));
-            }
             Managers.INVENTORY.syncToClient();
         }
         groundPosY = -1;
-        stoppedServerSprint = false;
         lastAngles = null;
         blockData = null;
         renderData = null;
