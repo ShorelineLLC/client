@@ -5,10 +5,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BlockListConfig;
@@ -18,10 +18,9 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderBuffers;
 import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.RotationModule;
+import net.shoreline.client.impl.module.BlockPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
@@ -36,23 +35,22 @@ import java.util.List;
 import java.util.Map;
 
 import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.START_SPRINTING;
-import static net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket.Mode.STOP_SPRINTING;
 
 /**
  * @author xgraza, Shoreline
  * @since 1.0
  */
-public final class ScaffoldModule extends RotationModule
+public final class ScaffoldModule extends BlockPlacerModule
 {
-    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
     Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
     Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT, Blocks.OBSIDIAN));
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim interactions", false));
+    Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Uses grim new interactions", false));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to scaffold blocks before placing", false));
     Config<Boolean> rotateHoldConfig = register(new BooleanConfig("RotateHold", "Holds rotations to scaffold blocks", false, () -> rotateConfig.getValue()));
     Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "Keeps the same y-level", false));
-    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimConfig.getValue()));
+    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimConfig.getValue() && !grimNewConfig.getValue()));
     Config<BlockPicker> pickerConfig = register(new EnumConfig<>("BlockSelection", "How to pick a block from the hotbar", BlockPicker.NORMAL, BlockPicker.values()));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
@@ -93,8 +91,10 @@ public final class ScaffoldModule extends RotationModule
     public void onPlayerTick(final PlayerTickEvent event)
     {
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
+        if (!multitaskConfig.getValue() && checkMultitask())
         {
+            blockData = null;
+            renderData = null;
             return;
         }
 
@@ -109,26 +109,23 @@ public final class ScaffoldModule extends RotationModule
         blockData = getBlockData(rotateHoldConfig.getValue());
         if (blockData == null)
         {
+            if (grimNewConfig.getValue() && rotateConfig.getValue())
+            {
+                setRotation(getMoveYaw(mc.player.getYaw()), 90.0f);
+            }
             return;
         }
         calcRotations(blockData);
         if (blockData.getAngles() == null)
         {
-            if (!grimConfig.getValue() && rotateConfig.getValue() && lastAngles != null)
+            if (!isGrim() && rotateConfig.getValue() && lastAngles != null)
             {
                 setRotation(lastAngles[0], lastAngles[1]);
             }
             return;
         }
 
-        if (!grimConfig.getValue() && !stoppedServerSprint && mc.player.isSprinting())
-        {
-            stoppedServerSprint = true;
-            Managers.NETWORK.sendQuietPacket(new ClientCommandC2SPacket(
-                    mc.player, STOP_SPRINTING));
-        }
-
-        if (!grimConfig.getValue() && Managers.INVENTORY.getServerSlot() != slot)
+        if (!isGrim() && Managers.INVENTORY.getServerSlot() != slot)
         {
             Managers.INVENTORY.setSlot(slot);
         }
@@ -165,7 +162,7 @@ public final class ScaffoldModule extends RotationModule
         });
         if (result)
         {
-            if (!grimConfig.getValue() && towerConfig.getValue() && mc.options.jumpKey.isPressed())
+            if (!isGrim() && towerConfig.getValue() && mc.options.jumpKey.isPressed())
             {
                 final Vec3d velocity = mc.player.getVelocity();
                 final double velocityY = velocity.y;
@@ -173,18 +170,6 @@ public final class ScaffoldModule extends RotationModule
                 {
                     mc.player.setVelocity(velocity.x, 0.42f, velocity.z);
                 }
-            }
-        }
-    }
-
-    @EventListener
-    public void onPacketOutbound(final PacketEvent.Outbound event)
-    {
-        if (event.getPacket() instanceof ClientCommandC2SPacket packet)
-        {
-            if (stoppedServerSprint && (packet.getMode() == START_SPRINTING || packet.getMode() == STOP_SPRINTING))
-            {
-                event.setCanceled(true);
             }
         }
     }
@@ -221,6 +206,43 @@ public final class ScaffoldModule extends RotationModule
             fadeList.entrySet().removeIf(e ->
                     e.getValue().getFactor() == 0.0);
         }
+    }
+
+    public float getMoveYaw(float yaw)
+    {
+        if (mc.options.forwardKey.isPressed() && !mc.options.backKey.isPressed())
+        {
+            if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
+            {
+                yaw -= 45.0f;
+            }
+            else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
+            {
+                yaw += 45.0f;
+            }
+            // Forward movement - no change to yaw
+        }
+        else if (mc.options.backKey.isPressed() && !mc.options.forwardKey.isPressed())
+        {
+            yaw += 180.0f;
+            if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
+            {
+                yaw += 45.0f;
+            }
+            else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
+            {
+                yaw -= 45.0f;
+            }
+        }
+        else if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
+        {
+            yaw -= 90.0f;
+        }
+        else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
+        {
+            yaw += 90.0f;
+        }
+        return MathHelper.wrapDegrees(yaw);
     }
 
     private void calcRotations(final BlockData blockData)
@@ -357,6 +379,11 @@ public final class ScaffoldModule extends RotationModule
         {
             return new BlockData(new BlockHitResult(pos.toCenterPos(), direction, pos, false), null);
         }
+    }
+
+    public boolean isGrim()
+    {
+        return grimConfig.getValue() || grimNewConfig.getValue();
     }
 
     public enum Selection
