@@ -74,6 +74,7 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
     Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
+    // Config<Boolean> fastConfig = register(new BooleanConfig("Fast", "Instant remines air", false, () -> instantConfig.getValue()));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
     Config<Boolean> crawlExtrapolateConfig = register(new BooleanConfig("ExtrapolateCrawl", "Predicts attempts to crawl you", false, () -> false));
@@ -190,6 +191,7 @@ public class AutoMineModule extends CombatModule
             if (crawling && crawlingConfig.getValue() && crawlingMine != null)
             {
                 miningQueue.clear();
+                silentSwapping = false;
                 crawlingOverride = true;
                 startAutoMine(crawlingMine, Direction.DOWN);
             }
@@ -249,10 +251,6 @@ public class AutoMineModule extends CombatModule
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
                                         stopMining(miningData);
-                                        if (!miningData.hasAttemptedBreak())
-                                        {
-                                            miningData.setAttemptedBreak(true);
-                                        }
                                     }
                                 }
                                 else
@@ -262,6 +260,7 @@ public class AutoMineModule extends CombatModule
                                     if (full && full2)
                                     {
                                         miningQueue.clear();
+                                        silentSwapping = false;
                                     }
                                     if (full2)
                                     {
@@ -287,10 +286,6 @@ public class AutoMineModule extends CombatModule
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
                                         stopMining(miningData);
-                                        if (!miningData.hasAttemptedBreak())
-                                        {
-                                            miningData.setAttemptedBreak(true);
-                                        }
                                     }
                                 }
                                 else
@@ -315,10 +310,6 @@ public class AutoMineModule extends CombatModule
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
                                         stopMining(miningData);
-                                        if (!miningData.hasAttemptedBreak())
-                                        {
-                                            miningData.setAttemptedBreak(true);
-                                        }
                                     }
                                 }
                                 else
@@ -345,10 +336,6 @@ public class AutoMineModule extends CombatModule
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
                                         stopMining(miningData);
-                                        if (!miningData.hasAttemptedBreak())
-                                        {
-                                            miningData.setAttemptedBreak(true);
-                                        }
                                     }
                                 }
                                 else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
@@ -377,7 +364,7 @@ public class AutoMineModule extends CombatModule
                 data.resetBreakTime();
             }
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak()
-                    && data.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000)))
+                    && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
                 silentSwapping = false;
@@ -396,11 +383,7 @@ public class AutoMineModule extends CombatModule
 
                 Managers.INVENTORY.setSlot(data.getSlot());
                 silentSwapping = true;
-
-                if (!data.hasAttemptedBreak())
-                {
-                    data.setAttemptedBreak(true);
-                }
+                data.setAttemptedBreak();
             }
         }
         MiningData miningData2 = miningQueue.getFirst();
@@ -439,7 +422,7 @@ public class AutoMineModule extends CombatModule
         }
         // Something went wrong, remove and remine
         if (miningData2.getBlockDamage() >= speedConfig.getValue() && miningData2.hasAttemptedBreak()
-                && miningData2.passedAttemptedBreakTime(grimNewConfig.getValue() ? 500 : 1000))
+                && miningData2.passedAttemptedBreakTime(500))
         {
             abortMining(miningData2);
             removeQueuedMine(miningData2);
@@ -453,10 +436,6 @@ public class AutoMineModule extends CombatModule
             if (instantConfig.getValue() || stopMiningTimer.passed(500))
             {
                 stopMining(miningData2);
-                if (!miningData2.hasAttemptedBreak())
-                {
-                    miningData2.setAttemptedBreak(true);
-                }
                 stopMiningTimer.reset();
             }
         }
@@ -491,6 +470,7 @@ public class AutoMineModule extends CombatModule
             if (data instanceof AutoMiningData)
             {
                 miningQueue.clear();
+                silentSwapping = false;
                 manualOverride = true;
             }
             startManualMine(event.getPos(), event.getDirection());
@@ -559,7 +539,7 @@ public class AutoMineModule extends CombatModule
             {
                 if (data.hasAttemptedBreak() && data.getPos().equals(packet.getPos()))
                 {
-                    data.setAttemptedBreak(false);
+                    data.setCompletedMine(true);
                 }
             }
             return;
@@ -570,14 +550,18 @@ public class AutoMineModule extends CombatModule
             antiCrawlTimer.reset();
         }
 
-        if (instantConfig.getValue())
-        {
-            return;
-        }
-
         for (MiningData data : miningQueue)
         {
-            if (data.getPos().equals(packet.getPos()))
+            if (!data.getPos().equals(packet.getPos()))
+            {
+                continue;
+            }
+            if (data.hasCompletedMine())
+            {
+                data.setCompletedMine(false);
+            }
+
+            if (!instantConfig.getValue())
             {
                 startMining(data);
             }
@@ -869,23 +853,24 @@ public class AutoMineModule extends CombatModule
     private void removeQueuedMine()
     {
         miningQueue.remove();
-        updateManualOverride();
+        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
+        {
+            manualOverride = false;
+        }
     }
 
     private void removeQueuedMine(MiningData data)
     {
         miningQueue.remove(data);
-        updateManualOverride();
+        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
+        {
+            manualOverride = false;
+        }
     }
 
     private void removeIfQueuedMine(Predicate<MiningData> dataPredicate)
     {
         miningQueue.removeIf(dataPredicate);
-        updateManualOverride();
-    }
-
-    private void updateManualOverride()
-    {
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
             manualOverride = false;
@@ -983,8 +968,11 @@ public class AutoMineModule extends CombatModule
         {
             swapTo(slot);
         }
+
         stopMiningInternal(data);
         lastBreak = System.currentTimeMillis();
+        data.setAttemptedBreak();
+
         if (canSwap)
         {
             swapSync(slot);
@@ -1071,12 +1059,15 @@ public class AutoMineModule extends CombatModule
 
     public static class MiningData
     {
+        private boolean completedMine;
         private boolean attemptedBreak;
         private long breakTime;
+
         private final BlockPos pos;
         private final Direction direction;
         private float lastDamage;
         private float blockDamage;
+
         private boolean instantRemine;
         private boolean started;
 
@@ -1086,11 +1077,21 @@ public class AutoMineModule extends CombatModule
             this.direction = direction;
         }
 
-        public void setAttemptedBreak(boolean attemptedBreak)
+        public void setCompletedMine(boolean completedMine)
         {
-            this.attemptedBreak = attemptedBreak;
-            if (attemptedBreak)
+            this.completedMine = completedMine;
+        }
+
+        public boolean hasCompletedMine()
+        {
+            return completedMine;
+        }
+
+        public void setAttemptedBreak()
+        {
+            if (!attemptedBreak)
             {
+                this.attemptedBreak = true;
                 resetBreakTime();
             }
         }
@@ -1107,7 +1108,7 @@ public class AutoMineModule extends CombatModule
 
         public boolean passedAttemptedBreakTime(long time)
         {
-            return System.currentTimeMillis() - breakTime >= time;
+            return !completedMine && System.currentTimeMillis() - breakTime >= time;
         }
 
         public boolean isInstantRemine()
