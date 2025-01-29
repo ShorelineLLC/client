@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.entity;
 
+import baritone.api.BaritoneAPI;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -8,14 +9,18 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.client.impl.event.render.entity.ElytraTransformEvent;
+import net.shoreline.client.impl.module.movement.ElytraFlyModule;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -44,6 +49,9 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
 
     @Shadow
     public abstract boolean hasStatusEffect(RegistryEntry<StatusEffect> par1);
+
+    @Unique
+    private boolean prevFlying;
 
     @Inject(method = "getHandSwingDuration", at = @At("HEAD"), cancellable = true)
     private void hookGetHandSwingDuration(CallbackInfoReturnable<Integer> cir)
@@ -160,12 +168,19 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
     @Inject(method = "isFallFlying", at = @At("TAIL"), cancellable = true)
     public void hookIsFallFlying(CallbackInfoReturnable<Boolean> cir)
     {
-        FallFlyingEvent fallFlyingEvent = new FallFlyingEvent(cir.getReturnValue());
-        EventBus.INSTANCE.dispatch(fallFlyingEvent);
-        if (fallFlyingEvent.isCanceled() && !cir.getReturnValue())
+        if (ShorelineMod.isBaritonePresent() && BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().isPathing())
         {
-            cir.setReturnValue(fallFlyingEvent.isFallFlying());
+            return;
         }
+        boolean flying = cir.getReturnValue();
+        boolean stoppedFlying = prevFlying && !flying;
+        if (ElytraFlyModule.getInstance().isEnabled() && ElytraFlyModule.getInstance().isBounce() && stoppedFlying)
+        {
+            mc.player.startFallFlying();
+            mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+            cir.setReturnValue(true);
+        }
+        prevFlying = flying;
     }
 
     @Inject(method = "applyDamage", at = @At(value = "HEAD"))

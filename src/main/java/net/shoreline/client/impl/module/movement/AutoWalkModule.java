@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.movement;
 
+import baritone.api.BaritoneAPI;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
@@ -40,6 +42,11 @@ public class AutoWalkModule extends ToggleModule
     {
         if (event.getStage() == StageEvent.EventStage.PRE)
         {
+            if (ShorelineMod.isBaritonePresent() && BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().isPathing())
+            {
+                return;
+            }
+
             mc.options.forwardKey.setPressed(!mc.options.sneakKey.isPressed()
                     && (!lockConfig.getValue() || (!mc.options.jumpKey.isPressed() && mc.player.isOnGround())));
         }

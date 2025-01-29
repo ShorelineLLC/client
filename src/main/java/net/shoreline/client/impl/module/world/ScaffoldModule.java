@@ -101,10 +101,44 @@ public final class ScaffoldModule extends BlockPlacerModule
         {
             if (grimNewConfig.getValue() && rotateConfig.getValue())
             {
-                setRotation(getMoveYaw(mc.player.getYaw()), 90.0f);
+                float yaw = mc.player.getYaw();
+                if (mc.options.forwardKey.isPressed() && !mc.options.backKey.isPressed())
+                {
+                    if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
+                    {
+                        yaw -= 45.0f;
+                    }
+                    else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
+                    {
+                        yaw += 45.0f;
+                    }
+                    // Forward movement - no change to yaw
+                }
+                else if (mc.options.backKey.isPressed() && !mc.options.forwardKey.isPressed())
+                {
+                    yaw += 180.0f;
+                    if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
+                    {
+                        yaw += 45.0f;
+                    }
+                    else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
+                    {
+                        yaw -= 45.0f;
+                    }
+                }
+                else if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
+                {
+                    yaw -= 90.0f;
+                }
+                else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
+                {
+                    yaw += 90.0f;
+                }
+                setRotation(MathHelper.wrapDegrees(yaw), 90.0f);
             }
             return;
         }
+
         calcRotations(blockData);
         if (blockData.getAngles() == null)
         {
@@ -196,43 +230,6 @@ public final class ScaffoldModule extends BlockPlacerModule
             fadeList.entrySet().removeIf(e ->
                     e.getValue().getFactor() == 0.0);
         }
-    }
-
-    public float getMoveYaw(float yaw)
-    {
-        if (mc.options.forwardKey.isPressed() && !mc.options.backKey.isPressed())
-        {
-            if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
-            {
-                yaw -= 45.0f;
-            }
-            else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
-            {
-                yaw += 45.0f;
-            }
-            // Forward movement - no change to yaw
-        }
-        else if (mc.options.backKey.isPressed() && !mc.options.forwardKey.isPressed())
-        {
-            yaw += 180.0f;
-            if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
-            {
-                yaw += 45.0f;
-            }
-            else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
-            {
-                yaw -= 45.0f;
-            }
-        }
-        else if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
-        {
-            yaw -= 90.0f;
-        }
-        else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
-        {
-            yaw += 90.0f;
-        }
-        return MathHelper.wrapDegrees(yaw);
     }
 
     private void calcRotations(final BlockData blockData)

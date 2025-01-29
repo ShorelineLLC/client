@@ -25,6 +25,8 @@ import net.shoreline.eventbus.event.StageEvent;
  */
 public class SprintModule extends RotationModule
 {
+    private static SprintModule INSTANCE;
+
     //
     Config<SprintMode> modeConfig = register(new EnumConfig<>("Mode", "Sprinting mode. Rage allows for multi-directional sprinting.", SprintMode.LEGIT, SprintMode.values()));
     Config<Boolean> jumpFixConfig = register(new BooleanConfig("JumpFix", "Fixes jumping slowdown in Rage sprint", true, () -> modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT));
@@ -35,6 +37,12 @@ public class SprintModule extends RotationModule
     public SprintModule()
     {
         super("Sprint", "Automatically sprints", ModuleCategory.MOVEMENT, 110);
+        INSTANCE = this;
+    }
+
+    public static SprintModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -149,7 +157,7 @@ public class SprintModule extends RotationModule
         return false;
     }
 
-    private float getSprintYaw(float yaw)
+    public float getSprintYaw(float yaw)
     {
         boolean forward = mc.options.forwardKey.isPressed();
         boolean backward = mc.options.backKey.isPressed();
