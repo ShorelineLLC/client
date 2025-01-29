@@ -116,7 +116,7 @@ public class SearchButton extends Button
         {
             switch (keyCode)
             {
-                case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_ESCAPE ->
+                case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_SPACE ->
                 {
                     typing = false;
                     SEARCH_TEXT = null;

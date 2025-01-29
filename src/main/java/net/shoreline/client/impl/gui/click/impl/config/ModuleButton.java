@@ -8,6 +8,7 @@ import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.gui.click.component.Button;
+import net.shoreline.client.impl.gui.click.impl.SearchButton;
 import net.shoreline.client.impl.gui.click.impl.config.setting.*;
 import net.shoreline.client.impl.manager.world.sound.SoundManager;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
@@ -131,22 +132,30 @@ public class ModuleButton extends Button
             scaledTime = 1.7f;
         }
 
+
         boolean state = isWithin(mouseX, mouseY);
         if (state != hoverAnimation.getState())
         {
             hoverAnimation.setState(state);
         }
-        int hoverAlpha = (int) (60 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
-        int hoverAlpha2 = (int) (50 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+        boolean b2 = SearchButton.SEARCH_TEXT != null && !SearchButton.SEARCH_TEXT.isEmpty();
+        boolean b1 = b2 && !getModule().getName().toLowerCase().contains(SearchButton.SEARCH_TEXT.toLowerCase());
+        int hoverAlpha = (int) ((b1 ? 30 : 60) * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
+        int hoverAlpha2 = (int) ((b1 ? 25 : 50) * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
 
         int unfilledColor = ClickGuiModule.getInstance().fixTransparency(new Color(hoverAlpha, hoverAlpha, hoverAlpha, 51 + hoverAlpha).getRGB());
-        rectGradient(context, fill ? ClickGuiModule.getInstance().getColor(100 + hoverAlpha2, scaledTime) : unfilledColor,
-                fill ? ClickGuiModule.getInstance().getGradient(100 + hoverAlpha2, scaledTime) : unfilledColor);
+        rectGradient(context, fill ? ClickGuiModule.getInstance().getColor((b1 ? 50 : 100) + hoverAlpha2, scaledTime) : unfilledColor,
+                fill ? ClickGuiModule.getInstance().getGradient((b1 ? 50 : 100) + hoverAlpha2, scaledTime) : unfilledColor);
 
         int whiteText = -1;
         int grayText = 0xFFAAAAAA;
+        int colorText = scaledTime > 0.99f ? whiteText : grayText;
+        if (b2)
+        {
+            colorText = b1 ? grayText : whiteText;
+        }
 
-        drawStringScaled(context, module.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (3.5f * ClickGuiModule.CLICK_GUI_SCALE), scaledTime > 0.99f ? whiteText : grayText);
+        drawStringScaled(context, module.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (3.5f * ClickGuiModule.CLICK_GUI_SCALE), colorText);
         if (settingsAnimation.getFactor() > 0.01f)
         {
             off = y + (height * ClickGuiModule.CLICK_GUI_SCALE) + ClickGuiModule.CLICK_GUI_SCALE;

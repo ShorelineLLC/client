@@ -113,11 +113,6 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
         }
         for (ModuleButton moduleButton : moduleButtons)
         {
-            if (SearchButton.SEARCH_TEXT != null && !SearchButton.SEARCH_TEXT.isEmpty()
-                    && !moduleButton.getModule().getName().toLowerCase().contains(SearchButton.SEARCH_TEXT.toLowerCase()))
-            {
-                continue;
-            }
             // account for button height
             fheight += moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE;
             if (moduleButton.getScaledTime() < 0.01f)
@@ -180,11 +175,6 @@ public class CategoryFrame extends Frame implements Serializable<CategoryFrame>
             inner = off;
             for (ModuleButton moduleButton : moduleButtons)
             {
-                if (SearchButton.SEARCH_TEXT != null && !SearchButton.SEARCH_TEXT.isEmpty()
-                        && !moduleButton.getModule().getName().toLowerCase().contains(SearchButton.SEARCH_TEXT.toLowerCase()))
-                {
-                    continue;
-                }
                 moduleButton.render(context, x + ClickGuiModule.CLICK_GUI_SCALE, inner + ClickGuiModule.CLICK_GUI_SCALE, mouseX, mouseY, delta);
                 off += (float) ((moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE) * categoryAnimation.getFactor());
                 inner += moduleButton.getHeight() + ClickGuiModule.CLICK_GUI_SCALE;
