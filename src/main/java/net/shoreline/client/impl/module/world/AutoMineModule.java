@@ -852,6 +852,10 @@ public class AutoMineModule extends CombatModule
 
     private void removeQueuedMine()
     {
+        if (isDataPacketMine(miningQueue.getFirst()))
+        {
+            silentSwapping = false;
+        }
         miningQueue.remove();
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
@@ -861,6 +865,10 @@ public class AutoMineModule extends CombatModule
 
     private void removeQueuedMine(MiningData data)
     {
+        if (isDataPacketMine(data))
+        {
+            silentSwapping = false;
+        }
         miningQueue.remove(data);
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
@@ -870,6 +878,13 @@ public class AutoMineModule extends CombatModule
 
     private void removeIfQueuedMine(Predicate<MiningData> dataPredicate)
     {
+        miningQueue.stream().filter(dataPredicate).forEach(d ->
+        {
+            if (isDataPacketMine(d))
+            {
+                silentSwapping = false;
+            }
+        });
         miningQueue.removeIf(dataPredicate);
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
@@ -1017,7 +1032,7 @@ public class AutoMineModule extends CombatModule
 
     private boolean isDataPacketMine(MiningData data)
     {
-        return miningQueue.size() == 2 && data == miningQueue.getLast();
+        return data != null && miningQueue.size() == 2 && data == miningQueue.getLast();
     }
 
     private boolean validAutoMineBlock(Block block)

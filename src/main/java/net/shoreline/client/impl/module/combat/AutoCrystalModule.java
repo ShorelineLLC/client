@@ -6,6 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -1392,7 +1393,7 @@ public class AutoCrystalModule extends CombatModule
         for (Entity entity : entities)
         {
             if (entity == null || !entity.isAlive()
-                    || entity instanceof ExperienceOrbEntity)
+                    || entity instanceof ExperienceOrbEntity || entity instanceof ItemEntity)
             {
                 entities.remove(entity);
             }
