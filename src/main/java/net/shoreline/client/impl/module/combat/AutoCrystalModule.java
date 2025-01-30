@@ -39,6 +39,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.AddEntityEvent;
 import net.shoreline.client.impl.module.CombatModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.EvictingQueue;
@@ -563,9 +564,9 @@ public class AutoCrystalModule extends CombatModule
             attackInternal(crystalEntity, hand);
             setStage("ATTACKING");
             lastAttackTimer.reset();
-            if (sequentialConfig.getValue() == Sequential.NORMAL && placeCrystal != null)
+            if (sequentialConfig.getValue() == Sequential.NORMAL)
             {
-                placeCrystal(placeCrystal.getBlockPos(), hand);
+                placeSequentialCrystal(hand);
             }
         }
         else if (instantCalcConfig.getValue())
@@ -598,15 +599,12 @@ public class AutoCrystalModule extends CombatModule
                 {
                     continue;
                 }
-                Set<BlockPos> instantMines = AutoMineModule.getInstance().getInstantMines();
-                boolean antiSurround = AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue() && !instantMines.isEmpty();
 
                 double damage = ExplosionUtil.getDamageTo(entity, crystalPos, blockDestructionConfig.getValue(),
-                        antiSurround ? instantMines : Set.of(),
                         extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 // TODO: Test this
                 DamageData<EndCrystalEntity> data = new DamageData<>(crystalEntity,
-                        entity, damage, selfDamage, crystalEntity.getBlockPos().down(), antiSurround);
+                        entity, damage, selfDamage, crystalEntity.getBlockPos().down(), false);
                 attackRotate = damage > instantDamageConfig.getValue() || attackCrystal != null
                         && damage >= attackCrystal.getDamage() && instantMaxConfig.getValue()
                         || entity instanceof LivingEntity entity1 && isCrystalLethalTo(data, entity1);
@@ -616,9 +614,9 @@ public class AutoCrystalModule extends CombatModule
                     attackInternal(crystalEntity, hand);
                     setStage("ATTACKING");
                     lastAttackTimer.reset();
-                    if (sequentialConfig.getValue() == Sequential.NORMAL && placeCrystal != null)
+                    if (sequentialConfig.getValue() == Sequential.NORMAL)
                     {
-                        placeCrystal(placeCrystal.getBlockPos(), hand);
+                        placeSequentialCrystal(hand);
                     }
                     break;
                 }
@@ -704,18 +702,18 @@ public class AutoCrystalModule extends CombatModule
                     }
                 }
 
-                if (sequentialConfig.getValue() == Sequential.STRICT && placeCrystal != null)
+                if (sequentialConfig.getValue() == Sequential.STRICT)
                 {
-                    placeCrystal(placeCrystal.getBlockPos(), hand);
+                    placeSequentialCrystal(hand);
                 }
             }
         }
         else
         {
             attackInternal(entity, hand);
-            if (sequentialConfig.getValue() == Sequential.STRICT && placeCrystal != null)
+            if (sequentialConfig.getValue() == Sequential.STRICT)
             {
-                placeCrystal(placeCrystal.getBlockPos(), hand);
+                placeSequentialCrystal(hand);
             }
         }
     }
@@ -750,6 +748,20 @@ public class AutoCrystalModule extends CombatModule
         else
         {
             antiStuckCrystals.put(crystalEntity, 1);
+        }
+    }
+
+    private void placeSequentialCrystal(Hand hand)
+    {
+        if (placeCrystal == null)
+        {
+            return;
+        }
+        int latency = FastLatencyModule.getInstance().isEnabled() ? (int)
+                FastLatencyModule.getInstance().getLatency() : Managers.NETWORK.getClientLatency();
+        if (!Managers.NETWORK.is2b2t() || latency >= 50)
+        {
+            placeCrystal(placeCrystal.getBlockPos(), hand);
         }
     }
 
@@ -928,6 +940,9 @@ public class AutoCrystalModule extends CombatModule
         {
             return null;
         }
+
+        final List<DamageData<EndCrystalEntity>> validData = new ArrayList<>();
+
         DamageData<EndCrystalEntity> data = null;
         for (Entity crystal : entities)
         {
@@ -971,25 +986,49 @@ public class AutoCrystalModule extends CombatModule
                 {
                     continue;
                 }
-                Set<BlockPos> instantMines = AutoMineModule.getInstance().getInstantMines();
-                boolean antiSurround = AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue() && !instantMines.isEmpty();
+
+                boolean antiSurround = false;
+                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                {
+                    BlockPos miningBlock = AutoMineModule.getInstance().getMiningBlock();
+                    if (miningBlock != null)
+                    {
+                        for (Direction direction : Direction.values())
+                        {
+                            BlockPos pos1 = miningBlock.offset(direction);
+                            if (crystal.getBlockPos().equals(pos1))
+                            {
+                                antiSurround = true;
+                            }
+                        }
+                    }
+                }
 
                 double damage = ExplosionUtil.getDamageTo(entity, crystal.getPos(), blockDestructionConfig.getValue(),
-                        antiSurround ? instantMines : Set.of(),
                         extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
                 }
+
+                DamageData<EndCrystalEntity> currentData = new DamageData<>(crystal1, entity,
+                        damage, selfDamage, crystal1.getBlockPos().down(), antiSurround);
+                validData.add(currentData);
                 if (data == null || damage > data.getDamage())
                 {
-                    data = new DamageData<>(crystal1, entity,
-                            damage, selfDamage, crystal1.getBlockPos().down(), antiSurround);
+                    data = currentData;
                 }
             }
         }
         if (data == null || targetDamageCheck(data))
         {
+            if (antiSurroundConfig.getValue())
+            {
+                return validData.stream()
+                        .filter(DamageData::isAntiSurround)
+                        .min(Comparator.comparingDouble(d -> mc.player.squaredDistanceTo(d.getBlockPos().toCenterPos())))
+                        .orElse(null);
+            }
             return null;
         }
         return data;
@@ -1031,6 +1070,9 @@ public class AutoCrystalModule extends CombatModule
         {
             return null;
         }
+
+        final List<DamageData<BlockPos>> validData = new ArrayList<>();
+
         DamageData<BlockPos> data = null;
         for (BlockPos pos : placeBlocks)
         {
@@ -1063,25 +1105,50 @@ public class AutoCrystalModule extends CombatModule
                 {
                     continue;
                 }
-                Set<BlockPos> instantMines = AutoMineModule.getInstance().getInstantMines();
-                boolean antiSurround = AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue() && !instantMines.isEmpty();
+
+                boolean antiSurround = false;
+                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                {
+                    BlockPos miningBlock = AutoMineModule.getInstance().getMiningBlock();
+                    if (miningBlock != null)
+                    {
+                        for (Direction direction : Direction.values())
+                        {
+                            BlockPos pos1 = miningBlock.offset(direction);
+                            if (pos.equals(pos1.down()))
+                            {
+                                antiSurround = true;
+                            }
+                        }
+                    }
+                }
 
                 double damage;
                 damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos), blockDestructionConfig.getValue(),
-                        antiSurround ? instantMines : Set.of(),
                         extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
                 if (checkOverrideSafety(unsafeToPlayer, damage, entity))
                 {
                     continue;
                 }
+
+                DamageData<BlockPos> currentData = new DamageData<>(pos, entity,
+                        damage, selfDamage, antiSurround);
+                validData.add(currentData);
                 if (data == null || damage > data.getDamage())
                 {
-                    data = new DamageData<>(pos, entity, damage, selfDamage, antiSurround);
+                    data = currentData;
                 }
             }
         }
         if (data == null || targetDamageCheck(data))
         {
+            if (antiSurroundConfig.getValue())
+            {
+                return validData.stream()
+                        .filter(DamageData::isAntiSurround)
+                        .min(Comparator.comparingDouble(d -> mc.player.squaredDistanceTo(d.getBlockPos().toCenterPos())))
+                        .orElse(null);
+            }
             return null;
         }
         return data;
@@ -1127,10 +1194,6 @@ public class AutoCrystalModule extends CombatModule
     private boolean targetDamageCheck(DamageData<?> crystal)
     {
         double minDmg = minDamageConfig.getValue();
-        if (crystal.isAntiSurround())
-        {
-            minDmg = 3.0f;
-        }
         if (crystal.getAttackTarget() instanceof LivingEntity entity && isCrystalLethalTo(crystal, entity))
         {
             minDmg = 2.0f;
@@ -1287,18 +1350,18 @@ public class AutoCrystalModule extends CombatModule
      * Returns <tt>true</tt> if an {@link EndCrystalItem} can be used on the
      * param {@link BlockPos}.
      *
-     * @param p The block pos
+     * @param pos The block pos
      * @return Returns <tt>true</tt> if the crystal item can be placed on the
      * block
      */
-    public boolean canUseCrystalOnBlock(BlockPos p)
+    public boolean canUseCrystalOnBlock(BlockPos pos)
     {
-        BlockState state = mc.world.getBlockState(p);
+        BlockState state = mc.world.getBlockState(pos);
         if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
         {
             return false;
         }
-        BlockPos p2 = p.up();
+        BlockPos p2 = pos.up();
         BlockState state2 = mc.world.getBlockState(p2);
         // ver 1.12.2 and below
         if (placementsConfig.getValue() == Placements.PROTOCOL && !mc.world.isAir(p2.up()))
