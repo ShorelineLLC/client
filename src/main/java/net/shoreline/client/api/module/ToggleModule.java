@@ -34,20 +34,15 @@ public class ToggleModule extends Module implements Hideable
 
     // Config representing the module enabled state. Cannot interact with
     // this configuration unless using #toggle() #enable() or #disable().
-    Config<Boolean> enabledConfig = register(new ToggleConfig("Enabled", "The module" +
-            " enabled state. This state is true when the module is running.", false));
+    Config<Boolean> enabledConfig = register(new ToggleConfig("Enabled", "The module enabled state", false));
     // Config for keybinding implementation. Module keybind is used to
     // interact with the #enabledConfig.
-    Config<Macro> keybindingConfig = register(new MacroConfig("Keybind", "The module " +
-            "keybinding. Pressing this key will toggle the module enabled " +
-            "state. Press [BACKSPACE] to delete the keybind.",
+    Config<Macro> keybindingConfig = register(new MacroConfig("Keybind", "The keybind to toggle the module",
             new Macro(getId(), GLFW.GLFW_KEY_UNKNOWN, () -> toggle())));
     // Arraylist rendering info
-    Config<Boolean> hiddenConfig = register(new BooleanConfig("Hidden", "The hidden " +
-            "state of the module in the Arraylist", false));
+    Config<Boolean> hiddenConfig = register(new BooleanConfig("Hidden", "The hidden state of the module in the arraylist", false));
     // Notifies in chat
-    Config<Boolean> notifyConfig = register(new BooleanConfig("Notify", "Notifies the module in chat",
-            false, () -> false));
+    Config<Boolean> notifyConfig = register(new BooleanConfig("Notify", "Notifies you when the module is toggled in chat", false, () -> false));
 
     /**
      * @param name     The module unique identifier
