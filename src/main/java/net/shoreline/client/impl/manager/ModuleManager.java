@@ -193,7 +193,6 @@ public final class ModuleManager
                 new AutoMineModule(),
                 new AutoToolModule(),
                 new AvoidModule(),
-                new FastDropModule(),
                 new FastPlaceModule(),
                 new MultitaskModule(),
                 new NoGlitchBlocksModule(),
