@@ -60,8 +60,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -637,7 +640,7 @@ public class NametagsModule extends ToggleModule
         }
         if (healthConfig.getValue())
         {
-            double health = Math.ceil(player.getHealth() + player.getAbsorptionAmount());
+            double health = player.getHealth() + player.getAbsorptionAmount();
 
             Formatting hcolor;
             if (health > 18)
@@ -664,9 +667,10 @@ public class NametagsModule extends ToggleModule
             {
                 hcolor = Formatting.DARK_RED;
             }
-            int phealth = (int) health;
+            BigDecimal bigDecimal = new BigDecimal(health);
+            bigDecimal = bigDecimal.setScale(1, RoundingMode.HALF_UP);
             info.append(hcolor);
-            info.append(phealth);
+            info.append(bigDecimal.doubleValue());
             info.append(" ");
         }
         if (totemsConfig.getValue() && player != mc.player)
@@ -674,7 +678,6 @@ public class NametagsModule extends ToggleModule
             int totems = Managers.TOTEM.getTotems(player);
             if (totems > 0)
             {
-
                 Formatting pcolor = Formatting.GREEN;
 
                 if (totems > 1)
