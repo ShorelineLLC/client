@@ -14,7 +14,10 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.*;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
@@ -96,7 +99,7 @@ public class AutoCrystalModule extends CombatModule
     Config<Float> breakSpeedConfig = register(new NumberConfig<>("BreakSpeed", "Speed to break crystals", 0.1f, 18.0f, 20.0f));
     Config<Float> attackDelayConfig = register(new NumberConfig<>("AttackDelay", "Added delays", 0.0f, 0.0f, 5.0f));
     Config<Integer> attackFactorConfig = register(new NumberConfig<>("AttackFactor", "Factor of attack delay", 0, 0, 3, () -> attackDelayConfig.getValue() > 0.0));
-    Config<Float> attackLimitConfig = register(new NumberConfig<>("AttackLimit", "Attacks before considering a crystal unbreakable", 0.5f, 1.5f, 20.0f));
+    Config<Float> attackLimitConfig = register(new NumberConfig<>("AttackLimit", "The number of attacks before considering a crystal unbreakable", 0.5f, 1.5f, 20.0f));
     // Config<Float> randomSpeedConfig = register(new NumberConfig<>("RandomSpeed", "Randomized delay for breaking crystals", 0.0f, 0.0f, 10.0f));
     Config<Boolean> breakDelayConfig = register(new BooleanConfig("BreakDelay", "Uses attack latency to calculate break delays", false));
     Config<Float> breakTimeoutConfig = register(new NumberConfig<>("BreakTimeout", "Time after waiting for the average break time before considering a crystal attack failed", 0.0f, 3.0f, 10.0f, () -> breakDelayConfig.getValue()));
@@ -120,7 +123,6 @@ public class AutoCrystalModule extends CombatModule
     Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
     Config<Boolean> breakValidConfig = register(new BooleanConfig("Strict", "Only places crystals that can be attacked", false, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
-    Config<Boolean> exposedDirectionConfig = register(new BooleanConfig("StrictDirection-Exposed", "Interacts with only exposed directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Placements> placementsConfig = register(new EnumConfig<>("Placements", "Version standard for placing end crystals", Placements.NATIVE, Placements.values(), () -> placeConfig.getValue()));
     Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider attacking or placing an end crystal", 1.0f, 4.0f, 10.0f));
     // Damage settings
@@ -140,13 +142,14 @@ public class AutoCrystalModule extends CombatModule
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the current placement", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "Adds extra debug info to arraylist", false);
-    Config<Boolean> debugDamageConfig = new BooleanConfig("Debug-Damage", "Renders damage", false, () -> renderConfig.getValue() && debugConfig.getValue());
+    Config<Boolean> debugDamageConfig = new BooleanConfig("Debug-Damage", "Renders damage", false, () -> renderConfig.getValue());
     Config<Boolean> disableDeathConfig = register(new BooleanConfig("DisableOnDeath", "Disables during disconnect/death", false));
     //
     private DamageData<EndCrystalEntity> attackCrystal;
     private DamageData<BlockPos> placeCrystal;
     //
     private BlockPos renderPos;
+    private double renderDamage;
     private BlockPos renderSpawnPos;
     //
     private Vec3d crystalRotation;
@@ -391,6 +394,7 @@ public class AutoCrystalModule extends CombatModule
         if (placeCrystal != null)
         {
             renderPos = placeCrystal.getDamageData();
+            renderDamage = placeCrystal.getDamage();
             if (placeRotate)
             {
                 // ChatUtil.clientSendMessage("place range:" + Math.sqrt(mc.player.getEyePos().squaredDistanceTo(placeCrystal.getDamageData().toCenterPos())));
@@ -426,11 +430,19 @@ public class AutoCrystalModule extends CombatModule
         if (renderConfig.getValue())
         {
             RenderBuffers.preRender();
+            BlockPos renderPos1 = null;
+            double factor = 0.0f;
             for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
             {
                 if (set.getKey() == renderPos)
                 {
                     continue;
+                }
+
+                if (set.getValue().getFactor() > factor)
+                {
+                    renderPos1 = set.getKey();
+                    factor = set.getValue().getFactor();
                 }
 
                 set.getValue().setState(false);
@@ -441,6 +453,13 @@ public class AutoCrystalModule extends CombatModule
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
+
+            if (debugConfig.getValue() && debugDamageConfig.getValue() && renderPos1 != null)
+            {
+                RenderManager.renderSign(String.format("%.2f", renderDamage),
+                        renderPos1.toCenterPos(), new Color(255, 255, 255, (int) (255.0f * factor)).getRGB());
+            }
+
             RenderBuffers.postRender();
 
             fadeList.entrySet().removeIf(e ->
@@ -451,7 +470,6 @@ public class AutoCrystalModule extends CombatModule
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(renderPos, animation);
             }
-
         }
     }
 
@@ -910,11 +928,7 @@ public class AutoCrystalModule extends CombatModule
                     RaycastContext.FluidHandling.NONE, mc.player));
             if (result != null && result.getType() == HitResult.Type.BLOCK)
             {
-                Direction direction = result.getSide();
-                if (!exposedDirectionConfig.getValue() || mc.world.isAir(blockPos.offset(direction)))
-                {
-                    return direction;
-                }
+                return result.getSide();
             }
         }
         else
