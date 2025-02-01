@@ -1407,7 +1407,7 @@ public class AutoCrystalModule extends CombatModule
         for (Entity entity : entities)
         {
             if (entity == null || !entity.isAlive()
-                    || entity instanceof ExperienceOrbEntity || entity instanceof ItemEntity)
+                    || entity instanceof ExperienceOrbEntity)
             {
                 entities.remove(entity);
             }
