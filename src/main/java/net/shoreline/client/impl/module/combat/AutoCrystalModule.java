@@ -454,7 +454,7 @@ public class AutoCrystalModule extends CombatModule
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
 
-            if (debugConfig.getValue() && debugDamageConfig.getValue() && renderPos1 != null)
+            if (debugDamageConfig.getValue() && renderPos1 != null)
             {
                 RenderManager.renderSign(String.format("%.2f", renderDamage),
                         renderPos1.toCenterPos(), new Color(255, 255, 255, (int) (255.0f * factor)).getRGB());
