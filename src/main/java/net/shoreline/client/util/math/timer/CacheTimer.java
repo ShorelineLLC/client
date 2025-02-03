@@ -100,10 +100,10 @@ public class CacheTimer implements Timer
     @Override
     public void reset()
     {
-        long currentNanoTime = System.nanoTime();
-        lastResetTime = currentNanoTime - this.time;
+        long time = System.nanoTime();
+        lastResetTime = time - this.time;
 
-        this.time = currentNanoTime;
+        this.time = time;
     }
 
     /**

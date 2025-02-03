@@ -141,9 +141,9 @@ public class AutoCrystalModule extends CombatModule
     // Render settings
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the current placement", true));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
+    Config<Boolean> disableDeathConfig = register(new BooleanConfig("DisableOnDeath", "Disables during disconnect/death", false));
     Config<Boolean> debugConfig = new BooleanConfig("Debug", "Adds extra debug info to arraylist", false);
     Config<Boolean> debugDamageConfig = new BooleanConfig("Debug-Damage", "Renders damage", false, () -> renderConfig.getValue());
-    Config<Boolean> disableDeathConfig = register(new BooleanConfig("DisableOnDeath", "Disables during disconnect/death", false));
     //
     private DamageData<EndCrystalEntity> attackCrystal;
     private DamageData<BlockPos> placeCrystal;
@@ -188,7 +188,7 @@ public class AutoCrystalModule extends CombatModule
                 ModuleCategory.COMBAT, 750);
         INSTANCE = this;
 
-        if (Loader.SESSION.getUserType().equals("dev") || Loader.SESSION.getUserType().equals("beta"))
+        if (!Loader.SESSION.getUserType().equals("release"))
         {
             register(debugConfig);
             register(debugDamageConfig);
