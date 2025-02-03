@@ -40,7 +40,6 @@ import java.util.List;
 
 /**
  * @author linus
- * @author lnus
  * @since 1.0
  */
 public class NoSlowModule extends ToggleModule

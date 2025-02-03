@@ -89,7 +89,6 @@ public final class ModuleManager
                 new PhaseModule(),
                 new PortalGodModeModule(),
                 new ReachModule(),
-                new SpawnerTrackerModule(),
                 // Misc
                 new AntiAFKModule(),
                 new AntiAimModule(),
