@@ -81,3 +81,5 @@ accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgress
 accessible field net/minecraft/client/render/item/HeldItemRenderer prevEquipProgressOffHand F
 accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgressOffHand F
 accessible field net/minecraft/block/spawner/MobSpawnerLogic spawnDelay I
+accessible field net/minecraft/entity/data/DataTracker entries [Lnet/minecraft/entity/data/DataTracker$Entry;
+accessible field net/minecraft/entity/Entity POSE Lnet/minecraft/entity/data/TrackedData;

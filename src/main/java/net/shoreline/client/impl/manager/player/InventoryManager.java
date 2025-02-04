@@ -156,13 +156,6 @@ public class InventoryManager implements Globals
     public void setSlotForced(final int barSlot)
     {
         Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(barSlot));
-
-        if (AutoMineModule.getInstance().isEnabled()
-                && AutoMineModule.getInstance().isSilentSwapping()
-                && AutoMineModule.getInstance().getSilentSwapSlot() != barSlot)
-        {
-            AutoMineModule.getInstance().resetSilentSwap();
-        }
     }
 
     /**

@@ -93,7 +93,7 @@ public class AutoMineModule extends CombatModule
     private boolean manualOverride;
     private boolean crawlingOverride;
     private final Timer antiCrawlTimer = new CacheTimer();
-    private int silentSwapping;
+    private boolean silentSwapping;
     private final Timer stopMiningTimer = new CacheTimer();
     private int tickDelay;
 
@@ -128,7 +128,7 @@ public class AutoMineModule extends CombatModule
         fadeList.clear();
         manualOverride = false;
         crawlingOverride = false;
-        silentSwapping = -1;
+        silentSwapping = false;
         tickDelay = 0;
         Managers.INVENTORY.syncToClient();
     }
@@ -143,6 +143,15 @@ public class AutoMineModule extends CombatModule
         else
         {
             miningQueue = new FirstOutQueue<>(1);
+        }
+    }
+
+    @EventListener
+    public void onTickPost(TickEvent event)
+    {
+        if (event.getStage() == StageEvent.EventStage.POST)
+        {
+            silentSwapping = false;
         }
     }
 
@@ -379,7 +388,7 @@ public class AutoMineModule extends CombatModule
                 }
 
                 Managers.INVENTORY.setSlot(data.getSlot());
-                silentSwapping = data.getSlot();
+                silentSwapping = true;
                 data.setAttemptedBreak();
             }
         }
@@ -1021,17 +1030,7 @@ public class AutoMineModule extends CombatModule
                 .map(MiningData::getPos).findAny().orElse(null);
     }
 
-    public void resetSilentSwap()
-    {
-        silentSwapping = -1;
-    }
-
     public boolean isSilentSwapping()
-    {
-        return silentSwapping != -1;
-    }
-
-    public int getSilentSwapSlot()
     {
         return silentSwapping;
     }

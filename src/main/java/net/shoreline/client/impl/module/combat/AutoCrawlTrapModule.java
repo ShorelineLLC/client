@@ -230,8 +230,18 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream().filter(e -> invalidEntity(e)).toList();
-            if (!invalid.isEmpty())
+            final Box surroundBox = new Box(surroundPos);
+            List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
+            boolean serverCrawling = true;
+            for (Entity entity : invalid)
+            {
+                if (!Managers.HITBOX.isServerCrawling(entity)
+                        || Managers.HITBOX.getCrawlingBoundingBox(entity).intersects(surroundBox))
+                {
+                    serverCrawling = false;
+                }
+            }
+            if (!invalid.isEmpty() && !serverCrawling)
             {
                 continue;
             }

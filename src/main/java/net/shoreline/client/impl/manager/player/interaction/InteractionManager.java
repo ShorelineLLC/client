@@ -7,10 +7,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -18,6 +15,9 @@ import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.SneakBlocks;
 import net.shoreline.eventbus.EventBus;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author xgraza
@@ -260,23 +260,20 @@ public final class InteractionManager implements Globals
         return ActionResult.SUCCESS;
     }
 
+    public Direction getInteractDirection(final BlockPos blockPos, final boolean strictDirection)
+    {
+        Direction direction = getInteractDirectionInternal(blockPos, strictDirection);
+        return direction == null ? Direction.UP : direction;
+    }
+
     /**
      * @param blockPos
      * @param strictDirection
      * @return
      */
-    public Direction getInteractDirection(final BlockPos blockPos, final boolean strictDirection)
-    {
-        Direction dir = getInteractDirectionInternal(blockPos, strictDirection);
-        if (dir != null)
-        {
-            return dir;
-        }
-        return Direction.UP;
-    }
-
     public Direction getInteractDirectionInternal(final BlockPos blockPos, final boolean strictDirection)
     {
+        Set<Direction> validDirections = getPlaceDirectionsNCP(mc.player.getEyePos(), blockPos.toCenterPos());
         Direction interactDirection = null;
         for (final Direction direction : Direction.values())
         {
@@ -285,7 +282,7 @@ public final class InteractionManager implements Globals
             {
                 continue;
             }
-            if (strictDirection && !canSeeFace(blockPos, direction.getOpposite()))
+            if (strictDirection && !validDirections.contains(direction.getOpposite()))
             {
                 continue;
             }
@@ -299,43 +296,81 @@ public final class InteractionManager implements Globals
         return interactDirection.getOpposite();
     }
 
-    public boolean canSeeFace(final BlockPos target, final Direction face)
+    public Direction getPlaceDirectionNCP(BlockPos blockPos, boolean visible)
     {
-        final Vec3d eyes = mc.player.getEyePos();
-        final Vec3i dir = face.getVector();
-        final Vec3d scaled = new Vec3d(dir.getX() * 0.5, dir.getY() * 0.5, dir.getZ() * 0.5);
-        final Vec3d pos = target.toCenterPos().add(scaled);
-        switch (face)
+        Vec3d eyePos = new Vec3d(mc.player.getX(), mc.player.getY() + mc.player.getStandingEyeHeight(), mc.player.getZ());
+        if (blockPos.getX() == eyePos.getX() && blockPos.getY() == eyePos.getY() && blockPos.getZ() == eyePos.getZ())
         {
-            case NORTH:
+            return Direction.DOWN;
+        }
+        else
+        {
+            Set<Direction> ncpDirections = getPlaceDirectionsNCP(eyePos, blockPos.toCenterPos());
+            for (Direction dir : ncpDirections)
             {
-                return eyes.z < pos.z;
-            }
-            case EAST:
-            {
-                return eyes.x > pos.x;
-            }
-            case SOUTH:
-            {
-                return eyes.z > pos.z;
-            }
-            case WEST:
-            {
-                return eyes.x < pos.x;
-            }
-            case UP:
-            {
-                return eyes.y + 0.5 > pos.y;
-            }
-            case DOWN:
-            {
-                return eyes.y < pos.y;
-            }
-            default:
-            {
-                return false;
+                if (visible && !mc.world.isAir(blockPos.offset(dir)))
+                {
+                    continue;
+                }
+                return dir;
             }
         }
+        return Direction.UP;
+    }
+
+    public Set<Direction> getPlaceDirectionsNCP(Vec3d eyePos, Vec3d blockPos)
+    {
+        return getPlaceDirectionsNCP(eyePos.x, eyePos.y, eyePos.z, blockPos.x, blockPos.y, blockPos.z);
+    }
+
+    public Set<Direction> getPlaceDirectionsNCP(final double x, final double y, final double z,
+                                                final double dx, final double dy, final double dz)
+    {
+        // directly from NCP src
+        final double xdiff = x - dx;
+        final double ydiff = y - dy;
+        final double zdiff = z - dz;
+        final Set<Direction> dirs = new HashSet<>(6);
+        if (ydiff > 0.5)
+        {
+            dirs.add(Direction.UP);
+        }
+        else if (ydiff < -0.5)
+        {
+            dirs.add(Direction.DOWN);
+        }
+        else
+        {
+            dirs.add(Direction.UP);
+            dirs.add(Direction.DOWN);
+        }
+        if (xdiff > 0.5)
+        {
+            dirs.add(Direction.EAST);
+        }
+        else if (xdiff < -0.5)
+        {
+            dirs.add(Direction.WEST);
+        }
+        else
+        {
+            dirs.add(Direction.EAST);
+            dirs.add(Direction.WEST);
+        }
+        if (zdiff > 0.5)
+        {
+            dirs.add(Direction.SOUTH);
+        }
+        else if (zdiff < -0.5)
+        {
+            dirs.add(Direction.NORTH);
+        }
+        else
+        {
+            dirs.add(Direction.SOUTH);
+            dirs.add(Direction.NORTH);
+        }
+        return dirs;
     }
 
     /**
