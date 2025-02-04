@@ -72,7 +72,7 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true));
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
-    Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false));
+    // Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
     // Config<Boolean> fastConfig = register(new BooleanConfig("Fast", "Instant remines air", false, () -> instantConfig.getValue()));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
@@ -661,7 +661,7 @@ public class AutoMineModule extends CombatModule
         {
             queueMiningData(miningData);
             // Need small tick delay between mines
-            if (grimConfig.getValue() || grimNewConfig.getValue())
+            if (grimConfig.getValue())
             {
                 tickDelay = 2;
             }
@@ -883,46 +883,19 @@ public class AutoMineModule extends CombatModule
         {
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
-            if (grimNewConfig.getValue())
-            {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            }
-            else
-            {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            }
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
         else
         {
