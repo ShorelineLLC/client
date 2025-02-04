@@ -19,6 +19,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
 import net.shoreline.client.util.Globals;
@@ -155,6 +156,13 @@ public class InventoryManager implements Globals
     public void setSlotForced(final int barSlot)
     {
         Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(barSlot));
+
+        if (AutoMineModule.getInstance().isEnabled()
+                && AutoMineModule.getInstance().isSilentSwapping()
+                && AutoMineModule.getInstance().getSilentSwapSlot() != barSlot)
+        {
+            AutoMineModule.getInstance().resetSilentSwap();
+        }
     }
 
     /**

@@ -93,7 +93,7 @@ public class AutoMineModule extends CombatModule
     private boolean manualOverride;
     private boolean crawlingOverride;
     private final Timer antiCrawlTimer = new CacheTimer();
-    private boolean silentSwapping;
+    private int silentSwapping;
     private final Timer stopMiningTimer = new CacheTimer();
     private int tickDelay;
 
@@ -128,7 +128,7 @@ public class AutoMineModule extends CombatModule
         fadeList.clear();
         manualOverride = false;
         crawlingOverride = false;
-        silentSwapping = false;
+        silentSwapping = -1;
         tickDelay = 0;
         Managers.INVENTORY.syncToClient();
     }
@@ -191,7 +191,6 @@ public class AutoMineModule extends CombatModule
             if (crawling && crawlingConfig.getValue() && crawlingMine != null)
             {
                 miningQueue.clear();
-                silentSwapping = false;
                 crawlingOverride = true;
                 startAutoMine(crawlingMine, Direction.DOWN);
             }
@@ -260,7 +259,6 @@ public class AutoMineModule extends CombatModule
                                     if (full && full2)
                                     {
                                         miningQueue.clear();
-                                        silentSwapping = false;
                                     }
                                     if (full2)
                                     {
@@ -367,7 +365,6 @@ public class AutoMineModule extends CombatModule
                     && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
-                silentSwapping = false;
                 removeQueuedMine(data);
                 continue;
             }
@@ -382,7 +379,7 @@ public class AutoMineModule extends CombatModule
                 }
 
                 Managers.INVENTORY.setSlot(data.getSlot());
-                silentSwapping = true;
+                silentSwapping = data.getSlot();
                 data.setAttemptedBreak();
             }
         }
@@ -470,7 +467,6 @@ public class AutoMineModule extends CombatModule
             if (data instanceof AutoMiningData)
             {
                 miningQueue.clear();
-                silentSwapping = false;
                 manualOverride = true;
             }
             startManualMine(event.getPos(), event.getDirection());
@@ -852,10 +848,6 @@ public class AutoMineModule extends CombatModule
 
     private void removeQueuedMine()
     {
-        if (isDataPacketMine(miningQueue.getFirst()))
-        {
-            silentSwapping = false;
-        }
         miningQueue.remove();
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
@@ -865,10 +857,6 @@ public class AutoMineModule extends CombatModule
 
     private void removeQueuedMine(MiningData data)
     {
-        if (isDataPacketMine(data))
-        {
-            silentSwapping = false;
-        }
         miningQueue.remove(data);
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
@@ -878,13 +866,6 @@ public class AutoMineModule extends CombatModule
 
     private void removeIfQueuedMine(Predicate<MiningData> dataPredicate)
     {
-        miningQueue.stream().filter(dataPredicate).forEach(d ->
-        {
-            if (isDataPacketMine(d))
-            {
-                silentSwapping = false;
-            }
-        });
         miningQueue.removeIf(dataPredicate);
         if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
         {
@@ -929,11 +910,18 @@ public class AutoMineModule extends CombatModule
             else
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             }
         }
         else
@@ -1060,12 +1048,17 @@ public class AutoMineModule extends CombatModule
                 .map(MiningData::getPos).findAny().orElse(null);
     }
 
-    public void setSilentSwap(boolean swap)
+    public void resetSilentSwap()
     {
-        silentSwapping = swap;
+        silentSwapping = -1;
     }
 
     public boolean isSilentSwapping()
+    {
+        return silentSwapping != -1;
+    }
+
+    public int getSilentSwapSlot()
     {
         return silentSwapping;
     }
