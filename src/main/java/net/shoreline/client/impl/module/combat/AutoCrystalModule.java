@@ -55,6 +55,7 @@ import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.loader.Loader;
@@ -1003,15 +1004,29 @@ public class AutoCrystalModule extends CombatModule
                 }
 
                 boolean antiSurround = false;
-                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                if (antiSurroundConfig.getValue() && entity instanceof PlayerEntity player
+                        && !BlastResistantBlocks.isUnbreakable(player.getBlockPos()))
                 {
+                    Set<BlockPos> miningPositions = new HashSet<>();
                     BlockPos miningBlock = AutoMineModule.getInstance().getMiningBlock();
-                    if (miningBlock != null)
+                    if (AutoMineModule.getInstance().isEnabled() && miningBlock != null)
                     {
+                        miningPositions.add(miningBlock);
+                    }
+                    if (Managers.BLOCK.getMines(0.75f).contains(player.getBlockPos().up()))
+                    {
+                        miningPositions.add(player.getBlockPos().up());
+                    }
+                    for (BlockPos miningBlockPos : miningPositions)
+                    {
+                        if (!SurroundModule.getInstance().getSurroundNoDown(player).contains(miningBlockPos))
+                        {
+                            continue;
+                        }
                         for (Direction direction : Direction.values())
                         {
-                            BlockPos pos1 = miningBlock.offset(direction);
-                            if (crystal.getBlockPos().equals(pos1))
+                            BlockPos pos1 = miningBlockPos.offset(direction);
+                            if (crystal.getBlockPos().equals(pos1.down()))
                             {
                                 antiSurround = true;
                             }
@@ -1122,14 +1137,28 @@ public class AutoCrystalModule extends CombatModule
                 }
 
                 boolean antiSurround = false;
-                if (AutoMineModule.getInstance().isEnabled() && antiSurroundConfig.getValue())
+                if (antiSurroundConfig.getValue() && entity instanceof PlayerEntity player
+                        && !BlastResistantBlocks.isUnbreakable(player.getBlockPos()))
                 {
+                    Set<BlockPos> miningPositions = new HashSet<>();
                     BlockPos miningBlock = AutoMineModule.getInstance().getMiningBlock();
-                    if (miningBlock != null)
+                    if (AutoMineModule.getInstance().isEnabled() && miningBlock != null)
                     {
+                        miningPositions.add(miningBlock);
+                    }
+                    if (Managers.BLOCK.getMines(0.75f).contains(player.getBlockPos().up()))
+                    {
+                        miningPositions.add(player.getBlockPos().up());
+                    }
+                    for (BlockPos miningBlockPos : miningPositions)
+                    {
+                        if (!SurroundModule.getInstance().getSurroundNoDown(player).contains(miningBlockPos))
+                        {
+                            continue;
+                        }
                         for (Direction direction : Direction.values())
                         {
-                            BlockPos pos1 = miningBlock.offset(direction);
+                            BlockPos pos1 = miningBlockPos.offset(direction);
                             if (pos.equals(pos1.down()))
                             {
                                 antiSurround = true;
