@@ -11,7 +11,9 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class BlockManager implements Globals
 {
@@ -63,6 +65,11 @@ public class BlockManager implements Globals
         return breakPositions.stream().filter(d -> d.getEntityId() == entityId).count();
     }
 
+    public boolean isInstantMine(BlockPos pos)
+    {
+        return breakPositions.getFirst().getPos().equals(pos);
+    }
+
     public boolean isBreaking(BlockPos pos)
     {
         return breakPositions.stream().anyMatch(d -> d.getPos().equals(pos));
@@ -71,6 +78,11 @@ public class BlockManager implements Globals
     public boolean isPassed(BlockPos pos, float blockDamage)
     {
         return breakPositions.stream().anyMatch(d -> d.getPos().equals(pos) && d.getBlockDamage() >= blockDamage);
+    }
+
+    public Set<BlockPos> getMines(float blockDamage)
+    {
+        return breakPositions.stream().filter(d -> isPassed(d.getPos(), blockDamage)).map(BreakEntry::getPos).collect(Collectors.toSet());
     }
 
     public static class BreakEntry

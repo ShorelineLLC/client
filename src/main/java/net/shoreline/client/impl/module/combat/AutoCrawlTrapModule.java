@@ -80,7 +80,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     {
         blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && checkMultitask() || AutoMineModule.getInstance().isSilentSwapping())
+        if (!multitaskConfig.getValue() && checkMultitask())
         {
             surround.clear();
             placements.clear();

@@ -98,7 +98,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     {
         blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && mc.player.isUsingItem() || AutoMineModule.getInstance().isSilentSwapping())
+        if (!multitaskConfig.getValue() && mc.player.isUsingItem())
         {
             surround.clear();
             placements.clear();

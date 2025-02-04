@@ -114,7 +114,7 @@ public class SurroundModule extends ObsidianPlacerModule
             return;
         }
 
-        if (!multitaskConfig.getValue() && checkMultitask() || AutoMineModule.getInstance().isSilentSwapping())
+        if (!multitaskConfig.getValue() && checkMultitask())
         {
             surround.clear();
             placements.clear();

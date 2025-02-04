@@ -93,7 +93,7 @@ public class HoleFillModule extends ObsidianPlacerModule
         //
         int blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && checkMultitask() || AutoMineModule.getInstance().isSilentSwapping())
+        if (!multitaskConfig.getValue() && checkMultitask())
         {
             fills.clear();
             return;
