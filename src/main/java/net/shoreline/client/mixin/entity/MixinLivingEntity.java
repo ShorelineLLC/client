@@ -247,4 +247,21 @@ public abstract class MixinLivingEntity extends MixinEntity implements Globals
             cir.setReturnValue(stepEvent.getStepHeight());
         }
     }
+
+    @Inject(method = "isClimbing", at = @At(value = "HEAD"), cancellable = true)
+    private void hookIsClimbing(CallbackInfoReturnable<Boolean> cir)
+    {
+        if ((Object) this != mc.player)
+        {
+            return;
+        }
+
+        PlayerClimbEvent playerClimbEvent = new PlayerClimbEvent();
+        EventBus.INSTANCE.dispatch(playerClimbEvent);
+        if (playerClimbEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(false);
+        }
+    }
 }

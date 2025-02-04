@@ -8,6 +8,7 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.PlayerClimbEvent;
 import net.shoreline.client.impl.event.world.BlockCollisionEvent;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.world.BlockUtil;
@@ -25,6 +26,7 @@ public class AvoidModule extends ToggleModule
     Config<Boolean> berryBushConfig = register(new BooleanConfig("BerryBush", "Prevents player from walking into sweet berry bushes", false));
     Config<Boolean> cactiConfig = register(new BooleanConfig("Cactus", "Prevents player from walking into cacti", false));
     Config<Boolean> unloadedConfig = register(new BooleanConfig("Unloaded", "Prevents player from entering chunks that haven't been loaded", false));
+    Config<Boolean> noClimbConfig = register(new BooleanConfig("NoClimb", "Prevents player from climbing up blocks", false));
 
     public AvoidModule()
     {
@@ -60,6 +62,15 @@ public class AvoidModule extends ToggleModule
         {
             event.cancel();
             event.setVoxelShape(VoxelShapes.fullCube());
+        }
+    }
+
+    @EventListener
+    public void onClimb(PlayerClimbEvent event)
+    {
+        if (noClimbConfig.getValue())
+        {
+            event.cancel();
         }
     }
 }
