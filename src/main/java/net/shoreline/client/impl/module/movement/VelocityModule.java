@@ -46,6 +46,7 @@ public class VelocityModule extends ToggleModule
     Config<Boolean> knockbackConfig = register(new BooleanConfig("Knockback", "Removes player knockback velocity", true));
     Config<Boolean> explosionConfig = register(new BooleanConfig("Explosion", "Removes player explosion velocity", true));
     Config<VelocityMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for velocity", VelocityMode.NORMAL, VelocityMode.values()));
+    Config<Boolean> concealConfig = register(new BooleanConfig("Conceal", "Fixes velocity on servers with excessive setbacks", false, () -> modeConfig.getValue() == VelocityMode.NORMAL));
     Config<Float> horizontalConfig = register(new NumberConfig<>("Horizontal", "How much horizontal knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
     Config<Float> verticalConfig = register(new NumberConfig<>("Vertical", "How much vertical knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
     Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only applies velocity in walls", false, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM));
@@ -56,6 +57,8 @@ public class VelocityModule extends ToggleModule
     Config<Boolean> pushFishhookConfig = register(new BooleanConfig("NoPush-Fishhook", "Prevents being pulled by fishing rod hooks", true));
     //
     private boolean cancelVelocity;
+
+    private boolean flag;
 
     /**
      *
@@ -120,6 +123,8 @@ public class VelocityModule extends ToggleModule
             }
             cancelVelocity = false;
         }
+
+        flag = false;
     }
 
     @EventListener
@@ -128,6 +133,11 @@ public class VelocityModule extends ToggleModule
         if (mc.player == null || mc.world == null)
         {
             return;
+        }
+
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket && concealConfig.getValue())
+        {
+            flag = true;
         }
 
         if (wallsOnlyConfig.getValue() && !isPhased())
@@ -139,6 +149,12 @@ public class VelocityModule extends ToggleModule
         {
             if (packet.getEntityId() != mc.player.getId())
             {
+                return;
+            }
+
+            if (flag && packet.getVelocityX() == 0 && packet.getVelocityZ() == 0 && packet.getVelocityZ() == 0)
+            {
+                flag = false;
                 return;
             }
 
@@ -340,6 +356,7 @@ public class VelocityModule extends ToggleModule
     @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
+        flag = false;
         if (wallsOnlyConfig.getValue() && !isPhased())
         {
             return;
