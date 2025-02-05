@@ -11,12 +11,12 @@ import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HitboxManager implements Globals
 {
-    private final Map<Entity, Box> serverCrawling = new HashMap<>();
+    private final List<Entity> serverCrawling = new CopyOnWriteArrayList<>();
 
     public HitboxManager()
     {
@@ -47,16 +47,11 @@ public class HitboxManager implements Globals
                     continue;
                 }
 
-                Box crawlingBb = entity.getDimensions(EntityPose.SWIMMING).getBoxAt(entity.getPos());
                 if (serializedEntry.value().equals(EntityPose.SWIMMING))
                 {
-                    if (serverCrawling.containsKey(entity))
+                    if (!serverCrawling.contains(entity))
                     {
-                        serverCrawling.replace(entity, crawlingBb);
-                    }
-                    else
-                    {
-                        serverCrawling.put(entity, crawlingBb);
+                        serverCrawling.add(entity);
                     }
                 }
                 else
@@ -69,11 +64,11 @@ public class HitboxManager implements Globals
 
     public boolean isServerCrawling(Entity entity)
     {
-        return serverCrawling.containsKey(entity);
+        return serverCrawling.contains(entity);
     }
 
     public Box getCrawlingBoundingBox(Entity entity)
     {
-        return serverCrawling.get(entity);
+        return entity.getDimensions(EntityPose.SWIMMING).getBoxAt(entity.getPos());
     }
 }

@@ -23,6 +23,7 @@ import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
@@ -33,7 +34,7 @@ import static java.lang.Integer.MIN_VALUE;
  */
 public class RotationManager implements Globals
 {
-    private final List<Rotation> requests = new ArrayList<>();
+    private final List<Rotation> requests = new CopyOnWriteArrayList<>();
     // Relevant rotation values
     private float serverYaw, serverPitch, lastServerYaw, lastServerPitch, prevJumpYaw, prevYaw, prevPitch;
     boolean rotate;
