@@ -33,12 +33,11 @@ public class CustomFontCommand extends Command
                 return 0;
             }
 
-            String filePath = String.format("%s/%s", Shoreline.CONFIG.getClientDirectory().toAbsolutePath(),
-                    font.endsWith(".ttf") ? font : font + ".ttf");
-            System.out.println(filePath);
+            String fileName = font.endsWith(".ttf") ? font : font + ".ttf";
+            String filePath = String.format("%s/%s", Shoreline.CONFIG.getClientDirectory().toAbsolutePath(), fileName);
             if (!Files.exists(Path.of(filePath)))
             {
-                ChatUtil.error("Could not find font file: " + filePath);
+                ChatUtil.error("Could not find font file: " + fileName);
                 return 0;
             }
 
