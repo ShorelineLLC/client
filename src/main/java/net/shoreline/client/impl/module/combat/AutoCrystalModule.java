@@ -457,7 +457,7 @@ public class AutoCrystalModule extends CombatModule
 
             if (debugDamageConfig.getValue() && renderPos1 != null)
             {
-                RenderManager.renderSign(String.format("%.2f", renderDamage),
+                RenderManager.renderSign(String.format("%.1f", renderDamage),
                         renderPos1.toCenterPos(), new Color(255, 255, 255, (int) (255.0f * factor)).getRGB());
             }
 
