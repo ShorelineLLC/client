@@ -114,6 +114,7 @@ public class AutoCrystalModule extends CombatModule
     //
     Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
+    Config<Boolean> forcePlaceConfig = register(new BooleanConfig("ForcePlace", "Places crystals on items", false))
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
     Config<Float> placeWallRangeConfig = register(new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
@@ -1436,7 +1437,7 @@ public class AutoCrystalModule extends CombatModule
         for (Entity entity : entities)
         {
             if (entity == null || !entity.isAlive()
-                    || entity instanceof ExperienceOrbEntity || entity instanceof ItemEntity)
+                    || entity instanceof ExperienceOrbEntity || forcePlaceConfig.getValue() && entity instanceof ItemEntity)
             {
                 entities.remove(entity);
             }

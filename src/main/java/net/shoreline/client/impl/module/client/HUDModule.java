@@ -37,7 +37,6 @@ import net.shoreline.client.impl.event.entity.StatusEffectEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.gui.screen.RenderOpenChatEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.gui.click.ClickGuiScreen;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
 import net.shoreline.client.init.Managers;
