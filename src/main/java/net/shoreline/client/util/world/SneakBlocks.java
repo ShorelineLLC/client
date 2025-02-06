@@ -51,7 +51,26 @@ public class SneakBlocks
                 Blocks.PURPLE_SHULKER_BOX,
                 Blocks.RED_SHULKER_BOX,
                 Blocks.WHITE_SHULKER_BOX,
-                Blocks.YELLOW_SHULKER_BOX
+                Blocks.YELLOW_SHULKER_BOX,
+                Blocks.ACACIA_TRAPDOOR,
+                Blocks.BAMBOO_TRAPDOOR,
+                Blocks.BIRCH_TRAPDOOR,
+                Blocks.CHERRY_TRAPDOOR,
+                Blocks.COPPER_TRAPDOOR,
+                Blocks.EXPOSED_COPPER_TRAPDOOR,
+                Blocks.OXIDIZED_COPPER_TRAPDOOR,
+                Blocks.WAXED_COPPER_TRAPDOOR,
+                Blocks.WAXED_EXPOSED_COPPER_TRAPDOOR,
+                Blocks.WAXED_OXIDIZED_COPPER_TRAPDOOR,
+                Blocks.WEATHERED_COPPER_TRAPDOOR,
+                Blocks.SPRUCE_TRAPDOOR,
+                Blocks.WARPED_TRAPDOOR,
+                Blocks.IRON_TRAPDOOR,
+                Blocks.DARK_OAK_TRAPDOOR,
+                Blocks.JUNGLE_TRAPDOOR,
+                Blocks.MANGROVE_TRAPDOOR,
+                Blocks.OAK_TRAPDOOR,
+                Blocks.CRIMSON_TRAPDOOR
         );
     }
 
