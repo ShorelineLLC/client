@@ -54,7 +54,7 @@ public class VelocityModule extends ToggleModule
 
     Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only applies velocity in walls", false, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM));
     Config<Boolean> wallsAirConfig = register(new BooleanConfig("Walls-Ground", "Only applies velocity in walls while on ground", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
-    Config<Boolean> wallsTrappedConfig = register(new BooleanConfig("Walls-Trapped", "Applies velocity in walls while player head is trapped", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
+    Config<Boolean> wallsTrappedConfig = register(new BooleanConfig("Walls-Trapped", "Applies velocity while player head is trapped", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
     Config<Boolean> pushEntitiesConfig = register(new BooleanConfig("NoPush-Entities", "Prevents being pushed away from entities", true));
     Config<Boolean> pushBlocksConfig = register(new BooleanConfig("NoPush-Blocks", "Prevents being pushed out of blocks", true));
     Config<Boolean> pushLiquidsConfig = register(new BooleanConfig("NoPush-Liquids", "Prevents being pushed by flowing liquids", true));

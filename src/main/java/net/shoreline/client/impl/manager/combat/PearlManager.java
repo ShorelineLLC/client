@@ -15,6 +15,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class PearlManager implements Globals
 {
     private float[] lastThrownAngles;
+    private Box pearlBB;
 
     public PearlManager()
     {
@@ -31,9 +32,11 @@ public class PearlManager implements Globals
 
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket packet && lastThrownAngles != null)
         {
-            BlockHitResult hitResult = (BlockHitResult) RayCastUtil.rayCast(3.0, new float[] { lastThrownAngles[0], 60.0f });
-            final Box box = new Box(hitResult.getBlockPos()).expand(0.5);
-            if (!box.contains(packet.getX(), packet.getY(), packet.getZ()))
+            BlockHitResult hitResult = (BlockHitResult) RayCastUtil.rayCast(3.0, lastThrownAngles);
+            pearlBB = new Box(hitResult.getPos().subtract(0.4, 0.4, 0.4),
+                    hitResult.getPos().add(0.4, 0.4, 0.4));
+
+            if (!pearlBB.contains(packet.getX(), packet.getY(), packet.getZ()))
             {
                 event.cancel();
                 mc.getNetworkHandler().getConnection().send(new TeleportConfirmC2SPacket(packet.getTeleportId()));
