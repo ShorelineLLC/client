@@ -9,6 +9,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberDisplay;
@@ -22,6 +23,7 @@ import net.shoreline.client.impl.event.entity.player.PushFluidsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
+import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
@@ -46,19 +48,20 @@ public class VelocityModule extends ToggleModule
     Config<Boolean> knockbackConfig = register(new BooleanConfig("Knockback", "Removes player knockback velocity", true));
     Config<Boolean> explosionConfig = register(new BooleanConfig("Explosion", "Removes player explosion velocity", true));
     Config<VelocityMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for velocity", VelocityMode.NORMAL, VelocityMode.values()));
-    Config<Boolean> concealConfig = register(new BooleanConfig("Conceal", "Fixes velocity on servers with excessive setbacks", false, () -> modeConfig.getValue() == VelocityMode.NORMAL));
     Config<Float> horizontalConfig = register(new NumberConfig<>("Horizontal", "How much horizontal knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
     Config<Float> verticalConfig = register(new NumberConfig<>("Vertical", "How much vertical knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
+    Config<Boolean> concealConfig = register(new BooleanConfig("Conceal", "Fixes velocity on servers with excessive setbacks", false, () -> modeConfig.getValue() == VelocityMode.NORMAL));
+
     Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only applies velocity in walls", false, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM));
-    Config<Boolean> wallsAirConfig = register(new BooleanConfig("WallsGroundOnly", "Only applies velocity in walls while on ground", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
+    Config<Boolean> wallsAirConfig = register(new BooleanConfig("Walls-Ground", "Only applies velocity in walls while on ground", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
+    Config<Boolean> wallsTrappedConfig = register(new BooleanConfig("Walls-Trapped", "Applies velocity in walls while player head is trapped", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
     Config<Boolean> pushEntitiesConfig = register(new BooleanConfig("NoPush-Entities", "Prevents being pushed away from entities", true));
     Config<Boolean> pushBlocksConfig = register(new BooleanConfig("NoPush-Blocks", "Prevents being pushed out of blocks", true));
     Config<Boolean> pushLiquidsConfig = register(new BooleanConfig("NoPush-Liquids", "Prevents being pushed by flowing liquids", true));
     Config<Boolean> pushFishhookConfig = register(new BooleanConfig("NoPush-Fishhook", "Prevents being pulled by fishing rod hooks", true));
     //
     private boolean cancelVelocity;
-
-    private boolean flag;
+    private boolean concealVelocity;
 
     /**
      *
@@ -96,10 +99,6 @@ public class VelocityModule extends ToggleModule
     @Override
     public void onDisable()
     {
-        if (wallsOnlyConfig.getValue() && !isPhased())
-        {
-            return;
-        }
         if (cancelVelocity)
         {
             if (modeConfig.getValue() == VelocityMode.GRIM)
@@ -124,7 +123,7 @@ public class VelocityModule extends ToggleModule
             cancelVelocity = false;
         }
 
-        flag = false;
+        concealVelocity = false;
     }
 
     @EventListener
@@ -137,12 +136,7 @@ public class VelocityModule extends ToggleModule
 
         if (event.getPacket() instanceof PlayerPositionLookS2CPacket && concealConfig.getValue())
         {
-            flag = true;
-        }
-
-        if (wallsOnlyConfig.getValue() && !isPhased())
-        {
-            return;
+            concealVelocity = true;
         }
 
         if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet && knockbackConfig.getValue())
@@ -152,9 +146,15 @@ public class VelocityModule extends ToggleModule
                 return;
             }
 
-            if (flag && packet.getVelocityX() == 0 && packet.getVelocityZ() == 0 && packet.getVelocityZ() == 0)
+            if (concealVelocity && packet.getVelocityX() == 0 && packet.getVelocityZ() == 0 && packet.getVelocityZ() == 0)
             {
-                flag = false;
+                concealVelocity = false;
+                return;
+            }
+
+            if (wallsOnlyConfig.getValue() && !isPhased()
+                    && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
+            {
                 return;
             }
 
@@ -188,17 +188,17 @@ public class VelocityModule extends ToggleModule
                     event.cancel();
                     cancelVelocity = true;
                 }
-                case GRIM_V3 ->
-                {
-                    if (isPhased())
-                    {
-                        event.cancel();
-                    }
-                }
+
+                case GRIM_V3 -> event.setCanceled(isPhased());
             }
         }
         else if (event.getPacket() instanceof ExplosionS2CPacket packet && explosionConfig.getValue())
         {
+            if (wallsOnlyConfig.getValue() && !isPhased())
+            {
+                return;
+            }
+
             switch (modeConfig.getValue())
             {
                 case NORMAL ->
@@ -226,32 +226,38 @@ public class VelocityModule extends ToggleModule
                     event.cancel();
                     cancelVelocity = true;
                 }
-                case GRIM_V3 ->
-                {
-                    if (isPhased())
-                    {
-                        event.cancel();
-                    }
-                }
+
+                case GRIM_V3 -> event.setCanceled(isPhased());
             }
+
             if (event.isCanceled())
             {
+                sendModuleMessage("canceled");
                 // Dumb fix bc canceling explosion velocity removes explosion handling in 1.19
                 mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet.getX(), packet.getY(), packet.getZ(),
                         SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
                         4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
             }
         }
+
         else if (event.getPacket() instanceof BundleS2CPacket packet)
         {
             List<Packet<?>> allowedBundle = new ArrayList<>();
+
             for (Packet<?> packet1 : packet.getPackets())
             {
                 if (packet1 instanceof ExplosionS2CPacket packet2 && explosionConfig.getValue())
                 {
+                    if (wallsOnlyConfig.getValue() && !isPhased())
+                    {
+                        allowedBundle.add(packet1);
+                        continue;
+                    }
+
                     mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
                             SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
                             4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
+
                     switch (modeConfig.getValue())
                     {
                         case NORMAL ->
@@ -274,9 +280,12 @@ public class VelocityModule extends ToggleModule
                         {
                             if (Managers.ANTICHEAT.hasPassed(100))
                             {
-                                cancelVelocity = true;
+                                allowedBundle.add(packet1);
                                 continue;
                             }
+
+                            cancelVelocity = true;
+                            continue;
                         }
                         case GRIM_V3 ->
                         {
@@ -287,11 +296,24 @@ public class VelocityModule extends ToggleModule
                         }
                     }
                 }
-                else if (packet1 instanceof EntityVelocityUpdateS2CPacket packet2
-                        && packet2.getEntityId() == mc.player.getId() && knockbackConfig.getValue())
+                else if (packet1 instanceof EntityVelocityUpdateS2CPacket packet2 && knockbackConfig.getValue())
                 {
+                    if (packet2.getEntityId() != mc.player.getId())
+                    {
+                        allowedBundle.add(packet1);
+                        continue;
+                    }
+
+                    if (wallsOnlyConfig.getValue() && !isPhased()
+                            && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
+                    {
+                        allowedBundle.add(packet1);
+                        return;
+                    }
+
                     if (wallsAirConfig.getValue() && !Managers.POSITION.isOnGround())
                     {
+                        allowedBundle.add(packet1);
                         continue;
                     }
 
@@ -317,9 +339,12 @@ public class VelocityModule extends ToggleModule
                         {
                             if (Managers.ANTICHEAT.hasPassed(100))
                             {
-                                cancelVelocity = true;
+                                allowedBundle.add(packet1);
                                 continue;
                             }
+
+                            cancelVelocity = true;
+                            continue;
                         }
                         case GRIM_V3 ->
                         {
@@ -330,18 +355,22 @@ public class VelocityModule extends ToggleModule
                         }
                     }
                 }
+
                 allowedBundle.add(packet1);
             }
 
             ((AccessorBundlePacket) packet).setIterable(allowedBundle);
         }
-        else if (event.getPacket() instanceof EntityDamageS2CPacket packet && packet.entityId() == mc.player.getId()
+
+        else if (event.getPacket() instanceof EntityDamageS2CPacket packet
+                && packet.entityId() == mc.player.getId()
                 && modeConfig.getValue() == VelocityMode.GRIM_V3 && isPhased())
         {
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(false));
             Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
             // Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.isOnGround()));
         }
+
         else if (event.getPacket() instanceof EntityStatusS2CPacket packet
                 && packet.getStatus() == EntityStatuses.PULL_HOOKED_ENTITY && pushFishhookConfig.getValue())
         {
@@ -356,7 +385,7 @@ public class VelocityModule extends ToggleModule
     @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
-        flag = false;
+        concealVelocity = false;
         if (wallsOnlyConfig.getValue() && !isPhased())
         {
             return;
@@ -412,6 +441,18 @@ public class VelocityModule extends ToggleModule
         {
             event.cancel();
         }
+    }
+
+    private boolean isWallsTrapped()
+    {
+        BlockPos headPos = mc.player.getBlockPos().up(mc.player.isCrawling() ? 1 : 2);
+        if (mc.world.getBlockState(headPos).isReplaceable())
+        {
+            return false;
+        }
+
+        return mc.player.isCrawling() || SurroundModule.getInstance().getSurroundNoDown(mc.player).stream()
+                .noneMatch(blockPos -> mc.world.getBlockState(blockPos.up()).isReplaceable());
     }
 
     private boolean isPhased()
