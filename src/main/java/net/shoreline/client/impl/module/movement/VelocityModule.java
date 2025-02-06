@@ -450,8 +450,8 @@ public class VelocityModule extends ToggleModule
             return false;
         }
 
-        return mc.player.isCrawling() || SurroundModule.getInstance().getSurroundNoDown(mc.player).stream()
-                .noneMatch(blockPos -> mc.world.getBlockState(blockPos.up()).isReplaceable());
+        return SurroundModule.getInstance().getSurroundNoDown(mc.player).stream()
+                .noneMatch(blockPos -> mc.world.getBlockState(mc.player.isCrawling() ? blockPos : blockPos.up()).isReplaceable());
     }
 
     private boolean isPhased()
