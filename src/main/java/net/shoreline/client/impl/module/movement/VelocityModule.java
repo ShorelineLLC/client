@@ -232,7 +232,6 @@ public class VelocityModule extends ToggleModule
 
             if (event.isCanceled())
             {
-                sendModuleMessage("canceled");
                 // Dumb fix bc canceling explosion velocity removes explosion handling in 1.19
                 mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet.getX(), packet.getY(), packet.getZ(),
                         SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
