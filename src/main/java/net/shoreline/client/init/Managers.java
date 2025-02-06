@@ -12,6 +12,7 @@ import net.shoreline.client.impl.manager.client.MacroManager;
 import net.shoreline.client.impl.manager.client.SocialManager;
 import net.shoreline.client.impl.manager.client.cape.CapeManager;
 import net.shoreline.client.impl.manager.combat.HitboxManager;
+import net.shoreline.client.impl.manager.combat.PearlManager;
 import net.shoreline.client.impl.manager.combat.TotemManager;
 import net.shoreline.client.impl.manager.combat.hole.HoleManager;
 import net.shoreline.client.impl.manager.mojang.LookupManager;
@@ -59,6 +60,7 @@ public class Managers
     public static LightmapManager LIGHT_MAP;
     public static BlockManager BLOCK;
     public static HitboxManager HITBOX;
+    public static PearlManager PEARL;
     // The initialized state of the managers. If this is true, all managers
     // have been initialized and the init process is complete. As a general
     // rule, it is good practice to check this state before accessing instances.
@@ -87,6 +89,7 @@ public class Managers
             ROTATION = new RotationManager();
             BLOCK = new BlockManager();
             HITBOX = new HitboxManager();
+            PEARL = new PearlManager();
             ANTICHEAT = new AntiCheatManager();
             MOVEMENT = new MovementManager();
             HOLE = new HoleManager();
