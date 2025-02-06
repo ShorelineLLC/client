@@ -46,9 +46,13 @@ public class BlockHighlightModule extends ToggleModule
     @Override
     public String getModuleData()
     {
-        if (mc.crosshairTarget == null)
+        if (mc.world == null)
         {
-            return "ARRAYLIST_INFO";
+            return super.getModuleData();
+        }
+        if (mc.crosshairTarget instanceof BlockHitResult result && mc.world.getBlockState(result.getBlockPos()).isAir())
+        {
+            return super.getModuleData();
         }
         DecimalFormat decimal = new DecimalFormat("0.0");
         return decimal.format(distance);

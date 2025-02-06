@@ -36,6 +36,11 @@ public class PearlManager implements Globals
             pearlBB = new Box(hitResult.getPos().subtract(0.4, 0.4, 0.4),
                     hitResult.getPos().add(0.4, 0.4, 0.4));
 
+            if (mc.world.getBlockState(hitResult.getBlockPos()).isAir())
+            {
+                return;
+            }
+
             if (!pearlBB.contains(packet.getX(), packet.getY(), packet.getZ()))
             {
                 event.cancel();
