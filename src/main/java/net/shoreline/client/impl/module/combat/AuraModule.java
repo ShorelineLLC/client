@@ -38,7 +38,6 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.manager.world.tick.TickSync;
 import net.shoreline.client.impl.module.CombatModule;
-import net.shoreline.client.impl.module.RotationModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;

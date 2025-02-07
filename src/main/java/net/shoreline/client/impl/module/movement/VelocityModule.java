@@ -247,15 +247,15 @@ public class VelocityModule extends ToggleModule
             {
                 if (packet1 instanceof ExplosionS2CPacket packet2 && explosionConfig.getValue())
                 {
+                    mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
+                            SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
+                            4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
+
                     if (wallsOnlyConfig.getValue() && !isPhased())
                     {
                         allowedBundle.add(packet1);
                         continue;
                     }
-
-                    mc.executeSync(() -> ((AccessorClientWorld) mc.world).hookPlaySound(packet2.getX(), packet2.getY(), packet2.getZ(),
-                            SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
-                            4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
 
                     switch (modeConfig.getValue())
                     {
@@ -336,7 +336,7 @@ public class VelocityModule extends ToggleModule
                         }
                         case GRIM ->
                         {
-                            if (Managers.ANTICHEAT.hasPassed(100))
+                            if (!Managers.ANTICHEAT.hasPassed(100))
                             {
                                 allowedBundle.add(packet1);
                                 continue;
