@@ -25,6 +25,7 @@ import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.network.InteractType;
 import net.shoreline.client.util.player.InventoryUtil;
+import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -38,7 +39,8 @@ public class CriticalsModule extends ToggleModule
 
     //
     Config<CritMode> modeConfig = register(new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values()));
-    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only attempts criticals in walls", false, () -> modeConfig.getValue() == CritMode.GRIM_V3));
+    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only attempts criticals in walls", false, () -> modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM));
+    Config<Boolean> moveFixConfig = register(new BooleanConfig("MoveFix", "Pauses crits when moving", false, () -> modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM));
     //
     private final Timer attackTimer = new CacheTimer();
     private boolean postUpdateGround;
@@ -165,27 +167,35 @@ public class CriticalsModule extends ToggleModule
             {
                 if (attackTimer.passed(500) && mc.player.isOnGround() && !mc.player.input.jumping)
                 {
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
-                            x, y + 1.1e-7f, z, mc.player.getYaw(), mc.player.getPitch(), false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
-                            x, y + 1.0e-8f, z, mc.player.getYaw(), mc.player.getPitch(), false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 1.1e-7f, z,false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 1.0e-8f, z, false));
                     postUpdateGround = true;
                     attackTimer.reset();
                 }
             }
             case GRIM ->
             {
-                if (!mc.player.isOnGround())
+                if (wallsOnlyConfig.getValue() && !isDoublePhased())
                 {
-                    float yaw = mc.player.getYaw();
-                    float pitch = mc.player.getPitch();
-                    if (Managers.ROTATION.isRotating())
-                    {
-                        yaw = Managers.ROTATION.getRotationYaw();
-                        pitch = Managers.ROTATION.getRotationPitch();
-                    }
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
-                            x, y - 0.000001, z, yaw, pitch, false));
+                    return;
+                }
+
+                if (moveFixConfig.getValue() && MovementUtil.isMoving())
+                {
+                    return;
+                }
+
+                if (attackTimer.passed(250) && mc.player.isOnGround() && !mc.player.isCrawling())
+                {
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.0625, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 0.0625013579, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y + 1.3579e-6, z, false));
+                    attackTimer.reset();
                 }
 //                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
 //                        x, y + 0.00150000001304f, z, mc.player.getYaw(), mc.player.getPitch(), false));
@@ -200,6 +210,12 @@ public class CriticalsModule extends ToggleModule
                 {
                     return;
                 }
+
+                if (moveFixConfig.getValue() && MovementUtil.isMoving())
+                {
+                    return;
+                }
+
                 if (mc.player.isOnGround() && !mc.player.isCrawling())
                 {
 //                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
@@ -208,6 +224,18 @@ public class CriticalsModule extends ToggleModule
 //                            x, y + 0.00000916580235f, z, false));
 //                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
 //                            x, y + 0.00000010371854f, z, false));
+                    float yaw = Managers.ROTATION.getServerYaw();
+                    float pitch = Managers.ROTATION.getServerPitch();
+                    if (Managers.ROTATION.isRotating())
+                    {
+                        yaw = Managers.ROTATION.getRotationYaw();
+                        pitch = Managers.ROTATION.getRotationPitch();
+                    }
+                    if (moveFixConfig.getValue())
+                    {
+                        Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                                x, y, z, yaw, pitch, true));
+                    }
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                             x, y + 0.0625f, z, false));
                     Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
