@@ -152,15 +152,17 @@ public class VelocityModule extends ToggleModule
                 return;
             }
 
-            if (wallsOnlyConfig.getValue() && !isPhased()
-                    && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
+            if (wallsOnlyConfig.getValue())
             {
-                return;
-            }
+                if (!isPhased() && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
+                {
+                    return;
+                }
 
-            if (wallsAirConfig.getValue() && !Managers.POSITION.isOnGround())
-            {
-                return;
+                if (wallsAirConfig.getValue() && !Managers.POSITION.isOnGround())
+                {
+                    return;
+                }
             }
 
             switch (modeConfig.getValue())
@@ -303,17 +305,19 @@ public class VelocityModule extends ToggleModule
                         continue;
                     }
 
-                    if (wallsOnlyConfig.getValue() && !isPhased()
-                            && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
+                    if (wallsOnlyConfig.getValue())
                     {
-                        allowedBundle.add(packet1);
-                        return;
-                    }
+                        if (!isPhased() && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
+                        {
+                            allowedBundle.add(packet1);
+                            return;
+                        }
 
-                    if (wallsAirConfig.getValue() && !Managers.POSITION.isOnGround())
-                    {
-                        allowedBundle.add(packet1);
-                        continue;
+                        if (wallsAirConfig.getValue() && !Managers.POSITION.isOnGround())
+                        {
+                            allowedBundle.add(packet1);
+                            continue;
+                        }
                     }
 
                     switch (modeConfig.getValue())
@@ -385,10 +389,7 @@ public class VelocityModule extends ToggleModule
     public void onPlayerTick(PlayerTickEvent event)
     {
         concealVelocity = false;
-        if (wallsOnlyConfig.getValue() && !isPhased())
-        {
-            return;
-        }
+
         if (cancelVelocity)
         {
             if (modeConfig.getValue() == VelocityMode.GRIM)
