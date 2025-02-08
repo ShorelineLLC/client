@@ -35,6 +35,12 @@
       "values": [ 1.0, 1.0 ]
     },
     {
+      "name": "sobel",
+      "type": "int",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
       "name": "texelSize",
       "type": "float",
       "count": 2,

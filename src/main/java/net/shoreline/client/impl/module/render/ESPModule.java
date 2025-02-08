@@ -32,6 +32,7 @@ import java.awt.*;
  */
 public class ESPModule extends ToggleModule
 {
+    private static ESPModule INSTANCE;
     //
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The ESP render range", 10.0f, 50.0f, 200.0f));
     Config<ESPMode> modeConfig = register(new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.BOX, ESPMode.values()));
@@ -54,6 +55,12 @@ public class ESPModule extends ToggleModule
     public ESPModule()
     {
         super("ESP", "See entities and objects through walls", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static ESPModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @EventListener

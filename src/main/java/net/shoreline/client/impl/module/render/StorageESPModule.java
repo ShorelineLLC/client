@@ -21,6 +21,8 @@ import java.awt.*;
 
 public class StorageESPModule extends ToggleModule
 {
+    private static StorageESPModule INSTANCE;
+
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The ESP render range", 10.0f, 50.0f, 200.0f));
     Config<Boolean> fillConfig = register(new BooleanConfig("Fill", "Fills in the highlight", false));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the highlight", 1.0f, 1.5f, 5.0f));
@@ -38,6 +40,12 @@ public class StorageESPModule extends ToggleModule
     public StorageESPModule()
     {
         super("StorageESP", "Highlights containers in the world", ModuleCategory.RENDER);
+        INSTANCE = this;
+    }
+
+    public static StorageESPModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @EventListener

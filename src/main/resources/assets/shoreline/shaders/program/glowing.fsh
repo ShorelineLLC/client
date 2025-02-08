@@ -10,6 +10,9 @@ uniform mat4 ProjMat;
 uniform vec2 InSize;
 uniform vec2 OutSize;
 
+//
+uniform int sobel;
+
 uniform vec2 resolution;
 uniform vec2 texelSize;
 uniform int samples;
@@ -23,8 +26,10 @@ uniform int glow;
 uniform float glowRadius;
 
 // Computes the distance from a vec2 to the nearest texture edge
-float computeEdgeDistance(vec2 coords)
+vec4 computeEdgeDistance(vec2 coords)
 {
+    vec4 color = vec4(0.0f);
+
     if (fastOutline != 1)
     {
         float closest = radius * 2.0f + 2.0f;
@@ -39,12 +44,13 @@ float computeEdgeDistance(vec2 coords)
                     if (currentDist < closest)
                     {
                         closest = currentDist;
+                        color = currentColor;
                     }
                 }
             }
         }
 
-        return closest;
+        return vec4(color.rgb, closest);
     }
 
     float minDist = radius * 2.0f;
@@ -62,22 +68,28 @@ float computeEdgeDistance(vec2 coords)
             {
                 float dist = length(offset);
                 minDist = min(minDist, dist);
+                color = offsetTex;
 
                 if (minDist <= radius)
                 {
-                    return minDist;
+                    return vec4(color.rgb, minDist);
                 }
             }
         }
     }
 
-    return minDist;
+    return vec4(color.rgb, minDist);
 }
 
 void main()
 {
     vec4 centerTex = texture(DiffuseSampler, texCoord);
 
+    vec3 colorFill = color.rgb;
+    if (sobel != 0)
+    {
+        colorFill = centerTex.rgb;
+    }
     if (centerTex.a > 0.0)
     {
         vec2 uv = (2.0 * gl_FragCoord.xy - resolution.xy) / min(resolution.x, resolution.y);
@@ -87,23 +99,28 @@ void main()
             uv.y += 0.6 / i * cos(i * 1.5 * uv.x + time);
         }
 
-        fragColor = vec4(color.r / abs(sin(time -uv.y - uv.x)), color.g / abs(sin(time -uv.y - uv.x)), color.b / abs(sin(time -uv.y - uv.x)), color.a);
+        fragColor = vec4(colorFill.r / abs(sin(time -uv.y - uv.x)), colorFill.g / abs(sin(time -uv.y - uv.x)), colorFill.b / abs(sin(time -uv.y - uv.x)), color.a);
     }
     else
     {
-        float edgeDist = computeEdgeDistance(texCoord);
+        vec4 edgeDist = computeEdgeDistance(texCoord);
 
-        if (radius > 0.0f && edgeDist <= radius)
+        vec3 colorOutline = color.rgb;
+        if (sobel != 0)
+        {
+            colorOutline = edgeDist.rgb;
+        }
+        if (radius > 0.0f && edgeDist.a <= radius)
         {
             if (glow != 0)
             {
-                float alpha = edgeDist / radius;
+                float alpha = edgeDist.a / radius;
                 float transform = 1.0f - pow(alpha, glowRadius);
-                fragColor = vec4(color.rgb, transform);
+                fragColor = vec4(colorOutline.rgb, transform);
             }
             else
             {
-                fragColor = vec4(color.rgb, 1.0f);
+                fragColor = vec4(colorOutline.rgb, 1.0f);
             }
         }
         else
