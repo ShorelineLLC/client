@@ -36,7 +36,7 @@ public class EntityUtil implements Globals
      */
     public static boolean isMonster(Entity e)
     {
-        return e instanceof HostileEntity || e instanceof Angerable && !isNeutral(e);
+        return e instanceof Monster || e instanceof Angerable && !isNeutral(e);
     }
 
     /**
