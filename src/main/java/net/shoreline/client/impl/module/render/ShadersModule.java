@@ -90,7 +90,7 @@ public class ShadersModule extends ToggleModule
     Config<Float> rainbowFactorConfig = register(new NumberConfig<>("RainbowFactor", "The rainbow speed", 0.001f, 0.005f, 0.01f, () -> modeConfig.getValue() == ShaderMode.RAINBOW));
 
     // Color settings
-    Config<Color> defaultColorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.4f)));
+    Config<Float> transparencyConfig = register(new NumberConfig<>("Transparency", "The transparency of the fill", 0.0f, 0.35f, 1.0f, () -> modeConfig.getValue() != ShaderMode.OFF));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
     Config<Color> handsColorConfig = register(new ColorConfig("HandsColor", "The color of the shader", new Color(0, 100, 255), false, () -> handsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render shaders on the player", true));
@@ -180,7 +180,7 @@ public class ShadersModule extends ToggleModule
                 {
                     shaderEffect.setUniformValue("sobel", 1);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", defaultColorConfig.getValue().getRed() / 255.0f, defaultColorConfig.getValue().getGreen() / 255.0f, defaultColorConfig.getValue().getBlue() / 255.0f, modeConfig.getValue() == ShaderMode.DEFAULT ? defaultColorConfig.getValue().getAlpha() / 255.0f : 0.0f);
+                    shaderEffect.setUniformValue("color", 1.0f, 1.0f, 1.0f, modeConfig.getValue() == ShaderMode.DEFAULT ? transparencyConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("dots", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? 1 : 0);
@@ -206,7 +206,7 @@ public class ShadersModule extends ToggleModule
                 {
                     shaderEffect.setUniformValue("sobel", 1);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", defaultColorConfig.getValue().getRed() / 255.0f, defaultColorConfig.getValue().getGreen() / 255.0f, defaultColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", 1.0f, 1.0f, 1.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, gradientConfig.getValue().getAlpha() / 255.0f);
@@ -237,7 +237,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    shaderEffect.setUniformValue("color", defaultColorConfig.getValue().getRed() / 255.0f, defaultColorConfig.getValue().getGreen() / 255.0f, defaultColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", 1.0f, 1.0f, 1.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
@@ -266,7 +266,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("imageTexture", 1);
-                    shaderEffect.setUniformValue("color", defaultColorConfig.getValue().getRed() / 255.0f, defaultColorConfig.getValue().getGreen() / 255.0f, defaultColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", 1.0f, 1.0f, 1.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("mixColor", mixConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("mixFactor", mixFactorConfig.getValue());
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
@@ -290,7 +290,7 @@ public class ShadersModule extends ToggleModule
                 {
                     shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", defaultColorConfig.getValue().getRed() / 255.0f, defaultColorConfig.getValue().getGreen() / 255.0f, defaultColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", 1.0f, 1.0f, 1.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
@@ -471,7 +471,7 @@ public class ShadersModule extends ToggleModule
                 {
                     shaderEffect.setUniformValue("sobel", 0);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, modeConfig.getValue() == ShaderMode.DEFAULT ? defaultColorConfig.getValue().getAlpha() / 255.0f : 0.0f);
+                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, modeConfig.getValue() == ShaderMode.DEFAULT ? transparencyConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("dots", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? 1 : 0);
@@ -499,7 +499,7 @@ public class ShadersModule extends ToggleModule
                 {
                     shaderEffect.setUniformValue("sobel", 0);
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f,defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f,transparencyConfig.getValue());
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("color1", gradientConfig.getValue().getRed() / 255.0f, gradientConfig.getValue().getGreen() / 255.0f, gradientConfig.getValue().getBlue() / 255.0f, gradientConfig.getValue().getAlpha() / 255.0f);
@@ -532,7 +532,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
-                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
@@ -562,7 +562,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("imageTexture", 1);
-                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("mixColor", mixConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("mixFactor", mixFactorConfig.getValue());
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
@@ -588,7 +588,7 @@ public class ShadersModule extends ToggleModule
                 {
                     shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
                     shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("samples", qualityConfig.getValue());
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
