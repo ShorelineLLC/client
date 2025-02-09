@@ -87,32 +87,33 @@ public class ShadersModule extends ToggleModule
     Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue() && modeConfig.getValue() == ShaderMode.DEFAULT));
     Config<Boolean> mixConfig = register(new BooleanConfig("Mix", "Mixes the image with the shader colors", true, () -> modeConfig.getValue() == ShaderMode.IMAGE));
     Config<Float> mixFactorConfig = register(new NumberConfig<>("MixFactor", "The mix image factor", 0.0f, 0.5f, 1.0f, () -> mixConfig.getValue() && modeConfig.getValue() == ShaderMode.IMAGE));
+    Config<Float> rainbowFactorConfig = register(new NumberConfig<>("RainbowFactor", "The rainbow speed", 0.001f, 0.005f, 0.01f, () -> modeConfig.getValue() == ShaderMode.RAINBOW));
 
     // Color settings
     Config<Color> defaultColorConfig = register(new ColorConfig("Color", "The color of the shader", new Color(1.0f, 0.0f, 0.0f, 0.4f)));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
-    Config<Color> handsColorConfig = register(new ColorConfig("HandsColor", "The color of the shader", new Color(0, 100, 255), false, () -> handsConfig.getValue()));
+    Config<Color> handsColorConfig = register(new ColorConfig("HandsColor", "The color of the shader", new Color(0, 100, 255), false, () -> handsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render shaders on the player", true));
-    Config<Color> selfColorConfig = register(new ColorConfig("SelfColor", "The render color for self", new Color(200, 60, 60), false, () -> selfConfig.getValue()));
+    Config<Color> selfColorConfig = register(new ColorConfig("SelfColor", "The render color for self", new Color(200, 60, 60), false, () -> selfConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render shaders on other players", true));
     Config<Boolean> friendsConfig = register(new BooleanConfig("FriendsColor", "Render shaders on friends", true));
-    Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue()));
+    Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render shaders on monsters", true));
-    Config<Color> monstersColorConfig = register(new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue()));
+    Config<Color> monstersColorConfig = register(new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render shaders on animals", true));
-    Config<Color> animalsColorConfig = register(new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue()));
+    Config<Color> animalsColorConfig = register(new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render shaders on items", true));
-    Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(200, 100, 0), false, () -> itemsConfig.getValue()));
+    Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(200, 100, 0), false, () -> itemsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> otherConfig = register(new BooleanConfig("Crystals", "Render shaders on crystals", true));
-    Config<Color> crystalsColorConfig = register(new ColorConfig("EndCrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> otherConfig.getValue()));
+    Config<Color> crystalsColorConfig = register(new ColorConfig("EndCrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> otherConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> projectilesConfig = register(new BooleanConfig("Projectiles", "Render shaders on projectiles", true));
-    Config<Color> projectilesColorConfig = register(new ColorConfig("ProjectilesColor", "The render color for projectiles", new Color(200, 100, 200), false, () -> projectilesConfig.getValue()));
+    Config<Color> projectilesColorConfig = register(new ColorConfig("ProjectilesColor", "The render color for projectiles", new Color(200, 100, 200), false, () -> projectilesConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render chests through walls", false));
-    Config<Color> chestsColorConfig = register(new ColorConfig("ChestsColor", "The render color for chests", new Color(200, 200, 101), false, false, () -> chestsConfig.getValue()));
+    Config<Color> chestsColorConfig = register(new ColorConfig("ChestsColor", "The render color for chests", new Color(200, 200, 101), false, false, () -> chestsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> echestsConfig = register(new BooleanConfig("EnderChests", "Render ender chests through walls", false));
-    Config<Color> echestsColorConfig = register(new ColorConfig("EnderChestsColor", "The render color for ender chests", new Color(155, 0, 200), false, false, () -> echestsConfig.getValue()));
+    Config<Color> echestsColorConfig = register(new ColorConfig("EnderChestsColor", "The render color for ender chests", new Color(155, 0, 200), false, false, () -> echestsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Render shulkers through walls", false));
-    Config<Color> shulkersColorConfig = register(new ColorConfig("ShulkersColor", "The render color for shulkers", new Color(200, 0, 106), false, false, () -> shulkersConfig.getValue()));
+    Config<Color> shulkersColorConfig = register(new ColorConfig("ShulkersColor", "The render color for shulkers", new Color(200, 0, 106), false, false, () -> shulkersConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
 
     private float shaderTime;
 
@@ -273,6 +274,32 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
+                }, () ->
+                {
+                    renderEntities(event.getTickDelta(), event.getMatrices());
+                });
+            }
+            case RAINBOW ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getRainbowShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("color", defaultColorConfig.getValue().getRed() / 255.0f, defaultColorConfig.getValue().getGreen() / 255.0f, defaultColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
+                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
+                    shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
+                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
+                    shaderTime += rainbowFactorConfig.getValue();
                 }, () ->
                 {
                     renderEntities(event.getTickDelta(), event.getMatrices());
@@ -550,6 +577,34 @@ public class ShadersModule extends ToggleModule
                     ignoreEntityRender = false;
                 });
             }
+            case RAINBOW ->
+            {
+                final ManagedShaderEffect shaderEffect = Managers.SHADER.getRainbowShaderEffect();
+                if (shaderEffect == null)
+                {
+                    return;
+                }
+                Managers.SHADER.applyShader(shaderEffect, () ->
+                {
+                    shaderEffect.setUniformValue("resolution", (float) mc.getWindow().getScaledWidth(), (float) mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                    shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, defaultColorConfig.getValue().getAlpha() / 255.0f);
+                    shaderEffect.setUniformValue("samples", qualityConfig.getValue());
+                    shaderEffect.setUniformValue("steps", stepsConfig.getValue());
+                    shaderEffect.setUniformValue("time", shaderTime);
+                    shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
+                    shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
+                    shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
+                    shaderTime += rainbowFactorConfig.getValue();
+                }, () ->
+                {
+                    ignoreEntityRender = true;
+                    ((AccessorGameRenderer) mc.gameRenderer).hookRenderHand(mc.gameRenderer.getCamera(), event.getTickDelta(), event.getMatrices().peek().getPositionMatrix());
+                    ignoreEntityRender = false;
+                });
+            }
         }
     }
 
@@ -724,7 +779,7 @@ public class ShadersModule extends ToggleModule
         DEFAULT,
         GRADIENT,
         MARBLE,
-        // FLAME,
+        RAINBOW,
         IMAGE,
         OFF
     }

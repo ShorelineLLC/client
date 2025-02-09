@@ -7,8 +7,6 @@ import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-import net.shoreline.client.api.render.layers.RenderLayersClient;
 import net.shoreline.client.api.render.satin.ManagedShaderEffect;
 import net.shoreline.client.api.render.satin.ShaderEffectManager;
 import net.shoreline.client.impl.imixin.IPostEffectProcessor;
@@ -36,7 +34,7 @@ public class ShaderManager implements Globals
     public ManagedShaderEffect gradientShaderEffect;
     public ManagedShaderEffect imageShaderEffect;
     public ManagedShaderEffect glowingShaderEffect;
-    public ManagedShaderEffect flameShaderEffect;
+    public ManagedShaderEffect rainbowShaderEffect;
 
     public ShaderManager()
     {
@@ -60,7 +58,7 @@ public class ShaderManager implements Globals
         gradientShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/gradient.json"));
         imageShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/image.json"));
         glowingShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/glowing.json"));
-        flameShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/flame.json"));
+        rainbowShaderEffect = ShaderEffectManager.getInstance().manage(Identifier.of("shoreline", "shaders/post/rainbow.json"));
     }
 
     public void applyShader(ManagedShaderEffect shaderEffect, Runnable setup, Runnable runnable)
@@ -150,8 +148,8 @@ public class ShaderManager implements Globals
         return glowingShaderEffect;
     }
 
-    public ManagedShaderEffect getFlameShaderEffect()
+    public ManagedShaderEffect getRainbowShaderEffect()
     {
-        return flameShaderEffect;
+        return rainbowShaderEffect;
     }
 }
