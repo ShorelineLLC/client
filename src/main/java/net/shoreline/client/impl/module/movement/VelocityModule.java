@@ -48,13 +48,11 @@ public class VelocityModule extends ToggleModule
     Config<Boolean> knockbackConfig = register(new BooleanConfig("Knockback", "Removes player knockback velocity", true));
     Config<Boolean> explosionConfig = register(new BooleanConfig("Explosion", "Removes player explosion velocity", true));
     Config<VelocityMode> modeConfig = register(new EnumConfig<>("Mode", "The mode for velocity", VelocityMode.NORMAL, VelocityMode.values()));
-    Config<Float> horizontalConfig = register(new NumberConfig<>("Horizontal", "How much horizontal knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
-    Config<Float> verticalConfig = register(new NumberConfig<>("Vertical", "How much vertical knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL));
-    Config<Boolean> concealConfig = register(new BooleanConfig("Conceal", "Fixes velocity on servers with excessive setbacks", false, () -> modeConfig.getValue() == VelocityMode.NORMAL));
-
-    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only applies velocity in walls", false, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM));
-    Config<Boolean> wallsAirConfig = register(new BooleanConfig("Walls-Ground", "Only applies velocity in walls while on ground", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
-    Config<Boolean> wallsTrappedConfig = register(new BooleanConfig("Walls-Trapped", "Applies velocity while player head is trapped", false, () -> (modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.GRIM) && wallsOnlyConfig.getValue()));
+    Config<Float> horizontalConfig = register(new NumberConfig<>("Horizontal", "How much horizontal knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.WALLS));
+    Config<Float> verticalConfig = register(new NumberConfig<>("Vertical", "How much vertical knock-back to take", 0.0f, 0.0f, 100.0f, NumberDisplay.PERCENT, () -> modeConfig.getValue() == VelocityMode.NORMAL || modeConfig.getValue() == VelocityMode.WALLS));
+    Config<Boolean> concealConfig = register(new BooleanConfig("Conceal", "Fixes velocity on servers with excessive setbacks", false));
+    Config<Boolean> wallsAirConfig = register(new BooleanConfig("GroundOnly", "Only applies velocity in walls while on ground", false, () -> modeConfig.getValue() == VelocityMode.WALLS));
+    Config<Boolean> wallsTrappedConfig = register(new BooleanConfig("Trapped", "Applies velocity while player head is trapped", false, () -> modeConfig.getValue() == VelocityMode.WALLS));
     Config<Boolean> pushEntitiesConfig = register(new BooleanConfig("NoPush-Entities", "Prevents being pushed away from entities", true));
     Config<Boolean> pushBlocksConfig = register(new BooleanConfig("NoPush-Blocks", "Prevents being pushed out of blocks", true));
     Config<Boolean> pushLiquidsConfig = register(new BooleanConfig("NoPush-Liquids", "Prevents being pushed by flowing liquids", true));
@@ -152,7 +150,7 @@ public class VelocityModule extends ToggleModule
                 return;
             }
 
-            if (wallsOnlyConfig.getValue())
+            if (modeConfig.getValue() == VelocityMode.WALLS)
             {
                 if (!isPhased() && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
                 {
@@ -167,7 +165,7 @@ public class VelocityModule extends ToggleModule
 
             switch (modeConfig.getValue())
             {
-                case NORMAL ->
+                case NORMAL, WALLS ->
                 {
                     if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
                     {
@@ -196,14 +194,14 @@ public class VelocityModule extends ToggleModule
         }
         else if (event.getPacket() instanceof ExplosionS2CPacket packet && explosionConfig.getValue())
         {
-            if (wallsOnlyConfig.getValue() && !isPhased())
+            if (modeConfig.getValue() == VelocityMode.WALLS && !isPhased())
             {
                 return;
             }
 
             switch (modeConfig.getValue())
             {
-                case NORMAL ->
+                case NORMAL, WALLS ->
                 {
                     if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
                     {
@@ -253,7 +251,7 @@ public class VelocityModule extends ToggleModule
                             SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS,
                             4.0f, (1.0f + (RANDOM.nextFloat() - RANDOM.nextFloat()) * 0.2f) * 0.7f, false, RANDOM.nextLong()));
 
-                    if (wallsOnlyConfig.getValue() && !isPhased())
+                    if (modeConfig.getValue() == VelocityMode.WALLS && !isPhased())
                     {
                         allowedBundle.add(packet1);
                         continue;
@@ -261,7 +259,7 @@ public class VelocityModule extends ToggleModule
 
                     switch (modeConfig.getValue())
                     {
-                        case NORMAL ->
+                        case NORMAL, WALLS ->
                         {
                             if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
                             {
@@ -305,7 +303,7 @@ public class VelocityModule extends ToggleModule
                         continue;
                     }
 
-                    if (wallsOnlyConfig.getValue())
+                    if (modeConfig.getValue() == VelocityMode.WALLS)
                     {
                         if (!isPhased() && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
                         {
@@ -322,7 +320,7 @@ public class VelocityModule extends ToggleModule
 
                     switch (modeConfig.getValue())
                     {
-                        case NORMAL ->
+                        case NORMAL, WALLS ->
                         {
                             if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
                             {
@@ -464,6 +462,7 @@ public class VelocityModule extends ToggleModule
     private enum VelocityMode
     {
         NORMAL,
+        WALLS,
         GRIM,
         GRIM_V3
     }

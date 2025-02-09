@@ -87,7 +87,7 @@ public class ShadersModule extends ToggleModule
     Config<Integer> dotRadiusConfig = register(new NumberConfig<>("DotRadius", "Width between the dots", 5, 8, 16, () -> dotsConfig.getValue() && modeConfig.getValue() == ShaderMode.DEFAULT));
     Config<Boolean> mixConfig = register(new BooleanConfig("Mix", "Mixes the image with the shader colors", true, () -> modeConfig.getValue() == ShaderMode.IMAGE));
     Config<Float> mixFactorConfig = register(new NumberConfig<>("MixFactor", "The mix image factor", 0.0f, 0.5f, 1.0f, () -> mixConfig.getValue() && modeConfig.getValue() == ShaderMode.IMAGE));
-    Config<Float> rainbowFactorConfig = register(new NumberConfig<>("RainbowFactor", "The rainbow speed", 0.001f, 0.005f, 0.02f, () -> modeConfig.getValue() == ShaderMode.RAINBOW));
+    Config<Float> rainbowFactorConfig = register(new NumberConfig<>("RainbowFactor", "The rainbow speed", 0.001f, 0.005f, 0.020f, () -> modeConfig.getValue() == ShaderMode.RAINBOW));
 
     // Color settings
     Config<Float> transparencyConfig = register(new NumberConfig<>("Transparency", "The transparency of the fill", 0.0f, 0.35f, 1.0f, () -> modeConfig.getValue() != ShaderMode.OFF));
