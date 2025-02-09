@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -144,7 +145,8 @@ public class ChamsModule extends ToggleModule
             double x = Math.abs(mc.gameRenderer.getCamera().getPos().x - entity.getX());
             double z = Math.abs(mc.gameRenderer.getCamera().getPos().z - entity.getZ());
             double d = (mc.options.getViewDistance().getValue() + 1) * 16;
-            if (mc.player.squaredDistanceTo(entity) > ((NumberConfig) rangeConfig).getValueSq() || x > d || z > d)
+            Vec3d start = FreecamModule.getInstance().isEnabled() ? FreecamModule.getInstance().getCameraPosition() : mc.player.getPos();
+            if (start.squaredDistanceTo(entity.getPos()) > ((NumberConfig) rangeConfig).getValueSq() || x > d || z > d)
             {
                 continue;
             }
