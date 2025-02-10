@@ -48,7 +48,7 @@ public class FakeLagModule extends ToggleModule
     @Override
     public void onEnable()
     {
-        if (renderConfig.getValue())
+        if (mc.player != null && renderConfig.getValue())
         {
             serverModel = new FakePlayerEntity(mc.player, mc.player.getGameProfile());
             serverModel.spawnPlayer();
