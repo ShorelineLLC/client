@@ -50,8 +50,7 @@ public class FakeLagModule extends ToggleModule
     {
         if (renderConfig.getValue())
         {
-            serverModel = new FakePlayerEntity(mc.player, mc.getGameProfile());
-            serverModel.despawnPlayer();
+            serverModel = new FakePlayerEntity(mc.player, mc.player.getGameProfile());
             serverModel.spawnPlayer();
         }
     }
