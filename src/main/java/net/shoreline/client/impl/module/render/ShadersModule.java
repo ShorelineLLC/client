@@ -72,7 +72,7 @@ public class ShadersModule extends ToggleModule
     Config<Float> rangeConfig = register(new NumberConfig<>("RenderDistance", "The shader render range", 10.0f, 50.0f, 200.0f));
     Config<Boolean> textureConfig = register(new BooleanConfig("Texture", "Renders the entity model texture", true));
     Config<Boolean> outlineConfig = register(new BooleanConfig("Outline", "Adds an outline around the shader", true));
-    Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 1.0f, 1.5f, 10.0f, () -> outlineConfig.getValue()));
+    Config<Float> lineWidthConfig = register(new NumberConfig<>("Width", "The outline width", 0.1f, 1.5f, 10.0f, () -> outlineConfig.getValue()));
     Config<Boolean> fastOutlineConfig = register(new BooleanConfig("FastOutline", "Faster outline calculations", false, () -> outlineConfig.getValue()));
     Config<Integer> qualityConfig = register(new NumberConfig<>("Quality", "The outline pixel quality", 2, 10, 32, () -> fastOutlineConfig.getValue() && outlineConfig.getValue()));
     Config<Integer> stepsConfig = register(new NumberConfig<>("Steps", "The number of steps for finding edges", 2, 4, 32, () -> fastOutlineConfig.getValue() && outlineConfig.getValue()));
@@ -167,6 +167,7 @@ public class ShadersModule extends ToggleModule
     @EventListener
     public void onRenderEntityWorld(RenderShaderEvent event)
     {
+        float lineThickness = Math.max(fastOutlineConfig.getValue() ? 0.3f : 1.0f, lineWidthConfig.getValue());
         switch (modeConfig.getValue())
         {
             case DEFAULT, OFF ->
@@ -186,7 +187,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("dots", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? 1 : 0);
                     shaderEffect.setUniformValue("dotRadius", dotRadiusConfig.getValue());
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -213,7 +214,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -240,7 +241,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("color", 1.0f, 1.0f, 1.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -270,7 +271,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("mixColor", mixConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("mixFactor", mixFactorConfig.getValue());
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -295,7 +296,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -459,6 +460,8 @@ public class ShadersModule extends ToggleModule
         {
             return;
         }
+
+        float lineThickness = Math.max(fastOutlineConfig.getValue() ? 0.3f : 1.0f, lineWidthConfig.getValue());
         switch (modeConfig.getValue())
         {
             case DEFAULT, OFF ->
@@ -478,7 +481,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("dots", dotsConfig.getValue() && modeConfig.getValue() != ShaderMode.OFF ? 1 : 0);
                     shaderEffect.setUniformValue("dotRadius", dotRadiusConfig.getValue());
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -507,7 +510,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("factor", factorConfig.getValue() * 10.0f);
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -535,7 +538,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("color", handsColorConfig.getValue().getRed() / 255.0f, handsColorConfig.getValue().getGreen() / 255.0f, handsColorConfig.getValue().getBlue() / 255.0f, transparencyConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -567,7 +570,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("mixColor", mixConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("mixFactor", mixFactorConfig.getValue());
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
@@ -594,7 +597,7 @@ public class ShadersModule extends ToggleModule
                     shaderEffect.setUniformValue("steps", stepsConfig.getValue());
                     shaderEffect.setUniformValue("time", shaderTime);
                     shaderEffect.setUniformValue("fastOutline", fastOutlineConfig.getValue() ? 1 : 0);
-                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineWidthConfig.getValue() : 0.0f);
+                    shaderEffect.setUniformValue("radius", outlineConfig.getValue() ? lineThickness : 0.0f);
                     shaderEffect.setUniformValue("glow", glowConfig.getValue() ? 1 : 0);
                     shaderEffect.setUniformValue("glowRadius", glowRadiusConfig.getValue());
                     shaderEffect.render(mc.getRenderTickCounter().getTickDelta(true));
