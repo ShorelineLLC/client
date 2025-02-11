@@ -828,14 +828,21 @@ public class AutoMineModule extends CombatModule
 
     private BlockPos getCrawlingMine(PlayerEntity playerTarget)
     {
-        BlockPos crawlingPos = mc.player.getBlockPos();
-        // We want to be same level as our opponent
-        if (playerTarget != null && playerTarget.getBlockPos().getY() < crawlingPos.getY()
-                && !BlastResistantBlocks.isUnbreakable(crawlingPos.down()) && !mc.world.isAir(crawlingPos.down()))
+        if (!mc.player.isOnGround())
         {
-            return crawlingPos.down();
+            return null;
         }
-        if (!BlastResistantBlocks.isUnbreakable(crawlingPos.up()) && !mc.world.isAir(crawlingPos.up()))
+        BlockPos crawlingPos = mc.player.getBlockPos();
+        boolean playerBelow = playerTarget != null && playerTarget.getBlockPos().getY() < crawlingPos.getY();
+        // We want to be same level as our opponent
+        if (playerBelow)
+        {
+            if (!BlastResistantBlocks.isUnbreakable(crawlingPos.down()) && !mc.world.isAir(crawlingPos.down()))
+            {
+                return crawlingPos.down();
+            }
+        }
+        else if (!BlastResistantBlocks.isUnbreakable(crawlingPos.up()) && !mc.world.isAir(crawlingPos.up()))
         {
             return crawlingPos.up();
         }
