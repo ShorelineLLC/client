@@ -55,33 +55,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity implements Globals
 
     /**
      * @param player
-     * @param profile
-     */
-    public FakePlayerEntity(PlayerEntity player, GameProfile profile)
-    {
-        super(MinecraftClient.getInstance().world, profile);
-        this.player = player;
-        copyPositionAndRotation(player);
-        prevYaw = getYaw();
-        prevPitch = getPitch();
-        headYaw = player.headYaw;
-        prevHeadYaw = headYaw;
-        bodyYaw = player.bodyYaw;
-        prevBodyYaw = bodyYaw;
-        Byte playerModel = player.getDataTracker()
-                .get(PlayerEntity.PLAYER_MODEL_PARTS);
-        dataTracker.set(PlayerEntity.PLAYER_MODEL_PARTS, playerModel);
-        getAttributes().setFrom(player.getAttributes());
-        setHealth(player.getHealth());
-        setAbsorptionAmount(player.getAbsorptionAmount());
-        // setBoundingBox(player.getBoundingBox());
-        getInventory().clone(player.getInventory());
-        setId(CURRENT_ID.incrementAndGet());
-        this.age = 100;
-    }
-
-    /**
-     * @param player
      */
     public FakePlayerEntity(PlayerEntity player)
     {

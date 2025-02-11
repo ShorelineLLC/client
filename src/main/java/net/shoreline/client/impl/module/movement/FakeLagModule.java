@@ -17,6 +17,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -50,8 +51,9 @@ public class FakeLagModule extends ToggleModule
     {
         if (mc.player != null && renderConfig.getValue())
         {
-            serverModel = new FakePlayerEntity(mc.player, mc.player.getGameProfile());
+            serverModel = new FakePlayerEntity(mc.player);
             serverModel.spawnPlayer();
+            serverModel.setUuid(mc.player.getUuid());
         }
     }
 
@@ -72,6 +74,7 @@ public class FakeLagModule extends ToggleModule
         }
         if (serverModel != null)
         {
+            serverModel.setUuid(UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7"));
             serverModel.despawnPlayer();
         }
     }
