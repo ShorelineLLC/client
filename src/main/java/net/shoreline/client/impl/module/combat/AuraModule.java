@@ -275,7 +275,7 @@ public class AuraModule extends CombatModule
         if (attackDelayConfig.getValue())
         {
             PlayerInventory inventory = mc.player.getInventory();
-            ItemStack itemStack = inventory.getStack(slot == -1 ? mc.player.getInventory().selectedSlot : slot);
+            ItemStack itemStack = inventory.getStack((slot == -1 || !swordCheckConfig.getValue()) ? mc.player.getInventory().selectedSlot : slot);
 
             MutableDouble attackSpeed = new MutableDouble(
                     mc.player.getAttributeBaseValue(EntityAttributes.GENERIC_ATTACK_SPEED));

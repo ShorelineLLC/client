@@ -267,7 +267,7 @@ public class NametagsModule extends ToggleModule
         if (borderedConfig.getValue())
         {
             RenderManager.borderedRectLine(matrices, isOnlineUser(entity) ? -width - 3.0f : -width - 1.0f, -1.0f, width * 2.0f + (isOnlineUser(entity) ? 5.0f : 2.5f),
-                    mc.textRenderer.fontHeight + 1.0f, ColorsModule.getInstance().getRGB());
+                    mc.textRenderer.fontHeight + 1.0f, Managers.SOCIAL.isFriend(entity.getDisplayName().getString()) ? SocialsModule.getInstance().getFriendRGB() : ColorsModule.getInstance().getRGB());
         }
 
         int color = getNametagColor(entity);
