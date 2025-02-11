@@ -902,8 +902,15 @@ public class AutoMineModule extends CombatModule
             }
         }
 
-        manualOverride = manualMining;
-        crawlingOverride = antiCrawlMining;
+        if (!manualMining)
+        {
+            manualOverride = false;
+        }
+
+        if (!antiCrawlMining)
+        {
+            crawlingOverride = false;
+        }
     }
 
     private boolean startMining(MiningData data)

@@ -137,7 +137,7 @@ public final class ChatNotifierModule extends ToggleModule
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§g" : "§7") + playerName + "§f entered your visual range", playerEntity.hashCode());
+        mc.executeSync(() -> ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§g" : "§7") + playerName + "§f entered your visual range", playerEntity.hashCode()));
     }
 
     @EventListener
@@ -153,7 +153,7 @@ public final class ChatNotifierModule extends ToggleModule
         {
             return;
         }
-        ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§g" : "§c") + playerName + "§f left your visual range", playerEntity.hashCode());
+        mc.executeSync(() -> ChatUtil.clientSendMessageRaw("§s[VisualRange] " + (isFriend ? "§g" : "§c") + playerName + "§f left your visual range", playerEntity.hashCode()));
     }
 
     @EventListener
