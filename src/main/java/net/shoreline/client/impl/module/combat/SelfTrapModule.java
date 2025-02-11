@@ -105,7 +105,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     public void onPlayerTick(PlayerTickEvent event)
     {
         blocksPlaced = 0;
-        if (autoDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5)
+        if (autoDisableConfig.getValue() && (mc.player.getY() - prevY > 0.5 || mc.player.fallDistance > 1.5f))
         {
             disable();
             return;

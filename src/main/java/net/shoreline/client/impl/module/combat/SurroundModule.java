@@ -108,7 +108,7 @@ public class SurroundModule extends ObsidianPlacerModule
             return;
         }
         blocksPlaced = 0;
-        if (jumpDisableConfig.getValue() && Math.abs(mc.player.getY() - prevY) > 0.5)
+        if (jumpDisableConfig.getValue() && (mc.player.getY() - prevY > 0.5 || mc.player.fallDistance > 1.5f))
         {
             disable();
             return;
