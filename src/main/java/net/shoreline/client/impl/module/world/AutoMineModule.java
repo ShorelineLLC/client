@@ -65,6 +65,8 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> avoidSelfConfig = register(new BooleanConfig("AvoidSelf", "Avoids mining blocks in your surround", false, () -> autoConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Only mines on visible faces", false, () -> autoConfig.getValue()));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for targets", 1.0f, 5.0f, 10.0f, () -> autoConfig.getValue()));
+    Config<Boolean> headConfig = register(new BooleanConfig("TargetBody", "Attempts to mine players face blocks", false));
+    Config<Boolean> aboveHeadConfig = register(new BooleanConfig("TargetHead", "Attempts to mine above players head", false));
     Config<Boolean> doubleBreakConfig = register(new BooleanConfig("DoubleBreak", "Allows you to mine two blocks at once", false));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.1f, 4.0f, 6.0f));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
@@ -75,7 +77,6 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
     // Config<Boolean> fastConfig = register(new BooleanConfig("Fast", "Instant remines air", false, () -> instantConfig.getValue()));
-    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Attempts to mine players head blocks", false));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
     Config<Boolean> crawlExtrapolateConfig = register(new BooleanConfig("ExtrapolateCrawl", "Predicts attempts to crawl you", false, () -> false));
     Config<Float> crawlResetConfig = register(new NumberConfig<>("CrawlResetTime", "The anticrawl reset timer", 0.0f, 5.0f, 10.0f, () -> false));
@@ -737,90 +738,105 @@ public class AutoMineModule extends CombatModule
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
 
-        if (headConfig.getValue() && BlastResistantBlocks.isUnbreakable(entity.getBlockPos()))
+        if (BlastResistantBlocks.isUnbreakable(entity.getBlockPos()) && !entity.isCrawling())
         {
-            for (BlockPos blockPos : surroundBlocks)
+            BlockPos belowFeet = entity.getBlockPos().down();
+            if (!mc.world.isAir(belowFeet))
             {
-                final BlockPos blockPos1 = blockPos.up();
-                if (BlastResistantBlocks.isUnbreakable(blockPos1)) // bedrock mine exploit!!
-                {
-                    continue;
-                }
-                double dist = mc.player.getEyePos().squaredDistanceTo(blockPos1.toCenterPos());
-                if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq())
-                {
-                    continue;
-                }
-                // Check all possible crystal placements for highest damage
-                double bestDamage = 0.0;
-                for (Direction direction : Direction.values())
-                {
-                    if (!direction.getAxis().isHorizontal())
-                    {
-                        continue;
-                    }
-                    BlockPos off = blockPos1.offset(direction);
-                    if (!AutoCrystalModule.getInstance().canUseCrystalOnBlock(off.down()))
-                    {
-                        continue;
-                    }
-
-                    double damage = ExplosionUtil.getDamageTo(entity, off.toCenterPos(),
-                            ExplosionUtil.IgnoreTerrain.NONE, Set.of(off), assumeArmorConfig.getValue());
-                    if (damage > bestDamage)
-                    {
-                        bestDamage = damage;
-                    }
-                }
-
-                miningPositions.add(new AutoMineCalc(blockPos1, bestDamage, false));
+                miningPositions.add(new AutoMineCalc(belowFeet, 1000, false));
             }
+            if (aboveHeadConfig.getValue())
+            {
+                BlockPos aboveHead = entity.getBlockPos().up(2);
+                if (!mc.world.isAir(aboveHead))
+                {
+                    miningPositions.add(new AutoMineCalc(aboveHead, 999, false));
+                }
+            }
+            if (headConfig.getValue())
+            {
+                for (BlockPos blockPos : surroundBlocks)
+                {
+                    final BlockPos blockPos1 = blockPos.up();
+                    if (BlastResistantBlocks.isUnbreakable(blockPos1)) // bedrock mine exploit!!
+                    {
+                        continue;
+                    }
+                    double dist = mc.player.getEyePos().squaredDistanceTo(blockPos1.toCenterPos());
+                    if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq())
+                    {
+                        continue;
+                    }
+                    // Check all possible crystal placements for highest damage
+                    double bestDamage = 0.0;
+                    for (Direction direction : Direction.values())
+                    {
+                        if (!direction.getAxis().isHorizontal())
+                        {
+                            continue;
+                        }
+                        BlockPos off = blockPos1.offset(direction);
+                        if (!AutoCrystalModule.getInstance().canUseCrystalOnBlock(off.down()))
+                        {
+                            continue;
+                        }
+
+                        double damage = ExplosionUtil.getDamageTo(entity, off.toCenterPos(),
+                                ExplosionUtil.IgnoreTerrain.NONE, Set.of(off), assumeArmorConfig.getValue());
+                        if (damage > bestDamage)
+                        {
+                            bestDamage = damage;
+                        }
+                    }
+
+                    miningPositions.add(new AutoMineCalc(blockPos1, bestDamage, false));
+                }
+            }
+
+            return miningPositions;
         }
 
-        else
+        List<AutoMineCalc> phasePositions = getPhasePosition(mc.player);
+        for (BlockPos blockPos : surroundBlocks)
         {
-            List<AutoMineCalc> phasePositions = getPhasePosition(mc.player);
-            for (BlockPos blockPos : surroundBlocks)
+            if (BlastResistantBlocks.isUnbreakable(blockPos)) // bedrock mine exploit!!
             {
-                if (BlastResistantBlocks.isUnbreakable(blockPos)) // bedrock mine exploit!!
-                {
-                    continue;
-                }
-                if (avoidSelfConfig.getValue() && (SurroundModule.getInstance().getSurroundNoDown(mc.player).contains(blockPos)
-                        || phasePositions.stream().anyMatch(d -> d.pos().equals(blockPos))))
-                {
-                    continue;
-                }
-                double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
-                if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq())
-                {
-                    continue;
-                }
-                // Check all possible crystal placements for highest damage
-                double bestDamage = 0.0;
-                for (Direction direction : Direction.values())
-                {
-                    if (!direction.getAxis().isHorizontal())
-                    {
-                        continue;
-                    }
-                    BlockPos off = blockPos.offset(direction);
-                    if (!AutoCrystalModule.getInstance().canUseCrystalOnBlock(off.down()))
-                    {
-                        continue;
-                    }
-
-                    double damage = ExplosionUtil.getDamageTo(entity, off.toCenterPos(),
-                            ExplosionUtil.IgnoreTerrain.NONE, Set.of(off), assumeArmorConfig.getValue());
-                    if (damage > bestDamage)
-                    {
-                        bestDamage = damage;
-                    }
-                }
-
-                // Check surrounding positions
-                miningPositions.add(new AutoMineCalc(blockPos, bestDamage, false));
+                continue;
             }
+            if (avoidSelfConfig.getValue() && (SurroundModule.getInstance().getSurroundNoDown(mc.player).contains(blockPos)
+                    || phasePositions.stream().anyMatch(d -> d.pos().equals(blockPos))))
+            {
+                continue;
+            }
+            double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
+            if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq())
+            {
+                continue;
+            }
+            // Check all possible crystal placements for highest damage
+            double bestDamage = 0.0;
+            for (Direction direction : Direction.values())
+            {
+                if (!direction.getAxis().isHorizontal())
+                {
+                    continue;
+                }
+                BlockPos off = blockPos.offset(direction);
+                if (!AutoCrystalModule.getInstance().canUseCrystalOnBlock(off.down()))
+                {
+                    continue;
+                }
+
+                double damage = ExplosionUtil.getDamageTo(entity, off.toCenterPos(),
+                        ExplosionUtil.IgnoreTerrain.NONE, Set.of(off), assumeArmorConfig.getValue());
+                if (damage > bestDamage)
+                {
+                    bestDamage = damage;
+                }
+            }
+
+            // Check surrounding positions
+            miningPositions.add(new AutoMineCalc(blockPos, bestDamage, false));
         }
 
         return miningPositions;
