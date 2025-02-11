@@ -176,13 +176,14 @@ public class AutoMineModule extends CombatModule
         playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
         boolean crawling = mc.player.isCrawling() || Managers.BLOCK.isBreaking(mc.player.getBlockPos()) && crawlExtrapolateConfig.getValue();
         BlockPos crawlingMine = getCrawlingMine(playerTarget);
-        if (crawling)
-        {
-            antiCrawlTimer.reset();
-        }
 
         if (crawlingOverride)
         {
+            if (crawling)
+            {
+                antiCrawlTimer.reset();
+            }
+
             MiningData miningData1 = null;
             if (!miningQueue.isEmpty())
             {
@@ -201,7 +202,7 @@ public class AutoMineModule extends CombatModule
             {
                 miningQueue.clear();
                 crawlingOverride = true;
-                startAutoMine(crawlingMine, Direction.DOWN);
+                startAutoMine(crawlingMine, Direction.DOWN, true);
             }
             else
             {
@@ -550,7 +551,7 @@ public class AutoMineModule extends CombatModule
             return;
         }
 
-        if (packet.getPos().equals(getCrawlingMine(playerTarget)))
+        if (crawlingOverride && packet.getPos().equals(getCrawlingMine(playerTarget)))
         {
             antiCrawlTimer.reset();
         }
@@ -665,7 +666,12 @@ public class AutoMineModule extends CombatModule
 
     private void startAutoMine(BlockPos pos, Direction miningDir)
     {
-        AutoMiningData miningData = new AutoMiningData(pos, miningDir);
+        startAutoMine(pos, miningDir, false);
+    }
+
+    private void startAutoMine(BlockPos pos, Direction miningDir, boolean crawlingMine)
+    {
+        AutoMiningData miningData = crawlingMine ? new CrawlMiningData(pos, miningDir) : new AutoMiningData(pos, miningDir);
         if (tickDelay <= 0)
         {
             queueMiningData(miningData);
@@ -858,28 +864,39 @@ public class AutoMineModule extends CombatModule
     private void removeQueuedMine()
     {
         miningQueue.remove();
-        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
-        {
-            manualOverride = false;
-        }
+        updateOverrides();
     }
 
     private void removeQueuedMine(MiningData data)
     {
         miningQueue.remove(data);
-        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
-        {
-            manualOverride = false;
-        }
+        updateOverrides();
     }
 
     private void removeIfQueuedMine(Predicate<MiningData> dataPredicate)
     {
         miningQueue.removeIf(dataPredicate);
-        if (miningQueue.stream().noneMatch(d -> d instanceof ManualMiningData))
+        updateOverrides();
+    }
+
+    private void updateOverrides()
+    {
+        boolean manualMining = false;
+        boolean antiCrawlMining = false;
+        for (MiningData data : miningQueue)
         {
-            manualOverride = false;
+            if (data instanceof ManualMiningData)
+            {
+                manualMining = true;
+            }
+            else if (data instanceof CrawlMiningData)
+            {
+                antiCrawlMining = true;
+            }
         }
+
+        manualOverride = manualMining;
+        crawlingOverride = antiCrawlMining;
     }
 
     private boolean startMining(MiningData data)
@@ -1072,6 +1089,14 @@ public class AutoMineModule extends CombatModule
     public static class AutoMiningData extends MiningData
     {
         public AutoMiningData(BlockPos pos, Direction direction)
+        {
+            super(pos, direction);
+        }
+    }
+
+    public static class CrawlMiningData extends AutoMiningData
+    {
+        public CrawlMiningData(BlockPos pos, Direction direction)
         {
             super(pos, direction);
         }
