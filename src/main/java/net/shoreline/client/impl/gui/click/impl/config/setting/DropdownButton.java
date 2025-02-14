@@ -90,7 +90,11 @@ public class DropdownButton extends ConfigButton<Enum<?>>
                 index = index - 1 < 0 ? values.length - 1 : index - 1;
                 config.setValue(Enum.valueOf(val.getClass(), values[index]));
             }
-            Managers.SOUND.playSound(SoundManager.GUI_CLICK);
+
+            if (ClickGuiModule.getInstance().getSounds())
+            {
+                Managers.SOUND.playSound(SoundManager.GUI_CLICK);
+            }
         }
     }
 

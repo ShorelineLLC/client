@@ -105,7 +105,7 @@ public class ShadersModule extends ToggleModule
     Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render shaders on items", true));
     Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(200, 100, 0), false, () -> itemsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> otherConfig = register(new BooleanConfig("Crystals", "Render shaders on crystals", true));
-    Config<Color> crystalsColorConfig = register(new ColorConfig("EndCrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> otherConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
+    Config<Color> crystalsColorConfig = register(new ColorConfig("CrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> otherConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> projectilesConfig = register(new BooleanConfig("Projectiles", "Render shaders on projectiles", true));
     Config<Color> projectilesColorConfig = register(new ColorConfig("ProjectilesColor", "The render color for projectiles", new Color(200, 100, 200), false, () -> projectilesConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> chestsConfig = register(new BooleanConfig("Chests", "Render chests through walls", false));

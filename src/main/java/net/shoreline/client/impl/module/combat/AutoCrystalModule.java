@@ -114,7 +114,7 @@ public class AutoCrystalModule extends CombatModule
     //
     Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
-    Config<Boolean> forcePlaceConfig = register(new BooleanConfig("ForcePlace", "Places crystals on items", false));
+    Config<ForcePlace> forcePlaceConfig = register(new EnumConfig<>("ForcePlace", "Places crystals on items", ForcePlace.NONE, ForcePlace.values()));
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
     Config<Float> placeWallRangeConfig = register(new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
@@ -793,7 +793,12 @@ public class AutoCrystalModule extends CombatModule
             return;
         }
 
-        if (checkCanUseCrystal())
+        placeCrystal(blockPos, hand, true);
+    }
+
+    public void placeCrystal(BlockPos blockPos, Hand hand, boolean checkPlacement)
+    {
+        if (checkPlacement && checkCanUseCrystal())
         {
             return;
         }
@@ -874,8 +879,9 @@ public class AutoCrystalModule extends CombatModule
         // Entity ID predict
         if (idPredictConfig.getValue())
         {
+            boolean flag = AutoXPModule.getInstance().isEnabled() || mc.player.isUsingItem() && mc.player.getStackInHand(mc.player.getActiveHand()).getItem() instanceof ExperienceBottleItem;
             int id = (int) (predictId + 1);
-            if (attackPackets.containsKey(id))
+            if (flag || attackPackets.containsKey(id))
             {
                 return;
             }
@@ -1231,6 +1237,26 @@ public class AutoCrystalModule extends CombatModule
         return breakValidConfig.getValue() && dist > maxDist;
     }
 
+    public void placeForceCrystal(PlayerEntity target, BlockPos blockPos)
+    {
+        if (placeRangeCheck(blockPos))
+        {
+            return;
+        }
+        double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalDamageVec(blockPos),
+                blockDestructionConfig.getValue(), Set.of(blockPos), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
+        if (playerDamageCheck(selfDamage))
+        {
+            return;
+        }
+        double damage = ExplosionUtil.getDamageTo(target, crystalDamageVec(blockPos), blockDestructionConfig.getValue(),
+                Set.of(blockPos), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
+        if (damage >= minDamageConfig.getValue() || isCrystalLethalTo(damage, target))
+        {
+            placeCrystal(blockPos, Hand.MAIN_HAND, false);
+        }
+    }
+
     private boolean checkOverrideSafety(boolean unsafeToPlayer, double damage, Entity entity)
     {
         return safetyOverride.getValue() && unsafeToPlayer && damage < EntityUtil.getHealth(entity) + 0.5;
@@ -1282,12 +1308,12 @@ public class AutoCrystalModule extends CombatModule
         return true;
     }
 
-    private boolean checkAntiTotem(DamageData<?> crystal, LivingEntity entity)
+    private boolean checkAntiTotem(double damage, LivingEntity entity)
     {
         if (entity instanceof PlayerEntity p)
         {
             float phealth = EntityUtil.getHealth(p);
-            if (phealth <= 2.0f && phealth - crystal.getDamage() < 0.5f)
+            if (phealth <= 2.0f && phealth - damage < 0.5f)
             {
                 long time = Managers.TOTEM.getLastPopTime(p);
                 if (time != -1)
@@ -1301,17 +1327,22 @@ public class AutoCrystalModule extends CombatModule
 
     private boolean isCrystalLethalTo(DamageData<?> crystal, LivingEntity entity)
     {
+        return isCrystalLethalTo(crystal.getDamage(), entity);
+    }
+
+    private boolean isCrystalLethalTo(double damage, LivingEntity entity)
+    {
         if (lethalDamageConfig.getValue() && lastAttackTimer.passed(500))
         {
             return true;
         }
 
-        if (antiTotemConfig.getValue() && checkAntiTotem(crystal, entity))
+        if (antiTotemConfig.getValue() && checkAntiTotem(damage, entity))
         {
             return true;
         }
         float health = entity.getHealth() + entity.getAbsorptionAmount();
-        if (crystal.getDamage() * (1.0f + lethalMultiplier.getValue()) >= health + 0.5f)
+        if (damage * (1.0f + lethalMultiplier.getValue()) >= health + 0.5f)
         {
             return true;
         }
@@ -1437,7 +1468,8 @@ public class AutoCrystalModule extends CombatModule
         for (Entity entity : entities)
         {
             if (entity == null || !entity.isAlive()
-                    || entity instanceof ExperienceOrbEntity || forcePlaceConfig.getValue() && entity instanceof ItemEntity)
+                    || entity instanceof ExperienceOrbEntity
+                    || forcePlaceConfig.getValue() != ForcePlace.NONE && entity instanceof ItemEntity)
             {
                 entities.remove(entity);
             }
@@ -1550,6 +1582,11 @@ public class AutoCrystalModule extends CombatModule
         return (int) avg;
     }
 
+    public boolean getPreForcePlace()
+    {
+        return forcePlaceConfig.getValue() == ForcePlace.PRE;
+    }
+
     public boolean getIgnoreTerrain()
     {
         return blockDestructionConfig.getValue();
@@ -1567,6 +1604,13 @@ public class AutoCrystalModule extends CombatModule
     {
         NORMAL,
         STRICT,
+        NONE
+    }
+
+    public enum ForcePlace
+    {
+        PRE,
+        POST,
         NONE
     }
 

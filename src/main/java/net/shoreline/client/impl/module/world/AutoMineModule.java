@@ -1043,6 +1043,16 @@ public class AutoMineModule extends CombatModule
         {
             Managers.ROTATION.setRotationSilentSync();
         }
+
+        if (playerTarget != null && AutoCrystalModule.getInstance().isEnabled()
+                && AutoCrystalModule.getInstance().getPreForcePlace())
+        {
+            BlockPos placePos = data.getPos().down();
+            float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), placePos.toCenterPos());
+
+            setRotation(rotations[0], rotations[1]);
+            AutoCrystalModule.getInstance().placeForceCrystal(playerTarget, placePos);
+        }
     }
 
     private void swapTo(int slot)
