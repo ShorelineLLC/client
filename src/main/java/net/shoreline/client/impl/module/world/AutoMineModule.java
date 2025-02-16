@@ -708,8 +708,17 @@ public class AutoMineModule extends CombatModule
     private List<AutoMineCalc> getPhasePosition(PlayerEntity entity, BlockPos entityPos)
     {
         List<AutoMineCalc> phasePositions = new ArrayList<>();
-        boolean bedrockPhased = headConfig.getValue() && BlastResistantBlocks.isUnbreakable(entity.getBlockPos());
-        List<BlockPos> entityIntersections = PositionUtil.getAllInBox(entity.getBoundingBox(), bedrockPhased ? entityPos.up() : entityPos);
+        boolean bedrockPhased = BlastResistantBlocks.isUnbreakable(entity.getBlockPos()) && !entity.isCrawling();
+        if (aboveHeadConfig.getValue() && bedrockPhased)
+        {
+            BlockPos aboveHead = entity.getBlockPos().up(2);
+            if (!mc.world.isAir(aboveHead) && !BlastResistantBlocks.isUnbreakable(aboveHead))
+            {
+                phasePositions.add(new AutoMineCalc(aboveHead, 999, false));
+            }
+        }
+        List<BlockPos> entityIntersections = PositionUtil.getAllInBox(entity.getBoundingBox(),
+                bedrockPhased && headConfig.getValue() ? entityPos.up() : entityPos);
         for (BlockPos blockPos : entityIntersections)
         {
             double dist = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
@@ -741,17 +750,9 @@ public class AutoMineModule extends CombatModule
         if (BlastResistantBlocks.isUnbreakable(entity.getBlockPos()) && !entity.isCrawling())
         {
             BlockPos belowFeet = entity.getBlockPos().down();
-            if (!mc.world.isAir(belowFeet))
+            if (!mc.world.isAir(belowFeet) && !BlastResistantBlocks.isUnbreakable(belowFeet))
             {
                 miningPositions.add(new AutoMineCalc(belowFeet, 1000, false));
-            }
-            if (aboveHeadConfig.getValue())
-            {
-                BlockPos aboveHead = entity.getBlockPos().up(2);
-                if (!mc.world.isAir(aboveHead))
-                {
-                    miningPositions.add(new AutoMineCalc(aboveHead, 999, false));
-                }
             }
             if (headConfig.getValue())
             {
