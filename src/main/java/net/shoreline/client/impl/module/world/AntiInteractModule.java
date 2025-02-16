@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.config.Config;
@@ -11,6 +12,7 @@ import net.shoreline.client.api.config.setting.BlockListConfig;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.InteractBlockEvent;
 import net.shoreline.client.impl.event.network.InteractBorderEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -25,7 +27,8 @@ import java.util.List;
 public class AntiInteractModule extends ToggleModule
 {
     //
-    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.ENDER_CHEST, Blocks.ANVIL));
+    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist"));
+    Config<Boolean> miningConfig = register(new BooleanConfig("Mining", "Prevents player mining blocks", false));
     Config<Boolean> borderConfig = register(new BooleanConfig("Border", "Prevents interacting with the world border", true));
 
     public AntiInteractModule()
@@ -61,6 +64,24 @@ public class AntiInteractModule extends ToggleModule
             {
                 event.cancel();
             }
+        }
+
+        if (miningConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
+                && (packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
+                || packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK
+                || packet.getAction() == PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK)
+                && !event.isClientPacket())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onAttackBlock(AttackBlockEvent event)
+    {
+        if (miningConfig.getValue())
+        {
+            event.cancel();
         }
     }
 
