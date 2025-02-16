@@ -83,7 +83,7 @@ public class PacketEvent extends Event
     }
 
     @Cancelable
-    public static class OutboundPost extends PacketEvent
+    public static class OutboundPost extends Outbound
     {
         /**
          * @param packet
