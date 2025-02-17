@@ -38,6 +38,7 @@ public class AutoLogModule extends ToggleModule
     Config<Integer> totemsConfig = register(new NumberConfig<>("Totems", "The number of totems before disconnecting", 0, 1, 5));
     Config<Boolean> invincibilityConfig = register(new BooleanConfig("SpawnInvincibility", "Accounts for spawn invincibility for logout", false));
     Config<Boolean> illegalDisconnectConfig = register(new BooleanConfig("IllegalDisconnect", "Disconnects from the server using invalid packets", false));
+    Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Automatically disables", true));
 
     private final Timer invincibilityTimer = new CacheTimer();
 
@@ -112,18 +113,28 @@ public class AutoLogModule extends ToggleModule
                     NetworkEncryptionUtils.SecureRandomUtil.nextLong(),
                     null,
                     new LastSeenMessageList.Acknowledgment(1, new BitSet(2)))); // Illegal packet
-            disable();
+            if (autoDisableConfig.getValue())
+            {
+                disable();
+            }
             return;
         }
         if (mc.getNetworkHandler() == null)
         {
             mc.world.disconnect();
-            disable();
+            if (autoDisableConfig.getValue())
+            {
+                disable();
+            }
+
             return;
         }
         disconnectReason = String.format(disconnectReason, args);
         mc.getNetworkHandler().getConnection().disconnect(Text.of(disconnectReason));
-        disable();
+        if (autoDisableConfig.getValue())
+        {
+            disable();
+        }
     }
 
     private boolean checkEnemy(AbstractClientPlayerEntity player)
