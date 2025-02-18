@@ -206,7 +206,7 @@ public class CriticalsModule extends ToggleModule
             }
             case GRIM_V3 ->
             {
-                if (wallsOnlyConfig.getValue() && !isDoublePhased())
+                if (wallsOnlyConfig.getValue() && !isPhased())
                 {
                     return;
                 }
@@ -231,15 +231,12 @@ public class CriticalsModule extends ToggleModule
                         yaw = Managers.ROTATION.getRotationYaw();
                         pitch = Managers.ROTATION.getRotationPitch();
                     }
-                    if (moveFixConfig.getValue())
-                    {
-                        Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
-                                x, y, z, yaw, pitch, true));
-                    }
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.0625f, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.04535f, z, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y, z, yaw, pitch, true));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y + 0.0625f, z, yaw, pitch, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y + 0.04535f, z, yaw, pitch, false));
                 }
             }
             case LOW_HOP ->
@@ -285,7 +282,7 @@ public class CriticalsModule extends ToggleModule
         {
             BlockState state = mc.world.getBlockState(pos);
             BlockState state2 = mc.world.getBlockState(pos.up());
-            if (!state.isReplaceable() && !state2.isReplaceable())
+            if (state.blocksMovement() && state2.blocksMovement())
             {
                 return true;
             }
@@ -295,9 +292,7 @@ public class CriticalsModule extends ToggleModule
 
     public boolean isPhased()
     {
-        Box bb = mc.player.getBoundingBox().shrink(0.0, 1.2, 0.0)
-                .offset(0.0, 1.0, 0.0).expand(0.01, 0.0, 0.01);
-        for (BlockPos pos : PositionUtil.getAllInBox(bb))
+        for (BlockPos pos : PositionUtil.getAllInBox(mc.player.getBoundingBox()))
         {
             if (mc.world.getBlockState(pos).blocksMovement())
             {
