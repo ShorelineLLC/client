@@ -1,6 +1,7 @@
 package net.shoreline.client.api.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.render.*;
@@ -13,6 +14,7 @@ import net.shoreline.client.impl.gui.click.component.ScissorStack;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.init.Fonts;
+import net.shoreline.client.mixin.accessor.AccessorTextRenderer;
 import net.shoreline.client.mixin.accessor.AccessorWorldRenderer;
 import net.shoreline.client.util.Globals;
 import org.joml.Matrix4f;
@@ -382,7 +384,14 @@ public class RenderManager implements Globals
             }
             else
             {
-                Fonts.VANILLA.drawWithShadow(matrices, text, -hwidth, 0.0f, color);
+                VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
+                ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(text, -hwidth, 0.0f, TextRenderer.tweakTransparency(color), true,
+                        matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                vertexConsumers.draw();
+
+                ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(text, -hwidth, 0.0f, TextRenderer.tweakTransparency(color), false,
+                        matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                vertexConsumers.draw();
             }
             GL11.glDepthFunc(GL11.GL_LEQUAL);
         });
