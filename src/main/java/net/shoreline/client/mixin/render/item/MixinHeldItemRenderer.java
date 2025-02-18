@@ -13,10 +13,7 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
-import net.shoreline.client.impl.event.render.item.EatTransformationEvent;
-import net.shoreline.client.impl.event.render.item.RenderArmEvent;
-import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
-import net.shoreline.client.impl.event.render.item.RenderSwingAnimationEvent;
+import net.shoreline.client.impl.event.render.item.*;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
@@ -40,10 +37,22 @@ public class MixinHeldItemRenderer implements Globals
     private MinecraftClient client;
 
     @Shadow
+    private ItemStack mainHand;
+    
+    @Shadow
+    private ItemStack offHand;
+
+    @Shadow
     public float equipProgressMainHand;
 
     @Shadow
-    private ItemStack mainHand;
+    public float equipProgressOffHand;
+
+    @Shadow
+    public float prevEquipProgressMainHand;
+
+    @Shadow
+    public float prevEquipProgressOffHand;
 
     /**
      * @param matrices
@@ -133,5 +142,24 @@ public class MixinHeldItemRenderer implements Globals
         float f = mc.player.getAttackCooldownProgress(1.0f);
         float modified = renderSwingAnimation.isCanceled() ? 1.0f : f * f * f;
         return (ItemStack.areEqual(mainHand, mc.player.getMainHandStack()) ? modified : 0.0f) - equipProgressMainHand;
+    }
+
+    @Inject(method = "updateHeldItems", at = @At(value = "HEAD"), cancellable = true)
+    private void hookUpdateHeldItems(CallbackInfo ci)
+    {
+        ItemStack itemStack = mc.player.getMainHandStack();
+        ItemStack itemStack2 = mc.player.getOffHandStack();
+        UpdateHeldItemsEvent updateHeldItemsEvent = new UpdateHeldItemsEvent();
+        EventBus.INSTANCE.dispatch(updateHeldItemsEvent);
+        if (updateHeldItemsEvent.isCanceled())
+        {
+            ci.cancel();
+            equipProgressMainHand = 1.0f;
+            equipProgressOffHand = 1.0f;
+            prevEquipProgressMainHand = 1.0f;
+            prevEquipProgressOffHand = 1.0f;
+            mainHand = itemStack;
+            offHand = itemStack2;
+        }
     }
 }

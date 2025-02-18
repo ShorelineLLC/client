@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -12,7 +14,12 @@ import net.shoreline.client.impl.event.entity.UpdateServerPositionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.item.EatTransformationEvent;
 import net.shoreline.client.impl.event.render.item.RenderSwingAnimationEvent;
+import net.shoreline.client.impl.event.render.item.UpdateHeldItemsEvent;
+import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author hockeyl8
@@ -20,6 +27,7 @@ import net.shoreline.eventbus.annotation.EventListener;
  */
 public final class AnimationsModule extends ToggleModule
 {
+    Config<Boolean> noSwitchConfig = register(new BooleanConfig("NoSwitchAnimation", "Removes the animation when switching items", false));
     Config<Boolean> oldSwingConfig = register(new BooleanConfig("OldSwingAnimation", "Reverts to the 1.8 swinging animations", false));
     Config<Boolean> swingSpeedConfig = register(new BooleanConfig("SwingSpeed", "Allows you to modify your swing speed.", false));
     Config<Integer> swingFactorConfig = register(new NumberConfig<>("SwingFactor", "The speed of your swing.", 1, 6, 20, () -> swingSpeedConfig.getValue()));
@@ -32,6 +40,15 @@ public final class AnimationsModule extends ToggleModule
     public AnimationsModule()
     {
         super("Animations", "Allows you to modify vanilla animations", ModuleCategory.RENDER);
+    }
+
+    @EventListener
+    public void onUpdateHeldItems(UpdateHeldItemsEvent event)
+    {
+        if (noSwitchConfig.getValue())
+        {
+            event.cancel();
+        }
     }
 
     @EventListener
@@ -92,7 +109,24 @@ public final class AnimationsModule extends ToggleModule
         {
             return;
         }
-        if (event.getPacket() instanceof EntityAnimationS2CPacket packet && oldSwingConfig.getValue()
+
+        if (event.getPacket() instanceof BundleS2CPacket packet)
+        {
+            List<Packet<?>> packets = new ArrayList<>();
+            for (Packet<?> packet1 : packet.getPackets())
+            {
+                if (packet1 instanceof EntityAnimationS2CPacket packet2 && oldSwingConfig.getValue()
+                        && packet2.getEntityId() == mc.player.getId()
+                        && (packet2.getAnimationId() == EntityAnimationS2CPacket.SWING_MAIN_HAND || packet2.getAnimationId() == EntityAnimationS2CPacket.SWING_OFF_HAND))
+                {
+                    continue;
+                }
+                packets.add(packet1);
+            }
+            ((AccessorBundlePacket) packet).setIterable(packets);
+        }
+
+        else if (event.getPacket() instanceof EntityAnimationS2CPacket packet && oldSwingConfig.getValue()
                 && packet.getEntityId() == mc.player.getId()
                 && (packet.getAnimationId() == EntityAnimationS2CPacket.SWING_MAIN_HAND || packet.getAnimationId() == EntityAnimationS2CPacket.SWING_OFF_HAND))
         {
