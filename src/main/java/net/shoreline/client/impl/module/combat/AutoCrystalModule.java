@@ -1469,7 +1469,8 @@ public class AutoCrystalModule extends CombatModule
         {
             if (entity == null || !entity.isAlive()
                     || entity instanceof ExperienceOrbEntity
-                    || forcePlaceConfig.getValue() != ForcePlace.NONE && entity instanceof ItemEntity)
+                    || forcePlaceConfig.getValue() != ForcePlace.NONE
+                    && entity instanceof ItemEntity && entity.age <= 10)
             {
                 entities.remove(entity);
             }
