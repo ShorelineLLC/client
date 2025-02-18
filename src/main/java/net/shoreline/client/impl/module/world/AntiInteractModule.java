@@ -69,7 +69,7 @@ public class AntiInteractModule extends ToggleModule
         }
 
         if (miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
-                && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK && !event.isClientPacket())
+                && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK)
         {
             Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, packet.getPos(), Direction.UP));

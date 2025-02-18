@@ -71,6 +71,7 @@ public class AutoMineModule extends CombatModule
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.1f, 4.0f, 6.0f));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
     Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values()));
+    Config<Boolean> swapBeforeConfig = register(new BooleanConfig("SwapBefore", "Swaps before mining", false, () -> swapConfig.getValue() != Swap.OFF));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true));
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
@@ -936,6 +937,12 @@ public class AutoMineModule extends CombatModule
         {
             return false;
         }
+
+        if (swapBeforeConfig.getValue() && data.getSlot() != -1)
+        {
+            Managers.INVENTORY.setSlot(data.getSlot());
+        }
+
         if (doubleBreakConfig.getValue())
         {
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
@@ -943,11 +950,7 @@ public class AutoMineModule extends CombatModule
             if (grimNewConfig.getValue())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -984,6 +987,12 @@ public class AutoMineModule extends CombatModule
             }
         }
         data.setStarted();
+
+        if (swapBeforeConfig.getValue() && data.getSlot() != -1)
+        {
+            Managers.INVENTORY.syncToClient();
+        }
+
         return true;
     }
 
@@ -1157,6 +1166,10 @@ public class AutoMineModule extends CombatModule
         public void setCompletedMine(boolean completedMine)
         {
             this.completedMine = completedMine;
+            if (completedMine)
+            {
+                attemptedBreak = false;
+            }
         }
 
         public boolean hasCompletedMine()
