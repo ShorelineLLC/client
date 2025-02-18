@@ -386,11 +386,11 @@ public class RenderManager implements Globals
             {
                 VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
                 ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(text, -hwidth, 0.0f, TextRenderer.tweakTransparency(color), true,
-                        matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                        matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0xF000F0);
                 vertexConsumers.draw();
 
                 ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(text, -hwidth, 0.0f, TextRenderer.tweakTransparency(color), false,
-                        matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                        matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0xF000F0);
                 vertexConsumers.draw();
             }
             GL11.glDepthFunc(GL11.GL_LEQUAL);

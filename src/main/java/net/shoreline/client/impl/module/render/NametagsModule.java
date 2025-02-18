@@ -312,11 +312,11 @@ public class NametagsModule extends ToggleModule
         {
             VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
             ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(text, x, y, TextRenderer.tweakTransparency(color), true,
-                    matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                    matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0xF000F0);
             vertexConsumers.draw();
 
             ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(text, x, y, TextRenderer.tweakTransparency(color), false,
-                    matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                    matrices.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0xF000F0);
             vertexConsumers.draw();
         }
     }
@@ -369,6 +369,17 @@ public class NametagsModule extends ToggleModule
                 mc.getBufferBuilders().getEntityVertexConsumers().draw();
                 matrixStack.pop();
                 renderItemOverlay(matrixStack, stack, (int) n10, (int) y);
+
+                matrixStack.scale(0.5f, 0.5f, 0.5f);
+                if (stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE)
+                {
+                    drawText(matrixStack, "God", (n10 + 2.0f) * 2, (m2 + 1.0f) * 2, 0xffc34e41);
+                }
+                else if (enchantmentsConfig.getValue())
+                {
+                    renderEnchants(matrixStack, stack, n10 + 2.0f, m2);
+                }
+                matrixStack.scale(2.0f, 2.0f, 2.0f);
             }
             matrixStack.scale(0.5f, 0.5f, 0.5f);
             if (durabilityConfig.getValue())
@@ -521,11 +532,11 @@ public class NametagsModule extends ToggleModule
             // this.matrices.translate(0.0f, 0.0f, 200.0f);
             VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
             ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(string, x + 17 - mc.textRenderer.getWidth(string), y + 9.0f, TextRenderer.tweakTransparency(-1), true,
-                    matrixStack.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                    matrixStack.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0xF000F0);
             vertexConsumers.draw();
 
             ((AccessorTextRenderer) mc.textRenderer).hookDrawLayer(string, x + 17 - mc.textRenderer.getWidth(string), y + 9.0f, TextRenderer.tweakTransparency(-1), false,
-                    matrixStack.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0);
+                    matrixStack.peek().getPositionMatrix(), vertexConsumers, TextRenderer.TextLayerType.SEE_THROUGH, 0, 0xF000F0);
             vertexConsumers.draw();
         }
         if (stack.isItemBarVisible())
