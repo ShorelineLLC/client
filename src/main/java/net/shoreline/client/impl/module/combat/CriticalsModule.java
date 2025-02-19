@@ -182,7 +182,7 @@ public class CriticalsModule extends ToggleModule
                     return;
                 }
 
-                if (moveFixConfig.getValue() && MovementUtil.isMoving())
+                if (moveFixConfig.getValue() && MovementUtil.isMovingInput())
                 {
                     return;
                 }
@@ -211,7 +211,7 @@ public class CriticalsModule extends ToggleModule
                     return;
                 }
 
-                if (moveFixConfig.getValue() && MovementUtil.isMoving())
+                if (moveFixConfig.getValue() && MovementUtil.isMovingInput())
                 {
                     return;
                 }
