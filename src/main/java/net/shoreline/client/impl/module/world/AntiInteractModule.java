@@ -18,6 +18,7 @@ import net.shoreline.client.impl.event.network.InteractBlockEvent;
 import net.shoreline.client.impl.event.network.InteractBorderEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.List;
@@ -68,16 +69,24 @@ public class AntiInteractModule extends ToggleModule
             }
         }
 
-        if (miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
-                && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK)
+        if (miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet)
         {
-            Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, packet.getPos(), Direction.UP));
-            Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, packet.getPos(), Direction.UP));
-            Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos(), Direction.UP));
-            event.cancel();
+            if (BlastResistantBlocks.isUnbreakable(packet.getPos()))
+            {
+                event.cancel();
+                return;
+            }
+
+            if (packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK)
+            {
+                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, packet.getPos(), Direction.UP));
+                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, packet.getPos(), Direction.UP));
+                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos(), Direction.UP));
+                event.cancel();
+            }
         }
     }
 
