@@ -37,6 +37,7 @@ public class AutoLogModule extends ToggleModule
     Config<Boolean> noTotemConfig = register(new BooleanConfig("NoTotems", "Disconnects when player has no totems in the inventory", false));
     Config<Integer> totemsConfig = register(new NumberConfig<>("Totems", "The number of totems before disconnecting", 0, 1, 5));
     Config<Boolean> invincibilityConfig = register(new BooleanConfig("SpawnInvincibility", "Accounts for spawn invincibility for logout", false));
+    Config<Float> invincibilityTimeConfig = register(new NumberConfig<>("InvincibilityTime", "The spawn invincibility time ", 0.1f, 2.9f, 5.0f, () -> invincibilityConfig.getValue()));
     Config<Boolean> illegalDisconnectConfig = register(new BooleanConfig("IllegalDisconnect", "Disconnects from the server using invalid packets", false));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Automatically disables", true));
 
@@ -57,7 +58,7 @@ public class AutoLogModule extends ToggleModule
         {
             return;
         }
-        if (invincibilityConfig.getValue() && !invincibilityTimer.passed(3000))
+        if (invincibilityConfig.getValue() && !invincibilityTimer.passed(invincibilityTimeConfig.getValue() * 1000))
         {
             return;
         }
