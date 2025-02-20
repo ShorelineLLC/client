@@ -34,7 +34,6 @@ public final class ModuleManager
         // MAINTAIN ALPHABETICAL ORDER
         register(
                 // Client
-                new ServerModule(),
                 new CapesModule(),
                 new ChatModule(),
                 new ClickGuiModule(),
@@ -114,6 +113,7 @@ public final class ModuleManager
                 new NoSoundLagModule(),
                 new PacketLoggerModule(),
                 new PMSoundModule(),
+                new ServerModule(),
                 new ShulkerceptionModule(),
                 new SkinBlinkModule(),
                 new SpammerModule(),
@@ -195,6 +195,7 @@ public final class ModuleManager
                 new FastPlaceModule(),
                 new MultitaskModule(),
                 new NoGlitchBlocksModule(),
+                // new NukerModule(),
                 new ScaffoldModule(),
                 new SpeedmineModule()
                 // new XRayModule()

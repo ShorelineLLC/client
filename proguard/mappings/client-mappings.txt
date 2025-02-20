@@ -3792,7 +3792,7 @@ net.shoreline.client.impl.module.client.RotationsModule -> net.shoreline.client.
     105:105:boolean getWebJumpFix() -> ab
     110:110:boolean getMouseSensFix() -> ac
     118:118:float getPreserveTicks() -> Y
-net.shoreline.client.impl.module.client.ServerModule -> net.shoreline.client.iK:
+net.shoreline.client.impl.module.misc.ServerModule -> net.shoreline.client.iK:
     net.shoreline.client.api.config.Config demoConfig -> aG
     net.shoreline.client.api.config.Config resourcePackConfig -> aH
     net.shoreline.client.api.config.Config antiCrashConfig -> aI

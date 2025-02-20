@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.client;
+package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.network.encryption.NetworkEncryptionUtils;
 import net.minecraft.network.message.LastSeenMessageList;
