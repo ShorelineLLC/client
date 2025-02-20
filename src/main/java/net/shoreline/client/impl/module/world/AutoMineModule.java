@@ -713,7 +713,8 @@ public class AutoMineModule extends CombatModule
         if (aboveHeadConfig.getValue() && bedrockPhased)
         {
             BlockPos aboveHead = entity.getBlockPos().up(2);
-            if (!mc.world.isAir(aboveHead) && !BlastResistantBlocks.isUnbreakable(aboveHead))
+            BlockState state = mc.world.getBlockState(aboveHead);
+            if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
                 phasePositions.add(new AutoMineCalc(aboveHead, 999, false));
             }
@@ -751,7 +752,8 @@ public class AutoMineModule extends CombatModule
         if (BlastResistantBlocks.isUnbreakable(entity.getBlockPos()) && !entity.isCrawling())
         {
             BlockPos belowFeet = entity.getBlockPos().down();
-            if (!mc.world.isAir(belowFeet) && !BlastResistantBlocks.isUnbreakable(belowFeet))
+            BlockState state = mc.world.getBlockState(belowFeet);
+            if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
                 miningPositions.add(new AutoMineCalc(belowFeet, 1000, false));
             }
@@ -760,7 +762,8 @@ public class AutoMineModule extends CombatModule
                 for (BlockPos blockPos : surroundBlocks)
                 {
                     final BlockPos blockPos1 = blockPos.up();
-                    if (BlastResistantBlocks.isUnbreakable(blockPos1)) // bedrock mine exploit!!
+                    BlockState state1 = mc.world.getBlockState(blockPos1);
+                    if (!validAutoMineBlock(state1.getBlock())) // bedrock mine exploit!!
                     {
                         continue;
                     }
@@ -801,7 +804,8 @@ public class AutoMineModule extends CombatModule
         List<AutoMineCalc> phasePositions = getPhasePosition(mc.player);
         for (BlockPos blockPos : surroundBlocks)
         {
-            if (BlastResistantBlocks.isUnbreakable(blockPos)) // bedrock mine exploit!!
+            BlockState state1 = mc.world.getBlockState(blockPos);
+            if (!validAutoMineBlock(state1.getBlock())) // bedrock mine exploit!!
             {
                 continue;
             }
@@ -1096,6 +1100,10 @@ public class AutoMineModule extends CombatModule
 
     private boolean validAutoMineBlock(Block block)
     {
+        if (BlastResistantBlocks.isUnbreakable(block))
+        {
+            return false;
+        }
         return switch (selectionConfig.getValue())
         {
             case WHITELIST -> ((BlockListConfig<?>) whitelistConfig).contains(block);

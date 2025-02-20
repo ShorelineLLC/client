@@ -221,13 +221,13 @@ public class SpeedmineModule extends CombatModule
         {
             return;
         }
+        event.cancel();
 
         // Do not try to break unbreakable blocks
         if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir())
         {
             return;
         }
-        event.cancel();
 
         startManualMine(event.getPos(), event.getDirection());
         mc.player.swingHand(Hand.MAIN_HAND);

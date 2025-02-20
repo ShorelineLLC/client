@@ -373,7 +373,8 @@ public class NametagsModule extends ToggleModule
                 matrixStack.scale(0.5f, 0.5f, 0.5f);
                 if (stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE)
                 {
-                    drawText(matrixStack, "God", (n10 + 2.0f) * 2, (m2 + 1.0f) * 2, 0xffc34e41);
+                    float y2 = (m2 + (armorConfig.getValue() ? 1.0f : -13.5f)) * 2;
+                    drawText(matrixStack, "God", (n10 + 2.0f) * 2, y2, 0xffc34e41);
                 }
                 else if (enchantmentsConfig.getValue())
                 {
