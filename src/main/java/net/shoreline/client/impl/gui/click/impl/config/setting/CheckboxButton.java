@@ -54,8 +54,7 @@ public class CheckboxButton extends ConfigButton<Boolean>
         }
         int hoverAlpha = (int) (80 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
 
-        rectGradient(context, checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor(100 + hoverAlpha, (float) checkboxAnimation.getFactor()) : new Color(hoverAlpha, hoverAlpha, hoverAlpha, hoverAlpha).getRGB(),
-                checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getGradient(100 + hoverAlpha, (float) checkboxAnimation.getFactor()) : new Color(hoverAlpha, hoverAlpha, hoverAlpha, hoverAlpha).getRGB());
+        rect(context, checkboxAnimation.getFactor() > 0.01f ? ClickGuiModule.getInstance().getColor(100 + hoverAlpha, (float) checkboxAnimation.getFactor()) : new Color(hoverAlpha, hoverAlpha, hoverAlpha, hoverAlpha).getRGB());
         int whiteText = -1;
         drawStringScaled(context, config.getName(), (ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE)), (iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE)), whiteText);
     }

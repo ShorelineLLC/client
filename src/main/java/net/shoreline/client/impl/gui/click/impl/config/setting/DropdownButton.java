@@ -55,8 +55,7 @@ public class DropdownButton extends ConfigButton<Enum<?>>
         }
         int hoverAlpha = (int) (80 * MathHelper.clamp(hoverAnimation.getFactor(), 0.0f, 1.0f));
 
-        rectGradient(context, ClickGuiModule.getInstance().getColor(100 + hoverAlpha),
-                ClickGuiModule.getInstance().getGradient(100 + hoverAlpha));
+        rect(context, ClickGuiModule.getInstance().getColor(100 + hoverAlpha));
 
         int whiteText = -1;
         drawStringScaled(context, config.getName(), ix + (2.0f * ClickGuiModule.CLICK_GUI_SCALE), iy + (4.0f * ClickGuiModule.CLICK_GUI_SCALE), whiteText);

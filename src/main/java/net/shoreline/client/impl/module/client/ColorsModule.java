@@ -20,7 +20,7 @@ public class ColorsModule extends ConcurrentModule
 
     //
     Config<Color> colorConfig = register(new ColorConfig("Global", "The primary client color", new Color(50, 100, 205), false, false));
-    Config<Color> gradientColorConfig = register(new ColorConfig("Gradient", "The secondary client color", new Color(0, 0, 165), false, false));
+    // Config<Color> gradientColorConfig = register(new ColorConfig("Gradient", "The secondary client color", new Color(0, 0, 165), false, false));
 
     /**
      *
@@ -69,30 +69,30 @@ public class ColorsModule extends ConcurrentModule
         return getColor(a).getRGB();
     }
 
-    public Color getGradient()
-    {
-        return gradientColorConfig.getValue();
-    }
-
-    public Color getGradient(float alpha)
-    {
-        ColorConfig config = (ColorConfig) gradientColorConfig;
-        return new Color(config.getRed() / 255.0f, config.getGreen() / 255.0f, config.getBlue() / 255.0f, MathHelper.clamp(alpha, 0.0f, 1.0f));
-    }
-
-    public Color getGradient(int alpha)
-    {
-        ColorConfig config = (ColorConfig) gradientColorConfig;
-        return new Color(config.getRed(), config.getGreen(), config.getBlue(), MathHelper.clamp(alpha, 0, 255));
-    }
-
-    public Integer getGradientRGB()
-    {
-        return getGradient().getRGB();
-    }
-
-    public int getGradientRGB(int a)
-    {
-        return getGradient(a).getRGB();
-    }
+//    public Color getGradient()
+//    {
+//        return gradientColorConfig.getValue();
+//    }
+//
+//    public Color getGradient(float alpha)
+//    {
+//        ColorConfig config = (ColorConfig) gradientColorConfig;
+//        return new Color(config.getRed() / 255.0f, config.getGreen() / 255.0f, config.getBlue() / 255.0f, MathHelper.clamp(alpha, 0.0f, 1.0f));
+//    }
+//
+//    public Color getGradient(int alpha)
+//    {
+//        ColorConfig config = (ColorConfig) gradientColorConfig;
+//        return new Color(config.getRed(), config.getGreen(), config.getBlue(), MathHelper.clamp(alpha, 0, 255));
+//    }
+//
+//    public Integer getGradientRGB()
+//    {
+//        return getGradient().getRGB();
+//    }
+//
+//    public int getGradientRGB(int a)
+//    {
+//        return getGradient(a).getRGB();
+//    }
 }

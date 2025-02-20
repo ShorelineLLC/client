@@ -420,13 +420,13 @@ public class RenderManager implements Globals
         rect(matrices, x1, y1, x2, y2, 0.0, color);
     }
 
-    public static void borderedRectGradient(MatrixStack matrices, double x1, double y1,
-                                    double x2, double y2, int borderColor, int borderColor2, double thickness)
+    public static void borderedRect(MatrixStack matrices, double x1, double y1,
+                                    double x2, double y2, int borderColor, double thickness)
     {
         rect(matrices, x1 - thickness, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
-        rect(matrices, x1 + x2, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor2);
-        rectGradient(matrices, (float) x1, (float) (y1 - thickness - 1.0f), (float) x2, (float) thickness, borderColor, borderColor2);
-        rectGradient(matrices,(float) x1, (float) (y1 + y2 + 1.0f), (float) x2, (float) thickness, borderColor, borderColor2);
+        rect(matrices, x1 + x2, y1 - thickness, thickness, y2 + (thickness * 2.0), borderColor);
+        rect(matrices, (float) x1, (float) (y1 - thickness - 1.0f), (float) x2, (float) thickness, borderColor);
+        rect(matrices,(float) x1, (float) (y1 + y2 + 1.0f), (float) x2, (float) thickness, borderColor);
     }
 
     public static void borderedRectLine(MatrixStack matrices, double x1, double y1, double x2, double y2, int borderColor)

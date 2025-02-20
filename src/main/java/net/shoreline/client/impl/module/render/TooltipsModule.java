@@ -68,8 +68,8 @@ public class TooltipsModule extends ToggleModule
                 }
                 defaultedList.set(j, stacks.get(i));
             }
-            RenderManager.rectGradient(event.context.getMatrices(), event.getX() + 8.0,
-                    event.getY() - 21.0, 150.0, 13.0, ColorsModule.getInstance().getRGB(170), ColorsModule.getInstance().getGradientRGB(170));
+            RenderManager.rect(event.context.getMatrices(), event.getX() + 8.0,
+                    event.getY() - 21.0, 150.0, 13.0, ColorsModule.getInstance().getRGB(170));
 
             RenderManager.enableScissor(event.getX() + 8.0,
                     event.getY() - 21.0, event.getX() + 158.0, event.getY() - 8.0);
@@ -92,8 +92,8 @@ public class TooltipsModule extends ToggleModule
             event.cancel();
             event.context.getMatrices().push();
             event.context.getMatrices().translate(0.0f, 0.0f, 600.0f);
-            RenderManager.rectGradient(event.context.getMatrices(), event.getX() + 8.0,
-                    event.getY() - 21.0, 128.0, 13.0, ColorsModule.getInstance().getRGB(170), ColorsModule.getInstance().getGradientRGB(170));
+            RenderManager.rect(event.context.getMatrices(), event.getX() + 8.0,
+                    event.getY() - 21.0, 128.0, 13.0, ColorsModule.getInstance().getRGB(170));
 
             RenderManager.enableScissor(event.getX() + 8.0,
                     event.getY() - 21.0, event.getX() + 132.0, event.getY() - 8.0);
