@@ -4319,18 +4319,20 @@ net.shoreline.client.impl.module.combat.AutoLogModule -> net.shoreline.client.jh
     net.shoreline.client.api.config.Config noTotemConfig -> cu
     net.shoreline.client.api.config.Config totemsConfig -> cv
     net.shoreline.client.api.config.Config invincibilityConfig -> cw
-    net.shoreline.client.api.config.Config illegalDisconnectConfig -> cx
-    net.shoreline.client.api.config.Config autoDisableConfig -> cy
+    net.shoreline.client.api.config.Config invincibilityTimeConfig -> cx
+    net.shoreline.client.api.config.Config illegalDisconnectConfig -> cy
+    net.shoreline.client.api.config.Config autoDisableConfig -> cz
     net.shoreline.client.util.math.timer.Timer invincibilityTimer -> q
-    34:51:void <init>() -> <init>
-    56:94:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    99:100:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
-    108:138:void playerDisconnect(java.lang.String,java.lang.Object[]) -> e
-    142:142:boolean checkEnemy(net.minecraft.class_742) -> e
-    67:67:boolean lambda$onTick$0(net.minecraft.class_742) -> f
+    34:52:void <init>() -> <init>
+    57:95:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    100:101:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
+    109:139:void playerDisconnect(java.lang.String,java.lang.Object[]) -> e
+    143:143:boolean checkEnemy(net.minecraft.class_742) -> e
+    68:68:boolean lambda$onTick$1(net.minecraft.class_742) -> f
+    40:40:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.combat.AutoRegearModule -> net.shoreline.client.ji:
     net.shoreline.client.impl.module.combat.AutoRegearModule INSTANCE -> a
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config delayConfig -> cA
     net.shoreline.client.util.math.timer.Timer clickTimer -> r
     java.util.Map regearInventory -> u
     38:47:void <init>() -> <init>
@@ -4343,15 +4345,15 @@ net.shoreline.client.impl.module.combat.AutoRegearModule -> net.shoreline.client
     206:229:void loadRegearFile() -> ac
 net.shoreline.client.impl.module.combat.AutoTotemModule -> net.shoreline.client.jj:
     net.shoreline.client.impl.module.combat.AutoTotemModule INSTANCE -> a
-    net.shoreline.client.api.config.Config itemConfig -> cA
+    net.shoreline.client.api.config.Config itemConfig -> cB
     net.shoreline.client.api.config.Config healthConfig -> cr
-    net.shoreline.client.api.config.Config gappleConfig -> cB
-    net.shoreline.client.api.config.Config crappleConfig -> cC
-    net.shoreline.client.api.config.Config lethalConfig -> cD
-    net.shoreline.client.api.config.Config fastConfig -> cE
-    net.shoreline.client.api.config.Config mainhandTotemConfig -> cF
-    net.shoreline.client.api.config.Config totemSlotConfig -> cG
-    net.shoreline.client.api.config.Config alternativeConfig -> cH
+    net.shoreline.client.api.config.Config gappleConfig -> cC
+    net.shoreline.client.api.config.Config crappleConfig -> cD
+    net.shoreline.client.api.config.Config lethalConfig -> cE
+    net.shoreline.client.api.config.Config fastConfig -> cF
+    net.shoreline.client.api.config.Config mainhandTotemConfig -> cG
+    net.shoreline.client.api.config.Config totemSlotConfig -> cH
+    net.shoreline.client.api.config.Config alternativeConfig -> cI
     net.shoreline.client.api.config.Config debugConfig -> F
     int lastHotbarSlot -> ak
     int lastTotemCount -> al
@@ -4391,15 +4393,15 @@ net.shoreline.client.impl.module.combat.AutoTrapModule -> net.shoreline.client.j
     net.shoreline.client.api.config.Config multitaskConfig -> i
     net.shoreline.client.api.config.Config placeRangeConfig -> cd
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config attackConfig -> cI
-    net.shoreline.client.api.config.Config extendConfig -> cJ
-    net.shoreline.client.api.config.Config supportConfig -> cK
-    net.shoreline.client.api.config.Config headConfig -> cL
-    net.shoreline.client.api.config.Config antiStepConfig -> cM
+    net.shoreline.client.api.config.Config attackConfig -> cJ
+    net.shoreline.client.api.config.Config extendConfig -> cK
+    net.shoreline.client.api.config.Config supportConfig -> cL
+    net.shoreline.client.api.config.Config headConfig -> cM
+    net.shoreline.client.api.config.Config antiStepConfig -> cN
     net.shoreline.client.api.config.Config shiftTicksConfig -> bG
     net.shoreline.client.api.config.Config shiftDelayConfig -> bH
-    net.shoreline.client.api.config.Config entityDelayConfig -> cN
-    net.shoreline.client.api.config.Config autoDisableConfig -> cy
+    net.shoreline.client.api.config.Config entityDelayConfig -> cO
+    net.shoreline.client.api.config.Config autoDisableConfig -> cz
     net.shoreline.client.api.config.Config renderConfig -> bl
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
     net.shoreline.client.util.math.timer.Timer invalidTimer -> s
@@ -4435,7 +4437,7 @@ net.shoreline.client.impl.module.combat.AutoWebModule -> net.shoreline.client.jm
     net.shoreline.client.api.config.Config rangeConfig -> j
     net.shoreline.client.api.config.Config enemyRangeConfig -> bE
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config coverHeadConfig -> cO
+    net.shoreline.client.api.config.Config coverHeadConfig -> cP
     net.shoreline.client.api.config.Config shiftTicksConfig -> bG
     net.shoreline.client.api.config.Config shiftDelayConfig -> bH
     net.shoreline.client.api.config.Config renderConfig -> bl
@@ -4454,10 +4456,10 @@ net.shoreline.client.impl.module.combat.AutoWebModule -> net.shoreline.client.jm
     41:41:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.combat.AutoXPModule -> net.shoreline.client.jn:
     net.shoreline.client.impl.module.combat.AutoXPModule INSTANCE -> a
-    net.shoreline.client.api.config.Config multiTaskConfig -> cP
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config multiTaskConfig -> cQ
+    net.shoreline.client.api.config.Config delayConfig -> cA
     net.shoreline.client.api.config.Config shiftTicksConfig -> bG
-    net.shoreline.client.api.config.Config durabilityCheckConfig -> cQ
+    net.shoreline.client.api.config.Config durabilityCheckConfig -> cR
     net.shoreline.client.api.config.Config rotateConfig -> aX
     net.shoreline.client.api.config.Config swingConfig -> aI
     net.shoreline.client.util.math.timer.TickTimer delayTimer -> a
@@ -4499,8 +4501,8 @@ net.shoreline.client.impl.module.combat.BedAuraModule$Priority -> net.shoreline.
     175:183:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.BlockLagModule -> net.shoreline.client.jq:
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config attackConfig -> cI
-    net.shoreline.client.api.config.Config autoDisableConfig -> cy
+    net.shoreline.client.api.config.Config attackConfig -> cJ
+    net.shoreline.client.api.config.Config autoDisableConfig -> cz
     double prevY -> y
     31:45:void <init>() -> <init>
     50:55:void onEnable() -> u
@@ -4529,9 +4531,9 @@ net.shoreline.client.impl.module.combat.BowAimModule -> net.shoreline.client.jr:
     129:136:boolean isValidAimTarget(net.minecraft.class_1297) -> n
 net.shoreline.client.impl.module.combat.ClickCrystalModule -> net.shoreline.client.js:
     net.shoreline.client.api.config.Config breakDelayConfig -> bU
-    net.shoreline.client.api.config.Config randomDelayConfig -> cR
+    net.shoreline.client.api.config.Config randomDelayConfig -> cS
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config randomRotateConfig -> cS
+    net.shoreline.client.api.config.Config randomRotateConfig -> cT
     java.util.Set placedCrystals -> i
     java.util.Map spawnedCrystals -> y
     float randomDelay -> aL
@@ -4544,8 +4546,8 @@ net.shoreline.client.impl.module.combat.ClickCrystalModule -> net.shoreline.clie
 net.shoreline.client.impl.module.combat.CriticalsModule -> net.shoreline.client.jt:
     net.shoreline.client.impl.module.combat.CriticalsModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config wallsOnlyConfig -> cT
-    net.shoreline.client.api.config.Config moveFixConfig -> cU
+    net.shoreline.client.api.config.Config wallsOnlyConfig -> cU
+    net.shoreline.client.api.config.Config moveFixConfig -> cV
     net.shoreline.client.util.math.timer.Timer attackTimer -> t
     boolean postUpdateGround -> ak
     boolean postUpdateSprint -> al
@@ -4554,11 +4556,11 @@ net.shoreline.client.impl.module.combat.CriticalsModule -> net.shoreline.client.
     69:69:java.lang.String getModuleData() -> x
     75:77:void onDisable() -> v
     86:131:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    136:248:void attackSpoofJump(net.minecraft.class_1297) -> d
-    253:272:void onPacketOutboundPost(net.shoreline.client.impl.event.network.PacketEvent$OutboundPost) -> a
-    276:276:boolean isGrim() -> B
-    281:290:boolean isDoublePhased() -> au
-    295:303:boolean isPhased() -> av
+    136:255:void attackSpoofJump(net.minecraft.class_1297) -> d
+    260:279:void onPacketOutboundPost(net.shoreline.client.impl.event.network.PacketEvent$OutboundPost) -> a
+    283:283:boolean isGrim() -> B
+    288:297:boolean isDoublePhased() -> au
+    302:310:boolean isPhased() -> av
     43:43:java.lang.Boolean lambda$new$1() -> a
     42:42:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.combat.CriticalsModule$CritMode -> net.shoreline.client.ju:
@@ -4569,25 +4571,25 @@ net.shoreline.client.impl.module.combat.CriticalsModule$CritMode -> net.shorelin
     net.shoreline.client.impl.module.combat.CriticalsModule$CritMode GRIM_V3 -> e
     net.shoreline.client.impl.module.combat.CriticalsModule$CritMode LOW_HOP -> f
     net.shoreline.client.impl.module.combat.CriticalsModule$CritMode[] $VALUES -> a
-    306:306:net.shoreline.client.impl.module.combat.CriticalsModule$CritMode[] values() -> values
-    306:306:net.shoreline.client.impl.module.combat.CriticalsModule$CritMode valueOf(java.lang.String) -> valueOf
-    306:306:void <init>(java.lang.String,int) -> <init>
-    306:306:net.shoreline.client.impl.module.combat.CriticalsModule$CritMode[] $values() -> a
-    306:313:void <clinit>() -> <clinit>
+    313:313:net.shoreline.client.impl.module.combat.CriticalsModule$CritMode[] values() -> values
+    313:313:net.shoreline.client.impl.module.combat.CriticalsModule$CritMode valueOf(java.lang.String) -> valueOf
+    313:313:void <init>(java.lang.String,int) -> <init>
+    313:313:net.shoreline.client.impl.module.combat.CriticalsModule$CritMode[] $values() -> a
+    313:320:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.HoleFillModule -> net.shoreline.client.jv:
     net.shoreline.client.impl.module.combat.HoleFillModule INSTANCE -> a
-    net.shoreline.client.api.config.Config obsidianConfig -> cV
-    net.shoreline.client.api.config.Config doublesConfig -> cW
+    net.shoreline.client.api.config.Config obsidianConfig -> cW
+    net.shoreline.client.api.config.Config doublesConfig -> cX
     net.shoreline.client.api.config.Config rangeConfig -> j
-    net.shoreline.client.api.config.Config websConfig -> cX
-    net.shoreline.client.api.config.Config autoConfig -> cY
+    net.shoreline.client.api.config.Config websConfig -> cY
+    net.shoreline.client.api.config.Config autoConfig -> cZ
     net.shoreline.client.api.config.Config targetRangeConfig -> bn
     net.shoreline.client.api.config.Config enemyRangeConfig -> bE
-    net.shoreline.client.api.config.Config attackConfig -> cI
+    net.shoreline.client.api.config.Config attackConfig -> cJ
     net.shoreline.client.api.config.Config rotateConfig -> aX
     net.shoreline.client.api.config.Config shiftTicksConfig -> bG
     net.shoreline.client.api.config.Config shiftDelayConfig -> bH
-    net.shoreline.client.api.config.Config autoDisableConfig -> cy
+    net.shoreline.client.api.config.Config autoDisableConfig -> cz
     net.shoreline.client.api.config.Config renderConfig -> bl
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
     int shiftDelay -> am
@@ -4615,7 +4617,7 @@ net.shoreline.client.impl.module.combat.NoHitDelayModule -> net.shoreline.client
     12:13:void <init>() -> <init>
     18:19:void onAttackCooldown(net.shoreline.client.impl.event.AttackCooldownEvent) -> a
 net.shoreline.client.impl.module.combat.ReplenishModule -> net.shoreline.client.jy:
-    net.shoreline.client.api.config.Config percentConfig -> cZ
+    net.shoreline.client.api.config.Config percentConfig -> da
     java.util.Map hotbarCache -> A
     net.shoreline.client.util.math.timer.Timer lastDroppedTimer -> u
     28:39:void <init>() -> <init>
@@ -4635,15 +4637,15 @@ net.shoreline.client.impl.module.combat.SelfTrapModule -> net.shoreline.client.j
     net.shoreline.client.impl.module.combat.SelfTrapModule INSTANCE -> a
     net.shoreline.client.api.config.Config placeRangeConfig -> cd
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config attackConfig -> cI
-    net.shoreline.client.api.config.Config extendConfig -> cJ
-    net.shoreline.client.api.config.Config mineExtendConfig -> da
-    net.shoreline.client.api.config.Config supportConfig -> cK
-    net.shoreline.client.api.config.Config headConfig -> cL
+    net.shoreline.client.api.config.Config attackConfig -> cJ
+    net.shoreline.client.api.config.Config extendConfig -> cK
+    net.shoreline.client.api.config.Config mineExtendConfig -> db
+    net.shoreline.client.api.config.Config supportConfig -> cL
+    net.shoreline.client.api.config.Config headConfig -> cM
     net.shoreline.client.api.config.Config shiftTicksConfig -> bG
     net.shoreline.client.api.config.Config shiftDelayConfig -> bH
-    net.shoreline.client.api.config.Config entityDelayConfig -> cN
-    net.shoreline.client.api.config.Config autoDisableConfig -> cy
+    net.shoreline.client.api.config.Config entityDelayConfig -> cO
+    net.shoreline.client.api.config.Config autoDisableConfig -> cz
     net.shoreline.client.api.config.Config renderConfig -> bl
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
     net.shoreline.client.util.math.timer.Timer invalidTimer -> v
@@ -4682,14 +4684,14 @@ net.shoreline.client.impl.module.combat.SurroundModule -> net.shoreline.client.j
     net.shoreline.client.impl.module.combat.SurroundModule INSTANCE -> a
     net.shoreline.client.api.config.Config placeRangeConfig -> cd
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config attackConfig -> cI
-    net.shoreline.client.api.config.Config extendConfig -> cJ
-    net.shoreline.client.api.config.Config mineExtendConfig -> da
-    net.shoreline.client.api.config.Config supportConfig -> cK
+    net.shoreline.client.api.config.Config attackConfig -> cJ
+    net.shoreline.client.api.config.Config extendConfig -> cK
+    net.shoreline.client.api.config.Config mineExtendConfig -> db
+    net.shoreline.client.api.config.Config supportConfig -> cL
     net.shoreline.client.api.config.Config shiftTicksConfig -> bG
     net.shoreline.client.api.config.Config shiftDelayConfig -> bH
-    net.shoreline.client.api.config.Config entityDelayConfig -> cN
-    net.shoreline.client.api.config.Config jumpDisableConfig -> db
+    net.shoreline.client.api.config.Config entityDelayConfig -> cO
+    net.shoreline.client.api.config.Config jumpDisableConfig -> dc
     net.shoreline.client.api.config.Config renderConfig -> bl
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
     net.shoreline.client.util.math.timer.Timer invalidTimer -> w
@@ -4739,11 +4741,11 @@ net.shoreline.client.impl.module.combat.TriggerModule$TriggerMode -> net.shoreli
     75:79:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.exploit.AntiHungerModule -> net.shoreline.client.jF:
     net.shoreline.client.api.config.Config sprintConfig -> m
-    net.shoreline.client.api.config.Config groundConfig -> dc
+    net.shoreline.client.api.config.Config groundConfig -> dd
     20:29:void <init>() -> <init>
     34:49:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
 net.shoreline.client.impl.module.exploit.BacktrackModule -> net.shoreline.client.jG:
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config delayConfig -> cA
     java.util.Queue packets -> f
     net.minecraft.class_1657 trackedEntity -> d
     net.minecraft.class_7422 trackedPosition -> a
@@ -4777,9 +4779,9 @@ net.shoreline.client.impl.module.exploit.ChorusControlModule -> net.shoreline.cl
     110:121:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
 net.shoreline.client.impl.module.exploit.ChorusInvincibilityModule -> net.shoreline.client.jJ:
     net.shoreline.client.impl.module.exploit.ChorusInvincibilityModule INSTANCE -> a
-    net.shoreline.client.api.config.Config healthCheckConfig -> dd
+    net.shoreline.client.api.config.Config healthCheckConfig -> de
     net.shoreline.client.api.config.Config healthConfig -> cr
-    net.shoreline.client.api.config.Config totemsCheckConfig -> de
+    net.shoreline.client.api.config.Config totemsCheckConfig -> df
     net.shoreline.client.api.config.Config totemsConfig -> cv
     boolean useChorus -> an
     net.shoreline.client.util.math.timer.Timer invincibilityTimer -> y
@@ -4861,8 +4863,8 @@ net.shoreline.client.impl.module.exploit.ExtendedFireworkModule -> net.shoreline
     166:171:void sendPongPackets() -> ad
     175:175:boolean isExtendingFirework() -> aE
 net.shoreline.client.impl.module.exploit.FakeLatencyModule -> net.shoreline.client.jQ:
-    net.shoreline.client.api.config.Config latencyConfig -> df
-    net.shoreline.client.api.config.Config transactionsConfig -> dg
+    net.shoreline.client.api.config.Config latencyConfig -> dg
+    net.shoreline.client.api.config.Config transactionsConfig -> dh
     java.util.concurrent.ConcurrentMap cachedPackets -> c
     27:38:void <init>() -> <init>
     46:56:void onDisable() -> v
@@ -4902,13 +4904,13 @@ net.shoreline.client.impl.module.exploit.FastLatencyModule -> net.shoreline.clie
     63:68:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     72:72:long getLatency() -> f
 net.shoreline.client.impl.module.exploit.FastProjectileModule -> net.shoreline.client.jU:
-    net.shoreline.client.api.config.Config chargeConfig -> dh
-    net.shoreline.client.api.config.Config arrowConfig -> di
-    net.shoreline.client.api.config.Config potionConfig -> dj
-    net.shoreline.client.api.config.Config pearlConfig -> dk
-    net.shoreline.client.api.config.Config snowballConfig -> dl
-    net.shoreline.client.api.config.Config eggConfig -> dm
-    net.shoreline.client.api.config.Config tridentConfig -> dn
+    net.shoreline.client.api.config.Config chargeConfig -> di
+    net.shoreline.client.api.config.Config arrowConfig -> dj
+    net.shoreline.client.api.config.Config potionConfig -> dk
+    net.shoreline.client.api.config.Config pearlConfig -> dl
+    net.shoreline.client.api.config.Config snowballConfig -> dm
+    net.shoreline.client.api.config.Config eggConfig -> dn
+    net.shoreline.client.api.config.Config tridentConfig -> do
     net.shoreline.client.util.math.timer.Timer chargeTimer -> D
     30:47:void <init>() -> <init>
     52:57:java.lang.String getModuleData() -> x
@@ -4919,12 +4921,12 @@ net.shoreline.client.impl.module.exploit.InventorySyncModule -> net.shoreline.cl
     21:26:void <init>() -> <init>
     31:51:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
 net.shoreline.client.impl.module.exploit.NewChunksModule -> net.shoreline.client.jW:
-    net.shoreline.client.api.config.Config newChunksConfig -> do
-    net.shoreline.client.api.config.Config oldChunksConfig -> dp
-    net.shoreline.client.api.config.Config yLevelConfig -> dq
-    net.shoreline.client.api.config.Config newChunksColorConfig -> dr
-    net.shoreline.client.api.config.Config oldChunksColorConfig -> ds
-    net.shoreline.client.api.config.Config spawnerDetectorConfig -> dt
+    net.shoreline.client.api.config.Config newChunksConfig -> dp
+    net.shoreline.client.api.config.Config oldChunksConfig -> dq
+    net.shoreline.client.api.config.Config yLevelConfig -> dr
+    net.shoreline.client.api.config.Config newChunksColorConfig -> ds
+    net.shoreline.client.api.config.Config oldChunksColorConfig -> dt
+    net.shoreline.client.api.config.Config spawnerDetectorConfig -> du
     net.shoreline.client.api.config.Config rangeConfig -> j
     net.shoreline.client.api.config.Config notifyConfig -> d
     net.shoreline.client.api.config.Config colorConfig -> R
@@ -4945,35 +4947,35 @@ net.shoreline.client.impl.module.exploit.NoMineAnimationModule -> net.shoreline.
     14:15:void <init>() -> <init>
     20:26:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
 net.shoreline.client.impl.module.exploit.PacketCancelerModule -> net.shoreline.client.jY:
-    net.shoreline.client.api.config.Config playerMoveConfig -> du
-    net.shoreline.client.api.config.Config playerInputConfig -> dv
-    net.shoreline.client.api.config.Config playerInteractBlockConfig -> dw
-    net.shoreline.client.api.config.Config playerInteractEntityConfig -> dx
-    net.shoreline.client.api.config.Config playerInteractItemConfig -> dy
-    net.shoreline.client.api.config.Config craftRequestConfig -> dz
-    net.shoreline.client.api.config.Config updateSelectedSlotConfig -> dA
-    net.shoreline.client.api.config.Config clickSlotConfig -> dB
-    net.shoreline.client.api.config.Config pickFromInventoryConfig -> dC
-    net.shoreline.client.api.config.Config creativeInventoryActionConfig -> dD
-    net.shoreline.client.api.config.Config handSwingConfig -> dE
-    net.shoreline.client.api.config.Config teleportConfirmConfig -> dF
-    net.shoreline.client.api.config.Config keepAliveConfig -> dG
-    net.shoreline.client.api.config.Config commonPongConfig -> dH
+    net.shoreline.client.api.config.Config playerMoveConfig -> dv
+    net.shoreline.client.api.config.Config playerInputConfig -> dw
+    net.shoreline.client.api.config.Config playerInteractBlockConfig -> dx
+    net.shoreline.client.api.config.Config playerInteractEntityConfig -> dy
+    net.shoreline.client.api.config.Config playerInteractItemConfig -> dz
+    net.shoreline.client.api.config.Config craftRequestConfig -> dA
+    net.shoreline.client.api.config.Config updateSelectedSlotConfig -> dB
+    net.shoreline.client.api.config.Config clickSlotConfig -> dC
+    net.shoreline.client.api.config.Config pickFromInventoryConfig -> dD
+    net.shoreline.client.api.config.Config creativeInventoryActionConfig -> dE
+    net.shoreline.client.api.config.Config handSwingConfig -> dF
+    net.shoreline.client.api.config.Config teleportConfirmConfig -> dG
+    net.shoreline.client.api.config.Config keepAliveConfig -> dH
+    net.shoreline.client.api.config.Config commonPongConfig -> dI
     21:43:void <init>() -> <init>
     48:118:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
 net.shoreline.client.impl.module.exploit.PacketFlyModule -> net.shoreline.client.jZ:
     net.shoreline.client.impl.module.exploit.PacketFlyModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config factorConfig -> dI
-    net.shoreline.client.api.config.Config reductionConfig -> dJ
-    net.shoreline.client.api.config.Config phaseConfig -> dK
-    net.shoreline.client.api.config.Config typeConfig -> dL
-    net.shoreline.client.api.config.Config limitConfig -> dM
-    net.shoreline.client.api.config.Config verticalLimitConfig -> dN
-    net.shoreline.client.api.config.Config concealConfig -> dO
-    net.shoreline.client.api.config.Config limitJitterConfig -> dP
-    net.shoreline.client.api.config.Config slowConfig -> dQ
-    net.shoreline.client.api.config.Config antiKickConfig -> dR
+    net.shoreline.client.api.config.Config factorConfig -> dJ
+    net.shoreline.client.api.config.Config reductionConfig -> dK
+    net.shoreline.client.api.config.Config phaseConfig -> dL
+    net.shoreline.client.api.config.Config typeConfig -> dM
+    net.shoreline.client.api.config.Config limitConfig -> dN
+    net.shoreline.client.api.config.Config verticalLimitConfig -> dO
+    net.shoreline.client.api.config.Config concealConfig -> dP
+    net.shoreline.client.api.config.Config limitJitterConfig -> dQ
+    net.shoreline.client.api.config.Config slowConfig -> dR
+    net.shoreline.client.api.config.Config antiKickConfig -> dS
     int limitTicks -> aq
     boolean limitSpeed -> ap
     int antiKickTicks -> ar
@@ -5079,14 +5081,14 @@ net.shoreline.client.impl.module.exploit.PacketFlyModule$Type$8 -> net.shoreline
 net.shoreline.client.impl.module.exploit.PhaseModule -> net.shoreline.client.km:
     net.shoreline.client.impl.module.exploit.PhaseModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config pitchConfig -> dS
-    net.shoreline.client.api.config.Config attackConfig -> cI
+    net.shoreline.client.api.config.Config pitchConfig -> dT
+    net.shoreline.client.api.config.Config attackConfig -> cJ
     net.shoreline.client.api.config.Config raytraceConfig -> bP
     net.shoreline.client.api.config.Config swingConfig -> aI
-    net.shoreline.client.api.config.Config selfFillConfig -> dT
-    net.shoreline.client.api.config.Config blocksConfig -> dU
-    net.shoreline.client.api.config.Config distanceConfig -> dV
-    net.shoreline.client.api.config.Config autoClipConfig -> dW
+    net.shoreline.client.api.config.Config selfFillConfig -> dU
+    net.shoreline.client.api.config.Config blocksConfig -> dV
+    net.shoreline.client.api.config.Config distanceConfig -> dW
+    net.shoreline.client.api.config.Config autoClipConfig -> dX
     boolean startPearlPhase -> ar
     float yaw -> e
     float pitch -> h
@@ -5125,7 +5127,7 @@ net.shoreline.client.impl.module.exploit.PhaseModule$PhaseMode -> net.shoreline.
     399:399:net.shoreline.client.impl.module.exploit.PhaseModule$PhaseMode[] $values() -> a
     399:405:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.exploit.PortalGodModeModule -> net.shoreline.client.ko:
-    net.shoreline.client.api.config.Config positionAdjustConfig -> dX
+    net.shoreline.client.api.config.Config positionAdjustConfig -> dY
     double teleportX -> A
     double teleportY -> B
     double teleportZ -> C
@@ -5136,23 +5138,23 @@ net.shoreline.client.impl.module.exploit.PortalGodModeModule -> net.shoreline.cl
     53:74:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     79:88:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
 net.shoreline.client.impl.module.exploit.ReachModule -> net.shoreline.client.kp:
-    net.shoreline.client.api.config.Config blockReachConfig -> dY
-    net.shoreline.client.api.config.Config reachConfig -> dZ
-    net.shoreline.client.api.config.Config noHitboxConfig -> ea
+    net.shoreline.client.api.config.Config blockReachConfig -> dZ
+    net.shoreline.client.api.config.Config reachConfig -> ea
+    net.shoreline.client.api.config.Config noHitboxConfig -> eb
     19:29:void <init>() -> <init>
     34:34:java.lang.String getModuleData() -> x
     40:42:void onReach(net.shoreline.client.impl.event.network.ReachEvent$Entity) -> a
     47:49:void onReach(net.shoreline.client.impl.event.network.ReachEvent$Block) -> a
     54:55:void onTargetEntity(net.shoreline.client.impl.event.render.TargetEntityEvent) -> a
 net.shoreline.client.impl.module.misc.AntiAFKModule -> net.shoreline.client.kq:
-    net.shoreline.client.api.config.Config secondsConfig -> eb
-    net.shoreline.client.api.config.Config messageConfig -> ec
-    net.shoreline.client.api.config.Config tabCompleteConfig -> ed
+    net.shoreline.client.api.config.Config secondsConfig -> ec
+    net.shoreline.client.api.config.Config messageConfig -> ed
+    net.shoreline.client.api.config.Config tabCompleteConfig -> ee
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config jumpConfig -> ee
-    net.shoreline.client.api.config.Config autoReplyConfig -> ef
-    net.shoreline.client.api.config.Config replyConfig -> eg
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config jumpConfig -> ef
+    net.shoreline.client.api.config.Config autoReplyConfig -> eg
+    net.shoreline.client.api.config.Config replyConfig -> eh
+    net.shoreline.client.api.config.Config delayConfig -> cA
     net.shoreline.client.util.math.timer.Timer afkTimer -> F
     net.shoreline.client.util.math.timer.Timer actionTimer -> G
     26:43:void <init>() -> <init>
@@ -5162,12 +5164,12 @@ net.shoreline.client.impl.module.misc.AntiAFKModule -> net.shoreline.client.kq:
     86:95:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     32:32:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.misc.AntiAimModule -> net.shoreline.client.kr:
-    net.shoreline.client.api.config.Config yawModeConfig -> eh
-    net.shoreline.client.api.config.Config pitchModeConfig -> ei
-    net.shoreline.client.api.config.Config yawAddConfig -> ej
-    net.shoreline.client.api.config.Config pitchAddConfig -> ek
-    net.shoreline.client.api.config.Config spinSpeedConfig -> el
-    net.shoreline.client.api.config.Config flipTicksConfig -> em
+    net.shoreline.client.api.config.Config yawModeConfig -> ei
+    net.shoreline.client.api.config.Config pitchModeConfig -> ej
+    net.shoreline.client.api.config.Config yawAddConfig -> ek
+    net.shoreline.client.api.config.Config pitchAddConfig -> el
+    net.shoreline.client.api.config.Config spinSpeedConfig -> em
+    net.shoreline.client.api.config.Config flipTicksConfig -> en
     float yaw -> e
     float pitch -> h
     float prevYaw -> aF
@@ -5201,7 +5203,7 @@ net.shoreline.client.impl.module.misc.AntiAimModule$YawMode -> net.shoreline.cli
     105:105:net.shoreline.client.impl.module.misc.AntiAimModule$YawMode[] $values() -> a
     105:107:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.misc.AntiSpamModule -> net.shoreline.client.ku:
-    net.shoreline.client.api.config.Config unicodeConfig -> en
+    net.shoreline.client.api.config.Config unicodeConfig -> eo
     java.util.Map messages -> F
     25:33:void <init>() -> <init>
     38:72:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
@@ -5218,15 +5220,15 @@ net.shoreline.client.impl.module.misc.AntiVanishModule -> net.shoreline.client.k
     60:60:java.util.UUID lambda$onTick$0(net.minecraft.class_640) -> a
 net.shoreline.client.impl.module.misc.AutoAcceptModule -> net.shoreline.client.kw:
     net.shoreline.client.util.math.timer.Timer acceptTimer -> I
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config delayConfig -> cA
     22:34:void <init>() -> <init>
     39:56:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
 net.shoreline.client.impl.module.misc.AutoAnvilRenameModule -> net.shoreline.client.kx:
-    net.shoreline.client.api.config.Config autoRenameSelectionConfig -> eo
-    net.shoreline.client.api.config.Config autoRenameWhitelistConfig -> ep
-    net.shoreline.client.api.config.Config autoRenameBlacklistConfig -> eq
-    net.shoreline.client.api.config.Config autoRenameTextConfig -> er
-    net.shoreline.client.api.config.Config autoRenameDelayConfig -> es
+    net.shoreline.client.api.config.Config autoRenameSelectionConfig -> ep
+    net.shoreline.client.api.config.Config autoRenameWhitelistConfig -> eq
+    net.shoreline.client.api.config.Config autoRenameBlacklistConfig -> er
+    net.shoreline.client.api.config.Config autoRenameTextConfig -> es
+    net.shoreline.client.api.config.Config autoRenameDelayConfig -> et
     net.shoreline.client.api.config.Config debugConfig -> F
     net.shoreline.client.util.math.timer.CacheTimer delayTimer -> b
     26:41:void <init>() -> <init>
@@ -5245,15 +5247,15 @@ net.shoreline.client.impl.module.misc.AutoAnvilRenameModule$Selection -> net.sho
     136:136:net.shoreline.client.impl.module.misc.AutoAnvilRenameModule$Selection[] $values() -> a
     136:140:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.misc.AutoEatModule -> net.shoreline.client.kz:
-    net.shoreline.client.api.config.Config hungerConfig -> et
+    net.shoreline.client.api.config.Config hungerConfig -> eu
     23:32:void <init>() -> <init>
     37:38:void onDisable() -> v
     44:66:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     70:104:int getFoodSlot() -> ak
 net.shoreline.client.impl.module.misc.AutoFishModule -> net.shoreline.client.kA:
-    net.shoreline.client.api.config.Config openInventoryConfig -> eu
-    net.shoreline.client.api.config.Config castDelayConfig -> ev
-    net.shoreline.client.api.config.Config maxSoundDistConfig -> ew
+    net.shoreline.client.api.config.Config openInventoryConfig -> ev
+    net.shoreline.client.api.config.Config castDelayConfig -> ew
+    net.shoreline.client.api.config.Config maxSoundDistConfig -> ex
     boolean autoReel -> at
     int autoReelTicks -> at
     int autoCastTicks -> au
@@ -5262,17 +5264,17 @@ net.shoreline.client.impl.module.misc.AutoFishModule -> net.shoreline.client.kA:
     73:104:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
 net.shoreline.client.impl.module.misc.AutoMountModule -> net.shoreline.client.kB:
     net.shoreline.client.api.config.Config rangeConfig -> j
-    net.shoreline.client.api.config.Config forceConfig -> ex
-    net.shoreline.client.api.config.Config horseConfig -> ey
-    net.shoreline.client.api.config.Config donkeyConfig -> ez
-    net.shoreline.client.api.config.Config muleConfig -> eA
-    net.shoreline.client.api.config.Config llamaConfig -> eB
+    net.shoreline.client.api.config.Config forceConfig -> ey
+    net.shoreline.client.api.config.Config horseConfig -> ez
+    net.shoreline.client.api.config.Config donkeyConfig -> eA
+    net.shoreline.client.api.config.Config muleConfig -> eB
+    net.shoreline.client.api.config.Config llamaConfig -> eC
     23:33:void <init>() -> <init>
     38:55:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     60:65:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     69:71:boolean checkMount(net.minecraft.class_1297) -> t
 net.shoreline.client.impl.module.misc.AutoReconnectModule -> net.shoreline.client.kC:
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config delayConfig -> cA
     17:26:void <init>() -> <init>
     33:33:int getDelay() -> al
 net.shoreline.client.impl.module.misc.AutoRespawnModule -> net.shoreline.client.kD:
@@ -5281,12 +5283,12 @@ net.shoreline.client.impl.module.misc.AutoRespawnModule -> net.shoreline.client.
     32:37:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     42:46:void onScreenOpen(net.shoreline.client.impl.event.ScreenOpenEvent) -> b
 net.shoreline.client.impl.module.misc.AutoTradeModule -> net.shoreline.client.kE:
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config delayConfig -> cA
     net.shoreline.client.api.config.Config rangeConfig -> j
-    net.shoreline.client.api.config.Config strictDirection -> eC
+    net.shoreline.client.api.config.Config strictDirection -> eD
     net.shoreline.client.api.config.Config rotateConfig -> aX
     net.shoreline.client.api.config.Config grimConfig -> h
-    net.shoreline.client.api.config.Config baritoneConfig -> eD
+    net.shoreline.client.api.config.Config baritoneConfig -> eE
     net.shoreline.client.util.math.timer.Timer delayTimer -> J
     java.util.List interactedEntities -> F
     40:59:void <init>() -> <init>
@@ -5300,13 +5302,13 @@ net.shoreline.client.impl.module.misc.BeaconSelectorModule -> net.shoreline.clie
     37:42:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     47:55:void onScreenOpen(net.shoreline.client.impl.event.ScreenOpenEvent) -> b
 net.shoreline.client.impl.module.misc.BetterChatModule -> net.shoreline.client.kG:
-    net.shoreline.client.api.config.Config chatFontConfig -> eE
-    net.shoreline.client.api.config.Config timestampConfig -> eF
-    net.shoreline.client.api.config.Config animationConfig -> eG
-    net.shoreline.client.api.config.Config timeConfig -> eH
-    net.shoreline.client.api.config.Config noSignatureConfig -> eI
-    net.shoreline.client.api.config.Config infiniteConfig -> eJ
-    net.shoreline.client.api.config.Config keepChatConfig -> eK
+    net.shoreline.client.api.config.Config chatFontConfig -> eF
+    net.shoreline.client.api.config.Config timestampConfig -> eG
+    net.shoreline.client.api.config.Config animationConfig -> eH
+    net.shoreline.client.api.config.Config timeConfig -> eI
+    net.shoreline.client.api.config.Config noSignatureConfig -> eJ
+    net.shoreline.client.api.config.Config infiniteConfig -> eK
+    net.shoreline.client.api.config.Config keepChatConfig -> eL
     java.util.Map animationMap -> H
     28:41:void <init>() -> <init>
     46:64:void onChatText(net.shoreline.client.impl.event.gui.hud.ChatMessageEvent) -> b
@@ -5339,18 +5341,18 @@ net.shoreline.client.impl.module.misc.BetterChatModule$Timestamp -> net.shorelin
     139:139:net.shoreline.client.impl.module.misc.BetterChatModule$Timestamp[] $values() -> a
     139:144:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.misc.BetterInvModule -> net.shoreline.client.kJ:
-    net.shoreline.client.api.config.Config dragItemMoveConfig -> eL
-    net.shoreline.client.api.config.Config fastDropConfig -> eM
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config dragItemMoveConfig -> eM
+    net.shoreline.client.api.config.Config fastDropConfig -> eN
+    net.shoreline.client.api.config.Config delayConfig -> cA
     int dropTicks -> av
     20:29:void <init>() -> <init>
     37:48:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     53:57:void onMouseDragged(net.shoreline.client.impl.event.gui.screen.MouseDraggedEvent) -> a
 net.shoreline.client.impl.module.misc.ChatNotifierModule -> net.shoreline.client.kK:
-    net.shoreline.client.api.config.Config totemPopConfig -> eN
-    net.shoreline.client.api.config.Config visualRangeConfig -> eO
-    net.shoreline.client.api.config.Config joinConfig -> eP
-    net.shoreline.client.api.config.Config leaveConfig -> eQ
+    net.shoreline.client.api.config.Config totemPopConfig -> eO
+    net.shoreline.client.api.config.Config visualRangeConfig -> eP
+    net.shoreline.client.api.config.Config joinConfig -> eQ
+    net.shoreline.client.api.config.Config leaveConfig -> eR
     net.shoreline.client.api.config.Config friendsConfig -> aF
     net.shoreline.client.api.config.Config grimConfig -> h
     35:45:void <init>() -> <init>
@@ -5365,8 +5367,8 @@ net.shoreline.client.impl.module.misc.ChatNotifierModule -> net.shoreline.client
     78:78:boolean lambda$onPacketInbound$1(net.minecraft.class_2703$class_2705) -> a
     77:77:boolean lambda$onPacketInbound$0(net.minecraft.class_2703$class_2705) -> b
 net.shoreline.client.impl.module.misc.ChestStealerModule -> net.shoreline.client.kL:
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config delayConfig -> cz
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config delayConfig -> cA
     net.shoreline.client.util.math.timer.Timer stealTimer -> K
     23:30:void <init>() -> <init>
     35:52:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
@@ -5374,7 +5376,7 @@ net.shoreline.client.impl.module.misc.ChestStealerModule -> net.shoreline.client
     61:61:boolean isValidItem(net.minecraft.class_1792) -> a
 net.shoreline.client.impl.module.misc.ChestSwapModule -> net.shoreline.client.kM:
     net.shoreline.client.api.config.Config priorityConfig -> aK
-    net.shoreline.client.api.config.Config autoFireworkConfig -> eS
+    net.shoreline.client.api.config.Config autoFireworkConfig -> eT
     22:28:void <init>() -> <init>
     33:91:void onEnable() -> u
     95:118:int getChestplateSlot() -> am
@@ -5397,9 +5399,9 @@ net.shoreline.client.impl.module.misc.FakePlayerModule -> net.shoreline.client.k
     61:65:void onPushEntity(net.shoreline.client.impl.event.entity.player.PushEntityEvent) -> a
 net.shoreline.client.impl.module.misc.InvCleanerModule -> net.shoreline.client.kP:
     net.shoreline.client.impl.module.misc.InvCleanerModule INSTANCE -> a
-    net.shoreline.client.api.config.Config blacklistConfig -> eT
-    net.shoreline.client.api.config.Config delayConfig -> cz
-    net.shoreline.client.api.config.Config hotbarConfig -> eU
+    net.shoreline.client.api.config.Config blacklistConfig -> eU
+    net.shoreline.client.api.config.Config delayConfig -> cA
+    net.shoreline.client.api.config.Config hotbarConfig -> eV
     net.shoreline.client.util.math.timer.Timer invCleanTimer -> L
     38:51:void <init>() -> <init>
     55:59:net.shoreline.client.impl.module.misc.InvCleanerModule getInstance() -> a
@@ -5411,9 +5413,9 @@ net.shoreline.client.impl.module.misc.InvCleanerModule$InvCleanerFile -> net.sho
     110:131:void save() -> c
     138:159:void load() -> d
 net.shoreline.client.impl.module.misc.MiddleClickModule -> net.shoreline.client.kR:
-    net.shoreline.client.api.config.Config friendConfig -> eV
-    net.shoreline.client.api.config.Config pearlConfig -> dk
-    net.shoreline.client.api.config.Config fireworkConfig -> eW
+    net.shoreline.client.api.config.Config friendConfig -> eW
+    net.shoreline.client.api.config.Config pearlConfig -> dl
+    net.shoreline.client.api.config.Config fireworkConfig -> eX
     30:41:void <init>() -> <init>
     46:117:void onMouseClick(net.shoreline.client.impl.event.MouseClickEvent) -> b
 net.shoreline.client.impl.module.misc.NoPacketKickModule -> net.shoreline.client.kS:
@@ -5443,35 +5445,35 @@ net.shoreline.client.impl.module.misc.PMSoundModule$PMSounds -> net.shoreline.cl
     52:52:net.shoreline.client.impl.module.misc.PMSoundModule$PMSounds[] $values() -> a
     52:57:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.misc.PacketLoggerModule -> net.shoreline.client.kW:
-    net.shoreline.client.api.config.Config chatConfig -> eX
-    net.shoreline.client.api.config.Config moveFullConfig -> eY
-    net.shoreline.client.api.config.Config moveLookConfig -> eZ
-    net.shoreline.client.api.config.Config movePosConfig -> fa
-    net.shoreline.client.api.config.Config moveGroundConfig -> fb
-    net.shoreline.client.api.config.Config vehicleMoveConfig -> fc
-    net.shoreline.client.api.config.Config playerActionConfig -> fd
-    net.shoreline.client.api.config.Config updateSlotConfig -> fe
-    net.shoreline.client.api.config.Config clickSlotConfig -> dB
-    net.shoreline.client.api.config.Config pickInventoryConfig -> ff
-    net.shoreline.client.api.config.Config handSwingConfig -> dE
-    net.shoreline.client.api.config.Config interactEntityConfig -> fg
-    net.shoreline.client.api.config.Config interactBlockConfig -> fh
-    net.shoreline.client.api.config.Config interactItemConfig -> fi
-    net.shoreline.client.api.config.Config commandConfig -> fj
-    net.shoreline.client.api.config.Config statusConfig -> fk
-    net.shoreline.client.api.config.Config closeScreenConfig -> fl
-    net.shoreline.client.api.config.Config teleportConfirmConfig -> dF
-    net.shoreline.client.api.config.Config pongConfig -> fm
+    net.shoreline.client.api.config.Config chatConfig -> eY
+    net.shoreline.client.api.config.Config moveFullConfig -> eZ
+    net.shoreline.client.api.config.Config moveLookConfig -> fa
+    net.shoreline.client.api.config.Config movePosConfig -> fb
+    net.shoreline.client.api.config.Config moveGroundConfig -> fc
+    net.shoreline.client.api.config.Config vehicleMoveConfig -> fd
+    net.shoreline.client.api.config.Config playerActionConfig -> fe
+    net.shoreline.client.api.config.Config updateSlotConfig -> ff
+    net.shoreline.client.api.config.Config clickSlotConfig -> dC
+    net.shoreline.client.api.config.Config pickInventoryConfig -> fg
+    net.shoreline.client.api.config.Config handSwingConfig -> dF
+    net.shoreline.client.api.config.Config interactEntityConfig -> fh
+    net.shoreline.client.api.config.Config interactBlockConfig -> fi
+    net.shoreline.client.api.config.Config interactItemConfig -> fj
+    net.shoreline.client.api.config.Config commandConfig -> fk
+    net.shoreline.client.api.config.Config statusConfig -> fl
+    net.shoreline.client.api.config.Config closeScreenConfig -> fm
+    net.shoreline.client.api.config.Config teleportConfirmConfig -> dG
+    net.shoreline.client.api.config.Config pongConfig -> fn
     19:42:void <init>() -> <init>
     47:48:void onEnable() -> u
     53:54:void onDisable() -> v
     58:68:void logPacket(java.lang.String,java.lang.Object[]) -> f
     73:172:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
 net.shoreline.client.impl.module.misc.ServerModule -> net.shoreline.client.kX:
-    net.shoreline.client.api.config.Config demoConfig -> fn
-    net.shoreline.client.api.config.Config resourcePackConfig -> fo
-    net.shoreline.client.api.config.Config antiCrashConfig -> fp
-    net.shoreline.client.api.config.Config illegalDisconnectConfig -> cx
+    net.shoreline.client.api.config.Config demoConfig -> fo
+    net.shoreline.client.api.config.Config resourcePackConfig -> fp
+    net.shoreline.client.api.config.Config antiCrashConfig -> fq
+    net.shoreline.client.api.config.Config illegalDisconnectConfig -> cy
     30:38:void <init>() -> <init>
     43:93:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     98:108:void onMenuDisconnect(net.shoreline.client.impl.event.gui.screen.MenuDisconnectEvent) -> a
@@ -5480,7 +5482,7 @@ net.shoreline.client.impl.module.misc.ShulkerceptionModule -> net.shoreline.clie
     18:19:void onShulkerNested(net.shoreline.client.impl.event.gui.screen.slot.ShulkerNestedEvent) -> a
 net.shoreline.client.impl.module.misc.SkinBlinkModule -> net.shoreline.client.kZ:
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config randomConfig -> fq
+    net.shoreline.client.api.config.Config randomConfig -> fr
     net.shoreline.client.util.math.timer.Timer blinkTimer -> M
     java.util.Set enabledPlayerModelParts -> p
     21:34:void <init>() -> <init>
@@ -5488,9 +5490,9 @@ net.shoreline.client.impl.module.misc.SkinBlinkModule -> net.shoreline.client.kZ
     49:57:void onDisable() -> v
     62:73:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
 net.shoreline.client.impl.module.misc.SpammerModule -> net.shoreline.client.la:
-    net.shoreline.client.api.config.Config delayConfig -> cz
-    net.shoreline.client.api.config.Config randomConfig -> fq
-    net.shoreline.client.api.config.Config antiKickConfig -> dR
+    net.shoreline.client.api.config.Config delayConfig -> cA
+    net.shoreline.client.api.config.Config randomConfig -> fr
+    net.shoreline.client.api.config.Config antiKickConfig -> dS
     java.util.List messages -> G
     int messageIndex -> aw
     net.shoreline.client.util.math.timer.Timer spamTimer -> N
@@ -5503,7 +5505,7 @@ net.shoreline.client.impl.module.misc.SpammerModule -> net.shoreline.client.la:
     141:169:void sendSpamMessage(java.lang.String) -> E
 net.shoreline.client.impl.module.misc.SwingModule -> net.shoreline.client.lb:
     net.shoreline.client.impl.module.misc.SwingModule INSTANCE -> a
-    net.shoreline.client.api.config.Config swingHandConfig -> fr
+    net.shoreline.client.api.config.Config swingHandConfig -> fs
     net.minecraft.class_1268 prevPreferredHand -> e
     net.minecraft.class_1268 hand -> a
     22:30:void <init>() -> <init>
@@ -5546,11 +5548,11 @@ net.shoreline.client.impl.module.misc.TrueDurabilityModule -> net.shoreline.clie
     20:22:void <init>() -> <init>
     28:35:void onDurability(net.shoreline.client.impl.event.item.DurabilityEvent) -> a
 net.shoreline.client.impl.module.misc.UnfocusedFPSModule -> net.shoreline.client.lg:
-    net.shoreline.client.api.config.Config limitConfig -> dM
+    net.shoreline.client.api.config.Config limitConfig -> dN
     17:26:void <init>() -> <init>
     31:36:void onFramerateLimit(net.shoreline.client.impl.event.FramerateLimitEvent) -> a
 net.shoreline.client.impl.module.misc.XCarryModule -> net.shoreline.client.lh:
-    net.shoreline.client.api.config.Config forceCancelConfig -> fs
+    net.shoreline.client.api.config.Config forceCancelConfig -> ft
     18:27:void <init>() -> <init>
     32:42:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
 net.shoreline.client.impl.module.movement.AntiLevitationModule -> net.shoreline.client.li:
@@ -5558,19 +5560,19 @@ net.shoreline.client.impl.module.movement.AntiLevitationModule -> net.shoreline.
     27:28:void onLevitation(net.shoreline.client.impl.event.entity.LevitationEvent) -> a
 net.shoreline.client.impl.module.movement.AutoWalkModule -> net.shoreline.client.lj:
     net.shoreline.client.impl.module.movement.AutoWalkModule INSTANCE -> a
-    net.shoreline.client.api.config.Config lockConfig -> ft
+    net.shoreline.client.api.config.Config lockConfig -> fu
     21:27:void <init>() -> <init>
     31:31:net.shoreline.client.impl.module.movement.AutoWalkModule getInstance() -> a
     37:38:void onDisable() -> v
     43:53:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
 net.shoreline.client.impl.module.movement.BoatFlyModule -> net.shoreline.client.lk:
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config vspeedConfig -> fu
-    net.shoreline.client.api.config.Config remountConfig -> fv
-    net.shoreline.client.api.config.Config antiKickConfig -> dR
-    net.shoreline.client.api.config.Config accelerateConfig -> fw
-    net.shoreline.client.api.config.Config accelerateSpeedConfig -> fx
-    net.shoreline.client.api.config.Config maxSpeedConfig -> fy
+    net.shoreline.client.api.config.Config vspeedConfig -> fv
+    net.shoreline.client.api.config.Config remountConfig -> fw
+    net.shoreline.client.api.config.Config antiKickConfig -> dS
+    net.shoreline.client.api.config.Config accelerateConfig -> fx
+    net.shoreline.client.api.config.Config accelerateSpeedConfig -> fy
+    net.shoreline.client.api.config.Config maxSpeedConfig -> fz
     double speed -> D
     double lastY -> E
     boolean floating -> aw
@@ -5601,15 +5603,15 @@ net.shoreline.client.impl.module.movement.ElytraFlyModule -> net.shoreline.clien
     net.shoreline.client.impl.module.movement.ElytraFlyModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config vspeedConfig -> fu
-    net.shoreline.client.api.config.Config accelerateConfig -> fw
-    net.shoreline.client.api.config.Config accelSpeedConfig -> fz
-    net.shoreline.client.api.config.Config maxSpeedConfig -> fy
-    net.shoreline.client.api.config.Config boostConfig -> fA
+    net.shoreline.client.api.config.Config vspeedConfig -> fv
+    net.shoreline.client.api.config.Config accelerateConfig -> fx
+    net.shoreline.client.api.config.Config accelSpeedConfig -> fA
+    net.shoreline.client.api.config.Config maxSpeedConfig -> fz
+    net.shoreline.client.api.config.Config boostConfig -> fB
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config fireworkConfig -> eW
-    net.shoreline.client.api.config.Config pitchConfig -> dS
-    net.shoreline.client.api.config.Config obstaclePasserConfig -> fB
+    net.shoreline.client.api.config.Config fireworkConfig -> eX
+    net.shoreline.client.api.config.Config pitchConfig -> dT
+    net.shoreline.client.api.config.Config obstaclePasserConfig -> fC
     double GRIM_AIR_FRICTION -> F
     boolean resetSpeed -> ay
     float speed -> r
@@ -5650,8 +5652,8 @@ net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode -> net.shoreli
     449:449:net.shoreline.client.impl.module.movement.ElytraFlyModule$FlyMode[] $values() -> a
     449:453:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.EntityControlModule -> net.shoreline.client.lo:
-    net.shoreline.client.api.config.Config jumpStrengthConfig -> fC
-    net.shoreline.client.api.config.Config noPigMoveConfig -> fD
+    net.shoreline.client.api.config.Config jumpStrengthConfig -> fD
+    net.shoreline.client.api.config.Config noPigMoveConfig -> fE
     23:29:void <init>() -> <init>
     34:44:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     49:50:void onEntitySteer(net.shoreline.client.impl.event.entity.passive.EntitySteerEvent) -> a
@@ -5659,8 +5661,8 @@ net.shoreline.client.impl.module.movement.EntityControlModule -> net.shoreline.c
     62:70:void onPigAI(net.shoreline.client.impl.event.entity.mob.PigAIEvent) -> a
 net.shoreline.client.impl.module.movement.EntitySpeedModule -> net.shoreline.client.lp:
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config antiStuckConfig -> fE
-    net.shoreline.client.api.config.Config strictConfig -> fF
+    net.shoreline.client.api.config.Config antiStuckConfig -> fF
+    net.shoreline.client.api.config.Config strictConfig -> fG
     net.shoreline.client.util.math.timer.Timer entityJumpTimer -> O
     32:44:void <init>() -> <init>
     49:50:java.lang.String getModuleData() -> x
@@ -5669,8 +5671,8 @@ net.shoreline.client.impl.module.movement.EntitySpeedModule -> net.shoreline.cli
     140:151:void handleEntityMotion(float,double,double) -> a
 net.shoreline.client.impl.module.movement.FakeLagModule -> net.shoreline.client.lq:
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config pulseConfig -> fG
-    net.shoreline.client.api.config.Config factorConfig -> dI
+    net.shoreline.client.api.config.Config pulseConfig -> fH
+    net.shoreline.client.api.config.Config factorConfig -> dJ
     net.shoreline.client.api.config.Config renderConfig -> bl
     net.shoreline.client.util.entity.FakePlayerEntity serverModel -> b
     boolean blinking -> az
@@ -5691,9 +5693,9 @@ net.shoreline.client.impl.module.movement.FakeLagModule$LagMode -> net.shoreline
     129:129:net.shoreline.client.impl.module.movement.FakeLagModule$LagMode[] $values() -> a
     129:131:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.FastFallModule -> net.shoreline.client.ls:
-    net.shoreline.client.api.config.Config heightConfig -> fH
-    net.shoreline.client.api.config.Config fallModeConfig -> fI
-    net.shoreline.client.api.config.Config accelerateConfig -> fw
+    net.shoreline.client.api.config.Config heightConfig -> fI
+    net.shoreline.client.api.config.Config fallModeConfig -> fJ
+    net.shoreline.client.api.config.Config accelerateConfig -> fx
     net.shoreline.client.api.config.Config shiftTicksConfig -> bG
     boolean prevOnGround -> aA
     boolean cancelFallMovement -> aB
@@ -5718,12 +5720,12 @@ net.shoreline.client.impl.module.movement.FastFallModule$FallMode -> net.shoreli
     163:166:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.FastSwimModule -> net.shoreline.client.lu:
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config waterSpeedConfig -> fJ
-    net.shoreline.client.api.config.Config lavaSpeedConfig -> fK
-    net.shoreline.client.api.config.Config verticalConfig -> fL
-    net.shoreline.client.api.config.Config elytraConfig -> fM
-    net.shoreline.client.api.config.Config elytraSpeedConfig -> fN
-    net.shoreline.client.api.config.Config depthStriderConfig -> fO
+    net.shoreline.client.api.config.Config waterSpeedConfig -> fK
+    net.shoreline.client.api.config.Config lavaSpeedConfig -> fL
+    net.shoreline.client.api.config.Config verticalConfig -> fM
+    net.shoreline.client.api.config.Config elytraConfig -> fN
+    net.shoreline.client.api.config.Config elytraSpeedConfig -> fO
+    net.shoreline.client.api.config.Config depthStriderConfig -> fP
     21:32:void <init>() -> <init>
     37:94:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
     26:26:java.lang.Boolean lambda$new$0() -> k
@@ -5738,9 +5740,9 @@ net.shoreline.client.impl.module.movement.FastSwimModule$SwimMode -> net.shoreli
     96:99:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.FireworkBoostModule -> net.shoreline.client.lw:
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config accelerateConfig -> fw
-    net.shoreline.client.api.config.Config accelSpeedConfig -> fz
-    net.shoreline.client.api.config.Config maxSpeedConfig -> fy
+    net.shoreline.client.api.config.Config accelerateConfig -> fx
+    net.shoreline.client.api.config.Config accelSpeedConfig -> fA
+    net.shoreline.client.api.config.Config maxSpeedConfig -> fz
     int tickCounter -> az
     double speed -> D
     23:34:void <init>() -> <init>
@@ -5753,11 +5755,11 @@ net.shoreline.client.impl.module.movement.FlightModule -> net.shoreline.client.l
     net.shoreline.client.impl.module.movement.FlightModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config vspeedConfig -> fu
-    net.shoreline.client.api.config.Config antiKickConfig -> dR
-    net.shoreline.client.api.config.Config accelerateConfig -> fw
-    net.shoreline.client.api.config.Config accelerateSpeedConfig -> fx
-    net.shoreline.client.api.config.Config maxSpeedConfig -> fy
+    net.shoreline.client.api.config.Config vspeedConfig -> fv
+    net.shoreline.client.api.config.Config antiKickConfig -> dS
+    net.shoreline.client.api.config.Config accelerateConfig -> fx
+    net.shoreline.client.api.config.Config accelerateSpeedConfig -> fy
+    net.shoreline.client.api.config.Config maxSpeedConfig -> fz
     double speed -> D
     double lastY -> E
     boolean floating -> aw
@@ -5801,7 +5803,7 @@ net.shoreline.client.impl.module.movement.IceSpeedModule -> net.shoreline.client
     35:43:void onDisable() -> v
 net.shoreline.client.impl.module.movement.JesusModule -> net.shoreline.client.lB:
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config strictConfig -> fF
+    net.shoreline.client.api.config.Config strictConfig -> fG
     int floatTimer -> aA
     boolean fluidState -> aC
     double floatOffset -> G
@@ -5831,9 +5833,9 @@ net.shoreline.client.impl.module.movement.JesusModule$JesusMode -> net.shoreline
 net.shoreline.client.impl.module.movement.LongJumpModule -> net.shoreline.client.lD:
     net.shoreline.client.impl.module.movement.LongJumpModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config boostConfig -> fA
-    net.shoreline.client.api.config.Config elytraBoostConfig -> fP
-    net.shoreline.client.api.config.Config autoDisableConfig -> cy
+    net.shoreline.client.api.config.Config boostConfig -> fB
+    net.shoreline.client.api.config.Config elytraBoostConfig -> fQ
+    net.shoreline.client.api.config.Config autoDisableConfig -> cz
     int stage -> aB
     double distance -> H
     double speed -> D
@@ -5863,8 +5865,8 @@ net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode -> net.shoreli
     505:505:net.shoreline.client.impl.module.movement.LongJumpModule$JumpMode[] $values() -> a
     505:509:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.NoAccelModule -> net.shoreline.client.lF:
-    net.shoreline.client.api.config.Config airConfig -> fQ
-    net.shoreline.client.api.config.Config downwardsConfig -> fR
+    net.shoreline.client.api.config.Config airConfig -> fR
+    net.shoreline.client.api.config.Config downwardsConfig -> fS
     15:21:void <init>() -> <init>
     26:51:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
 net.shoreline.client.impl.module.movement.NoFallModule -> net.shoreline.client.lG:
@@ -5894,23 +5896,23 @@ net.shoreline.client.impl.module.movement.NoJumpDelayModule -> net.shoreline.cli
     18:19:void onJumpDelay(net.shoreline.client.impl.event.entity.JumpDelayEvent) -> a
 net.shoreline.client.impl.module.movement.NoSlowModule -> net.shoreline.client.lL:
     net.shoreline.client.impl.module.movement.NoSlowModule INSTANCE -> a
-    net.shoreline.client.api.config.Config strictConfig -> fF
-    net.shoreline.client.api.config.Config airStrictConfig -> fS
+    net.shoreline.client.api.config.Config strictConfig -> fG
+    net.shoreline.client.api.config.Config airStrictConfig -> fT
     net.shoreline.client.api.config.Config grimConfig -> h
-    net.shoreline.client.api.config.Config grimNewConfig -> fT
-    net.shoreline.client.api.config.Config strafeFixConfig -> fU
-    net.shoreline.client.api.config.Config inventoryMoveConfig -> fV
-    net.shoreline.client.api.config.Config arrowMoveConfig -> fW
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config sneakConfig -> fX
-    net.shoreline.client.api.config.Config crawlConfig -> fY
-    net.shoreline.client.api.config.Config shieldsConfig -> fZ
-    net.shoreline.client.api.config.Config websConfig -> cX
-    net.shoreline.client.api.config.Config berryBushConfig -> ga
-    net.shoreline.client.api.config.Config webSpeedConfig -> gb
-    net.shoreline.client.api.config.Config soulsandConfig -> gc
-    net.shoreline.client.api.config.Config honeyblockConfig -> gd
-    net.shoreline.client.api.config.Config slimeblockConfig -> ge
+    net.shoreline.client.api.config.Config grimNewConfig -> fU
+    net.shoreline.client.api.config.Config strafeFixConfig -> fV
+    net.shoreline.client.api.config.Config inventoryMoveConfig -> fW
+    net.shoreline.client.api.config.Config arrowMoveConfig -> fX
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config sneakConfig -> fY
+    net.shoreline.client.api.config.Config crawlConfig -> fZ
+    net.shoreline.client.api.config.Config shieldsConfig -> ga
+    net.shoreline.client.api.config.Config websConfig -> cY
+    net.shoreline.client.api.config.Config berryBushConfig -> gb
+    net.shoreline.client.api.config.Config webSpeedConfig -> gc
+    net.shoreline.client.api.config.Config soulsandConfig -> gd
+    net.shoreline.client.api.config.Config honeyblockConfig -> ge
+    net.shoreline.client.api.config.Config slimeblockConfig -> gf
     boolean sneaking -> S
     50:78:void <init>() -> <init>
     82:82:net.shoreline.client.impl.module.movement.NoSlowModule getInstance() -> a
@@ -5940,19 +5942,19 @@ net.shoreline.client.impl.module.movement.ParkourModule -> net.shoreline.client.
     28:35:void onDisable() -> v
     40:54:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
 net.shoreline.client.impl.module.movement.SafeWalkModule -> net.shoreline.client.lN:
-    net.shoreline.client.api.config.Config sneakConfig -> fX
+    net.shoreline.client.api.config.Config sneakConfig -> fY
     12:17:void <init>() -> <init>
     22:31:void onLedgeClip(net.shoreline.client.impl.event.entity.player.LedgeClipEvent) -> a
 net.shoreline.client.impl.module.movement.SpeedModule -> net.shoreline.client.lO:
     net.shoreline.client.impl.module.movement.SpeedModule INSTANCE -> a
-    net.shoreline.client.api.config.Config speedModeConfig -> gf
-    net.shoreline.client.api.config.Config collisionDistanceConfig -> gg
+    net.shoreline.client.api.config.Config speedModeConfig -> gg
+    net.shoreline.client.api.config.Config collisionDistanceConfig -> gh
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config timerConfig -> gh
-    net.shoreline.client.api.config.Config fastConfig -> cE
-    net.shoreline.client.api.config.Config strafeBoostConfig -> gi
-    net.shoreline.client.api.config.Config boostTicksConfig -> gj
-    net.shoreline.client.api.config.Config speedWaterConfig -> gk
+    net.shoreline.client.api.config.Config timerConfig -> gi
+    net.shoreline.client.api.config.Config fastConfig -> cF
+    net.shoreline.client.api.config.Config strafeBoostConfig -> gj
+    net.shoreline.client.api.config.Config boostTicksConfig -> gk
+    net.shoreline.client.api.config.Config speedWaterConfig -> gl
     int strafe -> aE
     boolean accel -> aE
     int strictTicks -> aF
@@ -6005,7 +6007,7 @@ net.shoreline.client.impl.module.movement.SpeedModule$Speed -> net.shoreline.cli
 net.shoreline.client.impl.module.movement.SprintModule -> net.shoreline.client.lQ:
     net.shoreline.client.impl.module.movement.SprintModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config jumpFixConfig -> gl
+    net.shoreline.client.api.config.Config jumpFixConfig -> gm
     31:41:void <init>() -> <init>
     45:45:net.shoreline.client.impl.module.movement.SprintModule getInstance() -> a
     51:51:java.lang.String getModuleData() -> x
@@ -6030,10 +6032,10 @@ net.shoreline.client.impl.module.movement.SprintModule$SprintMode -> net.shoreli
     200:205:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.StepModule -> net.shoreline.client.lS:
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config heightConfig -> fH
-    net.shoreline.client.api.config.Config useTimerConfig -> gm
-    net.shoreline.client.api.config.Config strictConfig -> fF
-    net.shoreline.client.api.config.Config entityStepConfig -> gn
+    net.shoreline.client.api.config.Config heightConfig -> fI
+    net.shoreline.client.api.config.Config useTimerConfig -> gn
+    net.shoreline.client.api.config.Config strictConfig -> fG
+    net.shoreline.client.api.config.Config entityStepConfig -> go
     boolean cancelTimer -> aG
     net.shoreline.client.util.math.timer.Timer stepTimer -> Q
     float stepHeight -> t
@@ -6062,16 +6064,16 @@ net.shoreline.client.impl.module.movement.StepModule$StepMode -> net.shoreline.c
 net.shoreline.client.impl.module.movement.TickShiftModule -> net.shoreline.client.lU:
     net.shoreline.client.api.config.Config ticksConfig -> bD
     net.shoreline.client.api.config.Config packetsConfig -> ao
-    net.shoreline.client.api.config.Config chargeSpeedConfig -> go
+    net.shoreline.client.api.config.Config chargeSpeedConfig -> gp
     int packets -> ap
     21:34:void <init>() -> <init>
     39:39:java.lang.String getModuleData() -> x
     45:46:void onDisable() -> v
     51:74:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
 net.shoreline.client.impl.module.movement.TridentFlyModule -> net.shoreline.client.lV:
-    net.shoreline.client.api.config.Config allowNoWaterConfig -> gp
+    net.shoreline.client.api.config.Config allowNoWaterConfig -> gq
     net.shoreline.client.api.config.Config instantConfig -> bJ
-    net.shoreline.client.api.config.Config flyConfig -> gq
+    net.shoreline.client.api.config.Config flyConfig -> gr
     net.shoreline.client.api.config.Config ticksConfig -> bD
     26:34:void <init>() -> <init>
     39:48:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
@@ -6080,18 +6082,18 @@ net.shoreline.client.impl.module.movement.TridentFlyModule -> net.shoreline.clie
     29:29:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.movement.VelocityModule -> net.shoreline.client.lW:
     net.shoreline.client.impl.module.movement.VelocityModule INSTANCE -> a
-    net.shoreline.client.api.config.Config knockbackConfig -> gr
-    net.shoreline.client.api.config.Config explosionConfig -> gs
+    net.shoreline.client.api.config.Config knockbackConfig -> gs
+    net.shoreline.client.api.config.Config explosionConfig -> gt
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config horizontalConfig -> gt
-    net.shoreline.client.api.config.Config verticalConfig -> fL
-    net.shoreline.client.api.config.Config concealConfig -> dO
-    net.shoreline.client.api.config.Config wallsAirConfig -> gu
-    net.shoreline.client.api.config.Config wallsTrappedConfig -> gv
-    net.shoreline.client.api.config.Config pushEntitiesConfig -> gw
-    net.shoreline.client.api.config.Config pushBlocksConfig -> gx
-    net.shoreline.client.api.config.Config pushLiquidsConfig -> gy
-    net.shoreline.client.api.config.Config pushFishhookConfig -> gz
+    net.shoreline.client.api.config.Config horizontalConfig -> gu
+    net.shoreline.client.api.config.Config verticalConfig -> fM
+    net.shoreline.client.api.config.Config concealConfig -> dP
+    net.shoreline.client.api.config.Config wallsAirConfig -> gv
+    net.shoreline.client.api.config.Config wallsTrappedConfig -> gw
+    net.shoreline.client.api.config.Config pushEntitiesConfig -> gx
+    net.shoreline.client.api.config.Config pushBlocksConfig -> gy
+    net.shoreline.client.api.config.Config pushLiquidsConfig -> gz
+    net.shoreline.client.api.config.Config pushFishhookConfig -> gA
     boolean cancelVelocity -> aH
     boolean concealVelocity -> aI
     48:71:void <init>() -> <init>
@@ -6126,20 +6128,20 @@ net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode -> net.sho
     462:462:net.shoreline.client.impl.module.movement.VelocityModule$VelocityMode[] $values() -> a
     462:467:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.YawModule -> net.shoreline.client.lY:
-    net.shoreline.client.api.config.Config lockConfig -> ft
+    net.shoreline.client.api.config.Config lockConfig -> fu
     22:27:void <init>() -> <init>
     32:48:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     53:59:void onLookDirection(net.shoreline.client.impl.event.entity.LookDirectionEvent) -> a
 net.shoreline.client.impl.module.render.AmbienceModule -> net.shoreline.client.lZ:
     net.shoreline.client.impl.module.render.AmbienceModule INSTANCE -> a
-    net.shoreline.client.api.config.Config lightConfig -> gA
-    net.shoreline.client.api.config.Config lightColorConfig -> gB
-    net.shoreline.client.api.config.Config grassConfig -> gC
-    net.shoreline.client.api.config.Config grassColorConfig -> gD
-    net.shoreline.client.api.config.Config foliageConfig -> gE
-    net.shoreline.client.api.config.Config foliageColorConfig -> gF
-    net.shoreline.client.api.config.Config waterConfig -> gG
-    net.shoreline.client.api.config.Config waterColorConfig -> gH
+    net.shoreline.client.api.config.Config lightConfig -> gB
+    net.shoreline.client.api.config.Config lightColorConfig -> gC
+    net.shoreline.client.api.config.Config grassConfig -> gD
+    net.shoreline.client.api.config.Config grassColorConfig -> gE
+    net.shoreline.client.api.config.Config foliageConfig -> gF
+    net.shoreline.client.api.config.Config foliageColorConfig -> gG
+    net.shoreline.client.api.config.Config waterConfig -> gH
+    net.shoreline.client.api.config.Config waterColorConfig -> gI
     20:35:void <init>() -> <init>
     39:39:net.shoreline.client.impl.module.render.AmbienceModule getInstance() -> a
     45:50:void onEnable() -> u
@@ -6154,15 +6156,15 @@ net.shoreline.client.impl.module.render.AmbienceModule -> net.shoreline.client.l
     23:23:java.lang.Boolean lambda$new$1() -> a
     21:21:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.render.AnimationsModule -> net.shoreline.client.ma:
-    net.shoreline.client.api.config.Config noSwitchConfig -> gI
-    net.shoreline.client.api.config.Config oldSwingConfig -> gJ
-    net.shoreline.client.api.config.Config swingSpeedConfig -> gK
-    net.shoreline.client.api.config.Config swingFactorConfig -> gL
-    net.shoreline.client.api.config.Config selfOnlyConfig -> gM
-    net.shoreline.client.api.config.Config eatTransformConfig -> gN
-    net.shoreline.client.api.config.Config eatTransformFactorConfig -> gO
-    net.shoreline.client.api.config.Config limbSwing -> gP
-    net.shoreline.client.api.config.Config interpolationConfig -> gQ
+    net.shoreline.client.api.config.Config noSwitchConfig -> gJ
+    net.shoreline.client.api.config.Config oldSwingConfig -> gK
+    net.shoreline.client.api.config.Config swingSpeedConfig -> gL
+    net.shoreline.client.api.config.Config swingFactorConfig -> gM
+    net.shoreline.client.api.config.Config selfOnlyConfig -> gN
+    net.shoreline.client.api.config.Config eatTransformConfig -> gO
+    net.shoreline.client.api.config.Config eatTransformFactorConfig -> gP
+    net.shoreline.client.api.config.Config limbSwing -> gQ
+    net.shoreline.client.api.config.Config interpolationConfig -> gR
     30:43:void <init>() -> <init>
     48:52:void onUpdateHeldItems(net.shoreline.client.impl.event.render.item.UpdateHeldItemsEvent) -> a
     57:63:void onSwingSpeed(net.shoreline.client.impl.event.entity.SwingSpeedEvent) -> a
@@ -6176,9 +6178,9 @@ net.shoreline.client.impl.module.render.AnimationsModule -> net.shoreline.client
     34:34:java.lang.Boolean lambda$new$1() -> a
     33:33:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.render.BlockHighlightModule -> net.shoreline.client.mb:
-    net.shoreline.client.api.config.Config boxModeConfig -> gR
-    net.shoreline.client.api.config.Config entitiesConfig -> gS
-    net.shoreline.client.api.config.Config widthConfig -> gT
+    net.shoreline.client.api.config.Config boxModeConfig -> gS
+    net.shoreline.client.api.config.Config entitiesConfig -> gT
+    net.shoreline.client.api.config.Config widthConfig -> gU
     double distance -> H
     36:44:void <init>() -> <init>
     49:58:java.lang.String getModuleData() -> x
@@ -6189,15 +6191,15 @@ net.shoreline.client.impl.module.render.BlockHighlightModule$1 -> net.shoreline.
     99:99:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.BreadcrumbsModule -> net.shoreline.client.md:
     java.util.Map positions -> I
-    net.shoreline.client.api.config.Config infiniteConfig -> eJ
-    net.shoreline.client.api.config.Config maxTimeConfig -> gU
+    net.shoreline.client.api.config.Config infiniteConfig -> eK
+    net.shoreline.client.api.config.Config maxTimeConfig -> gV
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
-    net.shoreline.client.api.config.Config widthConfig -> gT
-    net.shoreline.client.api.config.Config selfConfig -> gV
+    net.shoreline.client.api.config.Config widthConfig -> gU
+    net.shoreline.client.api.config.Config selfConfig -> gW
     net.shoreline.client.api.config.Config playersConfig -> bg
-    net.shoreline.client.api.config.Config pearlsConfig -> gW
-    net.shoreline.client.api.config.Config arrowsConfig -> gX
-    net.shoreline.client.api.config.Config xpBottlesConfig -> gY
+    net.shoreline.client.api.config.Config pearlsConfig -> gX
+    net.shoreline.client.api.config.Config arrowsConfig -> gY
+    net.shoreline.client.api.config.Config xpBottlesConfig -> gZ
     34:48:void <init>() -> <init>
     53:54:void onDisable() -> v
     59:90:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerTickEvent) -> b
@@ -6229,16 +6231,16 @@ net.shoreline.client.impl.module.render.ChamsModule -> net.shoreline.client.mg:
     net.shoreline.client.impl.module.render.ChamsModule INSTANCE -> a
     net.shoreline.client.api.config.Config rangeConfig -> j
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config widthConfig -> gT
-    net.shoreline.client.api.config.Config wallsConfig -> gZ
-    net.shoreline.client.api.config.Config textureConfig -> ha
+    net.shoreline.client.api.config.Config widthConfig -> gU
+    net.shoreline.client.api.config.Config wallsConfig -> ha
+    net.shoreline.client.api.config.Config textureConfig -> hb
     net.shoreline.client.api.config.Config playersConfig -> bg
-    net.shoreline.client.api.config.Config selfConfig -> gV
-    net.shoreline.client.api.config.Config handsConfig -> hb
+    net.shoreline.client.api.config.Config selfConfig -> gW
+    net.shoreline.client.api.config.Config handsConfig -> hc
     net.shoreline.client.api.config.Config monstersConfig -> bh
     net.shoreline.client.api.config.Config animalsConfig -> bj
-    net.shoreline.client.api.config.Config crystalsConfig -> hc
-    net.shoreline.client.api.config.Config popsConfig -> hd
+    net.shoreline.client.api.config.Config crystalsConfig -> hd
+    net.shoreline.client.api.config.Config popsConfig -> he
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
     net.shoreline.client.api.config.Config colorConfig -> R
     java.util.Map fadeList -> K
@@ -6278,8 +6280,8 @@ net.shoreline.client.impl.module.render.ChamsModule$PopChamEntity -> net.shoreli
     399:399:net.shoreline.client.api.render.model.StaticBipedEntityModel getModel() -> a
 net.shoreline.client.impl.module.render.CrystalModelModule -> net.shoreline.client.mj:
     net.shoreline.client.impl.module.render.CrystalModelModule INSTANCE -> a
-    net.shoreline.client.api.config.Config spinConfig -> he
-    net.shoreline.client.api.config.Config bounceCrystalConfig -> hf
+    net.shoreline.client.api.config.Config spinConfig -> hf
+    net.shoreline.client.api.config.Config bounceCrystalConfig -> hg
     net.shoreline.client.api.config.Config scaleConfig -> N
     15:23:void <init>() -> <init>
     27:27:net.shoreline.client.impl.module.render.CrystalModelModule getInstance() -> a
@@ -6291,21 +6293,21 @@ net.shoreline.client.impl.module.render.ESPModule -> net.shoreline.client.mk:
     net.shoreline.client.impl.module.render.ESPModule INSTANCE -> a
     net.shoreline.client.api.config.Config rangeConfig -> j
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config fillConfig -> hg
-    net.shoreline.client.api.config.Config widthConfig -> gT
+    net.shoreline.client.api.config.Config fillConfig -> hh
+    net.shoreline.client.api.config.Config widthConfig -> gU
     net.shoreline.client.api.config.Config playersConfig -> bg
-    net.shoreline.client.api.config.Config selfConfig -> gV
-    net.shoreline.client.api.config.Config playersColorConfig -> hh
+    net.shoreline.client.api.config.Config selfConfig -> gW
+    net.shoreline.client.api.config.Config playersColorConfig -> hi
     net.shoreline.client.api.config.Config monstersConfig -> bh
-    net.shoreline.client.api.config.Config monstersColorConfig -> hi
+    net.shoreline.client.api.config.Config monstersColorConfig -> hj
     net.shoreline.client.api.config.Config animalsConfig -> bj
-    net.shoreline.client.api.config.Config animalsColorConfig -> hj
-    net.shoreline.client.api.config.Config vehiclesConfig -> hk
-    net.shoreline.client.api.config.Config vehiclesColorConfig -> hl
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config itemsColorConfig -> hm
-    net.shoreline.client.api.config.Config crystalsConfig -> hc
-    net.shoreline.client.api.config.Config crystalsColorConfig -> hn
+    net.shoreline.client.api.config.Config animalsColorConfig -> hk
+    net.shoreline.client.api.config.Config vehiclesConfig -> hl
+    net.shoreline.client.api.config.Config vehiclesColorConfig -> hm
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config itemsColorConfig -> hn
+    net.shoreline.client.api.config.Config crystalsConfig -> hd
+    net.shoreline.client.api.config.Config crystalsColorConfig -> ho
     37:59:void <init>() -> <init>
     63:63:net.shoreline.client.impl.module.render.ESPModule getInstance() -> a
     69:94:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
@@ -6332,8 +6334,8 @@ net.shoreline.client.impl.module.render.ESPModule$ESPMode -> net.shoreline.clien
     170:173:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.ExtraTabModule -> net.shoreline.client.mm:
     net.shoreline.client.api.config.Config sizeConfig -> U
-    net.shoreline.client.api.config.Config columnsConfig -> ho
-    net.shoreline.client.api.config.Config selfConfig -> gV
+    net.shoreline.client.api.config.Config columnsConfig -> hp
+    net.shoreline.client.api.config.Config selfConfig -> gW
     net.shoreline.client.api.config.Config friendsConfig -> aF
     29:37:void <init>() -> <init>
     42:69:void onPlayerListName(net.shoreline.client.impl.event.gui.hud.PlayerListNameEvent) -> a
@@ -6357,9 +6359,9 @@ net.shoreline.client.impl.module.render.FreeLookModule -> net.shoreline.client.m
 net.shoreline.client.impl.module.render.FreecamModule -> net.shoreline.client.mo:
     net.shoreline.client.impl.module.render.FreecamModule INSTANCE -> a
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config controlConfig -> hp
-    net.shoreline.client.api.config.Config toggleControlConfig -> hq
-    net.shoreline.client.api.config.Config interactConfig -> hr
+    net.shoreline.client.api.config.Config controlConfig -> hq
+    net.shoreline.client.api.config.Config toggleControlConfig -> hr
+    net.shoreline.client.api.config.Config interactConfig -> hs
     net.shoreline.client.api.config.Config rotateConfig -> aX
     net.minecraft.class_243 position -> a
     net.minecraft.class_243 lastPosition -> l
@@ -6405,7 +6407,7 @@ net.shoreline.client.impl.module.render.FreecamModule$Interact -> net.shoreline.
     319:319:net.shoreline.client.impl.module.render.FreecamModule$Interact[] $values() -> a
     319:322:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.FullbrightModule -> net.shoreline.client.mr:
-    net.shoreline.client.api.config.Config brightnessConfig -> hs
+    net.shoreline.client.api.config.Config brightnessConfig -> ht
     22:27:void <init>() -> <init>
     32:37:void onEnable() -> u
     42:47:void onDisable() -> v
@@ -6425,19 +6427,19 @@ net.shoreline.client.impl.module.render.FullbrightModule$Brightness -> net.shore
 net.shoreline.client.impl.module.render.HoleESPModule -> net.shoreline.client.mt:
     net.shoreline.client.impl.module.render.HoleESPModule INSTANCE -> a
     net.shoreline.client.api.config.Config rangeConfig -> j
-    net.shoreline.client.api.config.Config outlineConfig -> ht
-    net.shoreline.client.api.config.Config crossConfig -> hu
-    net.shoreline.client.api.config.Config heightConfig -> fH
-    net.shoreline.client.api.config.Config ignoreSelfConfig -> hv
-    net.shoreline.client.api.config.Config obsidianCheckConfig -> hw
-    net.shoreline.client.api.config.Config obsidianBedrockConfig -> hx
-    net.shoreline.client.api.config.Config doubleConfig -> hy
-    net.shoreline.client.api.config.Config quadConfig -> hz
-    net.shoreline.client.api.config.Config voidConfig -> hA
-    net.shoreline.client.api.config.Config obsidianConfig -> cV
-    net.shoreline.client.api.config.Config mixedConfig -> hB
-    net.shoreline.client.api.config.Config bedrockConfig -> hC
-    net.shoreline.client.api.config.Config voidColorConfig -> hD
+    net.shoreline.client.api.config.Config outlineConfig -> hu
+    net.shoreline.client.api.config.Config crossConfig -> hv
+    net.shoreline.client.api.config.Config heightConfig -> fI
+    net.shoreline.client.api.config.Config ignoreSelfConfig -> hw
+    net.shoreline.client.api.config.Config obsidianCheckConfig -> hx
+    net.shoreline.client.api.config.Config obsidianBedrockConfig -> hy
+    net.shoreline.client.api.config.Config doubleConfig -> hz
+    net.shoreline.client.api.config.Config quadConfig -> hA
+    net.shoreline.client.api.config.Config voidConfig -> hB
+    net.shoreline.client.api.config.Config obsidianConfig -> cW
+    net.shoreline.client.api.config.Config mixedConfig -> hC
+    net.shoreline.client.api.config.Config bedrockConfig -> hD
+    net.shoreline.client.api.config.Config voidColorConfig -> hE
     java.util.Map fadeList -> L
     35:56:void <init>() -> <init>
     61:62:void onDisable() -> v
@@ -6456,8 +6458,8 @@ net.shoreline.client.impl.module.render.HoleESPModule$1 -> net.shoreline.client.
     int[] $SwitchMap$net$shoreline$client$impl$manager$combat$hole$HoleType -> i
     160:160:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.KillEffectsModule -> net.shoreline.client.mv:
-    net.shoreline.client.api.config.Config killEffectConfig -> hE
-    net.shoreline.client.api.config.Config strikesConfig -> hF
+    net.shoreline.client.api.config.Config killEffectConfig -> hF
+    net.shoreline.client.api.config.Config strikesConfig -> hG
     java.util.Map lastAttackedEntities -> M
     26:34:void <init>() -> <init>
     39:59:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
@@ -6477,29 +6479,29 @@ net.shoreline.client.impl.module.render.KillEffectsModule$KillEffect -> net.shor
     125:125:net.shoreline.client.impl.module.render.KillEffectsModule$KillEffect[] $values() -> a
     125:128:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.NameProtectModule -> net.shoreline.client.mx:
-    net.shoreline.client.api.config.Config placeholderConfig -> hG
+    net.shoreline.client.api.config.Config placeholderConfig -> hH
     17:22:void <init>() -> <init>
     27:38:void onTextVisit(net.shoreline.client.impl.event.text.TextVisitEvent) -> a
 net.shoreline.client.impl.module.render.NametagsModule -> net.shoreline.client.my:
     net.shoreline.client.impl.module.render.NametagsModule INSTANCE -> a
     net.shoreline.client.api.config.Config armorConfig -> aa
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config enchantmentsConfig -> hH
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config enchantmentsConfig -> hI
     net.shoreline.client.api.config.Config durabilityConfig -> ag
     net.shoreline.client.api.config.Config itemNameConfig -> ad
-    net.shoreline.client.api.config.Config entityIdConfig -> hI
-    net.shoreline.client.api.config.Config gamemodeConfig -> hJ
-    net.shoreline.client.api.config.Config onlineUsersConfig -> hK
+    net.shoreline.client.api.config.Config entityIdConfig -> hJ
+    net.shoreline.client.api.config.Config gamemodeConfig -> hK
+    net.shoreline.client.api.config.Config onlineUsersConfig -> hL
     net.shoreline.client.api.config.Config pingConfig -> am
     net.shoreline.client.api.config.Config healthConfig -> cr
     net.shoreline.client.api.config.Config totemsConfig -> cv
-    net.shoreline.client.api.config.Config scalingConfig -> hL
+    net.shoreline.client.api.config.Config scalingConfig -> hM
     net.shoreline.client.api.config.Config invisiblesConfig -> bk
-    net.shoreline.client.api.config.Config backgroundConfig -> hM
-    net.shoreline.client.api.config.Config borderedConfig -> hN
-    net.shoreline.client.api.config.Config tamedConfig -> hO
-    net.shoreline.client.api.config.Config pearlsConfig -> gW
-    net.shoreline.client.api.config.Config droppedItemsConfig -> hP
+    net.shoreline.client.api.config.Config backgroundConfig -> hN
+    net.shoreline.client.api.config.Config borderedConfig -> hO
+    net.shoreline.client.api.config.Config tamedConfig -> hP
+    net.shoreline.client.api.config.Config pearlsConfig -> gX
+    net.shoreline.client.api.config.Config droppedItemsConfig -> hQ
     net.shoreline.client.api.config.Config soundsConfig -> P
     java.util.Map sounds -> N
     82:109:void <init>() -> <init>
@@ -6546,32 +6548,32 @@ net.shoreline.client.impl.module.render.NoBobModule -> net.shoreline.client.mB:
     19:20:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
 net.shoreline.client.impl.module.render.NoRenderModule -> net.shoreline.client.mC:
     net.shoreline.client.impl.module.render.NoRenderModule INSTANCE -> a
-    net.shoreline.client.api.config.Config hurtCamConfig -> hQ
+    net.shoreline.client.api.config.Config hurtCamConfig -> hR
     net.shoreline.client.api.config.Config armorConfig -> aa
-    net.shoreline.client.api.config.Config fireOverlayConfig -> hR
-    net.shoreline.client.api.config.Config portalOverlayConfig -> hS
-    net.shoreline.client.api.config.Config waterOverlayConfig -> hT
-    net.shoreline.client.api.config.Config blockOverlayConfig -> hU
-    net.shoreline.client.api.config.Config spyglassOverlayConfig -> hV
-    net.shoreline.client.api.config.Config pumpkinOverlayConfig -> hW
-    net.shoreline.client.api.config.Config bossOverlayConfig -> hX
-    net.shoreline.client.api.config.Config nauseaConfig -> hY
-    net.shoreline.client.api.config.Config blindnessConfig -> hZ
-    net.shoreline.client.api.config.Config frostbiteConfig -> ia
-    net.shoreline.client.api.config.Config skylightConfig -> ib
-    net.shoreline.client.api.config.Config witherSkullsConfig -> ic
-    net.shoreline.client.api.config.Config itemFramesConfig -> id
-    net.shoreline.client.api.config.Config entitiesConfig -> gS
-    net.shoreline.client.api.config.Config entitiesListConfig -> ie
-    net.shoreline.client.api.config.Config tileEntitiesConfig -> if
-    net.shoreline.client.api.config.Config signTextConfig -> ig
-    net.shoreline.client.api.config.Config fireEntityConfig -> ih
-    net.shoreline.client.api.config.Config fireworksConfig -> ii
-    net.shoreline.client.api.config.Config totemConfig -> ij
-    net.shoreline.client.api.config.Config worldBorderConfig -> ik
-    net.shoreline.client.api.config.Config fogConfig -> il
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config guiToastConfig -> im
+    net.shoreline.client.api.config.Config fireOverlayConfig -> hS
+    net.shoreline.client.api.config.Config portalOverlayConfig -> hT
+    net.shoreline.client.api.config.Config waterOverlayConfig -> hU
+    net.shoreline.client.api.config.Config blockOverlayConfig -> hV
+    net.shoreline.client.api.config.Config spyglassOverlayConfig -> hW
+    net.shoreline.client.api.config.Config pumpkinOverlayConfig -> hX
+    net.shoreline.client.api.config.Config bossOverlayConfig -> hY
+    net.shoreline.client.api.config.Config nauseaConfig -> hZ
+    net.shoreline.client.api.config.Config blindnessConfig -> ia
+    net.shoreline.client.api.config.Config frostbiteConfig -> ib
+    net.shoreline.client.api.config.Config skylightConfig -> ic
+    net.shoreline.client.api.config.Config witherSkullsConfig -> id
+    net.shoreline.client.api.config.Config itemFramesConfig -> ie
+    net.shoreline.client.api.config.Config entitiesConfig -> gT
+    net.shoreline.client.api.config.Config entitiesListConfig -> if
+    net.shoreline.client.api.config.Config tileEntitiesConfig -> ig
+    net.shoreline.client.api.config.Config signTextConfig -> ih
+    net.shoreline.client.api.config.Config fireEntityConfig -> ii
+    net.shoreline.client.api.config.Config fireworksConfig -> ij
+    net.shoreline.client.api.config.Config totemConfig -> ik
+    net.shoreline.client.api.config.Config worldBorderConfig -> il
+    net.shoreline.client.api.config.Config fogConfig -> im
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config guiToastConfig -> in
     42:73:void <init>() -> <init>
     77:77:net.shoreline.client.impl.module.render.NoRenderModule getInstance() -> a
     83:93:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
@@ -6624,11 +6626,11 @@ net.shoreline.client.impl.module.render.NoRenderModule$ItemRender -> net.shoreli
     360:360:net.shoreline.client.impl.module.render.NoRenderModule$ItemRender[] $values() -> a
     360:364:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.NoRotateModule -> net.shoreline.client.mF:
-    net.shoreline.client.api.config.Config positionAdjustConfig -> dX
+    net.shoreline.client.api.config.Config positionAdjustConfig -> dY
     17:22:void <init>() -> <init>
     27:40:void onServerRotation(net.shoreline.client.impl.event.network.ServerRotationEvent) -> a
 net.shoreline.client.impl.module.render.NoWeatherModule -> net.shoreline.client.mG:
-    net.shoreline.client.api.config.Config weatherConfig -> in
+    net.shoreline.client.api.config.Config weatherConfig -> io
     net.shoreline.client.impl.module.render.NoWeatherModule$Weather weather -> a
     24:31:void <init>() -> <init>
     36:36:java.lang.String getModuleData() -> x
@@ -6650,20 +6652,20 @@ net.shoreline.client.impl.module.render.NoWeatherModule$Weather -> net.shoreline
     128:128:net.shoreline.client.impl.module.render.NoWeatherModule$Weather[] $values() -> a
     128:133:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.ParticlesModule -> net.shoreline.client.mI:
-    net.shoreline.client.api.config.Config totemConfig -> ij
-    net.shoreline.client.api.config.Config totemColorConfig -> io
-    net.shoreline.client.api.config.Config totemParticlesConfig -> ip
-    net.shoreline.client.api.config.Config totemParticleTicksConfig -> iq
-    net.shoreline.client.api.config.Config explosionsConfig -> ir
-    net.shoreline.client.api.config.Config fireworkConfig -> eW
-    net.shoreline.client.api.config.Config potionConfig -> dj
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config bottleConfig -> is
-    net.shoreline.client.api.config.Config portalConfig -> it
-    net.shoreline.client.api.config.Config blockConfig -> iu
-    net.shoreline.client.api.config.Config blockBreakConfig -> iv
-    net.shoreline.client.api.config.Config campfiresConfig -> iw
-    net.shoreline.client.api.config.Config obsidianTearConfig -> ix
+    net.shoreline.client.api.config.Config totemConfig -> ik
+    net.shoreline.client.api.config.Config totemColorConfig -> ip
+    net.shoreline.client.api.config.Config totemParticlesConfig -> iq
+    net.shoreline.client.api.config.Config totemParticleTicksConfig -> ir
+    net.shoreline.client.api.config.Config explosionsConfig -> is
+    net.shoreline.client.api.config.Config fireworkConfig -> eX
+    net.shoreline.client.api.config.Config potionConfig -> dk
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config bottleConfig -> it
+    net.shoreline.client.api.config.Config portalConfig -> iu
+    net.shoreline.client.api.config.Config blockConfig -> iv
+    net.shoreline.client.api.config.Config blockBreakConfig -> iw
+    net.shoreline.client.api.config.Config campfiresConfig -> ix
+    net.shoreline.client.api.config.Config obsidianTearConfig -> iy
     27:45:void <init>() -> <init>
     50:62:void onParticle(net.shoreline.client.impl.event.particle.ParticleEvent) -> a
     67:71:void onParticleEmitter(net.shoreline.client.impl.event.particle.ParticleEvent$Emitter) -> a
@@ -6684,23 +6686,23 @@ net.shoreline.client.impl.module.render.ParticlesModule$TotemParticle -> net.sho
     121:121:net.shoreline.client.impl.module.render.ParticlesModule$TotemParticle[] $values() -> a
     121:125:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.PhaseESPModule -> net.shoreline.client.mK:
-    net.shoreline.client.api.config.Config widthConfig -> gT
-    net.shoreline.client.api.config.Config diagonalConfig -> iy
-    net.shoreline.client.api.config.Config safeConfig -> iz
-    net.shoreline.client.api.config.Config unsafeConfig -> iA
-    net.shoreline.client.api.config.Config obsidianConfig -> cV
-    net.shoreline.client.api.config.Config bedrockConfig -> hC
+    net.shoreline.client.api.config.Config widthConfig -> gU
+    net.shoreline.client.api.config.Config diagonalConfig -> iz
+    net.shoreline.client.api.config.Config safeConfig -> iA
+    net.shoreline.client.api.config.Config unsafeConfig -> iB
+    net.shoreline.client.api.config.Config obsidianConfig -> cW
+    net.shoreline.client.api.config.Config bedrockConfig -> hD
     24:34:void <init>() -> <init>
     39:118:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     122:144:java.awt.Color getPhaseColor(net.minecraft.class_2338) -> a
     29:29:java.lang.Boolean lambda$new$1() -> a
     28:28:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.render.SearchModule -> net.shoreline.client.mL:
-    net.shoreline.client.api.config.Config blocksConfig -> dU
-    net.shoreline.client.api.config.Config tracersConfig -> iB
-    net.shoreline.client.api.config.Config widthConfig -> gT
-    net.shoreline.client.api.config.Config fillConfig -> hg
-    net.shoreline.client.api.config.Config softReloadConfig -> iC
+    net.shoreline.client.api.config.Config blocksConfig -> dV
+    net.shoreline.client.api.config.Config tracersConfig -> iC
+    net.shoreline.client.api.config.Config widthConfig -> gU
+    net.shoreline.client.api.config.Config fillConfig -> hh
+    net.shoreline.client.api.config.Config softReloadConfig -> iD
     java.util.Map blocks -> O
     boolean warnedLag -> aK
     49:66:void <init>() -> <init>
@@ -6720,48 +6722,48 @@ net.shoreline.client.impl.module.render.SearchModule -> net.shoreline.client.mL:
 net.shoreline.client.impl.module.render.ShadersModule -> net.shoreline.client.mM:
     net.shoreline.client.impl.module.render.ShadersModule INSTANCE -> a
     net.shoreline.client.api.config.Config rangeConfig -> j
-    net.shoreline.client.api.config.Config textureConfig -> ha
-    net.shoreline.client.api.config.Config outlineConfig -> ht
-    net.shoreline.client.api.config.Config lineWidthConfig -> iD
-    net.shoreline.client.api.config.Config fastOutlineConfig -> iE
-    net.shoreline.client.api.config.Config qualityConfig -> iF
-    net.shoreline.client.api.config.Config stepsConfig -> iG
-    net.shoreline.client.api.config.Config glowConfig -> iH
-    net.shoreline.client.api.config.Config glowRadiusConfig -> iI
+    net.shoreline.client.api.config.Config textureConfig -> hb
+    net.shoreline.client.api.config.Config outlineConfig -> hu
+    net.shoreline.client.api.config.Config lineWidthConfig -> iE
+    net.shoreline.client.api.config.Config fastOutlineConfig -> iF
+    net.shoreline.client.api.config.Config qualityConfig -> iG
+    net.shoreline.client.api.config.Config stepsConfig -> iH
+    net.shoreline.client.api.config.Config glowConfig -> iI
+    net.shoreline.client.api.config.Config glowRadiusConfig -> iJ
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config gradientConfig -> iJ
-    net.shoreline.client.api.config.Config factorConfig -> dI
+    net.shoreline.client.api.config.Config gradientConfig -> iK
+    net.shoreline.client.api.config.Config factorConfig -> dJ
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config marbleFactorConfig -> iK
-    net.shoreline.client.api.config.Config dotsConfig -> iL
-    net.shoreline.client.api.config.Config dotRadiusConfig -> iM
-    net.shoreline.client.api.config.Config mixConfig -> iN
-    net.shoreline.client.api.config.Config mixFactorConfig -> iO
-    net.shoreline.client.api.config.Config rainbowFactorConfig -> iP
-    net.shoreline.client.api.config.Config transparencyConfig -> iQ
-    net.shoreline.client.api.config.Config handsConfig -> hb
-    net.shoreline.client.api.config.Config handsColorConfig -> iR
-    net.shoreline.client.api.config.Config selfConfig -> gV
-    net.shoreline.client.api.config.Config selfColorConfig -> iS
+    net.shoreline.client.api.config.Config marbleFactorConfig -> iL
+    net.shoreline.client.api.config.Config dotsConfig -> iM
+    net.shoreline.client.api.config.Config dotRadiusConfig -> iN
+    net.shoreline.client.api.config.Config mixConfig -> iO
+    net.shoreline.client.api.config.Config mixFactorConfig -> iP
+    net.shoreline.client.api.config.Config rainbowFactorConfig -> iQ
+    net.shoreline.client.api.config.Config transparencyConfig -> iR
+    net.shoreline.client.api.config.Config handsConfig -> hc
+    net.shoreline.client.api.config.Config handsColorConfig -> iS
+    net.shoreline.client.api.config.Config selfConfig -> gW
+    net.shoreline.client.api.config.Config selfColorConfig -> iT
     net.shoreline.client.api.config.Config playersConfig -> bg
     net.shoreline.client.api.config.Config friendsConfig -> aF
-    net.shoreline.client.api.config.Config playersColorConfig -> hh
+    net.shoreline.client.api.config.Config playersColorConfig -> hi
     net.shoreline.client.api.config.Config monstersConfig -> bh
-    net.shoreline.client.api.config.Config monstersColorConfig -> hi
+    net.shoreline.client.api.config.Config monstersColorConfig -> hj
     net.shoreline.client.api.config.Config animalsConfig -> bj
-    net.shoreline.client.api.config.Config animalsColorConfig -> hj
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config itemsColorConfig -> hm
-    net.shoreline.client.api.config.Config otherConfig -> iT
-    net.shoreline.client.api.config.Config crystalsColorConfig -> hn
-    net.shoreline.client.api.config.Config projectilesConfig -> iU
-    net.shoreline.client.api.config.Config projectilesColorConfig -> iV
+    net.shoreline.client.api.config.Config animalsColorConfig -> hk
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config itemsColorConfig -> hn
+    net.shoreline.client.api.config.Config otherConfig -> iU
+    net.shoreline.client.api.config.Config crystalsColorConfig -> ho
+    net.shoreline.client.api.config.Config projectilesConfig -> iV
+    net.shoreline.client.api.config.Config projectilesColorConfig -> iW
     net.shoreline.client.api.config.Config chestsConfig -> ak
-    net.shoreline.client.api.config.Config chestsColorConfig -> iW
-    net.shoreline.client.api.config.Config echestsConfig -> iX
-    net.shoreline.client.api.config.Config echestsColorConfig -> iY
+    net.shoreline.client.api.config.Config chestsColorConfig -> iX
+    net.shoreline.client.api.config.Config echestsConfig -> iY
+    net.shoreline.client.api.config.Config echestsColorConfig -> iZ
     net.shoreline.client.api.config.Config shulkersConfig -> bQ
-    net.shoreline.client.api.config.Config shulkersColorConfig -> iZ
+    net.shoreline.client.api.config.Config shulkersColorConfig -> ja
     float shaderTime -> aS
     int textureId -> aI
     boolean ignoreEntityRender -> aL
@@ -6845,20 +6847,20 @@ net.shoreline.client.impl.module.render.ShadersModule$ShaderMode -> net.shorelin
     781:781:net.shoreline.client.impl.module.render.ShadersModule$ShaderMode[] $values() -> a
     781:788:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.SkeletonModule -> net.shoreline.client.mO:
-    net.shoreline.client.api.config.Config widthConfig -> gT
+    net.shoreline.client.api.config.Config widthConfig -> gU
     35:40:void <init>() -> <init>
     45:147:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent$Game) -> a
     151:163:void rotateSkeleton(net.minecraft.class_4587,net.minecraft.class_630) -> a
 net.shoreline.client.impl.module.render.SkyboxModule -> net.shoreline.client.mP:
-    net.shoreline.client.api.config.Config dayTimeConfig -> ja
-    net.shoreline.client.api.config.Config skyConfig -> jb
-    net.shoreline.client.api.config.Config skyColorConfig -> jc
-    net.shoreline.client.api.config.Config cloudConfig -> jd
-    net.shoreline.client.api.config.Config cloudColorConfig -> je
-    net.shoreline.client.api.config.Config fogConfig -> il
-    net.shoreline.client.api.config.Config fogStartConfig -> jf
-    net.shoreline.client.api.config.Config fogEndConfig -> jg
-    net.shoreline.client.api.config.Config fogColorConfig -> jh
+    net.shoreline.client.api.config.Config dayTimeConfig -> jb
+    net.shoreline.client.api.config.Config skyConfig -> jc
+    net.shoreline.client.api.config.Config skyColorConfig -> jd
+    net.shoreline.client.api.config.Config cloudConfig -> je
+    net.shoreline.client.api.config.Config cloudColorConfig -> jf
+    net.shoreline.client.api.config.Config fogConfig -> im
+    net.shoreline.client.api.config.Config fogStartConfig -> jg
+    net.shoreline.client.api.config.Config fogEndConfig -> jh
+    net.shoreline.client.api.config.Config fogColorConfig -> ji
     26:39:void <init>() -> <init>
     44:48:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     53:57:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
@@ -6874,18 +6876,18 @@ net.shoreline.client.impl.module.render.SkyboxModule -> net.shoreline.client.mP:
 net.shoreline.client.impl.module.render.StorageESPModule -> net.shoreline.client.mQ:
     net.shoreline.client.impl.module.render.StorageESPModule INSTANCE -> a
     net.shoreline.client.api.config.Config rangeConfig -> j
-    net.shoreline.client.api.config.Config fillConfig -> hg
-    net.shoreline.client.api.config.Config widthConfig -> gT
+    net.shoreline.client.api.config.Config fillConfig -> hh
+    net.shoreline.client.api.config.Config widthConfig -> gU
     net.shoreline.client.api.config.Config chestsConfig -> ak
-    net.shoreline.client.api.config.Config chestsColorConfig -> iW
-    net.shoreline.client.api.config.Config echestsConfig -> iX
-    net.shoreline.client.api.config.Config echestsColorConfig -> iY
+    net.shoreline.client.api.config.Config chestsColorConfig -> iX
+    net.shoreline.client.api.config.Config echestsConfig -> iY
+    net.shoreline.client.api.config.Config echestsColorConfig -> iZ
     net.shoreline.client.api.config.Config shulkersConfig -> bQ
-    net.shoreline.client.api.config.Config shulkersColorConfig -> iZ
-    net.shoreline.client.api.config.Config hoppersConfig -> ji
-    net.shoreline.client.api.config.Config hoppersColorConfig -> jj
-    net.shoreline.client.api.config.Config furnacesConfig -> jk
-    net.shoreline.client.api.config.Config furnacesColorConfig -> jl
+    net.shoreline.client.api.config.Config shulkersColorConfig -> ja
+    net.shoreline.client.api.config.Config hoppersConfig -> jj
+    net.shoreline.client.api.config.Config hoppersColorConfig -> jk
+    net.shoreline.client.api.config.Config furnacesConfig -> jl
+    net.shoreline.client.api.config.Config furnacesColorConfig -> jm
     26:44:void <init>() -> <init>
     48:48:net.shoreline.client.impl.module.render.StorageESPModule getInstance() -> a
     54:186:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
@@ -6897,26 +6899,26 @@ net.shoreline.client.impl.module.render.StorageESPModule -> net.shoreline.client
     30:30:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.render.TooltipsModule -> net.shoreline.client.mR:
     net.shoreline.client.api.config.Config shulkersConfig -> bQ
-    net.shoreline.client.api.config.Config mapsConfig -> jm
+    net.shoreline.client.api.config.Config mapsConfig -> jn
     34:40:void <init>() -> <init>
     45:114:void onRenderTooltip(net.shoreline.client.impl.event.gui.RenderTooltipEvent) -> a
 net.shoreline.client.impl.module.render.TracersModule -> net.shoreline.client.mS:
     net.shoreline.client.api.config.Config modeConfig -> aJ
-    net.shoreline.client.api.config.Config targetConfig -> jn
-    net.shoreline.client.api.config.Config widthConfig -> gT
+    net.shoreline.client.api.config.Config targetConfig -> jo
+    net.shoreline.client.api.config.Config widthConfig -> gU
     net.shoreline.client.api.config.Config playersConfig -> bg
-    net.shoreline.client.api.config.Config playersColorConfig -> hh
+    net.shoreline.client.api.config.Config playersColorConfig -> hi
     net.shoreline.client.api.config.Config friendsConfig -> aF
     net.shoreline.client.api.config.Config invisiblesConfig -> bk
-    net.shoreline.client.api.config.Config invisiblesColorConfig -> jo
+    net.shoreline.client.api.config.Config invisiblesColorConfig -> jp
     net.shoreline.client.api.config.Config monstersConfig -> bh
-    net.shoreline.client.api.config.Config monstersColorConfig -> hi
+    net.shoreline.client.api.config.Config monstersColorConfig -> hj
     net.shoreline.client.api.config.Config animalsConfig -> bj
-    net.shoreline.client.api.config.Config animalsColorConfig -> hj
-    net.shoreline.client.api.config.Config vehiclesConfig -> hk
-    net.shoreline.client.api.config.Config vehiclesColorConfig -> hl
-    net.shoreline.client.api.config.Config itemsConfig -> eR
-    net.shoreline.client.api.config.Config itemsColorConfig -> hm
+    net.shoreline.client.api.config.Config animalsColorConfig -> hk
+    net.shoreline.client.api.config.Config vehiclesConfig -> hl
+    net.shoreline.client.api.config.Config vehiclesColorConfig -> hm
+    net.shoreline.client.api.config.Config itemsConfig -> eS
+    net.shoreline.client.api.config.Config itemsColorConfig -> hn
     38:58:void <init>() -> <init>
     63:121:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     125:154:java.awt.Color getTracerColor(net.minecraft.class_1297) -> b
@@ -6955,31 +6957,31 @@ net.shoreline.client.impl.module.render.TrajectoriesModule -> net.shoreline.clie
     204:204:boolean isThrowableItem(net.minecraft.class_1792) -> b
     211:211:boolean isThrowableEntity(net.minecraft.class_1297) -> C
 net.shoreline.client.impl.module.render.TrueSightModule -> net.shoreline.client.mW:
-    net.shoreline.client.api.config.Config onlyPlayersConfig -> jp
+    net.shoreline.client.api.config.Config onlyPlayersConfig -> jq
     17:22:void <init>() -> <init>
     27:31:void onRenderEntityInvisible(net.shoreline.client.impl.event.render.entity.RenderEntityInvisibleEvent) -> a
 net.shoreline.client.impl.module.render.ViewClipModule -> net.shoreline.client.mX:
-    net.shoreline.client.api.config.Config distanceConfig -> dV
+    net.shoreline.client.api.config.Config distanceConfig -> dW
     17:22:void <init>() -> <init>
     27:29:void onCameraClip(net.shoreline.client.impl.event.render.CameraClipEvent) -> a
 net.shoreline.client.impl.module.render.ViewModelModule -> net.shoreline.client.mY:
-    net.shoreline.client.api.config.Config positionXConfig -> jq
-    net.shoreline.client.api.config.Config positionYConfig -> jr
-    net.shoreline.client.api.config.Config positionZConfig -> js
-    net.shoreline.client.api.config.Config scaleXConfig -> jt
-    net.shoreline.client.api.config.Config scaleYConfig -> ju
-    net.shoreline.client.api.config.Config scaleZConfig -> jv
-    net.shoreline.client.api.config.Config rotateXConfig -> jw
-    net.shoreline.client.api.config.Config rotateYConfig -> jx
-    net.shoreline.client.api.config.Config rotateZConfig -> jy
+    net.shoreline.client.api.config.Config positionXConfig -> jr
+    net.shoreline.client.api.config.Config positionYConfig -> js
+    net.shoreline.client.api.config.Config positionZConfig -> jt
+    net.shoreline.client.api.config.Config scaleXConfig -> ju
+    net.shoreline.client.api.config.Config scaleYConfig -> jv
+    net.shoreline.client.api.config.Config scaleZConfig -> jw
+    net.shoreline.client.api.config.Config rotateXConfig -> jx
+    net.shoreline.client.api.config.Config rotateYConfig -> jy
+    net.shoreline.client.api.config.Config rotateZConfig -> jz
     20:33:void <init>() -> <init>
     38:52:void onRenderFirstPerson(net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent) -> a
 net.shoreline.client.impl.module.render.WaypointsModule -> net.shoreline.client.mZ:
     net.shoreline.client.impl.module.render.WaypointsModule INSTANCE -> a
-    net.shoreline.client.api.config.Config logoutsConfig -> jz
-    net.shoreline.client.api.config.Config deathsConfig -> jA
+    net.shoreline.client.api.config.Config logoutsConfig -> jA
+    net.shoreline.client.api.config.Config deathsConfig -> jB
     net.shoreline.client.api.config.Config coordsConfig -> ah
-    net.shoreline.client.api.config.Config distanceConfig -> dV
+    net.shoreline.client.api.config.Config distanceConfig -> dW
     java.text.DecimalFormat format -> c
     java.util.Map loginPlayers -> P
     java.util.Map logoutPlayers -> Q
@@ -6996,9 +6998,9 @@ net.shoreline.client.impl.module.render.WaypointsModule -> net.shoreline.client.
     212:213:void renderWaypointBox(net.minecraft.class_4587,net.minecraft.class_243,java.lang.String) -> a
     217:224:void renderWaypointBox(net.minecraft.class_4587,net.minecraft.class_243,java.lang.String,boolean) -> a
 net.shoreline.client.impl.module.render.ZoomModule -> net.shoreline.client.na:
-    net.shoreline.client.api.config.Config zoomConfig -> jB
-    net.shoreline.client.api.config.Config smoothCameraConfig -> jC
-    net.shoreline.client.api.config.Config zoomKeyConfig -> jD
+    net.shoreline.client.api.config.Config zoomConfig -> jC
+    net.shoreline.client.api.config.Config smoothCameraConfig -> jD
+    net.shoreline.client.api.config.Config zoomKeyConfig -> jE
     boolean flag -> aM
     boolean flag1 -> aN
     boolean isPressed -> aO
@@ -7009,10 +7011,10 @@ net.shoreline.client.impl.module.render.ZoomModule -> net.shoreline.client.na:
     20:20:void lambda$new$0() -> w
 net.shoreline.client.impl.module.world.AirPlaceModule -> net.shoreline.client.nb:
     net.shoreline.client.impl.module.world.AirPlaceModule INSTANCE -> a
-    net.shoreline.client.api.config.Config manualConfig -> jE
+    net.shoreline.client.api.config.Config manualConfig -> jF
     net.shoreline.client.api.config.Config grimConfig -> h
     net.shoreline.client.api.config.Config rangeConfig -> j
-    net.shoreline.client.api.config.Config fluidsConfig -> jF
+    net.shoreline.client.api.config.Config fluidsConfig -> jG
     int airPlaceTicks -> aK
     40:51:void <init>() -> <init>
     55:55:net.shoreline.client.impl.module.world.AirPlaceModule getInstance() -> a
@@ -7022,43 +7024,43 @@ net.shoreline.client.impl.module.world.AirPlaceModule -> net.shoreline.client.nb
     126:154:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     158:165:boolean isEntityInBlockPos(net.minecraft.class_2338) -> k
 net.shoreline.client.impl.module.world.AntiInteractModule -> net.shoreline.client.nc:
-    net.shoreline.client.api.config.Config blacklistConfig -> eT
-    net.shoreline.client.api.config.Config miningFixConfig -> jG
-    net.shoreline.client.api.config.Config borderConfig -> jH
+    net.shoreline.client.api.config.Config blacklistConfig -> eU
+    net.shoreline.client.api.config.Config miningFixConfig -> jH
+    net.shoreline.client.api.config.Config borderConfig -> jI
     33:40:void <init>() -> <init>
     45:53:void onInteractBlock(net.shoreline.client.impl.event.network.InteractBlockEvent) -> a
-    58:91:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    96:101:void onInteractBorder(net.shoreline.client.impl.event.network.InteractBorderEvent) -> a
+    58:94:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
+    99:104:void onInteractBorder(net.shoreline.client.impl.event.network.InteractBorderEvent) -> a
 net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nd:
     net.shoreline.client.impl.module.world.AutoMineModule INSTANCE -> a
-    net.shoreline.client.api.config.Config autoConfig -> cY
-    net.shoreline.client.api.config.Config selectionConfig -> jI
-    net.shoreline.client.api.config.Config whitelistConfig -> jJ
-    net.shoreline.client.api.config.Config blacklistConfig -> eT
-    net.shoreline.client.api.config.Config autoRemineConfig -> jK
-    net.shoreline.client.api.config.Config avoidSelfConfig -> jL
+    net.shoreline.client.api.config.Config autoConfig -> cZ
+    net.shoreline.client.api.config.Config selectionConfig -> jJ
+    net.shoreline.client.api.config.Config whitelistConfig -> jK
+    net.shoreline.client.api.config.Config blacklistConfig -> eU
+    net.shoreline.client.api.config.Config autoRemineConfig -> jL
+    net.shoreline.client.api.config.Config avoidSelfConfig -> jM
     net.shoreline.client.api.config.Config strictDirectionConfig -> g
     net.shoreline.client.api.config.Config enemyRangeConfig -> bE
-    net.shoreline.client.api.config.Config headConfig -> cL
-    net.shoreline.client.api.config.Config aboveHeadConfig -> jM
-    net.shoreline.client.api.config.Config doubleBreakConfig -> jN
+    net.shoreline.client.api.config.Config headConfig -> cM
+    net.shoreline.client.api.config.Config aboveHeadConfig -> jN
+    net.shoreline.client.api.config.Config doubleBreakConfig -> jO
     net.shoreline.client.api.config.Config rangeConfig -> j
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config swapConfig -> jO
-    net.shoreline.client.api.config.Config swapBeforeConfig -> jP
+    net.shoreline.client.api.config.Config swapConfig -> jP
+    net.shoreline.client.api.config.Config swapBeforeConfig -> jQ
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config switchResetConfig -> jQ
+    net.shoreline.client.api.config.Config switchResetConfig -> jR
     net.shoreline.client.api.config.Config grimConfig -> h
-    net.shoreline.client.api.config.Config grimNewConfig -> fT
+    net.shoreline.client.api.config.Config grimNewConfig -> fU
     net.shoreline.client.api.config.Config instantConfig -> bJ
-    net.shoreline.client.api.config.Config crawlingConfig -> jR
-    net.shoreline.client.api.config.Config crawlExtrapolateConfig -> jS
-    net.shoreline.client.api.config.Config crawlResetConfig -> jT
+    net.shoreline.client.api.config.Config crawlingConfig -> jS
+    net.shoreline.client.api.config.Config crawlExtrapolateConfig -> jT
+    net.shoreline.client.api.config.Config crawlResetConfig -> jU
     net.shoreline.client.api.config.Config assumeArmorConfig -> bq
     net.shoreline.client.api.config.Config colorConfig -> R
-    net.shoreline.client.api.config.Config colorDoneConfig -> jU
+    net.shoreline.client.api.config.Config colorDoneConfig -> jV
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
-    net.shoreline.client.api.config.Config smoothColorConfig -> jV
+    net.shoreline.client.api.config.Config smoothColorConfig -> jW
     net.minecraft.class_1657 playerTarget -> e
     java.util.Map fadeList -> R
     net.shoreline.client.util.collection.FirstOutQueue miningQueue -> a
@@ -7070,89 +7072,90 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nd
     boolean silentSwapping -> aR
     net.shoreline.client.util.math.timer.Timer stopMiningTimer -> S
     int tickDelay -> aL
-    60:106:void <init>() -> <init>
-    110:110:net.shoreline.client.impl.module.world.AutoMineModule getInstance() -> a
-    116:121:java.lang.String getModuleData() -> x
-    127:136:void onDisable() -> v
-    141:149:void onEnable() -> u
-    154:158:void onTickPost(net.shoreline.client.impl.event.TickEvent) -> e
-    163:451:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
-    456:503:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
-    508:515:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    520:540:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    544:577:void handleBlockUpdatePacket(net.minecraft.class_2626) -> a
-    582:593:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
-    598:658:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    662:667:void startManualMine(net.minecraft.class_2338,net.minecraft.class_2350) -> a
-    671:672:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350) -> b
-    676:690:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350,boolean) -> a
-    694:702:void queueMiningData(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
-    706:706:java.util.List getPhasePosition(net.minecraft.class_1657) -> e
-    711:737:java.util.List getPhasePosition(net.minecraft.class_1657,net.minecraft.class_2338) -> a
-    749:848:java.util.PriorityQueue getMiningPosition(net.minecraft.class_1657) -> a
-    853:871:net.minecraft.class_2338 getCrawlingMine(net.minecraft.class_1657) -> a
-    895:897:void removeQueuedMine() -> ap
-    901:903:void removeQueuedMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
-    907:909:void removeIfQueuedMine(java.util.function.Predicate) -> a
-    913:936:void updateOverrides() -> aq
-    940:1000:boolean startMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
-    1005:1012:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
-    1016:1061:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
-    1065:1071:void swapTo(int) -> z
-    1075:1080:void swapSync(int) -> A
-    1084:1088:void stopMiningInternal(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> e
-    1093:1093:boolean isBlockDelayGrim() -> aW
-    1098:1098:boolean isDataPacketMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
-    1103:1111:boolean validAutoMineBlock(net.minecraft.class_2248) -> a
-    1117:1122:net.minecraft.class_2338 getMiningBlock() -> e
-    1127:1127:boolean isSilentSwapping() -> aX
-    1119:1120:boolean lambda$getMiningBlock$17(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
-    1009:1010:net.minecraft.class_2596 lambda$abortMining$16(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> a
-    987:988:net.minecraft.class_2596 lambda$startMining$15(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> b
-    813:813:boolean lambda$getMiningPosition$14(net.minecraft.class_2338,net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
-    694:694:boolean lambda$queueMiningData$13(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
-    656:656:boolean lambda$onRenderWorld$12(java.util.Map$Entry) -> j
-    361:361:boolean lambda$onPlayerTick$11(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
-    226:226:boolean lambda$onPlayerTick$10(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
-    88:88:java.lang.Boolean lambda$new$9() -> c
-    87:87:java.lang.Boolean lambda$new$8() -> d
-    83:83:java.lang.Boolean lambda$new$7() -> e
-    82:82:java.lang.Boolean lambda$new$6() -> f
-    74:74:java.lang.Boolean lambda$new$5() -> g
-    67:67:java.lang.Boolean lambda$new$4() -> h
-    66:66:java.lang.Boolean lambda$new$3() -> i
-    65:65:java.lang.Boolean lambda$new$2() -> j
-    64:64:java.lang.Boolean lambda$new$1() -> a
-    61:61:java.lang.Boolean lambda$new$0() -> k
+    61:107:void <init>() -> <init>
+    111:111:net.shoreline.client.impl.module.world.AutoMineModule getInstance() -> a
+    117:122:java.lang.String getModuleData() -> x
+    128:137:void onDisable() -> v
+    142:150:void onEnable() -> u
+    155:159:void onTickPost(net.shoreline.client.impl.event.TickEvent) -> e
+    164:452:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
+    457:504:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
+    509:516:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
+    521:541:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    545:578:void handleBlockUpdatePacket(net.minecraft.class_2626) -> a
+    583:594:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
+    599:659:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
+    663:668:void startManualMine(net.minecraft.class_2338,net.minecraft.class_2350) -> a
+    672:673:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350) -> b
+    677:691:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350,boolean) -> a
+    695:703:void queueMiningData(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
+    707:707:java.util.List getPhasePosition(net.minecraft.class_1657) -> e
+    712:738:java.util.List getPhasePosition(net.minecraft.class_1657,net.minecraft.class_2338) -> a
+    750:849:java.util.PriorityQueue getMiningPosition(net.minecraft.class_1657) -> a
+    854:872:net.minecraft.class_2338 getCrawlingMine(net.minecraft.class_1657) -> a
+    896:898:void removeQueuedMine() -> ap
+    902:904:void removeQueuedMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
+    908:910:void removeIfQueuedMine(java.util.function.Predicate) -> a
+    914:937:void updateOverrides() -> aq
+    941:1001:boolean startMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
+    1006:1013:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
+    1017:1062:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
+    1066:1072:void swapTo(int) -> z
+    1076:1081:void swapSync(int) -> A
+    1085:1089:void stopMiningInternal(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> e
+    1094:1094:boolean isBlockDelayGrim() -> aW
+    1099:1099:boolean isDataPacketMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
+    1104:1104:boolean validAutoMineBlock(net.minecraft.class_2338) -> l
+    1109:1117:boolean validAutoMineBlock(net.minecraft.class_2248) -> a
+    1123:1128:net.minecraft.class_2338 getMiningBlock() -> e
+    1133:1133:boolean isSilentSwapping() -> aX
+    1125:1126:boolean lambda$getMiningBlock$17(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
+    1010:1011:net.minecraft.class_2596 lambda$abortMining$16(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> a
+    988:989:net.minecraft.class_2596 lambda$startMining$15(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> b
+    814:814:boolean lambda$getMiningPosition$14(net.minecraft.class_2338,net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
+    695:695:boolean lambda$queueMiningData$13(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
+    657:657:boolean lambda$onRenderWorld$12(java.util.Map$Entry) -> j
+    362:362:boolean lambda$onPlayerTick$11(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
+    227:227:boolean lambda$onPlayerTick$10(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
+    89:89:java.lang.Boolean lambda$new$9() -> c
+    88:88:java.lang.Boolean lambda$new$8() -> d
+    84:84:java.lang.Boolean lambda$new$7() -> e
+    83:83:java.lang.Boolean lambda$new$6() -> f
+    75:75:java.lang.Boolean lambda$new$5() -> g
+    68:68:java.lang.Boolean lambda$new$4() -> h
+    67:67:java.lang.Boolean lambda$new$3() -> i
+    66:66:java.lang.Boolean lambda$new$2() -> j
+    65:65:java.lang.Boolean lambda$new$1() -> a
+    62:62:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl -> net.shoreline.client.ne:
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl NORMAL -> a
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl EXTRAPOLATE -> b
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl OFF -> c
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $VALUES -> a
-    1297:1297:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] values() -> values
-    1297:1297:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl valueOf(java.lang.String) -> valueOf
-    1297:1297:void <init>(java.lang.String,int) -> <init>
-    1297:1297:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $values() -> a
-    1297:1301:void <clinit>() -> <clinit>
+    1303:1303:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] values() -> values
+    1303:1303:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl valueOf(java.lang.String) -> valueOf
+    1303:1303:void <init>(java.lang.String,int) -> <init>
+    1303:1303:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $values() -> a
+    1303:1307:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc -> net.shoreline.client.nf:
     net.minecraft.class_2338 pos -> n
     double entityDamage -> K
     boolean phase -> aS
-    874:874:void <init>(net.minecraft.class_2338,double,boolean) -> <init>
-    879:879:int compareTo(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
-    885:889:boolean equals(java.lang.Object) -> equals
-    874:874:java.lang.String toString() -> toString
-    874:874:int hashCode() -> hashCode
-    874:874:net.minecraft.class_2338 pos() -> c
-    874:874:double entityDamage() -> q
-    874:874:boolean phase() -> aY
-    874:874:int compareTo(java.lang.Object) -> compareTo
+    875:875:void <init>(net.minecraft.class_2338,double,boolean) -> <init>
+    880:880:int compareTo(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
+    886:890:boolean equals(java.lang.Object) -> equals
+    875:875:java.lang.String toString() -> toString
+    875:875:int hashCode() -> hashCode
+    875:875:net.minecraft.class_2338 pos() -> c
+    875:875:double entityDamage() -> q
+    875:875:boolean phase() -> aY
+    875:875:int compareTo(java.lang.Object) -> compareTo
 net.shoreline.client.impl.module.world.AutoMineModule$AutoMiningData -> net.shoreline.client.ng:
-    1142:1143:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1148:1149:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$CrawlMiningData -> net.shoreline.client.nh:
-    1150:1151:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1156:1157:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$ManualMiningData -> net.shoreline.client.ni:
-    1134:1135:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1140:1141:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shoreline.client.nj:
     boolean completedMine -> aT
     boolean attemptedBreak -> aU
@@ -7163,47 +7166,47 @@ net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shorelin
     float blockDamage -> aH
     boolean instantRemine -> aV
     boolean started -> Y
-    1169:1172:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
-    1176:1181:void setCompletedMine(boolean) -> t
-    1185:1185:boolean hasCompletedMine() -> aZ
-    1190:1195:void setAttemptedBreak() -> ar
-    1199:1200:void resetBreakTime() -> as
-    1204:1204:boolean hasAttemptedBreak() -> ba
-    1209:1209:boolean passedAttemptedBreakTime(long) -> c
-    1214:1214:boolean isInstantRemine() -> bb
-    1219:1220:void setInstantRemine() -> at
-    1224:1226:float damage(float) -> d
-    1231:1232:void setDamage(float) -> x
-    1236:1239:void resetDamage() -> au
-    1243:1243:net.minecraft.class_2338 getPos() -> a
-    1248:1248:net.minecraft.class_2350 getDirection() -> a
-    1253:1253:int getSlot() -> x
-    1258:1258:net.minecraft.class_2680 getState() -> a
-    1263:1263:float getBlockDamage() -> S
-    1268:1268:float getLastDamage() -> ae
-    1273:1273:boolean isStarted() -> bc
-    1278:1279:void setStarted() -> av
+    1175:1178:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1182:1187:void setCompletedMine(boolean) -> t
+    1191:1191:boolean hasCompletedMine() -> aZ
+    1196:1201:void setAttemptedBreak() -> ar
+    1205:1206:void resetBreakTime() -> as
+    1210:1210:boolean hasAttemptedBreak() -> ba
+    1215:1215:boolean passedAttemptedBreakTime(long) -> c
+    1220:1220:boolean isInstantRemine() -> bb
+    1225:1226:void setInstantRemine() -> at
+    1230:1232:float damage(float) -> d
+    1237:1238:void setDamage(float) -> x
+    1242:1245:void resetDamage() -> au
+    1249:1249:net.minecraft.class_2338 getPos() -> a
+    1254:1254:net.minecraft.class_2350 getDirection() -> a
+    1259:1259:int getSlot() -> x
+    1264:1264:net.minecraft.class_2680 getState() -> a
+    1269:1269:float getBlockDamage() -> S
+    1274:1274:float getLastDamage() -> ae
+    1279:1279:boolean isStarted() -> bc
+    1284:1285:void setStarted() -> av
 net.shoreline.client.impl.module.world.AutoMineModule$Selection -> net.shoreline.client.nk:
     net.shoreline.client.impl.module.world.AutoMineModule$Selection WHITELIST -> a
     net.shoreline.client.impl.module.world.AutoMineModule$Selection BLACKLIST -> b
     net.shoreline.client.impl.module.world.AutoMineModule$Selection ALL -> c
     net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $VALUES -> a
-    1290:1290:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] values() -> values
-    1290:1290:net.shoreline.client.impl.module.world.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
-    1290:1290:void <init>(java.lang.String,int) -> <init>
-    1290:1290:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $values() -> a
-    1290:1294:void <clinit>() -> <clinit>
+    1296:1296:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] values() -> values
+    1296:1296:net.shoreline.client.impl.module.world.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
+    1296:1296:void <init>(java.lang.String,int) -> <init>
+    1296:1296:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $values() -> a
+    1296:1300:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoMineModule$Swap -> net.shoreline.client.nl:
     net.shoreline.client.impl.module.world.AutoMineModule$Swap NORMAL -> a
     net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT -> b
     net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT_ALT -> c
     net.shoreline.client.impl.module.world.AutoMineModule$Swap OFF -> d
     net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $VALUES -> a
-    1282:1282:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] values() -> values
-    1282:1282:net.shoreline.client.impl.module.world.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
-    1282:1282:void <init>(java.lang.String,int) -> <init>
-    1282:1282:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $values() -> a
-    1282:1287:void <clinit>() -> <clinit>
+    1288:1288:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] values() -> values
+    1288:1288:net.shoreline.client.impl.module.world.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
+    1288:1288:void <init>(java.lang.String,int) -> <init>
+    1288:1288:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $values() -> a
+    1288:1293:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoToolModule -> net.shoreline.client.nm:
     net.shoreline.client.impl.module.world.AutoToolModule INSTANCE -> a
     25:27:void <init>() -> <init>
@@ -7214,12 +7217,12 @@ net.shoreline.client.impl.module.world.AutoToolModule -> net.shoreline.client.nm
 net.shoreline.client.impl.module.world.AutoTunnelModule -> net.shoreline.client.nn:
     13:14:void <init>() -> <init>
 net.shoreline.client.impl.module.world.AvoidModule -> net.shoreline.client.no:
-    net.shoreline.client.api.config.Config voidConfig -> hA
-    net.shoreline.client.api.config.Config fireConfig -> jW
-    net.shoreline.client.api.config.Config berryBushConfig -> ga
-    net.shoreline.client.api.config.Config cactiConfig -> jX
-    net.shoreline.client.api.config.Config unloadedConfig -> jY
-    net.shoreline.client.api.config.Config noClimbConfig -> jZ
+    net.shoreline.client.api.config.Config voidConfig -> hB
+    net.shoreline.client.api.config.Config fireConfig -> jX
+    net.shoreline.client.api.config.Config berryBushConfig -> gb
+    net.shoreline.client.api.config.Config cactiConfig -> jY
+    net.shoreline.client.api.config.Config unloadedConfig -> jZ
+    net.shoreline.client.api.config.Config noClimbConfig -> ka
     24:35:void <init>() -> <init>
     40:48:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     53:66:void onBlockCollision(net.shoreline.client.impl.event.world.BlockCollisionEvent) -> a
@@ -7243,12 +7246,12 @@ net.shoreline.client.impl.module.world.FastEatModule$Mode -> net.shoreline.clien
     110:110:net.shoreline.client.impl.module.world.FastEatModule$Mode[] $values() -> a
     110:114:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.FastPlaceModule -> net.shoreline.client.nr:
-    net.shoreline.client.api.config.Config selectionConfig -> jI
-    net.shoreline.client.api.config.Config delayConfig -> cz
-    net.shoreline.client.api.config.Config startDelayConfig -> ka
-    net.shoreline.client.api.config.Config ghostFixConfig -> kb
-    net.shoreline.client.api.config.Config whitelistConfig -> jJ
-    net.shoreline.client.api.config.Config blacklistConfig -> eT
+    net.shoreline.client.api.config.Config selectionConfig -> jJ
+    net.shoreline.client.api.config.Config delayConfig -> cA
+    net.shoreline.client.api.config.Config startDelayConfig -> kb
+    net.shoreline.client.api.config.Config ghostFixConfig -> kc
+    net.shoreline.client.api.config.Config whitelistConfig -> jK
+    net.shoreline.client.api.config.Config blacklistConfig -> eU
     net.shoreline.client.util.math.timer.CacheTimer startTimer -> c
     35:47:void <init>() -> <init>
     52:71:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
@@ -7270,7 +7273,7 @@ net.shoreline.client.impl.module.world.MultitaskModule -> net.shoreline.client.n
     22:23:void onItemMultitask(net.shoreline.client.impl.event.ItemMultitaskEvent) -> a
 net.shoreline.client.impl.module.world.NoGlitchBlocksModule -> net.shoreline.client.nu:
     net.shoreline.client.api.config.Config placeConfig -> k
-    net.shoreline.client.api.config.Config destroyConfig -> kc
+    net.shoreline.client.api.config.Config destroyConfig -> kd
     20:26:void <init>() -> <init>
     34:40:void onInteractBlock(net.shoreline.client.impl.event.network.InteractBlockEvent) -> a
     48:52:void onBreakBlock(net.shoreline.client.impl.event.network.BreakBlockEvent) -> a
@@ -7279,9 +7282,9 @@ net.shoreline.client.impl.module.world.NukerModule -> net.shoreline.client.nv:
     net.shoreline.client.api.config.Config modeConfig -> aJ
     net.shoreline.client.api.config.Config rangeConfig -> j
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config flattenConfig -> kd
-    net.shoreline.client.api.config.Config doubleBreakConfig -> jN
-    net.shoreline.client.api.config.Config swapConfig -> jO
+    net.shoreline.client.api.config.Config flattenConfig -> ke
+    net.shoreline.client.api.config.Config doubleBreakConfig -> jO
+    net.shoreline.client.api.config.Config swapConfig -> jP
     net.shoreline.client.api.config.Config rotateConfig -> aX
     net.shoreline.client.api.config.Config grimConfig -> h
     java.util.List miningBlocks -> H
@@ -7315,15 +7318,15 @@ net.shoreline.client.impl.module.world.NukerModule$Swap -> net.shoreline.client.
     138:138:net.shoreline.client.impl.module.world.NukerModule$Swap[] $values() -> a
     138:143:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.ScaffoldModule -> net.shoreline.client.nz:
-    net.shoreline.client.api.config.Config grimNewConfig -> fT
-    net.shoreline.client.api.config.Config selectionConfig -> jI
-    net.shoreline.client.api.config.Config whitelistConfig -> jJ
-    net.shoreline.client.api.config.Config blacklistConfig -> eT
+    net.shoreline.client.api.config.Config grimNewConfig -> fU
+    net.shoreline.client.api.config.Config selectionConfig -> jJ
+    net.shoreline.client.api.config.Config whitelistConfig -> jK
+    net.shoreline.client.api.config.Config blacklistConfig -> eU
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config rotateHoldConfig -> ke
-    net.shoreline.client.api.config.Config keepYConfig -> kf
-    net.shoreline.client.api.config.Config towerConfig -> kg
-    net.shoreline.client.api.config.Config pickerConfig -> kh
+    net.shoreline.client.api.config.Config rotateHoldConfig -> kf
+    net.shoreline.client.api.config.Config keepYConfig -> kg
+    net.shoreline.client.api.config.Config towerConfig -> kh
+    net.shoreline.client.api.config.Config pickerConfig -> ki
     net.shoreline.client.api.config.Config renderConfig -> bl
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
     java.util.Map fadeList -> S
@@ -7378,18 +7381,18 @@ net.shoreline.client.impl.module.world.SpeedmineModule -> net.shoreline.client.n
     net.shoreline.client.impl.module.world.SpeedmineModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aJ
     net.shoreline.client.api.config.Config multitaskConfig -> i
-    net.shoreline.client.api.config.Config doubleBreakConfig -> jN
+    net.shoreline.client.api.config.Config doubleBreakConfig -> jO
     net.shoreline.client.api.config.Config rangeConfig -> j
     net.shoreline.client.api.config.Config speedConfig -> al
-    net.shoreline.client.api.config.Config swapConfig -> jO
+    net.shoreline.client.api.config.Config swapConfig -> jP
     net.shoreline.client.api.config.Config rotateConfig -> aX
-    net.shoreline.client.api.config.Config switchResetConfig -> jQ
+    net.shoreline.client.api.config.Config switchResetConfig -> jR
     net.shoreline.client.api.config.Config grimConfig -> h
-    net.shoreline.client.api.config.Config grimNewConfig -> fT
+    net.shoreline.client.api.config.Config grimNewConfig -> fU
     net.shoreline.client.api.config.Config colorConfig -> R
-    net.shoreline.client.api.config.Config colorDoneConfig -> jU
+    net.shoreline.client.api.config.Config colorDoneConfig -> jV
     net.shoreline.client.api.config.Config fadeTimeConfig -> bx
-    net.shoreline.client.api.config.Config smoothColorConfig -> jV
+    net.shoreline.client.api.config.Config smoothColorConfig -> jW
     java.util.Map fadeList -> T
     net.shoreline.client.util.collection.FirstOutQueue miningQueue -> a
     long lastBreak -> p
@@ -7487,9 +7490,9 @@ net.shoreline.client.impl.module.world.SpeedmineModule$Swap -> net.shoreline.cli
     712:712:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] $values() -> a
     712:717:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.XRayModule -> net.shoreline.client.nI:
-    net.shoreline.client.api.config.Config opacityConfig -> ki
-    net.shoreline.client.api.config.Config softReloadConfig -> iC
-    net.shoreline.client.api.config.Config blocksConfig -> dU
+    net.shoreline.client.api.config.Config opacityConfig -> kj
+    net.shoreline.client.api.config.Config softReloadConfig -> iD
+    net.shoreline.client.api.config.Config blocksConfig -> dV
     16:34:void <init>() -> <init>
 net.shoreline.client.init.Fonts -> net.shoreline.client.lH:
     net.shoreline.client.impl.font.VanillaTextRenderer VANILLA -> a
@@ -8811,11 +8814,11 @@ net.shoreline.client.util.world.BlastResistantBlocks -> net.shoreline.client.rT:
     java.util.Set BLAST_RESISTANT -> r
     java.util.Set UNBREAKABLE -> s
     12:12:void <init>() -> <init>
-    37:41:boolean isBreakable(net.minecraft.class_2338) -> l
+    37:41:boolean isBreakable(net.minecraft.class_2338) -> m
     53:53:boolean isBreakable(net.minecraft.class_2248) -> c
-    62:66:boolean isUnbreakable(net.minecraft.class_2338) -> m
+    62:66:boolean isUnbreakable(net.minecraft.class_2338) -> n
     75:75:boolean isUnbreakable(net.minecraft.class_2248) -> d
-    84:88:boolean isBlastResistant(net.minecraft.class_2338) -> n
+    84:88:boolean isBlastResistant(net.minecraft.class_2338) -> o
     97:97:boolean isBlastResistant(net.minecraft.class_2680) -> c
     107:107:boolean isBlastResistant(net.minecraft.class_2248) -> e
     15:23:void <clinit>() -> <clinit>
@@ -8823,7 +8826,7 @@ net.shoreline.client.util.world.BlockUtil -> net.shoreline.client.rU:
     17:17:void <init>() -> <init>
     24:29:java.util.List blockEntities() -> q
     39:53:java.util.List loadedChunks() -> r
-    62:63:boolean isBlockAccessible(net.minecraft.class_2338) -> o
+    62:63:boolean isBlockAccessible(net.minecraft.class_2338) -> p
     74:80:boolean isBlockLoaded(double,double) -> b
 net.shoreline.client.util.world.DimensionUtil -> net.shoreline.client.rV:
     7:7:void <init>() -> <init>
