@@ -74,7 +74,7 @@ public class AntiInteractModule extends ToggleModule
                 || packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK
                 || packet.getAction() == PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK))
         {
-            if (BlastResistantBlocks.isUnbreakable(packet.getPos()))
+            if (BlastResistantBlocks.isUnbreakable(packet.getPos()) || mc.world.isAir(packet.getPos()))
             {
                 event.cancel();
                 return;

@@ -34,7 +34,7 @@ public final class ServerModule extends ConcurrentModule
 
     public ServerModule()
     {
-        super("Server", "Prevents servers actions on player", ModuleCategory.CLIENT);
+        super("Server", "Prevents servers actions on player", ModuleCategory.MISCELLANEOUS);
     }
 
     @EventListener
