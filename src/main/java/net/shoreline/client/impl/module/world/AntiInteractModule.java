@@ -69,7 +69,10 @@ public class AntiInteractModule extends ToggleModule
             }
         }
 
-        if (miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet)
+        if (miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
+                && (packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
+                || packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK
+                || packet.getAction() == PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK))
         {
             if (BlastResistantBlocks.isUnbreakable(packet.getPos()))
             {
