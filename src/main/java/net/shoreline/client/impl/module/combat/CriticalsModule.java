@@ -189,12 +189,19 @@ public class CriticalsModule extends ToggleModule
 
                 if (attackTimer.passed(250) && mc.player.isOnGround() && !mc.player.isCrawling())
                 {
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.0625, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 0.0625013579, z, false));
-                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
-                            x, y + 1.3579e-6, z, false));
+                    float yaw = Managers.ROTATION.getServerYaw();
+                    float pitch = Managers.ROTATION.getServerPitch();
+                    if (Managers.ROTATION.isRotating())
+                    {
+                        yaw = Managers.ROTATION.getRotationYaw();
+                        pitch = Managers.ROTATION.getRotationPitch();
+                    }
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y + 0.0625, z, yaw, pitch, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y + 0.0625013579, z, yaw, pitch, false));
+                    Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+                            x, y + 1.3579e-6, z, yaw, pitch, false));
                     attackTimer.reset();
                 }
 //                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
