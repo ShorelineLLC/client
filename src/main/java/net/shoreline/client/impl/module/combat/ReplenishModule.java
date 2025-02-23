@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
@@ -10,6 +11,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -32,7 +34,6 @@ public class ReplenishModule extends ToggleModule
 
     private final Timer lastDroppedTimer = new CacheTimer();
 
-
     public ReplenishModule()
     {
         super("Replenish", "Automatically replaces items in your hotbar", ModuleCategory.COMBAT);
@@ -47,53 +48,47 @@ public class ReplenishModule extends ToggleModule
     @EventListener
     public void onTick(PlayerTickEvent event)
     {
-        if (mc.player.age < 10)
-        {
-            hotbarCache.clear();
-            return;
-        }
-
         if (mc.options.dropKey.isPressed())
         {
             lastDroppedTimer.reset();
         }
 
-        boolean pauseReplenish = isInInventoryScreen() || !lastDroppedTimer.passed(100);
-
-        if (!pauseReplenish)
+        if (isInInventoryScreen() || !lastDroppedTimer.passed(100))
         {
-            for (int i = 0; i < 9; i++)
+            return;
+        }
+
+        for (int i = 0; i < 9; i++)
+        {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (stack.isEmpty())
             {
-                ItemStack stack = mc.player.getInventory().getStack(i);
-                if (stack.isEmpty())
+                ItemStack cachedStack = hotbarCache.getOrDefault(i, null);
+                if (cachedStack != null && !cachedStack.isEmpty())
                 {
-                    ItemStack cachedStack = hotbarCache.getOrDefault(i, null);
-                    if (cachedStack != null && !cachedStack.isEmpty())
-                    {
-                        replenishStack(i, cachedStack);
-                        break;
-                    }
-                    continue;
-                }
-
-                if (!stack.isStackable())
-                {
-                    continue;
-                }
-
-                double percentage = ((double) stack.getCount() / stack.getMaxCount()) * 100.0;
-                if (percentage <= percentConfig.getValue())
-                {
-                    replenishStack(i, stack);
+                    replenishStack(i, cachedStack);
                     break;
                 }
+                continue;
+            }
+
+            if (!stack.isStackable())
+            {
+                continue;
+            }
+
+            double percentage = ((double) stack.getCount() / stack.getMaxCount()) * 100.0;
+            if (percentage <= percentConfig.getValue())
+            {
+                replenishStack(i, stack);
+                break;
             }
         }
 
         for (int i = 0; i < 9; i++)
         {
             ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.isEmpty() && !pauseReplenish)
+            if (stack.isEmpty())
             {
                 continue;
             }
@@ -106,6 +101,15 @@ public class ReplenishModule extends ToggleModule
             {
                 hotbarCache.put(i, stack);
             }
+        }
+    }
+
+    @EventListener
+    public void onRemoveEntity(EntityDeathEvent event)
+    {
+        if (event.getEntity() instanceof ClientPlayerEntity)
+        {
+            hotbarCache.clear();
         }
     }
 
