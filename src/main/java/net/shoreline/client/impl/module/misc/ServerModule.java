@@ -9,8 +9,8 @@ import net.minecraft.network.packet.s2c.play.*;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.gui.screen.MenuDisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.init.Managers;
@@ -25,7 +25,7 @@ import static net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket.DEM
  * @author xgraza
  * @since 1.0
  */
-public final class ServerModule extends ConcurrentModule
+public final class ServerModule extends ToggleModule
 {
     Config<Boolean> demoConfig = register(new BooleanConfig("NoDemo", "Prevents servers from forcing you to a demo screen", true));
     Config<Boolean> resourcePackConfig = register(new BooleanConfig("NoResourcePack", "Prevents server from forcing resource pack", false));
@@ -79,9 +79,9 @@ public final class ServerModule extends ConcurrentModule
                 event.cancel();
             }
             else if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet
-                    && (packet.getVelocityX() > 1000 || packet.getVelocityY() > 1000 ||
-                    packet.getVelocityZ() > 1000 || packet.getVelocityX() < -1000 ||
-                    packet.getVelocityY() < -1000 || packet.getVelocityZ() < -1000))
+                    && (packet.getVelocityX() > 10000 || packet.getVelocityY() > 10000 ||
+                    packet.getVelocityZ() > 10000 || packet.getVelocityX() < -10000 ||
+                    packet.getVelocityY() < -10000 || packet.getVelocityZ() < -10000))
             {
                 event.cancel();
             }

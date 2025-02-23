@@ -32,7 +32,7 @@ public class AntiInteractModule extends ToggleModule
     //
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist"));
     Config<Boolean> miningConfig = register(new BooleanConfig("Mining", "Prevents mining", false));
-    Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> false));
+    // Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> false));
     Config<Boolean> borderConfig = register(new BooleanConfig("Border", "Prevents interacting with the world border", true));
 
     public AntiInteractModule()
@@ -87,16 +87,16 @@ public class AntiInteractModule extends ToggleModule
                 return;
             }
 
-            if (miningFixConfig.getValue() && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK)
-            {
-                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, packet.getPos(), packet.getDirection()));
-                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, packet.getPos(), packet.getDirection()));
-                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos(), packet.getDirection()));
-                event.cancel();
-            }
+//            if (miningFixConfig.getValue() && packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK)
+//            {
+//                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
+//                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, packet.getPos(), packet.getDirection()));
+//                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
+//                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, packet.getPos(), packet.getDirection()));
+//                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
+//                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos(), packet.getDirection()));
+//                event.cancel();
+//            }
         }
     }
 
