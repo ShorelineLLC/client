@@ -4159,35 +4159,35 @@ net.shoreline.client.impl.module.combat.AutoCrystalModule -> net.shoreline.clien
     1085:1101:boolean attackRangeCheck(net.minecraft.class_243) -> a
     1106:1205:net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData calculatePlaceCrystal(java.util.List,java.util.List) -> a
     1214:1237:boolean placeRangeCheck(net.minecraft.class_2338) -> e
-    1242:1258:void placeForceCrystal(net.minecraft.class_1657,net.minecraft.class_2338) -> a
-    1262:1262:boolean checkOverrideSafety(boolean,double,net.minecraft.class_1297) -> a
-    1267:1272:boolean targetDamageCheck(net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData) -> a
-    1277:1286:boolean playerDamageCheck(double) -> a
-    1291:1308:boolean isFeetSurrounded(net.minecraft.class_1309) -> a
-    1313:1325:boolean checkAntiTotem(double,net.minecraft.class_1309) -> a
-    1330:1330:boolean isCrystalLethalTo(net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData,net.minecraft.class_1309) -> a
-    1335:1375:boolean isCrystalLethalTo(double,net.minecraft.class_1309) -> b
-    1380:1388:boolean attackCheckPre(net.minecraft.class_1268) -> a
-    1393:1394:boolean checkCanUseCrystal() -> aj
-    1399:1403:boolean isHoldingCrystal() -> ak
-    1408:1408:net.minecraft.class_243 crystalDamageVec(net.minecraft.class_2338) -> a
-    1419:1422:boolean isValidTarget(net.minecraft.class_1297) -> d
-    1435:1459:boolean canUseCrystalOnBlock(net.minecraft.class_2338) -> f
-    1465:1492:java.util.List getEntitiesBlockingCrystal(net.minecraft.class_238) -> a
-    1497:1501:boolean intersectingAntiStuckCheck(net.minecraft.class_2338) -> g
-    1506:1507:net.minecraft.class_1511 intersectingCrystalCheck(net.minecraft.class_2338) -> a
-    1512:1513:java.util.List getSphere(net.minecraft.class_243) -> a
-    1518:1532:java.util.List getSphere(double,net.minecraft.class_243) -> a
-    1537:1537:boolean canHoldCrystal() -> al
-    1542:1552:net.minecraft.class_1268 getCrystalHand() -> b
-    1557:1557:float getBreakDelay() -> Z
-    1564:1564:void setStage(java.lang.String) -> D
-    1568:1583:int getBreakMs() -> ai
-    1588:1588:boolean getPreForcePlace() -> am
-    1593:1593:boolean getIgnoreTerrain() -> an
-    1507:1507:double lambda$intersectingCrystalCheck$31(net.minecraft.class_1297) -> c
-    1507:1507:boolean lambda$intersectingCrystalCheck$30(net.minecraft.class_1297) -> g
-    1501:1501:boolean lambda$intersectingAntiStuckCheck$29(net.minecraft.class_2338,net.shoreline.client.impl.module.combat.AutoCrystalModule$AntiStuckData) -> a
+    1242:1264:void placeForceCrystal(net.minecraft.class_1657,net.minecraft.class_2338) -> a
+    1268:1268:boolean checkOverrideSafety(boolean,double,net.minecraft.class_1297) -> a
+    1273:1278:boolean targetDamageCheck(net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData) -> a
+    1283:1292:boolean playerDamageCheck(double) -> a
+    1297:1314:boolean isFeetSurrounded(net.minecraft.class_1309) -> a
+    1319:1331:boolean checkAntiTotem(double,net.minecraft.class_1309) -> a
+    1336:1336:boolean isCrystalLethalTo(net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData,net.minecraft.class_1309) -> a
+    1341:1381:boolean isCrystalLethalTo(double,net.minecraft.class_1309) -> b
+    1386:1394:boolean attackCheckPre(net.minecraft.class_1268) -> a
+    1399:1400:boolean checkCanUseCrystal() -> aj
+    1405:1409:boolean isHoldingCrystal() -> ak
+    1414:1414:net.minecraft.class_243 crystalDamageVec(net.minecraft.class_2338) -> a
+    1425:1428:boolean isValidTarget(net.minecraft.class_1297) -> d
+    1441:1465:boolean canUseCrystalOnBlock(net.minecraft.class_2338) -> f
+    1471:1498:java.util.List getEntitiesBlockingCrystal(net.minecraft.class_238) -> a
+    1503:1507:boolean intersectingAntiStuckCheck(net.minecraft.class_2338) -> g
+    1512:1513:net.minecraft.class_1511 intersectingCrystalCheck(net.minecraft.class_2338) -> a
+    1518:1519:java.util.List getSphere(net.minecraft.class_243) -> a
+    1524:1538:java.util.List getSphere(double,net.minecraft.class_243) -> a
+    1543:1543:boolean canHoldCrystal() -> al
+    1548:1558:net.minecraft.class_1268 getCrystalHand() -> b
+    1563:1563:float getBreakDelay() -> Z
+    1570:1570:void setStage(java.lang.String) -> D
+    1574:1589:int getBreakMs() -> ai
+    1594:1594:boolean getPreForcePlace() -> am
+    1599:1599:boolean getIgnoreTerrain() -> an
+    1513:1513:double lambda$intersectingCrystalCheck$31(net.minecraft.class_1297) -> c
+    1513:1513:boolean lambda$intersectingCrystalCheck$30(net.minecraft.class_1297) -> g
+    1507:1507:boolean lambda$intersectingAntiStuckCheck$29(net.minecraft.class_2338,net.shoreline.client.impl.module.combat.AutoCrystalModule$AntiStuckData) -> a
     1200:1200:double lambda$calculatePlaceCrystal$28(net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData) -> a
     1066:1066:double lambda$calculateAttackCrystal$27(net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData) -> b
     973:973:boolean lambda$calculateAttackCrystal$26(net.minecraft.class_1297,net.shoreline.client.impl.module.combat.AutoCrystalModule$AntiStuckData) -> a
@@ -4223,20 +4223,20 @@ net.shoreline.client.impl.module.combat.AutoCrystalModule$AntiStuckData -> net.s
     net.minecraft.class_2338 blockPos -> m
     net.minecraft.class_243 pos -> j
     double stuckDist -> v
-    1631:1631:void <init>(int,net.minecraft.class_2338,net.minecraft.class_243,double) -> <init>
-    1631:1631:java.lang.String toString() -> toString
-    1631:1631:int hashCode() -> hashCode
-    1631:1631:boolean equals(java.lang.Object) -> equals
-    1631:1631:int id() -> aj
-    1631:1631:net.minecraft.class_2338 blockPos() -> d
-    1631:1631:net.minecraft.class_243 pos() -> l
-    1631:1631:double stuckDist() -> k
+    1637:1637:void <init>(int,net.minecraft.class_2338,net.minecraft.class_243,double) -> <init>
+    1637:1637:java.lang.String toString() -> toString
+    1637:1637:int hashCode() -> hashCode
+    1637:1637:boolean equals(java.lang.Object) -> equals
+    1637:1637:int id() -> aj
+    1637:1637:net.minecraft.class_2338 blockPos() -> d
+    1637:1637:net.minecraft.class_243 pos() -> l
+    1637:1637:double stuckDist() -> k
 net.shoreline.client.impl.module.combat.AutoCrystalModule$AttackCrystalTask -> net.shoreline.client.iZ:
     java.util.List threadSafeEntities -> x
     net.shoreline.client.impl.module.combat.AutoCrystalModule this$0 -> b
-    1716:1718:void <init>(net.shoreline.client.impl.module.combat.AutoCrystalModule,java.util.List) -> <init>
-    1723:1723:net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData call() -> a
-    1711:1711:java.lang.Object call() -> call
+    1722:1724:void <init>(net.shoreline.client.impl.module.combat.AutoCrystalModule,java.util.List) -> <init>
+    1729:1729:net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData call() -> a
+    1717:1717:java.lang.Object call() -> call
 net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData -> net.shoreline.client.ja:
     java.util.List tags -> y
     java.lang.Object damageData -> e
@@ -4245,73 +4245,73 @@ net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData -> net.shor
     double damage -> w
     double selfDamage -> x
     boolean antiSurround -> ai
-    1636:1648:void <init>() -> <init>
-    1636:1659:void <init>(net.minecraft.class_2338,net.minecraft.class_1297,double,double,boolean) -> <init>
-    1636:1670:void <init>(java.lang.Object,net.minecraft.class_1297,double,double,net.minecraft.class_2338,boolean) -> <init>
-    1674:1678:void setDamageData(java.lang.Object,net.minecraft.class_1297,double,double) -> a
-    1682:1682:java.lang.Object getDamageData() -> b
-    1687:1687:net.minecraft.class_1297 getAttackTarget() -> f
-    1692:1692:double getDamage() -> l
-    1697:1697:double getSelfDamage() -> m
-    1702:1702:net.minecraft.class_2338 getBlockPos() -> b
-    1707:1707:boolean isAntiSurround() -> ao
+    1642:1654:void <init>() -> <init>
+    1642:1665:void <init>(net.minecraft.class_2338,net.minecraft.class_1297,double,double,boolean) -> <init>
+    1642:1676:void <init>(java.lang.Object,net.minecraft.class_1297,double,double,net.minecraft.class_2338,boolean) -> <init>
+    1680:1684:void setDamageData(java.lang.Object,net.minecraft.class_1297,double,double) -> a
+    1688:1688:java.lang.Object getDamageData() -> b
+    1693:1693:net.minecraft.class_1297 getAttackTarget() -> f
+    1698:1698:double getDamage() -> l
+    1703:1703:double getSelfDamage() -> m
+    1708:1708:net.minecraft.class_2338 getBlockPos() -> b
+    1713:1713:boolean isAntiSurround() -> ao
 net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace -> net.shoreline.client.jb:
     net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace PRE -> a
     net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace POST -> b
     net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace NONE -> c
     net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace[] $VALUES -> a
-    1611:1611:net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace[] values() -> values
-    1611:1611:net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace valueOf(java.lang.String) -> valueOf
-    1611:1611:void <init>(java.lang.String,int) -> <init>
-    1611:1611:net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace[] $values() -> a
-    1611:1615:void <clinit>() -> <clinit>
+    1617:1617:net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace[] values() -> values
+    1617:1617:net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace valueOf(java.lang.String) -> valueOf
+    1617:1617:void <init>(java.lang.String,int) -> <init>
+    1617:1617:net.shoreline.client.impl.module.combat.AutoCrystalModule$ForcePlace[] $values() -> a
+    1617:1621:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.AutoCrystalModule$PlaceCrystalTask -> net.shoreline.client.jc:
     java.util.List threadSafeBlocks -> z
     java.util.List threadSafeEntities -> A
     net.shoreline.client.impl.module.combat.AutoCrystalModule this$0 -> c
-    1734:1737:void <init>(net.shoreline.client.impl.module.combat.AutoCrystalModule,java.util.List,java.util.List) -> <init>
-    1742:1742:net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData call() -> a
-    1727:1727:java.lang.Object call() -> call
+    1740:1743:void <init>(net.shoreline.client.impl.module.combat.AutoCrystalModule,java.util.List,java.util.List) -> <init>
+    1748:1748:net.shoreline.client.impl.module.combat.AutoCrystalModule$DamageData call() -> a
+    1733:1733:java.lang.Object call() -> call
 net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements -> net.shoreline.client.jd:
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements NATIVE -> a
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements PROTOCOL -> b
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements[] $VALUES -> a
-    1618:1618:net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements[] values() -> values
-    1618:1618:net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements valueOf(java.lang.String) -> valueOf
-    1618:1618:void <init>(java.lang.String,int) -> <init>
-    1618:1618:net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements[] $values() -> a
-    1618:1621:void <clinit>() -> <clinit>
+    1624:1624:net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements[] values() -> values
+    1624:1624:net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements valueOf(java.lang.String) -> valueOf
+    1624:1624:void <init>(java.lang.String,int) -> <init>
+    1624:1624:net.shoreline.client.impl.module.combat.AutoCrystalModule$Placements[] $values() -> a
+    1624:1627:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate -> net.shoreline.client.je:
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate FULL -> a
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate SEMI -> b
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate OFF -> c
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate[] $VALUES -> a
-    1624:1624:net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate[] values() -> values
-    1624:1624:net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate valueOf(java.lang.String) -> valueOf
-    1624:1624:void <init>(java.lang.String,int) -> <init>
-    1624:1624:net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate[] $values() -> a
-    1624:1628:void <clinit>() -> <clinit>
+    1630:1630:net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate[] values() -> values
+    1630:1630:net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate valueOf(java.lang.String) -> valueOf
+    1630:1630:void <init>(java.lang.String,int) -> <init>
+    1630:1630:net.shoreline.client.impl.module.combat.AutoCrystalModule$Rotate[] $values() -> a
+    1630:1634:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential -> net.shoreline.client.jf:
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential NORMAL -> a
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential STRICT -> b
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential NONE -> c
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential[] $VALUES -> a
-    1604:1604:net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential[] values() -> values
-    1604:1604:net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential valueOf(java.lang.String) -> valueOf
-    1604:1604:void <init>(java.lang.String,int) -> <init>
-    1604:1604:net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential[] $values() -> a
-    1604:1608:void <clinit>() -> <clinit>
+    1610:1610:net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential[] values() -> values
+    1610:1610:net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential valueOf(java.lang.String) -> valueOf
+    1610:1610:void <init>(java.lang.String,int) -> <init>
+    1610:1610:net.shoreline.client.impl.module.combat.AutoCrystalModule$Sequential[] $values() -> a
+    1610:1614:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap -> net.shoreline.client.jg:
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap NORMAL -> a
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap SILENT -> b
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap SILENT_ALT -> c
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap OFF -> d
     net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap[] $VALUES -> a
-    1596:1596:net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap[] values() -> values
-    1596:1596:net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap valueOf(java.lang.String) -> valueOf
-    1596:1596:void <init>(java.lang.String,int) -> <init>
-    1596:1596:net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap[] $values() -> a
-    1596:1601:void <clinit>() -> <clinit>
+    1602:1602:net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap[] values() -> values
+    1602:1602:net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap valueOf(java.lang.String) -> valueOf
+    1602:1602:void <init>(java.lang.String,int) -> <init>
+    1602:1602:net.shoreline.client.impl.module.combat.AutoCrystalModule$Swap[] $values() -> a
+    1602:1607:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.AutoLogModule -> net.shoreline.client.jh:
     net.shoreline.client.api.config.Config healthConfig -> cr
     net.shoreline.client.api.config.Config healthTotemConfig -> cs
@@ -4620,11 +4620,12 @@ net.shoreline.client.impl.module.combat.ReplenishModule -> net.shoreline.client.
     net.shoreline.client.api.config.Config percentConfig -> da
     java.util.Map hotbarCache -> A
     net.shoreline.client.util.math.timer.Timer lastDroppedTimer -> u
-    28:39:void <init>() -> <init>
-    44:45:void onDisable() -> v
-    50:110:void onTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
-    114:114:boolean isInInventoryScreen() -> aw
-    119:161:void replenishStack(int,net.minecraft.class_1799) -> a
+    30:40:void <init>() -> <init>
+    45:46:void onDisable() -> v
+    51:105:void onTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
+    110:114:void onRemoveEntity(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> a
+    118:118:boolean isInInventoryScreen() -> aw
+    123:165:void replenishStack(int,net.minecraft.class_1799) -> a
 net.shoreline.client.impl.module.combat.SelfBowModule -> net.shoreline.client.jz:
     net.shoreline.client.impl.module.combat.SelfBowModule INSTANCE -> a
     int pullTicks -> an
@@ -5291,8 +5292,8 @@ net.shoreline.client.impl.module.misc.AutoTradeModule -> net.shoreline.client.kE
     net.shoreline.client.api.config.Config baritoneConfig -> eE
     net.shoreline.client.util.math.timer.Timer delayTimer -> J
     java.util.List interactedEntities -> F
-    40:59:void <init>() -> <init>
-    64:106:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    40:53:void <init>() -> <init>
+    58:101:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     44:44:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.misc.BeaconSelectorModule -> net.shoreline.client.kF:
     net.minecraft.class_1291 primaryEffect -> a
@@ -7025,12 +7026,13 @@ net.shoreline.client.impl.module.world.AirPlaceModule -> net.shoreline.client.nb
     158:165:boolean isEntityInBlockPos(net.minecraft.class_2338) -> k
 net.shoreline.client.impl.module.world.AntiInteractModule -> net.shoreline.client.nc:
     net.shoreline.client.api.config.Config blacklistConfig -> eU
-    net.shoreline.client.api.config.Config miningFixConfig -> jH
+    net.shoreline.client.api.config.Config miningConfig -> jH
     net.shoreline.client.api.config.Config borderConfig -> jI
-    33:40:void <init>() -> <init>
-    45:53:void onInteractBlock(net.shoreline.client.impl.event.network.InteractBlockEvent) -> a
-    58:94:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    99:104:void onInteractBorder(net.shoreline.client.impl.event.network.InteractBorderEvent) -> a
+    33:41:void <init>() -> <init>
+    46:54:void onInteractBlock(net.shoreline.client.impl.event.network.InteractBlockEvent) -> a
+    59:101:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
+    106:111:void onInteractBorder(net.shoreline.client.impl.event.network.InteractBorderEvent) -> a
+    116:120:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
 net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nd:
     net.shoreline.client.impl.module.world.AutoMineModule INSTANCE -> a
     net.shoreline.client.api.config.Config autoConfig -> cZ
@@ -7072,90 +7074,89 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nd
     boolean silentSwapping -> aR
     net.shoreline.client.util.math.timer.Timer stopMiningTimer -> S
     int tickDelay -> aL
-    61:107:void <init>() -> <init>
-    111:111:net.shoreline.client.impl.module.world.AutoMineModule getInstance() -> a
-    117:122:java.lang.String getModuleData() -> x
-    128:137:void onDisable() -> v
-    142:150:void onEnable() -> u
-    155:159:void onTickPost(net.shoreline.client.impl.event.TickEvent) -> e
-    164:452:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
-    457:504:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
-    509:516:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    521:541:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    545:578:void handleBlockUpdatePacket(net.minecraft.class_2626) -> a
-    583:594:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
-    599:659:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    663:668:void startManualMine(net.minecraft.class_2338,net.minecraft.class_2350) -> a
-    672:673:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350) -> b
-    677:691:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350,boolean) -> a
-    695:703:void queueMiningData(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
-    707:707:java.util.List getPhasePosition(net.minecraft.class_1657) -> e
-    712:738:java.util.List getPhasePosition(net.minecraft.class_1657,net.minecraft.class_2338) -> a
-    750:849:java.util.PriorityQueue getMiningPosition(net.minecraft.class_1657) -> a
-    854:872:net.minecraft.class_2338 getCrawlingMine(net.minecraft.class_1657) -> a
-    896:898:void removeQueuedMine() -> ap
-    902:904:void removeQueuedMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
-    908:910:void removeIfQueuedMine(java.util.function.Predicate) -> a
-    914:937:void updateOverrides() -> aq
-    941:1001:boolean startMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
-    1006:1013:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
-    1017:1062:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
-    1066:1072:void swapTo(int) -> z
-    1076:1081:void swapSync(int) -> A
-    1085:1089:void stopMiningInternal(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> e
-    1094:1094:boolean isBlockDelayGrim() -> aW
-    1099:1099:boolean isDataPacketMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
-    1104:1104:boolean validAutoMineBlock(net.minecraft.class_2338) -> l
-    1109:1117:boolean validAutoMineBlock(net.minecraft.class_2248) -> a
-    1123:1128:net.minecraft.class_2338 getMiningBlock() -> e
-    1133:1133:boolean isSilentSwapping() -> aX
-    1125:1126:boolean lambda$getMiningBlock$17(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
-    1010:1011:net.minecraft.class_2596 lambda$abortMining$16(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> a
-    988:989:net.minecraft.class_2596 lambda$startMining$15(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> b
-    814:814:boolean lambda$getMiningPosition$14(net.minecraft.class_2338,net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
-    695:695:boolean lambda$queueMiningData$13(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
-    657:657:boolean lambda$onRenderWorld$12(java.util.Map$Entry) -> j
-    362:362:boolean lambda$onPlayerTick$11(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
-    227:227:boolean lambda$onPlayerTick$10(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
-    89:89:java.lang.Boolean lambda$new$9() -> c
-    88:88:java.lang.Boolean lambda$new$8() -> d
-    84:84:java.lang.Boolean lambda$new$7() -> e
-    83:83:java.lang.Boolean lambda$new$6() -> f
-    75:75:java.lang.Boolean lambda$new$5() -> g
-    68:68:java.lang.Boolean lambda$new$4() -> h
-    67:67:java.lang.Boolean lambda$new$3() -> i
-    66:66:java.lang.Boolean lambda$new$2() -> j
-    65:65:java.lang.Boolean lambda$new$1() -> a
-    62:62:java.lang.Boolean lambda$new$0() -> k
+    60:106:void <init>() -> <init>
+    110:110:net.shoreline.client.impl.module.world.AutoMineModule getInstance() -> a
+    116:121:java.lang.String getModuleData() -> x
+    127:136:void onDisable() -> v
+    141:149:void onEnable() -> u
+    154:158:void onTickPost(net.shoreline.client.impl.event.TickEvent) -> e
+    163:451:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
+    456:503:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
+    508:515:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
+    520:540:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    544:577:void handleBlockUpdatePacket(net.minecraft.class_2626) -> a
+    582:593:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
+    598:658:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
+    662:667:void startManualMine(net.minecraft.class_2338,net.minecraft.class_2350) -> a
+    671:672:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350) -> b
+    676:690:void startAutoMine(net.minecraft.class_2338,net.minecraft.class_2350,boolean) -> a
+    694:702:void queueMiningData(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
+    706:706:java.util.List getPhasePosition(net.minecraft.class_1657) -> e
+    711:737:java.util.List getPhasePosition(net.minecraft.class_1657,net.minecraft.class_2338) -> a
+    749:848:java.util.PriorityQueue getMiningPosition(net.minecraft.class_1657) -> a
+    853:876:net.minecraft.class_2338 getCrawlingMine(net.minecraft.class_1657) -> a
+    900:902:void removeQueuedMine() -> ap
+    906:908:void removeQueuedMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
+    912:914:void removeIfQueuedMine(java.util.function.Predicate) -> a
+    918:941:void updateOverrides() -> aq
+    945:1009:boolean startMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
+    1014:1021:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
+    1025:1070:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
+    1074:1080:void swapTo(int) -> z
+    1084:1089:void swapSync(int) -> A
+    1093:1097:void stopMiningInternal(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> e
+    1102:1102:boolean isBlockDelayGrim() -> aW
+    1107:1107:boolean isDataPacketMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
+    1112:1120:boolean validAutoMineBlock(net.minecraft.class_2248) -> a
+    1126:1131:net.minecraft.class_2338 getMiningBlock() -> e
+    1136:1136:boolean isSilentSwapping() -> aX
+    1128:1129:boolean lambda$getMiningBlock$17(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
+    1018:1019:net.minecraft.class_2596 lambda$abortMining$16(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> a
+    996:997:net.minecraft.class_2596 lambda$startMining$15(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> b
+    813:813:boolean lambda$getMiningPosition$14(net.minecraft.class_2338,net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
+    694:694:boolean lambda$queueMiningData$13(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
+    656:656:boolean lambda$onRenderWorld$12(java.util.Map$Entry) -> j
+    361:361:boolean lambda$onPlayerTick$11(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
+    226:226:boolean lambda$onPlayerTick$10(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
+    88:88:java.lang.Boolean lambda$new$9() -> c
+    87:87:java.lang.Boolean lambda$new$8() -> d
+    83:83:java.lang.Boolean lambda$new$7() -> e
+    82:82:java.lang.Boolean lambda$new$6() -> f
+    74:74:java.lang.Boolean lambda$new$5() -> g
+    67:67:java.lang.Boolean lambda$new$4() -> h
+    66:66:java.lang.Boolean lambda$new$3() -> i
+    65:65:java.lang.Boolean lambda$new$2() -> j
+    64:64:java.lang.Boolean lambda$new$1() -> a
+    61:61:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl -> net.shoreline.client.ne:
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl NORMAL -> a
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl EXTRAPOLATE -> b
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl OFF -> c
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $VALUES -> a
-    1303:1303:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] values() -> values
-    1303:1303:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl valueOf(java.lang.String) -> valueOf
-    1303:1303:void <init>(java.lang.String,int) -> <init>
-    1303:1303:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $values() -> a
-    1303:1307:void <clinit>() -> <clinit>
+    1306:1306:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] values() -> values
+    1306:1306:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl valueOf(java.lang.String) -> valueOf
+    1306:1306:void <init>(java.lang.String,int) -> <init>
+    1306:1306:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $values() -> a
+    1306:1310:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc -> net.shoreline.client.nf:
     net.minecraft.class_2338 pos -> n
     double entityDamage -> K
     boolean phase -> aS
-    875:875:void <init>(net.minecraft.class_2338,double,boolean) -> <init>
-    880:880:int compareTo(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
-    886:890:boolean equals(java.lang.Object) -> equals
-    875:875:java.lang.String toString() -> toString
-    875:875:int hashCode() -> hashCode
-    875:875:net.minecraft.class_2338 pos() -> c
-    875:875:double entityDamage() -> q
-    875:875:boolean phase() -> aY
-    875:875:int compareTo(java.lang.Object) -> compareTo
+    879:879:void <init>(net.minecraft.class_2338,double,boolean) -> <init>
+    884:884:int compareTo(net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
+    890:894:boolean equals(java.lang.Object) -> equals
+    879:879:java.lang.String toString() -> toString
+    879:879:int hashCode() -> hashCode
+    879:879:net.minecraft.class_2338 pos() -> c
+    879:879:double entityDamage() -> q
+    879:879:boolean phase() -> aY
+    879:879:int compareTo(java.lang.Object) -> compareTo
 net.shoreline.client.impl.module.world.AutoMineModule$AutoMiningData -> net.shoreline.client.ng:
-    1148:1149:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1151:1152:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$CrawlMiningData -> net.shoreline.client.nh:
-    1156:1157:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1159:1160:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$ManualMiningData -> net.shoreline.client.ni:
-    1140:1141:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1143:1144:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shoreline.client.nj:
     boolean completedMine -> aT
     boolean attemptedBreak -> aU
@@ -7166,47 +7167,47 @@ net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shorelin
     float blockDamage -> aH
     boolean instantRemine -> aV
     boolean started -> Y
-    1175:1178:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
-    1182:1187:void setCompletedMine(boolean) -> t
-    1191:1191:boolean hasCompletedMine() -> aZ
-    1196:1201:void setAttemptedBreak() -> ar
-    1205:1206:void resetBreakTime() -> as
-    1210:1210:boolean hasAttemptedBreak() -> ba
-    1215:1215:boolean passedAttemptedBreakTime(long) -> c
-    1220:1220:boolean isInstantRemine() -> bb
-    1225:1226:void setInstantRemine() -> at
-    1230:1232:float damage(float) -> d
-    1237:1238:void setDamage(float) -> x
-    1242:1245:void resetDamage() -> au
-    1249:1249:net.minecraft.class_2338 getPos() -> a
-    1254:1254:net.minecraft.class_2350 getDirection() -> a
-    1259:1259:int getSlot() -> x
-    1264:1264:net.minecraft.class_2680 getState() -> a
-    1269:1269:float getBlockDamage() -> S
-    1274:1274:float getLastDamage() -> ae
-    1279:1279:boolean isStarted() -> bc
-    1284:1285:void setStarted() -> av
+    1178:1181:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1185:1190:void setCompletedMine(boolean) -> t
+    1194:1194:boolean hasCompletedMine() -> aZ
+    1199:1204:void setAttemptedBreak() -> ar
+    1208:1209:void resetBreakTime() -> as
+    1213:1213:boolean hasAttemptedBreak() -> ba
+    1218:1218:boolean passedAttemptedBreakTime(long) -> c
+    1223:1223:boolean isInstantRemine() -> bb
+    1228:1229:void setInstantRemine() -> at
+    1233:1235:float damage(float) -> d
+    1240:1241:void setDamage(float) -> x
+    1245:1248:void resetDamage() -> au
+    1252:1252:net.minecraft.class_2338 getPos() -> a
+    1257:1257:net.minecraft.class_2350 getDirection() -> a
+    1262:1262:int getSlot() -> x
+    1267:1267:net.minecraft.class_2680 getState() -> a
+    1272:1272:float getBlockDamage() -> S
+    1277:1277:float getLastDamage() -> ae
+    1282:1282:boolean isStarted() -> bc
+    1287:1288:void setStarted() -> av
 net.shoreline.client.impl.module.world.AutoMineModule$Selection -> net.shoreline.client.nk:
     net.shoreline.client.impl.module.world.AutoMineModule$Selection WHITELIST -> a
     net.shoreline.client.impl.module.world.AutoMineModule$Selection BLACKLIST -> b
     net.shoreline.client.impl.module.world.AutoMineModule$Selection ALL -> c
     net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $VALUES -> a
-    1296:1296:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] values() -> values
-    1296:1296:net.shoreline.client.impl.module.world.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
-    1296:1296:void <init>(java.lang.String,int) -> <init>
-    1296:1296:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $values() -> a
-    1296:1300:void <clinit>() -> <clinit>
+    1299:1299:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] values() -> values
+    1299:1299:net.shoreline.client.impl.module.world.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
+    1299:1299:void <init>(java.lang.String,int) -> <init>
+    1299:1299:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $values() -> a
+    1299:1303:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoMineModule$Swap -> net.shoreline.client.nl:
     net.shoreline.client.impl.module.world.AutoMineModule$Swap NORMAL -> a
     net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT -> b
     net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT_ALT -> c
     net.shoreline.client.impl.module.world.AutoMineModule$Swap OFF -> d
     net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $VALUES -> a
-    1288:1288:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] values() -> values
-    1288:1288:net.shoreline.client.impl.module.world.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
-    1288:1288:void <init>(java.lang.String,int) -> <init>
-    1288:1288:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $values() -> a
-    1288:1293:void <clinit>() -> <clinit>
+    1291:1291:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] values() -> values
+    1291:1291:net.shoreline.client.impl.module.world.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
+    1291:1291:void <init>(java.lang.String,int) -> <init>
+    1291:1291:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $values() -> a
+    1291:1296:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoToolModule -> net.shoreline.client.nm:
     net.shoreline.client.impl.module.world.AutoToolModule INSTANCE -> a
     25:27:void <init>() -> <init>
@@ -7411,18 +7412,18 @@ net.shoreline.client.impl.module.world.SpeedmineModule -> net.shoreline.client.n
     389:390:void startManualMine(net.minecraft.class_2338,net.minecraft.class_2350) -> a
     394:399:void clickMine(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
     403:415:void queueMiningData(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> b
-    419:452:boolean startMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
-    457:464:void abortMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> c
-    468:500:void stopMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> d
-    504:510:void swapTo(int) -> z
-    514:519:void swapSync(int) -> A
-    523:527:void stopMiningInternal(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> e
-    532:532:boolean isBlockDelayGrim() -> aW
-    537:537:boolean isDataPacketMine(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> b
-    542:554:float calcBlockBreakingDelta(net.minecraft.class_2680,net.minecraft.class_1922,net.minecraft.class_2338) -> a
-    560:594:float getBlockBreakingSpeed(net.minecraft.class_2680) -> a
-    599:604:boolean canHarvest(net.minecraft.class_2680) -> b
-    461:462:net.minecraft.class_2596 lambda$abortMining$12(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData,int) -> a
+    419:456:boolean startMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
+    461:468:void abortMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> c
+    472:504:void stopMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> d
+    508:514:void swapTo(int) -> z
+    518:523:void swapSync(int) -> A
+    527:531:void stopMiningInternal(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> e
+    536:536:boolean isBlockDelayGrim() -> aW
+    541:541:boolean isDataPacketMine(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> b
+    546:558:float calcBlockBreakingDelta(net.minecraft.class_2680,net.minecraft.class_1922,net.minecraft.class_2338) -> a
+    564:598:float getBlockBreakingSpeed(net.minecraft.class_2680) -> a
+    603:608:boolean canHarvest(net.minecraft.class_2680) -> b
+    465:466:net.minecraft.class_2596 lambda$abortMining$12(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData,int) -> a
     409:409:boolean lambda$queueMiningData$11(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData,net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
     383:383:boolean lambda$onRenderWorld$10(java.util.Map$Entry) -> k
     69:69:java.lang.Boolean lambda$new$9() -> c
@@ -7443,52 +7444,52 @@ net.shoreline.client.impl.module.world.SpeedmineModule$MiningData -> net.shoreli
     float lastDamage -> aT
     float blockDamage -> aH
     boolean started -> Y
-    618:621:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
-    625:630:void setAttemptedBreak(boolean) -> u
-    634:635:void resetBreakTime() -> as
-    639:639:boolean hasAttemptedBreak() -> ba
-    644:644:boolean passedAttemptedBreakTime(long) -> c
-    649:651:float damage(float) -> d
-    656:657:void setDamage(float) -> x
-    661:663:void resetDamage() -> au
-    667:667:net.minecraft.class_2338 getPos() -> a
-    672:672:net.minecraft.class_2350 getDirection() -> a
-    677:677:int getSlot() -> x
-    682:682:net.minecraft.class_2680 getState() -> a
-    687:687:float getBlockDamage() -> S
-    692:692:float getLastDamage() -> ae
-    697:697:boolean isStarted() -> bc
-    702:703:void setStarted() -> av
+    622:625:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    629:634:void setAttemptedBreak(boolean) -> u
+    638:639:void resetBreakTime() -> as
+    643:643:boolean hasAttemptedBreak() -> ba
+    648:648:boolean passedAttemptedBreakTime(long) -> c
+    653:655:float damage(float) -> d
+    660:661:void setDamage(float) -> x
+    665:667:void resetDamage() -> au
+    671:671:net.minecraft.class_2338 getPos() -> a
+    676:676:net.minecraft.class_2350 getDirection() -> a
+    681:681:int getSlot() -> x
+    686:686:net.minecraft.class_2680 getState() -> a
+    691:691:float getBlockDamage() -> S
+    696:696:float getLastDamage() -> ae
+    701:701:boolean isStarted() -> bc
+    706:707:void setStarted() -> av
 net.shoreline.client.impl.module.world.SpeedmineModule$Selection -> net.shoreline.client.nF:
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection WHITELIST -> a
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection BLACKLIST -> b
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection ALL -> c
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] $VALUES -> a
-    720:720:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] values() -> values
-    720:720:net.shoreline.client.impl.module.world.SpeedmineModule$Selection valueOf(java.lang.String) -> valueOf
-    720:720:void <init>(java.lang.String,int) -> <init>
-    720:720:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] $values() -> a
-    720:724:void <clinit>() -> <clinit>
+    724:724:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] values() -> values
+    724:724:net.shoreline.client.impl.module.world.SpeedmineModule$Selection valueOf(java.lang.String) -> valueOf
+    724:724:void <init>(java.lang.String,int) -> <init>
+    724:724:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] $values() -> a
+    724:728:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode -> net.shoreline.client.nG:
     net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode PACKET -> a
     net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode DAMAGE -> b
     net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] $VALUES -> a
-    706:706:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] values() -> values
-    706:706:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode valueOf(java.lang.String) -> valueOf
-    706:706:void <init>(java.lang.String,int) -> <init>
-    706:706:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] $values() -> a
-    706:709:void <clinit>() -> <clinit>
+    710:710:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] values() -> values
+    710:710:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode valueOf(java.lang.String) -> valueOf
+    710:710:void <init>(java.lang.String,int) -> <init>
+    710:710:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] $values() -> a
+    710:713:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.SpeedmineModule$Swap -> net.shoreline.client.nH:
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap NORMAL -> a
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap SILENT -> b
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap SILENT_ALT -> c
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap OFF -> d
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] $VALUES -> a
-    712:712:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] values() -> values
-    712:712:net.shoreline.client.impl.module.world.SpeedmineModule$Swap valueOf(java.lang.String) -> valueOf
-    712:712:void <init>(java.lang.String,int) -> <init>
-    712:712:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] $values() -> a
-    712:717:void <clinit>() -> <clinit>
+    716:716:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] values() -> values
+    716:716:net.shoreline.client.impl.module.world.SpeedmineModule$Swap valueOf(java.lang.String) -> valueOf
+    716:716:void <init>(java.lang.String,int) -> <init>
+    716:716:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] $values() -> a
+    716:721:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.XRayModule -> net.shoreline.client.nI:
     net.shoreline.client.api.config.Config opacityConfig -> kj
     net.shoreline.client.api.config.Config softReloadConfig -> iD
@@ -8814,11 +8815,11 @@ net.shoreline.client.util.world.BlastResistantBlocks -> net.shoreline.client.rT:
     java.util.Set BLAST_RESISTANT -> r
     java.util.Set UNBREAKABLE -> s
     12:12:void <init>() -> <init>
-    37:41:boolean isBreakable(net.minecraft.class_2338) -> m
+    37:41:boolean isBreakable(net.minecraft.class_2338) -> l
     53:53:boolean isBreakable(net.minecraft.class_2248) -> c
-    62:66:boolean isUnbreakable(net.minecraft.class_2338) -> n
+    62:66:boolean isUnbreakable(net.minecraft.class_2338) -> m
     75:75:boolean isUnbreakable(net.minecraft.class_2248) -> d
-    84:88:boolean isBlastResistant(net.minecraft.class_2338) -> o
+    84:88:boolean isBlastResistant(net.minecraft.class_2338) -> n
     97:97:boolean isBlastResistant(net.minecraft.class_2680) -> c
     107:107:boolean isBlastResistant(net.minecraft.class_2248) -> e
     15:23:void <clinit>() -> <clinit>
@@ -8826,7 +8827,7 @@ net.shoreline.client.util.world.BlockUtil -> net.shoreline.client.rU:
     17:17:void <init>() -> <init>
     24:29:java.util.List blockEntities() -> q
     39:53:java.util.List loadedChunks() -> r
-    62:63:boolean isBlockAccessible(net.minecraft.class_2338) -> p
+    62:63:boolean isBlockAccessible(net.minecraft.class_2338) -> o
     74:80:boolean isBlockLoaded(double,double) -> b
 net.shoreline.client.util.world.DimensionUtil -> net.shoreline.client.rV:
     7:7:void <init>() -> <init>
