@@ -140,6 +140,12 @@ public class VelocityModule extends ToggleModule
         if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet
                 && packet.getEntityId() == mc.player.getId() && knockbackConfig.getValue())
         {
+            if (concealVelocity && packet.getVelocityX() == 0.0 && packet.getVelocityY() == 0.0 && packet.getVelocityZ() == 0.0)
+            {
+                concealVelocity = false;
+                return;
+            }
+
             if (!shouldCancelKnockback(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ()))
             {
                 return;
@@ -396,12 +402,6 @@ public class VelocityModule extends ToggleModule
 
     private boolean shouldCancelKnockback(double x, double y, double z)
     {
-        if (concealVelocity && x == 0.0 && y == 0.0 && z == 0.0)
-        {
-            concealVelocity = false;
-            return false;
-        }
-
         if (modeConfig.getValue() == VelocityMode.WALLS)
         {
             if (!isPhased() && (!wallsTrappedConfig.getValue() || !isWallsTrapped()))
