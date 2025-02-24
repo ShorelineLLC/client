@@ -7,7 +7,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BlockListConfig;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -17,8 +16,6 @@ import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.InteractBlockEvent;
 import net.shoreline.client.impl.event.network.InteractBorderEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.List;
@@ -31,7 +28,7 @@ public class AntiInteractModule extends ToggleModule
 {
     //
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist"));
-    Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false));
+    Config<Boolean> miningConfig = register(new BooleanConfig("Mining", "Prevents player mining blocks", false));
     Config<Boolean> borderConfig = register(new BooleanConfig("Border", "Prevents interacting with the world border", true));
 
     public AntiInteractModule()
@@ -69,27 +66,22 @@ public class AntiInteractModule extends ToggleModule
             }
         }
 
-        if (miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
+        if (miningConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
                 && (packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
                 || packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK
-                || packet.getAction() == PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK))
+                || packet.getAction() == PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK)
+                && !event.isClientPacket())
         {
-            if (BlastResistantBlocks.isUnbreakable(packet.getPos()) || mc.world.isAir(packet.getPos()))
-            {
-                event.cancel();
-                return;
-            }
+            event.cancel();
+        }
+    }
 
-            if (packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK)
-            {
-                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, packet.getPos(), Direction.UP));
-                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, packet.getPos(), Direction.UP));
-                Managers.NETWORK.sendQuietPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos(), Direction.UP));
-                event.cancel();
-            }
+    @EventListener
+    public void onAttackBlock(AttackBlockEvent event)
+    {
+        if (miningConfig.getValue())
+        {
+            event.cancel();
         }
     }
 

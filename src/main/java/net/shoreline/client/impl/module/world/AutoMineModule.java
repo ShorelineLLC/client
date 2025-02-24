@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -715,7 +714,7 @@ public class AutoMineModule extends CombatModule
         {
             BlockPos aboveHead = entity.getBlockPos().up(2);
             BlockState state = mc.world.getBlockState(aboveHead);
-            if (validAutoMineBlock(state.getBlock()))
+            if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
                 phasePositions.add(new AutoMineCalc(aboveHead, 999, false));
             }
@@ -730,7 +729,7 @@ public class AutoMineModule extends CombatModule
                 continue;
             }
             BlockState state = mc.world.getBlockState(blockPos);
-            if (validAutoMineBlock(state.getBlock()))
+            if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
                 phasePositions.add(new AutoMineCalc(blockPos, -1.0, true));
             }
@@ -754,7 +753,7 @@ public class AutoMineModule extends CombatModule
         {
             BlockPos belowFeet = entity.getBlockPos().down();
             BlockState state = mc.world.getBlockState(belowFeet);
-            if (validAutoMineBlock(state.getBlock()))
+            if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
                 miningPositions.add(new AutoMineCalc(belowFeet, 1000, false));
             }
@@ -860,14 +859,19 @@ public class AutoMineModule extends CombatModule
         // We want to be same level as our opponent
         if (playerBelow)
         {
-            if (validAutoMineBlock(crawlingPos.down()))
+            BlockState state = mc.world.getBlockState(crawlingPos.down());
+            if (validAutoMineBlock(state.getBlock()) && !mc.world.isAir(crawlingPos.down()))
             {
                 return crawlingPos.down();
             }
         }
-        else if (validAutoMineBlock(crawlingPos.up()))
+        else
         {
-            return crawlingPos.up();
+            BlockState state = mc.world.getBlockState(crawlingPos.up());
+            if (validAutoMineBlock(state.getBlock()) && !mc.world.isAir(crawlingPos.up()))
+            {
+                return crawlingPos.up();
+            }
         }
         return null;
     }
@@ -955,7 +959,11 @@ public class AutoMineModule extends CombatModule
             if (grimNewConfig.getValue())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -1099,14 +1107,9 @@ public class AutoMineModule extends CombatModule
         return data != null && miningQueue.size() == 2 && data == miningQueue.getLast();
     }
 
-    private boolean validAutoMineBlock(BlockPos blockPos)
-    {
-        return validAutoMineBlock(mc.world.getBlockState(blockPos).getBlock());
-    }
-
     private boolean validAutoMineBlock(Block block)
     {
-        if (BlastResistantBlocks.isUnbreakable(block) || block instanceof FluidBlock || block == Blocks.AIR)
+        if (BlastResistantBlocks.isUnbreakable(block))
         {
             return false;
         }
@@ -1121,10 +1124,10 @@ public class AutoMineModule extends CombatModule
     public BlockPos getMiningBlock()
     {
         return miningQueue.stream().filter(d ->
-        {
-            double damage = d.getBlockDamage() / speedConfig.getValue();
-            return !isDataPacketMine(d) && damage > 0.75;
-        })
+                {
+                    double damage = d.getBlockDamage() / speedConfig.getValue();
+                    return !isDataPacketMine(d) && damage > 0.75;
+                })
                 .map(MiningData::getPos).findAny().orElse(null);
     }
 
