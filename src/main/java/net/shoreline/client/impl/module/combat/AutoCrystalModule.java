@@ -1251,13 +1251,7 @@ public class AutoCrystalModule extends CombatModule
         }
         double damage = ExplosionUtil.getDamageTo(target, crystalDamageVec(blockPos), blockDestructionConfig.getValue(),
                 Set.of(blockPos), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
-        if (damage < minDamageConfig.getValue() && !isCrystalLethalTo(damage, target))
-        {
-            return;
-        }
-        int latency = FastLatencyModule.getInstance().isEnabled() ? (int)
-                FastLatencyModule.getInstance().getLatency() : Managers.NETWORK.getClientLatency();
-        if (!Managers.NETWORK.is2b2t() || latency >= 50)
+        if (damage >= minDamageConfig.getValue() || isCrystalLethalTo(damage, target))
         {
             placeCrystal(blockPos, Hand.MAIN_HAND, false);
         }
