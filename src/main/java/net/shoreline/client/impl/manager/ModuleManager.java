@@ -12,6 +12,7 @@ import net.shoreline.client.impl.module.movement.*;
 import net.shoreline.client.impl.module.render.*;
 import net.shoreline.client.impl.module.world.*;
 import net.shoreline.client.init.Managers;
+import net.shoreline.loader.Loader;
 
 import java.util.*;
 
@@ -80,13 +81,13 @@ public final class ModuleManager
                 new FakeLatencyModule(),
                 new FastLatencyModule(),
                 new FastProjectileModule(),
+                new GodModeModule(),
                 new InventorySyncModule(),
                 new NewChunksModule(),
                 new NoMineAnimationModule(),
                 new PacketCancelerModule(),
                 new PacketFlyModule(),
                 new PhaseModule(),
-                new PortalGodModeModule(),
                 new ReachModule(),
                 // Misc
                 new AntiAFKModule(),
@@ -200,6 +201,12 @@ public final class ModuleManager
                 new SpeedmineModule()
                 // new XRayModule()
         );
+
+        if (Loader.SESSION.getUsername().equalsIgnoreCase("Dagger"))
+        {
+            modules.remove("godmode-module");
+        }
+
         if (ShorelineMod.isBaritonePresent())
         {
             register(new BaritoneModule());
