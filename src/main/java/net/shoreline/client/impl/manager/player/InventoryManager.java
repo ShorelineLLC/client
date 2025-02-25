@@ -377,7 +377,7 @@ public class InventoryManager implements Globals
 
         public boolean isPassedClearTime()
         {
-            return clearTime != null && clearTime.passed(500);
+            return clearTime != null && clearTime.passed(300);
         }
 
         public ItemStack getSwapping()
