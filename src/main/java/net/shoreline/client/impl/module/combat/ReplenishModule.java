@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
@@ -10,6 +11,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
+import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -45,14 +48,23 @@ public class ReplenishModule extends ToggleModule
     }
 
     @EventListener
-    public void onTick(PlayerTickEvent event)
+    public void onDisconnect(DisconnectEvent event)
     {
-        if (mc.player.age < 10)
+        hotbarCache.clear();
+    }
+
+    @EventListener
+    public void onEntityDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() instanceof ClientPlayerEntity)
         {
             hotbarCache.clear();
-            return;
         }
+    }
 
+    @EventListener
+    public void onTick(PlayerTickEvent event)
+    {
         if (mc.options.dropKey.isPressed())
         {
             lastDroppedTimer.reset();
@@ -100,11 +112,11 @@ public class ReplenishModule extends ToggleModule
 
             if (hotbarCache.containsKey(i))
             {
-                hotbarCache.replace(i, stack);
+                hotbarCache.replace(i, stack.copy());
             }
             else
             {
-                hotbarCache.put(i, stack);
+                hotbarCache.put(i, stack.copy());
             }
         }
     }
