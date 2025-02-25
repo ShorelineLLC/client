@@ -35,7 +35,6 @@ public class ReplenishModule extends ToggleModule
 
     private final Timer lastDroppedTimer = new CacheTimer();
 
-
     public ReplenishModule()
     {
         super("Replenish", "Automatically replaces items in your hotbar", ModuleCategory.COMBAT);

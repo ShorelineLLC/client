@@ -19,7 +19,7 @@ public class BetterInvModule extends ToggleModule
 
     Config<Boolean> dragItemMoveConfig = register(new BooleanConfig("DragItemMove", "Allows you to hold down shift and drag move items.", true));
     Config<Boolean> fastDropConfig = register(new BooleanConfig("FastDrop", "Drops items from the hotbar faster", false));
-    Config<Integer> delayConfig = register(new NumberConfig<>("Delay", "The delay for dropping items", 0, 0, 4));
+    Config<Integer> delayConfig = register(new NumberConfig<>("Delay", "The delay for dropping items", 0, 0, 4, () -> fastDropConfig.getValue()));
 
     private int dropTicks;
 

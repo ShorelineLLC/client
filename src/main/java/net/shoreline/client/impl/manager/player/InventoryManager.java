@@ -74,6 +74,7 @@ public class InventoryManager implements Globals
             slot = packet.getSlot();
         }
 
+        // retarded packets from grim we can ignore
         if (event.getPacket() instanceof BundleS2CPacket packet)
         {
             List<Packet<?>> allowedBundle = new ArrayList<>();
@@ -145,7 +146,7 @@ public class InventoryManager implements Globals
         if (slot != barSlot && PlayerInventory.isValidHotbarIndex(barSlot))
         {
             setSlotForced(barSlot);
-            swapData.add(new PreSwapData(mc.player.getMainHandStack(), mc.player.getInventory().getStack(barSlot), slot, barSlot));
+            swapData.add(new PreSwapData(mc.player.getMainHandStack().copy(), mc.player.getInventory().getStack(barSlot).copy(), slot, barSlot));
         }
     }
 
