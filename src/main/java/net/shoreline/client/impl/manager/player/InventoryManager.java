@@ -3,7 +3,6 @@ package net.shoreline.client.impl.manager.player;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
@@ -16,18 +15,22 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.collection.DefaultedList;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author xgraza & linus
@@ -35,6 +38,7 @@ import java.util.List;
  */
 public class InventoryManager implements Globals
 {
+    private final List<PreSwapData> swapData = new CopyOnWriteArrayList<>();
 
     // The serverside selected hotbar slot.
     private int slot;
@@ -83,13 +87,35 @@ public class InventoryManager implements Globals
             }
             ((AccessorBundlePacket) packet).setIterable(allowedBundle);
         }
+
+        if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet)
+        {
+            int slot = packet.getSlot() - 36;
+            if (slot < 0 || slot > 8)
+            {
+                return;
+            }
+
+            for (PreSwapData data : swapData)
+            {
+                if (!isGrimSilentSwapData(data, packet.getStack(), slot))
+                {
+                    continue;
+                }
+
+                event.cancel();
+            }
+        }
     }
 
     @EventListener
     public void onItemDesync(ItemDesyncEvent event)
     {
-        event.setCanceled(isDesynced());
-        event.setStack(getServerItem());
+        if (isDesynced())
+        {
+            event.cancel();
+            event.setStack(getServerItem());
+        }
     }
 
     @EventListener
@@ -99,6 +125,12 @@ public class InventoryManager implements Globals
         {
             syncToClient();
         }
+    }
+
+    @EventListener
+    public void onTick(TickEvent event)
+    {
+        swapData.removeIf(PreSwapData::isPassedClearTime);
     }
 
     /**
@@ -113,6 +145,7 @@ public class InventoryManager implements Globals
         if (slot != barSlot && PlayerInventory.isValidHotbarIndex(barSlot))
         {
             setSlotForced(barSlot);
+            swapData.add(new PreSwapData(mc.player.getMainHandStack(), mc.player.getInventory().getStack(barSlot), slot, barSlot));
         }
     }
 
@@ -166,6 +199,11 @@ public class InventoryManager implements Globals
         if (isDesynced())
         {
             setSlotForced(mc.player.getInventory().selectedSlot);
+
+            for (PreSwapData swapData : swapData)
+            {
+                swapData.beginClear();
+            }
         }
     }
 
@@ -296,5 +334,69 @@ public class InventoryManager implements Globals
             return mc.player.getInventory().getStack(getServerSlot());
         }
         return null;
+    }
+
+    public boolean isGrimSilentSwapData(PreSwapData data, ItemStack stack, int slot)
+    {
+        if (data.getSlot() == slot && stack.getCount() == data.getHolding().getCount()
+                && stack.getItem().equals(data.getHolding().getItem())
+                && stack.getName().equals(data.getHolding().getName()))
+        {
+            return true;
+        }
+
+        return data.getStarting() == slot && stack.getCount() == data.getSwapping().getCount()
+                && stack.getItem().equals(data.getSwapping().getItem())
+                && stack.getName().equals(data.getSwapping().getName());
+    }
+
+    public static class PreSwapData
+    {
+        private final ItemStack holding;
+        private final ItemStack swapping;
+
+        private final int starting;
+        private final int swapTo;
+
+        private Timer clearTime;
+
+        public PreSwapData(ItemStack holding, ItemStack swapping, int start, int swapTo)
+        {
+            this.holding = holding;
+            this.swapping = swapping;
+            this.starting = start;
+            this.swapTo = swapTo;
+        }
+
+        public void beginClear()
+        {
+            clearTime = new CacheTimer();
+            clearTime.reset();
+        }
+
+        public boolean isPassedClearTime()
+        {
+            return clearTime != null && clearTime.passed(500);
+        }
+
+        public ItemStack getSwapping()
+        {
+            return swapping;
+        }
+
+        public ItemStack getHolding()
+        {
+            return holding;
+        }
+
+        public int getStarting()
+        {
+            return starting;
+        }
+
+        public int getSlot()
+        {
+            return swapTo;
+        }
     }
 }
