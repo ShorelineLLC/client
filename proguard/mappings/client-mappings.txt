@@ -2990,12 +2990,12 @@ net.shoreline.client.impl.manager.EventManager -> net.shoreline.client.hB:
     26:27:void onReloadShader(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> a
 net.shoreline.client.impl.manager.ModuleManager -> net.shoreline.client.fD:
     java.util.Map modules -> i
-    27:223:void <init>() -> <init>
-    231:231:void postInit() -> N
-    239:243:void register(net.shoreline.client.api.module.Module[]) -> a
-    250:251:void register(net.shoreline.client.api.module.Module) -> a
-    259:259:net.shoreline.client.api.module.Module getModuleById(java.lang.String) -> a
-    267:267:java.util.List getModules() -> h
+    27:218:void <init>() -> <init>
+    226:226:void postInit() -> N
+    234:238:void register(net.shoreline.client.api.module.Module[]) -> a
+    245:246:void register(net.shoreline.client.api.module.Module) -> a
+    254:254:net.shoreline.client.api.module.Module getModuleById(java.lang.String) -> a
+    262:262:java.util.List getModules() -> h
 net.shoreline.client.impl.manager.anticheat.AntiCheatManager -> net.shoreline.client.hC:
     net.shoreline.client.impl.manager.anticheat.SetbackData lastSetback -> a
     int[] transactions -> d
@@ -3214,38 +3214,36 @@ net.shoreline.client.impl.manager.player.InventoryManager -> net.shoreline.clien
     int slot -> v
     41:52:void <init>() -> <init>
     57:67:void onPacketOutBound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> b
-    72:110:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    115:120:void onItemDesync(net.shoreline.client.impl.event.network.ItemDesyncEvent) -> a
-    125:129:void onDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> b
-    134:135:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    146:151:void setSlot(int) -> t
-    160:165:void setSlotAlt(int) -> u
-    177:183:void setClientSlot(int) -> v
-    192:193:void setSlotForced(int) -> w
-    200:209:void syncToClient() -> Q
-    213:213:boolean isDesynced() -> K
-    219:220:void closeScreen() -> R
-    227:227:int pickupSlot(int) -> c
-    232:233:void quickMove(int) -> x
-    240:241:void throwSlot(int) -> y
-    245:253:int findEmptySlot() -> S
-    263:285:int click(int,int,net.minecraft.class_1713) -> a
-    290:312:int click2(int,int,net.minecraft.class_1713) -> b
-    320:320:int getServerSlot() -> T
-    325:325:int getClientSlot() -> U
-    333:337:net.minecraft.class_1799 getServerItem() -> b
-    342:351:boolean isGrimSilentSwapData(net.shoreline.client.impl.manager.player.InventoryManager$PreSwapData,net.minecraft.class_1799,int) -> a
+    72:120:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    125:130:void onItemDesync(net.shoreline.client.impl.event.network.ItemDesyncEvent) -> a
+    135:139:void onDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> b
+    144:145:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    156:167:void setSlot(int) -> t
+    176:181:void setSlotAlt(int) -> u
+    193:199:void setClientSlot(int) -> v
+    208:209:void setSlotForced(int) -> w
+    216:225:void syncToClient() -> Q
+    229:229:boolean isDesynced() -> K
+    235:236:void closeScreen() -> R
+    243:243:int pickupSlot(int) -> c
+    248:249:void quickMove(int) -> x
+    256:257:void throwSlot(int) -> y
+    261:269:int findEmptySlot() -> S
+    279:301:int click(int,int,net.minecraft.class_1713) -> a
+    306:328:int click2(int,int,net.minecraft.class_1713) -> b
+    336:336:int getServerSlot() -> T
+    341:341:int getClientSlot() -> U
+    349:353:net.minecraft.class_1799 getServerItem() -> b
+    358:358:boolean isEqual(net.minecraft.class_1799,net.minecraft.class_1799) -> a
 net.shoreline.client.impl.manager.player.InventoryManager$PreSwapData -> net.shoreline.client.hW:
-    net.minecraft.class_1799 holding -> g
-    net.minecraft.class_1799 swapping -> h
+    net.minecraft.class_1799[] preHotbar -> a
     int starting -> Z
     int swapTo -> aa
     net.shoreline.client.util.math.timer.Timer clearTime -> f
-    365:370:void <init>(net.minecraft.class_1799,net.minecraft.class_1799,int,int) -> <init>
-    374:376:void beginClear() -> S
-    380:380:boolean isPassedClearTime() -> L
-    385:385:net.minecraft.class_1799 getSwapping() -> e
-    390:390:net.minecraft.class_1799 getHolding() -> f
+    371:375:void <init>(net.minecraft.class_1799[],int,int) -> <init>
+    379:381:void beginClear() -> S
+    385:385:boolean isPassedClearTime() -> L
+    390:390:net.minecraft.class_1799 getPreHolding(int) -> a
     395:395:int getStarting() -> V
     400:400:int getSlot() -> x
 net.shoreline.client.impl.manager.player.MovementManager -> net.shoreline.client.hX:
@@ -3999,11 +3997,11 @@ net.shoreline.client.impl.module.combat.AutoArmorModule -> net.shoreline.client.
 net.shoreline.client.impl.module.combat.AutoArmorModule$ArmorSlot -> net.shoreline.client.iU:
     int armorType -> ai
     int slot -> aj
-    net.minecraft.class_1799 armorStack -> i
+    net.minecraft.class_1799 armorStack -> g
     net.shoreline.client.impl.module.combat.AutoArmorModule this$0 -> a
     201:205:void <init>(net.shoreline.client.impl.module.combat.AutoArmorModule,int,int,net.minecraft.class_1799) -> <init>
     210:235:int compareTo(net.shoreline.client.impl.module.combat.AutoArmorModule$ArmorSlot) -> a
-    241:241:net.minecraft.class_1799 getArmorStack() -> g
+    241:241:net.minecraft.class_1799 getArmorStack() -> e
     246:246:int getType() -> ah
     251:251:int getSlot() -> x
     193:193:int compareTo(java.lang.Object) -> compareTo
@@ -4633,16 +4631,18 @@ net.shoreline.client.impl.module.combat.NoHitDelayModule -> net.shoreline.client
     12:13:void <init>() -> <init>
     18:19:void onAttackCooldown(net.shoreline.client.impl.event.AttackCooldownEvent) -> a
 net.shoreline.client.impl.module.combat.ReplenishModule -> net.shoreline.client.jz:
+    net.shoreline.client.impl.module.combat.ReplenishModule INSTANCE -> a
     net.shoreline.client.api.config.Config percentConfig -> da
     java.util.Map hotbarCache -> A
     net.shoreline.client.util.math.timer.Timer lastDroppedTimer -> v
-    31:41:void <init>() -> <init>
-    46:47:void onDisable() -> v
-    52:53:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
-    58:62:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
-    67:121:void onTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
-    125:125:boolean isInInventoryScreen() -> ax
-    130:172:void replenishStack(int,net.minecraft.class_1799) -> a
+    32:43:void <init>() -> <init>
+    47:47:net.shoreline.client.impl.module.combat.ReplenishModule getInstance() -> a
+    53:54:void onDisable() -> v
+    59:60:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
+    65:69:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
+    74:128:void onTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
+    132:132:boolean isInInventoryScreen() -> ax
+    137:179:void replenishStack(int,net.minecraft.class_1799) -> a
 net.shoreline.client.impl.module.combat.SelfBowModule -> net.shoreline.client.jA:
     net.shoreline.client.impl.module.combat.SelfBowModule INSTANCE -> a
     int pullTicks -> ap
@@ -5325,7 +5325,7 @@ net.shoreline.client.impl.module.misc.AutoTradeModule -> net.shoreline.client.kG
     net.shoreline.client.util.math.timer.Timer delayTimer -> K
     java.util.List interactedEntities -> G
     40:53:void <init>() -> <init>
-    58:101:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    58:102:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     44:44:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.misc.BeaconSelectorModule -> net.shoreline.client.kH:
     net.minecraft.class_1291 primaryEffect -> a
