@@ -3214,40 +3214,40 @@ net.shoreline.client.impl.manager.player.InventoryManager -> net.shoreline.clien
     int slot -> v
     41:52:void <init>() -> <init>
     57:67:void onPacketOutBound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> b
-    72:109:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    114:119:void onItemDesync(net.shoreline.client.impl.event.network.ItemDesyncEvent) -> a
-    124:128:void onDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> b
-    133:134:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    145:150:void setSlot(int) -> t
-    159:164:void setSlotAlt(int) -> u
-    176:182:void setClientSlot(int) -> v
-    191:192:void setSlotForced(int) -> w
-    199:208:void syncToClient() -> Q
-    212:212:boolean isDesynced() -> K
-    218:219:void closeScreen() -> R
-    226:226:int pickupSlot(int) -> c
-    231:232:void quickMove(int) -> x
-    239:240:void throwSlot(int) -> y
-    244:252:int findEmptySlot() -> S
-    262:284:int click(int,int,net.minecraft.class_1713) -> a
-    289:311:int click2(int,int,net.minecraft.class_1713) -> b
-    319:319:int getServerSlot() -> T
-    324:324:int getClientSlot() -> U
-    332:336:net.minecraft.class_1799 getServerItem() -> b
-    341:350:boolean isGrimSilentSwapData(net.shoreline.client.impl.manager.player.InventoryManager$PreSwapData,net.minecraft.class_1799,int) -> a
+    72:110:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    115:120:void onItemDesync(net.shoreline.client.impl.event.network.ItemDesyncEvent) -> a
+    125:129:void onDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> b
+    134:135:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    146:151:void setSlot(int) -> t
+    160:165:void setSlotAlt(int) -> u
+    177:183:void setClientSlot(int) -> v
+    192:193:void setSlotForced(int) -> w
+    200:209:void syncToClient() -> Q
+    213:213:boolean isDesynced() -> K
+    219:220:void closeScreen() -> R
+    227:227:int pickupSlot(int) -> c
+    232:233:void quickMove(int) -> x
+    240:241:void throwSlot(int) -> y
+    245:253:int findEmptySlot() -> S
+    263:285:int click(int,int,net.minecraft.class_1713) -> a
+    290:312:int click2(int,int,net.minecraft.class_1713) -> b
+    320:320:int getServerSlot() -> T
+    325:325:int getClientSlot() -> U
+    333:337:net.minecraft.class_1799 getServerItem() -> b
+    342:351:boolean isGrimSilentSwapData(net.shoreline.client.impl.manager.player.InventoryManager$PreSwapData,net.minecraft.class_1799,int) -> a
 net.shoreline.client.impl.manager.player.InventoryManager$PreSwapData -> net.shoreline.client.hW:
     net.minecraft.class_1799 holding -> g
     net.minecraft.class_1799 swapping -> h
     int starting -> Z
     int swapTo -> aa
     net.shoreline.client.util.math.timer.Timer clearTime -> f
-    364:369:void <init>(net.minecraft.class_1799,net.minecraft.class_1799,int,int) -> <init>
-    373:375:void beginClear() -> S
-    379:379:boolean isPassedClearTime() -> L
-    384:384:net.minecraft.class_1799 getSwapping() -> e
-    389:389:net.minecraft.class_1799 getHolding() -> f
-    394:394:int getStarting() -> V
-    399:399:int getSlot() -> x
+    365:370:void <init>(net.minecraft.class_1799,net.minecraft.class_1799,int,int) -> <init>
+    374:376:void beginClear() -> S
+    380:380:boolean isPassedClearTime() -> L
+    385:385:net.minecraft.class_1799 getSwapping() -> e
+    390:390:net.minecraft.class_1799 getHolding() -> f
+    395:395:int getStarting() -> V
+    400:400:int getSlot() -> x
 net.shoreline.client.impl.manager.player.MovementManager -> net.shoreline.client.hX:
     boolean packetSneaking -> R
     19:21:void <init>() -> <init>
@@ -4636,11 +4636,13 @@ net.shoreline.client.impl.module.combat.ReplenishModule -> net.shoreline.client.
     net.shoreline.client.api.config.Config percentConfig -> da
     java.util.Map hotbarCache -> A
     net.shoreline.client.util.math.timer.Timer lastDroppedTimer -> v
-    28:39:void <init>() -> <init>
-    44:45:void onDisable() -> v
-    50:110:void onTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
-    114:114:boolean isInInventoryScreen() -> ax
-    119:161:void replenishStack(int,net.minecraft.class_1799) -> a
+    31:41:void <init>() -> <init>
+    46:47:void onDisable() -> v
+    52:53:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
+    58:62:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
+    67:121:void onTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
+    125:125:boolean isInInventoryScreen() -> ax
+    130:172:void replenishStack(int,net.minecraft.class_1799) -> a
 net.shoreline.client.impl.module.combat.SelfBowModule -> net.shoreline.client.jA:
     net.shoreline.client.impl.module.combat.SelfBowModule INSTANCE -> a
     int pullTicks -> ap
@@ -4945,19 +4947,19 @@ net.shoreline.client.impl.module.exploit.GodModeModule -> net.shoreline.client.j
     49:52:void onEnable() -> u
     57:59:void onDisable() -> v
     64:88:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    93:100:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    105:109:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
-    114:123:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    93:98:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
+    103:107:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
+    112:121:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     28:28:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.exploit.GodModeModule$Mode -> net.shoreline.client.jX:
     net.shoreline.client.impl.module.exploit.GodModeModule$Mode PACKET -> a
     net.shoreline.client.impl.module.exploit.GodModeModule$Mode PORTAL -> b
     net.shoreline.client.impl.module.exploit.GodModeModule$Mode[] $VALUES -> a
-    125:125:net.shoreline.client.impl.module.exploit.GodModeModule$Mode[] values() -> values
-    125:125:net.shoreline.client.impl.module.exploit.GodModeModule$Mode valueOf(java.lang.String) -> valueOf
-    125:125:void <init>(java.lang.String,int) -> <init>
-    125:125:net.shoreline.client.impl.module.exploit.GodModeModule$Mode[] $values() -> a
-    125:128:void <clinit>() -> <clinit>
+    123:123:net.shoreline.client.impl.module.exploit.GodModeModule$Mode[] values() -> values
+    123:123:net.shoreline.client.impl.module.exploit.GodModeModule$Mode valueOf(java.lang.String) -> valueOf
+    123:123:void <init>(java.lang.String,int) -> <init>
+    123:123:net.shoreline.client.impl.module.exploit.GodModeModule$Mode[] $values() -> a
+    123:126:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.exploit.InventorySyncModule -> net.shoreline.client.jY:
     net.shoreline.client.api.config.Config debugConfig -> F
     21:26:void <init>() -> <init>
@@ -5379,6 +5381,7 @@ net.shoreline.client.impl.module.misc.BetterInvModule -> net.shoreline.client.kL
     20:29:void <init>() -> <init>
     37:48:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     53:57:void onMouseDragged(net.shoreline.client.impl.event.gui.screen.MouseDraggedEvent) -> a
+    22:22:java.lang.Boolean lambda$new$0() -> k
 net.shoreline.client.impl.module.misc.ChatNotifierModule -> net.shoreline.client.kM:
     net.shoreline.client.api.config.Config totemPopConfig -> eO
     net.shoreline.client.api.config.Config visualRangeConfig -> eP
