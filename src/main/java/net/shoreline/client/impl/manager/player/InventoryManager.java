@@ -102,9 +102,14 @@ public class InventoryManager implements Globals
                 return;
             }
 
+            if (packet.getStack().isEmpty())
+            {
+                return;
+            }
+
             for (PreSwapData data : swapData)
             {
-                if (data.getSlot() != slot)
+                if (data.getSlot() != slot && data.getStarting() != slot)
                 {
                     continue;
                 }
@@ -355,7 +360,7 @@ public class InventoryManager implements Globals
 
     private boolean isEqual(ItemStack stack1, ItemStack stack2)
     {
-        return stack1.getCount() == stack2.getCount() && stack1.getItem().equals(stack2.getItem()) && stack1.getName().equals(stack2.getName());
+        return stack1.getItem().equals(stack2.getItem()) && stack1.getName().equals(stack2.getName());
     }
 
     public static class PreSwapData
