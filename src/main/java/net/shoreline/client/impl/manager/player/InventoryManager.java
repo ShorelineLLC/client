@@ -19,10 +19,10 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.module.combat.ReplenishModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
 import net.shoreline.client.util.Globals;
-import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.eventbus.EventBus;
@@ -73,6 +73,11 @@ public class InventoryManager implements Globals
         {
             slot = packet.getSlot();
         }
+        
+        if (ReplenishModule.getInstance().isInInventoryScreen())
+        {
+            return;
+        }
 
         // retarded packets from grim we can ignore
         if (event.getPacket() instanceof BundleS2CPacket packet)
@@ -99,12 +104,17 @@ public class InventoryManager implements Globals
 
             for (PreSwapData data : swapData)
             {
-                if (!isGrimSilentSwapData(data, packet.getStack(), slot))
+                if (data.getSlot() != slot)
                 {
                     continue;
                 }
 
-                event.cancel();
+                ItemStack preStack = data.getPreHolding(slot);
+                if (!isEqual(preStack, packet.getStack()))
+                {
+                    event.cancel();
+                    break;
+                }
             }
         }
     }
@@ -146,7 +156,13 @@ public class InventoryManager implements Globals
         if (slot != barSlot && PlayerInventory.isValidHotbarIndex(barSlot))
         {
             setSlotForced(barSlot);
-            swapData.add(new PreSwapData(mc.player.getMainHandStack().copy(), mc.player.getInventory().getStack(barSlot).copy(), slot, barSlot));
+
+            final ItemStack[] hotbarCopy = new ItemStack[9];
+            for (int i = 0; i < 9; i++)
+            {
+                hotbarCopy[i] = mc.player.getInventory().getStack(i);
+            }
+            swapData.add(new PreSwapData(hotbarCopy, slot, barSlot));
         }
     }
 
@@ -337,34 +353,23 @@ public class InventoryManager implements Globals
         return null;
     }
 
-    public boolean isGrimSilentSwapData(PreSwapData data, ItemStack stack, int slot)
+    private boolean isEqual(ItemStack stack1, ItemStack stack2)
     {
-        if (data.getSlot() == slot && stack.getCount() == data.getHolding().getCount()
-                && stack.getItem().equals(data.getHolding().getItem())
-                && stack.getName().equals(data.getHolding().getName()))
-        {
-            return true;
-        }
-
-        return data.getStarting() == slot && stack.getCount() == data.getSwapping().getCount()
-                && stack.getItem().equals(data.getSwapping().getItem())
-                && stack.getName().equals(data.getSwapping().getName());
+        return stack1.getCount() == stack2.getCount() && stack1.getItem().equals(stack2.getItem()) && stack1.getName().equals(stack2.getName());
     }
 
     public static class PreSwapData
     {
-        private final ItemStack holding;
-        private final ItemStack swapping;
+        private final ItemStack[] preHotbar;
 
         private final int starting;
         private final int swapTo;
 
         private Timer clearTime;
 
-        public PreSwapData(ItemStack holding, ItemStack swapping, int start, int swapTo)
+        public PreSwapData(ItemStack[] preHotbar, int start, int swapTo)
         {
-            this.holding = holding;
-            this.swapping = swapping;
+            this.preHotbar = preHotbar;
             this.starting = start;
             this.swapTo = swapTo;
         }
@@ -380,14 +385,9 @@ public class InventoryManager implements Globals
             return clearTime != null && clearTime.passed(300);
         }
 
-        public ItemStack getSwapping()
+        public ItemStack getPreHolding(int i)
         {
-            return swapping;
-        }
-
-        public ItemStack getHolding()
-        {
-            return holding;
+            return preHotbar[i];
         }
 
         public int getStarting()

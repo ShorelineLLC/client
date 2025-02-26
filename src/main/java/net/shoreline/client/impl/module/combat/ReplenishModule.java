@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ReplenishModule extends ToggleModule
 {
+    private static ReplenishModule INSTANCE;
 
     Config<Integer> percentConfig = register(new NumberConfig<>("Percent", "The minimum percent of total stack before replenishing", 1, 25, 80));
 
@@ -38,6 +39,12 @@ public class ReplenishModule extends ToggleModule
     public ReplenishModule()
     {
         super("Replenish", "Automatically replaces items in your hotbar", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static ReplenishModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -120,7 +127,7 @@ public class ReplenishModule extends ToggleModule
         }
     }
 
-    private boolean isInInventoryScreen()
+    public boolean isInInventoryScreen()
     {
         return mc.currentScreen instanceof GenericContainerScreen || mc.currentScreen instanceof ShulkerBoxScreen || mc.currentScreen instanceof InventoryScreen;
     }

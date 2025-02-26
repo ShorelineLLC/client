@@ -202,11 +202,6 @@ public final class ModuleManager
                 // new XRayModule()
         );
 
-        if (Loader.SESSION.getUsername().equalsIgnoreCase("Dagger"))
-        {
-            modules.remove("godmode-module");
-        }
-
         if (ShorelineMod.isBaritonePresent())
         {
             register(new BaritoneModule());
