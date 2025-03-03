@@ -3214,38 +3214,38 @@ net.shoreline.client.impl.manager.player.InventoryManager -> net.shoreline.clien
     int slot -> v
     41:52:void <init>() -> <init>
     57:67:void onPacketOutBound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> b
-    72:120:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    125:130:void onItemDesync(net.shoreline.client.impl.event.network.ItemDesyncEvent) -> a
-    135:139:void onDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> b
-    144:145:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    156:167:void setSlot(int) -> t
-    176:181:void setSlotAlt(int) -> u
-    193:199:void setClientSlot(int) -> v
-    208:209:void setSlotForced(int) -> w
-    216:225:void syncToClient() -> Q
-    229:229:boolean isDesynced() -> K
-    235:236:void closeScreen() -> R
-    243:243:int pickupSlot(int) -> c
-    248:249:void quickMove(int) -> x
-    256:257:void throwSlot(int) -> y
-    261:269:int findEmptySlot() -> S
-    279:301:int click(int,int,net.minecraft.class_1713) -> a
-    306:328:int click2(int,int,net.minecraft.class_1713) -> b
-    336:336:int getServerSlot() -> T
-    341:341:int getClientSlot() -> U
-    349:353:net.minecraft.class_1799 getServerItem() -> b
-    358:358:boolean isEqual(net.minecraft.class_1799,net.minecraft.class_1799) -> a
+    72:125:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    130:135:void onItemDesync(net.shoreline.client.impl.event.network.ItemDesyncEvent) -> a
+    140:144:void onDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> b
+    149:150:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
+    161:172:void setSlot(int) -> t
+    181:186:void setSlotAlt(int) -> u
+    198:204:void setClientSlot(int) -> v
+    213:214:void setSlotForced(int) -> w
+    221:230:void syncToClient() -> Q
+    234:234:boolean isDesynced() -> K
+    240:241:void closeScreen() -> R
+    248:248:int pickupSlot(int) -> c
+    253:254:void quickMove(int) -> x
+    261:262:void throwSlot(int) -> y
+    266:274:int findEmptySlot() -> S
+    284:306:int click(int,int,net.minecraft.class_1713) -> a
+    311:333:int click2(int,int,net.minecraft.class_1713) -> b
+    341:341:int getServerSlot() -> T
+    346:346:int getClientSlot() -> U
+    354:358:net.minecraft.class_1799 getServerItem() -> b
+    363:363:boolean isEqual(net.minecraft.class_1799,net.minecraft.class_1799) -> a
 net.shoreline.client.impl.manager.player.InventoryManager$PreSwapData -> net.shoreline.client.hW:
     net.minecraft.class_1799[] preHotbar -> a
     int starting -> Z
     int swapTo -> aa
     net.shoreline.client.util.math.timer.Timer clearTime -> f
-    371:375:void <init>(net.minecraft.class_1799[],int,int) -> <init>
-    379:381:void beginClear() -> S
-    385:385:boolean isPassedClearTime() -> L
-    390:390:net.minecraft.class_1799 getPreHolding(int) -> a
-    395:395:int getStarting() -> V
-    400:400:int getSlot() -> x
+    376:380:void <init>(net.minecraft.class_1799[],int,int) -> <init>
+    384:386:void beginClear() -> S
+    390:390:boolean isPassedClearTime() -> L
+    395:395:net.minecraft.class_1799 getPreHolding(int) -> a
+    400:400:int getStarting() -> V
+    405:405:int getSlot() -> x
 net.shoreline.client.impl.manager.player.MovementManager -> net.shoreline.client.hX:
     boolean packetSneaking -> R
     19:21:void <init>() -> <init>
@@ -7059,13 +7059,12 @@ net.shoreline.client.impl.module.world.AirPlaceModule -> net.shoreline.client.nd
     158:165:boolean isEntityInBlockPos(net.minecraft.class_2338) -> k
 net.shoreline.client.impl.module.world.AntiInteractModule -> net.shoreline.client.ne:
     net.shoreline.client.api.config.Config blacklistConfig -> eU
-    net.shoreline.client.api.config.Config miningConfig -> jH
+    net.shoreline.client.api.config.Config miningFixConfig -> jH
     net.shoreline.client.api.config.Config borderConfig -> jI
-    30:37:void <init>() -> <init>
-    42:50:void onInteractBlock(net.shoreline.client.impl.event.network.InteractBlockEvent) -> a
-    55:77:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    82:86:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
-    91:96:void onInteractBorder(net.shoreline.client.impl.event.network.InteractBorderEvent) -> a
+    33:40:void <init>() -> <init>
+    45:53:void onInteractBlock(net.shoreline.client.impl.event.network.InteractBlockEvent) -> a
+    58:94:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
+    99:104:void onInteractBorder(net.shoreline.client.impl.event.network.InteractBorderEvent) -> a
 net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nf:
     net.shoreline.client.impl.module.world.AutoMineModule INSTANCE -> a
     net.shoreline.client.api.config.Config autoConfig -> cZ
@@ -7132,20 +7131,20 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nf
     906:908:void removeQueuedMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
     912:914:void removeIfQueuedMine(java.util.function.Predicate) -> a
     918:941:void updateOverrides() -> ar
-    945:1009:boolean startMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
-    1014:1021:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
-    1025:1070:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
-    1074:1080:void swapTo(int) -> z
-    1084:1089:void swapSync(int) -> A
-    1093:1097:void stopMiningInternal(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> e
-    1102:1102:boolean isBlockDelayGrim() -> aX
-    1107:1107:boolean isDataPacketMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
-    1112:1120:boolean validAutoMineBlock(net.minecraft.class_2248) -> a
-    1126:1131:net.minecraft.class_2338 getMiningBlock() -> e
-    1136:1136:boolean isSilentSwapping() -> aY
-    1128:1129:boolean lambda$getMiningBlock$18(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
-    1018:1019:net.minecraft.class_2596 lambda$abortMining$17(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> a
-    996:997:net.minecraft.class_2596 lambda$startMining$16(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> b
+    945:1005:boolean startMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
+    1010:1017:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
+    1021:1066:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
+    1070:1076:void swapTo(int) -> z
+    1080:1085:void swapSync(int) -> A
+    1089:1093:void stopMiningInternal(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> e
+    1098:1098:boolean isBlockDelayGrim() -> aX
+    1103:1103:boolean isDataPacketMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
+    1108:1116:boolean validAutoMineBlock(net.minecraft.class_2248) -> a
+    1122:1127:net.minecraft.class_2338 getMiningBlock() -> e
+    1132:1132:boolean isSilentSwapping() -> aY
+    1124:1125:boolean lambda$getMiningBlock$18(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
+    1014:1015:net.minecraft.class_2596 lambda$abortMining$17(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> a
+    992:993:net.minecraft.class_2596 lambda$startMining$16(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,int) -> b
     813:813:boolean lambda$getMiningPosition$15(net.minecraft.class_2338,net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc) -> a
     694:694:boolean lambda$queueMiningData$14(net.shoreline.client.impl.module.world.AutoMineModule$MiningData,net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
     656:656:boolean lambda$onRenderWorld$13(java.util.Map$Entry) -> j
@@ -7167,11 +7166,11 @@ net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl -> net.shoreline
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl EXTRAPOLATE -> b
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl OFF -> c
     net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $VALUES -> a
-    1306:1306:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] values() -> values
-    1306:1306:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl valueOf(java.lang.String) -> valueOf
-    1306:1306:void <init>(java.lang.String,int) -> <init>
-    1306:1306:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $values() -> a
-    1306:1310:void <clinit>() -> <clinit>
+    1302:1302:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] values() -> values
+    1302:1302:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl valueOf(java.lang.String) -> valueOf
+    1302:1302:void <init>(java.lang.String,int) -> <init>
+    1302:1302:net.shoreline.client.impl.module.world.AutoMineModule$AntiCrawl[] $values() -> a
+    1302:1306:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc -> net.shoreline.client.nh:
     net.minecraft.class_2338 pos -> n
     double entityDamage -> K
@@ -7186,11 +7185,11 @@ net.shoreline.client.impl.module.world.AutoMineModule$AutoMineCalc -> net.shorel
     879:879:boolean phase() -> aZ
     879:879:int compareTo(java.lang.Object) -> compareTo
 net.shoreline.client.impl.module.world.AutoMineModule$AutoMiningData -> net.shoreline.client.ni:
-    1151:1152:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1147:1148:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$CrawlMiningData -> net.shoreline.client.nj:
-    1159:1160:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1155:1156:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$ManualMiningData -> net.shoreline.client.nk:
-    1143:1144:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1139:1140:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
 net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shoreline.client.nl:
     boolean completedMine -> aU
     boolean attemptedBreak -> aV
@@ -7201,47 +7200,47 @@ net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shorelin
     float blockDamage -> aH
     boolean instantRemine -> aW
     boolean started -> Y
-    1178:1181:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
-    1185:1190:void setCompletedMine(boolean) -> t
-    1194:1194:boolean hasCompletedMine() -> ba
-    1199:1204:void setAttemptedBreak() -> as
-    1208:1209:void resetBreakTime() -> at
-    1213:1213:boolean hasAttemptedBreak() -> bb
-    1218:1218:boolean passedAttemptedBreakTime(long) -> c
-    1223:1223:boolean isInstantRemine() -> bc
-    1228:1229:void setInstantRemine() -> au
-    1233:1235:float damage(float) -> d
-    1240:1241:void setDamage(float) -> x
-    1245:1248:void resetDamage() -> av
-    1252:1252:net.minecraft.class_2338 getPos() -> a
-    1257:1257:net.minecraft.class_2350 getDirection() -> a
-    1262:1262:int getSlot() -> x
-    1267:1267:net.minecraft.class_2680 getState() -> a
-    1272:1272:float getBlockDamage() -> S
-    1277:1277:float getLastDamage() -> ae
-    1282:1282:boolean isStarted() -> bd
-    1287:1288:void setStarted() -> aw
+    1174:1177:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    1181:1186:void setCompletedMine(boolean) -> t
+    1190:1190:boolean hasCompletedMine() -> ba
+    1195:1200:void setAttemptedBreak() -> as
+    1204:1205:void resetBreakTime() -> at
+    1209:1209:boolean hasAttemptedBreak() -> bb
+    1214:1214:boolean passedAttemptedBreakTime(long) -> c
+    1219:1219:boolean isInstantRemine() -> bc
+    1224:1225:void setInstantRemine() -> au
+    1229:1231:float damage(float) -> d
+    1236:1237:void setDamage(float) -> x
+    1241:1244:void resetDamage() -> av
+    1248:1248:net.minecraft.class_2338 getPos() -> a
+    1253:1253:net.minecraft.class_2350 getDirection() -> a
+    1258:1258:int getSlot() -> x
+    1263:1263:net.minecraft.class_2680 getState() -> a
+    1268:1268:float getBlockDamage() -> S
+    1273:1273:float getLastDamage() -> ae
+    1278:1278:boolean isStarted() -> bd
+    1283:1284:void setStarted() -> aw
 net.shoreline.client.impl.module.world.AutoMineModule$Selection -> net.shoreline.client.nm:
     net.shoreline.client.impl.module.world.AutoMineModule$Selection WHITELIST -> a
     net.shoreline.client.impl.module.world.AutoMineModule$Selection BLACKLIST -> b
     net.shoreline.client.impl.module.world.AutoMineModule$Selection ALL -> c
     net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $VALUES -> a
-    1299:1299:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] values() -> values
-    1299:1299:net.shoreline.client.impl.module.world.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
-    1299:1299:void <init>(java.lang.String,int) -> <init>
-    1299:1299:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $values() -> a
-    1299:1303:void <clinit>() -> <clinit>
+    1295:1295:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] values() -> values
+    1295:1295:net.shoreline.client.impl.module.world.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
+    1295:1295:void <init>(java.lang.String,int) -> <init>
+    1295:1295:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $values() -> a
+    1295:1299:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoMineModule$Swap -> net.shoreline.client.nn:
     net.shoreline.client.impl.module.world.AutoMineModule$Swap NORMAL -> a
     net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT -> b
     net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT_ALT -> c
     net.shoreline.client.impl.module.world.AutoMineModule$Swap OFF -> d
     net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $VALUES -> a
-    1291:1291:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] values() -> values
-    1291:1291:net.shoreline.client.impl.module.world.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
-    1291:1291:void <init>(java.lang.String,int) -> <init>
-    1291:1291:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $values() -> a
-    1291:1296:void <clinit>() -> <clinit>
+    1287:1287:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] values() -> values
+    1287:1287:net.shoreline.client.impl.module.world.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
+    1287:1287:void <init>(java.lang.String,int) -> <init>
+    1287:1287:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $values() -> a
+    1287:1292:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoToolModule -> net.shoreline.client.no:
     net.shoreline.client.impl.module.world.AutoToolModule INSTANCE -> a
     25:27:void <init>() -> <init>
@@ -7446,18 +7445,18 @@ net.shoreline.client.impl.module.world.SpeedmineModule -> net.shoreline.client.n
     389:390:void startManualMine(net.minecraft.class_2338,net.minecraft.class_2350) -> a
     394:399:void clickMine(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
     403:415:void queueMiningData(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> b
-    419:456:boolean startMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
-    461:468:void abortMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> c
-    472:504:void stopMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> d
-    508:514:void swapTo(int) -> z
-    518:523:void swapSync(int) -> A
-    527:531:void stopMiningInternal(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> e
-    536:536:boolean isBlockDelayGrim() -> aX
-    541:541:boolean isDataPacketMine(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> b
-    546:558:float calcBlockBreakingDelta(net.minecraft.class_2680,net.minecraft.class_1922,net.minecraft.class_2338) -> a
-    564:598:float getBlockBreakingSpeed(net.minecraft.class_2680) -> a
-    603:608:boolean canHarvest(net.minecraft.class_2680) -> b
-    465:466:net.minecraft.class_2596 lambda$abortMining$13(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData,int) -> a
+    419:452:boolean startMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
+    457:464:void abortMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> c
+    468:500:void stopMining(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> d
+    504:510:void swapTo(int) -> z
+    514:519:void swapSync(int) -> A
+    523:527:void stopMiningInternal(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> e
+    532:532:boolean isBlockDelayGrim() -> aX
+    537:537:boolean isDataPacketMine(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> b
+    542:554:float calcBlockBreakingDelta(net.minecraft.class_2680,net.minecraft.class_1922,net.minecraft.class_2338) -> a
+    560:594:float getBlockBreakingSpeed(net.minecraft.class_2680) -> a
+    599:604:boolean canHarvest(net.minecraft.class_2680) -> b
+    461:462:net.minecraft.class_2596 lambda$abortMining$13(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData,int) -> a
     409:409:boolean lambda$queueMiningData$12(net.shoreline.client.impl.module.world.SpeedmineModule$MiningData,net.shoreline.client.impl.module.world.SpeedmineModule$MiningData) -> a
     383:383:boolean lambda$onRenderWorld$11(java.util.Map$Entry) -> k
     69:69:java.lang.Boolean lambda$new$10() -> b
@@ -7479,52 +7478,52 @@ net.shoreline.client.impl.module.world.SpeedmineModule$MiningData -> net.shoreli
     float lastDamage -> aT
     float blockDamage -> aH
     boolean started -> Y
-    622:625:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
-    629:634:void setAttemptedBreak(boolean) -> u
-    638:639:void resetBreakTime() -> at
-    643:643:boolean hasAttemptedBreak() -> bb
-    648:648:boolean passedAttemptedBreakTime(long) -> c
-    653:655:float damage(float) -> d
-    660:661:void setDamage(float) -> x
-    665:667:void resetDamage() -> av
-    671:671:net.minecraft.class_2338 getPos() -> a
-    676:676:net.minecraft.class_2350 getDirection() -> a
-    681:681:int getSlot() -> x
-    686:686:net.minecraft.class_2680 getState() -> a
-    691:691:float getBlockDamage() -> S
-    696:696:float getLastDamage() -> ae
-    701:701:boolean isStarted() -> bd
-    706:707:void setStarted() -> aw
+    618:621:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
+    625:630:void setAttemptedBreak(boolean) -> u
+    634:635:void resetBreakTime() -> at
+    639:639:boolean hasAttemptedBreak() -> bb
+    644:644:boolean passedAttemptedBreakTime(long) -> c
+    649:651:float damage(float) -> d
+    656:657:void setDamage(float) -> x
+    661:663:void resetDamage() -> av
+    667:667:net.minecraft.class_2338 getPos() -> a
+    672:672:net.minecraft.class_2350 getDirection() -> a
+    677:677:int getSlot() -> x
+    682:682:net.minecraft.class_2680 getState() -> a
+    687:687:float getBlockDamage() -> S
+    692:692:float getLastDamage() -> ae
+    697:697:boolean isStarted() -> bd
+    702:703:void setStarted() -> aw
 net.shoreline.client.impl.module.world.SpeedmineModule$Selection -> net.shoreline.client.nH:
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection WHITELIST -> a
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection BLACKLIST -> b
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection ALL -> c
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] $VALUES -> a
-    724:724:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] values() -> values
-    724:724:net.shoreline.client.impl.module.world.SpeedmineModule$Selection valueOf(java.lang.String) -> valueOf
-    724:724:void <init>(java.lang.String,int) -> <init>
-    724:724:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] $values() -> a
-    724:728:void <clinit>() -> <clinit>
+    720:720:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] values() -> values
+    720:720:net.shoreline.client.impl.module.world.SpeedmineModule$Selection valueOf(java.lang.String) -> valueOf
+    720:720:void <init>(java.lang.String,int) -> <init>
+    720:720:net.shoreline.client.impl.module.world.SpeedmineModule$Selection[] $values() -> a
+    720:724:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode -> net.shoreline.client.nI:
     net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode PACKET -> a
     net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode DAMAGE -> b
     net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] $VALUES -> a
-    710:710:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] values() -> values
-    710:710:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode valueOf(java.lang.String) -> valueOf
-    710:710:void <init>(java.lang.String,int) -> <init>
-    710:710:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] $values() -> a
-    710:713:void <clinit>() -> <clinit>
+    706:706:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] values() -> values
+    706:706:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode valueOf(java.lang.String) -> valueOf
+    706:706:void <init>(java.lang.String,int) -> <init>
+    706:706:net.shoreline.client.impl.module.world.SpeedmineModule$SpeedmineMode[] $values() -> a
+    706:709:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.SpeedmineModule$Swap -> net.shoreline.client.nJ:
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap NORMAL -> a
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap SILENT -> b
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap SILENT_ALT -> c
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap OFF -> d
     net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] $VALUES -> a
-    716:716:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] values() -> values
-    716:716:net.shoreline.client.impl.module.world.SpeedmineModule$Swap valueOf(java.lang.String) -> valueOf
-    716:716:void <init>(java.lang.String,int) -> <init>
-    716:716:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] $values() -> a
-    716:721:void <clinit>() -> <clinit>
+    712:712:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] values() -> values
+    712:712:net.shoreline.client.impl.module.world.SpeedmineModule$Swap valueOf(java.lang.String) -> valueOf
+    712:712:void <init>(java.lang.String,int) -> <init>
+    712:712:net.shoreline.client.impl.module.world.SpeedmineModule$Swap[] $values() -> a
+    712:717:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.XRayModule -> net.shoreline.client.nK:
     net.shoreline.client.api.config.Config opacityConfig -> kj
     net.shoreline.client.api.config.Config softReloadConfig -> iD
