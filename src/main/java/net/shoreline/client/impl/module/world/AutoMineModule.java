@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -363,16 +364,21 @@ public class AutoMineModule extends CombatModule
             }
         }
         tickDelay--;
-        if (miningQueue.isEmpty())
-        {
-            return;
-        }
+
         for (MiningData data : miningQueue)
         {
+
+            if (data instanceof AutoMiningData && !(data instanceof CrawlMiningData) && playerTarget != null
+                    && !isPhasedInBedrock(playerTarget) && data.getPos().getY() != playerTarget.getBlockPos().getY())
+            {
+                removeQueuedMine(data);
+            }
+
             if (data.getState().isAir())
             {
                 data.resetBreakTime();
             }
+
             if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak()
                     && data.passedAttemptedBreakTime(500)))
             {
@@ -394,6 +400,11 @@ public class AutoMineModule extends CombatModule
                 silentSwapping = true;
                 data.setAttemptedBreak();
             }
+        }
+
+        if (miningQueue.isEmpty())
+        {
+            return;
         }
         MiningData miningData2 = miningQueue.getFirst();
         final double distance = mc.player.getEyePos().squaredDistanceTo(miningData2.getPos().toCenterPos());
@@ -749,7 +760,7 @@ public class AutoMineModule extends CombatModule
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
 
-        if (BlastResistantBlocks.isUnbreakable(entity.getBlockPos()) && !entity.isCrawling())
+        if (isPhasedInBedrock(entity))
         {
             BlockPos belowFeet = entity.getBlockPos().down();
             BlockState state = mc.world.getBlockState(belowFeet);
@@ -772,6 +783,13 @@ public class AutoMineModule extends CombatModule
                     {
                         continue;
                     }
+
+                    BlockState state2 = mc.world.getBlockState(blockPos1.down());
+                    if (!state2.isOf(Blocks.OBSIDIAN) && !state2.isOf(Blocks.BEDROCK))
+                    {
+                        continue;
+                    }
+
                     // Check all possible crystal placements for highest damage
                     double bestDamage = 0.0;
                     for (Direction direction : Direction.values())
@@ -819,6 +837,13 @@ public class AutoMineModule extends CombatModule
             {
                 continue;
             }
+
+            BlockState state2 = mc.world.getBlockState(blockPos.down());
+            if (!state2.isOf(Blocks.OBSIDIAN) && !state2.isOf(Blocks.BEDROCK))
+            {
+                continue;
+            }
+
             // Check all possible crystal placements for highest damage
             double bestDamage = 0.0;
             for (Direction direction : Direction.values())
@@ -846,6 +871,12 @@ public class AutoMineModule extends CombatModule
         }
 
         return miningPositions;
+    }
+
+    private boolean isPhasedInBedrock(Entity entity)
+    {
+        return PositionUtil.getAllInBox(entity.getBoundingBox(), entity.getBlockPos())
+                .stream().anyMatch(BlastResistantBlocks::isUnbreakable) && !entity.isCrawling();
     }
 
     private BlockPos getCrawlingMine(PlayerEntity playerTarget)
