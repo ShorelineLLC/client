@@ -19,6 +19,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.ItemDesyncEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.combat.ReplenishModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorBundlePacket;
@@ -74,7 +75,7 @@ public class InventoryManager implements Globals
             slot = packet.getSlot();
         }
         
-        if (ReplenishModule.getInstance().isInInventoryScreen())
+        if (ReplenishModule.getInstance().isInInventoryScreen() || !AnticheatModule.getInstance().isGrim())
         {
             return;
         }

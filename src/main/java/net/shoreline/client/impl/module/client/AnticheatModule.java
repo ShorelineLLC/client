@@ -27,9 +27,9 @@ public class AnticheatModule extends ConcurrentModule
 {
     private static AnticheatModule INSTANCE;
 
-    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Applies grim strict directions", false));
-    Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false));
-    Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Applies grim optimizations", false));
+    Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> grimConfig.getValue()));
+    Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false, () -> grimConfig.getValue()));
     Config<Boolean> raytraceSpoofConfig = register(new BooleanConfig("RaytraceFix", "Allows you to spoof your raytrace", false));
 
     private final Timer raytraceTimer = new CacheTimer();
