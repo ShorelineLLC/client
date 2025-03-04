@@ -13,6 +13,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.RenderPlayerEvent;
 import net.shoreline.client.impl.imixin.IClientPlayerEntity;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.RotationsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -180,7 +181,7 @@ public class RotationManager implements Globals
             {
                 prevJumpYaw = mc.player.getYaw();
                 mc.player.setYaw(rotation.getYaw());
-                if (RotationsModule.getInstance().getWebJumpFix() && webJumpFix)
+                if (AnticheatModule.getInstance().getWebJumpFix() && webJumpFix)
                 {
                     preJumpFix = mc.player.isSprinting();
                     mc.player.setSprinting(false);

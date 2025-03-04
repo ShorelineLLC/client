@@ -26,6 +26,7 @@ import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.CombatModule;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
@@ -990,7 +991,7 @@ public class AutoMineModule extends CombatModule
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             if (grimNewConfig.getValue())
             {
-                if (!AntiInteractModule.getInstance().getMiningFix())
+                if (!AnticheatModule.getInstance().getMiningFix())
                 {
                     Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                             PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));

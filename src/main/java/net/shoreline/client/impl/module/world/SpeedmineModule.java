@@ -32,6 +32,7 @@ import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.CombatModule;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager;
 import net.shoreline.client.util.collection.FirstOutQueue;
@@ -426,7 +427,7 @@ public class SpeedmineModule extends CombatModule
         data.setStarted();
         if (grimNewConfig.getValue())
         {
-            if (!AntiInteractModule.getInstance().getMiningFix())
+            if (!AnticheatModule.getInstance().getMiningFix())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));

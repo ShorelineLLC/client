@@ -18,6 +18,8 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
+import net.shoreline.client.impl.module.world.AutoMineModule;
+import net.shoreline.client.impl.module.world.SpeedmineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.position.PositionUtil;
@@ -87,6 +89,12 @@ public class CriticalsModule extends ToggleModule
         {
             return;
         }
+
+        if (AutoCrystalModule.getInstance().isAttacking() || AutoCrystalModule.getInstance().isPlacing())
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof IPlayerInteractEntityC2SPacket packet
                 && packet.getType() == InteractType.ATTACK)
         {

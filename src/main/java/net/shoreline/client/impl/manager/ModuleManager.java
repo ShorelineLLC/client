@@ -35,6 +35,7 @@ public final class ModuleManager
         // MAINTAIN ALPHABETICAL ORDER
         register(
                 // Client
+                new AnticheatModule(),
                 new CapesModule(),
                 new ChatModule(),
                 new ClickGuiModule(),

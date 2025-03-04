@@ -33,13 +33,8 @@ public class RotationsModule extends ConcurrentModule
     Config<Float> preserveTicksConfig = register(new NumberConfig<>("PreserveTicks", "Time to preserve rotations after reaching the target rotations", 0.0f, 10.0f, 20.0f));
     Config<Boolean> movementFixConfig = register(new BooleanConfig("MovementFix", "Fixes movement on Grim when rotating", false));
     Config<Boolean> mouseSensFixConfig = register(new BooleanConfig("MouseSensFix", "Fixes movement on Grim when applying mouse sensitivity", false));
-    Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false));
-    Config<Boolean> raytraceSpoofConfig = register(new BooleanConfig("RaytraceSpoof", "Allows you to spoof your raytrace", false));
     //
     private float prevYaw;
-
-    private final Timer raytraceTimer = new CacheTimer();
-    private float pitch = Float.NaN;
 
     /**
      *
@@ -50,46 +45,6 @@ public class RotationsModule extends ConcurrentModule
         INSTANCE = this;
     }
 
-    @EventListener
-    public void onConfigUpdate(ConfigUpdateEvent event)
-    {
-        if (event.getStage() == StageEvent.EventStage.POST &&
-                event.getConfig() == raytraceSpoofConfig && !raytraceSpoofConfig.getValue())
-        {
-            pitch = Float.NaN;
-        }
-    }
-
-    @EventListener(priority = 10000)
-    public void onPacketOutbound(PacketEvent.Outbound event)
-    {
-        if (mc.player == null || mc.world == null || !raytraceSpoofConfig.getValue())
-        {
-            return;
-        }
-        if (event.getPacket() instanceof PlayerInteractBlockC2SPacket packet && raytraceTimer.passed(250))
-        {
-            BlockHitResult packetResult = packet.getBlockHitResult();
-            BlockPos pos = packetResult.getBlockPos();
-            BlockHitResult result = mc.world.raycast(new RaycastContext(
-                    mc.player.getEyePos(), DirectionUtil.getDirectionOffsetPos(pos, packetResult.getSide()),
-                    RaycastContext.ShapeType.COLLIDER,
-                    RaycastContext.FluidHandling.NONE, mc.player));
-            if (mc.world.isSpaceEmpty(mc.player.getBoundingBox().stretch(0.0, 0.15, 0.0)) && result != null
-                    && result.getType() == HitResult.Type.BLOCK && !result.getBlockPos().equals(pos))
-            {
-                pitch = -75;
-                raytraceTimer.reset();
-            }
-        }
-
-        if (event.getPacket() instanceof PlayerMoveC2SPacket packet && packet.changesLook() && !Float.isNaN(pitch))
-        {
-            ((AccessorPlayerMoveC2SPacket) packet).hookSetPitch(pitch);
-            pitch = Float.NaN;
-        }
-    }
-
     public static RotationsModule getInstance()
     {
         return INSTANCE;
@@ -98,11 +53,6 @@ public class RotationsModule extends ConcurrentModule
     public boolean getMovementFix()
     {
         return movementFixConfig.getValue() && !(DisablerModule.getInstance().isEnabled() && DisablerModule.getInstance().isYawOverflow());
-    }
-
-    public boolean getWebJumpFix()
-    {
-        return webJumpFixConfig.getValue();
     }
 
     public boolean getMouseSensFix()
