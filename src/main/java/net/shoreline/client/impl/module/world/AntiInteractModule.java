@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class AntiInteractModule extends ToggleModule
 {
+    private static AntiInteractModule INSTANCE;
+
     //
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist"));
     Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false));
@@ -37,6 +39,12 @@ public class AntiInteractModule extends ToggleModule
     public AntiInteractModule()
     {
         super("AntiInteract", "Prevents player from interacting with certain objects", ModuleCategory.WORLD);
+        INSTANCE = this;
+    }
+
+    public static AntiInteractModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @EventListener
@@ -101,5 +109,10 @@ public class AntiInteractModule extends ToggleModule
             return;
         }
         event.cancel();
+    }
+
+    public boolean getMiningFix()
+    {
+        return miningFixConfig.getValue();
     }
 }

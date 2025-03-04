@@ -426,8 +426,21 @@ public class SpeedmineModule extends CombatModule
         data.setStarted();
         if (grimNewConfig.getValue())
         {
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            if (!AntiInteractModule.getInstance().getMiningFix())
+            {
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            }
+            else
+            {
+                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+            }
+
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -435,6 +448,7 @@ public class SpeedmineModule extends CombatModule
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             return true;
         }
+
         Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                 PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
         Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
@@ -602,6 +616,11 @@ public class SpeedmineModule extends CombatModule
             return mc.player.getInventory().getStack(tool).isSuitableFor(state);
         }
         return true;
+    }
+
+    public boolean isMining()
+    {
+        return !miningQueue.isEmpty();
     }
 
     public static class MiningData

@@ -990,8 +990,21 @@ public class AutoMineModule extends CombatModule
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
             if (grimNewConfig.getValue())
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                if (!AntiInteractModule.getInstance().getMiningFix())
+                {
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                }
+                else
+                {
+                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
+                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
+                }
+
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
                 Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -1157,6 +1170,11 @@ public class AutoMineModule extends CombatModule
                     return !isDataPacketMine(d) && damage > 0.75;
                 })
                 .map(MiningData::getPos).findAny().orElse(null);
+    }
+
+    public boolean isMining()
+    {
+        return !miningQueue.isEmpty();
     }
 
     public boolean isSilentSwapping()
