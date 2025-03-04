@@ -91,7 +91,7 @@ public class AutoMineModule extends CombatModule
     private PlayerEntity playerTarget;
     private final Map<MiningData, Animation> fadeList = new HashMap<>();
     private FirstOutQueue<MiningData> miningQueue = new FirstOutQueue<>(2);
-    private final Queue<AutoMiningData> autoMiningQueue = new ArrayDeque<>();
+    private final Queue<MiningData> autoMiningQueue = new ArrayDeque<>();
     private long lastBreak;
     private boolean manualOverride;
     private boolean crawlingOverride;
@@ -168,7 +168,7 @@ public class AutoMineModule extends CombatModule
 
         if (!autoMiningQueue.isEmpty() && tickDelay <= 0)
         {
-            AutoMiningData nextMine = autoMiningQueue.poll();
+            MiningData nextMine = autoMiningQueue.poll();
             if (nextMine != null)
             {
                 queueMiningData(nextMine);
@@ -257,7 +257,7 @@ public class AutoMineModule extends CombatModule
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos()) && miningQueue.size() < 2;
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
@@ -291,7 +291,7 @@ public class AutoMineModule extends CombatModule
                             if (instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
@@ -315,7 +315,7 @@ public class AutoMineModule extends CombatModule
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
@@ -341,7 +341,7 @@ public class AutoMineModule extends CombatModule
                             if (instantMineIncorrect || miningQueue.isEmpty())
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData instanceof AutoMiningData && miningData.isInstantRemine()
+                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
                                         && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
@@ -359,16 +359,17 @@ public class AutoMineModule extends CombatModule
                 }
                 else
                 {
-                    removeIfQueuedMine(d -> d instanceof AutoMiningData);
+                    removeIfQueuedMine(MiningData::isAutoMine);
                 }
             }
         }
+
         tickDelay--;
 
         for (MiningData data : miningQueue)
         {
 
-            if (data instanceof AutoMiningData && !(data instanceof CrawlMiningData) && playerTarget != null
+            if (data.getType() == MiningDataType.AUTO && playerTarget != null
                     && !isPhasedInBedrock(playerTarget) && data.getPos().getY() != playerTarget.getBlockPos().getY())
             {
                 removeQueuedMine(data);
@@ -426,7 +427,7 @@ public class AutoMineModule extends CombatModule
             }
             if (instantConfig.getValue())
             {
-                if (miningData2 instanceof AutoMiningData && !autoRemineConfig.getValue())
+                if (miningData2.isAutoMine() && !autoRemineConfig.getValue())
                 {
                     removeQueuedMine(miningData2);
                     return;
@@ -487,7 +488,7 @@ public class AutoMineModule extends CombatModule
                 // abortMining(miningData);
                 return;
             }
-            if (data instanceof AutoMiningData)
+            if (data.isAutoMine())
             {
                 miningQueue.clear();
                 manualOverride = true;
@@ -503,7 +504,7 @@ public class AutoMineModule extends CombatModule
                 // abortMining(miningData);
                 return;
             }
-            if (data1 instanceof AutoMiningData && data2 instanceof AutoMiningData)
+            if (data1.isAutoMine() && data2.isAutoMine())
             {
                 removeQueuedMine();
                 manualOverride = true;
@@ -674,7 +675,7 @@ public class AutoMineModule extends CombatModule
         {
             return;
         }
-        queueMiningData(new ManualMiningData(pos, direction));
+        queueMiningData(new MiningData(pos, direction, MiningDataType.MANUAL));
     }
 
     private void startAutoMine(BlockPos pos, Direction miningDir)
@@ -684,7 +685,7 @@ public class AutoMineModule extends CombatModule
 
     private void startAutoMine(BlockPos pos, Direction miningDir, boolean crawlingMine)
     {
-        AutoMiningData miningData = crawlingMine ? new CrawlMiningData(pos, miningDir) : new AutoMiningData(pos, miningDir);
+        MiningData miningData = new MiningData(pos, miningDir, crawlingMine ? MiningDataType.ANTI_CRAWL : MiningDataType.AUTO);
         if (tickDelay <= 0)
         {
             queueMiningData(miningData);
@@ -950,11 +951,11 @@ public class AutoMineModule extends CombatModule
         boolean antiCrawlMining = false;
         for (MiningData data : miningQueue)
         {
-            if (data instanceof ManualMiningData)
+            if (data.getType() == MiningDataType.MANUAL)
             {
                 manualMining = true;
             }
-            else if (data instanceof CrawlMiningData)
+            else if (data.getType() == MiningDataType.ANTI_CRAWL)
             {
                 antiCrawlMining = true;
             }
@@ -1163,32 +1164,17 @@ public class AutoMineModule extends CombatModule
         return silentSwapping;
     }
 
-    public static class ManualMiningData extends MiningData
+    public enum MiningDataType
     {
-        public ManualMiningData(BlockPos pos, Direction direction)
-        {
-            super(pos, direction);
-        }
-    }
-
-    public static class AutoMiningData extends MiningData
-    {
-        public AutoMiningData(BlockPos pos, Direction direction)
-        {
-            super(pos, direction);
-        }
-    }
-
-    public static class CrawlMiningData extends AutoMiningData
-    {
-        public CrawlMiningData(BlockPos pos, Direction direction)
-        {
-            super(pos, direction);
-        }
+        MANUAL,
+        AUTO,
+        ANTI_CRAWL
     }
 
     public static class MiningData
     {
+        private final MiningDataType type;
+
         private boolean completedMine;
         private boolean attemptedBreak;
         private long breakTime;
@@ -1201,10 +1187,11 @@ public class AutoMineModule extends CombatModule
         private boolean instantRemine;
         private boolean started;
 
-        public MiningData(BlockPos pos, Direction direction)
+        public MiningData(BlockPos pos, Direction direction, MiningDataType type)
         {
             this.pos = pos;
             this.direction = direction;
+            this.type = type;
         }
 
         public void setCompletedMine(boolean completedMine)
@@ -1272,6 +1259,16 @@ public class AutoMineModule extends CombatModule
             instantRemine = false;
             started = false;
             blockDamage = 0.0f;
+        }
+
+        public MiningDataType getType()
+        {
+            return type;
+        }
+
+        public boolean isAutoMine()
+        {
+            return type != MiningDataType.MANUAL;
         }
 
         public BlockPos getPos()
