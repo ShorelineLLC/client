@@ -31,6 +31,7 @@ import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.FirstOutQueue;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
@@ -371,7 +372,7 @@ public class AutoMineModule extends CombatModule
         {
 
             if (data.getType() == MiningDataType.AUTO && playerTarget != null
-                    && !isPhasedInBedrock(playerTarget) && data.getPos().getY() != playerTarget.getBlockPos().getY())
+                    && !isPhasedInBedrock(playerTarget) && data.getPos().getY() != Math.round(playerTarget.getY()))
             {
                 removeQueuedMine(data);
             }
@@ -716,16 +717,17 @@ public class AutoMineModule extends CombatModule
 
     private List<AutoMineCalc> getPhasePosition(PlayerEntity entity)
     {
-        return getPhasePosition(entity, entity.getBlockPos());
+        return getPhasePosition(entity, EntityUtil.getRoundedBlockPos(entity));
     }
 
     private List<AutoMineCalc> getPhasePosition(PlayerEntity entity, BlockPos entityPos)
     {
+        BlockPos entityBlockPos = EntityUtil.getRoundedBlockPos(entity);
         List<AutoMineCalc> phasePositions = new ArrayList<>();
-        boolean bedrockPhased = BlastResistantBlocks.isUnbreakable(entity.getBlockPos()) && !entity.isCrawling();
+        boolean bedrockPhased = BlastResistantBlocks.isUnbreakable(entityBlockPos) && !entity.isCrawling();
         if (aboveHeadConfig.getValue() && bedrockPhased)
         {
-            BlockPos aboveHead = entity.getBlockPos().up(2);
+            BlockPos aboveHead = entityBlockPos.up(2);
             BlockState state = mc.world.getBlockState(aboveHead);
             if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
@@ -759,12 +761,14 @@ public class AutoMineModule extends CombatModule
      */
     private PriorityQueue<AutoMineCalc> getMiningPosition(PlayerEntity entity)
     {
+        BlockPos entityBlockPos = EntityUtil.getRoundedBlockPos(entity);
+
         PriorityQueue<AutoMineCalc> miningPositions = new PriorityQueue<>();
         List<BlockPos> surroundBlocks = SurroundModule.getInstance().getSurroundNoDown(entity);
 
         if (isPhasedInBedrock(entity))
         {
-            BlockPos belowFeet = entity.getBlockPos().down();
+            BlockPos belowFeet = entityBlockPos.down();
             BlockState state = mc.world.getBlockState(belowFeet);
             if (!state.isReplaceable() && validAutoMineBlock(state.getBlock()))
             {
@@ -888,7 +892,7 @@ public class AutoMineModule extends CombatModule
             return null;
         }
         BlockPos crawlingPos = mc.player.getBlockPos();
-        boolean playerBelow = playerTarget != null && playerTarget.getBlockPos().getY() < crawlingPos.getY();
+        boolean playerBelow = playerTarget != null && EntityUtil.getRoundedBlockPos(playerTarget).getY() < crawlingPos.getY();
         // We want to be same level as our opponent
         if (playerBelow)
         {

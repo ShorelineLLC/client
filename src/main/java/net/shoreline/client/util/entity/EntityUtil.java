@@ -8,6 +8,7 @@ import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
+import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.util.Globals;
 import net.shoreline.client.util.chat.ChatUtil;
 
@@ -17,6 +18,16 @@ import net.shoreline.client.util.chat.ChatUtil;
  */
 public class EntityUtil implements Globals
 {
+    /**
+     *
+     * @param entity
+     * @return
+     */
+    public static BlockPos getRoundedBlockPos(Entity entity)
+    {
+        return new BlockPos(entity.getBlockX(), (int) Math.round(entity.getY()), entity.getBlockZ());
+    }
+
     /**
      * @param entity
      * @return
