@@ -46,6 +46,7 @@ public class HoleESPModule extends ToggleModule
     Config<Color> mixedConfig = register(new ColorConfig("Obsidian-BedrockColor", "The color for rendering mixed holes", new Color(255, 255, 0, 80), () -> obsidianBedrockConfig.getValue()));
     Config<Color> bedrockConfig = register(new ColorConfig("BedrockColor", "The color for rendering bedrock holes", new Color(0, 255, 0, 80)));
     Config<Color> voidColorConfig = register(new ColorConfig("VoidColor", "The color for rendering bedrock holes", new Color(255, 0, 0, 140), () -> voidConfig.getValue()));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 300, 1000, () -> false));
 
     private final Map<Hole, Animation> fadeList = new HashMap<>();
 
@@ -77,7 +78,7 @@ public class HoleESPModule extends ToggleModule
         {
             if (!containsPos(fadeList.keySet(), hole))
             {
-                Animation anim = new Animation(false, 300);
+                Animation anim = new Animation(false, fadeTimeConfig.getValue());
                 fadeList.put(hole, anim);
             }
         }

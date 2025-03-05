@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -22,9 +23,12 @@ import net.shoreline.client.impl.event.render.RenderBlockOutlineEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author linus
@@ -36,7 +40,12 @@ public class BlockHighlightModule extends ToggleModule
     Config<BoxRender> boxModeConfig = register(new EnumConfig<>("BoxMode", "Box rendering mode", BoxRender.OUTLINE, BoxRender.values()));
     Config<Boolean> entitiesConfig = register(new BooleanConfig("Debug-Entities", "Highlights entity bounding boxes for debug purposes", false));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the highlight", 1.0f, 1.0f, 5.0f));
+    Config<Boolean> fadeConfig = register(new BooleanConfig("Fade", "Fades the block highlight", false));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 200, 1000, () -> false));
+
     private double distance;
+
+    private final Map<Box, Animation> fadeList = new HashMap<>();
 
     public BlockHighlightModule()
     {
@@ -58,6 +67,12 @@ public class BlockHighlightModule extends ToggleModule
         return decimal.format(distance);
     }
 
+    @Override
+    public void onDisable()
+    {
+        fadeList.clear();
+    }
+
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
@@ -65,6 +80,12 @@ public class BlockHighlightModule extends ToggleModule
         {
             return;
         }
+
+        if (!fadeConfig.getValue() && !fadeList.isEmpty())
+        {
+            fadeList.clear();
+        }
+
         Box render = null;
         final HitResult result = mc.crosshairTarget;
         if (result != null)
@@ -76,6 +97,10 @@ public class BlockHighlightModule extends ToggleModule
                 final Entity entity = ((EntityHitResult) result).getEntity();
                 render = entity.getBoundingBox();
                 distance = pos.distanceTo(entity.getPos());
+                if (fadeConfig.getValue())
+                {
+                    fadeList.put(render, new Animation(true, fadeTimeConfig.getValue()));
+                }
             }
             else if (result.getType() == HitResult.Type.BLOCK)
             {
@@ -91,25 +116,48 @@ public class BlockHighlightModule extends ToggleModule
                         hpos.getZ() + render1.minZ, hpos.getX() + render1.maxX,
                         hpos.getY() + render1.maxY, hpos.getZ() + render1.maxZ);
                 distance = pos.distanceTo(hpos.toCenterPos());
+                if (fadeConfig.getValue())
+                {
+                    fadeList.put(render, new Animation(true, fadeTimeConfig.getValue()));
+                }
             }
         }
         RenderBuffers.preRender();
-        if (render != null)
+        if (fadeConfig.getValue())
         {
-            switch (boxModeConfig.getValue())
+            for (Map.Entry<Box, Animation> set : fadeList.entrySet())
             {
-                case FILL ->
+                Box box = set.getKey();
+                set.getValue().setState(false);
+                if (set.getValue().getFactor() < 0.01f)
                 {
-                    RenderManager.renderBox(event.getMatrices(), render,
-                            ColorsModule.getInstance().getRGB(60));
-                    RenderManager.renderBoundingBox(event.getMatrices(),
-                            render, widthConfig.getValue(), ColorsModule.getInstance().getRGB(145));
+                    continue;
                 }
-                case OUTLINE -> RenderManager.renderBoundingBox(event.getMatrices(),
-                        render, widthConfig.getValue(), ColorsModule.getInstance().getRGB(145));
+                int boxAlpha = (int) (40 * set.getValue().getFactor());
+                int lineAlpha = (int) (145 * set.getValue().getFactor());
+                renderBb(event.getMatrices(), box, ColorsModule.getInstance().getRGB(boxAlpha), ColorsModule.getInstance().getRGB(lineAlpha));
             }
         }
+        else if (render != null)
+        {
+            renderBb(event.getMatrices(), render, ColorsModule.getInstance().getRGB(40), ColorsModule.getInstance().getRGB(145));
+        }
         RenderBuffers.postRender();
+    }
+
+    private void renderBb(MatrixStack matrixStack, Box render, int color, int lineColor)
+    {
+        switch (boxModeConfig.getValue())
+        {
+            case FILL ->
+            {
+                RenderManager.renderBox(matrixStack, render, color);
+                RenderManager.renderBoundingBox(matrixStack,
+                        render, widthConfig.getValue(), lineColor);
+            }
+            case OUTLINE -> RenderManager.renderBoundingBox(matrixStack,
+                    render, widthConfig.getValue(), lineColor);
+        }
     }
 
     @EventListener
