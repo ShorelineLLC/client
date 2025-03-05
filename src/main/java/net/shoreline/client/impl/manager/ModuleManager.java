@@ -12,7 +12,6 @@ import net.shoreline.client.impl.module.movement.*;
 import net.shoreline.client.impl.module.render.*;
 import net.shoreline.client.impl.module.world.*;
 import net.shoreline.client.init.Managers;
-import net.shoreline.loader.Loader;
 
 import java.util.*;
 
@@ -159,6 +158,7 @@ public final class ModuleManager
                 new BreadcrumbsModule(),
                 new BreakHighlightModule(),
                 new ChamsModule(),
+                new CrosshairModule(),
                 new CrystalModelModule(),
                 new ESPModule(),
                 new ExtraTabModule(),
