@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -25,6 +26,7 @@ import net.shoreline.client.impl.event.render.block.entity.RenderSignTextEvent;
 import net.shoreline.client.impl.event.render.entity.*;
 import net.shoreline.client.impl.event.toast.RenderToastEvent;
 import net.shoreline.client.impl.event.world.BlindnessEvent;
+import net.shoreline.client.impl.module.exploit.GodModeModule;
 import net.shoreline.client.mixin.accessor.AccessorFireworkRocketEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
@@ -65,6 +67,7 @@ public class NoRenderModule extends ToggleModule
     Config<FogRender> fogConfig = register(new EnumConfig<>("Fog", "Prevents fog from rendering in the world", FogRender.OFF, FogRender.values()));
     Config<ItemRender> itemsConfig = register(new EnumConfig<>("Items", "Prevents dropped items from rendering", ItemRender.OFF, ItemRender.values()));
     Config<Boolean> guiToastConfig = register(new BooleanConfig("GuiToast", "Prevents advancements from rendering", true));
+    Config<Boolean> terrainScreenConfig = register(new BooleanConfig("TerrainScreen", "Prevents downloading terrain screen from rendering", false));
 
     public NoRenderModule()
     {
@@ -80,7 +83,12 @@ public class NoRenderModule extends ToggleModule
     @EventListener
     public void onTick(TickEvent event)
     {
-        if (itemsConfig.getValue() == ItemRender.REMOVE && event.getStage() == StageEvent.EventStage.PRE)
+        if (event.getStage() != StageEvent.EventStage.PRE)
+        {
+            return;
+        }
+
+        if (itemsConfig.getValue() == ItemRender.REMOVE)
         {
             for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
             {
@@ -89,6 +97,12 @@ public class NoRenderModule extends ToggleModule
                     mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
                 }
             }
+        }
+
+        if (terrainScreenConfig.getValue() && mc.currentScreen instanceof DownloadingTerrainScreen
+                && !GodModeModule.getInstance().isPortal())
+        {
+            mc.currentScreen = null;
         }
     }
 

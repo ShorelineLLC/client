@@ -6,6 +6,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.event.gui.hud.RenderCrosshairEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
@@ -164,5 +165,16 @@ public class MixinInGameHud implements Globals
     {
         RenderOverlayEvent.Hotbar hotbar = new RenderOverlayEvent.Hotbar(context);
         EventBus.INSTANCE.dispatch(hotbar);
+    }
+
+    @Inject(method = "renderCrosshair", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    {
+        RenderCrosshairEvent renderCrosshairEvent = new RenderCrosshairEvent(context);
+        EventBus.INSTANCE.dispatch(renderCrosshairEvent);
+        if (renderCrosshairEvent.isCanceled())
+        {
+            ci.cancel();
+        }
     }
 }

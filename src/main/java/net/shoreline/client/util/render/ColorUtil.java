@@ -75,6 +75,11 @@ public class ColorUtil
         return f;
     }
 
+    public static int withAlpha(int color, float opacity)
+    {
+        return withAlpha(color, (int) (255 * opacity));
+    }
+
     public static int withAlpha(int color, int alpha)
     {
         int red = 0xFF & (color >> 16);
