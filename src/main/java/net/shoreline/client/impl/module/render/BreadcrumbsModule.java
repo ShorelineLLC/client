@@ -15,8 +15,10 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.Interpolation;
 import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.event.world.RemoveEntityEvent;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -34,7 +36,7 @@ public class BreadcrumbsModule extends ToggleModule
     private final Map<Integer, List<TimedPosition>> positions = new ConcurrentHashMap<>();
     Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Renders breadcrumbs for all positions since toggle", true));
     Config<Float> maxTimeConfig = register(new NumberConfig<>("MaxPosition", "The maximum time for a given position", 1.0f, 2.0f, 20.0f));
-    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 1000, 2000, () -> false));
+    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 1000, 5000, () -> false));
     Config<Float> widthConfig = register(new NumberConfig<>("Width", "The line width of the path", 1.0f, 1.0f, 5.0f));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Renders breadcrumbs on player", true));
     Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Renders breadcrumbs on other players", false));
@@ -86,6 +88,15 @@ public class BreadcrumbsModule extends ToggleModule
                     }
                 }
             }
+        }
+    }
+
+    @EventListener
+    public void onEntityDeath(RemoveEntityEvent event)
+    {
+        if (infiniteConfig.getValue())
+        {
+            positions.remove(event.getEntity().getId());
         }
     }
 

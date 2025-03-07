@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.option.Perspective;
+import net.minecraft.world.GameMode;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.ColorConfig;
@@ -35,6 +37,12 @@ public class CrosshairModule extends ToggleModule
     public void onRenderCrosshair(RenderCrosshairEvent event)
     {
         event.cancel();
+
+        if (!mc.options.getPerspective().isFirstPerson() || mc.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR)
+        {
+            return;
+        }
+
         DrawContext context = event.getContext();
         float x = (context.getScaledWindowWidth() / 2.0f) - 0.5f;
         float y = (context.getScaledWindowHeight() / 2.0f) - 0.5f;

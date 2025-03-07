@@ -47,7 +47,16 @@ public class EntityUtil implements Globals
      */
     public static boolean isMonster(Entity e)
     {
-        return e instanceof Monster && !(e instanceof Angerable) || e instanceof Angerable && !isNeutral(e);
+        return e instanceof Monster && !isNeutralInternal(e);
+    }
+
+    private static boolean isNeutralInternal(Entity e)
+    {
+        return e instanceof EndermanEntity enderman && !enderman.isAttacking()
+                || e instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()
+                || e instanceof WolfEntity wolf && !wolf.isAttacking()
+                || e instanceof IronGolemEntity ironGolem && !ironGolem.isAttacking()
+                || e instanceof BeeEntity bee && !bee.isAttacking();
     }
 
     /**
@@ -56,11 +65,7 @@ public class EntityUtil implements Globals
      */
     public static boolean isNeutral(Entity e)
     {
-        return e instanceof EndermanEntity enderman && !enderman.isAttacking()
-                || e instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()
-                || e instanceof WolfEntity wolf && !wolf.isAttacking()
-                || e instanceof IronGolemEntity ironGolem && !ironGolem.isAttacking()
-                || e instanceof BeeEntity bee && !bee.isAttacking();
+        return e instanceof EndermanEntity || e instanceof ZombifiedPiglinEntity || e instanceof WolfEntity || e instanceof IronGolemEntity;
     }
 
     /**
