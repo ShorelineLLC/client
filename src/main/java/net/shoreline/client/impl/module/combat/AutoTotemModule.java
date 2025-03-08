@@ -18,6 +18,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.world.LoadWorldEvent;
 import net.shoreline.client.impl.module.exploit.ChorusInvincibilityModule;
@@ -60,6 +61,9 @@ public final class AutoTotemModule extends ToggleModule
     private boolean replacing;
     private long replaceTime;
 
+    private final Timer mainhandSwapTimer = new CacheTimer();
+    private boolean totemInMainhand;
+
     public AutoTotemModule()
     {
         super("AutoTotem", "Automatically replenishes the totem in your offhand", ModuleCategory.COMBAT);
@@ -85,6 +89,7 @@ public final class AutoTotemModule extends ToggleModule
         lastHotbarSlot = -1;
         lastHotbarItem = null;
         offhandItem = null;
+        totemInMainhand = false;
     }
 
     @EventListener
@@ -101,7 +106,7 @@ public final class AutoTotemModule extends ToggleModule
             return;
         }
 
-        if (mainhandTotemConfig.getValue())
+        if (mainhandTotemConfig.getValue() && mainhandSwapTimer.passed(200))
         {
             int totemSlot1 = totemSlotConfig.getValue() - 1;
             ItemStack totemSlotStack = mc.player.getInventory().getStack(totemSlot1);
@@ -143,7 +148,8 @@ public final class AutoTotemModule extends ToggleModule
                 }
             }
 
-            if (checkMainhandTotem())
+            totemInMainhand = checkMainhandTotem();
+            if (totemInMainhand)
             {
                 int totemSlot = -1;
                 for (int i = 0; i < 9; i++)
@@ -160,6 +166,10 @@ public final class AutoTotemModule extends ToggleModule
                     Managers.INVENTORY.setClientSlot(totemSlot);
                 }
             }
+        }
+        else
+        {
+            totemInMainhand = false;
         }
 
         offhandItem = itemConfig.getValue().getItem();
@@ -298,6 +308,15 @@ public final class AutoTotemModule extends ToggleModule
         return failureReasonsSet;
     }
 
+    @EventListener
+    public void onConfigUpdate(ConfigUpdateEvent event)
+    {
+        if (event.getConfig() == totemSlotConfig)
+        {
+            mainhandSwapTimer.reset();
+        }
+    }
+
     private boolean checkLethal()
     {
         // If the player's health (+absorption) falls below the "safe" amount, equip a totem
@@ -349,6 +368,11 @@ public final class AutoTotemModule extends ToggleModule
             return false;
         }
         return checkLethalCrystal(PlayerUtil.getLocalPlayerHealth());
+    }
+
+    public boolean isTotemInMainhand()
+    {
+        return totemInMainhand;
     }
 
     public boolean isReplacing()

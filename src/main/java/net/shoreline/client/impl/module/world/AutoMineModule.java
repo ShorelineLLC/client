@@ -28,6 +28,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.CombatModule;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
+import net.shoreline.client.impl.module.combat.AutoTotemModule;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.collection.FirstOutQueue;
@@ -152,17 +153,13 @@ public class AutoMineModule extends CombatModule
     }
 
     @EventListener
-    public void onTickPost(TickEvent event)
+    public void onPlayerTick(final TickEvent event)
     {
         if (event.getStage() == StageEvent.EventStage.POST)
         {
             silentSwapping = false;
         }
-    }
 
-    @EventListener
-    public void onPlayerTick(final TickEvent event)
-    {
         if (mc.player.isCreative() || mc.player.isSpectator() || event.getStage() != StageEvent.EventStage.PRE)
         {
             return;
@@ -382,8 +379,8 @@ public class AutoMineModule extends CombatModule
                 data.resetBreakTime();
             }
 
-            if (isDataPacketMine(data) && (data.getState().isAir() || data.hasAttemptedBreak()
-                    && data.passedAttemptedBreakTime(500)))
+            if (isDataPacketMine(data) && (data.getState().isAir()
+                    || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
                 removeQueuedMine(data);
@@ -394,6 +391,12 @@ public class AutoMineModule extends CombatModule
             data.damage(damageDelta);
             if (isDataPacketMine(data) && data.getBlockDamage() >= 1.0f && data.getSlot() != -1)
             {
+                if (AutoTotemModule.getInstance().isTotemInMainhand())
+                {
+                    Managers.INVENTORY.syncToClient();
+                    continue;
+                }
+
                 if (checkMultitask() && !multitaskConfig.getValue())
                 {
                     continue;
