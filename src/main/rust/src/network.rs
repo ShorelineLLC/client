@@ -19,7 +19,7 @@ lazy_static!
         .unwrap();
 
     static ref SHORELINE_CERT_SHA256: String = obfstr! {
-        "84f4d8aac7084c4385c65c7c0797e0b904b833675278c966237859815906c08c"
+        "566310683d85a644e8d228f93141a1a2976c95b4f318ff92a71e29c63c4426df"
     }.to_string();
 
     static ref WE1_CERT_SHA256: String = obfstr! {
@@ -81,7 +81,8 @@ fn confirm_server_integrity(domain: &str) -> Result<(), String>
         Ok(res) => res,
         Err(_) => return Err(obfstr! {
             "Shoreline couldn't verify the authenticity of the server connection. Code: 0x4.\n\n
-            If this issue persists, contact a developer."
+            Please make sure that your network is configured for IPv4. If you are having trouble \
+            or the issue is persisting, contact a developer."
         }.to_string())
     };
 
