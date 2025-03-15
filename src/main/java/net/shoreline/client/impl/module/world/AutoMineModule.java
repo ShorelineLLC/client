@@ -80,8 +80,7 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
     Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false, () -> grimConfig.getValue()));
-    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instant remines mined blocks", true));
-    // Config<Boolean> fastConfig = register(new BooleanConfig("Fast", "Instant remines air", false, () -> instantConfig.getValue()));
+    Config<InstantMode> instantConfig = register(new EnumConfig<>("Instant", "Instant remines mined blocks", InstantMode.OFF, InstantMode.values()));
     Config<Boolean> crawlingConfig = register(new BooleanConfig("AntiCrawl", "Attempts to stop player from crawling", false));
     Config<Boolean> crawlExtrapolateConfig = register(new BooleanConfig("ExtrapolateCrawl", "Predicts attempts to crawl you", false, () -> false));
     Config<Float> crawlResetConfig = register(new NumberConfig<>("CrawlResetTime", "The anticrawl reset timer", 0.0f, 5.0f, 10.0f, () -> false));
@@ -256,15 +255,8 @@ public class AutoMineModule extends CombatModule
                             boolean instantMineIncorrect = instantMine == null || !instantMine.getPos().equals(miningPos.pos()) && miningQueue.size() < 2;
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
-                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
-                                {
-                                    if (multitaskConfig.getValue() && !checkMultitask())
-                                    {
-                                        stopMining(miningData);
-                                    }
-                                }
-                                else
+                                if (miningData == null || !miningData.isAutoMine() || !miningData.isInstantRemine()
+                                        || isAirMine(miningData.getPos()) || !autoRemineConfig.getValue())
                                 {
                                     boolean full2 = !isAirMine(miningPos2.pos());
                                     boolean full = !isAirMine(miningPos.pos());
@@ -290,20 +282,10 @@ public class AutoMineModule extends CombatModule
                             if (instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
+                                if (miningData == null || !miningData.isAutoMine() || !miningData.isInstantRemine()
+                                        || isAirMine(miningData.getPos()) || !autoRemineConfig.getValue())
                                 {
-                                    if (multitaskConfig.getValue() && !checkMultitask())
-                                    {
-                                        stopMining(miningData);
-                                    }
-                                }
-                                else
-                                {
-                                    if (!isAirMine(miningPos.pos()))
-                                    {
-                                        startAutoMine(miningPos.pos(), miningDir);
-                                    }
+                                    startAutoMine(miningPos.pos(), miningDir);
                                 }
                             }
                         }
@@ -314,15 +296,8 @@ public class AutoMineModule extends CombatModule
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
-                                {
-                                    if (multitaskConfig.getValue() && !checkMultitask())
-                                    {
-                                        stopMining(miningData);
-                                    }
-                                }
-                                else
+                                if (miningData == null || !miningData.isAutoMine() || !miningData.isInstantRemine()
+                                        || isAirMine(miningData.getPos()) || !autoRemineConfig.getValue())
                                 {
                                     startAutoMine(miningPos2.pos(), miningDir2);
                                 }
@@ -340,15 +315,8 @@ public class AutoMineModule extends CombatModule
                             if (instantMineIncorrect || miningQueue.isEmpty())
                             {
                                 // If we are re-mining, bypass throttle check below
-                                if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
-                                {
-                                    if (multitaskConfig.getValue() && !checkMultitask())
-                                    {
-                                        stopMining(miningData);
-                                    }
-                                }
-                                else if (!isAirMine(miningPos.pos()) && !isBlockDelayGrim())
+                                if (miningData == null || !miningData.isAutoMine() || !miningData.isInstantRemine()
+                                        || isAirMine(miningData.getPos()) || !autoRemineConfig.getValue())
                                 {
                                     startAutoMine(miningPos.pos(), miningDir);
                                 }
@@ -430,7 +398,7 @@ public class AutoMineModule extends CombatModule
                 miningQueue.remove(miningData2);
                 return;
             }
-            if (instantConfig.getValue())
+            if (instantConfig.getValue() != InstantMode.OFF)
             {
                 if (miningData2.isAutoMine() && !autoRemineConfig.getValue())
                 {
@@ -444,7 +412,11 @@ public class AutoMineModule extends CombatModule
             {
                 miningData2.resetDamage();
             }
-            return;
+
+            if (instantConfig.getValue() != InstantMode.PACKET)
+            {
+                return;
+            }
         }
         // Something went wrong, remove and remine
         if (miningData2.getBlockDamage() >= speedConfig.getValue() && miningData2.hasAttemptedBreak()
@@ -459,7 +431,7 @@ public class AutoMineModule extends CombatModule
             {
                 return;
             }
-            if (instantConfig.getValue() || stopMiningTimer.passed(500))
+            if (instantConfig.getValue() != InstantMode.OFF || stopMiningTimer.passed(500))
             {
                 stopMining(miningData2);
                 stopMiningTimer.reset();
@@ -586,7 +558,7 @@ public class AutoMineModule extends CombatModule
                 data.setCompletedMine(false);
             }
 
-            if (!instantConfig.getValue())
+            if (instantConfig.getValue() == InstantMode.OFF)
             {
                 startMining(data);
             }
@@ -1071,7 +1043,7 @@ public class AutoMineModule extends CombatModule
 
     private void stopMining(MiningData data)
     {
-        if (!data.isStarted() || isAirMine(data.getState()))
+        if (!data.isStarted() || isAirMine(data.getState()) && instantConfig.getValue() != InstantMode.PACKET)
         {
             return;
         }
@@ -1353,6 +1325,13 @@ public class AutoMineModule extends CombatModule
         NORMAL,
         SILENT,
         SILENT_ALT,
+        OFF
+    }
+
+    public enum InstantMode
+    {
+        PACKET,
+        NORMAL,
         OFF
     }
 
