@@ -598,10 +598,10 @@ public class SpeedmineModule extends CombatModule
             };
             f *= g;
         }
-        if (mc.player.isSubmergedIn(FluidTags.WATER) && EnchantmentUtil.getLevel(mc.player.getEquippedStack(EquipmentSlot.FEET), Enchantments.AQUA_AFFINITY) <= 0)
-        {
-            f /= 5.0f;
-        }
+//        if (mc.player.isSubmergedIn(FluidTags.WATER) && EnchantmentUtil.getLevel(mc.player.getEquippedStack(EquipmentSlot.FEET), Enchantments.AQUA_AFFINITY) <= 0)
+//        {
+//            f /= 5.0f;
+//        }
         if (!mc.player.isOnGround())
         {
             f /= 5.0f;

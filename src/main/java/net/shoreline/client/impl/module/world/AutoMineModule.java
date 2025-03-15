@@ -223,7 +223,7 @@ public class AutoMineModule extends CombatModule
                     List<AutoMineCalc> phasePositions = getPhasePosition(playerTarget);
                     PriorityQueue<AutoMineCalc> miningPositions = getMiningPosition(playerTarget);
                     PriorityQueue<AutoMineCalc> miningPositions2 = miningPositions.stream()
-                            .filter(c -> !mc.world.isAir(c.pos()))
+                            .filter(c -> !isAirMine(c.pos()))
                             .collect(Collectors.toCollection(PriorityQueue::new));
                     if (doubleBreakConfig.getValue())
                     {
@@ -239,7 +239,7 @@ public class AutoMineModule extends CombatModule
                         else
                         {
                             miningPos = autoRemineConfig.getValue() ? miningPositions.peek() : miningPositions2.peek();
-                            boolean b2 = miningPos != null && !mc.world.isAir(miningPos.pos());
+                            boolean b2 = miningPos != null && !isAirMine(miningPos.pos());
                             if (b2)
                             {
                                 miningPositions2.poll();
@@ -257,7 +257,7 @@ public class AutoMineModule extends CombatModule
                             if (miningPhasePos && miningQueue.size() < 2 || instantMineIncorrect)
                             {
                                 if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
@@ -266,8 +266,8 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else
                                 {
-                                    boolean full2 = !mc.world.isAir(miningPos2.pos());
-                                    boolean full = !mc.world.isAir(miningPos.pos());
+                                    boolean full2 = !isAirMine(miningPos2.pos());
+                                    boolean full = !isAirMine(miningPos.pos());
                                     if (full && full2)
                                     {
                                         miningQueue.clear();
@@ -291,7 +291,7 @@ public class AutoMineModule extends CombatModule
                             {
                                 // If we are re-mining, bypass throttle check below
                                 if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
@@ -300,7 +300,7 @@ public class AutoMineModule extends CombatModule
                                 }
                                 else
                                 {
-                                    if (!mc.world.isAir(miningPos.pos()))
+                                    if (!isAirMine(miningPos.pos()))
                                     {
                                         startAutoMine(miningPos.pos(), miningDir);
                                     }
@@ -315,7 +315,7 @@ public class AutoMineModule extends CombatModule
                             {
                                 // If we are re-mining, bypass throttle check below
                                 if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
@@ -341,14 +341,14 @@ public class AutoMineModule extends CombatModule
                             {
                                 // If we are re-mining, bypass throttle check below
                                 if (miningData != null && miningData.isAutoMine() && miningData.isInstantRemine()
-                                        && !mc.world.getBlockState(miningData.getPos()).isReplaceable() && autoRemineConfig.getValue())
+                                        && !isAirMine(miningData.getPos()) && autoRemineConfig.getValue())
                                 {
                                     if (multitaskConfig.getValue() && !checkMultitask())
                                     {
                                         stopMining(miningData);
                                     }
                                 }
-                                else if (!mc.world.isAir(miningPos.pos()) && !isBlockDelayGrim())
+                                else if (!isAirMine(miningPos.pos()) && !isBlockDelayGrim())
                                 {
                                     startAutoMine(miningPos.pos(), miningDir);
                                 }
@@ -374,12 +374,12 @@ public class AutoMineModule extends CombatModule
                 removeQueuedMine(data);
             }
 
-            if (data.getState().isAir())
+            if (isAirMine(data.getState()))
             {
                 data.resetBreakTime();
             }
 
-            if (isDataPacketMine(data) && (data.getState().isAir()
+            if (isDataPacketMine(data) && (isAirMine(data.getState())
                     || data.hasAttemptedBreak() && data.passedAttemptedBreakTime(500)))
             {
                 Managers.INVENTORY.syncToClient();
@@ -420,7 +420,7 @@ public class AutoMineModule extends CombatModule
             removeQueuedMine(miningData2);
             return;
         }
-        if (miningData2.getState().isAir())
+        if (isAirMine(miningData2.getState()))
         {
             // Once we broke the block that overrode that the auto city, we can allow the module
             // to auto mine "city" blocks
@@ -476,7 +476,7 @@ public class AutoMineModule extends CombatModule
         }
         event.cancel();
         // Do not try to break unbreakable blocks
-        if (event.getState().getBlock().getHardness() == -1.0f || event.getState().isAir())
+        if (event.getState().getBlock().getHardness() == -1.0f || isAirMine(event.getState()))
         {
             return;
         }
@@ -558,7 +558,7 @@ public class AutoMineModule extends CombatModule
 
     private void handleBlockUpdatePacket(BlockUpdateS2CPacket packet)
     {
-        if (packet.getState().isAir())
+        if (isAirMine(packet.getState()))
         {
             for (MiningData data : miningQueue)
             {
@@ -628,15 +628,15 @@ public class AutoMineModule extends CombatModule
             int lineColor;
             if (smoothColorConfig.getValue())
             {
-                boxColor = data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) :
+                boxColor = isAirMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) :
                         ColorUtil.interpolateColor(Math.min(data.getBlockDamage(), 1.0f), ((ColorConfig) colorDoneConfig).getValue(boxAlpha), ((ColorConfig) colorConfig).getValue(boxAlpha)).getRGB();
-                lineColor = data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) :
+                lineColor = isAirMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) :
                         ColorUtil.interpolateColor(Math.min(data.getBlockDamage(), 1.0f), ((ColorConfig) colorDoneConfig).getValue(lineAlpha), ((ColorConfig) colorConfig).getValue(lineAlpha)).getRGB();
             }
             else
             {
-                boxColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
-                lineColor = data.getBlockDamage() >= 0.95f || data.getState().isAir() ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
+                boxColor = data.getBlockDamage() >= 0.95f || isAirMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
+                lineColor = data.getBlockDamage() >= 0.95f || isAirMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
             }
 
             BlockPos mining = data.getPos();
@@ -652,7 +652,7 @@ public class AutoMineModule extends CombatModule
                     mining.getY() + render1.maxY, mining.getZ() + render1.maxZ);
             Vec3d center = render.getCenter();
             float total = isDataPacketMine(data) ? 1.0f : speedConfig.getValue();
-            float scale = data.isInstantRemine() || data.getState().isAir() ? 1.0f : MathHelper.clamp((data.getBlockDamage() + (data.getBlockDamage() - data.getLastDamage()) * event.getTickDelta()) / total, 0.0f, 1.0f);
+            float scale = data.isInstantRemine() || isAirMine(data.getState()) ? 1.0f : MathHelper.clamp((data.getBlockDamage() + (data.getBlockDamage() - data.getLastDamage()) * event.getTickDelta()) / total, 0.0f, 1.0f);
             double dx = (render1.maxX - render1.minX) / 2.0;
             double dy = (render1.maxY - render1.minY) / 2.0;
             double dz = (render1.maxZ - render1.minZ) / 2.0;
@@ -662,7 +662,7 @@ public class AutoMineModule extends CombatModule
         }
         for (MiningData data : miningQueue)
         {
-            if (data.getState().isAir() && !data.isInstantRemine())
+            if (isAirMine(data.getState()) && !data.isInstantRemine())
             {
                 continue;
             }
@@ -708,7 +708,7 @@ public class AutoMineModule extends CombatModule
 
     private void queueMiningData(MiningData data)
     {
-        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())) || data.getState().isAir())
+        if (miningQueue.stream().anyMatch(p1 -> data.getPos().equals(p1.getPos())) || isAirMine(data.getState()))
         {
             return;
         }
@@ -900,7 +900,7 @@ public class AutoMineModule extends CombatModule
         if (playerBelow)
         {
             BlockState state = mc.world.getBlockState(crawlingPos.down());
-            if (validAutoMineBlock(state.getBlock()) && !mc.world.isAir(crawlingPos.down()))
+            if (validAutoMineBlock(state.getBlock()) && !isAirMine(crawlingPos.down()))
             {
                 return crawlingPos.down();
             }
@@ -908,7 +908,7 @@ public class AutoMineModule extends CombatModule
         else
         {
             BlockState state = mc.world.getBlockState(crawlingPos.up());
-            if (validAutoMineBlock(state.getBlock()) && !mc.world.isAir(crawlingPos.up()))
+            if (validAutoMineBlock(state.getBlock()) && !isAirMine(crawlingPos.up()))
             {
                 return crawlingPos.up();
             }
@@ -1060,7 +1060,7 @@ public class AutoMineModule extends CombatModule
 
     private void abortMining(MiningData data)
     {
-        if (!data.isStarted() || data.getState().isAir() || data.isInstantRemine())
+        if (!data.isStarted() || isAirMine(data.getState()) || data.isInstantRemine())
         {
             return;
         }
@@ -1071,7 +1071,7 @@ public class AutoMineModule extends CombatModule
 
     private void stopMining(MiningData data)
     {
-        if (!data.isStarted() || data.getState().isAir())
+        if (!data.isStarted() || isAirMine(data.getState()))
         {
             return;
         }
@@ -1168,6 +1168,16 @@ public class AutoMineModule extends CombatModule
             case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
             case ALL -> true;
         };
+    }
+
+    public boolean isAirMine(BlockPos pos)
+    {
+        return isAirMine(mc.world.getBlockState(pos));
+    }
+
+    public boolean isAirMine(BlockState state)
+    {
+        return state.isAir() || !state.getFluidState().isEmpty();
     }
 
     public BlockPos getMiningBlock()
