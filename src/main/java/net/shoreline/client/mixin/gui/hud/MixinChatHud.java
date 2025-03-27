@@ -166,47 +166,54 @@ public abstract class MixinChatHud implements IChatHud, Globals
     private void hookAddMessage(Text message, MessageSignatureData signatureData, MessageIndicator indicator, CallbackInfo ci)
     {
         ci.cancel();
-        visibleMessages.removeIf(msg -> ((IChatHudLineVisible) (Object) msg).getId() == currentId && currentId != 0);
-        for (int i = messages.size() - 1; i > -1; i--)
+        try
         {
-            if (((IChatHudLine) (Object) messages.get(i)).getId() == currentId && currentId != 0)
+            visibleMessages.removeIf(msg -> ((IChatHudLineVisible) (Object) msg).getId() == currentId && currentId != 0);
+            for (int i = messages.size() - 1; i > -1; i--)
             {
-                messages.remove(i);
+                if (((IChatHudLine) (Object) messages.get(i)).getId() == currentId && currentId != 0)
+                {
+                    messages.remove(i);
+                }
+            }
+            ChatMessageEvent chatTextEvent = new ChatMessageEvent(message);
+            EventBus.INSTANCE.dispatch(chatTextEvent);
+            int i = MathHelper.floor((double) this.getWidth() / this.getChatScale());
+            if (indicator != null && indicator.icon() != null)
+            {
+                i -= indicator.icon().width + 4 + 2;
+            }
+            List<OrderedText> list = ChatMessages.breakRenderedChatMessageLines(chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, i, this.client.textRenderer);
+            boolean bl = this.isChatFocused();
+            for (int j = 0; j < list.size(); ++j)
+            {
+                OrderedText orderedText = list.get(j);
+                if (bl && this.scrolledLines > 0)
+                {
+                    this.hasUnreadNewMessages = true;
+                    this.scroll(1);
+                }
+                ChatTextEvent chatMessageEvent = new ChatTextEvent(orderedText);
+                EventBus.INSTANCE.dispatch(chatMessageEvent);
+                boolean bl2 = j == list.size() - 1;
+                ChatHudLine.Visible visibleLine = new ChatHudLine.Visible(mc.inGameHud.getTicks(), chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2);
+                ((IChatHudLineVisible) (Object) visibleLine).setId(currentId);
+                this.visibleMessages.add(0, visibleLine);
+            }
+            ChatLengthEvent chatLengthEvent = new ChatLengthEvent();
+            EventBus.INSTANCE.dispatch(chatLengthEvent);
+            boolean bl1 = chatLengthEvent.isCanceled();
+            if (!bl1)
+            {
+                while (this.visibleMessages.size() > 100)
+                {
+                    this.visibleMessages.remove(this.visibleMessages.size() - 1);
+                }
             }
         }
-        ChatMessageEvent chatTextEvent = new ChatMessageEvent(message);
-        EventBus.INSTANCE.dispatch(chatTextEvent);
-        int i = MathHelper.floor((double) this.getWidth() / this.getChatScale());
-        if (indicator != null && indicator.icon() != null)
+        catch (Exception ignored)
         {
-            i -= indicator.icon().width + 4 + 2;
-        }
-        List<OrderedText> list = ChatMessages.breakRenderedChatMessageLines(chatTextEvent.isCanceled() ? chatTextEvent.getText() : message, i, this.client.textRenderer);
-        boolean bl = this.isChatFocused();
-        for (int j = 0; j < list.size(); ++j)
-        {
-            OrderedText orderedText = list.get(j);
-            if (bl && this.scrolledLines > 0)
-            {
-                this.hasUnreadNewMessages = true;
-                this.scroll(1);
-            }
-            ChatTextEvent chatMessageEvent = new ChatTextEvent(orderedText);
-            EventBus.INSTANCE.dispatch(chatMessageEvent);
-            boolean bl2 = j == list.size() - 1;
-            ChatHudLine.Visible visibleLine = new ChatHudLine.Visible(mc.inGameHud.getTicks(), chatMessageEvent.isCanceled() ? chatMessageEvent.getText() : orderedText, indicator, bl2);
-            ((IChatHudLineVisible) (Object) visibleLine).setId(currentId);
-            this.visibleMessages.add(0, visibleLine);
-        }
-        ChatLengthEvent chatLengthEvent = new ChatLengthEvent();
-        EventBus.INSTANCE.dispatch(chatLengthEvent);
-        boolean bl1 = chatLengthEvent.isCanceled();
-        if (!bl1)
-        {
-            while (this.visibleMessages.size() > 100)
-            {
-                this.visibleMessages.remove(this.visibleMessages.size() - 1);
-            }
+
         }
     }
 
