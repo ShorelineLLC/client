@@ -837,9 +837,9 @@ public class HUDModule extends ToggleModule
 
         public void draw(DrawContext context, long drawnCount)
         {
+            int color = ColorUtil.fixTransparency(getHudColor(drawnCount - rainbowOffset), (float) module.getAnimation().getFactor());
             RenderManager.renderText(context, getFormattedModule(module),
-                     mc.getWindow().getScaledWidth() + (float) this.x,
-                    renderingUp ? topRight : bottomRight, getHudColor(drawnCount - rainbowOffset));
+                     mc.getWindow().getScaledWidth() + (float) this.x, renderingUp ? topRight : bottomRight, color);
 
             if (renderingUp)
             {
