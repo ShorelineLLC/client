@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author linus
@@ -40,6 +42,8 @@ public class ClientConfiguration implements Globals
     private MacroFile macrosFile;
     private final ClickGuiFile clickGuiFile;
     private final FontFile fontFile;
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /**
      *
@@ -143,21 +147,27 @@ public class ClientConfiguration implements Globals
      */
     public void loadClient()
     {
-        for (ConfigFile file : files)
+        executor.submit(() ->
         {
-            file.load();
-        }
+            for (ConfigFile file : files)
+            {
+                file.load();
+            }
+        });
     }
 
     public void loadClientModules()
     {
-        for (ConfigFile file : files)
+        executor.submit(() ->
         {
-            if (file instanceof ModuleFile)
+            for (ConfigFile file : files)
             {
-                file.load();
+                if (file instanceof ModuleFile)
+                {
+                    file.load();
+                }
             }
-        }
+        });
     }
 
     public void saveModuleConfiguration(String configFile)
@@ -168,15 +178,20 @@ public class ClientConfiguration implements Globals
 
     public boolean loadModuleConfiguration(String configFile)
     {
-        Path configDir = clientDir.resolve("Configs");
-        modulesFile = new ModuleConfigFile(configDir, configFile);
-        if (!Files.exists(configDir.resolve(configFile + ".json")))
+        executor.submit(() ->
         {
-            ChatUtil.error("Could not find config file: " + configFile);
-            return false;
-        }
-        modulesFile.load();
-        return true;
+            Path configDir = clientDir.resolve("Configs");
+            modulesFile = new ModuleConfigFile(configDir, configFile);
+            if (!Files.exists(configDir.resolve(configFile + ".json")))
+            {
+                ChatUtil.error("Could not find config file: " + configFile);
+                return false;
+            }
+            modulesFile.load();
+            return true;
+        });
+
+        return false;
     }
 
 
