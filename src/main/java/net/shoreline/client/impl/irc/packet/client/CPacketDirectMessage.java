@@ -34,5 +34,6 @@ public final class CPacketDirectMessage extends IRCPacket
                 + this.onlineUser.getName() + Formatting.ITALIC + "§7: " + this.message;
 
         ircManager.addToChat(message);
+        ircManager.setLastMessagedUser(this.onlineUser);
     }
 }
