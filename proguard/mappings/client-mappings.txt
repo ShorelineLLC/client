@@ -405,23 +405,27 @@ net.shoreline.client.api.file.ClientConfiguration -> net.shoreline.client.Q:
     net.shoreline.client.api.macro.MacroFile macrosFile -> a
     net.shoreline.client.impl.gui.click.ClickGuiFile clickGuiFile -> a
     net.shoreline.client.api.font.FontFile fontFile -> a
-    34:117:void <init>() -> <init>
-    124:128:void saveClient() -> j
-    132:139:void saveClientModules() -> k
-    146:150:void loadClient() -> l
-    154:161:void loadClientModules() -> m
-    165:167:void saveModuleConfiguration(java.lang.String) -> n
-    171:179:boolean loadModuleConfiguration(java.lang.String) -> a
-    185:187:void saveKeybindConfiguration(java.lang.String) -> o
-    191:199:boolean loadKeybindConfiguration(java.lang.String) -> b
-    204:205:void saveClickGui() -> n
-    209:210:void loadClickGui() -> o
-    214:215:void saveFonts() -> p
-    219:220:void loadFonts() -> q
-    224:224:java.util.Set getFiles() -> a
-    229:230:void addFile(net.shoreline.client.api.file.ConfigFile) -> a
-    234:235:void removeFile(net.shoreline.client.api.file.ConfigFile) -> b
-    242:242:java.nio.file.Path getClientDirectory() -> a
+    java.util.concurrent.ExecutorService executor -> a
+    36:121:void <init>() -> <init>
+    128:132:void saveClient() -> j
+    136:143:void saveClientModules() -> k
+    150:157:void loadClient() -> l
+    161:171:void loadClientModules() -> m
+    175:177:void saveModuleConfiguration(java.lang.String) -> n
+    181:194:boolean loadModuleConfiguration(java.lang.String) -> a
+    200:202:void saveKeybindConfiguration(java.lang.String) -> o
+    206:214:boolean loadKeybindConfiguration(java.lang.String) -> b
+    219:220:void saveClickGui() -> n
+    224:225:void loadClickGui() -> o
+    229:230:void saveFonts() -> p
+    234:235:void loadFonts() -> q
+    239:239:java.util.Set getFiles() -> a
+    244:245:void addFile(net.shoreline.client.api.file.ConfigFile) -> a
+    249:250:void removeFile(net.shoreline.client.api.file.ConfigFile) -> b
+    257:257:java.nio.file.Path getClientDirectory() -> a
+    183:191:java.lang.Boolean lambda$loadModuleConfiguration$2(java.lang.String) -> a
+    163:170:void lambda$loadClientModules$1() -> r
+    152:156:void lambda$loadClient$0() -> s
 net.shoreline.client.api.file.ConfigFile -> net.shoreline.client.S:
     com.google.gson.Gson GSON -> a
     java.lang.String fileName -> M
@@ -487,7 +491,7 @@ net.shoreline.client.api.font.GlyphCache -> net.shoreline.client.W:
     49:53:net.shoreline.client.api.font.Glyph getGlyph(char) -> a
     58:61:void clear() -> f
     65:65:boolean contains(char) -> a
-    70:124:void createBitmap() -> r
+    70:124:void createBitmap() -> t
     128:128:net.minecraft.class_2960 getId() -> a
     133:133:int getWidth() -> m
     138:138:int getHeight() -> n
@@ -500,7 +504,7 @@ net.shoreline.client.api.macro.Macro -> net.shoreline.client.Y:
     java.lang.Runnable macro -> a
     int keycode -> i
     32:36:void <init>(java.lang.String,int,java.lang.Runnable) -> <init>
-    43:44:void runMacro() -> s
+    43:44:void runMacro() -> u
     51:51:java.lang.String getName() -> q
     59:59:java.lang.Runnable getRunnable() -> a
     71:71:int getKeycode() -> g
@@ -555,11 +559,11 @@ net.shoreline.client.api.module.ToggleModule -> net.shoreline.client.ad:
     68:70:void <init>(java.lang.String,java.lang.String,net.shoreline.client.api.module.ModuleCategory,java.lang.Integer) -> <init>
     78:78:boolean isHidden() -> c
     87:88:void setHidden(boolean) -> a
-    100:108:void toggle() -> t
+    100:108:void toggle() -> v
     119:125:void enable() -> h
     136:142:void disable() -> i
-    153:153:void onEnable() -> u
-    164:164:void onDisable() -> v
+    153:153:void onEnable() -> w
+    164:164:void onDisable() -> x
     177:179:void keybind(int) -> c
     190:190:boolean isEnabled() -> i
     198:198:net.shoreline.client.api.macro.Macro getKeybinding() -> a
@@ -567,7 +571,7 @@ net.shoreline.client.api.module.ToggleModule -> net.shoreline.client.ad:
     208:208:boolean getNotify() -> j
     216:216:net.shoreline.client.util.render.animation.Animation getAnimation() -> a
     45:45:java.lang.Boolean lambda$new$1() -> a
-    41:41:void lambda$new$0() -> w
+    41:41:void lambda$new$0() -> y
 net.shoreline.client.api.module.file.ModuleConfigFile -> net.shoreline.client.ae:
     25:26:void <init>(java.nio.file.Path,java.lang.String) -> <init>
     33:57:void save() -> c
@@ -602,8 +606,8 @@ net.shoreline.client.api.render.RenderBuffers -> net.shoreline.client.ai:
     java.util.List postRenderCallbacks -> b
     boolean isSetup -> g
     19:19:void <init>() -> <init>
-    29:36:void preRender() -> x
-    42:53:void postRender() -> y
+    29:36:void preRender() -> z
+    42:53:void postRender() -> A
     57:65:void post(java.lang.Runnable) -> a
     69:72:org.joml.Matrix4d toMatrix4d(org.joml.Matrix4f) -> a
     21:25:void <clinit>() -> <clinit>
@@ -617,12 +621,12 @@ net.shoreline.client.api.render.RenderBuffers$Buffer -> net.shoreline.client.aj:
     85:89:void <init>(net.minecraft.class_293$class_5596,net.minecraft.class_293) -> <init>
     93:95:void begin(net.minecraft.class_4587) -> a
     99:103:void updateMatrices(net.minecraft.class_4587) -> b
-    110:111:void end() -> z
+    110:111:void end() -> B
     115:122:net.shoreline.client.api.render.RenderBuffers$Buffer vertex(double,double,double) -> a
     127:134:net.shoreline.client.api.render.RenderBuffers$Buffer vertexTex(double,double,double,float,float) -> a
     139:157:net.shoreline.client.api.render.RenderBuffers$Buffer vertexLine(double,double,double,double,double,double) -> a
     162:163:void color(int) -> d
-    167:190:void draw() -> A
+    167:190:void draw() -> C
 net.shoreline.client.api.render.RenderManager -> net.shoreline.client.ak:
     net.minecraft.class_289 TESSELLATOR -> a
     net.shoreline.client.impl.gui.click.component.ScissorStack SCISSOR_STACK -> a
@@ -663,7 +667,7 @@ net.shoreline.client.api.render.RenderManager -> net.shoreline.client.ak:
     573:603:void fillGradientQuad(net.minecraft.class_4587,float,float,float,float,int,int,boolean) -> a
     610:625:void rectTextured(net.minecraft.class_4587,net.minecraft.class_2960,float,float,float,float,float,float,float,float,float,float,float,float,float) -> a
     629:634:void enableScissor(double,double,double,double) -> a
-    638:639:void disableScissor() -> B
+    638:639:void disableScissor() -> D
     643:658:void setScissor(net.minecraft.class_8030) -> a
     669:675:void renderText(net.minecraft.class_332,java.lang.String,float,float,int) -> a
     683:687:int textWidth(java.lang.String) -> b
@@ -772,8 +776,8 @@ net.shoreline.client.api.render.layers.RenderLayersClient$DepthTest -> net.shore
     98:103:void method_23518() -> method_23518
 net.shoreline.client.api.render.layers.RenderLayersClient$Lightmap -> net.shoreline.client.aq:
     110:119:void <init>() -> <init>
-    117:118:void lambda$new$1() -> C
-    113:114:void lambda$new$0() -> w
+    117:118:void lambda$new$1() -> E
+    113:114:void lambda$new$0() -> y
 net.shoreline.client.api.render.model.StaticBipedEntityModel -> net.shoreline.client.ar:
     net.minecraft.class_742 player -> a
     float limbSwing -> c
@@ -805,17 +809,17 @@ net.shoreline.client.api.render.satin.FramebufferWrapper -> net.shoreline.client
     46:46:java.lang.String getName() -> q
     51:51:net.minecraft.class_276 getFramebuffer() -> a
     56:59:void beginWrite(boolean) -> e
-    63:65:void draw() -> A
+    63:65:void draw() -> C
     69:72:void draw(int,int,boolean) -> a
     76:77:void clear() -> f
     81:84:void clear(boolean) -> f
 net.shoreline.client.api.render.satin.ManagedCoreShader -> net.shoreline.client.at:
     net.minecraft.class_5944 getProgram() -> a
-    void release() -> D
+    void release() -> F
 net.shoreline.client.api.render.satin.ManagedFramebuffer -> net.shoreline.client.au:
     net.minecraft.class_276 getFramebuffer() -> a
     void beginWrite(boolean) -> e
-    void draw() -> A
+    void draw() -> C
     void draw(int,int,boolean) -> a
     void clear() -> f
     void clear(boolean) -> f
@@ -828,7 +832,7 @@ net.shoreline.client.api.render.satin.ManagedSamplerUniformBase -> net.shoreline
     60:60:int getSamplerLoc(net.shoreline.client.api.render.satin.SamplerAccess) -> a
     65:66:boolean findUniformTarget(net.minecraft.class_5944) -> a
     70:76:boolean findUniformTarget1(net.shoreline.client.api.render.satin.SamplerAccess) -> a
-    80:85:void syncCurrentValues() -> E
+    80:85:void syncCurrentValues() -> G
     void set(java.lang.Object) -> c
 net.shoreline.client.api.render.satin.ManagedSamplerUniformV1 -> net.shoreline.client.aw:
     26:27:void <init>(java.lang.String) -> <init>
@@ -846,7 +850,7 @@ net.shoreline.client.api.render.satin.ManagedSamplerUniformV2 -> net.shoreline.c
     45:45:int lambda$set$0(int) -> b
 net.shoreline.client.api.render.satin.ManagedShaderEffect -> net.shoreline.client.ay:
     net.minecraft.class_279 getShaderEffect() -> a
-    void release() -> D
+    void release() -> F
     void render(float) -> c
     net.shoreline.client.api.render.satin.ManagedFramebuffer getTarget(java.lang.String) -> a
     void setUniformValue(java.lang.String,int) -> a
@@ -873,7 +877,7 @@ net.shoreline.client.api.render.satin.ManagedUniform -> net.shoreline.client.az:
     41:49:void <init>(java.lang.String,int) -> <init>
     53:71:boolean findUniformTargets(java.util.List) -> a
     77:84:boolean findUniformTarget(net.minecraft.class_5944) -> a
-    89:99:void syncCurrentValues() -> E
+    89:99:void syncCurrentValues() -> G
     103:114:void set(int) -> e
     118:130:void set(int,int) -> a
     134:147:void set(int,int,int) -> a
@@ -935,7 +939,7 @@ net.shoreline.client.api.render.satin.ResettableManagedShaderBase -> net.shoreli
     void logInitError(java.io.IOException) -> a
     54:58:void initialize(net.minecraft.class_5912) -> c
     java.lang.AutoCloseable parseShader(net.minecraft.class_5912,net.minecraft.class_310,net.minecraft.class_2960) -> a
-    63:73:void release() -> D
+    63:73:void release() -> F
     76:76:java.util.Collection getManagedUniforms() -> b
     boolean setupUniform(net.shoreline.client.api.render.satin.ManagedUniformBase,java.lang.AutoCloseable) -> a
     82:82:boolean isInitialized() -> k
@@ -1049,8 +1053,8 @@ net.shoreline.client.api.render.shader.ShaderManager -> net.shoreline.client.aU:
     net.shoreline.client.api.render.satin.ManagedShaderEffect glowingShaderEffect -> d
     net.shoreline.client.api.render.satin.ManagedShaderEffect rainbowShaderEffect -> e
     27:44:void <init>() -> <init>
-    48:52:void reloadShaders() -> F
-    56:62:void reloadShadersInternal() -> G
+    48:52:void reloadShaders() -> H
+    56:62:void reloadShadersInternal() -> I
     66:98:void applyShader(net.shoreline.client.api.render.satin.ManagedShaderEffect,java.lang.Runnable,java.lang.Runnable) -> a
     102:102:net.minecraft.class_4597 createVertexConsumers(net.minecraft.class_4597,java.awt.Color) -> a
     119:119:java.util.function.Function memoizeTexture(java.util.function.Function) -> a
@@ -1061,8 +1065,8 @@ net.shoreline.client.api.render.shader.ShaderManager -> net.shoreline.client.aU:
     153:153:net.shoreline.client.api.render.satin.ManagedShaderEffect getRainbowShaderEffect() -> e
     104:113:net.minecraft.class_4588 lambda$createVertexConsumers$3(net.minecraft.class_4597,java.awt.Color,net.minecraft.class_1921) -> a
     42:43:net.minecraft.class_1921 lambda$new$2(net.minecraft.class_4668$class_5939) -> a
-    41:41:void lambda$new$1() -> C
-    41:41:void lambda$new$0() -> w
+    41:41:void lambda$new$1() -> E
+    41:41:void lambda$new$0() -> y
 net.shoreline.client.api.render.shader.ShaderManager$1 -> net.shoreline.client.aV:
     java.util.Map cache -> g
     java.util.function.Function val$function -> n
@@ -1189,7 +1193,7 @@ net.shoreline.client.impl.command.ModuleCommand -> net.shoreline.client.br:
     123:181:int addDeleteItem(net.shoreline.client.api.config.Config,java.lang.String,java.lang.Object) -> a
     186:241:int listItems(net.shoreline.client.api.config.Config,java.lang.String) -> a
     246:368:int updateValue(net.shoreline.client.api.config.Config,java.lang.String) -> b
-    373:381:java.lang.Boolean parseBoolean(java.lang.String) -> a
+    373:381:java.lang.Boolean parseBoolean(java.lang.String) -> b
     321:321:java.lang.String[] lambda$updateValue$5(int) -> a
     112:117:int lambda$buildCommand$4(com.mojang.brigadier.context.CommandContext) -> d
     108:109:int lambda$buildCommand$3(com.mojang.brigadier.context.CommandContext) -> e
@@ -1298,10 +1302,10 @@ net.shoreline.client.impl.command.irc.CloakCommand -> net.shoreline.client.bN:
     17:17:void <clinit>() -> <clinit>
 net.shoreline.client.impl.command.irc.DirectMessageCommand -> net.shoreline.client.bO:
     17:18:void <init>() -> <init>
-    23:46:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
-    43:44:int lambda$buildCommand$2(com.mojang.brigadier.context.CommandContext) -> a
-    38:39:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
-    28:35:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
+    23:45:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
+    42:43:int lambda$buildCommand$2(com.mojang.brigadier.context.CommandContext) -> a
+    37:38:int lambda$buildCommand$1(com.mojang.brigadier.context.CommandContext) -> b
+    28:34:int lambda$buildCommand$0(com.mojang.brigadier.context.CommandContext) -> c
 net.shoreline.client.impl.command.irc.DirectServerMsgCommand -> net.shoreline.client.bP:
     17:18:void <init>() -> <init>
     23:45:void buildCommand(com.mojang.brigadier.builder.LiteralArgumentBuilder) -> a
@@ -2485,7 +2489,7 @@ net.shoreline.client.impl.font.VanillaTextRenderer$Drawer -> net.shoreline.clien
     java.util.List rectangles -> f
     114:126:void <init>(net.minecraft.class_4597,float,float,int,boolean,org.joml.Matrix4f,net.minecraft.class_327$class_6415,int) -> <init>
     135:163:boolean accept(int,net.minecraft.class_2583,int) -> accept
-    168:177:void drawLayer() -> H
+    168:177:void drawLayer() -> J
 net.shoreline.client.impl.gui.account.AccountAddAccountScreen -> net.shoreline.client.gC:
     net.minecraft.class_437 parent -> b
     net.minecraft.class_342 email -> a
@@ -2541,7 +2545,7 @@ net.shoreline.client.impl.gui.account.list.AccountEntry -> net.shoreline.client.
 net.shoreline.client.impl.gui.account.list.AccountListWidget -> net.shoreline.client.gG:
     java.lang.String searchFilter -> Z
     23:24:void <init>(net.minecraft.class_310,int,int,int,int) -> <init>
-    28:38:void populateEntries() -> I
+    28:38:void populateEntries() -> K
     44:77:void method_25311(net.minecraft.class_332,int,int,float) -> method_25311
     82:92:boolean method_25402(double,double,int) -> method_25402
     97:98:void setSearchFilter(java.lang.String) -> w
@@ -2638,7 +2642,7 @@ net.shoreline.client.impl.gui.click.component.Component -> net.shoreline.client.
     494:496:void setPos(float,float) -> b
     504:506:void setDimensions(float,float) -> c
     510:515:void enableScissor(double,double,double,double) -> a
-    519:520:void disableScissor() -> B
+    519:520:void disableScissor() -> D
     524:539:void setScissor(net.minecraft.class_8030) -> a
 net.shoreline.client.impl.gui.click.component.Drawable -> net.shoreline.client.gM:
     void render(net.minecraft.class_332,float,float,float) -> a
@@ -2761,7 +2765,7 @@ net.shoreline.client.impl.gui.click.impl.config.setting.ColorButton -> net.shore
     316:320:void charTyped(char,int) -> a
     324:324:boolean isHexDigit(char) -> b
     329:334:float getPickerHeight() -> K
-    339:340:void endTyping() -> J
+    339:340:void endTyping() -> L
     344:353:java.lang.String getInsertionPoint() -> E
     358:358:boolean isTyping() -> x
     363:363:float getScaledTime() -> J
@@ -2794,7 +2798,7 @@ net.shoreline.client.impl.gui.click.impl.config.setting.SliderButton -> net.shor
     230:295:void keyPressed(int,int,int) -> b
     300:304:void charTyped(char,int) -> a
     308:317:java.lang.String getInsertionPoint() -> E
-    322:323:void endTyping() -> J
+    322:323:void endTyping() -> L
     327:327:boolean isTyping() -> x
 net.shoreline.client.impl.gui.click.impl.config.setting.TextButton -> net.shoreline.client.gZ:
     char[] buffer -> a
@@ -2807,7 +2811,7 @@ net.shoreline.client.impl.gui.click.impl.config.setting.TextButton -> net.shorel
     113:113:void mouseReleased(double,double,int) -> b
     123:146:void keyPressed(int,int,int) -> b
     151:155:void charTyped(char,int) -> a
-    159:160:void endTyping() -> J
+    159:160:void endTyping() -> L
     164:164:boolean isTyping() -> x
     169:178:java.lang.String getInsertionPoint() -> E
 net.shoreline.client.impl.gui.hud.HudScreen -> net.shoreline.client.ha:
@@ -2830,8 +2834,8 @@ net.shoreline.client.impl.imixin.IClientPlayerEntity -> net.shoreline.client.hf:
     float getLastSpoofedYaw() -> L
     float getLastSpoofedPitch() -> M
 net.shoreline.client.impl.imixin.IMinecraftClient -> net.shoreline.client.hg:
-    void leftClick() -> K
-    void rightClick() -> L
+    void leftClick() -> M
+    void rightClick() -> N
 net.shoreline.client.impl.imixin.IMixin -> net.shoreline.client.im:
 net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket -> net.shoreline.client.hh:
     net.minecraft.class_1297 getEntity() -> a
@@ -2862,7 +2866,7 @@ net.shoreline.client.impl.irc.IRCManager -> net.shoreline.client.ir:
     125:128:net.shoreline.client.impl.irc.user.OnlineUser findGlobalOnlineUser(java.lang.String) -> b
     133:133:java.util.Set getActiveOnlineUsers() -> b
     138:138:java.util.Set getAllOnlineUsers() -> c
-    143:144:void clearOutboundPackets() -> M
+    143:144:void clearOutboundPackets() -> O
     148:155:void addToChat(java.lang.String) -> x
     159:166:void addServerMessageToChat(java.lang.String) -> y
     170:171:void setLastMessagedUser(net.shoreline.client.impl.irc.user.OnlineUser) -> a
@@ -2876,8 +2880,8 @@ net.shoreline.client.impl.irc.IRCManager -> net.shoreline.client.ir:
     150:154:void lambda$addToChat$4(java.lang.String) -> B
     126:126:boolean lambda$findGlobalOnlineUser$3(java.lang.String,net.shoreline.client.impl.irc.user.OnlineUser) -> a
     118:118:boolean lambda$findOnlineUser$2(java.lang.String,net.shoreline.client.impl.irc.user.OnlineUser) -> b
-    65:89:void lambda$new$1() -> C
-    58:60:void lambda$new$0() -> w
+    65:89:void lambda$new$1() -> E
+    58:60:void lambda$new$0() -> y
 net.shoreline.client.impl.irc.packet.IRCPacket -> net.shoreline.client.hj:
     java.lang.String name -> ad
     11:13:void <init>(java.lang.String) -> <init>
@@ -2906,7 +2910,7 @@ net.shoreline.client.impl.irc.packet.client.CPacketDirectMessage -> net.shorelin
     java.lang.String message -> ah
     17:21:void <init>(net.shoreline.client.impl.irc.user.OnlineUser,java.lang.String) -> <init>
     26:28:void addData(com.google.gson.JsonObject) -> a
-    33:37:void onSend(net.shoreline.client.impl.irc.IRCManager) -> a
+    33:38:void onSend(net.shoreline.client.impl.irc.IRCManager) -> a
 net.shoreline.client.impl.irc.packet.client.CPacketDirectServerMsg -> net.shoreline.client.hp:
     net.shoreline.client.impl.irc.user.OnlineUser user -> d
     java.lang.String message -> ai
@@ -2995,7 +2999,7 @@ net.shoreline.client.impl.manager.EventManager -> net.shoreline.client.hC:
 net.shoreline.client.impl.manager.ModuleManager -> net.shoreline.client.fD:
     java.util.Map modules -> i
     26:219:void <init>() -> <init>
-    227:227:void postInit() -> N
+    227:227:void postInit() -> P
     235:239:void register(net.shoreline.client.api.module.Module[]) -> a
     246:247:void register(net.shoreline.client.api.module.Module) -> a
     255:255:net.shoreline.client.api.module.Module getModuleById(java.lang.String) -> a
@@ -3008,7 +3012,7 @@ net.shoreline.client.impl.manager.anticheat.AntiCheatManager -> net.shoreline.cl
     23:31:void <init>() -> <init>
     36:55:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     60:63:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
-    67:76:void grimCheck() -> O
+    67:76:void grimCheck() -> Q
     80:80:boolean isGrim() -> B
     85:85:boolean hasPassed(long) -> b
 net.shoreline.client.impl.manager.anticheat.SetbackData -> net.shoreline.client.hE:
@@ -3028,7 +3032,7 @@ net.shoreline.client.impl.manager.client.AccountManager -> net.shoreline.client.
     java.util.List accounts -> l
     net.shoreline.client.api.account.config.AccountFile configFile -> a
     21:25:void <init>() -> <init>
-    32:45:void postInit() -> N
+    32:45:void postInit() -> P
     52:53:void register(net.shoreline.client.api.account.type.MinecraftAccount) -> a
     60:61:void unregister(net.shoreline.client.api.account.type.MinecraftAccount) -> b
     65:67:void setSession(net.minecraft.class_320) -> a
@@ -3056,13 +3060,13 @@ net.shoreline.client.impl.manager.client.CommandManager -> net.shoreline.client.
     235:235:net.minecraft.class_2172 getSource() -> a
 net.shoreline.client.impl.manager.client.DiscordManager -> net.shoreline.client.hG:
     7:7:void <init>() -> <init>
-    10:10:void startRPC() -> P
+    10:10:void startRPC() -> R
 net.shoreline.client.impl.manager.client.MacroManager -> net.shoreline.client.hH:
     java.util.Set macros -> e
     26:34:void <init>() -> <init>
     42:63:void onKeyboardInput(net.shoreline.client.impl.event.keyboard.KeyboardInputEvent) -> a
     68:90:void onMouseInput(net.shoreline.client.impl.event.MouseClickEvent) -> a
-    99:99:void postInit() -> N
+    99:99:void postInit() -> P
     103:108:void setMacro(net.shoreline.client.api.macro.Macro,int) -> a
     115:119:void register(net.shoreline.client.api.macro.Macro[]) -> a
     126:127:void register(net.shoreline.client.api.macro.Macro) -> a
@@ -3149,7 +3153,7 @@ net.shoreline.client.impl.manager.combat.hole.Hole -> net.shoreline.client.hQ:
     176:176:double method_10214() -> method_10214
     185:185:double method_10215() -> method_10215
 net.shoreline.client.impl.manager.combat.hole.HoleManager -> net.shoreline.client.hR:
-    java.util.concurrent.ExecutorService executor -> a
+    java.util.concurrent.ExecutorService executor -> b
     java.util.concurrent.Future result -> a
     java.util.Set holes -> f
     28:36:void <init>() -> <init>
@@ -3226,9 +3230,9 @@ net.shoreline.client.impl.manager.player.InventoryManager -> net.shoreline.clien
     182:187:void setSlotAlt(int) -> u
     199:205:void setClientSlot(int) -> v
     214:215:void setSlotForced(int) -> w
-    222:231:void syncToClient() -> Q
+    222:231:void syncToClient() -> S
     235:235:boolean isDesynced() -> K
-    241:242:void closeScreen() -> R
+    241:242:void closeScreen() -> T
     249:249:int pickupSlot(int) -> c
     254:255:void quickMove(int) -> x
     262:263:void throwSlot(int) -> y
@@ -3245,7 +3249,7 @@ net.shoreline.client.impl.manager.player.InventoryManager$PreSwapData -> net.sho
     int swapTo -> aa
     net.shoreline.client.util.math.timer.Timer clearTime -> f
     377:381:void <init>(net.minecraft.class_1799[],int,int) -> <init>
-    385:387:void beginClear() -> S
+    385:387:void beginClear() -> U
     391:391:boolean isPassedClearTime() -> L
     396:396:net.minecraft.class_1799 getPreHolding(int) -> a
     401:401:int getStarting() -> V
@@ -3352,7 +3356,7 @@ net.shoreline.client.impl.manager.player.rotation.RotationManager -> net.shoreli
     221:243:void setRotation(net.shoreline.client.impl.manager.player.rotation.Rotation) -> a
     251:257:void setRotationClient(float,float) -> d
     261:264:void setRotationSilent(float,float) -> e
-    269:275:void setRotationSilentSync() -> T
+    269:275:void setRotationSilentSync() -> V
     282:282:boolean removeRotation(net.shoreline.client.impl.manager.player.rotation.Rotation) -> a
     287:287:boolean isRotationBlocked(int) -> a
     295:295:boolean isDoneRotating() -> Q
@@ -3387,8 +3391,8 @@ net.shoreline.client.impl.manager.world.BlockManager$BreakEntry -> net.shoreline
     float blockDamage -> aH
     boolean started -> Y
     97:100:void <init>(int,net.minecraft.class_2338) -> <init>
-    104:109:void updateDamage() -> U
-    113:115:void startMining() -> V
+    104:109:void updateDamage() -> W
+    113:115:void startMining() -> X
     119:119:net.minecraft.class_2338 getPos() -> a
     124:124:float getBlockDamage() -> S
     129:129:int getEntityId() -> X
@@ -3538,7 +3542,7 @@ net.shoreline.client.impl.module.client.BaritoneModule -> net.shoreline.client.i
     66:97:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
     102:103:void onChat(net.shoreline.client.impl.event.gui.hud.ChatMessageEvent) -> a
     108:109:void onLoadWorld(net.shoreline.client.impl.event.world.LoadWorldEvent) -> a
-    113:140:void syncBaritoneSettings() -> W
+    113:140:void syncBaritoneSettings() -> Y
     145:151:void onChatText(net.shoreline.client.impl.event.gui.hud.ChatMessageEvent) -> b
 net.shoreline.client.impl.module.client.CapesModule -> net.shoreline.client.iv:
     net.shoreline.client.impl.module.client.CapesModule instance -> a
@@ -3546,8 +3550,8 @@ net.shoreline.client.impl.module.client.CapesModule -> net.shoreline.client.iv:
     net.shoreline.client.api.config.Config optifineConfig -> N
     boolean capesEnabled -> Z
     21:31:void <init>() -> <init>
-    36:42:void onEnable() -> u
-    47:52:void onDisable() -> v
+    36:42:void onEnable() -> w
+    47:52:void onDisable() -> x
     57:58:void onGameJoinEvent(net.shoreline.client.impl.event.network.GameJoinEvent) -> a
     63:75:void onCapes(net.shoreline.client.impl.event.network.CapesEvent) -> a
     79:91:java.lang.String getCapePath(net.shoreline.client.impl.irc.user.OnlineUser) -> a
@@ -3573,7 +3577,7 @@ net.shoreline.client.impl.module.client.ChatModule -> net.shoreline.client.iy:
     net.shoreline.client.util.render.animation.Animation ircAnimation -> h
     36:46:void <init>() -> <init>
     50:50:net.shoreline.client.impl.module.client.ChatModule getInstance() -> a
-    56:63:void onEnable() -> u
+    56:63:void onEnable() -> w
     68:79:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     84:100:void onKey(net.shoreline.client.impl.event.keyboard.KeyboardInputEvent) -> b
     105:123:void onChatMessage(net.shoreline.client.impl.event.gui.chat.ChatMessageEvent$Client) -> a
@@ -3592,8 +3596,8 @@ net.shoreline.client.impl.module.client.ClickGuiModule -> net.shoreline.client.i
     net.shoreline.client.util.render.animation.Animation transparencyAnimation -> j
     28:46:void <init>() -> <init>
     50:50:net.shoreline.client.impl.module.client.ClickGuiModule getInstance() -> a
-    56:79:void onEnable() -> u
-    84:96:void onDisable() -> v
+    56:79:void onEnable() -> w
+    84:96:void onDisable() -> x
     101:106:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
     110:110:int getColor() -> u
     115:115:int getColor(int) -> d
@@ -3719,7 +3723,7 @@ net.shoreline.client.impl.module.client.HUDModule$HudRenderModule -> net.shoreli
     boolean wasDrawing -> ad
     net.shoreline.client.impl.module.client.HUDModule this$0 -> b
     807:809:void <init>(net.shoreline.client.impl.module.client.HUDModule,net.shoreline.client.api.module.ToggleModule) -> <init>
-    813:836:void updateAnimation() -> X
+    813:836:void updateAnimation() -> Z
     840:853:void draw(net.minecraft.class_332,long) -> a
 net.shoreline.client.impl.module.client.HUDModule$Ordering -> net.shoreline.client.iE:
     net.shoreline.client.impl.module.client.HUDModule$Ordering LENGTH -> a
@@ -3745,7 +3749,7 @@ net.shoreline.client.impl.module.client.HUDModule$PotionData -> net.shoreline.cl
     int amplifier -> ag
     int duration -> ah
     863:867:void <init>(net.minecraft.class_6880,int,int) -> <init>
-    871:876:void update() -> Y
+    871:876:void update() -> aa
     880:880:java.lang.String getPotionName() -> I
     885:885:net.minecraft.class_6880 getType() -> a
     890:890:int getAmplifier() -> ab
@@ -3865,7 +3869,7 @@ net.shoreline.client.impl.module.combat.AuraModule -> net.shoreline.client.iN:
     65:123:void <init>() -> <init>
     127:127:net.shoreline.client.impl.module.combat.AuraModule getInstance() -> a
     133:133:java.lang.String getModuleData() -> x
-    139:141:void onDisable() -> v
+    139:141:void onDisable() -> x
     146:150:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     155:159:void onRemoveEntity(net.shoreline.client.impl.event.world.RemoveEntityEvent) -> a
     164:347:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerTickEvent) -> b
@@ -3874,7 +3878,7 @@ net.shoreline.client.impl.module.combat.AuraModule -> net.shoreline.client.iN:
     401:424:boolean attackTarget(net.minecraft.class_1297) -> b
     429:480:int getSwordSlot() -> ae
     485:501:int getBreachMaceSlot() -> af
-    506:536:void preAttackTarget() -> Z
+    506:536:void preAttackTarget() -> ab
     541:569:void postAttackTarget(net.minecraft.class_1297) -> a
     573:637:net.minecraft.class_1297 getAttackTarget(net.minecraft.class_243) -> a
     642:652:float getArmorDurability(net.minecraft.class_1309) -> a
@@ -3963,7 +3967,7 @@ net.shoreline.client.impl.module.combat.AutoAnchorModule -> net.shoreline.client
     java.util.Map fadeList -> n
     45:77:void <init>() -> <init>
     81:81:net.shoreline.client.impl.module.combat.AutoAnchorModule getInstance() -> a
-    87:89:void onDisable() -> v
+    87:89:void onDisable() -> x
     94:166:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
     171:199:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     203:252:void setAnchor(net.minecraft.class_2338) -> a
@@ -4050,7 +4054,7 @@ net.shoreline.client.impl.module.combat.AutoCrawlTrapModule -> net.shoreline.cli
     int blocksPlaced -> ak
     41:62:void <init>() -> <init>
     66:66:net.shoreline.client.impl.module.combat.AutoCrawlTrapModule getInstance() -> a
-    72:76:void onDisable() -> v
+    72:76:void onDisable() -> x
     81:133:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     138:153:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     157:199:void handlePackets(net.minecraft.class_2596) -> c
@@ -4151,11 +4155,11 @@ net.shoreline.client.impl.module.combat.AutoCrystalModule -> net.shoreline.clien
     long predictId -> i
     java.util.Map antiStuckCrystals -> t
     java.util.List stuckCrystals -> x
-    java.util.concurrent.ExecutorService executor -> b
+    java.util.concurrent.ExecutorService executor -> c
     77:198:void <init>() -> <init>
     202:202:net.shoreline.client.impl.module.combat.AutoCrystalModule getInstance() -> a
     208:221:java.lang.String getModuleData() -> x
-    228:241:void onDisable() -> v
+    228:241:void onDisable() -> x
     246:254:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     259:408:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerTickEvent) -> b
     413:427:void onRunTick(net.shoreline.client.impl.event.RunTickEvent) -> a
@@ -4359,12 +4363,12 @@ net.shoreline.client.impl.module.combat.AutoRegearModule -> net.shoreline.client
     java.util.Map regearInventory -> u
     38:47:void <init>() -> <init>
     51:51:net.shoreline.client.impl.module.combat.AutoRegearModule getInstance() -> a
-    57:61:void onEnable() -> u
+    57:61:void onEnable() -> w
     66:156:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    160:161:void clearPlayerInventory() -> aa
-    165:171:void savePlayerInventory() -> ab
-    175:202:void saveRegearFile() -> ac
-    206:229:void loadRegearFile() -> ad
+    160:161:void clearPlayerInventory() -> ac
+    165:171:void savePlayerInventory() -> ad
+    175:202:void saveRegearFile() -> ae
+    206:229:void loadRegearFile() -> af
 net.shoreline.client.impl.module.combat.AutoTotemModule -> net.shoreline.client.jl:
     net.shoreline.client.impl.module.combat.AutoTotemModule INSTANCE -> a
     net.shoreline.client.api.config.Config itemConfig -> cC
@@ -4388,7 +4392,7 @@ net.shoreline.client.impl.module.combat.AutoTotemModule -> net.shoreline.client.
     47:71:void <init>() -> <init>
     75:75:net.shoreline.client.impl.module.combat.AutoTotemModule getInstance() -> a
     81:81:java.lang.String getModuleData() -> x
-    88:93:void onDisable() -> v
+    88:93:void onDisable() -> x
     98:99:void onLoadWorld(net.shoreline.client.impl.event.world.LoadWorldEvent) -> a
     104:258:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     263:295:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
@@ -4438,7 +4442,7 @@ net.shoreline.client.impl.module.combat.AutoTrapModule -> net.shoreline.client.j
     int blocksPlaced -> ak
     54:80:void <init>() -> <init>
     84:84:net.shoreline.client.impl.module.combat.AutoTrapModule getInstance() -> a
-    90:94:void onDisable() -> v
+    90:94:void onDisable() -> x
     99:175:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     180:195:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     199:241:void handlePackets(net.minecraft.class_2596) -> c
@@ -4472,7 +4476,7 @@ net.shoreline.client.impl.module.combat.AutoWebModule -> net.shoreline.client.jo
     java.util.List webs -> C
     java.util.Map fadeList -> x
     34:49:void <init>() -> <init>
-    54:56:void onDisable() -> v
+    54:56:void onDisable() -> x
     61:62:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     67:137:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     142:176:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
@@ -4504,7 +4508,7 @@ net.shoreline.client.impl.module.combat.BedAuraModule -> net.shoreline.client.jq
     net.minecraft.class_1657 lastTarget -> b
     net.minecraft.class_1657 currentTarget -> c
     31:43:void <init>() -> <init>
-    48:53:void onEnable() -> u
+    48:53:void onEnable() -> w
     58:84:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerTickEvent) -> b
     88:138:java.util.List getPossibleTargets() -> n
     143:143:void test(net.minecraft.class_746) -> a
@@ -4531,7 +4535,7 @@ net.shoreline.client.impl.module.combat.BlockLagModule -> net.shoreline.client.j
     net.shoreline.client.api.config.Config autoDisableConfig -> cA
     double prevY -> y
     31:45:void <init>() -> <init>
-    50:55:void onEnable() -> u
+    50:55:void onEnable() -> w
     60:61:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     66:105:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     109:115:void attackPlace(net.minecraft.class_2338) -> b
@@ -4580,7 +4584,7 @@ net.shoreline.client.impl.module.combat.CriticalsModule -> net.shoreline.client.
     43:58:void <init>() -> <init>
     62:62:net.shoreline.client.impl.module.combat.CriticalsModule getInstance() -> a
     71:71:java.lang.String getModuleData() -> x
-    77:79:void onDisable() -> v
+    77:79:void onDisable() -> x
     88:139:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     144:263:void attackSpoofJump(net.minecraft.class_1297) -> d
     268:287:void onPacketOutboundPost(net.shoreline.client.impl.event.network.PacketEvent$OutboundPost) -> a
@@ -4623,7 +4627,7 @@ net.shoreline.client.impl.module.combat.HoleFillModule -> net.shoreline.client.j
     java.util.List fills -> D
     45:70:void <init>() -> <init>
     74:74:net.shoreline.client.impl.module.combat.HoleFillModule getInstance() -> a
-    80:82:void onDisable() -> v
+    80:82:void onDisable() -> x
     87:88:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     94:188:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     192:209:void attackBlockingCrystals(java.util.List) -> a
@@ -4649,7 +4653,7 @@ net.shoreline.client.impl.module.combat.ReplenishModule -> net.shoreline.client.
     net.shoreline.client.util.math.timer.Timer lastDroppedTimer -> w
     32:43:void <init>() -> <init>
     47:47:net.shoreline.client.impl.module.combat.ReplenishModule getInstance() -> a
-    53:54:void onDisable() -> v
+    53:54:void onDisable() -> x
     59:60:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     65:69:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
     74:128:void onTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> c
@@ -4661,7 +4665,7 @@ net.shoreline.client.impl.module.combat.SelfBowModule -> net.shoreline.client.jB
     java.util.Set arrows -> j
     33:39:void <init>() -> <init>
     43:43:net.shoreline.client.impl.module.combat.SelfBowModule getInstance() -> a
-    49:51:void onDisable() -> v
+    49:51:void onDisable() -> x
     56:131:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
 net.shoreline.client.impl.module.combat.SelfTrapModule -> net.shoreline.client.jC:
     net.shoreline.client.impl.module.combat.SelfTrapModule INSTANCE -> a
@@ -4687,8 +4691,8 @@ net.shoreline.client.impl.module.combat.SelfTrapModule -> net.shoreline.client.j
     double prevY -> y
     52:78:void <init>() -> <init>
     82:82:net.shoreline.client.impl.module.combat.SelfTrapModule getInstance() -> a
-    88:93:void onEnable() -> u
-    98:102:void onDisable() -> v
+    88:93:void onEnable() -> w
+    98:102:void onDisable() -> x
     107:177:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     182:197:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     201:243:void handlePackets(net.minecraft.class_2596) -> c
@@ -4708,7 +4712,7 @@ net.shoreline.client.impl.module.combat.SelfTrapModule -> net.shoreline.client.j
 net.shoreline.client.impl.module.combat.SelfWebModule -> net.shoreline.client.jD:
     net.shoreline.client.api.config.Config rotateConfig -> aY
     14:19:void <init>() -> <init>
-    24:51:void onEnable() -> u
+    24:51:void onEnable() -> w
     34:48:void lambda$onEnable$0(boolean,float[]) -> f
 net.shoreline.client.impl.module.combat.SurroundModule -> net.shoreline.client.jE:
     net.shoreline.client.impl.module.combat.SurroundModule INSTANCE -> a
@@ -4733,8 +4737,8 @@ net.shoreline.client.impl.module.combat.SurroundModule -> net.shoreline.client.j
     double prevY -> y
     52:77:void <init>() -> <init>
     81:81:net.shoreline.client.impl.module.combat.SurroundModule getInstance() -> a
-    87:92:void onEnable() -> u
-    97:101:void onDisable() -> v
+    87:92:void onEnable() -> w
+    97:101:void onDisable() -> x
     106:175:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     180:195:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     199:241:void handlePackets(net.minecraft.class_2596) -> c
@@ -4780,7 +4784,7 @@ net.shoreline.client.impl.module.exploit.BacktrackModule -> net.shoreline.client
     net.minecraft.class_1657 trackedEntity -> d
     net.minecraft.class_7422 trackedPosition -> a
     32:40:void <init>() -> <init>
-    45:50:void onDisable() -> v
+    45:50:void onDisable() -> x
     55:58:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     63:71:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     76:110:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
@@ -4802,7 +4806,7 @@ net.shoreline.client.impl.module.exploit.ChorusControlModule -> net.shoreline.cl
     int chorusTeleportId -> aq
     net.minecraft.class_2708 teleportPacket -> a
     38:40:void <init>() -> <init>
-    45:51:void onDisable() -> v
+    45:51:void onDisable() -> x
     56:68:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     73:78:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     83:105:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
@@ -4817,7 +4821,7 @@ net.shoreline.client.impl.module.exploit.ChorusInvincibilityModule -> net.shorel
     net.shoreline.client.util.math.timer.Timer invincibilityTimer -> A
     27:38:void <init>() -> <init>
     42:42:net.shoreline.client.impl.module.exploit.ChorusInvincibilityModule getInstance() -> a
-    48:50:void onDisable() -> v
+    48:50:void onDisable() -> x
     55:71:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     76:95:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     100:104:void onFinishUsing(net.shoreline.client.impl.event.item.FinishUsingEvent) -> a
@@ -4885,19 +4889,19 @@ net.shoreline.client.impl.module.exploit.ExtendedFireworkModule -> net.shoreline
     32:42:void <init>() -> <init>
     46:46:net.shoreline.client.impl.module.exploit.ExtendedFireworkModule getInstance() -> a
     52:56:java.lang.String getModuleData() -> x
-    62:70:void onDisable() -> v
+    62:70:void onDisable() -> x
     75:82:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     87:116:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     121:130:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     135:162:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    166:171:void sendPongPackets() -> ae
+    166:171:void sendPongPackets() -> ag
     175:175:boolean isExtendingFirework() -> aH
 net.shoreline.client.impl.module.exploit.FakeLatencyModule -> net.shoreline.client.jS:
     net.shoreline.client.api.config.Config latencyConfig -> dh
     net.shoreline.client.api.config.Config transactionsConfig -> di
     java.util.concurrent.ConcurrentMap cachedPackets -> c
     27:38:void <init>() -> <init>
-    46:56:void onDisable() -> v
+    46:56:void onDisable() -> x
     61:80:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     85:99:void onTick(net.shoreline.client.impl.event.RunTickEvent) -> b
     92:98:void lambda$onTick$1(net.minecraft.class_2596,java.lang.Long) -> a
@@ -4945,7 +4949,7 @@ net.shoreline.client.impl.module.exploit.FastProjectileModule -> net.shoreline.c
     30:47:void <init>() -> <init>
     52:57:java.lang.String getModuleData() -> x
     63:94:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    98:110:void spoofProjectileVelocity() -> af
+    98:110:void spoofProjectileVelocity() -> ah
 net.shoreline.client.impl.module.exploit.GodModeModule -> net.shoreline.client.jX:
     net.shoreline.client.impl.module.exploit.GodModeModule INSTANCE -> a
     net.shoreline.client.api.config.Config modeConfig -> aK
@@ -4958,8 +4962,8 @@ net.shoreline.client.impl.module.exploit.GodModeModule -> net.shoreline.client.j
     net.shoreline.client.util.math.timer.Timer portalTimer -> G
     28:46:void <init>() -> <init>
     50:50:net.shoreline.client.impl.module.exploit.GodModeModule getInstance() -> a
-    56:59:void onEnable() -> u
-    64:66:void onDisable() -> v
+    56:59:void onEnable() -> w
+    64:66:void onDisable() -> x
     71:95:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     100:105:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     110:114:void onEntityDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> c
@@ -4993,7 +4997,7 @@ net.shoreline.client.impl.module.exploit.NewChunksModule -> net.shoreline.client
     java.util.Set oldChunks -> l
     java.util.List activatedSpawners -> F
     48:67:void <init>() -> <init>
-    72:73:void onDisable() -> v
+    72:73:void onDisable() -> x
     78:80:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     85:132:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     137:167:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
@@ -5047,7 +5051,7 @@ net.shoreline.client.impl.module.exploit.PacketFlyModule -> net.shoreline.client
     46:78:void <init>() -> <init>
     82:82:net.shoreline.client.impl.module.exploit.PacketFlyModule getInstance() -> a
     91:91:java.lang.String getModuleData() -> x
-    100:107:void onDisable() -> v
+    100:107:void onDisable() -> x
     112:113:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     118:122:void onScreenOpen(net.shoreline.client.impl.event.ScreenOpenEvent) -> b
     127:132:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
@@ -5151,7 +5155,7 @@ net.shoreline.client.impl.module.exploit.PhaseModule -> net.shoreline.client.kq:
     45:64:void <init>() -> <init>
     68:68:net.shoreline.client.impl.module.exploit.PhaseModule getInstance() -> a
     74:74:java.lang.String getModuleData() -> x
-    80:238:void onEnable() -> u
+    80:238:void onEnable() -> w
     243:257:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     262:296:void onBlockCollision(net.shoreline.client.impl.event.world.BlockCollisionEvent) -> a
     301:330:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
@@ -5201,7 +5205,7 @@ net.shoreline.client.impl.module.misc.AntiAFKModule -> net.shoreline.client.kt:
     net.shoreline.client.util.math.timer.Timer afkTimer -> H
     net.shoreline.client.util.math.timer.Timer actionTimer -> I
     26:43:void <init>() -> <init>
-    48:49:void onEnable() -> u
+    48:49:void onEnable() -> w
     54:55:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     60:81:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     86:95:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
@@ -5218,7 +5222,7 @@ net.shoreline.client.impl.module.misc.AntiAimModule -> net.shoreline.client.ku:
     float prevYaw -> aF
     float prevPitch -> aG
     18:37:void <init>() -> <init>
-    45:51:void onEnable() -> u
+    45:51:void onEnable() -> w
     59:103:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerTickEvent) -> b
 net.shoreline.client.impl.module.misc.AntiAimModule$PitchMode -> net.shoreline.client.kv:
     net.shoreline.client.impl.module.misc.AntiAimModule$PitchMode OFF -> a
@@ -5255,7 +5259,7 @@ net.shoreline.client.impl.module.misc.AntiVanishModule -> net.shoreline.client.k
     java.util.Set messageCache -> n
     java.util.Map playerCache -> G
     18:26:void <init>() -> <init>
-    31:32:void onEnable() -> u
+    31:32:void onEnable() -> w
     40:45:void onChatMessage(net.shoreline.client.impl.event.gui.hud.ChatMessageEvent) -> c
     50:75:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     68:68:boolean lambda$onTick$2(java.lang.String,java.lang.String) -> a
@@ -5292,7 +5296,7 @@ net.shoreline.client.impl.module.misc.AutoAnvilRenameModule$Selection -> net.sho
 net.shoreline.client.impl.module.misc.AutoEatModule -> net.shoreline.client.kC:
     net.shoreline.client.api.config.Config hungerConfig -> ev
     23:32:void <init>() -> <init>
-    37:38:void onDisable() -> v
+    37:38:void onDisable() -> x
     44:66:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     70:104:int getFoodSlot() -> al
 net.shoreline.client.impl.module.misc.AutoFishModule -> net.shoreline.client.kD:
@@ -5422,7 +5426,7 @@ net.shoreline.client.impl.module.misc.ChestSwapModule -> net.shoreline.client.kP
     net.shoreline.client.api.config.Config priorityConfig -> aL
     net.shoreline.client.api.config.Config autoFireworkConfig -> eU
     22:28:void <init>() -> <init>
-    33:91:void onEnable() -> u
+    33:91:void onEnable() -> w
     95:118:int getChestplateSlot() -> an
     123:133:int getElytraSlot() -> ao
 net.shoreline.client.impl.module.misc.ChestSwapModule$Priority -> net.shoreline.client.kQ:
@@ -5437,8 +5441,8 @@ net.shoreline.client.impl.module.misc.ChestSwapModule$Priority -> net.shoreline.
 net.shoreline.client.impl.module.misc.FakePlayerModule -> net.shoreline.client.kR:
     net.shoreline.client.util.entity.FakePlayerEntity fakePlayer -> a
     25:27:void <init>() -> <init>
-    32:37:void onEnable() -> u
-    42:47:void onDisable() -> v
+    32:37:void onEnable() -> w
+    42:47:void onDisable() -> x
     52:54:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     61:65:void onPushEntity(net.shoreline.client.impl.event.entity.player.PushEntityEvent) -> a
 net.shoreline.client.impl.module.misc.InvCleanerModule -> net.shoreline.client.kS:
@@ -5512,8 +5516,8 @@ net.shoreline.client.impl.module.misc.PacketLoggerModule -> net.shoreline.client
     net.shoreline.client.api.config.Config pongConfig -> fq
     java.util.List packetLogs -> H
     28:55:void <init>() -> <init>
-    60:61:void onEnable() -> u
-    66:67:void onDisable() -> v
+    60:61:void onEnable() -> w
+    66:67:void onDisable() -> x
     71:82:void logPacket(net.minecraft.class_2596,java.lang.String,java.lang.Object[]) -> a
     87:91:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     96:124:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
@@ -5545,8 +5549,8 @@ net.shoreline.client.impl.module.misc.SkinBlinkModule -> net.shoreline.client.le
     net.shoreline.client.util.math.timer.Timer blinkTimer -> O
     java.util.Set enabledPlayerModelParts -> p
     21:34:void <init>() -> <init>
-    39:44:void onEnable() -> u
-    49:57:void onDisable() -> v
+    39:44:void onEnable() -> w
+    49:57:void onDisable() -> x
     62:73:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
 net.shoreline.client.impl.module.misc.SpammerModule -> net.shoreline.client.lf:
     net.shoreline.client.api.config.Config delayConfig -> cB
@@ -5556,10 +5560,10 @@ net.shoreline.client.impl.module.misc.SpammerModule -> net.shoreline.client.lf:
     int messageIndex -> ay
     net.shoreline.client.util.math.timer.Timer spamTimer -> P
     33:43:void <init>() -> <init>
-    48:50:void onEnable() -> u
+    48:50:void onEnable() -> w
     55:56:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     61:70:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    74:97:void loadFile() -> ag
+    74:97:void loadFile() -> ai
     101:136:java.lang.String getSpammerMessage() -> J
     141:169:void sendSpamMessage(java.lang.String) -> E
 net.shoreline.client.impl.module.misc.SwingModule -> net.shoreline.client.lg:
@@ -5569,8 +5573,8 @@ net.shoreline.client.impl.module.misc.SwingModule -> net.shoreline.client.lg:
     net.minecraft.class_1268 hand -> a
     22:30:void <init>() -> <init>
     34:34:net.shoreline.client.impl.module.misc.SwingModule getInstance() -> a
-    40:48:void onEnable() -> u
-    53:57:void onDisable() -> v
+    40:48:void onEnable() -> w
+    53:57:void onDisable() -> x
     62:63:void onSwing(net.shoreline.client.impl.event.entity.SwingEvent) -> a
     67:92:void updateSwingHand(net.shoreline.client.impl.module.misc.SwingModule$SwingHand) -> a
     96:100:int getHandSwingDuration() -> ap
@@ -5596,13 +5600,13 @@ net.shoreline.client.impl.module.misc.TimerModule -> net.shoreline.client.li:
     26:38:void <init>() -> <init>
     42:46:net.shoreline.client.impl.module.misc.TimerModule getInstance() -> a
     52:53:java.lang.String getModuleData() -> x
-    59:65:void toggle() -> t
-    70:71:void onDisable() -> v
+    59:65:void toggle() -> v
+    70:71:void onDisable() -> x
     76:89:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     94:99:void onTickCounter(net.shoreline.client.impl.event.render.TickCounterEvent) -> a
     106:106:float getTimer() -> ab
     114:116:void setTimer(float) -> w
-    120:125:void resetTimer() -> ah
+    120:125:void resetTimer() -> aj
 net.shoreline.client.impl.module.misc.TrueDurabilityModule -> net.shoreline.client.lj:
     20:22:void <init>() -> <init>
     28:35:void onDurability(net.shoreline.client.impl.event.item.DurabilityEvent) -> a
@@ -5622,7 +5626,7 @@ net.shoreline.client.impl.module.movement.AutoWalkModule -> net.shoreline.client
     net.shoreline.client.api.config.Config lockConfig -> fx
     21:27:void <init>() -> <init>
     31:31:net.shoreline.client.impl.module.movement.AutoWalkModule getInstance() -> a
-    37:38:void onDisable() -> v
+    37:38:void onDisable() -> x
     43:53:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
 net.shoreline.client.impl.module.movement.BoatFlyModule -> net.shoreline.client.lo:
     net.shoreline.client.api.config.Config speedConfig -> ao
@@ -5638,8 +5642,8 @@ net.shoreline.client.impl.module.movement.BoatFlyModule -> net.shoreline.client.
     int floatingTicks -> az
     boolean modifyY -> ay
     26:44:void <init>() -> <init>
-    49:50:void onEnable() -> u
-    55:56:void onDisable() -> v
+    49:50:void onEnable() -> w
+    55:56:void onDisable() -> x
     61:65:void onTravel(net.shoreline.client.impl.event.entity.EntityTravelEvent) -> a
     70:74:void onDismountVehicle(net.shoreline.client.impl.event.network.DismountVehicleEvent) -> a
     79:148:void onPlayerTick(net.shoreline.client.impl.event.entity.player.TravelEvent) -> a
@@ -5678,8 +5682,8 @@ net.shoreline.client.impl.module.movement.ElytraFlyModule -> net.shoreline.clien
     49:79:void <init>() -> <init>
     83:83:net.shoreline.client.impl.module.movement.ElytraFlyModule getInstance() -> a
     89:89:java.lang.String getModuleData() -> x
-    95:96:void onEnable() -> u
-    101:106:void onDisable() -> v
+    95:96:void onEnable() -> w
+    101:106:void onDisable() -> x
     111:116:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
     121:201:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     206:229:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
@@ -5688,7 +5692,7 @@ net.shoreline.client.impl.module.movement.ElytraFlyModule -> net.shoreline.clien
     361:371:void onCameraRotation(net.shoreline.client.impl.event.camera.CameraRotationEvent) -> a
     376:390:void onMouseUpdate(net.shoreline.client.impl.event.MouseUpdateEvent) -> a
     394:416:float getControlPitch() -> ac
-    422:428:void applyVanillaBoost() -> ai
+    422:428:void applyVanillaBoost() -> ak
     432:441:boolean isBoostedByRocket() -> aC
     446:446:boolean isBounce() -> aM
     61:61:java.lang.Boolean lambda$new$8() -> e
@@ -5737,8 +5741,8 @@ net.shoreline.client.impl.module.movement.FakeLagModule -> net.shoreline.client.
     boolean blinking -> aA
     java.util.Queue packets -> g
     31:47:void <init>() -> <init>
-    52:58:void onEnable() -> u
-    63:80:void onDisable() -> v
+    52:58:void onEnable() -> w
+    63:80:void onDisable() -> x
     85:103:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     109:110:void onDisconnectEvent(net.shoreline.client.impl.event.network.DisconnectEvent) -> b
     115:127:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
@@ -5761,7 +5765,7 @@ net.shoreline.client.impl.module.movement.FastFallModule -> net.shoreline.client
     int fallTicks -> aA
     net.shoreline.client.util.math.timer.Timer fallTimer -> R
     27:44:void <init>() -> <init>
-    49:51:void onDisable() -> v
+    49:51:void onDisable() -> x
     56:86:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     91:127:void onTickMovement(net.shoreline.client.impl.event.network.TickMovementEvent) -> a
     132:148:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
@@ -5805,7 +5809,7 @@ net.shoreline.client.impl.module.movement.FireworkBoostModule -> net.shoreline.c
     int tickCounter -> aB
     double speed -> D
     23:34:void <init>() -> <init>
-    39:40:void onDisable() -> v
+    39:40:void onDisable() -> x
     45:78:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     82:91:boolean isBoostedByRocket() -> aC
     26:26:java.lang.Boolean lambda$new$1() -> a
@@ -5827,14 +5831,14 @@ net.shoreline.client.impl.module.movement.FlightModule -> net.shoreline.client.l
     30:49:void <init>() -> <init>
     53:53:net.shoreline.client.impl.module.movement.FlightModule getInstance() -> a
     59:59:java.lang.String getModuleData() -> x
-    65:70:void onEnable() -> u
-    75:80:void onDisable() -> v
+    65:70:void onEnable() -> w
+    75:80:void onDisable() -> x
     85:170:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     175:204:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     208:210:boolean floatingCheck(net.minecraft.class_2828) -> a
     215:215:boolean isEntityOnAir(net.minecraft.class_1297) -> u
-    220:222:void enableVanillaFly() -> aj
-    226:232:void disableVanillaFly() -> ak
+    220:222:void enableVanillaFly() -> al
+    226:232:void disableVanillaFly() -> am
     36:36:java.lang.Boolean lambda$new$1() -> a
     35:35:java.lang.Boolean lambda$new$0() -> b
 net.shoreline.client.impl.module.movement.FlightModule$AntiKick -> net.shoreline.client.lC:
@@ -5858,8 +5862,8 @@ net.shoreline.client.impl.module.movement.FlightModule$FlightMode -> net.shoreli
     234:237:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.movement.IceSpeedModule -> net.shoreline.client.lE:
     16:17:void <init>() -> <init>
-    22:30:void onEnable() -> u
-    35:43:void onDisable() -> v
+    22:30:void onEnable() -> w
+    35:43:void onDisable() -> x
 net.shoreline.client.impl.module.movement.JesusModule -> net.shoreline.client.lF:
     net.shoreline.client.api.config.Config modeConfig -> aK
     net.shoreline.client.api.config.Config strictConfig -> fJ
@@ -5868,7 +5872,7 @@ net.shoreline.client.impl.module.movement.JesusModule -> net.shoreline.client.lF
     double floatOffset -> G
     39:53:void <init>() -> <init>
     58:58:java.lang.String getModuleData() -> x
-    64:68:void onDisable() -> v
+    64:68:void onDisable() -> x
     73:94:void onBlockCollision(net.shoreline.client.impl.event.world.BlockCollisionEvent) -> a
     99:103:void onPlayerJump(net.shoreline.client.impl.event.entity.player.PlayerJumpEvent) -> a
     108:146:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
@@ -5903,8 +5907,8 @@ net.shoreline.client.impl.module.movement.LongJumpModule -> net.shoreline.client
     44:63:void <init>() -> <init>
     67:67:net.shoreline.client.impl.module.movement.LongJumpModule getInstance() -> a
     73:73:java.lang.String getModuleData() -> x
-    79:80:void onEnable() -> u
-    85:87:void onDisable() -> v
+    79:80:void onEnable() -> w
+    85:87:void onDisable() -> x
     92:163:void onTravel(net.shoreline.client.impl.event.TickEvent) -> d
     168:172:void onElytraTransform(net.shoreline.client.impl.event.render.entity.ElytraTransformEvent) -> a
     177:234:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
@@ -5975,7 +5979,7 @@ net.shoreline.client.impl.module.movement.NoSlowModule -> net.shoreline.client.l
     boolean sneaking -> S
     50:78:void <init>() -> <init>
     82:82:net.shoreline.client.impl.module.movement.NoSlowModule getInstance() -> a
-    88:95:void onDisable() -> v
+    88:95:void onDisable() -> x
     100:106:void onSetCurrentHand(net.shoreline.client.impl.event.network.SetCurrentHandEvent) -> a
     111:125:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
     129:129:boolean checkStack(net.minecraft.class_1799) -> b
@@ -5998,7 +6002,7 @@ net.shoreline.client.impl.module.movement.NoSlowModule -> net.shoreline.client.l
 net.shoreline.client.impl.module.movement.ParkourModule -> net.shoreline.client.lQ:
     boolean override -> aE
     22:23:void <init>() -> <init>
-    28:35:void onDisable() -> v
+    28:35:void onDisable() -> x
     40:54:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
 net.shoreline.client.impl.module.movement.SafeWalkModule -> net.shoreline.client.lR:
     net.shoreline.client.api.config.Config sneakConfig -> gb
@@ -6027,8 +6031,8 @@ net.shoreline.client.impl.module.movement.SpeedModule -> net.shoreline.client.lS
     44:74:void <init>() -> <init>
     78:78:net.shoreline.client.impl.module.movement.SpeedModule getInstance() -> a
     84:88:java.lang.String getModuleData() -> x
-    94:99:void onEnable() -> u
-    104:113:void onDisable() -> v
+    94:99:void onEnable() -> w
+    104:113:void onDisable() -> x
     118:148:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     153:564:void onPlayerMove(net.shoreline.client.impl.event.entity.player.PlayerMoveEvent) -> a
     572:602:net.minecraft.class_241 handleStrafeMotion(float) -> b
@@ -6037,9 +6041,9 @@ net.shoreline.client.impl.module.movement.SpeedModule -> net.shoreline.client.lS
     654:674:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
     678:678:boolean isBoxColliding() -> aV
     683:683:boolean checkIsCollidingEntity(net.minecraft.class_1297) -> v
-    689:690:void setPrevTimer() -> al
+    689:690:void setPrevTimer() -> an
     694:694:boolean isUsingTimer() -> aW
-    699:705:void resetStrafe() -> am
+    699:705:void resetStrafe() -> ao
     709:709:boolean isStrafe() -> aX
     50:50:java.lang.Boolean lambda$new$5() -> h
     49:49:java.lang.Boolean lambda$new$4() -> i
@@ -6100,8 +6104,8 @@ net.shoreline.client.impl.module.movement.StepModule -> net.shoreline.client.lW:
     float stepHeight -> t
     34:51:void <init>() -> <init>
     56:56:java.lang.String getModuleData() -> x
-    62:68:void onEnable() -> u
-    73:74:void onDisable() -> v
+    62:68:void onEnable() -> w
+    73:74:void onDisable() -> x
     79:104:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
     109:132:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     137:143:void onStep(net.shoreline.client.impl.event.entity.StepEvent) -> a
@@ -6127,7 +6131,7 @@ net.shoreline.client.impl.module.movement.TickShiftModule -> net.shoreline.clien
     int packets -> ar
     21:34:void <init>() -> <init>
     39:39:java.lang.String getModuleData() -> x
-    45:46:void onDisable() -> v
+    45:46:void onDisable() -> x
     51:74:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
 net.shoreline.client.impl.module.movement.TridentFlyModule -> net.shoreline.client.lZ:
     net.shoreline.client.api.config.Config allowNoWaterConfig -> gt
@@ -6158,8 +6162,8 @@ net.shoreline.client.impl.module.movement.VelocityModule -> net.shoreline.client
     48:71:void <init>() -> <init>
     75:75:net.shoreline.client.impl.module.movement.VelocityModule getInstance() -> a
     81:88:java.lang.String getModuleData() -> x
-    94:95:void onEnable() -> u
-    100:125:void onDisable() -> v
+    94:95:void onEnable() -> w
+    100:125:void onDisable() -> x
     130:384:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     389:415:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     420:424:void onPushEntity(net.shoreline.client.impl.event.entity.player.PushEntityEvent) -> a
@@ -6203,8 +6207,8 @@ net.shoreline.client.impl.module.render.AmbienceModule -> net.shoreline.client.m
     net.shoreline.client.api.config.Config waterColorConfig -> gL
     20:35:void <init>() -> <init>
     39:39:net.shoreline.client.impl.module.render.AmbienceModule getInstance() -> a
-    45:50:void onEnable() -> u
-    55:60:void onDisable() -> v
+    45:50:void onEnable() -> w
+    55:60:void onDisable() -> x
     65:71:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
     76:81:void onAmbientColor(net.shoreline.client.impl.event.render.AmbientColorEvent) -> a
     86:91:void onGrassColor(net.shoreline.client.impl.event.biome.BiomeColorEvent$Grass) -> a
@@ -6246,7 +6250,7 @@ net.shoreline.client.impl.module.render.BlockHighlightModule -> net.shoreline.cl
     java.util.Map fadeList -> I
     40:53:void <init>() -> <init>
     58:67:java.lang.String getModuleData() -> x
-    73:74:void onDisable() -> v
+    73:74:void onDisable() -> x
     79:146:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     150:161:void renderBb(net.minecraft.class_4587,net.minecraft.class_238,int,int) -> a
     166:167:void onRenderBlockOutline(net.shoreline.client.impl.event.render.RenderBlockOutlineEvent) -> a
@@ -6266,7 +6270,7 @@ net.shoreline.client.impl.module.render.BreadcrumbsModule -> net.shoreline.clien
     net.shoreline.client.api.config.Config arrowsConfig -> hc
     net.shoreline.client.api.config.Config xpBottlesConfig -> hd
     36:50:void <init>() -> <init>
-    55:56:void onDisable() -> v
+    55:56:void onDisable() -> x
     61:92:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerTickEvent) -> b
     97:101:void onEntityDeath(net.shoreline.client.impl.event.world.RemoveEntityEvent) -> b
     106:136:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
@@ -6312,7 +6316,7 @@ net.shoreline.client.impl.module.render.ChamsModule -> net.shoreline.client.mk:
     java.util.Map fadeList -> L
     56:78:void <init>() -> <init>
     82:82:net.shoreline.client.impl.module.render.ChamsModule getInstance() -> a
-    88:89:void onDisable() -> v
+    88:89:void onDisable() -> x
     94:98:void onRenderThroughWalls(net.shoreline.client.impl.event.render.entity.RenderThroughWallsEvent) -> a
     104:172:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     177:194:void onRenderGame(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> b
@@ -6427,8 +6431,8 @@ net.shoreline.client.impl.module.render.FreeLookModule -> net.shoreline.client.m
     float cameraPitch -> aP
     net.minecraft.class_5498 perspective -> a
     21:22:void <init>() -> <init>
-    27:28:void onEnable() -> u
-    33:37:void onDisable() -> v
+    27:28:void onEnable() -> w
+    33:37:void onDisable() -> x
     42:46:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     51:56:void onPerspectiveUpdate(net.shoreline.client.impl.event.option.PerspectiveUpdateEvent) -> a
     61:66:void onCameraRotation(net.shoreline.client.impl.event.camera.CameraRotationEvent) -> a
@@ -6448,8 +6452,8 @@ net.shoreline.client.impl.module.render.FreecamModule -> net.shoreline.client.mt
     boolean control -> aK
     45:61:void <init>() -> <init>
     65:65:net.shoreline.client.impl.module.render.FreecamModule getInstance() -> a
-    71:81:void onEnable() -> u
-    86:88:void onDisable() -> v
+    71:81:void onEnable() -> w
+    86:88:void onDisable() -> x
     93:97:void onDeath(net.shoreline.client.impl.event.entity.EntityDeathEvent) -> b
     103:117:void onKey(net.shoreline.client.impl.event.keyboard.KeyboardInputEvent) -> b
     122:123:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
@@ -6468,13 +6472,13 @@ net.shoreline.client.impl.module.render.FreecamModule -> net.shoreline.client.mt
     306:306:net.minecraft.class_243 getCameraPosition() -> n
     311:311:net.minecraft.class_243 getLastCameraPosition() -> o
     316:316:float[] getCameraRotations() -> b
-    46:46:void lambda$new$0() -> w
+    46:46:void lambda$new$0() -> y
 net.shoreline.client.impl.module.render.FreecamModule$FreecamKeyboardInput -> net.shoreline.client.mu:
     net.minecraft.class_315 options -> a
     net.shoreline.client.impl.module.render.FreecamModule this$0 -> b
     209:212:void <init>(net.shoreline.client.impl.module.render.FreecamModule,net.minecraft.class_315) -> <init>
     217:242:void method_3129(boolean,float) -> method_3129
-    246:254:void unset() -> an
+    246:254:void unset() -> ap
 net.shoreline.client.impl.module.render.FreecamModule$Interact -> net.shoreline.client.mv:
     net.shoreline.client.impl.module.render.FreecamModule$Interact PLAYER -> a
     net.shoreline.client.impl.module.render.FreecamModule$Interact CAMERA -> b
@@ -6487,8 +6491,8 @@ net.shoreline.client.impl.module.render.FreecamModule$Interact -> net.shoreline.
 net.shoreline.client.impl.module.render.FullbrightModule -> net.shoreline.client.mw:
     net.shoreline.client.api.config.Config brightnessConfig -> hE
     22:27:void <init>() -> <init>
-    32:37:void onEnable() -> u
-    42:47:void onDisable() -> v
+    32:37:void onEnable() -> w
+    42:47:void onDisable() -> x
     52:54:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     59:64:void onLightmapGamma(net.shoreline.client.impl.event.render.LightmapGammaEvent) -> a
     69:75:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
@@ -6521,7 +6525,7 @@ net.shoreline.client.impl.module.render.HoleESPModule -> net.shoreline.client.my
     net.shoreline.client.api.config.Config fadeTimeConfig -> by
     java.util.Map fadeList -> M
     35:57:void <init>() -> <init>
-    62:63:void onDisable() -> v
+    62:63:void onDisable() -> x
     67:67:net.shoreline.client.impl.module.render.HoleESPModule getInstance() -> a
     73:126:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     130:140:void renderHole(net.minecraft.class_4587,net.shoreline.client.impl.manager.combat.hole.Hole,int,int) -> a
@@ -6586,7 +6590,7 @@ net.shoreline.client.impl.module.render.NametagsModule -> net.shoreline.client.m
     java.util.Map sounds -> O
     82:109:void <init>() -> <init>
     113:113:net.shoreline.client.impl.module.render.NametagsModule getInstance() -> a
-    119:120:void onDisable() -> v
+    119:120:void onDisable() -> x
     125:231:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     236:240:void onRenderLabel(net.shoreline.client.impl.event.render.entity.RenderLabelEvent) -> a
     245:246:void onPlaySound(net.shoreline.client.impl.event.world.PlaySoundEvent) -> a
@@ -6715,8 +6719,8 @@ net.shoreline.client.impl.module.render.NoWeatherModule -> net.shoreline.client.
     net.shoreline.client.impl.module.render.NoWeatherModule$Weather weather -> a
     24:31:void <init>() -> <init>
     36:36:java.lang.String getModuleData() -> x
-    42:58:void onEnable() -> u
-    63:67:void onDisable() -> v
+    42:58:void onEnable() -> w
+    63:67:void onDisable() -> x
     72:76:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     81:86:void onBiomeEffects(net.shoreline.client.impl.event.biome.BiomeEffectsEvent) -> a
     90:111:void setWeather(net.shoreline.client.impl.module.render.NoWeatherModule$Weather) -> a
@@ -6787,8 +6791,8 @@ net.shoreline.client.impl.module.render.SearchModule -> net.shoreline.client.mQ:
     java.util.Map blocks -> P
     boolean warnedLag -> aL
     49:66:void <init>() -> <init>
-    71:103:void onEnable() -> u
-    108:109:void onDisable() -> v
+    71:103:void onEnable() -> w
+    108:109:void onDisable() -> x
     114:115:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     120:121:void onChangeDimension(net.shoreline.client.impl.event.world.LoadWorldEvent) -> b
     126:131:void onLoadChunk(net.shoreline.client.impl.event.world.LoadChunkBlockEvent) -> a
@@ -6850,7 +6854,7 @@ net.shoreline.client.impl.module.render.ShadersModule -> net.shoreline.client.mR
     boolean ignoreEntityRender -> aM
     72:127:void <init>() -> <init>
     131:131:net.shoreline.client.impl.module.render.ShadersModule getInstance() -> a
-    137:142:void onEnable() -> u
+    137:142:void onEnable() -> w
     147:156:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
     161:165:void onGameJoin(net.shoreline.client.impl.event.network.GameJoinEvent) -> b
     170:311:void onRenderEntityWorld(net.shoreline.client.impl.event.render.RenderShaderEvent) -> a
@@ -6862,7 +6866,7 @@ net.shoreline.client.impl.module.render.ShadersModule -> net.shoreline.client.mR
     365:454:void renderEntities(float,net.minecraft.class_4587) -> a
     459:613:void onReloadShader(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> a
     618:626:void onEntityOutline(net.shoreline.client.impl.event.EntityOutlineEvent) -> a
-    635:703:void loadShaderImage() -> ao
+    635:703:void loadShaderImage() -> aq
     707:740:java.awt.Color getESPColor(net.minecraft.class_1297) -> a
     745:757:java.awt.Color getStorageESPColor(net.minecraft.class_2586) -> a
     762:771:boolean checkShaders(net.minecraft.class_1297) -> B
@@ -7068,7 +7072,7 @@ net.shoreline.client.impl.module.render.WaypointsModule -> net.shoreline.client.
     java.util.Map logoutPlayers -> R
     45:58:void <init>() -> <init>
     62:62:net.shoreline.client.impl.module.render.WaypointsModule getInstance() -> a
-    68:71:void onDisable() -> v
+    68:71:void onDisable() -> x
     76:77:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     82:83:void onLoadWorld(net.shoreline.client.impl.event.world.LoadWorldEvent) -> a
     88:105:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
@@ -7089,7 +7093,7 @@ net.shoreline.client.impl.module.render.ZoomModule -> net.shoreline.client.nf:
     18:30:void <init>() -> <init>
     35:39:void onKey(net.shoreline.client.impl.event.keyboard.KeyboardInputEvent) -> b
     44:67:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
-    20:20:void lambda$new$0() -> w
+    20:20:void lambda$new$0() -> y
 net.shoreline.client.impl.module.world.AirPlaceModule -> net.shoreline.client.ng:
     net.shoreline.client.impl.module.world.AirPlaceModule INSTANCE -> a
     net.shoreline.client.api.config.Config manualConfig -> jQ
@@ -7099,7 +7103,7 @@ net.shoreline.client.impl.module.world.AirPlaceModule -> net.shoreline.client.ng
     int airPlaceTicks -> aM
     40:51:void <init>() -> <init>
     55:55:net.shoreline.client.impl.module.world.AirPlaceModule getInstance() -> a
-    61:62:void onEnable() -> u
+    61:62:void onEnable() -> w
     67:112:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
     117:121:void onItemUse(net.shoreline.client.impl.event.ItemUseEvent) -> a
     126:154:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
@@ -7157,8 +7161,8 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.ni
     64:109:void <init>() -> <init>
     113:113:net.shoreline.client.impl.module.world.AutoMineModule getInstance() -> a
     119:124:java.lang.String getModuleData() -> x
-    130:139:void onDisable() -> v
-    144:152:void onEnable() -> u
+    130:139:void onDisable() -> x
+    144:152:void onEnable() -> w
     157:440:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
     445:492:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
     497:504:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
@@ -7175,10 +7179,10 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.ni
     739:854:java.util.PriorityQueue getMiningPosition(net.minecraft.class_1657) -> a
     859:860:boolean isPhasedInBedrock(net.minecraft.class_1297) -> D
     865:888:net.minecraft.class_2338 getCrawlingMine(net.minecraft.class_1657) -> a
-    912:914:void removeQueuedMine() -> ap
+    912:914:void removeQueuedMine() -> ar
     918:920:void removeQueuedMine(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> b
     924:926:void removeIfQueuedMine(java.util.function.Predicate) -> a
-    930:953:void updateOverrides() -> aq
+    930:953:void updateOverrides() -> as
     957:1030:boolean startMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> a
     1035:1042:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> c
     1046:1091:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MiningData) -> d
@@ -7258,15 +7262,15 @@ net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shorelin
     1199:1203:void <init>(net.minecraft.class_2338,net.minecraft.class_2350,net.shoreline.client.impl.module.world.AutoMineModule$MiningDataType) -> <init>
     1207:1212:void setCompletedMine(boolean) -> t
     1216:1216:boolean hasCompletedMine() -> be
-    1221:1226:void setAttemptedBreak() -> ar
-    1230:1231:void resetBreakTime() -> as
+    1221:1226:void setAttemptedBreak() -> at
+    1230:1231:void resetBreakTime() -> au
     1235:1235:boolean hasAttemptedBreak() -> bf
     1240:1240:boolean passedAttemptedBreakTime(long) -> c
     1245:1245:boolean isInstantRemine() -> bg
-    1250:1251:void setInstantRemine() -> at
+    1250:1251:void setInstantRemine() -> av
     1255:1257:float damage(float) -> d
     1262:1263:void setDamage(float) -> x
-    1267:1270:void resetDamage() -> au
+    1267:1270:void resetDamage() -> aw
     1274:1274:net.shoreline.client.impl.module.world.AutoMineModule$MiningDataType getType() -> a
     1279:1279:boolean isAutoMine() -> bh
     1284:1284:net.minecraft.class_2338 getPos() -> a
@@ -7276,7 +7280,7 @@ net.shoreline.client.impl.module.world.AutoMineModule$MiningData -> net.shorelin
     1304:1304:float getBlockDamage() -> S
     1309:1309:float getLastDamage() -> ae
     1314:1314:boolean isStarted() -> bi
-    1319:1320:void setStarted() -> av
+    1319:1320:void setStarted() -> ax
 net.shoreline.client.impl.module.world.AutoMineModule$MiningDataType -> net.shoreline.client.nn:
     net.shoreline.client.impl.module.world.AutoMineModule$MiningDataType MANUAL -> b
     net.shoreline.client.impl.module.world.AutoMineModule$MiningDataType AUTO -> c
@@ -7436,7 +7440,7 @@ net.shoreline.client.impl.module.world.ScaffoldModule -> net.shoreline.client.nD
     float[] lastAngles -> d
     int groundPosY -> aO
     42:63:void <init>() -> <init>
-    68:77:void onDisable() -> v
+    68:77:void onDisable() -> x
     83:198:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     203:232:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     236:242:void calcRotations(net.shoreline.client.impl.module.world.ScaffoldModule$BlockData) -> a
@@ -7500,8 +7504,8 @@ net.shoreline.client.impl.module.world.SpeedmineModule -> net.shoreline.client.n
     57:80:void <init>() -> <init>
     84:84:net.shoreline.client.impl.module.world.SpeedmineModule getInstance() -> a
     90:98:java.lang.String getModuleData() -> x
-    104:107:void onDisable() -> v
-    112:120:void onEnable() -> u
+    104:107:void onDisable() -> x
+    112:120:void onEnable() -> w
     125:213:void onPlayerTick(net.shoreline.client.impl.event.TickEvent) -> c
     218:237:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
     242:258:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
@@ -7548,12 +7552,12 @@ net.shoreline.client.impl.module.world.SpeedmineModule$MiningData -> net.shoreli
     boolean started -> Y
     638:641:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
     645:650:void setAttemptedBreak(boolean) -> u
-    654:655:void resetBreakTime() -> as
+    654:655:void resetBreakTime() -> au
     659:659:boolean hasAttemptedBreak() -> bf
     664:664:boolean passedAttemptedBreakTime(long) -> c
     669:671:float damage(float) -> d
     676:677:void setDamage(float) -> x
-    681:683:void resetDamage() -> au
+    681:683:void resetDamage() -> aw
     687:687:net.minecraft.class_2338 getPos() -> a
     692:692:net.minecraft.class_2350 getDirection() -> a
     697:697:int getSlot() -> x
@@ -7561,7 +7565,7 @@ net.shoreline.client.impl.module.world.SpeedmineModule$MiningData -> net.shoreli
     707:707:float getBlockDamage() -> S
     712:712:float getLastDamage() -> ae
     717:717:boolean isStarted() -> bi
-    722:723:void setStarted() -> av
+    722:723:void setStarted() -> ax
 net.shoreline.client.impl.module.world.SpeedmineModule$Selection -> net.shoreline.client.nJ:
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection WHITELIST -> a
     net.shoreline.client.impl.module.world.SpeedmineModule$Selection BLACKLIST -> b
@@ -7608,7 +7612,7 @@ net.shoreline.client.init.Fonts -> net.shoreline.client.lH:
     11:11:void <init>() -> <init>
     28:36:void init() -> b
     42:51:void loadFonts() -> q
-    55:57:void closeFonts() -> aw
+    55:57:void closeFonts() -> ay
     61:71:void setSize(float) -> y
     75:75:boolean isInitialized() -> k
     14:22:void <clinit>() -> <clinit>
@@ -7641,7 +7645,7 @@ net.shoreline.client.init.Managers -> net.shoreline.client.lI:
     boolean initialized -> aX
     34:34:void <init>() -> <init>
     77:104:void init() -> b
-    115:122:void postInit() -> N
+    115:122:void postInit() -> P
     136:136:boolean isInitialized() -> k
 net.shoreline.client.mixin.MixinKeyboard -> net.shoreline.client.nN:
     net.minecraft.class_310 field_1678 -> field_1678
@@ -7668,8 +7672,8 @@ net.shoreline.client.mixin.MixinMinecraftClient -> net.shoreline.client.nQ:
     37:156:void <init>() -> <init>
     void method_1583() -> method_1583
     boolean method_1536() -> method_1536
-    84:85:void leftClick() -> K
-    93:94:void rightClick() -> L
+    84:85:void leftClick() -> M
+    93:94:void rightClick() -> N
     103:105:void hookRun(org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
     110:112:void hookTick(org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> b
     121:124:void hookOnInitFinished(net.minecraft.class_310$class_8764,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> a
@@ -7720,7 +7724,7 @@ net.shoreline.client.mixin.accessor.AccessorClientPlayerEntity -> net.shoreline.
     double getLastZ() -> t
     void hookSetTicksSinceLastPositionPacketSent(int) -> B
 net.shoreline.client.mixin.accessor.AccessorClientPlayerInteractionManager -> net.shoreline.client.oc:
-    void hookSyncSelectedSlot() -> ax
+    void hookSyncSelectedSlot() -> az
     net.minecraft.class_1269 hookInteractBlockInternal(net.minecraft.class_746,net.minecraft.class_1268,net.minecraft.class_3965) -> a
     float hookGetCurrentBreakingProgress() -> am
     void hookSetCurrentBreakingProgress(float) -> z
@@ -7730,7 +7734,7 @@ net.shoreline.client.mixin.accessor.AccessorClientWorld -> net.shoreline.client.
 net.shoreline.client.mixin.accessor.AccessorCustomPayloadC2SPacket -> net.shoreline.client.oe:
     void hookSetData(net.minecraft.class_8710) -> a
 net.shoreline.client.mixin.accessor.AccessorEntity -> net.shoreline.client.of:
-    void hookUnsetRemoved() -> ay
+    void hookUnsetRemoved() -> aA
     void hookSetFlag(int,boolean) -> a
 net.shoreline.client.mixin.accessor.AccessorEntityTrackerUpdateS2CPacket -> net.shoreline.client.og:
     void hookSetTrackedValues(java.util.List) -> b
@@ -7745,7 +7749,7 @@ net.shoreline.client.mixin.accessor.AccessorExplosionS2CPacket -> net.shoreline.
 net.shoreline.client.mixin.accessor.AccessorFireworkRocketEntity -> net.shoreline.client.oj:
     net.minecraft.class_1309 hookGetShooter() -> d
     boolean hookWasShotByEntity() -> bk
-    void hookExplodeAndRemove() -> az
+    void hookExplodeAndRemove() -> aB
 net.shoreline.client.mixin.accessor.AccessorGameOptions -> net.shoreline.client.ok:
     java.util.Set getPlayerModelParts() -> g
 net.shoreline.client.mixin.accessor.AccessorGameRenderer -> net.shoreline.client.ol:
@@ -7765,7 +7769,7 @@ net.shoreline.client.mixin.accessor.AccessorMinecraftClient -> net.shoreline.cli
     void hookSetItemUseCooldown(int) -> F
     int hookGetItemUseCooldown() -> ar
     void hookSetAttackCooldown(int) -> G
-    void hookDoItemUse() -> aA
+    void hookDoItemUse() -> aC
     void setSession(net.minecraft.class_320) -> a
     void hookSetWorld(net.minecraft.class_638) -> a
     void hookSetDisconnecting(boolean) -> w
@@ -7971,10 +7975,10 @@ net.shoreline.client.mixin.gui.hud.MixinChatHud -> net.shoreline.client.pe:
     92:98:void hookTimeAdded(org.spongepowered.asm.mixin.injection.callback.CallbackInfo,int) -> a
     114:153:int drawTextWithShadowHook(net.minecraft.class_332,net.minecraft.class_327,net.minecraft.class_5481,int,int,int) -> a
     160:162:net.minecraft.class_7591 hookRender(net.minecraft.class_7591) -> a
-    168:211:void hookAddMessage(net.minecraft.class_2561,net.minecraft.class_7469,net.minecraft.class_7591,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-    216:222:void hookClear(boolean,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-    227:230:void addMessage(net.minecraft.class_2561,net.minecraft.class_7591,int) -> a
-    169:169:boolean lambda$hookAddMessage$0(net.minecraft.class_303$class_7590) -> a
+    168:218:void hookAddMessage(net.minecraft.class_2561,net.minecraft.class_7469,net.minecraft.class_7591,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
+    223:229:void hookClear(boolean,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
+    234:237:void addMessage(net.minecraft.class_2561,net.minecraft.class_7591,int) -> a
+    171:171:boolean lambda$hookAddMessage$0(net.minecraft.class_303$class_7590) -> a
 net.shoreline.client.mixin.gui.hud.MixinChatHudLine -> net.shoreline.client.pf:
     int id -> al
     10:10:void <init>() -> <init>
@@ -8027,7 +8031,7 @@ net.shoreline.client.mixin.gui.screen.MixinChatInputSuggestor -> net.shoreline.c
     23:23:void <init>() -> <init>
     void method_23937() -> method_23937
     50:73:void hookRefresh(org.spongepowered.asm.mixin.injection.callback.CallbackInfo,java.lang.String,com.mojang.brigadier.StringReader) -> a
-    65:69:void lambda$hookRefresh$0() -> aB
+    65:69:void lambda$hookRefresh$0() -> aD
 net.shoreline.client.mixin.gui.screen.MixinChatScreen -> net.shoreline.client.pm:
     net.minecraft.class_342 field_2382 -> field_2382
     30:30:void <init>() -> <init>
@@ -8565,8 +8569,8 @@ net.shoreline.client.util.entity.FakePlayerEntity -> net.shoreline.client.qO:
     net.minecraft.class_1657 player -> f
     29:54:void <init>(net.minecraft.class_1657,java.lang.String) -> <init>
     61:62:void <init>(net.minecraft.class_1657) -> <init>
-    69:74:void spawnPlayer() -> aC
-    81:86:void despawnPlayer() -> aD
+    69:74:void spawnPlayer() -> aE
+    81:86:void despawnPlayer() -> aF
     94:94:boolean method_29504() -> method_29504
     102:102:net.minecraft.class_1657 getPlayer() -> b
     19:19:void <clinit>() -> <clinit>
@@ -8604,7 +8608,7 @@ net.shoreline.client.util.math.MathUtil$ExpIntTable -> net.shoreline.client.qS:
 net.shoreline.client.util.math.PerSecondCounter -> net.shoreline.client.qT:
     java.util.LinkedList counter -> a
     5:7:void <init>() -> <init>
-    11:12:void updateCounter() -> aE
+    11:12:void updateCounter() -> aG
     16:28:int getPerSecond() -> au
 net.shoreline.client.util.math.position.DirectionUtil -> net.shoreline.client.qU:
     7:7:void <init>() -> <init>
@@ -8640,7 +8644,7 @@ net.shoreline.client.util.math.timer.CacheTimer -> net.shoreline.client.qY:
     81:82:void setDelay(java.lang.Number) -> c
     89:89:long getElapsedTime(java.util.concurrent.TimeUnit) -> a
     94:94:long getLastResetTime() -> i
-    103:107:void reset() -> aF
+    103:107:void reset() -> aH
     114:114:long toMillis(long) -> a
 net.shoreline.client.util.math.timer.HashTimer -> net.shoreline.client.qZ:
     3:3:void <init>() -> <init>
@@ -8649,13 +8653,13 @@ net.shoreline.client.util.math.timer.TickTimer -> net.shoreline.client.ra:
     24:27:void <init>() -> <init>
     35:39:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     52:52:boolean passed(java.lang.Number) -> a
-    61:62:void reset() -> aF
+    61:62:void reset() -> aH
     70:70:long getElapsedTime() -> h
     79:80:void setElapsedTime(java.lang.Number) -> b
 net.shoreline.client.util.math.timer.Timer -> net.shoreline.client.rb:
     long MAX_TIME -> v
     boolean passed(java.lang.Number) -> a
-    void reset() -> aF
+    void reset() -> aH
     long getElapsedTime() -> h
     void setElapsedTime(java.lang.Number) -> b
 net.shoreline.client.util.network.InteractType -> net.shoreline.client.rc:
@@ -8695,7 +8699,7 @@ net.shoreline.client.util.player.MovementUtil -> net.shoreline.client.rg:
     21:24:boolean isInputtingMovement() -> br
     32:32:boolean isMovingInput() -> bs
     41:44:boolean isMoving() -> bt
-    49:52:void applySneak() -> aG
+    49:52:void applySneak() -> aI
     56:128:net.minecraft.class_241 applySafewalk(double,double) -> a
     134:149:float getYawOffset(net.minecraft.class_744,float) -> a
 net.shoreline.client.util.player.PlayerUtil -> net.shoreline.client.rh:
@@ -8748,7 +8752,7 @@ net.shoreline.client.util.render.animation.Animation -> net.shoreline.client.rm:
     60:60:double getLength() -> x
     65:66:void setLength(float) -> H
     70:70:boolean isFinished() -> bw
-    75:76:void reset() -> aF
+    75:76:void reset() -> aH
 net.shoreline.client.util.render.animation.Easing -> net.shoreline.client.rn:
     net.shoreline.client.util.render.animation.Easing LINEAR -> b
     net.shoreline.client.util.render.animation.Easing SINE_IN -> c
@@ -9039,7 +9043,7 @@ net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
     14:14:boolean isCancelable() -> bx
     19:19:boolean isCanceled() -> by
     24:29:void setCanceled(boolean) -> A
-    34:35:void cancel() -> aH
+    34:35:void cancel() -> aJ
 net.shoreline.eventbus.event.StageEvent -> net.shoreline.client.sj:
     net.shoreline.eventbus.event.StageEvent$EventStage stage -> a
     3:3:void <init>() -> <init>
