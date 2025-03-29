@@ -178,20 +178,16 @@ public class ClientConfiguration implements Globals
 
     public boolean loadModuleConfiguration(String configFile)
     {
-        executor.submit(() ->
+        Path configDir = clientDir.resolve("Configs");
+        modulesFile = new ModuleConfigFile(configDir, configFile);
+        if (!Files.exists(configDir.resolve(configFile + ".json")))
         {
-            Path configDir = clientDir.resolve("Configs");
-            modulesFile = new ModuleConfigFile(configDir, configFile);
-            if (!Files.exists(configDir.resolve(configFile + ".json")))
-            {
-                ChatUtil.error("Could not find config file: " + configFile);
-                return false;
-            }
-            modulesFile.load();
-            return true;
-        });
+            ChatUtil.error("Could not find config file: " + configFile);
+            return false;
+        }
+        executor.submit(() -> modulesFile.load());
 
-        return false;
+        return true;
     }
 
 

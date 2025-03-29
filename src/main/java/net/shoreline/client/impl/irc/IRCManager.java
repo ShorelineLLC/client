@@ -106,6 +106,11 @@ public final class IRCManager implements Globals
         this.sendQueue.add(packet);
     }
 
+    public void sendPingPacket()
+    {
+        sendPacket(createPingPacket());
+    }
+
     private native void dispatchPacket(String packet);
 
     private native void attemptReconnection(String backupToken);

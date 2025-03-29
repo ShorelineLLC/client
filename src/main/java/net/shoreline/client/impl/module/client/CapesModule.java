@@ -7,12 +7,15 @@ import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.CapesEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.irc.IRCManager;
+import net.shoreline.client.impl.irc.packet.client.CPacketPing;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.mixin.accessor.AccessorGameOptions;
 import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.eventbus.event.StageEvent;
 
 public final class CapesModule extends ToggleModule
 {
@@ -71,6 +74,15 @@ public final class CapesModule extends ToggleModule
         {
             String capePath = getCapePath(onlineUser);
             event.setTexture(Identifier.of("shoreline", capePath));
+        }
+    }
+
+    @EventListener
+    public void onConfigUpdate(ConfigUpdateEvent event)
+    {
+        if (event.getConfig() == clientConfig && event.getStage() == StageEvent.EventStage.POST)
+        {
+            IRCManager.getInstance().sendPingPacket();
         }
     }
 
