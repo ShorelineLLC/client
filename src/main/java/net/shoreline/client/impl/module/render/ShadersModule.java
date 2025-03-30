@@ -90,7 +90,7 @@ public class ShadersModule extends ToggleModule
     Config<Float> rainbowFactorConfig = register(new NumberConfig<>("RainbowFactor", "The rainbow speed", 0.001f, 0.005f, 0.020f, () -> modeConfig.getValue() == ShaderMode.RAINBOW));
 
     // Color settings
-    Config<Float> transparencyConfig = register(new NumberConfig<>("Transparency", "The transparency of the fill", 0.0f, 0.35f, 1.0f, () -> modeConfig.getValue() != ShaderMode.OFF));
+    Config<Float> transparencyConfig = register(new NumberConfig<>("Opacity", "The transparency of the fill", 0.0f, 0.35f, 1.0f, () -> modeConfig.getValue() != ShaderMode.OFF));
     Config<Boolean> handsConfig = register(new BooleanConfig("Hands", "Render shaders on first-person hands", true));
     Config<Color> handsColorConfig = register(new ColorConfig("HandsColor", "The color of the shader", new Color(0, 100, 255), false, () -> handsConfig.getValue() && modeConfig.getValue() != ShaderMode.RAINBOW));
     Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render shaders on the player", true));
