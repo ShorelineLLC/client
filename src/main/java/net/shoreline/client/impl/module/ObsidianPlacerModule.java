@@ -5,8 +5,7 @@ import net.minecraft.block.Blocks;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author linus
@@ -37,14 +36,41 @@ public class ObsidianPlacerModule extends BlockPlacerModule
      */
     protected int getResistantBlockItem()
     {
+        final Set<BlockSlot> blockSlots = new HashSet<>();
         for (final Block type : RESISTANT_BLOCKS)
         {
             final int slot = getBlockItemSlot(type);
             if (slot != -1)
             {
-                return slot;
+                blockSlots.add(new BlockSlot(type, slot));
             }
         }
+
+        // Prioritize
+        BlockSlot slot = blockSlots.stream().filter(b -> b.block() == Blocks.OBSIDIAN).findFirst().orElse(null);
+        if (slot != null)
+        {
+            return slot.slot();
+        }
+        BlockSlot slot1 = blockSlots.stream().filter(b -> b.block() == Blocks.CRYING_OBSIDIAN).findFirst().orElse(null);
+        if (slot1 != null)
+        {
+            return slot1.slot();
+        }
+        BlockSlot slot2 = blockSlots.stream().filter(b -> b.block() == Blocks.ENDER_CHEST).findFirst().orElse(null);
+        if (slot2 != null)
+        {
+            return slot2.slot();
+        }
         return -1;
+    }
+
+    public record BlockSlot(Block block, int slot)
+    {
+        @Override
+        public boolean equals(Object obj)
+        {
+            return obj instanceof BlockSlot b && b.block() == block;
+        }
     }
 }
