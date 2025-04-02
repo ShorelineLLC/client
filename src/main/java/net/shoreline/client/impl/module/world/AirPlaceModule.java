@@ -30,7 +30,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 /**
- * @author xgraza, linus, hockeyl8
+ * @author xgraza, linus
  * @since 1.0
  */
 public final class AirPlaceModule extends ToggleModule
@@ -64,6 +64,11 @@ public final class AirPlaceModule extends ToggleModule
     @EventListener
     public void onPlayerTick(final TickEvent event)
     {
+        if (airPlaceTicks > 0)
+        {
+            airPlaceTicks--;
+        }
+
         if (mc.player == null || mc.interactionManager == null || !manualConfig.getValue()
                 || event.getStage() != StageEvent.EventStage.PRE)
         {
@@ -75,10 +80,6 @@ public final class AirPlaceModule extends ToggleModule
             return;
         }
 
-        if (airPlaceTicks > 0)
-        {
-            airPlaceTicks--;
-        }
         final ItemStack stack = mc.player.getMainHandStack();
         if ((stack.isEmpty() || !(stack.getItem() instanceof BlockItem)) || !mc.options.useKey.isPressed())
         {
