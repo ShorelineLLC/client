@@ -10,7 +10,6 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -27,7 +26,6 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
@@ -214,27 +212,6 @@ public class SurroundModule extends ObsidianPlacerModule
                 else if (BlastResistantBlocks.isBlastResistant(blockState))
                 {
                     packets.remove(targetPos);
-                }
-            }
-        }
-        if (serverPacket instanceof EntitiesDestroyS2CPacket packet)
-        {
-            for (int id : packet.getEntityIds())
-            {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity == null || !(entity instanceof EndCrystalEntity))
-                {
-                    continue;
-                }
-                BlockPos targetPos = entity.getBlockPos();
-                if (surround.contains(targetPos))
-                {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(targetPos, slot);
                 }
             }
         }

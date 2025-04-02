@@ -4,12 +4,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
@@ -24,7 +22,6 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
@@ -172,27 +169,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 else if (BlastResistantBlocks.isBlastResistant(blockState))
                 {
                     packets.remove(targetPos);
-                }
-            }
-        }
-        if (serverPacket instanceof EntitiesDestroyS2CPacket packet)
-        {
-            for (int id : packet.getEntityIds())
-            {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity == null || !(entity instanceof EndCrystalEntity))
-                {
-                    continue;
-                }
-                BlockPos targetPos = entity.getBlockPos();
-                if (surround.contains(targetPos))
-                {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(targetPos, slot);
                 }
             }
         }
