@@ -10,7 +10,6 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -53,7 +52,8 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true));
-    Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the block is being mined", false));
+    Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the feet block is being mined", false));
+    Config<Boolean> headExtendConfig = register(new BooleanConfig("HeadExtend", "Extends surround if the head block is being mined", false));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap if there is none", false));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
@@ -219,27 +219,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 }
             }
         }
-        if (serverPacket instanceof EntitiesDestroyS2CPacket packet)
-        {
-            for (int id : packet.getEntityIds())
-            {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity == null || !(entity instanceof EndCrystalEntity))
-                {
-                    continue;
-                }
-                BlockPos targetPos = entity.getBlockPos();
-                if (surround.contains(targetPos))
-                {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(targetPos, slot);
-                }
-            }
-        }
     }
 
     private void placeBlock(BlockPos pos, int slot)
@@ -386,7 +365,8 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         {
             for (BlockPos surroundPos : new ArrayList<>(surroundBlocks))
             {
-                if (surroundPos.getY() != playerPos.getY())
+                boolean secondLayer = surroundPos.getY() != playerPos.getY();
+                if (!headExtendConfig.getValue() && secondLayer)
                 {
                     continue;
                 }
@@ -394,9 +374,16 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 {
                     continue;
                 }
+
+                if (secondLayer && Managers.INTERACT.getInteractDirectionInternal(surroundPos,
+                        strictDirectionConfig.getValue()) == null)
+                {
+                    continue;
+                }
+
                 for (Direction direction : Direction.values())
                 {
-                    if (direction == Direction.DOWN)
+                    if (direction == Direction.DOWN || direction == Direction.UP && secondLayer)
                     {
                         continue;
                     }
