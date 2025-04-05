@@ -3,6 +3,7 @@ use jni::JNIEnv;
 use jni::objects::{JClass, JObject, JObjectArray, JString};
 use jni::sys::{jint, jlong};
 use obfstr::obfstr;
+use crate::classloader::ClassLoader;
 use crate::notifs;
 
 pub unsafe extern "system" fn generate_native_callsite<'a>(mut env: JNIEnv<'a>,
@@ -223,4 +224,31 @@ unsafe fn full_decrypt<'a>(env: &mut JNIEnv<'a>,
     ).unwrap();
 
     return JString::from(java_string);
+}
+
+pub unsafe extern "system" fn generate_key_bootstrapper<'a>(mut env: JNIEnv<'a>,
+                                                            caller_class: JClass<'a>,
+                                                            lookup: JObject<'a>,
+                                                            _cd_name: JString<'a>,
+                                                            _cd_type: JClass<'a>,
+                                                            base_key: jlong,
+                                                            string_key: JString) -> jlong
+{
+    let class_loader = ClassLoader::get_instance(&mut env);
+
+    *class_loader.payload.keys.get(&(base_key as i64)).unwrap() as jlong
+}
+
+pub unsafe extern "system" fn generate_interface_key_bootstrapper<'a>(mut env: JNIEnv<'a>,
+                                                                      _caller_class: JClass<'a>,
+                                                                      lookup: JObject<'a>,
+                                                                      _cd_name: JString<'a>,
+                                                                      _cd_type: JClass<'a>,
+                                                                      base_key: jlong,
+                                                                      string_key: JString,
+                                                                      itf_caller_class: JClass<'a>) -> jlong
+{
+    let class_loader = ClassLoader::get_instance(&mut env);
+
+    *class_loader.payload.keys.get(&(base_key as i64)).unwrap() as jlong
 }

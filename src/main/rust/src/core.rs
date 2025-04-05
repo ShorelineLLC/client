@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io::Cursor;
+use std::process::exit;
 use jni::JNIEnv;
 use jni::sys::jbyteArray;
 use obfstr::obfstr;
@@ -32,7 +33,9 @@ pub struct Payload
     // The mixin refmap
     pub(crate) refmap: Option<Vec<u8>>,
     // The access widener
-    pub(crate) access_widener: Option<Vec<u8>>
+    pub(crate) access_widener: Option<Vec<u8>>,
+    // The decryption keys
+    pub(crate) keys: HashMap<i64, i64>
 }
 
 pub unsafe fn request_token(env: &mut JNIEnv) -> Result<String, String>
@@ -229,6 +232,7 @@ fn download_resources_internal(token: String) -> Result<Payload, String>
                         let mut mixin_list = Vec::new();
                         let mut refmap = None;
                         let mut access_widener = None;
+                        let mut keys = HashMap::new();
 
                         for i in 0..archive.len()
                         {
@@ -262,6 +266,7 @@ fn download_resources_internal(token: String) -> Result<Payload, String>
                             const RESOURCE: u32 = 1 << 4;
                             const REFMAP: u32 = 1 << 5;
                             const ACCESS_WIDENER: u32 = 1 << 6;
+                            const KEY_FILE: u32 = 1 << 7;
 
                             let name = file.name().to_string();
 
@@ -319,10 +324,43 @@ fn download_resources_internal(token: String) -> Result<Payload, String>
 
                             if (flags & REFMAP) != 0
                             {
-                                refmap = Some(buffer);
+                                refmap = Some(buffer.clone());
                             } else if (flags & ACCESS_WIDENER) != 0
                             {
-                                access_widener = Some(buffer);
+                                access_widener = Some(buffer.clone());
+                            }
+
+                            if (flags & KEY_FILE) != 0
+                            {
+                                let decrypted_key_bytes = match crate::crypto::decrypt(buffer)
+                                {
+                                    Ok(content) => content,
+                                    Err(_) => {
+                                        let msg = obfstr! {
+                                            "Failed to load the client due to improper decryption. \
+                                            Please report this to a developer."
+                                        }.to_string();
+
+                                        notifs::display_error_msg(&msg);
+
+                                        exit(-1);
+                                    }
+                                };
+
+                                let content = String::from_utf8(decrypted_key_bytes).unwrap();
+
+                                let key_pairs: Vec<i64> = content
+                                    .split_whitespace()
+                                    .map(|s| s.parse::<i64>())
+                                    .collect::<Result<Vec<_>, _>>()
+                                    .unwrap();
+
+                                for i in (0..key_pairs.len()).step_by(2)
+                                {
+                                    let key = key_pairs[i];
+                                    let value = key_pairs[i + 1];
+                                    keys.insert(key, value);
+                                }
                             }
                         }
 
@@ -347,7 +385,8 @@ fn download_resources_internal(token: String) -> Result<Payload, String>
                             late_loading_bytecode,
                             mixin_list: Some(mixin_list),
                             refmap,
-                            access_widener
+                            access_widener,
+                            keys
                         })
                     }
 

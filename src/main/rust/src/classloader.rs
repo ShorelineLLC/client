@@ -321,15 +321,17 @@ pub unsafe fn define_class_via_knot(env: &mut JNIEnv,
         notifs::error(env, &msg);
         notifs::display_error_msg(&msg);
 
-        exit(-1);
+        env.exception_describe().unwrap();
+
+        //exit(-1);
     }
 
     let clazz = clazz.unwrap();
 
-    // attempt to autoregister the native bootstrap method, which will error if it doesnt exist
+    // attempt to autoregister the native bootstrap methods (outdated) and the key bootstrapper, which will error if it doesnt exist
     // so we'll just clear the error >:)
     // https://media.discordapp.net/attachments/1035106423589326889/1118046735957246033/caption.gif?ex=66b303aa&is=66b1b22a&hm=d270260c0f5c60c7322331e6077dbeeb91176b513c011baa04c6f3b97b8dbbac&
-    let native_method = [
+    let native_methods = [
         NativeMethod
         {
             name: JNIString::from(obfstr!("ur_not_cracking_this")),
@@ -338,7 +340,45 @@ pub unsafe fn define_class_via_knot(env: &mut JNIEnv,
         }
     ];
 
-    let register = env.register_native_methods(&clazz, &native_method);
+    let register = env.register_native_methods(&clazz, &native_methods);
+
+    if env.exception_check().unwrap()
+    {
+        env.exception_clear().unwrap()
+    } else
+    {
+        register.unwrap();
+    }
+
+    let native_methods = [
+        NativeMethod
+        {
+            name: JNIString::from(obfstr!("bootstrap")),
+            sig: JNIString::from(obfstr!("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/Class;JLjava/lang/String;)J")),
+            fn_ptr: anticrack::generate_key_bootstrapper as *mut c_void,
+        }
+    ];
+
+    let register = env.register_native_methods(&clazz, &native_methods);
+
+    if env.exception_check().unwrap()
+    {
+        env.exception_clear().unwrap()
+    } else
+    {
+        register.unwrap();
+    }
+
+    let native_methods = [
+        NativeMethod
+        {
+            name: JNIString::from(obfstr!("bootstrap")),
+            sig: JNIString::from(obfstr!("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/Class;JLjava/lang/String;Ljava/lang/Class;)J")),
+            fn_ptr: anticrack::generate_interface_key_bootstrapper as *mut c_void,
+        }
+    ];
+
+    let register = env.register_native_methods(&clazz, &native_methods);
 
     if env.exception_check().unwrap()
     {
