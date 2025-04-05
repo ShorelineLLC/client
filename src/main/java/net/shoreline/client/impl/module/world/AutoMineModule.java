@@ -34,7 +34,6 @@ import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
-import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 import org.jetbrains.annotations.NotNull;
@@ -175,7 +174,6 @@ public class AutoMineModule extends CombatModule
             {
                 if (checkMultitask() && !multitaskConfig.getValue())
                 {
-                    Managers.INVENTORY.syncToClient();
                     return;
                 }
                 Managers.INVENTORY.setSlot(slot);
@@ -717,14 +715,7 @@ public class AutoMineModule extends CombatModule
             swapSync(slot);
         }
 
-        if (data.equals(instantMine))
-        {
-            instantMineAnim = new MineAnimation(data, new Animation(true, fadeTimeConfig.getValue()));
-        }
-        else if (data.equals(packetMine))
-        {
-            packetMineAnim = new MineAnimation(data, new Animation(true, fadeTimeConfig.getValue()));
-        }
+        instantMineAnim = new MineAnimation(data, new Animation(true, fadeTimeConfig.getValue()));
     }
 
     public void abortMining(MineData data)
