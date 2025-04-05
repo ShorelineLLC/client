@@ -10,6 +10,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -51,6 +52,7 @@ public class SurroundModule extends ObsidianPlacerModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true));
+    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Attempts to place on crystals (may cause kicks)", true));
     Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the block is being mined", false));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the surround if there is none", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
@@ -215,6 +217,28 @@ public class SurroundModule extends ObsidianPlacerModule
                 }
             }
         }
+
+        if (instantConfig.getValue() && serverPacket instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity == null || !(entity instanceof EndCrystalEntity))
+                {
+                    continue;
+                }
+                BlockPos targetPos = entity.getBlockPos();
+                if (surround.contains(targetPos))
+                {
+                    final int slot = getResistantBlockItem();
+                    if (slot == -1)
+                    {
+                        return;
+                    }
+                    placeBlock(targetPos, slot);
+                }
+            }
+        }
     }
 
     private void placeBlock(BlockPos pos, int slot)
@@ -329,10 +353,19 @@ public class SurroundModule extends ObsidianPlacerModule
 
     public List<BlockPos> getSurroundNoDown(PlayerEntity player)
     {
+        return getSurroundNoDown(player, 0.0f);
+    }
+
+    public List<BlockPos> getSurroundNoDown(PlayerEntity player, float range)
+    {
         List<BlockPos> surroundBlocks = new ArrayList<>();
         List<BlockPos> playerBlocks = getPlayerBlocks(player);
         for (BlockPos pos : playerBlocks)
         {
+            if (range > 0.0f && mc.player.getEyePos().squaredDistanceTo(pos.toCenterPos()) > range * range)
+            {
+                continue;
+            }
             for (Direction dir : Direction.values())
             {
                 if (!dir.getAxis().isHorizontal())

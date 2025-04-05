@@ -11,6 +11,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -54,6 +55,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true));
+    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Attempts to place on crystals (may cause kicks)", true));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap if there is none", false));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at targets head", true));
     Config<Boolean> antiStepConfig = register(new BooleanConfig("PreventStep", "Prevents target from stepping out of the trap", false));
@@ -212,6 +214,28 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 else if (BlastResistantBlocks.isBlastResistant(blockState))
                 {
                     packets.remove(targetPos);
+                }
+            }
+        }
+
+        if (instantConfig.getValue() && serverPacket instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity == null || !(entity instanceof EndCrystalEntity))
+                {
+                    continue;
+                }
+                BlockPos targetPos = entity.getBlockPos();
+                if (surround.contains(targetPos))
+                {
+                    final int slot = getResistantBlockItem();
+                    if (slot == -1)
+                    {
+                        return;
+                    }
+                    placeBlock(targetPos, slot);
                 }
             }
         }
