@@ -264,7 +264,8 @@ public class AutoCrystalModule extends CombatModule
         for (AntiStuckData d : stuckCrystals)
         {
             double dist = mc.player.squaredDistanceTo(d.pos());
-            if (Math.abs(dist - d.stuckDist()) > 0.5)
+            double diff = d.stuckDist() - dist;
+            if (diff > 0.5)
             {
                 stuckCrystals.remove(d);
             }

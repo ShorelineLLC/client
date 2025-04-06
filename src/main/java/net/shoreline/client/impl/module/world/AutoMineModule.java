@@ -160,6 +160,7 @@ public class AutoMineModule extends CombatModule
             if (packetMine.getTicksMining() > mineTicksConfig.getValue())
             {
                 packetMineAnim.animation.setState(false);
+                packetSwapBack = false;
                 packetMine = null;
                 return;
             }
@@ -339,6 +340,7 @@ public class AutoMineModule extends CombatModule
                     if (packetMine != null && packetMine.getGoal() == MiningGoal.MINING_ENEMY)
                     {
                         packetMineAnim.animation.setState(false);
+                        packetSwapBack = false;
                         packetMine = null;
                     }
                 }
