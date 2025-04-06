@@ -154,29 +154,25 @@ public class AutoMineModule extends CombatModule
         autoMineTickDelay--;
         antiCrawlTicks--;
 
+        if (packetMine != null && packetMine.getTicksMining() > mineTicksConfig.getValue())
+        {
+            packetMineAnim.animation.setState(false);
+            packetSwapBack = false;
+            packetMine = null;
+        }
+
         // Mining packet handling
         if (packetMine != null)
         {
-            if (packetMine.getTicksMining() > mineTicksConfig.getValue())
-            {
-                packetMineAnim.animation.setState(false);
-                packetSwapBack = false;
-                packetMine = null;
-                return;
-            }
-
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     packetMine.getState(), mc.world, packetMine.getPos());
             packetMine.addBlockDamage(damageDelta);
 
             int slot = packetMine.getBestSlot();
             if (packetMine.getBlockDamage() >= 1.0f && slot != -1
-                    && Managers.INVENTORY.getServerSlot() != slot)
+                    && Managers.INVENTORY.getServerSlot() != slot
+                    && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
             {
-                if (checkMultitask() && !multitaskConfig.getValue())
-                {
-                    return;
-                }
                 Managers.INVENTORY.setSlot(slot);
                 packetSwapBack = true;
             }
@@ -206,9 +202,11 @@ public class AutoMineModule extends CombatModule
                 abortMining(instantMine);
                 instantMineAnim.animation.setState(false);
                 instantMine = null;
-                return;
             }
+        }
 
+        if (instantMine != null)
+        {
             final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
                     instantMine.getState(), mc.world, instantMine.getPos());
             instantMine.addBlockDamage(damageDelta);
@@ -226,20 +224,15 @@ public class AutoMineModule extends CombatModule
                     if (manualOverride)
                     {
                         manualOverride = false;
+                        // Clear our old manual mine
                         abortMining(instantMine);
                         instantMineAnim.animation.setState(false);
                         instantMine = null;
-                        return;
                     }
                 }
 
-                if (instantConfig.getValue() == InstantMode.PACKET || canMine)
+                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET || canMine))
                 {
-                    if (checkMultitask() && !multitaskConfig.getValue() && swapConfig.getValue() != Swap.OFF)
-                    {
-                        return;
-                    }
-
                     stopMining(instantMine);
                     if (instantConfig.getValue() == InstantMode.OFF)
                     {
@@ -311,7 +304,7 @@ public class AutoMineModule extends CombatModule
                         bestMine = new MineData(pos1, strictDirectionConfig.getValue() ?
                                 Managers.INTERACT.getInteractDirection(pos1, false) : Direction.UP);
 
-                        if (packetMine == null || isInstantMineComplete())
+                        if (packetMine == null && doubleBreakConfig.getValue() || isInstantMineComplete())
                         {
                             startAutoMine(bestMine);
                         }
@@ -319,9 +312,11 @@ public class AutoMineModule extends CombatModule
 
                     else
                     {
-                        bestMine = getInstantMine(getMiningBlocks(playerTarget));
+                        List<BlockPos> miningBlocks = getMiningBlocks(playerTarget);
+                        bestMine = getInstantMine(miningBlocks);
 
-                        if (bestMine != null && (packetMine == null && !changedInstantMine || isInstantMineComplete()))
+                        if (bestMine != null && (packetMine == null && doubleBreakConfig.getValue()
+                                && !changedInstantMine || isInstantMineComplete()))
                         {
                             startAutoMine(bestMine);
                         }
@@ -432,6 +427,13 @@ public class AutoMineModule extends CombatModule
     {
         if (!canMine(data.getState()) || isMining(data.getPos()))
         {
+            return;
+        }
+
+        if (!doubleBreakConfig.getValue())
+        {
+            instantMine = data;
+            autoMineQueue.offer(data);
             return;
         }
 
