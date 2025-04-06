@@ -59,7 +59,7 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> aboveHeadConfig = register(new BooleanConfig("TargetHead", "Attempts to mine above players head", false, () -> autoConfig.getValue()));
     Config<Boolean> doubleBreakConfig = register(new BooleanConfig("DoubleBreak", "Allows you to mine two blocks at once", false));
     Config<InstantMode> instantConfig = register(new EnumConfig<>("Instant", "Instant remines mined blocks", InstantMode.OFF, InstantMode.values()));
-    Config<Integer> mineTicksConfig = register(new NumberConfig<>("MiningTicks", "The max number of ticks to hold a pickaxe for the packet mine", 5, 40, 60, () -> doubleBreakConfig.getValue()));
+    Config<Integer> mineTicksConfig = register(new NumberConfig<>("MiningTicks", "The max number of ticks to hold a pickaxe for the packet mine", 5, 20, 60, () -> doubleBreakConfig.getValue()));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.1f, 4.0f, 6.0f));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
     Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values()));
@@ -234,7 +234,7 @@ public class AutoMineModule extends CombatModule
 
                 if (instantConfig.getValue() == InstantMode.PACKET || canMine)
                 {
-                    if (checkMultitask() && !multitaskConfig.getValue())
+                    if (checkMultitask() && !multitaskConfig.getValue() && swapConfig.getValue() != Swap.OFF)
                     {
                         return;
                     }
@@ -448,7 +448,7 @@ public class AutoMineModule extends CombatModule
             }
         }
 
-        if (changedInstantMine && packetMine == null && !isInstantMineComplete())
+        if (changedInstantMine && !isInstantMineComplete())
         {
             return;
         }
