@@ -14,6 +14,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.StringHelper;
@@ -44,6 +45,7 @@ import net.shoreline.client.util.StreamUtils;
 import net.shoreline.client.util.math.PerSecondCounter;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.util.player.InventoryUtil;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.render.animation.Easing;
@@ -77,6 +79,7 @@ public class HUDModule extends ToggleModule
     Config<Boolean> rotationConfig = register(new BooleanConfig("Rotation", "Displays player yaw and pitch", false, () -> directionConfig.getValue()));
     Config<Boolean> armorConfig = register(new BooleanConfig("Armor", "Displays player equipped armor and durability", true));
     Config<Boolean> armorDurabilityConfig = register(new BooleanConfig("ArmorDurability", "Displays player equipped armor durability", false, () -> armorConfig.getValue()));
+    Config<Boolean> totemsConfig = register(new BooleanConfig("Totems", "Displays player totems", false));
     Config<VanillaHud> potionHudConfig = register(new EnumConfig<>("PotionHud", "Renders the Minecraft potion Hud", VanillaHud.HIDE, VanillaHud.values()));
     Config<VanillaHud> itemNameConfig = register(new EnumConfig<>("ItemName", "Renders the Minecraft item name display", VanillaHud.HIDE, VanillaHud.values()));
     Config<Boolean> potionEffectsConfig = register(new BooleanConfig("PotionEffects", "Displays active potion effects", true));
@@ -560,6 +563,39 @@ public class HUDModule extends ToggleModule
                     }
                     x += 18;
                 }
+            }
+
+            if (totemsConfig.getValue())
+            {
+                final Entity riding = mc.player.getVehicle();
+                int x = res.getScaledWidth() / 2 - 4;
+                int y = res.getScaledHeight();
+                int n1 = mc.player.getMaxAir();
+                int n2 = Math.min(mc.player.getAir(), n1);
+                if (mc.player.isSubmergedIn(FluidTags.WATER) || n2 < n1)
+                {
+                    y -= 65;
+                }
+                else if (riding instanceof LivingEntity entity)
+                {
+                    y -= 45 + (int) Math.ceil((entity.getMaxHealth() - 1.0f) / 20.0f) * 10;
+                }
+                else if (mc.player.isCreative())
+                {
+                    y -= 45;
+                }
+                else
+                {
+                    y -= 55;
+                }
+
+                event.getContext().drawItem(new ItemStack(Items.TOTEM_OF_UNDYING), x, y - 1);
+                String totems = String.valueOf(InventoryUtil.count(Items.TOTEM_OF_UNDYING));
+
+                event.getContext().getMatrices().scale(0.75f, 0.75f, 1.0f);
+                event.getContext().getMatrices().translate(0.0f, 0.0f, 200.0f);
+                RenderManager.renderText(event.getContext(), totems, (x + 19 - RenderManager.textWidth(totems)) * 1.333333f, (y + 9) * 1.333333f, -1);
+                event.getContext().getMatrices().scale(1.333333f, 1.333333f, 1.0f);
             }
         }
     }
