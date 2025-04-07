@@ -114,7 +114,6 @@ public class AutoCrystalModule extends CombatModule
     //
     Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
     Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
-    Config<ForcePlace> forcePlaceConfig = register(new EnumConfig<>("ForcePlace", "Places crystals on items", ForcePlace.NONE, ForcePlace.values()));
     Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
     Config<Float> placeWallRangeConfig = register(new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
@@ -123,6 +122,7 @@ public class AutoCrystalModule extends CombatModule
     Config<Swap> autoSwapConfig = register(new EnumConfig<>("Swap", "Swaps to an end crystal before placing if the player is not holding one", Swap.OFF, Swap.values(), () -> placeConfig.getValue()));
     // Config<Float> alternateSpeedConfig = register(new NumberConfig<>("AlternateSpeed", "Speed for alternative swapping crystals", 1.0f, 18.0f, 20.0f, () -> placeConfig.getValue() && autoSwapConfig.getValue() == Swap.SILENT_ALT));
     Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
+    Config<ForcePlace> forcePlaceConfig = register(new EnumConfig<>("PreventReplace", "Attempts to replace crystals in surrounds", ForcePlace.NONE, ForcePlace.values()));
     Config<Boolean> breakValidConfig = register(new BooleanConfig("Strict", "Only places crystals that can be attacked", false, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Placements> placementsConfig = register(new EnumConfig<>("Placements", "Version standard for placing end crystals", Placements.NATIVE, Placements.values(), () -> placeConfig.getValue()));
