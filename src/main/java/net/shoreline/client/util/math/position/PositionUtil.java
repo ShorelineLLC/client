@@ -3,6 +3,7 @@ package net.shoreline.client.util.math.position;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.util.world.BlastResistantBlocks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,11 @@ public class PositionUtil
         final int flooredY = (int) Math.round(y);
         final int flooredZ = MathHelper.floor(z);
         return new BlockPos(flooredX, flooredY, flooredZ);
+    }
+
+    public static boolean isBedrock(Box box, BlockPos pos)
+    {
+        return getAllInBox(box, pos).stream().anyMatch(BlastResistantBlocks::isUnbreakable);
     }
 
     /**

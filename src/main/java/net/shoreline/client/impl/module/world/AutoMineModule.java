@@ -92,7 +92,7 @@ public class AutoMineModule extends CombatModule
 
     public AutoMineModule()
     {
-        super("AutoMine", "Automatically mines blocks", ModuleCategory.WORLD);
+        super("AutoMine", "Automatically mines blocks", ModuleCategory.WORLD, 900);
         INSTANCE = this;
     }
 
@@ -154,28 +154,16 @@ public class AutoMineModule extends CombatModule
         autoMineTickDelay--;
         antiCrawlTicks--;
 
+        // Mining packet handling
         if (packetMine != null && packetMine.getTicksMining() > mineTicksConfig.getValue())
         {
             packetMineAnim.animation.setState(false);
-            packetSwapBack = false;
-            packetMine = null;
-        }
-
-        // Mining packet handling
-        if (packetMine != null)
-        {
-            final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
-                    packetMine.getState(), mc.world, packetMine.getPos());
-            packetMine.addBlockDamage(damageDelta);
-
-            int slot = packetMine.getBestSlot();
-            if (packetMine.getBlockDamage() >= 1.0f && slot != -1
-                    && Managers.INVENTORY.getServerSlot() != slot
-                    && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
+            if (packetSwapBack)
             {
-                Managers.INVENTORY.setSlot(slot);
-                packetSwapBack = true;
+                Managers.INVENTORY.syncToClient();
+                packetSwapBack = false;
             }
+            packetMine = null;
         }
 
         if (packetSwapBack)
@@ -190,6 +178,21 @@ public class AutoMineModule extends CombatModule
                 packetSwapBack = false;
                 packetMineAnim.animation.setState(false);
                 packetMine = null;
+            }
+        }
+
+        if (packetMine != null)
+        {
+            final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
+                    packetMine.getState(), mc.world, packetMine.getPos());
+            packetMine.addBlockDamage(damageDelta);
+
+            int slot = packetMine.getBestSlot();
+            if (packetMine.getBlockDamage() >= 1.0f && slot != -1
+                    && Managers.INVENTORY.getServerSlot() != slot && !checkMultitask())
+            {
+                Managers.INVENTORY.setSlot(slot);
+                packetSwapBack = true;
             }
         }
 
@@ -231,7 +234,8 @@ public class AutoMineModule extends CombatModule
                     }
                 }
 
-                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET || canMine))
+                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET || canMine)
+                        && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
                 {
                     stopMining(instantMine);
                     if (instantConfig.getValue() == InstantMode.OFF)
@@ -295,7 +299,10 @@ public class AutoMineModule extends CombatModule
 
                 else if (playerTarget != null)
                 {
-                    List<BlockPos> phasedBlocks = getPhaseBlocks(playerTarget);
+                    BlockPos targetPos = EntityUtil.getRoundedBlockPos(playerTarget);
+                    boolean bedrockPhased = PositionUtil.isBedrock(playerTarget.getBoundingBox(), targetPos) && !playerTarget.isCrawling();
+
+                    List<BlockPos> phasedBlocks = getPhaseBlocks(playerTarget, targetPos, bedrockPhased);
 
                     MineData bestMine;
                     if (!phasedBlocks.isEmpty())
@@ -312,7 +319,7 @@ public class AutoMineModule extends CombatModule
 
                     else
                     {
-                        List<BlockPos> miningBlocks = getMiningBlocks(playerTarget);
+                        List<BlockPos> miningBlocks = getMiningBlocks(playerTarget, targetPos, bedrockPhased);
                         bestMine = getInstantMine(miningBlocks);
 
                         if (bestMine != null && (packetMine == null && doubleBreakConfig.getValue()
@@ -335,7 +342,11 @@ public class AutoMineModule extends CombatModule
                     if (packetMine != null && packetMine.getGoal() == MiningGoal.MINING_ENEMY)
                     {
                         packetMineAnim.animation.setState(false);
-                        packetSwapBack = false;
+                        if (packetSwapBack)
+                        {
+                            Managers.INVENTORY.syncToClient();
+                            packetSwapBack = false;
+                        }
                         packetMine = null;
                     }
                 }
@@ -491,7 +502,7 @@ public class AutoMineModule extends CombatModule
 
             Direction direction = strictDirectionConfig.getValue() ?
                     Managers.INTERACT.getInteractDirection(blockPos, false) : Direction.UP;
-            validInstantMines.add(new MineData(blockPos, direction, MiningGoal.MINING_ENEMY));
+            validInstantMines.add(new MineData(blockPos, direction));
         }
 
         if (validInstantMines.isEmpty())
@@ -502,13 +513,11 @@ public class AutoMineModule extends CombatModule
         return validInstantMines.peek();
     }
 
-    public List<BlockPos> getPhaseBlocks(PlayerEntity player)
+    public List<BlockPos> getPhaseBlocks(PlayerEntity player, BlockPos playerPos, boolean targetBedrockPhased)
     {
-        BlockPos playerPos = EntityUtil.getRoundedBlockPos(player);
-        boolean bedrockPhased = PositionUtil.getAllInBox(player.getBoundingBox(), playerPos)
-                .stream().anyMatch(BlastResistantBlocks::isUnbreakable) && !player.isCrawling() && headConfig.getValue();
+        List<BlockPos> phaseBlocks = PositionUtil.getAllInBox(player.getBoundingBox(),
+                targetBedrockPhased && headConfig.getValue() ? playerPos.up() : playerPos);
 
-        List<BlockPos> phaseBlocks = PositionUtil.getAllInBox(player.getBoundingBox(), bedrockPhased ? playerPos.up() : playerPos);
         return phaseBlocks.stream().filter(p ->
         {
             double dist = mc.player.getEyePos().squaredDistanceTo(p.toCenterPos());
@@ -518,6 +527,7 @@ public class AutoMineModule extends CombatModule
             }
             BlockState state = mc.world.getBlockState(p);
             return isAutoMineBlock(state.getBlock()) && canMine(state);
+
         }).collect(Collectors.toList());
     }
 
@@ -526,11 +536,10 @@ public class AutoMineModule extends CombatModule
      * @param player
      * @return A {@link Set} of potential blocks to mine for an enemy player
      */
-    public List<BlockPos> getMiningBlocks(PlayerEntity player)
+    public List<BlockPos> getMiningBlocks(PlayerEntity player, BlockPos playerPos, boolean bedrockPhased)
     {
         List<BlockPos> surroundingBlocks = SurroundModule.getInstance().getSurroundNoDown(player, rangeConfig.getValue());
         List<BlockPos> miningBlocks;
-        boolean bedrockPhased = isTargetInBedrock(playerTarget);
         if (bedrockPhased)
         {
             List<BlockPos> facePlaceBlocks = new ArrayList<>();
@@ -541,7 +550,13 @@ public class AutoMineModule extends CombatModule
 
             if (aboveHeadConfig.getValue())
             {
-                facePlaceBlocks.add(EntityUtil.getRoundedBlockPos(player).up(2));
+                facePlaceBlocks.add(playerPos.up(2));
+            }
+
+            BlockState belowFeet = mc.world.getBlockState(playerPos.down());
+            if (canMine(belowFeet))
+            {
+                facePlaceBlocks.add(playerPos.down());
             }
             miningBlocks = facePlaceBlocks;
         }
@@ -550,7 +565,6 @@ public class AutoMineModule extends CombatModule
             miningBlocks = surroundingBlocks;
         }
 
-        miningBlocks.removeIf(p -> packetMine != null && packetMine.getPos().equals(p));
         return miningBlocks;
     }
 
@@ -852,7 +866,7 @@ public class AutoMineModule extends CombatModule
         return !state.isAir() && state.getFluidState().isEmpty();
     }
 
-    public class MineData implements Comparable<MineData>
+    public static class MineData implements Comparable<MineData>
     {
         private final BlockPos pos;
         private final Direction direction;
@@ -875,7 +889,7 @@ public class AutoMineModule extends CombatModule
             this.goal = goal;
         }
 
-        public double calculatePotentialDamage(PlayerEntity player)
+        public double calculatePotentialDamage()
         {
             double damage = 0.0f;
             for (Direction direction : Direction.values())
@@ -898,7 +912,7 @@ public class AutoMineModule extends CombatModule
         @Override
         public int compareTo(@NotNull MineData o)
         {
-            return Double.compare(calculatePotentialDamage(playerTarget), o.calculatePotentialDamage(playerTarget));
+            return Double.compare(calculatePotentialDamage(), o.calculatePotentialDamage());
         }
 
         @Override
