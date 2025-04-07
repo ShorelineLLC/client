@@ -34,9 +34,11 @@ import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.ScreenOpenEvent;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.entity.StatusEffectEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
 import net.shoreline.client.impl.event.gui.screen.RenderOpenChatEvent;
+import net.shoreline.client.impl.event.network.DisconnectEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.misc.TimerModule;
@@ -143,6 +145,21 @@ public class HUDModule extends ToggleModule
         {
             hudRender.draw(event.getContext(), drawnCount);
         }
+    }
+
+    @EventListener
+    public void onDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() == mc.player)
+        {
+            hudRenderPotions.clear();
+        }
+    }
+
+    @EventListener
+    public void onDisconnect(DisconnectEvent event)
+    {
+        hudRenderPotions.clear();
     }
 
     @EventListener
@@ -331,7 +348,8 @@ public class HUDModule extends ToggleModule
                         case OFF -> getHudColor(rainbowOffset);
                     };
                     RenderManager.renderText(event.getContext(), text,
-                            res.getScaledWidth() - x, renderingUp ? bottomRight : topRight, potionColor);
+                            res.getScaledWidth() - x, renderingUp ? bottomRight : topRight,
+                            ColorUtil.fixTransparency(potionColor, (float) animation.getFactor()));
                     if (renderingUp)
                     {
                         bottomRight -= RenderManager.textHeight();
