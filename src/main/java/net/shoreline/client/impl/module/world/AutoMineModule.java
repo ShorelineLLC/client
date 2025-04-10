@@ -115,6 +115,7 @@ public class AutoMineModule extends CombatModule
     @Override
     public void onDisable()
     {
+        autoMineQueue.clear();
         playerTarget = null;
         packetMine = null;
         if (instantMine != null)
@@ -402,7 +403,8 @@ public class AutoMineModule extends CombatModule
             return;
         }
 
-        if (changedInstantMine && packetMine == null && !isInstantMineComplete() || waitForPacketMine)
+        if (!manualOverride && (changedInstantMine && packetMine == null
+                && !isInstantMineComplete() || waitForPacketMine))
         {
             return;
         }
