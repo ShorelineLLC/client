@@ -250,7 +250,7 @@ public class AutoMineModule extends CombatModule
                     }
                 }
 
-                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET || canMine)
+                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET && packetMine == null || canMine)
                         && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
                 {
                     stopMining(instantMine);
@@ -835,6 +835,7 @@ public class AutoMineModule extends CombatModule
         {
             swapSync(slot);
         }
+
         if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
