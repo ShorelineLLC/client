@@ -81,7 +81,7 @@ public class AnticheatModule extends ConcurrentModule
                 || packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK
                 || packet.getAction() == PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK))
         {
-            if (BlastResistantBlocks.isUnbreakable(packet.getPos()) || mc.world.isAir(packet.getPos()))
+            if (BlastResistantBlocks.isUnbreakable(packet.getPos()))
             {
                 event.cancel();
                 return;

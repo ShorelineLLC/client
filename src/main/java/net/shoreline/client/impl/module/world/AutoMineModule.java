@@ -250,7 +250,7 @@ public class AutoMineModule extends CombatModule
                     }
                 }
 
-                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET && packetMine == null || canMine)
+                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET && !isSilentSwapping() || canMine)
                         && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
                 {
                     stopMining(instantMine);
@@ -537,14 +537,13 @@ public class AutoMineModule extends CombatModule
             }
 
             BlockState state2 = mc.world.getBlockState(blockPos.down());
-            if (!state2.isOf(Blocks.OBSIDIAN) && !state2.isOf(Blocks.BEDROCK))
+            if (state2.isOf(Blocks.OBSIDIAN) || state2.isOf(Blocks.BEDROCK))
             {
-                continue;
-            }
+                Direction direction = strictDirectionConfig.getValue() ?
+                        Managers.INTERACT.getInteractDirection(blockPos, false) : Direction.UP;
 
-            Direction direction = strictDirectionConfig.getValue() ?
-                    Managers.INTERACT.getInteractDirection(blockPos, false) : Direction.UP;
-            validInstantMines.add(new MineData(blockPos, direction));
+                validInstantMines.add(new MineData(blockPos, direction));
+            }
         }
 
         if (validInstantMines.isEmpty())
@@ -563,13 +562,13 @@ public class AutoMineModule extends CombatModule
         phaseBlocks.removeIf(p ->
         {
             BlockState state = mc.world.getBlockState(p);
-            if (!isAutoMineBlock(state.getBlock()) || !canMine(state))
+            if (!isAutoMineBlock(state.getBlock()) || !canMine(state) || isMining(p))
             {
                 return true;
             }
 
             double dist = mc.player.getEyePos().squaredDistanceTo(p.toCenterPos());
-            if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq() || isMining(p))
+            if (dist > ((NumberConfig<Float>) rangeConfig).getValueSq())
             {
                 return true;
             }
