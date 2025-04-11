@@ -1,0 +1,65 @@
+name: Rust Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Build .so
+        run: cargo build --release
+
+      - name: Upload .so
+        uses: actions/upload-artifact@v3
+        with:
+          name: shoreline-loader.so
+          path: target/release/*.so
+
+  build-windows:
+    name: Build on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Build .dll
+        run: cargo build --release
+
+      - name: Upload .dll
+        uses: actions/upload-artifact@v3
+        with:
+          name: shoreline-loader.dll
+          path: target/release/*.dll
+
+  build-macos:
+    name: Build on macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Build .dylib
+        run: cargo build --release
+
+      - name: Upload .dylib
+        uses: actions/upload-artifact@v3
+        with:
+          name: shoreline-loader.dylib
+          path: target/release/*.dylib
