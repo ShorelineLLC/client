@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-windows:
-    name: win-x86_64 compile
+    name: windows
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,6 +19,9 @@ jobs:
         run: cargo build --release
         working-directory: src/main/rust
 
+      - name: Pack Library
+        run: upx.exe src/main/rust/target/release/*.dll --best --lzma
+
       - name: Upload DLL
         uses: actions/upload-artifact@v4
         with:
@@ -26,7 +29,7 @@ jobs:
           path: src/main/rust/target/release/*.dll
 
   build-linux:
-    name: lin-x86_64 compile
+    name: linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -35,13 +38,37 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-
-      - name: Install Linux Dependencies
-        run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev
+        
+      - name: Install Linux System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libglib2.0-dev \
+            pkg-config \
+            libgtk-3-dev \
+            libpango1.0-dev \
+            libcairo2-dev \
+            libgdk-pixbuf2.0-dev \
+            libatk1.0-dev \
+            libgdk3.0-cil-dev \
+            libx11-dev \
+            libxtst-dev \
+            libxrender-dev \
+            libxcb1-dev \
+            libxcomposite-dev \
+            libxdamage-dev \
+            libxrandr-dev \
+            libxi-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxext-dev
 
       - name: Compile SO
         run: cargo build --release
         working-directory: src/main/rust
+
+      - name: Pack Library
+        run: strip src/main/rust/target/release/*.so
 
       - name: Upload SO
         uses: actions/upload-artifact@v4
@@ -50,7 +77,7 @@ jobs:
           path: src/main/rust/target/release/*.so
 
   build-macos:
-    name: mac-aarch64 compile
+    name: mac
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -63,6 +90,9 @@ jobs:
       - name: Build DYLIB
         run: cargo build --release
         working-directory: src/main/rust
+
+      - name: Pack Library
+        run: strip src/main/rust/target/release/*.dylib
 
       - name: Upload DYLIB
         uses: actions/upload-artifact@v4
