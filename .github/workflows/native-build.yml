@@ -20,7 +20,7 @@ jobs:
         working-directory: src/main/rust
 
       - name: Pack Library
-        run: upx.exe src/main/rust/target/release/*.dll --best --lzma
+        run: src/main/rust/upx.exe src/main/rust/target/release/*.dll --best --lzma
 
       - name: Upload DLL
         uses: actions/upload-artifact@v4
@@ -92,7 +92,7 @@ jobs:
         working-directory: src/main/rust
 
       - name: Pack Library
-        run: strip src/main/rust/target/release/*.dylib
+        run: strip -x src/main/rust/target/release/*.dylib
 
       - name: Upload DYLIB
         uses: actions/upload-artifact@v4
