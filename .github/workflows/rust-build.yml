@@ -1,68 +1,71 @@
-name: Rust Build
+name: Native Build
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-linux:
-    name: Build on Linux
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Build .so
-        run: cargo build --release
-        working-directory: src/main/rust
-
-      - name: Upload .so
-        uses: actions/upload-artifact@v4
-        with:
-          name: shoreline-loader.so
-          path: native-builds/*.so
-
   build-windows:
-    name: Build on Windows
+    name: win-x86_64 compile
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Rust
+      - name: Install Toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
 
-      - name: Build .dll
+      - name: Build DLL
         run: cargo build --release
         working-directory: src/main/rust
 
-      - name: Upload .dll
+      - name: Upload DLL
         uses: actions/upload-artifact@v4
         with:
           name: shoreline-loader.dll
-          path: native-builds/*.dll
+          path: src/main/rust/target/release/*.dll
+
+  build-linux:
+    name: lin-x86_64 compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install Linux Dependencies
+        run: sudo apt-get update && sudo apt-get install -y libglib2.0-dev
+
+      - name: Compile SO
+        run: cargo build --release
+        working-directory: src/main/rust
+
+      - name: Upload SO
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoreline-loader.so
+          path: src/main/rust/target/release/*.so
 
   build-macos:
-    name: Build on macOS
+    name: mac-aarch64 compile
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Rust
+      - name: Install Toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
 
-      - name: Build .dylib
+      - name: Build DYLIB
         run: cargo build --release
         working-directory: src/main/rust
 
-      - name: Upload .dylib
+      - name: Upload DYLIB
         uses: actions/upload-artifact@v4
         with:
           name: shoreline-loader.dylib
-          path: native-builds/*.dylib
+          path: src/main/rust/target/release/*.dylib
