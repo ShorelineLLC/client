@@ -236,7 +236,7 @@ pub unsafe extern "system" fn generate_key_bootstrapper<'a>(mut env: JNIEnv<'a>,
 {
     let class_loader = ClassLoader::get_instance(&mut env);
 
-    class_loader.payload.keys.remove(&(base_key as i64)).unwrap() as jlong
+    *class_loader.payload.keys.get(&(base_key as i64)).unwrap() as jlong
 }
 
 pub unsafe extern "system" fn generate_interface_key_bootstrapper<'a>(mut env: JNIEnv<'a>,
@@ -250,5 +250,5 @@ pub unsafe extern "system" fn generate_interface_key_bootstrapper<'a>(mut env: J
 {
     let class_loader = ClassLoader::get_instance(&mut env);
 
-    class_loader.payload.keys.remove(&(base_key as i64)).unwrap() as jlong
+    *class_loader.payload.keys.get(&(base_key as i64)).unwrap() as jlong
 }
