@@ -54,9 +54,9 @@ pub unsafe fn init_internal(env: &mut JNIEnv)
 
 static mut LOOKUP: Option<GlobalRef> = None;
 
-pub unsafe extern "system" fn subscribe(mut env: JNIEnv,
-                                        caller_instance: JObject,
-                                        subscriber: JObject) -> JObject
+pub unsafe extern "system" fn subscribe<'a>(mut env: JNIEnv,
+                                            caller_instance: JObject,
+                                            subscriber: JObject<'a>) -> JObject<'a>
 {
     if env.is_same_object(&subscriber, &JObject::null()).unwrap()
     {
@@ -354,9 +354,9 @@ pub unsafe extern "system" fn subscribe(mut env: JNIEnv,
     return JObject::null()
 }
 
-pub unsafe extern "system" fn unsubscribe(mut env: JNIEnv,
-                                          caller_instance: JObject,
-                                          subscriber: JObject) -> JObject
+pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
+                                              caller_instance: JObject,
+                                              subscriber: JObject<'a>) -> JObject<'a>
 {
     if env.is_same_object(&subscriber, &JObject::null()).unwrap()
     {
