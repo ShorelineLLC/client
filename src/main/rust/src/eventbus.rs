@@ -2,7 +2,7 @@ use jni::objects::{GlobalRef, JClass, JObject, JObjectArray};
 use jni::JNIEnv;
 use jni::sys::JNI_FALSE;
 use obfstr::obfstr;
-use crate::obfuscation;
+use crate::{notifs, obfuscation};
 
 static mut INVOKER_CACHE: Option<GlobalRef> = None;
 
@@ -38,6 +38,8 @@ pub unsafe fn init_internal(env: &mut JNIEnv)
         obfuscation::EVENT_BUS_INVOKER_MAP.get_desc(),
         (&concurrent_hash_map).into()
     ).unwrap();
+
+    notifs::info(env, "init_internal");
 
     if obfuscation::IS_DEVELOPMENT_ENVIRONMENT
     {
@@ -280,6 +282,11 @@ pub unsafe extern "system" fn subscribe(mut env: JNIEnv,
                         obfuscation::EVENT_BUS_INVOKER_MAP.get_name(),
                         obfuscation::EVENT_BUS_INVOKER_MAP.get_desc()
                     ).unwrap().l().unwrap();
+
+                    if env.is_same_object(&event_map, JObject::null())
+                    {
+                        notifs::info(&mut env, "yeah its fucking null")
+                    }
 
                     let mut prev = env.call_method(
                         &event_map,
