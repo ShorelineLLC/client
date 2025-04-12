@@ -56,8 +56,13 @@ static mut LOOKUP: Option<GlobalRef> = None;
 
 pub unsafe extern "system" fn subscribe(mut env: JNIEnv,
                                         caller_instance: JObject,
-                                        subscriber: JObject)
+                                        subscriber: JObject) -> JObject
 {
+    if env.is_same_object(&subscriber, &JObject::null()).unwrap()
+    {
+        return subscriber;
+    }
+
     if LOOKUP.is_none()
     {
         let lookup = env.call_static_method(
@@ -343,14 +348,21 @@ pub unsafe extern "system" fn subscribe(mut env: JNIEnv,
                 }
             }
         }
-        None => panic!("unable to complete native method subscribe")
+        None => panic!("unable to complete native method a")
     }
+
+    return JObject::null()
 }
 
 pub unsafe extern "system" fn unsubscribe(mut env: JNIEnv,
                                           caller_instance: JObject,
-                                          subscriber: JObject)
+                                          subscriber: JObject) -> JObject
 {
+    if env.is_same_object(&subscriber, &JObject::null()).unwrap()
+    {
+        return subscriber;
+    }
+
     notifs::info(&mut env, "entered native code");
 
     let event_map = env.get_field(
@@ -463,6 +475,9 @@ pub unsafe extern "system" fn unsubscribe(mut env: JNIEnv,
             tmp = tmp_next;
         }
     }
+
+    notifs::info(&mut env, "function exit");
+    return JObject::null();
 }
 
 pub unsafe fn cache_event_class(env: &mut JNIEnv,
