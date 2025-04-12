@@ -50,15 +50,15 @@ glib = "0.20.1"
 
 [profile.release]
 strip = "symbols"
-#opt-level = "s"
-#lto = true
-#codegen-units = 1
-#panic = "abort"
-#debug = false
-#debug-assertions = false
-#overflow-checks = false
-#incremental = false
-#rpath = false
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+debug = false
+debug-assertions = false
+overflow-checks = false
+incremental = false
+rpath = false
 
 [lib]
 crate-type = ["cdylib"]

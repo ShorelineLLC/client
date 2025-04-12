@@ -39,8 +39,6 @@ pub unsafe fn init_internal(env: &mut JNIEnv)
         (&concurrent_hash_map).into()
     ).unwrap();
 
-    notifs::info(env, "init_internal");
-
     if obfuscation::IS_DEVELOPMENT_ENVIRONMENT
     {
         env.call_static_method(
@@ -363,15 +361,11 @@ pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
         return subscriber;
     }
 
-    notifs::info(&mut env, "entered native code");
-
     let event_map = env.get_field(
         &caller_instance,
         obfuscation::EVENT_BUS_INVOKER_MAP.get_name(),
         obfuscation::EVENT_BUS_INVOKER_MAP.get_desc()
     ).unwrap().l().unwrap();
-
-    notifs::info(&mut env, "got event map");
 
     let entry_set = env.call_method(
         &event_map,
@@ -380,16 +374,12 @@ pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
         &[]
     ).unwrap().l().unwrap();
 
-    notifs::info(&mut env, "entrySet");
-
     let iterator = env.call_method(
         &entry_set,
         obfstr!("iterator"),
         obfstr!("()Ljava/util/Iterator;"),
         &[]
     ).unwrap().l().unwrap();
-
-    notifs::info(&mut env, "iterator");
 
     while env.call_method(
         &iterator,
@@ -398,16 +388,12 @@ pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
         &[]
     ).unwrap().z().unwrap()
     {
-        notifs::info(&mut env, "entered while loop");
-
         let entry = env.call_method(
             &iterator,
             obfstr!("next"),
             obfstr!("()Ljava/lang/Object;"),
             &[]
         ).unwrap().l().unwrap();
-
-        notifs::info(&mut env, "next");
 
         let mut prev = env.call_method(
             &entry,
@@ -416,27 +402,19 @@ pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
             &[]
         ).unwrap().l().unwrap();
 
-        notifs::info(&mut env, "getValue");
-
         let mut tmp = env.get_field(
             &prev,
             obfuscation::INVOKER_NODE_NEXT_FIELD.get_name(),
             obfuscation::INVOKER_NODE_NEXT_FIELD.get_desc()
         ).unwrap().l().unwrap();
 
-        notifs::info(&mut env, "tmp");
-
         while !env.is_same_object(&tmp, JObject::null()).unwrap()
         {
-            notifs::info(&mut env, "entered isSameObject loop");
-
             let tmp_instance = env.get_field(
                 &tmp,
                 obfuscation::INVOKER_NODE_SUBSCRIBER_FIELD.get_name(),
                 obfstr!("Ljava/lang/Object;")
             ).unwrap().l().unwrap();
-
-            notifs::info(&mut env, "tmp_instance");
 
             let tmp_next = env.get_field(
                 &tmp,
@@ -444,19 +422,13 @@ pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
                 obfuscation::INVOKER_NODE_NEXT_FIELD.get_desc()
             ).unwrap().l().unwrap();
 
-            notifs::info(&mut env, "tmp_next");
-
             if env.is_same_object(&tmp_instance, &subscriber).unwrap()
             {
-                notifs::info(&mut env, "isSameObject passed");
-
                 let tmp_next = env.get_field(
                     &tmp,
                     obfuscation::INVOKER_NODE_NEXT_FIELD.get_name(),
                     obfuscation::INVOKER_NODE_NEXT_FIELD.get_desc()
                 ).unwrap().l().unwrap();
-
-                notifs::info(&mut env, "reassigned tmp_next");
 
                 env.set_field(
                     &prev,
@@ -464,11 +436,8 @@ pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
                     obfuscation::INVOKER_NODE_NEXT_FIELD.get_desc(),
                     (&tmp_next).into()
                 ).unwrap();
-
-                notifs::info(&mut env, "set field");
             } else
             {
-                notifs::info(&mut env, "isSameObject failed");
                 prev = tmp;
             }
 
@@ -476,7 +445,6 @@ pub unsafe extern "system" fn unsubscribe<'a>(mut env: JNIEnv,
         }
     }
 
-    notifs::info(&mut env, "function exit");
     return JObject::null();
 }
 

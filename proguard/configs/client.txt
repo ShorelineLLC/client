@@ -2,7 +2,6 @@
 -dontshrink
 -dontoptimize
 -allowaccessmodification
--overloadaggressively
 -useuniqueclassmembernames
 -repackageclasses net.shoreline.client
 -keepattributes *Annotation*,LineNumberTable
