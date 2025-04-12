@@ -283,7 +283,7 @@ pub unsafe extern "system" fn subscribe(mut env: JNIEnv,
                         obfuscation::EVENT_BUS_INVOKER_MAP.get_desc()
                     ).unwrap().l().unwrap();
 
-                    if env.is_same_object(&event_map, JObject::null())
+                    if env.is_same_object(&event_map, JObject::null()).unwrap()
                     {
                         notifs::info(&mut env, "yeah its fucking null")
                     }
