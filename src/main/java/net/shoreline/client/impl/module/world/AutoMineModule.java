@@ -145,7 +145,9 @@ public class AutoMineModule extends CombatModule
             return;
         }
 
-        playerTarget = getClosestPlayer(enemyRangeConfig.getValue());
+        PlayerEntity currentTarget = getClosestPlayer(enemyRangeConfig.getValue());
+        boolean targetChanged = playerTarget != null && playerTarget != currentTarget;
+        playerTarget = currentTarget;
 
         if (isInstantMineComplete())
         {
@@ -313,35 +315,57 @@ public class AutoMineModule extends CombatModule
                     }
                 }
 
-                else if (playerTarget != null)
+                else if (playerTarget != null && !targetChanged)
                 {
                     BlockPos targetPos = EntityUtil.getRoundedBlockPos(playerTarget);
                     boolean bedrockPhased = PositionUtil.isBedrock(playerTarget.getBoundingBox(), targetPos) && !playerTarget.isCrawling();
 
-                    List<BlockPos> phasedBlocks = getPhaseBlocks(playerTarget, targetPos, bedrockPhased);
-
-                    MineData bestMine;
-                    if (!phasedBlocks.isEmpty())
+                    if (!isInstantMineComplete() && checkDataY(instantMine, targetPos, bedrockPhased))
                     {
-                        BlockPos pos1 = phasedBlocks.removeFirst();
-                        bestMine = new MineData(pos1, strictDirectionConfig.getValue() ?
-                                Managers.INTERACT.getInteractDirection(pos1, false) : Direction.UP);
+                        abortMining(instantMine);
+                        instantMineAnim.animation.setState(false);
+                        instantMine = null;
+                    }
 
-                        if (packetMine == null && doubleBreakConfig.getValue() || isInstantMineComplete())
+                    else if (packetMine != null && checkDataY(packetMine, targetPos, bedrockPhased))
+                    {
+                        packetMineAnim.animation.setState(false);
+                        if (packetSwapBack)
                         {
-                            startAutoMine(bestMine);
+                            Managers.INVENTORY.syncToClient();
+                            packetSwapBack = false;
                         }
+                        packetMine = null;
+                        waitForPacketMine = false;
                     }
 
                     else
                     {
-                        List<BlockPos> miningBlocks = getMiningBlocks(playerTarget, targetPos, bedrockPhased);
-                        bestMine = getInstantMine(miningBlocks);
+                        List<BlockPos> phasedBlocks = getPhaseBlocks(playerTarget, targetPos, bedrockPhased);
 
-                        if (bestMine != null && (packetMine == null && !changedInstantMine
-                                && doubleBreakConfig.getValue() || isInstantMineComplete()))
+                        MineData bestMine;
+                        if (!phasedBlocks.isEmpty())
                         {
-                            startAutoMine(bestMine);
+                            BlockPos pos1 = phasedBlocks.removeFirst();
+                            bestMine = new MineData(pos1, strictDirectionConfig.getValue() ?
+                                    Managers.INTERACT.getInteractDirection(pos1, false) : Direction.UP);
+
+                            if (packetMine == null && doubleBreakConfig.getValue() || isInstantMineComplete())
+                            {
+                                startAutoMine(bestMine);
+                            }
+                        }
+
+                        else
+                        {
+                            List<BlockPos> miningBlocks = getMiningBlocks(playerTarget, targetPos, bedrockPhased);
+                            bestMine = getInstantMine(miningBlocks);
+
+                            if (bestMine != null && (packetMine == null && !changedInstantMine
+                                    && doubleBreakConfig.getValue() || isInstantMineComplete()))
+                            {
+                                startAutoMine(bestMine);
+                            }
                         }
                     }
                 }
@@ -652,6 +676,11 @@ public class AutoMineModule extends CombatModule
             }
         }
         return null;
+    }
+
+    private boolean checkDataY(MineData data, BlockPos targetPos, boolean bedrockPhased)
+    {
+        return data.getGoal() == MiningGoal.MINING_ENEMY && !bedrockPhased && data.getPos().getY() != targetPos.getY();
     }
 
     private boolean intersectsPlayer(BlockPos pos)
