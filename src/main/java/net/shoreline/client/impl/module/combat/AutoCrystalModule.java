@@ -1240,7 +1240,7 @@ public class AutoCrystalModule extends CombatModule
 
     public void placeForceCrystal(PlayerEntity target, BlockPos blockPos)
     {
-        if (placeRangeCheck(blockPos))
+        if (placeRangeCheck(blockPos) || !canUseCrystalOnBlock(blockPos))
         {
             return;
         }
