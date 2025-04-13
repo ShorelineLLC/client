@@ -197,7 +197,7 @@ public final class ModuleManager
                 new FastPlaceModule(),
                 new MultitaskModule(),
                 new NoGlitchBlocksModule(),
-                // new NukerModule(),
+                new NukerModule(),
                 new ScaffoldModule(),
                 new SpeedmineModule()
                 // new XRayModule()
