@@ -1261,6 +1261,7 @@ public class AutoCrystalModule extends CombatModule
         if (!Managers.NETWORK.is2b2t() || latency >= 50)
         {
             placeCrystal(blockPos, Hand.MAIN_HAND, false);
+            fadeList.put(blockPos, new Animation(true, fadeTimeConfig.getValue()));
         }
     }
 
