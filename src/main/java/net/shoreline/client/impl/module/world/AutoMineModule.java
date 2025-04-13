@@ -166,18 +166,22 @@ public class AutoMineModule extends CombatModule
         antiCrawlTicks--;
 
         // Mining packet handling
-        if (packetMine != null && packetMine.getTicksMining() > mineTicksConfig.getValue())
+        if (packetMine != null)
         {
-            packetMineAnim.animation.setState(false);
-            if (packetSwapBack)
+            final double distance = mc.player.getEyePos().squaredDistanceTo(packetMine.getPos().toCenterPos());
+            if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq() || packetMine.getTicksMining() > mineTicksConfig.getValue())
             {
-                Managers.INVENTORY.syncToClient();
-                packetSwapBack = false;
-            }
-            packetMine = null;
-            if (!isInstantMineComplete())
-            {
-                waitForPacketMine = true;
+                packetMineAnim.animation.setState(false);
+                if (packetSwapBack)
+                {
+                    Managers.INVENTORY.syncToClient();
+                    packetSwapBack = false;
+                }
+                packetMine = null;
+                if (!isInstantMineComplete())
+                {
+                    waitForPacketMine = true;
+                }
             }
         }
 
