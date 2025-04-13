@@ -188,8 +188,7 @@ public class AutoMineModule extends CombatModule
             packetMine.addBlockDamage(damageDelta);
 
             int slot = packetMine.getBestSlot();
-            if (packetMine.getBlockDamage() >= 1.0f
-                    && slot != -1 && Managers.INVENTORY.getServerSlot() != slot && !checkMultitask())
+            if (packetMine.getBlockDamage() >= 1.0f && slot != -1  && !checkMultitask())
             {
                 Managers.INVENTORY.setSlot(slot);
                 packetSwapBack = true;
