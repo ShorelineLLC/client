@@ -59,6 +59,7 @@ public class SpeedmineModule extends CombatModule
     Config<Boolean> doubleBreakConfig = register(new BooleanConfig("DoubleBreak", "Allows you to mine two blocks at once", false, () -> modeConfig.getValue() == SpeedmineMode.PACKET));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.1f, 4.0f, 6.0f, () -> modeConfig.getValue() == SpeedmineMode.PACKET));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
+    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instantly mines already broken blocks", false));
     Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values(), () -> modeConfig.getValue() == SpeedmineMode.PACKET));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true, () -> modeConfig.getValue() == SpeedmineMode.PACKET));
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false, () -> modeConfig.getValue() == SpeedmineMode.PACKET));
@@ -205,6 +206,12 @@ public class SpeedmineModule extends CombatModule
                 return;
             }
             stopMining(miningData2);
+
+            if (!instantConfig.getValue())
+            {
+                miningQueue.remove(miningData2);
+            }
+
             if (!miningData2.hasAttemptedBreak())
             {
                 miningData2.setAttemptedBreak(true);
