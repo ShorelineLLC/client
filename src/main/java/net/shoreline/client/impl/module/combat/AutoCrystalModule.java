@@ -1595,9 +1595,9 @@ public class AutoCrystalModule extends CombatModule
         return forcePlaceConfig.getValue() == ForcePlace.PRE;
     }
 
-    public boolean getIgnoreTerrain()
+    public float getPlaceRange()
     {
-        return blockDestructionConfig.getValue();
+        return placeRangeConfig.getValue();
     }
 
     public enum Swap

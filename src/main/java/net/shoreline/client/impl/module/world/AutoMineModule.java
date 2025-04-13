@@ -39,8 +39,9 @@ import net.shoreline.eventbus.event.StageEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
 
 public class AutoMineModule extends CombatModule
 {
@@ -637,16 +638,7 @@ public class AutoMineModule extends CombatModule
             miningBlocks = surroundingBlocks;
         }
 
-        miningBlocks.removeIf(p ->
-        {
-            if (packetMine != null && packetMine.getPos().equals(p))
-            {
-                return true;
-            }
-
-            return avoidSelfConfig.getValue() && intersectsPlayer(p);
-        });
-
+        miningBlocks.removeIf(p -> avoidSelfConfig.getValue() && intersectsPlayer(p));
         return miningBlocks;
     }
 
@@ -980,22 +972,13 @@ public class AutoMineModule extends CombatModule
 
         public double calculatePotentialDamage()
         {
-            double damage = 0.0f;
-            for (Direction direction : Direction.values())
+            double dist = mc.player.getEyePos().squaredDistanceTo(pos.down().toCenterPos());
+            if (dist <= AutoCrystalModule.getInstance().getPlaceRange())
             {
-                if (direction == Direction.DOWN)
-                {
-                    continue;
-                }
-
-                BlockPos offPos = pos.offset(direction);
-                if (AutoCrystalModule.getInstance().canUseCrystalOnBlock(offPos))
-                {
-                    damage = 10.0f;
-                }
+                return 10.0f;
             }
 
-            return damage;
+            return 0.0f;
         }
 
         @Override
