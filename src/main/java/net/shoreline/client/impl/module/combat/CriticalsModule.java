@@ -40,7 +40,8 @@ public class CriticalsModule extends ToggleModule
     //
     Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows crits when other combat modules are enabled", true));
     Config<CritMode> modeConfig = register(new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values()));
-    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only attempts criticals in walls", false, () -> modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM));
+    Config<Boolean> phaseOnlyConfig = register(new BooleanConfig("PhasedOnly", "Only attempts criticals when phased", false, () -> modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM));
+    Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only attempts criticals in walls", false, () -> (modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM) && phaseOnlyConfig.getValue()));
     Config<Boolean> moveFixConfig = register(new BooleanConfig("MoveFix", "Pauses crits when moving", false, () -> modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM));
     //
     private final Timer attackTimer = new CacheTimer();
@@ -197,7 +198,7 @@ public class CriticalsModule extends ToggleModule
             }
             case GRIM ->
             {
-                if (wallsOnlyConfig.getValue() && !isDoublePhased())
+                if (phaseOnlyConfig.getValue() && (wallsOnlyConfig.getValue() ? !isDoublePhased() : !isPhased()))
                 {
                     return;
                 }
@@ -233,7 +234,7 @@ public class CriticalsModule extends ToggleModule
             }
             case GRIM_V3 ->
             {
-                if (wallsOnlyConfig.getValue() && !isPhased())
+                if (phaseOnlyConfig.getValue() && (wallsOnlyConfig.getValue() ? !isDoublePhased() : !isPhased()))
                 {
                     return;
                 }
