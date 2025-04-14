@@ -169,7 +169,8 @@ public class AutoMineModule extends CombatModule
         if (packetMine != null)
         {
             final double distance = mc.player.getEyePos().squaredDistanceTo(packetMine.getPos().toCenterPos());
-            if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq() || packetMine.getTicksMining() > mineTicksConfig.getValue())
+            if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq()
+                    || packetMine.getTicksMining() > mineTicksConfig.getValue())
             {
                 packetMineAnim.animation.setState(false);
                 if (packetSwapBack)
@@ -256,7 +257,7 @@ public class AutoMineModule extends CombatModule
                     }
                 }
 
-                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET && !isSilentSwapping() || canMine)
+                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET && packetMine == null || canMine)
                         && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
                 {
                     stopMining(instantMine);
@@ -428,12 +429,6 @@ public class AutoMineModule extends CombatModule
             instantMine = data;
             startMining(instantMine);
             mc.player.swingHand(Hand.MAIN_HAND, false);
-            return;
-        }
-
-        if (!manualOverride && (changedInstantMine && packetMine == null
-                && !isInstantMineComplete() || waitForPacketMine))
-        {
             return;
         }
 
