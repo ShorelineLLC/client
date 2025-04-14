@@ -448,4 +448,9 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         fadeList.entrySet().removeIf(e ->
                 e.getValue().getFactor() == 0.0);
     }
+
+    public boolean isPlacing()
+    {
+        return !placements.isEmpty();
+    }
 }

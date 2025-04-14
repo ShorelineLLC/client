@@ -17,6 +17,7 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2SPacket;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.position.PositionUtil;
@@ -37,6 +38,7 @@ public class CriticalsModule extends ToggleModule
     private static CriticalsModule INSTANCE;
 
     //
+    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows crits when other combat modules are enabled", true));
     Config<CritMode> modeConfig = register(new EnumConfig<>("Mode", "Mode for critical attack modifier", CritMode.PACKET, CritMode.values()));
     Config<Boolean> wallsOnlyConfig = register(new BooleanConfig("WallsOnly", "Only attempts criticals in walls", false, () -> modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM));
     Config<Boolean> moveFixConfig = register(new BooleanConfig("MoveFix", "Pauses crits when moving", false, () -> modeConfig.getValue() == CritMode.GRIM_V3 || modeConfig.getValue() == CritMode.GRIM));
@@ -88,6 +90,19 @@ public class CriticalsModule extends ToggleModule
         }
 
         if (AutoCrystalModule.getInstance().isAttacking() || AutoCrystalModule.getInstance().isPlacing())
+        {
+            return;
+        }
+
+        // All combat modules have priority
+        if (!multitaskConfig.getValue() && (SurroundModule.getInstance().isPlacing()
+                || SelfTrapModule.getInstance().isPlacing()
+                || AutoTrapModule.getInstance().isPlacing()
+                || AutoCrawlTrapModule.getInstance().isPlacing()
+                || AutoWebModule.getInstance().isPlacing()
+                || HoleFillModule.getInstance().isPlacing()
+                || AutoXPModule.getInstance().isEnabled()
+                || AutoMineModule.getInstance().isEnabled()))
         {
             return;
         }

@@ -30,6 +30,7 @@ import java.util.Map;
  */
 public class AutoWebModule extends BlockPlacerModule
 {
+    private static AutoWebModule INSTANCE;
 
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to fill nearby holes", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
@@ -46,6 +47,12 @@ public class AutoWebModule extends BlockPlacerModule
     public AutoWebModule()
     {
         super("AutoWeb", "Automatically traps nearby entities in webs", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static AutoWebModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -184,5 +191,10 @@ public class AutoWebModule extends BlockPlacerModule
                 Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
             }
         });
+    }
+
+    public boolean isPlacing()
+    {
+        return !webs.isEmpty();
     }
 }

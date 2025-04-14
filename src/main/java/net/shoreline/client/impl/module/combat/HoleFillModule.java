@@ -21,7 +21,6 @@ import net.shoreline.client.impl.manager.combat.hole.Hole;
 import net.shoreline.client.impl.manager.combat.hole.HoleType;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -251,5 +250,10 @@ public class HoleFillModule extends ObsidianPlacerModule
 
         fadeList.entrySet().removeIf(e ->
                 e.getValue().getFactor() == 0.0);
+    }
+
+    public boolean isPlacing()
+    {
+        return !fills.isEmpty();
     }
 }
