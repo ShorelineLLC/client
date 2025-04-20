@@ -1238,9 +1238,9 @@ public class AutoCrystalModule extends CombatModule
         return breakValidConfig.getValue() && dist > maxDist;
     }
 
-    public void placeForceCrystal(PlayerEntity target, BlockPos blockPos)
+    public void placeCrystalForTarget(PlayerEntity target, BlockPos blockPos)
     {
-        if (placeRangeCheck(blockPos) || !canUseCrystalOnBlock(blockPos))
+        if (target == null || placeRangeCheck(blockPos) || !canUseCrystalOnBlock(blockPos))
         {
             return;
         }
@@ -1252,17 +1252,16 @@ public class AutoCrystalModule extends CombatModule
         }
         double damage = ExplosionUtil.getDamageTo(target, crystalDamageVec(blockPos), blockDestructionConfig.getValue(),
                 Set.of(blockPos), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
-        if (damage < minDamageConfig.getValue() && !isCrystalLethalTo(damage, target))
+        if (damage < minDamageConfig.getValue() && !isCrystalLethalTo(damage, target)
+                || placeCrystal != null && placeCrystal.getDamage() >= damage)
         {
             return;
         }
-        int latency = FastLatencyModule.getInstance().isEnabled() ? (int)
-                FastLatencyModule.getInstance().getLatency() : Managers.NETWORK.getClientLatency();
-        if (!Managers.NETWORK.is2b2t() || latency >= 50)
-        {
-            placeCrystal(blockPos, Hand.MAIN_HAND, false);
-            fadeList.put(blockPos, new Animation(true, fadeTimeConfig.getValue()));
-        }
+
+        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), blockPos.toCenterPos());
+        setRotation(rotations[0], rotations[1]);
+        placeCrystal(blockPos, Hand.MAIN_HAND, false);
+        fadeList.put(blockPos, new Animation(true, fadeTimeConfig.getValue()));
     }
 
     private boolean checkOverrideSafety(boolean unsafeToPlayer, double damage, Entity entity)
@@ -1591,7 +1590,7 @@ public class AutoCrystalModule extends CombatModule
         return (int) avg;
     }
 
-    public boolean getPreForcePlace()
+    public boolean shouldPreForcePlace()
     {
         return forcePlaceConfig.getValue() == ForcePlace.PRE;
     }
