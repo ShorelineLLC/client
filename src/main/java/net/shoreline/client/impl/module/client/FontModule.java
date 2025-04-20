@@ -7,7 +7,6 @@ import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
-import net.shoreline.client.impl.event.gui.hud.ChatTextRenderEvent;
 import net.shoreline.client.init.Fonts;
 import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
@@ -23,6 +22,7 @@ public class FontModule extends ToggleModule
     Config<Boolean> antiAliasConfig = register(new BooleanConfig("AntiAlias", "Applies antialiasing to font", true));
     Config<Boolean> fractionalMetrics = register(new BooleanConfig("FractionalMetrics", "Applies fractional metrics to font", false));
     Config<Integer> sizeConfig = register(new NumberConfig<>("Size", "The font size", 5, 9, 12));
+    Config<Float> vanillaShadowConfig = register(new NumberConfig<>("VanillaShadow", "The vanilla shadow offset", 0.1f, 1.0f, 1.5f));
 
     /**
      *
@@ -54,6 +54,7 @@ public class FontModule extends ToggleModule
         {
             return;
         }
+
         if (event.getStage() == StageEvent.EventStage.POST
                 && (event.getConfig() == antiAliasConfig || event.getConfig() == fractionalMetrics))
         {
@@ -69,5 +70,10 @@ public class FontModule extends ToggleModule
     public boolean getFractionalMetrics()
     {
         return fractionalMetrics.getValue();
+    }
+
+    public float getVanillaShadow()
+    {
+        return vanillaShadowConfig.getValue();
     }
 }
