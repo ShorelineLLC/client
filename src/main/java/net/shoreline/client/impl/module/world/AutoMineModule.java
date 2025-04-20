@@ -832,15 +832,14 @@ public class AutoMineModule extends CombatModule
             }
         }
         int slot = data.getBestSlot();
-        boolean canSwap = slot != -1 && slot != Managers.INVENTORY.getServerSlot();
-        if (canSwap)
+        if (slot != -1)
         {
             swapTo(slot);
         }
 
         stopMiningInternal(data);
 
-        if (canSwap)
+        if (slot != -1)
         {
             swapSync(slot);
         }
