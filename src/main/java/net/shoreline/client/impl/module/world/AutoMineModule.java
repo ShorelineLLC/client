@@ -63,7 +63,7 @@ public class AutoMineModule extends CombatModule
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.1f, 4.0f, 6.0f));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
     Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values()));
-    Config<Boolean> swapBeforeConfig = register(new BooleanConfig("SwapBefore", "Swaps before mining", false, () -> swapConfig.getValue() != Swap.OFF));
+    Config<Boolean> swapBeforeConfig = register(new BooleanConfig("SwapBefore", "Swaps before fully done mining", false, () -> swapConfig.getValue() != Swap.OFF));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true));
     Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
@@ -166,23 +166,18 @@ public class AutoMineModule extends CombatModule
         antiCrawlTicks--;
 
         // Mining packet handling
-        if (packetMine != null)
+        if (packetMine != null && packetMine.getTicksMining() > mineTicksConfig.getValue())
         {
-            final double distance = mc.player.getEyePos().squaredDistanceTo(packetMine.getPos().toCenterPos());
-            if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq()
-                    || packetMine.getTicksMining() > mineTicksConfig.getValue())
+            packetMineAnim.animation.setState(false);
+            if (packetSwapBack)
             {
-                packetMineAnim.animation.setState(false);
-                if (packetSwapBack)
-                {
-                    Managers.INVENTORY.syncToClient();
-                    packetSwapBack = false;
-                }
-                packetMine = null;
-                if (!isInstantMineComplete())
-                {
-                    waitForPacketMine = true;
-                }
+                Managers.INVENTORY.syncToClient();
+                packetSwapBack = false;
+            }
+            packetMine = null;
+            if (!isInstantMineComplete())
+            {
+                waitForPacketMine = true;
             }
         }
 
@@ -193,7 +188,8 @@ public class AutoMineModule extends CombatModule
             packetMine.addBlockDamage(damageDelta);
 
             int slot = packetMine.getBestSlot();
-            if (packetMine.getBlockDamage() >= 1.0f && slot != -1  && !checkMultitask())
+            float damageDone = packetMine.getBlockDamage() + (swapBeforeConfig.getValue() ? damageDelta : 0.0f);
+            if (damageDone >= 1.0f && slot != -1  && !checkMultitask())
             {
                 Managers.INVENTORY.setSlot(slot);
                 packetSwapBack = true;
@@ -261,6 +257,13 @@ public class AutoMineModule extends CombatModule
                         && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
                 {
                     stopMining(instantMine);
+
+                    if (AutoCrystalModule.getInstance().isEnabled()
+                            && AutoCrystalModule.getInstance().shouldPreForcePlace())
+                    {
+                        AutoCrystalModule.getInstance().placeCrystalForTarget(playerTarget, instantMine.getPos().down());
+                    }
+
                     if (instantConfig.getValue() == InstantMode.OFF)
                     {
                         instantMine.setTotalBlockDamage(0.0f, 0.0f);
@@ -748,13 +751,6 @@ public class AutoMineModule extends CombatModule
 
     public void startMining(MineData data)
     {
-        int slot = data.getBestSlot();
-        boolean swapBack = slot != -1 && Managers.INVENTORY.getServerSlot() != slot;
-        if (swapBeforeConfig.getValue() && swapBack)
-        {
-            swapTo(slot);
-        }
-
         if (doubleBreakConfig.getValue())
         {
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
@@ -812,11 +808,6 @@ public class AutoMineModule extends CombatModule
             }
         }
 
-        if (swapBeforeConfig.getValue() && swapBack)
-        {
-            swapSync(slot);
-        }
-
         instantMineAnim = new MineAnimation(data, new Animation(true, fadeTimeConfig.getValue()));
     }
 
@@ -857,16 +848,6 @@ public class AutoMineModule extends CombatModule
         if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
-        }
-
-        if (playerTarget != null && AutoCrystalModule.getInstance().isEnabled()
-                && AutoCrystalModule.getInstance().getPreForcePlace())
-        {
-            BlockPos placePos = data.getPos().down();
-            float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), placePos.toCenterPos());
-
-            setRotation(rotations[0], rotations[1]);
-            AutoCrystalModule.getInstance().placeForceCrystal(playerTarget, placePos);
         }
     }
 

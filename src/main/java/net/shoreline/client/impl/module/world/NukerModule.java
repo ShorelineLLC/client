@@ -147,8 +147,8 @@ public class NukerModule extends CombatModule
             packetMine.addBlockDamage(damageDelta);
 
             int slot = packetMine.getBestSlot();
-            if (packetMine.getBlockDamage() >= 1.0f && canMine(packetMine.getState())
-                    && slot != -1 && !checkMultitask())
+            float damageDone = packetMine.getBlockDamage() + (swapBeforeConfig.getValue() ? damageDelta : 0.0f);
+            if (damageDone >= 1.0f && canMine(packetMine.getState()) && slot != -1 && !checkMultitask())
             {
                 packetMine.markAttemptedMine();
                 Managers.INVENTORY.setSlot(slot);
@@ -499,13 +499,6 @@ public class NukerModule extends CombatModule
 
     public void startMining(MineData data)
     {
-        int slot = data.getBestSlot();
-        boolean swapBack = slot != -1 && Managers.INVENTORY.getServerSlot() != slot;
-        if (swapBeforeConfig.getValue() && swapBack)
-        {
-            swapTo(slot);
-        }
-
         if (doubleBreakConfig.getValue())
         {
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
@@ -561,11 +554,6 @@ public class NukerModule extends CombatModule
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                         PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
             }
-        }
-
-        if (swapBeforeConfig.getValue() && swapBack)
-        {
-            swapSync(slot);
         }
 
         instantMineAnim = new MineAnimation(data, new Animation(true, fadeTimeConfig.getValue()));
