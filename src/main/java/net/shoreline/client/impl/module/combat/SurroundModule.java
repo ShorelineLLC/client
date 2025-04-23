@@ -6,6 +6,7 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -30,8 +32,6 @@ import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -48,20 +48,18 @@ public class SurroundModule extends ObsidianPlacerModule
 {
     private static SurroundModule INSTANCE;
 
+    Config<Timing> timingConfig = register(new EnumConfig<>("Timing", "Timing for replacing blocks", Timing.VANILLA, Timing.values()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true));
-    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Attempts to place on crystals (may cause kicks)", true));
     Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the block is being mined", false));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the surround if there is none", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
-    Config<Float> entityDelayConfig = register(new NumberConfig<>("EntityDelay", "The delay to place when placing on entities", 0.0f, 2.0f, 5.0f));
     Config<Boolean> jumpDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after moving out of the hole", true));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
 
-    private final Timer invalidTimer = new CacheTimer();
     private int blocksPlaced;
     private List<BlockPos> surround = new ArrayList<>();
     private List<BlockPos> placements = new ArrayList<>();
@@ -220,7 +218,7 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (instantConfig.getValue() && serverPacket instanceof ExplosionS2CPacket packet)
+        if (timingConfig.getValue() == Timing.SEQUENTIAL && serverPacket instanceof ExplosionS2CPacket packet)
         {
             BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
             if (surround.contains(pos))
@@ -376,7 +374,7 @@ public class SurroundModule extends ObsidianPlacerModule
 
     public boolean invalidEntity(Entity entity)
     {
-        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity);
+        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity) && !(entity instanceof ArrowEntity);
     }
 
     @EventListener
@@ -420,5 +418,11 @@ public class SurroundModule extends ObsidianPlacerModule
     public boolean isPlacing()
     {
         return !placements.isEmpty();
+    }
+
+    public enum Timing
+    {
+        VANILLA,
+        SEQUENTIAL
     }
 }

@@ -4,12 +4,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
@@ -39,7 +38,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
 
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to trap enemies", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
-    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Attempts to place on crystals (may cause kicks)", true));
     Config<Boolean> downConfig = register(new BooleanConfig("PreventDownwards", "Prevents digging downwards", true));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
@@ -175,28 +173,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 }
             }
         }
-
-        if (instantConfig.getValue() && serverPacket instanceof EntitiesDestroyS2CPacket packet)
-        {
-            for (int id : packet.getEntityIds())
-            {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity == null || !(entity instanceof EndCrystalEntity))
-                {
-                    continue;
-                }
-                BlockPos targetPos = entity.getBlockPos();
-                if (surround.contains(targetPos))
-                {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(targetPos, slot);
-                }
-            }
-        }
     }
 
     private void placeBlock(BlockPos pos, int slot)
@@ -284,7 +260,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
 
     public boolean invalidEntity(Entity entity)
     {
-        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity);
+        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity) && !(entity instanceof ArrowEntity);
     }
 
     @EventListener

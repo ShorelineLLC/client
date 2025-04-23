@@ -6,11 +6,13 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -18,6 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.render.RenderBuffers;
@@ -30,9 +33,6 @@ import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -49,23 +49,21 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 {
     private static SelfTrapModule INSTANCE;
 
+    Config<Timing> timingConfig = register(new EnumConfig<>("Timing", "Timing for replacing blocks", Timing.VANILLA, Timing.values()));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for trap ", 0.0f, 4.0f, 6.0f));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true));
-    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Attempts to place on crystals (may cause kicks)", true));
     Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the feet block is being mined", false));
     Config<Boolean> headExtendConfig = register(new BooleanConfig("HeadExtend", "Extends surround if the head block is being mined", false));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap if there is none", false));
     Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at your head", true));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
-    Config<Float> entityDelayConfig = register(new NumberConfig<>("EntityDelay", "The delay to place when placing on entities", 0.0f, 2.0f, 5.0f));
     Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after placing the blocks", true));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where trap is placing blocks", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
 
-    private final Timer invalidTimer = new CacheTimer();
     private List<BlockPos> surround = new ArrayList<>();
     private List<BlockPos> placements = new ArrayList<>();
     private final Map<BlockPos, Long> packets = new HashMap<>();
@@ -222,25 +220,17 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
         }
 
-        if (instantConfig.getValue() && serverPacket instanceof EntitiesDestroyS2CPacket packet)
+        if (timingConfig.getValue() == Timing.SEQUENTIAL && serverPacket instanceof ExplosionS2CPacket packet)
         {
-            for (int id : packet.getEntityIds())
+            BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
+            if (surround.contains(pos))
             {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity == null || !(entity instanceof EndCrystalEntity))
+                final int slot = getResistantBlockItem();
+                if (slot == -1)
                 {
-                    continue;
+                    return;
                 }
-                BlockPos targetPos = entity.getBlockPos();
-                if (surround.contains(targetPos))
-                {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(targetPos, slot);
-                }
+                placeBlock(pos, slot);
             }
         }
     }
@@ -259,27 +249,15 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     public void attackBlockingCrystals(List<BlockPos> posList)
     {
-        for (BlockPos blockPos : posList)
+        Box surroundBb = PositionUtil.enclosingBox(posList);
+        Entity crystalEntity = mc.world.getOtherEntities(null, surroundBb).stream()
+                .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
+        if (crystalEntity == null)
         {
-            if (!mc.world.getBlockState(blockPos).isReplaceable())
-            {
-                continue;
-            }
-            Entity crystalEntity = mc.world.getOtherEntities(null, new Box(blockPos)).stream()
-                    .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
-            if (crystalEntity == null)
-            {
-                continue;
-            }
-            if (rotateConfig.getValue())
-            {
-                float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalEntity.getPos());
-                Managers.ROTATION.setRotationSilent(rotations[0], rotations[1]);
-            }
-            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
-            mc.player.swingHand(Hand.MAIN_HAND);
             return;
         }
+        Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
+        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
 
     public List<BlockPos> getPlacementsFromSurround(List<BlockPos> surround)
@@ -303,15 +281,9 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
             List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream()
                     .filter(e -> invalidEntity(e)).toList();
-            boolean onlyCrystal = invalid.stream().allMatch(e -> e instanceof EndCrystalEntity);
-            boolean canPlaceOnCrystal = onlyCrystal && attackConfig.getValue() && invalidTimer.passed(entityDelayConfig.getValue() * 50.0f);
-            if (invalid.isEmpty() || canPlaceOnCrystal)
+            if (invalid.isEmpty())
             {
                 placements.add(surroundPos);
-                if (canPlaceOnCrystal)
-                {
-                    invalidTimer.reset();
-                }
             }
         }
         return placements;
@@ -439,7 +411,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     public boolean invalidEntity(Entity entity)
     {
-        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity);
+        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity) && !(entity instanceof ArrowEntity);
     }
 
     @EventListener
@@ -479,5 +451,11 @@ public final class SelfTrapModule extends ObsidianPlacerModule
     public boolean isPlacing()
     {
         return !placements.isEmpty();
+    }
+
+    public enum Timing
+    {
+        VANILLA,
+        SEQUENTIAL
     }
 }
