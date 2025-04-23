@@ -168,7 +168,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             placeBlock(targetPos, slot);
         }
 
-        if (grimConfig.getValue())
+        if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
         }
@@ -243,7 +243,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
     private void placeBlock(BlockPos pos, int slot)
     {
-        Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, true, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {
@@ -284,10 +284,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             }
             Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
             mc.player.swingHand(Hand.MAIN_HAND);
-            if (rotateConfig.getValue() && grimConfig.getValue())
-            {
-                Managers.ROTATION.setRotationSilentSync();
-            }
             return;
         }
     }

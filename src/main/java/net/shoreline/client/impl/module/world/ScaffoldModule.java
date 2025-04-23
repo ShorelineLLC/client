@@ -39,14 +39,14 @@ import java.util.Map;
  */
 public final class ScaffoldModule extends BlockPlacerModule
 {
+    Config<Boolean> rotateHoldConfig = register(new BooleanConfig("RotateHold", "Holds rotations to scaffold blocks", false, () -> rotateConfig.getValue()));
+    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim interactions", false));
     Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Uses grim new interactions", false));
     Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
     Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT, Blocks.OBSIDIAN));
     Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to scaffold blocks before placing", false));
-    Config<Boolean> rotateHoldConfig = register(new BooleanConfig("RotateHold", "Holds rotations to scaffold blocks", false, () -> rotateConfig.getValue()));
     Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "Keeps the same y-level", false));
-    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimConfig.getValue() && !grimNewConfig.getValue()));
+    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimNewConfig.getValue()));
     Config<BlockPicker> pickerConfig = register(new EnumConfig<>("BlockSelection", "How to pick a block from the hotbar", BlockPicker.NORMAL, BlockPicker.values()));
     Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
@@ -152,8 +152,7 @@ public final class ScaffoldModule extends BlockPlacerModule
         {
             Managers.INVENTORY.setSlot(slot);
         }
-        boolean result = Managers.INTERACT.placeBlock(blockData.getBlockPos(),
-                slot, grimConfig.getValue(), false, false, false, (state, angles) ->
+        boolean result = Managers.INTERACT.placeBlock(blockData.getBlockPos(), slot, false, false, false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {

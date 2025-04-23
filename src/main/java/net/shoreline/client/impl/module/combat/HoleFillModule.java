@@ -180,7 +180,7 @@ public class HoleFillModule extends ObsidianPlacerModule
             placeBlock(targetPos, slot);
         }
 
-        if (grimConfig.getValue())
+        if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
         }
@@ -209,7 +209,7 @@ public class HoleFillModule extends ObsidianPlacerModule
 
     private void placeBlock(BlockPos targetPos, int slot)
     {
-        Managers.INTERACT.placeBlock(targetPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {

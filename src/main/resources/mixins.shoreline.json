@@ -67,6 +67,7 @@
     "entity.player.MixinPlayerEntity",
     "entity.player.MixinPlayerInventory",
     "entity.projectile.MixinFireworkRocketEntity",
+    "font.MixinGlyph",
     "font.MixinTextRenderLayerSet",
     "gl.MixinJsonEffectGlShader",
     "gl.MixinPostEffectProcessor",

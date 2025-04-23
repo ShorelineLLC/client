@@ -172,7 +172,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             placeBlock(targetPos, slot);
         }
 
-        if (grimConfig.getValue())
+        if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
         }
@@ -247,7 +247,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     private void placeBlock(BlockPos pos, int slot)
     {
-        Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, true, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {

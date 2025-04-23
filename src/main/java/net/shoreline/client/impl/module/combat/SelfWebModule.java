@@ -29,7 +29,7 @@ public class SelfWebModule extends BlockPlacerModule
             {
                 return;
             }
-            Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+            Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
             {
                 if (rotateConfig.getValue())
                 {
@@ -39,10 +39,7 @@ public class SelfWebModule extends BlockPlacerModule
                     }
                     else
                     {
-                        if (grimConfig.getValue())
-                        {
-                            Managers.ROTATION.setRotationSilentSync();
-                        }
+                        Managers.ROTATION.setRotationSilentSync();
                     }
                 }
             });

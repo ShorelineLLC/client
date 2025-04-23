@@ -137,7 +137,7 @@ public class AutoWebModule extends BlockPlacerModule
             placeWeb(targetPos, slot);
         }
 
-        if (grimConfig.getValue())
+        if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
         }
@@ -184,7 +184,7 @@ public class AutoWebModule extends BlockPlacerModule
 
     private void placeWeb(BlockPos pos, int slot)
     {
-        Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {

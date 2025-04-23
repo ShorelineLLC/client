@@ -11,20 +11,19 @@ import java.util.function.Predicate;
 
 public class BlockPlacerModule extends CombatModule
 {
-
     protected Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Places on visible sides only", false));
-    protected Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Places using grim instant rotations", false));
+    protected Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
 
     public BlockPlacerModule(String name, String desc, ModuleCategory category)
     {
         super(name, desc, category);
-        register(strictDirectionConfig, grimConfig);
+        register(strictDirectionConfig, rotateConfig);
     }
 
     public BlockPlacerModule(String name, String desc, ModuleCategory category, int rotationPriority)
     {
         super(name, desc, category, rotationPriority);
-        register(strictDirectionConfig, grimConfig);
+        register(strictDirectionConfig, rotateConfig);
     }
 
     protected int getSlot(final Predicate<ItemStack> filter)

@@ -10,6 +10,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.RaycastContext;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
+import net.shoreline.client.api.config.setting.EnumConfig;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
@@ -27,10 +28,10 @@ public class AnticheatModule extends ConcurrentModule
 {
     private static AnticheatModule INSTANCE;
 
-    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Applies grim optimizations", false));
-    Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> grimConfig.getValue()));
-    Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false, () -> grimConfig.getValue()));
-    Config<Boolean> raytraceSpoofConfig = register(new BooleanConfig("RaytraceFix", "Allows you to spoof your raytrace", false));
+    Config<Anticheats> modeConfig = register(new EnumConfig<>("Mode", "Applies anticheat optimizations", Anticheats.VANILLA, Anticheats.values()));
+    Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> modeConfig.getValue() == Anticheats.GRIM));
+    Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false, () -> modeConfig.getValue() == Anticheats.GRIM));
+    Config<Boolean> raytraceSpoofConfig = register(new BooleanConfig("RaytraceFix", "Allows you to spoof your raytrace", false, () -> modeConfig.getValue() == Anticheats.N_C_P));
 
     private final Timer raytraceTimer = new CacheTimer();
     private float pitch = Float.NaN;
@@ -54,7 +55,7 @@ public class AnticheatModule extends ConcurrentModule
             return;
         }
 
-        if (raytraceSpoofConfig.getValue() && event.getPacket() instanceof PlayerInteractBlockC2SPacket packet && raytraceTimer.passed(250))
+        if (isNCP() && raytraceSpoofConfig.getValue() && event.getPacket() instanceof PlayerInteractBlockC2SPacket packet && raytraceTimer.passed(250))
         {
             BlockHitResult packetResult = packet.getBlockHitResult();
             BlockPos pos = packetResult.getBlockPos();
@@ -76,7 +77,7 @@ public class AnticheatModule extends ConcurrentModule
             pitch = Float.NaN;
         }
 
-        if (miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
+        if (isGrim() && miningFixConfig.getValue() && event.getPacket() instanceof PlayerActionC2SPacket packet
                 && (packet.getAction() == PlayerActionC2SPacket.Action.START_DESTROY_BLOCK
                 || packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK
                 || packet.getAction() == PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK))
@@ -112,7 +113,12 @@ public class AnticheatModule extends ConcurrentModule
 
     public boolean isGrim()
     {
-        return grimConfig.getValue();
+        return modeConfig.getValue() == Anticheats.GRIM;
+    }
+
+    public boolean isNCP()
+    {
+        return modeConfig.getValue() == Anticheats.N_C_P;
     }
 
     public boolean getMiningFix()
@@ -123,5 +129,12 @@ public class AnticheatModule extends ConcurrentModule
     public boolean getWebJumpFix()
     {
         return webJumpFixConfig.getValue();
+    }
+
+    private enum Anticheats
+    {
+        GRIM,
+        N_C_P,
+        VANILLA
     }
 }

@@ -10,6 +10,44 @@ import java.util.List;
 
 public class PositionUtil
 {
+    public static Box enclosingBox(List<BlockPos> posList)
+    {
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
+        for (BlockPos blockPos : posList)
+        {
+            if (blockPos.getX() < minX)
+            {
+                minX = blockPos.getX();
+            }
+            if (blockPos.getY() < minY)
+            {
+                minY = blockPos.getY();
+            }
+            if (blockPos.getZ() < minZ)
+            {
+                minZ = blockPos.getZ();
+            }
+            if (blockPos.getX() > maxX)
+            {
+                maxX = blockPos.getX();
+            }
+            if (blockPos.getY() > maxY)
+            {
+                maxY = blockPos.getY();
+            }
+            if (blockPos.getZ() > maxZ)
+            {
+                maxZ = blockPos.getZ();
+            }
+        }
+
+        return new Box(minX, minY, minZ, maxX, maxY, maxZ);
+    }
 
     public static BlockPos getRoundedBlockPos(final double x, final double y, final double z)
     {

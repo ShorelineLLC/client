@@ -7,10 +7,11 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -31,7 +32,6 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.math.timer.CacheTimer;
 import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -49,7 +49,6 @@ public class SurroundModule extends ObsidianPlacerModule
     private static SurroundModule INSTANCE;
 
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f));
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true));
     Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Attempts to place on crystals (may cause kicks)", true));
@@ -103,11 +102,12 @@ public class SurroundModule extends ObsidianPlacerModule
     @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
+        blocksPlaced = 0;
         if (SelfTrapModule.getInstance().isEnabled())
         {
             return;
         }
-        blocksPlaced = 0;
+
         if (jumpDisableConfig.getValue() && (mc.player.getY() - prevY > 0.5 || mc.player.fallDistance > 1.5f))
         {
             disable();
@@ -134,6 +134,7 @@ public class SurroundModule extends ObsidianPlacerModule
         {
             return;
         }
+
         if (attackConfig.getValue())
         {
             attackBlockingCrystals(surround);
@@ -143,6 +144,7 @@ public class SurroundModule extends ObsidianPlacerModule
         {
             return;
         }
+
         if (supportConfig.getValue())
         {
             for (BlockPos block : new ArrayList<>(placements))
@@ -168,7 +170,7 @@ public class SurroundModule extends ObsidianPlacerModule
             placeBlock(targetPos, slot);
         }
 
-        if (grimConfig.getValue())
+        if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
         }
@@ -218,32 +220,24 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (instantConfig.getValue() && serverPacket instanceof EntitiesDestroyS2CPacket packet)
+        if (instantConfig.getValue() && serverPacket instanceof ExplosionS2CPacket packet)
         {
-            for (int id : packet.getEntityIds())
+            BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
+            if (surround.contains(pos))
             {
-                Entity entity = mc.world.getEntityById(id);
-                if (entity == null || !(entity instanceof EndCrystalEntity))
+                final int slot = getResistantBlockItem();
+                if (slot == -1)
                 {
-                    continue;
+                    return;
                 }
-                BlockPos targetPos = entity.getBlockPos();
-                if (surround.contains(targetPos))
-                {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(targetPos, slot);
-                }
+                placeBlock(pos, slot);
             }
         }
     }
 
     private void placeBlock(BlockPos pos, int slot)
     {
-        Managers.INTERACT.placeBlock(pos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, true, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {
@@ -255,27 +249,15 @@ public class SurroundModule extends ObsidianPlacerModule
 
     public void attackBlockingCrystals(List<BlockPos> posList)
     {
-        for (BlockPos blockPos : posList)
+        Box surroundBb = PositionUtil.enclosingBox(posList);
+        Entity crystalEntity = mc.world.getOtherEntities(null, surroundBb).stream()
+                .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
+        if (crystalEntity == null)
         {
-            if (!mc.world.getBlockState(blockPos).isReplaceable())
-            {
-                continue;
-            }
-            Entity crystalEntity = mc.world.getOtherEntities(null, new Box(blockPos)).stream()
-                    .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
-            if (crystalEntity == null)
-            {
-                continue;
-            }
-            if (rotateConfig.getValue())
-            {
-                float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalEntity.getPos());
-                Managers.ROTATION.setRotationSilent(rotations[0], rotations[1]);
-            }
-            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
-            mc.player.swingHand(Hand.MAIN_HAND);
             return;
         }
+        Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
+        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
 
     public List<BlockPos> getPlacementsFromSurround(List<BlockPos> surround)
@@ -299,15 +281,9 @@ public class SurroundModule extends ObsidianPlacerModule
             }
             List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream()
                     .filter(e -> invalidEntity(e)).toList();
-            boolean onlyCrystal = invalid.stream().allMatch(e -> e instanceof EndCrystalEntity);
-            boolean canPlaceOnCrystal = onlyCrystal && attackConfig.getValue() && invalidTimer.passed(entityDelayConfig.getValue() * 50.0f);
-            if (invalid.isEmpty() || canPlaceOnCrystal)
+            if (invalid.isEmpty())
             {
                 placements.add(surroundPos);
-                if (canPlaceOnCrystal)
-                {
-                    invalidTimer.reset();
-                }
             }
         }
         return placements;

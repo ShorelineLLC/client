@@ -30,6 +30,8 @@ import net.shoreline.client.impl.module.combat.SurroundModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.position.PositionUtil;
+import net.shoreline.client.util.math.timer.CacheTimer;
+import net.shoreline.client.util.math.timer.Timer;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -58,8 +60,9 @@ public class AutoMineModule extends CombatModule
     Config<Boolean> headConfig = register(new BooleanConfig("TargetBody", "Attempts to mine players face blocks", false, () -> autoConfig.getValue()));
     Config<Boolean> aboveHeadConfig = register(new BooleanConfig("TargetHead", "Attempts to mine above players head", false, () -> autoConfig.getValue()));
     Config<Boolean> doubleBreakConfig = register(new BooleanConfig("DoubleBreak", "Allows you to mine two blocks at once", false));
-    Config<InstantMode> instantConfig = register(new EnumConfig<>("Instant", "Instant remines mined blocks", InstantMode.OFF, InstantMode.values()));
     Config<Integer> mineTicksConfig = register(new NumberConfig<>("MiningTicks", "The max number of ticks to hold a pickaxe for the packet mine", 5, 20, 60, () -> doubleBreakConfig.getValue()));
+    Config<RemineMode> remineConfig = register(new EnumConfig<>("Remine", "Remines already mined blocks", RemineMode.NORMAL, RemineMode.values()));
+    Config<Boolean> packetInstantConfig = register(new BooleanConfig("Fast", "Instant mines on packet", false, () -> remineConfig.getValue() == RemineMode.INSTANT));
     Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.1f, 4.0f, 6.0f));
     Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
     Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values()));
@@ -77,6 +80,7 @@ public class AutoMineModule extends CombatModule
     private MineData packetMine, instantMine; // mining2 should always be the instant mine
     private boolean packetSwapBack;
     private boolean manualOverride;
+    private final Timer remineTimer = new CacheTimer();
 
     private boolean changedInstantMine;
     private boolean waitForPacketMine;
@@ -243,6 +247,11 @@ public class AutoMineModule extends CombatModule
                 else
                 {
                     instantMine.resetMiningTicks();
+                    if (remineConfig.getValue() == RemineMode.NORMAL || remineConfig.getValue() == RemineMode.FAST)
+                    {
+                        instantMine.setTotalBlockDamage(0.0f, 0.0f);
+                    }
+
                     if (manualOverride)
                     {
                         manualOverride = false;
@@ -253,10 +262,13 @@ public class AutoMineModule extends CombatModule
                     }
                 }
 
-                if (instantMine != null && (instantConfig.getValue() == InstantMode.PACKET && packetMine == null || canMine)
+                boolean passedRemine = remineConfig.getValue() == RemineMode.INSTANT || remineTimer.passed(500);
+                if (instantMine != null && (remineConfig.getValue() == RemineMode.INSTANT
+                        && packetInstantConfig.getValue() && packetMine == null || canMine && passedRemine)
                         && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
                 {
                     stopMining(instantMine);
+                    remineTimer.reset();
 
                     if (AutoCrystalModule.getInstance().isEnabled()
                             && AutoCrystalModule.getInstance().shouldPreForcePlace())
@@ -264,9 +276,9 @@ public class AutoMineModule extends CombatModule
                         AutoCrystalModule.getInstance().placeCrystalForTarget(playerTarget, instantMine.getPos().down());
                     }
 
-                    if (instantConfig.getValue() == InstantMode.OFF)
+                    if (remineConfig.getValue() == RemineMode.FAST)
                     {
-                        instantMine.setTotalBlockDamage(0.0f, 0.0f);
+                        startMining(instantMine);
                     }
                 }
             }
@@ -698,7 +710,7 @@ public class AutoMineModule extends CombatModule
                     instantMineAnim, true);
         }
 
-        if (packetMineAnim != null && packetMineAnim.animation().getFactor() > 0.01f)
+        if (doubleBreakConfig.getValue() && packetMineAnim != null && packetMineAnim.animation().getFactor() > 0.01f)
         {
             renderMiningData(event.getMatrices(), event.getTickDelta(),
                     packetMineAnim, false);
@@ -751,6 +763,19 @@ public class AutoMineModule extends CombatModule
 
     public void startMining(MineData data)
     {
+        if (rotateConfig.getValue())
+        {
+            float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), data.getPos().toCenterPos());
+            if (grimConfig.getValue())
+            {
+                setRotationSilent(rotations[0], rotations[1]);
+            }
+            else
+            {
+                setRotation(rotations[0], rotations[1]);
+            }
+        }
+
         if (doubleBreakConfig.getValue())
         {
             // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
@@ -799,13 +824,11 @@ public class AutoMineModule extends CombatModule
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            if (!grimConfig.getValue())
-            {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            }
+        }
+
+        if (rotateConfig.getValue() && grimConfig.getValue())
+        {
+            Managers.ROTATION.setRotationSilentSync();
         }
 
         instantMineAnim = new MineAnimation(data, new Animation(true, fadeTimeConfig.getValue()));
@@ -831,6 +854,7 @@ public class AutoMineModule extends CombatModule
                 setRotation(rotations[0], rotations[1]);
             }
         }
+
         int slot = data.getBestSlot();
         if (slot != -1)
         {
@@ -844,7 +868,7 @@ public class AutoMineModule extends CombatModule
             swapSync(slot);
         }
 
-        if (rotateConfig.getValue())
+        if (rotateConfig.getValue() && grimConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
         }
@@ -948,7 +972,7 @@ public class AutoMineModule extends CombatModule
             this.goal = goal;
         }
 
-        public double calculatePotentialDamage()
+        private double getPriority()
         {
             double dist = mc.player.getEyePos().squaredDistanceTo(pos.down().toCenterPos());
             if (dist <= AutoCrystalModule.getInstance().getPlaceRange())
@@ -962,7 +986,7 @@ public class AutoMineModule extends CombatModule
         @Override
         public int compareTo(@NotNull MineData o)
         {
-            return Double.compare(calculatePotentialDamage(), o.calculatePotentialDamage());
+            return Double.compare(getPriority(), o.getPriority());
         }
 
         @Override
@@ -1055,11 +1079,11 @@ public class AutoMineModule extends CombatModule
         PREVENT_CRAWL
     }
 
-    public enum InstantMode
+    public enum RemineMode
     {
-        PACKET,
+        INSTANT,
         NORMAL,
-        OFF
+        FAST
     }
 
     public enum Selection
