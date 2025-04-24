@@ -4,6 +4,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -188,21 +189,16 @@ public class HoleFillModule extends ObsidianPlacerModule
 
     public void attackBlockingCrystals(List<BlockPos> posList)
     {
-        for (BlockPos blockPos : posList)
+        for (BlockPos pos : posList)
         {
-            Entity crystalEntity = mc.world.getOtherEntities(null, new Box(blockPos)).stream()
+            Entity crystalEntity = mc.world.getOtherEntities(null, new Box(pos)).stream()
                     .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
             if (crystalEntity == null)
             {
                 continue;
             }
-            if (rotateConfig.getValue())
-            {
-                float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalEntity.getPos());
-                Managers.ROTATION.setRotationSilent(rotations[0], rotations[1]);
-            }
             Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
-            mc.player.swingHand(Hand.MAIN_HAND);
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             return;
         }
     }

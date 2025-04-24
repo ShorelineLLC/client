@@ -249,15 +249,18 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
     public void attackBlockingCrystals(List<BlockPos> posList)
     {
-        Box surroundBb = PositionUtil.enclosingBox(posList);
-        Entity crystalEntity = mc.world.getOtherEntities(null, surroundBb).stream()
-                .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
-        if (crystalEntity == null)
+        for (BlockPos pos : posList)
         {
+            Entity crystalEntity = mc.world.getOtherEntities(null, new Box(pos)).stream()
+                    .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
+            if (crystalEntity == null)
+            {
+                continue;
+            }
+            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             return;
         }
-        Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
-        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
     }
 
     public List<BlockPos> getPlacementsFromSurround(List<BlockPos> surround)
@@ -430,6 +433,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
                 RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
             }
+
             RenderBuffers.postRender();
 
             if (placements.isEmpty())
