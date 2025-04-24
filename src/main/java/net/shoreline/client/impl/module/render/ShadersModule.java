@@ -29,6 +29,7 @@ import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
 import net.shoreline.client.api.render.RenderBuffers;
+import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.api.render.satin.ManagedShaderEffect;
 import net.shoreline.client.impl.event.EntityOutlineEvent;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
@@ -370,6 +371,12 @@ public class ShadersModule extends ToggleModule
             {
                 continue;
             }
+
+            if (!RenderManager.isFrustumVisible(entity.getBoundingBox()))
+            {
+                continue;
+            }
+
             if (checkShaders(entity))
             {
                 Vec3d start = FreecamModule.getInstance().isEnabled() ? FreecamModule.getInstance().getCameraPosition() : mc.player.getPos();

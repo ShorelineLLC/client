@@ -66,7 +66,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -132,6 +131,11 @@ public class NametagsModule extends ToggleModule
         Vec3d pos = camera.getPos();
         for (Entity entity : mc.world.getEntities())
         {
+            if (!RenderManager.isFrustumVisible(entity.getBoundingBox()))
+            {
+                continue;
+            }
+
             if (entity instanceof PlayerEntity player)
             {
                 if (player == mc.player && !FreecamModule.getInstance().isEnabled())
@@ -363,7 +367,7 @@ public class NametagsModule extends ToggleModule
                 matrixStack.translate(n10, y, 0.0f);
                 matrixStack.translate(8.0f, 8.0f, 0.0f);
                 matrixStack.scale(16.0f, 16.0f, 0.0f);
-                matrixStack.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 0.0f));
+                matrixStack.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 0.0001f));
                 renderItem(stack, ModelTransformationMode.GUI, 0xf, OverlayTexture.DEFAULT_UV,
                         matrixStack, mc.getBufferBuilders().getEntityVertexConsumers(), mc.world, 0);
                 mc.getBufferBuilders().getEntityVertexConsumers().draw();
