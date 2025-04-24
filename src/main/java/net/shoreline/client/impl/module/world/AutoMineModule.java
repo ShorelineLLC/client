@@ -379,7 +379,7 @@ public class AutoMineModule extends CombatModule
                         else
                         {
                             List<BlockPos> miningBlocks = getMiningBlocks(playerTarget, targetPos, bedrockPhased);
-                            bestMine = getInstantMine(miningBlocks);
+                            bestMine = getInstantMine(miningBlocks, bedrockPhased);
 
                             if (bestMine != null && (packetMine == null && !changedInstantMine
                                     && doubleBreakConfig.getValue() || isInstantMineComplete()))
@@ -557,7 +557,7 @@ public class AutoMineModule extends CombatModule
         }
     }
 
-    public MineData getInstantMine(List<BlockPos> miningBlocks)
+    public MineData getInstantMine(List<BlockPos> miningBlocks, boolean bedrockPhased)
     {
         PriorityQueue<MineData> validInstantMines = new PriorityQueue<>();
         for (BlockPos blockPos : miningBlocks)
@@ -575,7 +575,7 @@ public class AutoMineModule extends CombatModule
             }
 
             BlockState state2 = mc.world.getBlockState(blockPos.down());
-            if (state2.isOf(Blocks.OBSIDIAN) || state2.isOf(Blocks.BEDROCK))
+            if (bedrockPhased || state2.isOf(Blocks.OBSIDIAN) || state2.isOf(Blocks.BEDROCK))
             {
                 Direction direction = strictDirectionConfig.getValue() ?
                         Managers.INTERACT.getInteractDirection(blockPos, false) : Direction.UP;
@@ -614,6 +614,11 @@ public class AutoMineModule extends CombatModule
             return avoidSelfConfig.getValue() && intersectsPlayer(p);
         });
 
+        if (targetBedrockPhased && aboveHeadConfig.getValue())
+        {
+            phaseBlocks.add(playerPos.up(2));
+        }
+
         return phaseBlocks;
     }
 
@@ -632,11 +637,6 @@ public class AutoMineModule extends CombatModule
             if (headConfig.getValue())
             {
                 facePlaceBlocks.addAll(surroundingBlocks.stream().map(BlockPos::up).toList());
-            }
-
-            if (aboveHeadConfig.getValue())
-            {
-                facePlaceBlocks.add(playerPos.up(2));
             }
 
             BlockState belowFeet = mc.world.getBlockState(playerPos.down());
