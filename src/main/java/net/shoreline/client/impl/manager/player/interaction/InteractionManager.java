@@ -8,6 +8,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
@@ -32,17 +33,15 @@ public final class InteractionManager implements Globals
 
     public boolean placeBlock(final BlockPos pos,
                               final int slot,
-                              final boolean grim,
                               final boolean strictDirection,
                               final boolean clientSwing,
                               final RotationCallback rotationCallback)
     {
-        return placeBlock(pos, slot, grim, strictDirection, clientSwing, rotationCallback, false);
+        return placeBlock(pos, slot, strictDirection, clientSwing, rotationCallback, false);
     }
 
     public boolean placeBlock(final BlockPos pos,
                               final int slot,
-                              final boolean grim,
                               final boolean strictDirection,
                               final boolean clientSwing,
                               final RotationCallback rotationCallback,
@@ -52,7 +51,7 @@ public final class InteractionManager implements Globals
         if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
-            return placeBlock(pos, direction, slot, clientSwing, grim, rotationCallback);
+            return placeBlock(pos, direction, slot, clientSwing, AnticheatModule.getInstance().isGrim(), rotationCallback);
         }
         if (direction == null)
         {
@@ -64,18 +63,16 @@ public final class InteractionManager implements Globals
 
     public boolean placeBlock(final BlockPos pos,
                               final int slot,
-                              final boolean grim,
                               final boolean strictDirection,
                               final boolean clientSwing,
                               final boolean packet,
                               final RotationCallback rotationCallback)
     {
-        return placeBlock(pos, slot, grim, strictDirection, clientSwing, packet, false, rotationCallback);
+        return placeBlock(pos, slot, strictDirection, clientSwing, packet, false, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
                               final int slot,
-                              final boolean grim,
                               final boolean strictDirection,
                               final boolean clientSwing,
                               final boolean packet,
@@ -86,7 +83,7 @@ public final class InteractionManager implements Globals
         if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
         {
             direction = Direction.DOWN;
-            return placeBlock(pos, direction, slot, clientSwing, grim, rotationCallback);
+            return placeBlock(pos, direction, slot, clientSwing, AnticheatModule.getInstance().isGrim(), rotationCallback);
         }
         if (direction == null)
         {

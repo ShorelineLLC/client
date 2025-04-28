@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -12,6 +13,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -162,7 +164,6 @@ public class SurroundModule extends ObsidianPlacerModule
                 break;
             }
             BlockPos targetPos = placements.get(blocksPlaced);
-            blocksPlaced++;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
             placeBlock(targetPos, slot);
@@ -218,17 +219,45 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (timingConfig.getValue() == Timing.SEQUENTIAL && serverPacket instanceof ExplosionS2CPacket packet)
+        if (timingConfig.getValue() == Timing.SEQUENTIAL)
         {
-            BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
-            if (surround.contains(pos))
+            if (blocksPlaced >= shiftTicksConfig.getValue())
             {
-                final int slot = getResistantBlockItem();
-                if (slot == -1)
+                return;
+            }
+
+            if (serverPacket instanceof ExplosionS2CPacket packet)
+            {
+                BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
+                if (surround.contains(pos))
                 {
-                    return;
+                    final int slot = getResistantBlockItem();
+                    if (slot == -1)
+                    {
+                        return;
+                    }
+                    placeBlock(pos, slot);
                 }
-                placeBlock(pos, slot);
+            }
+
+            if (serverPacket instanceof EntitySpawnS2CPacket packet && packet.getEntityType().equals(EntityType.END_CRYSTAL))
+            {
+                EndCrystalEntity crystal = new EndCrystalEntity(mc.world, packet.getX(), packet.getY(), packet.getZ());
+                for (BlockPos pos : surround)
+                {
+                    if (!crystal.getBoundingBox().intersects(new Box(pos)))
+                    {
+                        continue;
+                    }
+
+                    final int slot = getResistantBlockItem();
+                    if (slot == -1)
+                    {
+                        return;
+                    }
+                    placeBlock(pos, slot);
+                    break;
+                }
             }
         }
     }
@@ -243,6 +272,7 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         });
         packets.put(pos, System.currentTimeMillis());
+        blocksPlaced++;
     }
 
     public void attackBlockingCrystals(List<BlockPos> posList)
