@@ -343,9 +343,9 @@ public class HUDModule extends ToggleModule
                     float x = (width + 1.0f) * (float) animation.getFactor();
                     int potionColor = switch (potionColorsConfig.getValue())
                     {
-                        case NORMAL -> ColorUtil.withAlpha(effect.getColor(), 255);
-                        case OLD -> ColorUtil.withAlpha(getLiquidColor(e.getType().getIdAsString(), effect), 255);
-                        case OFF -> getHudColor(rainbowOffset);
+                        case NORMAL -> ColorUtil.withAlpha(effect.getColor(), (int) (255 * animation.getFactor()));
+                        case OLD -> ColorUtil.withAlpha(getLiquidColor(e.getType().getIdAsString(), effect), (int) (255 * animation.getFactor()));
+                        case OFF -> ColorUtil.withAlpha(getHudColor(rainbowOffset), (int) (255 * animation.getFactor()));
                     };
                     RenderManager.renderText(event.getContext(), text,
                             res.getScaledWidth() - x, renderingUp ? bottomRight : topRight,

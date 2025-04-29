@@ -56,7 +56,6 @@ public final class ModuleManager
                 new AutoTrapModule(),
                 new AutoWebModule(),
                 new AutoXPModule(),
-                new BlockLagModule(),
                 new BowAimModule(),
                 new ClickCrystalModule(),
                 new CriticalsModule(),
@@ -65,8 +64,9 @@ public final class ModuleManager
                 new NoHitDelayModule(),
                 new ReplenishModule(),
                 new SelfBowModule(),
+                new SelfFillModule(),
                 new SelfTrapModule(),
-                new SelfWebModule(),
+                // new SelfWebModule(),
                 new SurroundModule(),
                 new TriggerModule(),
                 // Exploit
