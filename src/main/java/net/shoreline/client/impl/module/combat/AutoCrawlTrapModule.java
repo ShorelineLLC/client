@@ -39,6 +39,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to trap enemies", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
     Config<Boolean> downConfig = register(new BooleanConfig("PreventDownwards", "Prevents digging downwards", true));
+    Config<Boolean> serverHitboxConfig = register(new BooleanConfig("HitboxSync", "Places on serverside crawling hitboxes", false));
     Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
@@ -209,13 +210,14 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             final Box surroundBox = new Box(surroundPos);
             List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
             boolean serverCrawling = invalid.stream().allMatch(e -> Managers.HITBOX.isServerCrawling(e)
-                    && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox)) && blocksPlaced <= shiftTicksConfig.getValue();
-            if (!invalid.isEmpty() || serverCrawling)
+                    && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox));
+            if (!invalid.isEmpty() && (!serverCrawling || !serverHitboxConfig.getValue()))
             {
                 continue;
             }
             placements.add(surroundPos);
         }
+
         return placements;
     }
 

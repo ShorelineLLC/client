@@ -402,8 +402,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 {
                     continue;
                 }
-                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f)
-                        || AutoMineModule.getInstance().getMiningBlock() == surroundPos)
+                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f))
                 {
                     continue;
                 }
@@ -421,7 +420,8 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                         continue;
                     }
                     BlockPos blockerPos = surroundPos.offset(direction);
-                    if (playerBlocks.contains(blockerPos))
+                    if (playerBlocks.contains(blockerPos)
+                            || AutoMineModule.getInstance().getMiningBlock() == blockerPos) // Dont want to help our opponent surround
                     {
                         continue;
                     }

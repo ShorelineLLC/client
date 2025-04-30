@@ -337,8 +337,7 @@ public class SurroundModule extends ObsidianPlacerModule
         {
             for (BlockPos surroundPos : new ArrayList<>(surroundBlocks))
             {
-                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f)
-                        || AutoMineModule.getInstance().getMiningBlock() == surroundPos)
+                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f))
                 {
                     continue;
                 }
@@ -349,7 +348,8 @@ public class SurroundModule extends ObsidianPlacerModule
                         continue;
                     }
                     BlockPos blockerPos = surroundPos.offset(direction);
-                    if (playerBlocks.contains(blockerPos))
+                    if (playerBlocks.contains(blockerPos)
+                            || AutoMineModule.getInstance().getMiningBlock() == blockerPos) // Dont want to help our opponent surround
                     {
                         continue;
                     }

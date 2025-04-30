@@ -47,16 +47,15 @@ public class HitboxManager implements Globals
                     continue;
                 }
 
-                if (serializedEntry.value().equals(EntityPose.SWIMMING))
-                {
-                    if (!serverCrawling.contains(entity))
-                    {
-                        serverCrawling.add(entity);
-                    }
-                }
-                else
+                if (!serializedEntry.value().equals(EntityPose.SWIMMING))
                 {
                     serverCrawling.remove(entity);
+                    continue;
+                }
+
+                if (!serverCrawling.contains(entity))
+                {
+                    serverCrawling.add(entity);
                 }
             }
         }
