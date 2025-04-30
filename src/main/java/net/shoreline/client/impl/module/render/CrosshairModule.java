@@ -13,6 +13,8 @@ import net.shoreline.client.api.render.RenderManager;
 import net.shoreline.client.impl.event.gui.hud.RenderCrosshairEvent;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.render.ColorUtil;
+import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.util.render.animation.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
@@ -27,6 +29,8 @@ public class CrosshairModule extends ToggleModule
     Config<Float> outlineThicknessConfig = register(new NumberConfig<>("OutlineThickness", "The width of the outline", 0.1f, 0.3f, 0.5f, () -> outlineConfig.getValue()));
     Config<Float> opacityConfig = register(new NumberConfig<>("Opacity", "The crosshair opacity", 0.10f, 1.00f, 1.00f));
     Config<Color> colorConfig = register(new ColorConfig("Color", "The crosshair color", Color.WHITE));
+
+    private final Animation gapAnimation = new Animation(false, 100L, Easing.LINEAR);
 
     public CrosshairModule()
     {
@@ -52,10 +56,12 @@ public class CrosshairModule extends ToggleModule
         float o2 = o1 * 2.0f;
         float o3 = o1 * 3.0f;
 
-        float gap = gapConfig.getValue();
-        if (dynamicConfig.getValue() && MovementUtil.isMovingInput())
+        boolean moving = MovementUtil.isMovingInput() || mc.player.isSneaking() || mc.player.isClimbing() || !mc.player.isOnGround();
+        double gap = gapConfig.getValue();
+        if (dynamicConfig.getValue())
         {
-            gap += 2.0f;
+            gapAnimation.setState(moving);
+            gap += 2.0f * gapAnimation.getFactor();
         }
 
         if (outlineConfig.getValue())

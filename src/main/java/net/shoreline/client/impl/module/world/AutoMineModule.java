@@ -474,7 +474,7 @@ public class AutoMineModule extends CombatModule
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event)
     {
-        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket && switchResetConfig.getValue())
+        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket && switchResetConfig.getValue() && instantMine != null)
         {
             instantMine.setTotalBlockDamage(0.0f, 0.0f);
         }
