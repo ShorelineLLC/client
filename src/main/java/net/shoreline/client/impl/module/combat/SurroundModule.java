@@ -32,6 +32,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -336,7 +337,8 @@ public class SurroundModule extends ObsidianPlacerModule
         {
             for (BlockPos surroundPos : new ArrayList<>(surroundBlocks))
             {
-                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f))
+                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f)
+                        || AutoMineModule.getInstance().getMiningBlock() == surroundPos)
                 {
                     continue;
                 }

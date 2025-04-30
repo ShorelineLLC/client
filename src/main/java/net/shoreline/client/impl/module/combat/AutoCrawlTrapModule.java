@@ -118,7 +118,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 break;
             }
             BlockPos targetPos = placements.get(blocksPlaced);
-            blocksPlaced++;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
             placeBlock(targetPos, slot);
@@ -185,6 +184,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             }
         });
         packets.put(pos, System.currentTimeMillis());
+        blocksPlaced++;
     }
 
     public List<BlockPos> getPlacementsFromTrap(List<BlockPos> surround)
@@ -208,16 +208,9 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             }
             final Box surroundBox = new Box(surroundPos);
             List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
-            boolean serverCrawling = true;
-            for (Entity entity : invalid)
-            {
-                if (!Managers.HITBOX.isServerCrawling(entity)
-                        || Managers.HITBOX.getCrawlingBoundingBox(entity).intersects(surroundBox))
-                {
-                    serverCrawling = false;
-                }
-            }
-            if (!invalid.isEmpty() && !serverCrawling)
+            boolean serverCrawling = invalid.stream().allMatch(e -> Managers.HITBOX.isServerCrawling(e)
+                    && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox)) && blocksPlaced <= shiftTicksConfig.getValue();
+            if (!invalid.isEmpty() || serverCrawling)
             {
                 continue;
             }

@@ -33,6 +33,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
+import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -246,6 +247,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             if (serverPacket instanceof EntitySpawnS2CPacket packet && packet.getEntityType().equals(EntityType.END_CRYSTAL))
             {
                 EndCrystalEntity crystal = new EndCrystalEntity(mc.world, packet.getX(), packet.getY(), packet.getZ());
+
                 for (BlockPos pos : surround)
                 {
                     if (!crystal.getBoundingBox().intersects(new Box(pos)))
@@ -400,7 +402,8 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                 {
                     continue;
                 }
-                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f))
+                if (!Managers.BLOCK.isPassed(surroundPos, 0.7f)
+                        || AutoMineModule.getInstance().getMiningBlock() == surroundPos)
                 {
                     continue;
                 }
