@@ -243,10 +243,9 @@ public class SurroundModule extends ObsidianPlacerModule
 
             if (serverPacket instanceof EntitySpawnS2CPacket packet && packet.getEntityType().equals(EntityType.END_CRYSTAL))
             {
-                EndCrystalEntity crystal = new EndCrystalEntity(mc.world, packet.getX(), packet.getY(), packet.getZ());
                 for (BlockPos pos : surround)
                 {
-                    if (!crystal.getBoundingBox().intersects(new Box(pos)))
+                    if (!pos.equals(BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ())))
                     {
                         continue;
                     }
