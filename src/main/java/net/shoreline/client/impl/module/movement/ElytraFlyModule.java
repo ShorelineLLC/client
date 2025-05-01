@@ -102,7 +102,6 @@ public class ElytraFlyModule extends RotationModule
         {
             BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().forceCancel();
         }
-
     }
 
     @EventListener
@@ -195,6 +194,7 @@ public class ElytraFlyModule extends RotationModule
         }
         else if (modeConfig.getValue() == FlyMode.BOUNCE)
         {
+            mc.player.setSprinting(true);
             mc.player.setPitch(pitchConfig.getValue());
             setRotation(mc.player.getYaw(), pitchConfig.getValue());
         }
