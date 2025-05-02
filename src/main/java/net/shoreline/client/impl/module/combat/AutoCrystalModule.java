@@ -1240,7 +1240,7 @@ public class AutoCrystalModule extends CombatModule
 
     public void placeCrystalForTarget(PlayerEntity target, BlockPos blockPos)
     {
-        if (target == null || placeRangeCheck(blockPos) || !canUseCrystalOnBlock(blockPos))
+        if (target == null || target.isDead() || placeRangeCheck(blockPos) || !canUseCrystalOnBlock(blockPos))
         {
             return;
         }
