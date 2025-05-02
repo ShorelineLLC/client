@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -225,11 +227,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
         if (timingConfig.getValue() == Timing.SEQUENTIAL)
         {
-            if (blocksPlaced >= shiftTicksConfig.getValue())
-            {
-                return;
-            }
-
             if (serverPacket instanceof ExplosionS2CPacket packet)
             {
                 BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
@@ -313,9 +310,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream()
-                    .filter(e -> invalidEntity(e)).toList();
-            if (invalid.isEmpty())
+            if (mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()))
             {
                 placements.add(surroundPos);
             }

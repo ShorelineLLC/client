@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -211,7 +213,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
             boolean serverCrawling = invalid.stream().allMatch(e -> Managers.HITBOX.isServerCrawling(e)
                     && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox));
-            if (!invalid.isEmpty() && (!serverCrawling || !serverHitboxConfig.getValue()))
+            if (!mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()) && (!serverCrawling || !serverHitboxConfig.getValue()))
             {
                 continue;
             }

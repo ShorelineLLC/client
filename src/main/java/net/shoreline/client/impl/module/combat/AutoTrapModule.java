@@ -2,6 +2,8 @@ package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -271,9 +273,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            List<Entity> invalid = mc.world.getOtherEntities(null, new Box(surroundPos)).stream()
-                    .filter(e -> invalidEntity(e)).toList();
-            if (invalid.isEmpty())
+
+            if (mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()))
             {
                 placements.add(surroundPos);
             }

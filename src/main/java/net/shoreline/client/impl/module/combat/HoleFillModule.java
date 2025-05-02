@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -122,11 +123,12 @@ public class HoleFillModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            if (mc.world.getOtherEntities(null, new Box(hole.getPos()))
-                    .stream().anyMatch(e -> SurroundModule.getInstance().invalidEntity(e)))
+
+            if (!mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), hole.getPos(), ShapeContext.absent()))
             {
                 continue;
             }
+
             if (autoConfig.getValue())
             {
                 for (PlayerEntity entity : mc.world.getPlayers())
