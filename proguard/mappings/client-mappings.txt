@@ -4084,23 +4084,23 @@ net.shoreline.client.impl.module.combat.AutoCrawlTrapModule -> net.shoreline.cli
     java.util.Map fadeList -> ry
     net.minecraft.class_1657 target -> rz
     int blocksPlaced -> rA
-    39:61:void <init>() -> <init>
-    65:65:net.shoreline.client.impl.module.combat.AutoCrawlTrapModule getInstance() -> iG
-    71:75:void onDisable() -> ba
-    80:131:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
-    136:151:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    155:176:void handlePackets(net.minecraft.class_2596) -> d
-    180:189:void placeBlock(net.minecraft.class_2338,int) -> a
-    193:221:java.util.List getPlacementsFromTrap(java.util.List) -> b
-    226:253:java.util.List getCrawlTrap(net.minecraft.class_1657) -> a
-    258:258:boolean invalidEntity(net.minecraft.class_1297) -> m
-    264:293:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    297:297:boolean isPlacing() -> iH
-    292:292:boolean lambda$onRenderWorld$4(java.util.Map$Entry) -> b
-    212:213:boolean lambda$getPlacementsFromTrap$3(net.minecraft.class_238,net.minecraft.class_1297) -> a
-    211:211:boolean lambda$getPlacementsFromTrap$2(net.minecraft.class_1297) -> n
-    182:186:void lambda$placeBlock$1(boolean,float[]) -> b
-    48:48:java.lang.Boolean lambda$new$0() -> hr
+    41:63:void <init>() -> <init>
+    67:67:net.shoreline.client.impl.module.combat.AutoCrawlTrapModule getInstance() -> iG
+    73:77:void onDisable() -> ba
+    82:133:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
+    138:153:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    157:178:void handlePackets(net.minecraft.class_2596) -> d
+    182:191:void placeBlock(net.minecraft.class_2338,int) -> a
+    195:223:java.util.List getPlacementsFromTrap(java.util.List) -> b
+    228:255:java.util.List getCrawlTrap(net.minecraft.class_1657) -> a
+    260:260:boolean invalidEntity(net.minecraft.class_1297) -> m
+    266:295:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
+    299:299:boolean isPlacing() -> iH
+    294:294:boolean lambda$onRenderWorld$4(java.util.Map$Entry) -> b
+    214:215:boolean lambda$getPlacementsFromTrap$3(net.minecraft.class_238,net.minecraft.class_1297) -> a
+    213:213:boolean lambda$getPlacementsFromTrap$2(net.minecraft.class_1297) -> n
+    184:188:void lambda$placeBlock$1(boolean,float[]) -> b
+    50:50:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.combat.AutoCrystalModule -> net.shoreline.client.jb:
     net.shoreline.client.impl.module.combat.AutoCrystalModule INSTANCE -> rB
     net.shoreline.client.api.config.Config whileMiningConfig -> rC
@@ -4472,29 +4472,28 @@ net.shoreline.client.impl.module.combat.AutoTrapModule -> net.shoreline.client.j
     java.util.Map packets -> ug
     java.util.Map fadeList -> uh
     int blocksPlaced -> rA
-    51:75:void <init>() -> <init>
-    79:79:net.shoreline.client.impl.module.combat.AutoTrapModule getInstance() -> jG
-    85:89:void onDisable() -> ba
-    94:170:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
-    175:190:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    194:215:void handlePackets(net.minecraft.class_2596) -> d
-    219:227:void placeBlock(net.minecraft.class_2338,int) -> a
-    231:236:net.minecraft.class_1657 getTrapTarget() -> jH
-    241:253:void attackBlockingCrystals(java.util.List) -> d
-    257:281:java.util.List getPlacementsFromSurround(java.util.List) -> e
-    286:350:java.util.List getSurround(net.minecraft.class_2338,net.minecraft.class_1657) -> a
-    355:364:java.util.List getPlayerBlocks(net.minecraft.class_2338,net.minecraft.class_1657) -> b
-    369:369:boolean invalidEntity(net.minecraft.class_1297) -> m
-    375:404:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    408:408:boolean isPlacing() -> iH
-    403:403:boolean lambda$onRenderWorld$7(java.util.Map$Entry) -> d
-    275:275:boolean lambda$getPlacementsFromSurround$6(net.minecraft.class_1297) -> s
-    244:244:boolean lambda$attackBlockingCrystals$5(net.minecraft.class_1297) -> t
-    235:235:double lambda$getTrapTarget$4(net.minecraft.class_1297) -> u
-    234:234:boolean lambda$getTrapTarget$3(net.minecraft.class_1297) -> v
-    233:233:boolean lambda$getTrapTarget$2(net.minecraft.class_1297) -> w
-    221:225:void lambda$placeBlock$1(boolean,float[]) -> b
-    63:63:java.lang.Boolean lambda$new$0() -> hr
+    53:77:void <init>() -> <init>
+    81:81:net.shoreline.client.impl.module.combat.AutoTrapModule getInstance() -> jG
+    87:91:void onDisable() -> ba
+    96:172:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
+    177:192:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    196:217:void handlePackets(net.minecraft.class_2596) -> d
+    221:229:void placeBlock(net.minecraft.class_2338,int) -> a
+    233:238:net.minecraft.class_1657 getTrapTarget() -> jH
+    243:255:void attackBlockingCrystals(java.util.List) -> d
+    259:282:java.util.List getPlacementsFromSurround(java.util.List) -> e
+    287:351:java.util.List getSurround(net.minecraft.class_2338,net.minecraft.class_1657) -> a
+    356:365:java.util.List getPlayerBlocks(net.minecraft.class_2338,net.minecraft.class_1657) -> b
+    370:370:boolean invalidEntity(net.minecraft.class_1297) -> m
+    376:405:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
+    409:409:boolean isPlacing() -> iH
+    404:404:boolean lambda$onRenderWorld$6(java.util.Map$Entry) -> d
+    246:246:boolean lambda$attackBlockingCrystals$5(net.minecraft.class_1297) -> s
+    237:237:double lambda$getTrapTarget$4(net.minecraft.class_1297) -> t
+    236:236:boolean lambda$getTrapTarget$3(net.minecraft.class_1297) -> u
+    235:235:boolean lambda$getTrapTarget$2(net.minecraft.class_1297) -> v
+    223:227:void lambda$placeBlock$1(boolean,float[]) -> b
+    65:65:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.combat.AutoWebModule -> net.shoreline.client.jq:
     net.shoreline.client.impl.module.combat.AutoWebModule INSTANCE -> ui
     net.shoreline.client.api.config.Config rangeConfig -> mQ
@@ -4574,10 +4573,10 @@ net.shoreline.client.impl.module.combat.BowAimModule -> net.shoreline.client.ju:
     25:39:void <init>() -> <init>
     44:74:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
     79:83:void onLookDirection(net.shoreline.client.impl.event.entity.LookDirectionEvent) -> a
-    87:103:float[] getBowRotationsTo(net.minecraft.class_1297) -> x
+    87:103:float[] getBowRotationsTo(net.minecraft.class_1297) -> w
     108:112:float calculateArc(net.minecraft.class_1297,double,double) -> a
     117:124:float calculateArc(double,double,double,double) -> b
-    129:136:boolean isValidAimTarget(net.minecraft.class_1297) -> y
+    129:136:boolean isValidAimTarget(net.minecraft.class_1297) -> x
 net.shoreline.client.impl.module.combat.ClickCrystalModule -> net.shoreline.client.jv:
     net.shoreline.client.api.config.Config breakDelayConfig -> rO
     net.shoreline.client.api.config.Config randomDelayConfig -> uz
@@ -4607,7 +4606,7 @@ net.shoreline.client.impl.module.combat.CriticalsModule -> net.shoreline.client.
     71:71:java.lang.String getModuleData() -> aW
     77:79:void onDisable() -> ba
     88:152:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    157:276:void attackSpoofJump(net.minecraft.class_1297) -> z
+    157:276:void attackSpoofJump(net.minecraft.class_1297) -> y
     281:300:void onPacketOutboundPost(net.shoreline.client.impl.event.network.PacketEvent$OutboundPost) -> a
     304:304:boolean isGrim() -> fO
     309:318:boolean isDoublePhased() -> jO
@@ -4647,22 +4646,21 @@ net.shoreline.client.impl.module.combat.HoleFillModule -> net.shoreline.client.j
     int shiftDelay -> uk
     java.util.Map fadeList -> uX
     java.util.List fills -> uY
-    45:70:void <init>() -> <init>
-    74:74:net.shoreline.client.impl.module.combat.HoleFillModule getInstance() -> jR
-    80:82:void onDisable() -> ba
-    87:88:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
-    94:188:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
-    192:204:void attackBlockingCrystals(java.util.List) -> d
-    208:215:void placeBlock(net.minecraft.class_2338,int) -> a
-    220:249:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    253:253:boolean isPlacing() -> iH
-    248:248:boolean lambda$onRenderWorld$6(java.util.Map$Entry) -> f
-    210:214:void lambda$placeBlock$5(boolean,float[]) -> d
-    195:195:boolean lambda$attackBlockingCrystals$4(net.minecraft.class_1297) -> A
-    126:126:boolean lambda$onPlayerTick$3(net.minecraft.class_1297) -> B
-    58:58:java.lang.Boolean lambda$new$2() -> hq
-    51:51:java.lang.Boolean lambda$new$1() -> be
-    50:50:java.lang.Boolean lambda$new$0() -> hr
+    46:71:void <init>() -> <init>
+    75:75:net.shoreline.client.impl.module.combat.HoleFillModule getInstance() -> jR
+    81:83:void onDisable() -> ba
+    88:89:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
+    95:190:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
+    194:206:void attackBlockingCrystals(java.util.List) -> d
+    210:217:void placeBlock(net.minecraft.class_2338,int) -> a
+    222:251:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
+    255:255:boolean isPlacing() -> iH
+    250:250:boolean lambda$onRenderWorld$5(java.util.Map$Entry) -> a
+    212:216:void lambda$placeBlock$4(boolean,float[]) -> d
+    197:197:boolean lambda$attackBlockingCrystals$3(net.minecraft.class_1297) -> z
+    59:59:java.lang.Boolean lambda$new$2() -> hq
+    52:52:java.lang.Boolean lambda$new$1() -> be
+    51:51:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.combat.KeepSprintModule -> net.shoreline.client.jz:
     12:13:void <init>() -> <init>
     18:19:void onSprintReset(net.shoreline.client.impl.event.entity.player.SprintResetEvent) -> a
@@ -4704,7 +4702,7 @@ net.shoreline.client.impl.module.combat.SelfFillModule -> net.shoreline.client.j
     144:150:void attackPlace(net.minecraft.class_2338) -> m
     154:171:void attackPlace(net.minecraft.class_2338,int) -> c
     166:170:void lambda$attackPlace$4(boolean,float[]) -> e
-    156:156:boolean lambda$attackPlace$3(net.minecraft.class_1297) -> C
+    156:156:boolean lambda$attackPlace$3(net.minecraft.class_1297) -> A
     121:132:void lambda$onPlayerTick$2(boolean,float[]) -> f
     79:79:boolean lambda$onPlayerTick$1(net.minecraft.class_2338) -> n
     36:36:java.lang.Boolean lambda$new$0() -> hr
@@ -4739,35 +4737,34 @@ net.shoreline.client.impl.module.combat.SelfTrapModule -> net.shoreline.client.j
     java.util.Map fadeList -> vq
     int blocksPlaced -> rA
     double prevY -> vh
-    56:82:void <init>() -> <init>
-    86:86:net.shoreline.client.impl.module.combat.SelfTrapModule getInstance() -> jW
-    92:97:void onEnable() -> aZ
-    102:106:void onDisable() -> ba
-    111:180:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
-    185:200:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    204:266:void handlePackets(net.minecraft.class_2596) -> d
-    270:279:void placeBlock(net.minecraft.class_2338,int) -> a
-    283:295:void attackBlockingCrystals(java.util.List) -> d
-    299:323:java.util.List getPlacementsFromSurround(java.util.List) -> e
-    328:430:java.util.List getSurround(net.minecraft.class_2338,net.minecraft.class_1657) -> a
-    435:444:java.util.List getPlayerBlocks(net.minecraft.class_2338,net.minecraft.class_1657) -> b
-    449:449:boolean invalidEntity(net.minecraft.class_1297) -> m
-    455:485:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    489:489:boolean isPlacing() -> iH
-    484:484:boolean lambda$onRenderWorld$4(java.util.Map$Entry) -> b
-    317:317:boolean lambda$getPlacementsFromSurround$3(net.minecraft.class_1297) -> D
-    286:286:boolean lambda$attackBlockingCrystals$2(net.minecraft.class_1297) -> E
-    272:276:void lambda$placeBlock$1(boolean,float[]) -> b
-    69:69:java.lang.Boolean lambda$new$0() -> hr
+    58:84:void <init>() -> <init>
+    88:88:net.shoreline.client.impl.module.combat.SelfTrapModule getInstance() -> jW
+    94:99:void onEnable() -> aZ
+    104:108:void onDisable() -> ba
+    113:182:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
+    187:202:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    206:263:void handlePackets(net.minecraft.class_2596) -> d
+    267:276:void placeBlock(net.minecraft.class_2338,int) -> a
+    280:292:void attackBlockingCrystals(java.util.List) -> d
+    296:318:java.util.List getPlacementsFromSurround(java.util.List) -> e
+    323:425:java.util.List getSurround(net.minecraft.class_2338,net.minecraft.class_1657) -> a
+    430:439:java.util.List getPlayerBlocks(net.minecraft.class_2338,net.minecraft.class_1657) -> b
+    444:444:boolean invalidEntity(net.minecraft.class_1297) -> m
+    450:480:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
+    484:484:boolean isPlacing() -> iH
+    479:479:boolean lambda$onRenderWorld$3(java.util.Map$Entry) -> f
+    283:283:boolean lambda$attackBlockingCrystals$2(net.minecraft.class_1297) -> B
+    269:273:void lambda$placeBlock$1(boolean,float[]) -> b
+    71:71:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.combat.SelfTrapModule$Timing -> net.shoreline.client.jG:
     net.shoreline.client.impl.module.combat.SelfTrapModule$Timing VANILLA -> vr
     net.shoreline.client.impl.module.combat.SelfTrapModule$Timing SEQUENTIAL -> vs
     net.shoreline.client.impl.module.combat.SelfTrapModule$Timing[] $VALUES -> vt
-    492:492:net.shoreline.client.impl.module.combat.SelfTrapModule$Timing[] values() -> values
-    492:492:net.shoreline.client.impl.module.combat.SelfTrapModule$Timing valueOf(java.lang.String) -> valueOf
-    492:492:void <init>(java.lang.String,int) -> <init>
-    492:492:net.shoreline.client.impl.module.combat.SelfTrapModule$Timing[] $values() -> jX
-    492:495:void <clinit>() -> <clinit>
+    487:487:net.shoreline.client.impl.module.combat.SelfTrapModule$Timing[] values() -> values
+    487:487:net.shoreline.client.impl.module.combat.SelfTrapModule$Timing valueOf(java.lang.String) -> valueOf
+    487:487:void <init>(java.lang.String,int) -> <init>
+    487:487:net.shoreline.client.impl.module.combat.SelfTrapModule$Timing[] $values() -> jX
+    487:490:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.SurroundModule -> net.shoreline.client.jH:
     net.shoreline.client.impl.module.combat.SurroundModule INSTANCE -> vu
     net.shoreline.client.api.config.Config timingConfig -> vm
@@ -4787,37 +4784,36 @@ net.shoreline.client.impl.module.combat.SurroundModule -> net.shoreline.client.j
     java.util.Map packets -> vw
     java.util.Map fadeList -> vx
     double prevY -> vh
-    54:77:void <init>() -> <init>
-    81:81:net.shoreline.client.impl.module.combat.SurroundModule getInstance() -> jY
-    87:92:void onEnable() -> aZ
-    97:101:void onDisable() -> ba
-    106:177:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
-    182:197:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    201:263:void handlePackets(net.minecraft.class_2596) -> d
-    267:276:void placeBlock(net.minecraft.class_2338,int) -> a
-    280:292:void attackBlockingCrystals(java.util.List) -> d
-    296:320:java.util.List getPlacementsFromSurround(java.util.List) -> e
-    325:359:java.util.List getSurround(net.minecraft.class_1657) -> e
-    364:364:java.util.List getSurroundNoDown(net.minecraft.class_1657) -> f
-    369:391:java.util.List getSurroundNoDown(net.minecraft.class_1657,float) -> a
-    396:406:java.util.List getPlayerBlocks(net.minecraft.class_1657) -> g
-    411:411:boolean invalidEntity(net.minecraft.class_1297) -> m
-    417:450:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    454:454:boolean isPlacing() -> iH
-    449:449:boolean lambda$onRenderWorld$4(java.util.Map$Entry) -> b
-    314:314:boolean lambda$getPlacementsFromSurround$3(net.minecraft.class_1297) -> D
-    283:283:boolean lambda$attackBlockingCrystals$2(net.minecraft.class_1297) -> E
-    269:273:void lambda$placeBlock$1(boolean,float[]) -> b
-    64:64:java.lang.Boolean lambda$new$0() -> hr
+    57:80:void <init>() -> <init>
+    84:84:net.shoreline.client.impl.module.combat.SurroundModule getInstance() -> jY
+    90:95:void onEnable() -> aZ
+    100:104:void onDisable() -> ba
+    109:180:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
+    185:200:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
+    204:261:void handlePackets(net.minecraft.class_2596) -> d
+    265:274:void placeBlock(net.minecraft.class_2338,int) -> a
+    278:290:void attackBlockingCrystals(java.util.List) -> d
+    294:317:java.util.List getPlacementsFromSurround(java.util.List) -> e
+    322:356:java.util.List getSurround(net.minecraft.class_1657) -> e
+    361:361:java.util.List getSurroundNoDown(net.minecraft.class_1657) -> f
+    366:388:java.util.List getSurroundNoDown(net.minecraft.class_1657,float) -> a
+    393:403:java.util.List getPlayerBlocks(net.minecraft.class_1657) -> g
+    408:408:boolean invalidEntity(net.minecraft.class_1297) -> m
+    414:447:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
+    451:451:boolean isPlacing() -> iH
+    446:446:boolean lambda$onRenderWorld$3(java.util.Map$Entry) -> f
+    281:281:boolean lambda$attackBlockingCrystals$2(net.minecraft.class_1297) -> B
+    267:271:void lambda$placeBlock$1(boolean,float[]) -> b
+    67:67:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.combat.SurroundModule$Timing -> net.shoreline.client.jI:
     net.shoreline.client.impl.module.combat.SurroundModule$Timing VANILLA -> vy
     net.shoreline.client.impl.module.combat.SurroundModule$Timing SEQUENTIAL -> vz
     net.shoreline.client.impl.module.combat.SurroundModule$Timing[] $VALUES -> vA
-    457:457:net.shoreline.client.impl.module.combat.SurroundModule$Timing[] values() -> values
-    457:457:net.shoreline.client.impl.module.combat.SurroundModule$Timing valueOf(java.lang.String) -> valueOf
-    457:457:void <init>(java.lang.String,int) -> <init>
-    457:457:net.shoreline.client.impl.module.combat.SurroundModule$Timing[] $values() -> jZ
-    457:460:void <clinit>() -> <clinit>
+    454:454:net.shoreline.client.impl.module.combat.SurroundModule$Timing[] values() -> values
+    454:454:net.shoreline.client.impl.module.combat.SurroundModule$Timing valueOf(java.lang.String) -> valueOf
+    454:454:void <init>(java.lang.String,int) -> <init>
+    454:454:net.shoreline.client.impl.module.combat.SurroundModule$Timing[] $values() -> jZ
+    454:457:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.combat.TriggerModule -> net.shoreline.client.jJ:
     net.shoreline.client.api.config.Config modeConfig -> mH
     net.shoreline.client.api.config.Config attackSpeedConfig -> pI
@@ -5383,7 +5379,7 @@ net.shoreline.client.impl.module.misc.AutoMountModule -> net.shoreline.client.kI
     23:33:void <init>() -> <init>
     38:55:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     60:65:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    69:71:boolean checkMount(net.minecraft.class_1297) -> F
+    69:71:boolean checkMount(net.minecraft.class_1297) -> C
 net.shoreline.client.impl.module.misc.AutoReconnectModule -> net.shoreline.client.kJ:
     net.shoreline.client.api.config.Config delayConfig -> tB
     17:26:void <init>() -> <init>
@@ -5701,7 +5697,7 @@ net.shoreline.client.impl.module.movement.BoatFlyModule -> net.shoreline.client.
     79:148:void onPlayerTick(net.shoreline.client.impl.event.entity.player.TravelEvent) -> a
     153:178:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     182:184:boolean floatingCheck(net.minecraft.class_2833,net.minecraft.class_1297) -> a
-    189:189:boolean isEntityOnAir(net.minecraft.class_1297) -> G
+    189:189:boolean isEntityOnAir(net.minecraft.class_1297) -> D
     32:32:java.lang.Boolean lambda$new$1() -> be
     31:31:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.movement.BoatFlyModule$AntiKick -> net.shoreline.client.ls:
@@ -5888,7 +5884,7 @@ net.shoreline.client.impl.module.movement.FlightModule -> net.shoreline.client.l
     85:170:void onPlayerTick(net.shoreline.client.impl.event.network.PlayerTickEvent) -> d
     175:204:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     208:210:boolean floatingCheck(net.minecraft.class_2828) -> a
-    215:215:boolean isEntityOnAir(net.minecraft.class_1297) -> G
+    215:215:boolean isEntityOnAir(net.minecraft.class_1297) -> D
     220:222:void enableVanillaFly() -> lt
     226:232:void disableVanillaFly() -> lu
     36:36:java.lang.Boolean lambda$new$1() -> be
@@ -6092,7 +6088,7 @@ net.shoreline.client.impl.module.movement.SpeedModule -> net.shoreline.client.lV
     626:649:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     654:674:void onConfigUpdate(net.shoreline.client.impl.event.config.ConfigUpdateEvent) -> a
     678:678:boolean isBoxColliding() -> lM
-    683:683:boolean checkIsCollidingEntity(net.minecraft.class_1297) -> H
+    683:683:boolean checkIsCollidingEntity(net.minecraft.class_1297) -> E
     689:690:void setPrevTimer() -> lN
     694:694:boolean isUsingTimer() -> lO
     699:705:void resetStrafe() -> lP
@@ -6163,7 +6159,7 @@ net.shoreline.client.impl.module.movement.StepModule -> net.shoreline.client.lZ:
     137:143:void onStep(net.shoreline.client.impl.event.entity.StepEvent) -> a
     148:157:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent) -> a
     166:199:double[] getStepOffsets(double) -> n
-    204:204:boolean isAbstractHorse(net.minecraft.class_1297) -> I
+    204:204:boolean isAbstractHorse(net.minecraft.class_1297) -> F
     37:37:java.lang.Boolean lambda$new$1() -> be
     36:36:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.movement.StepModule$StepMode -> net.shoreline.client.ma:
@@ -6325,7 +6321,7 @@ net.shoreline.client.impl.module.render.BreadcrumbsModule -> net.shoreline.clien
     61:92:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerTickEvent) -> b
     97:101:void onEntityDeath(net.shoreline.client.impl.event.world.RemoveEntityEvent) -> b
     106:136:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    140:146:boolean checkEntity(net.minecraft.class_1297) -> J
+    140:146:boolean checkEntity(net.minecraft.class_1297) -> G
     39:39:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.render.BreadcrumbsModule$TimedPosition -> net.shoreline.client.ml:
     net.minecraft.class_243 pos -> EY
@@ -6447,8 +6443,8 @@ net.shoreline.client.impl.module.render.ESPModule -> net.shoreline.client.ms:
     69:94:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     99:107:void onEntityOutline(net.shoreline.client.impl.event.EntityOutlineEvent) -> a
     112:121:void onTeamColor(net.shoreline.client.impl.event.entity.decoration.TeamColorEvent) -> a
-    125:153:java.awt.Color getESPColor(net.minecraft.class_1297) -> K
-    158:167:boolean checkESP(net.minecraft.class_1297) -> L
+    125:153:java.awt.Color getESPColor(net.minecraft.class_1297) -> H
+    158:167:boolean checkESP(net.minecraft.class_1297) -> I
     53:53:java.lang.Boolean lambda$new$7() -> hO
     51:51:java.lang.Boolean lambda$new$6() -> hP
     49:49:java.lang.Boolean lambda$new$5() -> hQ
@@ -6602,7 +6598,7 @@ net.shoreline.client.impl.module.render.KillEffectsModule -> net.shoreline.clien
     64:78:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     82:101:void fireworkExplode(double,double,double,double,int) -> a
     105:117:void addExplosionParticle(double,double,double,double,double,double) -> d
-    121:122:boolean wasLastAttackedByPlayer(net.minecraft.class_1297) -> M
+    121:122:boolean wasLastAttackedByPlayer(net.minecraft.class_1297) -> J
     70:70:boolean lambda$onPacketInbound$1(java.util.Map$Entry) -> i
     27:27:java.lang.Boolean lambda$new$0() -> hr
 net.shoreline.client.impl.module.render.KillEffectsModule$KillEffect -> net.shoreline.client.mE:
@@ -6741,7 +6737,7 @@ net.shoreline.client.impl.module.render.NoRenderModule -> net.shoreline.client.m
     338:342:void onRenderToast(net.shoreline.client.impl.event.toast.RenderToastEvent) -> a
     347:351:void onRenderFireEntity(net.shoreline.client.impl.event.entity.RenderFireEntityEvent) -> a
     356:360:void onItemTick(net.shoreline.client.impl.event.entity.ItemTickEvent) -> a
-    364:364:boolean shouldSkipEntity(net.minecraft.class_1297) -> N
+    364:364:boolean shouldSkipEntity(net.minecraft.class_1297) -> K
 net.shoreline.client.impl.module.render.NoRenderModule$FogRender -> net.shoreline.client.mL:
     net.shoreline.client.impl.module.render.NoRenderModule$FogRender CLEAR -> Hj
     net.shoreline.client.impl.module.render.NoRenderModule$FogRender LIQUID_VISION -> Hk
@@ -6919,9 +6915,9 @@ net.shoreline.client.impl.module.render.ShadersModule -> net.shoreline.client.mU
     466:620:void onReloadShader(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> a
     625:633:void onEntityOutline(net.shoreline.client.impl.event.EntityOutlineEvent) -> a
     642:710:void loadShaderImage() -> mz
-    714:747:java.awt.Color getESPColor(net.minecraft.class_1297) -> K
+    714:747:java.awt.Color getESPColor(net.minecraft.class_1297) -> H
     752:764:java.awt.Color getStorageESPColor(net.minecraft.class_2586) -> a
-    769:778:boolean checkShaders(net.minecraft.class_1297) -> O
+    769:778:boolean checkShaders(net.minecraft.class_1297) -> L
     783:785:boolean checkStorageShaders(net.minecraft.class_2586) -> b
     614:617:void lambda$onReloadShader$46(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> c
     600:612:void lambda$onReloadShader$45(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> a
@@ -7058,8 +7054,8 @@ net.shoreline.client.impl.module.render.TracersModule -> net.shoreline.client.na
     net.shoreline.client.api.config.Config itemsColorConfig -> FG
     38:58:void <init>() -> <init>
     63:121:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    125:154:java.awt.Color getTracerColor(net.minecraft.class_1297) -> P
-    159:163:double getTargetY(net.minecraft.class_1297) -> Q
+    125:154:java.awt.Color getTracerColor(net.minecraft.class_1297) -> M
+    159:163:double getTargetY(net.minecraft.class_1297) -> N
     53:53:java.lang.Boolean lambda$new$6() -> hP
     51:51:java.lang.Boolean lambda$new$5() -> hQ
     49:49:java.lang.Boolean lambda$new$4() -> hR
@@ -7092,7 +7088,7 @@ net.shoreline.client.impl.module.render.TrajectoriesModule -> net.shoreline.clie
     41:180:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
     184:199:float getProjectilePower(net.minecraft.class_1792) -> d
     204:204:boolean isThrowableItem(net.minecraft.class_1792) -> e
-    211:211:boolean isThrowableEntity(net.minecraft.class_1297) -> R
+    211:211:boolean isThrowableEntity(net.minecraft.class_1297) -> O
 net.shoreline.client.impl.module.render.TrueSightModule -> net.shoreline.client.ne:
     net.shoreline.client.api.config.Config onlyPlayersConfig -> IZ
     17:22:void <init>() -> <init>
@@ -8660,13 +8656,13 @@ net.shoreline.client.util.collection.FirstOutQueue -> net.shoreline.client.qR:
     29:29:java.lang.Object delegate() -> delegate
 net.shoreline.client.util.entity.EntityUtil -> net.shoreline.client.qS:
     19:19:void <init>() -> <init>
-    28:28:net.minecraft.class_2338 getRoundedBlockPos(net.minecraft.class_1297) -> S
-    37:41:float getHealth(net.minecraft.class_1297) -> T
-    50:50:boolean isMonster(net.minecraft.class_1297) -> U
-    55:59:boolean isNeutralInternal(net.minecraft.class_1297) -> V
-    68:68:boolean isNeutral(net.minecraft.class_1297) -> W
-    77:77:boolean isPassive(net.minecraft.class_1297) -> X
-    82:82:boolean isVehicle(net.minecraft.class_1297) -> Y
+    28:28:net.minecraft.class_2338 getRoundedBlockPos(net.minecraft.class_1297) -> P
+    37:41:float getHealth(net.minecraft.class_1297) -> Q
+    50:50:boolean isMonster(net.minecraft.class_1297) -> R
+    55:59:boolean isNeutralInternal(net.minecraft.class_1297) -> S
+    68:68:boolean isNeutral(net.minecraft.class_1297) -> T
+    77:77:boolean isPassive(net.minecraft.class_1297) -> U
+    82:82:boolean isVehicle(net.minecraft.class_1297) -> V
 net.shoreline.client.util.entity.FakePlayerEntity -> net.shoreline.client.qT:
     java.util.concurrent.atomic.AtomicInteger CURRENT_ID -> Nq
     net.minecraft.class_1657 player -> Nr
@@ -8820,8 +8816,8 @@ net.shoreline.client.util.player.RayCastUtil -> net.shoreline.client.rn:
     29:34:net.minecraft.class_239 raycastEntity(double) -> t
     39:41:net.minecraft.class_239 rayCast(double,float[]) -> a
     47:55:net.minecraft.class_239 rayCast(double,net.minecraft.class_243,float[]) -> b
-    34:34:boolean lambda$raycastEntity$1(net.minecraft.class_1297) -> Z
-    24:24:boolean lambda$raycastEntity$0(net.minecraft.class_1297) -> aa
+    34:34:boolean lambda$raycastEntity$1(net.minecraft.class_1297) -> W
+    24:24:boolean lambda$raycastEntity$0(net.minecraft.class_1297) -> X
 net.shoreline.client.util.player.RotationUtil -> net.shoreline.client.ro:
     11:11:void <init>() -> <init>
     20:27:float[] getRotationsTo(net.minecraft.class_243,net.minecraft.class_243) -> b
