@@ -55,6 +55,8 @@ public class SurroundModule extends ObsidianPlacerModule
     private static SurroundModule INSTANCE;
 
     Config<Timing> timingConfig = register(new EnumConfig<>("Timing", "Timing for replacing blocks", Timing.VANILLA, Timing.values()));
+    Config<Boolean> prePlaceExplosionConfig = register(new BooleanConfig("PrePlace-Explosions", "Pre places before explosions", false, () -> timingConfig.getValue() == Timing.SEQUENTIAL));
+    Config<Boolean> prePlaceTickConfig = register(new BooleanConfig("PrePlace-Tick", "Pre places before ticks", false, () -> timingConfig.getValue() == Timing.SEQUENTIAL));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true));
@@ -201,6 +203,11 @@ public class SurroundModule extends ObsidianPlacerModule
 
     private void handlePackets(Packet<?> serverPacket)
     {
+        if (timingConfig.getValue() != Timing.SEQUENTIAL)
+        {
+            return;
+        }
+
         if (serverPacket instanceof BlockUpdateS2CPacket packet)
         {
             final BlockState blockState = packet.getState();
@@ -223,39 +230,37 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (timingConfig.getValue() == Timing.SEQUENTIAL)
+        if (serverPacket instanceof ExplosionS2CPacket packet && prePlaceExplosionConfig.getValue())
         {
-            if (serverPacket instanceof ExplosionS2CPacket packet)
+            BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
+            if (surround.contains(pos))
             {
-                BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
-                if (surround.contains(pos))
+                final int slot = getResistantBlockItem();
+                if (slot == -1)
                 {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(pos, slot);
+                    return;
                 }
+                placeBlock(pos, slot);
             }
+        }
 
-            if (serverPacket instanceof EntitySpawnS2CPacket packet && packet.getEntityType().equals(EntityType.END_CRYSTAL))
+        if (serverPacket instanceof EntitySpawnS2CPacket packet
+                && packet.getEntityType().equals(EntityType.END_CRYSTAL) && prePlaceTickConfig.getValue())
+        {
+            for (BlockPos pos : surround)
             {
-                for (BlockPos pos : surround)
+                if (!pos.equals(BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ())))
                 {
-                    if (!pos.equals(BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ())))
-                    {
-                        continue;
-                    }
-
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    placeBlock(pos, slot);
-                    break;
+                    continue;
                 }
+
+                final int slot = getResistantBlockItem();
+                if (slot == -1)
+                {
+                    return;
+                }
+                placeBlock(pos, slot);
+                break;
             }
         }
     }
