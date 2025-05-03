@@ -449,13 +449,7 @@ public class ElytraFlyModule extends RotationModule
 
     private boolean canSprint()
     {
-        if (AnticheatModule.getInstance().getWebJumpFix() && PlayerUtil.inWeb(1.0))
-        {
-            return false;
-        }
-        return MovementUtil.isInputtingMovement()
-                && !mc.player.isSneaking()
-                && !mc.player.isRiding()
+        return !mc.player.isSneaking() && !mc.player.isRiding()
                 && !mc.player.isFallFlying()
                 && !mc.player.isTouchingWater()
                 && !mc.player.isInLava()
