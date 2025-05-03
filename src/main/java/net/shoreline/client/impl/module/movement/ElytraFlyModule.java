@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.movement;
 import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.GoalBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.item.FireworkRocketItem;
 import net.minecraft.item.ItemStack;
@@ -29,10 +30,12 @@ import net.shoreline.client.impl.event.entity.player.TravelEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.module.RotationModule;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.mixin.accessor.AccessorFireworkRocketEntity;
 import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.player.MovementUtil;
+import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -194,7 +197,10 @@ public class ElytraFlyModule extends RotationModule
         }
         else if (modeConfig.getValue() == FlyMode.BOUNCE)
         {
-            mc.player.setSprinting(true);
+            if (canSprint())
+            {
+                mc.player.setSprinting(true);
+            }
             mc.player.setPitch(pitchConfig.getValue());
             setRotation(mc.player.getYaw(), pitchConfig.getValue());
         }
@@ -439,6 +445,23 @@ public class ElytraFlyModule extends RotationModule
             }
         }
         return false;
+    }
+
+    private boolean canSprint()
+    {
+        if (AnticheatModule.getInstance().getWebJumpFix() && PlayerUtil.inWeb(1.0))
+        {
+            return false;
+        }
+        return MovementUtil.isInputtingMovement()
+                && !mc.player.isSneaking()
+                && !mc.player.isRiding()
+                && !mc.player.isFallFlying()
+                && !mc.player.isTouchingWater()
+                && !mc.player.isInLava()
+                && !mc.player.isHoldingOntoLadder()
+                && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
+                && mc.player.getHungerManager().getFoodLevel() > 6.0F;
     }
 
     public boolean isBounce()
