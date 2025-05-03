@@ -213,7 +213,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
             boolean serverCrawling = invalid.stream().allMatch(e -> Managers.HITBOX.isServerCrawling(e)
                     && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox));
-            if (!mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()) && (!serverCrawling || !serverHitboxConfig.getValue()))
+            if (!mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()) || !(serverCrawling && serverHitboxConfig.getValue()))
             {
                 continue;
             }
