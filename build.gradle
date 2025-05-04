@@ -12,14 +12,14 @@ repositories {
 }
 
 dependencies {
-    implementation "io.javalin:javalin:6.1.4"
-    implementation "org.slf4j:slf4j-simple:2.0.12"
-    implementation 'com.mysql:mysql-connector-j:8.4.0'
+    implementation "io.javalin:javalin:6.3.0"
+    implementation 'com.mysql:mysql-connector-j:9.1.0'
     implementation 'com.zaxxer:HikariCP:5.1.0'
     implementation 'org.ow2.asm:asm:9.7'
     implementation 'org.ow2.asm:asm-tree:9.7'
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'ch.qos.logback:logback-classic:1.5.6'
+    implementation 'net.dv8tion:JDA:5.1.0'
 }
 
 application {

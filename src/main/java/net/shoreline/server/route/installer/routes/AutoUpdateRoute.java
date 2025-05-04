@@ -6,7 +6,17 @@ import io.javalin.http.NotFoundResponse;
 import net.shoreline.server.ServerMain;
 import net.shoreline.server.route.Route;
 
-public final class NativesRoute extends Route
+/**
+ * Throws:
+ *   NotFoundResponse (404) ->
+ *      1) If the user agent doesn't match
+ *   UnauthorizedResponse (401) ->
+ *      1) If the user doesn't have an active session (aka, they accessed this route without logging in)
+ *   InternalServerErrorResponse (500) ->
+ *      1) If something went wrong here
+ */
+
+public final class AutoUpdateRoute extends Route
 {
     @Override
     public void doHandle(Context context) throws Exception
@@ -18,24 +28,14 @@ public final class NativesRoute extends Route
             throw new NotFoundResponse();
         }
 
-        String libType = context.header("Library-Type");
-
-        if (!"dll".equals(libType) && !"dylib".equals(libType) && !"so".equals(libType))
-        {
-            throw new NotFoundResponse();
-        }
-
-        String path = String.format(
-                "/home/container/assets/installer/natives/shoreline_installer.%s",
-                libType
-        );
+        String path = "/home/container/assets/installer/shoreline-installer.jar";
 
         try
         {
             sendFile(context, path);
         } catch (Throwable t)
         {
-            ServerMain.LOGGER.error("Couldn't send {} : ", path, t);
+            ServerMain.LOGGER.error("Couldn't read or send {}", path);
             throw new InternalServerErrorResponse();
         }
     }

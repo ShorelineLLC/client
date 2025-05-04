@@ -54,6 +54,7 @@ public final class CPacketCloak extends ClientPacket
                 if (this.session.getUsertype().equals("beta"))
                 {
                     server.sendServerMessage("You do not have permission to mask as \u00a7cdev\u00a7r.", this.session);
+                    return;
                 }
 
                 code = "c";

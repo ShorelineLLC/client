@@ -21,6 +21,8 @@ import java.sql.SQLException;
  *      1) If the user/password is wrong
  *   ForbiddenResponse (403) ->
  *      1) If the hardware ID sent from the client does not match
+ *   NotAcceptableResponse (406) ->
+ *      1) If the user is banned
  *   InternalServerErrorResponse (500) -> Some internal error happened
  */
 public final class LoginRoute extends Route
@@ -76,7 +78,8 @@ public final class LoginRoute extends Route
             int id;
             String uid;
             String usertype;
-            String findUser = "SELECT id, uid, usertype FROM users WHERE username = ? AND user_password = ?";
+            int banned;
+            String findUser = "SELECT id, uid, usertype, banned FROM users WHERE username = ? AND user_password = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(findUser))
             {
                 preparedStatement.setString(1, username);
@@ -88,6 +91,7 @@ public final class LoginRoute extends Route
                         id = resultSet.getInt("id");
                         uid = resultSet.getString("uid");
                         usertype = resultSet.getString("usertype");
+                        banned = resultSet.getInt("banned");
                     } else
                     {
                         throw new UnauthorizedResponse();
@@ -111,6 +115,12 @@ public final class LoginRoute extends Route
 
                 ServerMain.LOGGER.error("Failed to prepare statement: ", t);
                 throw new InternalServerErrorResponse();
+            }
+
+            if (banned == 1)
+            {
+                ServerMain.LOGGER.info("Blocking {} from opening the installer because they are banned", username);
+                throw new NotAcceptableResponse();
             }
 
             String matchHwid = "SELECT hwid FROM hwids WHERE user_id = ?";
@@ -195,6 +205,7 @@ public final class LoginRoute extends Route
                         throw new ForbiddenResponse();
                     }
 
+                    context.sessionAttribute("Username", username);
                     context.sessionAttribute("User-Type", usertype); // Validate the session for the user
 
                     LoginResponse loginResponse = new LoginResponse(uid, usertype);

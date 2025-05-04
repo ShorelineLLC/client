@@ -20,6 +20,7 @@ public final class CommandManager
         registeredCommands.add(new ResetClassCacheCommand());
         registeredCommands.add(new ResetHWIDCommand());
         registeredCommands.add(new SafeStopCommand());
+        registeredCommands.add(new SendIRCMessageCommand());
         registeredCommands.add(new SetHWIDCountCommand());
     }
 
@@ -58,6 +59,7 @@ public final class CommandManager
             case "resetclasscache" -> new ResetClassCacheCommand();
             case "resethwid" -> new ResetHWIDCommand();
             case "safestop" -> new SafeStopCommand();
+            case "sendircmessage" -> new SendIRCMessageCommand();
             case "sethwidcount" -> new SetHWIDCountCommand();
             default -> null;
         };

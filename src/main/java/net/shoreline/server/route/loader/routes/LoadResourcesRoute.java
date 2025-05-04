@@ -36,6 +36,7 @@ public final class LoadResourcesRoute extends Route
     static int RESOURCE = 1 << 4; // It's a resource file
     static int REFMAP = 1 << 5; // The mixin refmap
     static int ACCESS_WIDENER = 1 << 6; // The access widener
+    static int KEYS_FILE = 1 << 7; // Decryption keys
 
     @Override
     public void doHandle(Context context) throws Exception
@@ -244,19 +245,17 @@ public final class LoadResourcesRoute extends Route
             entryName = entryName.replace(".class", "," + flags);
         } else
         {
-            if (entryName.equals("shoreline-refmap.json"))
+            flags = switch (entryName)
             {
-                flags = REFMAP;
-            } else if (entryName.equals("shoreline.accesswidener"))
-            {
-                flags = ACCESS_WIDENER;
-            } else
-            {
-                flags = RESOURCE;
-            }
+                case "shoreline-refmap.json" -> REFMAP;
+                case "shoreline.accesswidener" -> ACCESS_WIDENER;
+                case "keys.txt" -> KEYS_FILE;
+                default -> RESOURCE;
+            };
 
-            entryName = entryName + "," + flags;
+            entryName += "," + flags;
         }
+
         content = Encryption.encryptReversible(content);
 
         return new TransformedJarEntry(new JarEntry(entryName), content);

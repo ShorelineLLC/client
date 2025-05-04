@@ -13,9 +13,10 @@ public final class InstallerEndpoint implements EndpointGroup
         ApiBuilder.post("logout", new LogoutRoute());
 
         ApiBuilder.get("install", new InstallRoute());
-        ApiBuilder.get("natives", new NativesRoute());
         ApiBuilder.get("fabric", new FabricRoute());
         ApiBuilder.get("baritone", new BaritoneRoute());
-        ApiBuilder.get("vulture", new VultureRoute());
+        ApiBuilder.get("versioncheck", new VersionCheckRoute());
+        ApiBuilder.get("update", new AutoUpdateRoute());
+        ApiBuilder.get("link", new LinkDiscordRoute());
     }
 }

@@ -16,9 +16,9 @@ public final class LoaderEndpoint implements EndpointGroup
     public static ClassCache BETA_CLASS_CACHE;
     public static ClassCache DEV_CLASS_CACHE;
 
-    public static TokenManager DEV_TOKEN_MANAGER = new TokenManager(500L);
-    public static TokenManager BETA_TOKEN_MANAGER = new TokenManager(500L);
-    public static TokenManager RELEASE_TOKEN_MANAGER = new TokenManager(500L);
+    public static TokenManager DEV_TOKEN_MANAGER = new TokenManager(5000L);
+    public static TokenManager BETA_TOKEN_MANAGER = new TokenManager(5000L);
+    public static TokenManager RELEASE_TOKEN_MANAGER = new TokenManager(5000L);
 
     public static TokenManager IRC_TOKEN_MANAGER = new TokenManager(300000L);
 
@@ -44,13 +44,7 @@ public final class LoaderEndpoint implements EndpointGroup
     public void addEndpoints()
     {
         ApiBuilder.post("login", new LoginRoute());
-
         ApiBuilder.get("natives", new NativesRoute());
-        ApiBuilder.get("auth", new AuthRoute());
-        ApiBuilder.get("version", new VersionRoute());
-        ApiBuilder.get("integrity", new IntegrityRoute());
-        ApiBuilder.get("download", new DownloadRoute());
-
         ApiBuilder.get("versioncheck", new VersionCheckRoute());
         ApiBuilder.get("update", new AutoUpdateRoute());
         ApiBuilder.get("gentoken", new GenTokenRoute());

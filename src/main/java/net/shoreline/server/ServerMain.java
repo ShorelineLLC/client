@@ -4,6 +4,7 @@ import io.javalin.Javalin;
 import io.javalin.http.NotFoundResponse;
 import net.shoreline.server.command.CommandManager;
 import net.shoreline.server.database.Database;
+import net.shoreline.server.discord.DiscordBot;
 import net.shoreline.server.route.frontend.FrontendEndpoint;
 import net.shoreline.server.route.installer.InstallerEndpoint;
 import net.shoreline.server.route.irc.IRCEndpoint;
@@ -67,6 +68,17 @@ public final class ServerMain
         {
             throw new NotFoundResponse();
         });
+
+        LOGGER.info("Launching discord bot...");
+        try
+        {
+            DiscordBot.loadBot();
+        } catch (Throwable t)
+        {
+            LOGGER.error("Failed to load the discord bot: ", t);
+            throw new RuntimeException(t);
+        }
+        LOGGER.info("Bot launched");
 
         CommandManager.startListening();
     }

@@ -105,7 +105,7 @@ public final class IRCServer
 
             ws.send(packet.fullySerialize());
 
-            ServerMain.LOGGER.info("Successfully {} {} to the network", backup ? "re-connected" : "connected" ,session.getUsername());
+            ServerMain.LOGGER.info("Successfully {} {} to the online users network", backup ? "re-connected" : "connected" ,session.getUsername());
         };
     }
 
@@ -201,7 +201,7 @@ public final class IRCServer
             if (session != null)
             {
                 this.sessionMap.remove(session);
-                ServerMain.LOGGER.info("{} disconnected from the network", session.getUsername());
+                ServerMain.LOGGER.info("{} disconnected from the online users network", session.getUsername());
             } else
             {
                 ServerMain.LOGGER.info("Blocked a user from entering the IRC because the token was expired");

@@ -2,6 +2,7 @@ package net.shoreline.server.route.loader.classcache;
 
 import net.shoreline.server.ServerMain;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
@@ -218,6 +219,34 @@ public final class ClassCache
                         if (indy.desc.contains("net/shoreline/client"))
                         {
                             Type methodType = Type.getMethodType(indy.desc);
+                            String returnTypeName = methodType.getReturnType().getInternalName();
+                            if (returnTypeName.contains("net/shoreline/client"))
+                            {
+                                cacheClasses.add(returnTypeName);
+                                cacheClasses.addAll(allSubClassesOf(returnTypeName));
+                            }
+
+                            for (Type argumentType : methodType.getArgumentTypes())
+                            {
+                                if (argumentType.getInternalName().contains("net/shoreline/client"))
+                                {
+                                    cacheClasses.add(argumentType.getInternalName());
+                                    cacheClasses.addAll(allSubClassesOf(argumentType.getInternalName()));
+                                }
+                            }
+                        }
+
+                        Handle bsm = indy.bsm;
+
+                        if (bsm.getOwner().contains("net/shoreline/client"))
+                        {
+                            cacheClasses.add(bsm.getOwner());
+                            cacheClasses.addAll(allSubClassesOf(bsm.getOwner()));
+                        }
+
+                        if (bsm.getDesc().contains("net/shoreline/client"))
+                        {
+                            Type methodType = Type.getMethodType(bsm.getDesc());
                             String returnTypeName = methodType.getReturnType().getInternalName();
                             if (returnTypeName.contains("net/shoreline/client"))
                             {

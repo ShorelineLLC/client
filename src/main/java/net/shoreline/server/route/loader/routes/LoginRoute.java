@@ -13,6 +13,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Throws:
+ *   NotFoundResponse (404) ->
+ *      1) If the user agent doesn't match
+ *      2) If the request body is malformed
+ *   UnauthorizedResponse (401) ->
+ *      1) If the user/password is wrong
+ *   ForbiddenResponse (403) ->
+ *      1) If the hardware ID sent from the client does not match
+ *   NotAcceptableResponse (406) ->
+ *      1) If the user is banned
+ *   InternalServerErrorResponse (500) -> Some internal error happened
+ */
 public final class LoginRoute extends Route
 {
     @Override
@@ -66,7 +79,8 @@ public final class LoginRoute extends Route
             int id;
             String uid;
             String usertype;
-            String findUser = "SELECT id, uid, usertype FROM users WHERE username = ? AND user_password = ?";
+            int banned;
+            String findUser = "SELECT id, uid, usertype, banned FROM users WHERE username = ? AND user_password = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(findUser))
             {
                 preparedStatement.setString(1, username);
@@ -78,6 +92,7 @@ public final class LoginRoute extends Route
                         id = resultSet.getInt("id");
                         uid = resultSet.getString("uid");
                         usertype = resultSet.getString("usertype");
+                        banned = resultSet.getInt("banned");
                     } else
                     {
                         throw new UnauthorizedResponse();
@@ -103,6 +118,12 @@ public final class LoginRoute extends Route
                 throw new InternalServerErrorResponse();
             }
 
+            if (banned == 1)
+            {
+                ServerMain.LOGGER.info("Blocking {} from launching because they are banned", username);
+                throw new NotAcceptableResponse();
+            }
+
             String matchHwid = "SELECT hwid FROM hwids WHERE user_id = ?";
             String hwidCountSql = "SELECT COUNT(*) as hwid_count FROM hwids WHERE user_id = ?";
             String maxHwidSql = "SELECT max_hwids FROM users WHERE id = ?";
@@ -125,7 +146,8 @@ public final class LoginRoute extends Route
                         hwidCount = countResultSet.getInt("hwid_count");
                     } else
                     {
-                        throw new UnauthorizedResponse();
+                        ServerMain.LOGGER.error("Severe error: could not read hwid_count column while {} was launching", username);
+                        throw new InternalServerErrorResponse();
                     }
                 }
 
@@ -136,7 +158,8 @@ public final class LoginRoute extends Route
                         maxHwids = maxHwidResultSet.getInt("max_hwids");
                     } else
                     {
-                        throw new UnauthorizedResponse();
+                        ServerMain.LOGGER.error("Severe error: could not read max_hwids column while {} was launching", username);
+                        throw new InternalServerErrorResponse();
                     }
                 }
 
@@ -182,6 +205,7 @@ public final class LoginRoute extends Route
 
                     if (!matchFound)
                     {
+                        ServerMain.LOGGER.info("Blocking {} from launching because of an invalid hardware ID", username);
                         throw new ForbiddenResponse();
                     }
 
@@ -213,6 +237,8 @@ public final class LoginRoute extends Route
 
                     context.header("Content-Type", "application/json");
                     context.result(jsonResponse);
+
+                    ServerMain.LOGGER.info("{} has just launched Shoreline", username);
                 } catch (Throwable t)
                 {
                     if (t instanceof HttpResponseException)
