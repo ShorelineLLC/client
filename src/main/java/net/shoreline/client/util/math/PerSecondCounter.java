@@ -16,7 +16,7 @@ public class PerSecondCounter
         long time = System.currentTimeMillis();
         try
         {
-            while (!counter.isEmpty() && counter.peek() < time)
+            while (!counter.isEmpty() && counter.peek() != null && counter.peek() < time)
             {
                 counter.remove();
             }

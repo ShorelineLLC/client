@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
@@ -240,6 +241,7 @@ public class AutoMineModule extends CombatModule
             if (instantMine.getBlockDamage() >= speedConfig.getValue())
             {
                 boolean canMine = canMine(instantMine.getState());
+                boolean canPlace = mc.world.canPlace(instantMine.getState(), instantMine.getPos(), ShapeContext.absent());
                 if (canMine)
                 {
                     instantMine.markAttemptedMine();
@@ -264,7 +266,7 @@ public class AutoMineModule extends CombatModule
 
                 boolean passedRemine = remineConfig.getValue() == RemineMode.INSTANT || remineTimer.passed(500);
                 if (instantMine != null && (remineConfig.getValue() == RemineMode.INSTANT
-                        && packetInstantConfig.getValue() && packetMine == null || canMine && passedRemine)
+                        && packetInstantConfig.getValue() && packetMine == null && canPlace || canMine && passedRemine)
                         && (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF))
                 {
                     stopMining(instantMine);
@@ -483,33 +485,11 @@ public class AutoMineModule extends CombatModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && canMine(packet.getState()))
         {
-            if (canMine(packet.getState()))
+            if (antiCrawlOverride && packet.getPos().equals(getAntiCrawlPos(playerTarget)))
             {
-                if (antiCrawlOverride && packet.getPos().equals(getAntiCrawlPos(playerTarget)))
-                {
-                    antiCrawlTicks = 10;
-                }
-            }
-
-            else
-            {
-                if (packetMine != null && packetMine.getPos().equals(packet.getPos()))
-                {
-                    packetMineAnim.animation.setState(false);
-                    if (packetSwapBack)
-                    {
-                        Managers.INVENTORY.syncToClient();
-                        packetSwapBack = false;
-                    }
-                    packetMine = null;
-                    waitForPacketMine = false;
-                    if (!isInstantMineComplete())
-                    {
-                        waitForPacketMine = true;
-                    }
-                }
+                antiCrawlTicks = 10;
             }
         }
     }
