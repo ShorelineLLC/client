@@ -26,6 +26,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -103,11 +104,13 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             return;
         }
 
-        surround = getCrawlTrap(target);
-        if (surround.isEmpty())
+        BlockPos targetPos = EntityUtil.getRoundedBlockPos(target);
+        surround = getCrawlTrap(target, targetPos);
+        if (!canCrawlTrap(target, targetPos) || surround.isEmpty())
         {
             return;
         }
+
         placements = getPlacementsFromTrap(surround);
         if (placements.isEmpty())
         {
@@ -120,10 +123,10 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             {
                 break;
             }
-            BlockPos targetPos = placements.get(blocksPlaced);
+            BlockPos targetPlacePos = placements.get(blocksPlaced);
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            placeBlock(targetPos, slot);
+            placeBlock(targetPlacePos, slot);
         }
 
         if (rotateConfig.getValue())
@@ -223,13 +226,13 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         return placements;
     }
 
-    public List<BlockPos> getCrawlTrap(PlayerEntity entity)
+    public List<BlockPos> getCrawlTrap(PlayerEntity entity, BlockPos playerPos)
     {
         final List<BlockPos> crawlTrap = new ArrayList<>();
-        crawlTrap.add(entity.getBlockPos().up());
+        crawlTrap.add(playerPos.up());
         if (downConfig.getValue())
         {
-            crawlTrap.add(entity.getBlockPos().down());
+            crawlTrap.add(playerPos.down());
         }
 
         double x = entity.getX();
@@ -292,6 +295,11 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
 
         fadeList.entrySet().removeIf(e ->
                 e.getValue().getFactor() == 0.0);
+    }
+
+    private boolean canCrawlTrap(PlayerEntity player, BlockPos playerPos)
+    {
+        return player.isOnGround() || !mc.world.getBlockState(playerPos.up()).isReplaceable() || !mc.world.getBlockState(playerPos.up(2)).isReplaceable();
     }
 
     public boolean isPlacing()
