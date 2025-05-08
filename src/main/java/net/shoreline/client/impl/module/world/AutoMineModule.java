@@ -85,6 +85,7 @@ public class AutoMineModule extends CombatModule
 
     private boolean changedInstantMine;
     private boolean waitForPacketMine;
+    private boolean packetMineStuck;
 
     private boolean antiCrawlOverride;
     private int antiCrawlTicks;
@@ -136,6 +137,7 @@ public class AutoMineModule extends CombatModule
         manualOverride = false;
         antiCrawlOverride = false;
         waitForPacketMine = false;
+        packetMineStuck = false;
         if (packetSwapBack)
         {
             Managers.INVENTORY.syncToClient();
@@ -173,6 +175,7 @@ public class AutoMineModule extends CombatModule
         // Mining packet handling
         if (packetMine != null && packetMine.getTicksMining() > mineTicksConfig.getValue())
         {
+            packetMineStuck = true;
             packetMineAnim.animation.setState(false);
             if (packetSwapBack)
             {
@@ -193,11 +196,16 @@ public class AutoMineModule extends CombatModule
             packetMine.addBlockDamage(damageDelta);
 
             int slot = packetMine.getBestSlot();
-            float damageDone = packetMine.getBlockDamage() + (swapBeforeConfig.getValue() ? damageDelta : 0.0f);
+            float damageDone = packetMine.getBlockDamage() + (swapBeforeConfig.getValue()
+                    || packetMineStuck ? damageDelta : 0.0f);
             if (damageDone >= 1.0f && slot != -1  && !checkMultitask())
             {
                 Managers.INVENTORY.setSlot(slot);
                 packetSwapBack = true;
+                if (packetMineStuck)
+                {
+                    packetMineStuck = false;
+                }
             }
         }
 
