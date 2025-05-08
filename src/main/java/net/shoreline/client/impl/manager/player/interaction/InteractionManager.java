@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.manager.player.interaction;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -12,6 +13,7 @@ import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.Globals;
+import net.shoreline.client.util.chat.ChatUtil;
 import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.SneakBlocks;
@@ -279,6 +281,13 @@ public final class InteractionManager implements Globals
             {
                 continue;
             }
+
+            if (state.getBlock() == Blocks.ANVIL || state.getBlock() == Blocks.CHIPPED_ANVIL
+                    || state.getBlock() == Blocks.DAMAGED_ANVIL)
+            {
+                continue;
+            }
+
             if (strictDirection && !validDirections.contains(direction.getOpposite()))
             {
                 continue;
