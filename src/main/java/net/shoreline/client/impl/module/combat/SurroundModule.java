@@ -4,11 +4,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
@@ -33,6 +30,7 @@ import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
+import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.module.world.AutoMineModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.math.position.PositionUtil;
@@ -58,6 +56,7 @@ public class SurroundModule extends ObsidianPlacerModule
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true));
+    Config<Boolean> headConfig = register(new BooleanConfig("CoverHead", "Place a block at your head", false));
     Config<Boolean> mineExtendConfig = register(new BooleanConfig("MineExtend", "Extends surround if the block is being mined", false));
     Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the surround if there is none", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
@@ -153,6 +152,10 @@ public class SurroundModule extends ObsidianPlacerModule
         {
             for (BlockPos block : new ArrayList<>(placements))
             {
+                if (block.getY() > mc.player.getBlockY() + 1.0)
+                {
+                    continue;
+                }
                 Direction direction = Managers.INTERACT.getInteractDirectionInternal(block, strictDirectionConfig.getValue());
                 if (direction == null)
                 {
@@ -360,6 +363,11 @@ public class SurroundModule extends ObsidianPlacerModule
                     surroundBlocks.add(blockerPos);
                 }
             }
+        }
+
+        if (AirPlaceModule.getInstance().isEnabled() && headConfig.getValue())
+        {
+            surroundBlocks.add(mc.player.getBlockPos().up(2));
         }
         return surroundBlocks;
     }
