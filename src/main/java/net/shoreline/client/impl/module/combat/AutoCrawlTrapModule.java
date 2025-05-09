@@ -204,7 +204,15 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            if (!mc.world.getBlockState(surroundPos).isReplaceable())
+
+            final Box surroundBox = new Box(surroundPos);
+            List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
+            boolean serverCrawling = invalid.stream().allMatch(e -> Managers.HITBOX.isServerCrawling(e)
+                    && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox));
+
+            if (!mc.world.getBlockState(surroundPos).isReplaceable()
+                    && !(serverCrawling && serverHitboxConfig.getValue())
+                    && !(Managers.BLOCK.isPassed(surroundPos, 0.7f) && mineIgnoreConfig.getValue()))
             {
                 continue;
             }
@@ -213,14 +221,8 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            final Box surroundBox = new Box(surroundPos);
-            List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
-            boolean serverCrawling = invalid.stream().allMatch(e -> Managers.HITBOX.isServerCrawling(e)
-                    && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox));
 
-            if (mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent())
-                    || (serverCrawling && serverHitboxConfig.getValue())
-                    || (Managers.BLOCK.isPassed(surroundPos, 0.7f) && mineIgnoreConfig.getValue()))
+            if (mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()))
             {
                 placements.add(surroundPos);
             }
