@@ -59,6 +59,7 @@ public final class ModuleManager
                 new BowAimModule(),
                 new ClickCrystalModule(),
                 new CriticalsModule(),
+                new CrystalBasePlaceModule(),
                 new HoleFillModule(),
                 new KeepSprintModule(),
                 new NoHitDelayModule(),
