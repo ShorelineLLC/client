@@ -35,7 +35,7 @@ import net.shoreline.eventbus.event.StageEvent;
  */
 public final class AirPlaceModule extends ToggleModule
 {
-    public static AirPlaceModule INSTANCE;
+    private static AirPlaceModule INSTANCE;
 
     Config<Boolean> manualConfig = register(new BooleanConfig("Click", "Allow manual air place", true));
     Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Place on air on grim", false));

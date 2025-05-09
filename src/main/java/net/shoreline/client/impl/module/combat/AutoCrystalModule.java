@@ -126,8 +126,9 @@ public class AutoCrystalModule extends CombatModule
     Config<Boolean> breakValidConfig = register(new BooleanConfig("Strict", "Only places crystals that can be attacked", false, () -> placeConfig.getValue()));
     Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
     Config<Placements> placementsConfig = register(new EnumConfig<>("Placements", "Version standard for placing end crystals", Placements.NATIVE, Placements.values(), () -> placeConfig.getValue()));
-    Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider attacking or placing an end crystal", 1.0f, 4.0f, 10.0f));
     // Damage settings
+    Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider attacking or placing an end crystal", 1.0f, 4.0f, 10.0f));
+    Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
     Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
     Config<Boolean> armorBreakerConfig = register(new BooleanConfig("ArmorBreaker", "Attempts to break enemy armor with crystals", true));
     Config<Float> armorScaleConfig = register(new NumberConfig<>("ArmorScale", "Armor damage scale before attempting to break enemy armor with crystals", 1.0f, 5.0f, 20.0f, NumberDisplay.PERCENT, () -> armorBreakerConfig.getValue()));
@@ -136,7 +137,6 @@ public class AutoCrystalModule extends CombatModule
     Config<Boolean> lethalDamageConfig = register(new BooleanConfig("Lethal-DamageTick", "Places lethal crystals only on ticks where they damage entities", false));
     Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when attacking and placing crystals", true));
     Config<Boolean> safetyOverride = register(new BooleanConfig("SafetyOverride", "Overrides the safety checks if the crystal will kill an enemy", false));
-    Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
     Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
     Config<Boolean> selfExtrapolateConfig = register(new BooleanConfig("SelfExtrapolate", "Accounts for motion when calculating self damage", false));
     Config<Integer> extrapolateTicksConfig = register(new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10));
@@ -278,7 +278,7 @@ public class AutoCrystalModule extends CombatModule
         }
         renderPos = null;
         ArrayList<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-        List<BlockPos> blocks = getSphere(mc.player.getPos());
+        List<BlockPos> blocks = getSphere(placeRangeEyeConfig.getValue() ? mc.player.getEyePos() : mc.player.getPos());
         long timePre = System.nanoTime();
         if (placeConfig.getValue())
         {

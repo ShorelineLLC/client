@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.module.combat.SurroundModule;
@@ -14,6 +15,8 @@ import java.util.*;
  */
 public class ObsidianPlacerModule extends BlockPlacerModule
 {
+    protected static final BlockState DEFAULT_OBSIDIAN_STATE = Blocks.OBSIDIAN.getDefaultState();
+    // Blocks that can prevent explosion damage
     private static final List<Block> RESISTANT_BLOCKS = new LinkedList<>()
     {{
         add(Blocks.OBSIDIAN);

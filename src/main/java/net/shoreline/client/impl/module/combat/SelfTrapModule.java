@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -45,7 +44,6 @@ import net.shoreline.eventbus.annotation.EventListener;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Shoreline
@@ -216,7 +214,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             final BlockPos targetPos = packet.getPos();
             if (surround.contains(targetPos))
             {
-                if (blockState.isReplaceable() && mc.world.canPlace(blockState, targetPos, ShapeContext.absent()))
+                if (blockState.isReplaceable() && mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, targetPos, ShapeContext.absent()))
                 {
                     final int slot = getResistantBlockItem();
                     if (slot == -1)
@@ -320,7 +318,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            if (mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()))
+            if (mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, surroundPos, ShapeContext.absent()))
             {
                 placements.add(surroundPos);
             }
@@ -447,11 +445,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             playerBlocks.add(playerPos);
         }
         return playerBlocks;
-    }
-
-    public boolean invalidEntity(Entity entity)
-    {
-        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity) && !(entity instanceof ArrowEntity);
     }
 
     @EventListener

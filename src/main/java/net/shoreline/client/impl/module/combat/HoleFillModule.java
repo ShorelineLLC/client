@@ -24,7 +24,6 @@ import net.shoreline.client.impl.manager.combat.hole.HoleType;
 import net.shoreline.client.impl.module.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -124,7 +123,7 @@ public class HoleFillModule extends ObsidianPlacerModule
                 continue;
             }
 
-            if (!mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), hole.getPos(), ShapeContext.absent()))
+            if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, hole.getPos(), ShapeContext.absent()))
             {
                 continue;
             }

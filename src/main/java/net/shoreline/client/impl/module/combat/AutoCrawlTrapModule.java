@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -44,7 +43,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     Config<Boolean> downConfig = register(new BooleanConfig("PreventDownwards", "Prevents digging downwards", true));
     Config<Boolean> serverHitboxConfig = register(new BooleanConfig("HitboxSync", "Places on serverside crawling hitboxes", false));
     Config<Boolean> mineIgnoreConfig = register(new BooleanConfig("PreventMine", "Prevents enemies from mining the trap", false));
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
     Config<Integer> extrapolateTicksConfig = register(new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10));
@@ -164,7 +162,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             final BlockPos targetPos = packet.getPos();
             if (surround.contains(targetPos))
             {
-                if (blockState.isReplaceable() && mc.world.canPlace(blockState, targetPos, ShapeContext.absent()))
+                if (blockState.isReplaceable() && mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, targetPos, ShapeContext.absent()))
                 {
                     final int slot = getResistantBlockItem();
                     if (slot == -1)
@@ -222,7 +220,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 continue;
             }
 
-            if (mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), surroundPos, ShapeContext.absent()))
+            if (mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, surroundPos, ShapeContext.absent()))
             {
                 placements.add(surroundPos);
             }
