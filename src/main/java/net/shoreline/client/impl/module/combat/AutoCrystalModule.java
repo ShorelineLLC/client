@@ -1444,6 +1444,11 @@ public class AutoCrystalModule extends CombatModule
         {
             return false;
         }
+        return isCrystalHitboxClear(pos);
+    }
+
+    public boolean isCrystalHitboxClear(BlockPos pos)
+    {
         BlockPos p2 = pos.up();
         BlockState state2 = mc.world.getBlockState(p2);
         // ver 1.12.2 and below

@@ -1,11 +1,9 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.api.config.Config;
@@ -21,7 +19,6 @@ import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
-import net.shoreline.client.util.player.PlayerUtil;
 import net.shoreline.client.util.render.animation.Animation;
 import net.shoreline.client.util.world.ExplosionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -32,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CrystalBasePlaceModule extends ObsidianPlacerModule
+public class BasePlaceModule extends ObsidianPlacerModule
 {
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for bases", 0.0f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
@@ -47,9 +44,9 @@ public class CrystalBasePlaceModule extends ObsidianPlacerModule
     private final Map<BlockPos, Long> packets = new HashMap<>();
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
 
-    public CrystalBasePlaceModule()
+    public BasePlaceModule()
     {
-        super("CrystalBasePlace", "Places obsidian for crystal placements", ModuleCategory.COMBAT);
+        super("BasePlace", "Places obsidian for crystal placements", ModuleCategory.COMBAT);
     }
 
     @Override
@@ -63,6 +60,11 @@ public class CrystalBasePlaceModule extends ObsidianPlacerModule
     @EventListener
     public void onTick(PlayerTickEvent event)
     {
+        if (!AutoCrystalModule.getInstance().isEnabled() || AutoCrystalModule.getInstance().isPlacing())
+        {
+            return;
+        }
+
         PlayerEntity target = getClosestPlayer(enemyRangeConfig.getValue());
         if (target == null)
         {
@@ -141,7 +143,6 @@ public class CrystalBasePlaceModule extends ObsidianPlacerModule
         for (BlockPos pos : targetBlocks)
         {
             final BlockPos basePos = pos.down();
-
             if (basePos.getY() >= EntityUtil.getRoundedBlockPos(player).getY())
             {
                 continue;
@@ -153,7 +154,7 @@ public class CrystalBasePlaceModule extends ObsidianPlacerModule
                 continue;
             }
 
-            if (!mc.world.getBlockState(pos).isReplaceable() || !mc.world.isSpaceEmpty(new Box(pos)))
+            if (!AutoCrystalModule.getInstance().isCrystalHitboxClear(pos))
             {
                 continue;
             }
