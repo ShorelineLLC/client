@@ -458,7 +458,7 @@ public class AutoMineModule extends CombatModule
         }
 
         boolean updateChanged = false;
-        if (!isInstantMineComplete() && !changedInstantMine)
+        if (!isInstantMineComplete())
         {
             if (packetMine == null)
             {

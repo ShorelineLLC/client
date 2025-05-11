@@ -231,11 +231,6 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (blocksPlaced > shiftTicksConfig.getValue() * 2) // Give some leniency if we are getting place on
-        {
-            return;
-        }
-
         if (serverPacket instanceof ExplosionS2CPacket packet && prePlaceExplosionConfig.getValue())
         {
             BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
