@@ -1,8 +1,10 @@
 package net.shoreline.client.impl.module.client;
 
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.s2c.play.CloseScreenS2CPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -11,6 +13,7 @@ import net.minecraft.world.RaycastContext;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
+import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
@@ -29,8 +32,12 @@ public class AnticheatModule extends ConcurrentModule
     private static AnticheatModule INSTANCE;
 
     Config<Anticheats> modeConfig = register(new EnumConfig<>("Mode", "Applies anticheat optimizations", Anticheats.VANILLA, Anticheats.values()));
+    Config<Integer> entityPlaceConfig = register(new NumberConfig<>("EntityPlaceThreshold", "The max ticks to place on entities", 10, 20, 50));
+    // GRIM
     Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> modeConfig.getValue() == Anticheats.GRIM));
     Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false, () -> modeConfig.getValue() == Anticheats.GRIM));
+    Config<Boolean> noScreenCloseConfig = register(new BooleanConfig("NoScreenClose", "Prevents the server from closing your inventory screen", false, () -> modeConfig.getValue() == Anticheats.GRIM));
+    // NCP
     Config<Boolean> raytraceSpoofConfig = register(new BooleanConfig("RaytraceFix", "Allows you to spoof your raytrace", false, () -> modeConfig.getValue() == Anticheats.N_C_P));
 
     private final Timer raytraceTimer = new CacheTimer();
@@ -102,6 +109,20 @@ public class AnticheatModule extends ConcurrentModule
     }
 
     @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (mc.player == null || mc.world == null)
+        {
+            return;
+        }
+
+        if (isGrim() && noScreenCloseConfig.getValue() && event.getPacket() instanceof CloseScreenS2CPacket packet && packet.getSyncId() == 0)
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
     public void onConfigUpdate(ConfigUpdateEvent event)
     {
         if (event.getStage() == StageEvent.EventStage.POST &&
@@ -129,6 +150,11 @@ public class AnticheatModule extends ConcurrentModule
     public boolean getWebJumpFix()
     {
         return webJumpFixConfig.getValue();
+    }
+
+    public int getEntityPlaceThreshold()
+    {
+        return entityPlaceConfig.getValue();
     }
 
     private enum Anticheats

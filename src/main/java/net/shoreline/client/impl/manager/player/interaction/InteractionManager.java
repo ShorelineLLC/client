@@ -82,7 +82,7 @@ public final class InteractionManager implements Globals
                 if (entity instanceof EndCrystalEntity)
                 {
                     placedOnEntities.compute(entity.getId(), (k, attempts) -> attempts != null ? attempts + 1 : 1);
-                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > 10)
+                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > AnticheatModule.getInstance().getEntityPlaceThreshold())
                     {
                         continue;
                     }
@@ -147,7 +147,7 @@ public final class InteractionManager implements Globals
                 if (entity instanceof EndCrystalEntity)
                 {
                     placedOnEntities.compute(entity.getId(), (k, attempts) -> attempts != null ? attempts + 1 : 1);
-                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > 10)
+                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > AnticheatModule.getInstance().getEntityPlaceThreshold())
                     {
                         continue;
                     }
