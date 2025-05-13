@@ -39,17 +39,15 @@ public class FakePlayerModule extends ToggleModule
     @Override
     public void onDisable()
     {
-        if (fakePlayer != null)
+        if (fakePlayer != null && !fakePlayer.isRemoved())
         {
             fakePlayer.despawnPlayer();
-            fakePlayer = null;
         }
     }
 
     @EventListener
     public void onDisconnect(DisconnectEvent event)
     {
-        fakePlayer = null;
         disable();
     }
 
