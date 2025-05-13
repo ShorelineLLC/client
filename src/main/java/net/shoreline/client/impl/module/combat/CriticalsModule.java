@@ -96,12 +96,12 @@ public class CriticalsModule extends ToggleModule
         }
 
         // All combat modules have priority
-        if (!multitaskConfig.getValue() && (SurroundModule.getInstance().isPlacing()
-                || SelfTrapModule.getInstance().isPlacing()
-                || AutoTrapModule.getInstance().isPlacing()
-                || AutoCrawlTrapModule.getInstance().isPlacing()
-                || AutoWebModule.getInstance().isPlacing()
-                || HoleFillModule.getInstance().isPlacing()
+        if (!multitaskConfig.getValue() && (SurroundModule.getInstance().isEnabled()
+                || SelfTrapModule.getInstance().isEnabled()
+                || AutoTrapModule.getInstance().isEnabled()
+                || AutoCrawlTrapModule.getInstance().isEnabled()
+                || AutoWebModule.getInstance().isEnabled()
+                || HoleFillModule.getInstance().isEnabled()
                 || AutoXPModule.getInstance().isEnabled()
                 || AutoMineModule.getInstance().isEnabled()))
         {

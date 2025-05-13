@@ -142,7 +142,8 @@ public class AutoAnchorModule extends BlockPlacerModule
             if (placeTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f))
             {
                 Managers.INVENTORY.setSlot(slot);
-                Managers.INTERACT.placeBlock(anchorPos, slot, grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
+                Managers.INTERACT.placeBlock(anchorPos, Blocks.RESPAWN_ANCHOR, slot,
+                        grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
                 {
                     if (rotateConfig.getValue())
                     {

@@ -37,7 +37,7 @@ public class ObsidianPlacerModule extends BlockPlacerModule
     /**
      * @return
      */
-    protected int getResistantBlockItem()
+    protected BlockSlot getResistantBlockItem()
     {
         final Set<BlockSlot> blockSlots = new HashSet<>();
         for (final Block type : RESISTANT_BLOCKS)
@@ -53,27 +53,19 @@ public class ObsidianPlacerModule extends BlockPlacerModule
         BlockSlot slot = blockSlots.stream().filter(b -> b.block() == Blocks.OBSIDIAN).findFirst().orElse(null);
         if (slot != null)
         {
-            return slot.slot();
+            return slot;
         }
         BlockSlot slot1 = blockSlots.stream().filter(b -> b.block() == Blocks.CRYING_OBSIDIAN).findFirst().orElse(null);
         if (slot1 != null)
         {
-            return slot1.slot();
+            return slot1;
         }
         BlockSlot slot2 = blockSlots.stream().filter(b -> b.block() == Blocks.ENDER_CHEST).findFirst().orElse(null);
         if (slot2 != null)
         {
-            return slot2.slot();
+            return slot2;
         }
-        return -1;
-    }
 
-    public record BlockSlot(Block block, int slot)
-    {
-        @Override
-        public boolean equals(Object obj)
-        {
-            return obj instanceof BlockSlot b && b.block() == block;
-        }
+        return null;
     }
 }

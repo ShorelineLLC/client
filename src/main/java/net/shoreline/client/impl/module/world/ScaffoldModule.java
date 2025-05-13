@@ -87,7 +87,8 @@ public final class ScaffoldModule extends BlockPlacerModule
             return;
         }
 
-        int slot = getBlockSlot();
+        BlockSlot blockItem = getBlockSlot();
+        final int slot = blockItem.slot();
         if (slot == -1)
         {
             blockData = null;
@@ -152,7 +153,8 @@ public final class ScaffoldModule extends BlockPlacerModule
         {
             Managers.INVENTORY.setSlot(slot);
         }
-        boolean result = Managers.INTERACT.placeBlock(blockData.getBlockPos(), slot, false, false, false, (state, angles) ->
+        boolean result = Managers.INTERACT.placeBlock(blockData.getBlockPos(), blockItem.block(), slot,
+                false, false, false, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
@@ -283,14 +285,16 @@ public final class ScaffoldModule extends BlockPlacerModule
         return null;
     }
 
-    private int getBlockSlot()
+    private BlockSlot getBlockSlot()
     {
         final ItemStack serverStack = Managers.INVENTORY.getServerItem();
         if (!serverStack.isEmpty() && serverStack.getItem() instanceof BlockItem blockItem && validScaffoldBlock(blockItem.getBlock()))
         {
-            return Managers.INVENTORY.getServerSlot();
+            Block block1 = blockItem.getBlock();
+            return new BlockSlot(block1, Managers.INVENTORY.getServerSlot());
         }
 
+        Block block = null;
         int blockSlot = -1;
         int count = 0;
         for (int i = 0; i < 9; ++i)
@@ -298,20 +302,22 @@ public final class ScaffoldModule extends BlockPlacerModule
             final ItemStack itemStack = mc.player.getInventory().getStack(i);
             if (!itemStack.isEmpty() && itemStack.getItem() instanceof BlockItem blockItem && validScaffoldBlock(blockItem.getBlock()))
             {
+                Block block1 = blockItem.getBlock();
                 if (pickerConfig.getValue() == BlockPicker.NORMAL)
                 {
-                    return i;
+                    return new BlockSlot(block1, i);
                 }
 
                 if (blockSlot == -1 || itemStack.getCount() > count)
                 {
+                    block = block1;
                     blockSlot = i;
                     count = itemStack.getCount();
                 }
             }
         }
 
-        return blockSlot;
+        return new BlockSlot(block, blockSlot);
     }
 
     private boolean validScaffoldBlock(Block block)

@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -184,7 +185,7 @@ public class AutoWebModule extends BlockPlacerModule
 
     private void placeWeb(BlockPos pos, int slot)
     {
-        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, Blocks.COBWEB, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {

@@ -240,6 +240,12 @@ public class AutoCrystalModule extends CombatModule
         setStage("NONE");
     }
 
+    @Override
+    public void onEnable()
+    {
+        BasePlaceModule.getInstance().startBasePlace();
+    }
+
     @EventListener
     public void onDisconnect(DisconnectEvent event)
     {

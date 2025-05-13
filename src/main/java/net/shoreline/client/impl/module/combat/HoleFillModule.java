@@ -99,8 +99,8 @@ public class HoleFillModule extends ObsidianPlacerModule
             return;
         }
 
-        final int slot = websConfig.getValue() ? getBlockItemSlot(Blocks.COBWEB) : getResistantBlockItem();
-        if (slot == -1)
+        BlockSlot blockItem = websConfig.getValue() ? new BlockSlot(Blocks.COBWEB, getBlockItemSlot(Blocks.COBWEB)) : getResistantBlockItem();
+        if (blockItem == null || blockItem.slot() == -1)
         {
             fills.clear();
             return;
@@ -119,11 +119,6 @@ public class HoleFillModule extends ObsidianPlacerModule
                 continue;
             }
             if (hole.squaredDistanceTo(mc.player) > ((NumberConfig) rangeConfig).getValueSq())
-            {
-                continue;
-            }
-
-            if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, hole.getPos(), ShapeContext.absent()))
             {
                 continue;
             }
@@ -179,7 +174,7 @@ public class HoleFillModule extends ObsidianPlacerModule
             shiftDelay = 0;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            placeBlock(targetPos, slot);
+            placeBlock(targetPos, blockItem);
         }
 
         if (rotateConfig.getValue())
@@ -204,9 +199,10 @@ public class HoleFillModule extends ObsidianPlacerModule
         }
     }
 
-    private void placeBlock(BlockPos targetPos, int slot)
+    private void placeBlock(BlockPos targetPos, BlockSlot blockItem)
     {
-        Managers.INTERACT.placeBlock(targetPos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, blockItem.block(), blockItem.slot(),
+                strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {

@@ -31,6 +31,8 @@ import java.util.Map;
 
 public class BasePlaceModule extends ObsidianPlacerModule
 {
+    private static BasePlaceModule INSTANCE;
+
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for bases", 0.0f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
     // Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
@@ -41,12 +43,19 @@ public class BasePlaceModule extends ObsidianPlacerModule
     Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
 
     private BlockPos crystalBase;
+    private int startCooldown;
     private final Map<BlockPos, Long> packets = new HashMap<>();
     private final Map<BlockPos, Animation> fadeList = new HashMap<>();
 
     public BasePlaceModule()
     {
         super("BasePlace", "Places obsidian for crystal placements", ModuleCategory.COMBAT);
+        INSTANCE = this;
+    }
+
+    public static BasePlaceModule getInstance()
+    {
+        return INSTANCE;
     }
 
     @Override
@@ -60,7 +69,9 @@ public class BasePlaceModule extends ObsidianPlacerModule
     @EventListener
     public void onTick(PlayerTickEvent event)
     {
-        if (!AutoCrystalModule.getInstance().isEnabled() || AutoCrystalModule.getInstance().isPlacing())
+        startCooldown--;
+
+        if (!AutoCrystalModule.getInstance().isEnabled() || AutoCrystalModule.getInstance().isPlacing() || startCooldown > 0)
         {
             return;
         }
@@ -78,13 +89,13 @@ public class BasePlaceModule extends ObsidianPlacerModule
         }
 
         BlockState state = mc.world.getBlockState(crystalBase);
-        int slot = getResistantBlockItem();
-        if (slot == -1 || !state.isReplaceable())
+        BlockSlot blockItem = getResistantBlockItem();
+        if (blockItem == null || !state.isReplaceable())
         {
             return;
         }
 
-        placeBlock(crystalBase, slot);
+        placeBlock(crystalBase, blockItem);
     }
 
     @EventListener
@@ -105,7 +116,8 @@ public class BasePlaceModule extends ObsidianPlacerModule
             }
             RenderBuffers.postRender();
 
-            if (crystalBase != null && mc.world.isAir(crystalBase))
+            if (crystalBase != null && (!AutoCrystalModule.getInstance().isEnabled()
+                    || !AutoCrystalModule.getInstance().isPlacing()) && mc.world.isAir(crystalBase))
             {
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(crystalBase, animation);
@@ -116,9 +128,9 @@ public class BasePlaceModule extends ObsidianPlacerModule
                 e.getValue().getFactor() == 0.0);
     }
 
-    private void placeBlock(BlockPos pos, int slot)
+    private void placeBlock(BlockPos pos, BlockSlot blockItem)
     {
-        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, blockItem.block(), blockItem.slot(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
         {
             if (rotateConfig.getValue())
             {
@@ -143,7 +155,13 @@ public class BasePlaceModule extends ObsidianPlacerModule
         for (BlockPos pos : targetBlocks)
         {
             final BlockPos basePos = pos.down();
-            if (basePos.getY() >= EntityUtil.getRoundedBlockPos(player).getY())
+            BlockState state = mc.world.getBlockState(basePos);
+            if (basePos.getY() >= EntityUtil.getRoundedBlockPos(player).getY() + 1.0f)
+            {
+                continue;
+            }
+
+            if (AutoCrystalModule.getInstance().isEnabled() && !AutoCrystalModule.getInstance().isPlacing() && !state.isReplaceable())
             {
                 continue;
             }
@@ -154,7 +172,7 @@ public class BasePlaceModule extends ObsidianPlacerModule
                 continue;
             }
 
-            if (!AutoCrystalModule.getInstance().isCrystalHitboxClear(pos))
+            if (!AutoCrystalModule.getInstance().isCrystalHitboxClear(basePos))
             {
                 continue;
             }
@@ -209,5 +227,10 @@ public class BasePlaceModule extends ObsidianPlacerModule
             }
         }
         return sphere;
+    }
+
+    public void startBasePlace()
+    {
+        startCooldown = 10;
     }
 }

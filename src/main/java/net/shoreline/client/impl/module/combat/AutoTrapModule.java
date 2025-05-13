@@ -101,8 +101,8 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             return;
         }
 
-        final int slot = getResistantBlockItem();
-        if (slot == -1)
+        BlockSlot blockItem = getResistantBlockItem();
+        if (blockItem == null)
         {
             surround.clear();
             placements.clear();
@@ -161,7 +161,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             blocksPlaced++;
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            placeBlock(targetPos, slot);
+            placeBlock(targetPos, blockItem);
         }
 
         if (rotateConfig.getValue())
@@ -200,12 +200,12 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             {
                 if (blockState.isReplaceable() && mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, targetPos, ShapeContext.absent()))
                 {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
+                    BlockSlot blockItem = getResistantBlockItem();
+                    if (blockItem == null)
                     {
                         return;
                     }
-                    placeBlock(targetPos, slot);
+                    placeBlock(targetPos, blockItem);
                 }
                 else if (BlastResistantBlocks.isBlastResistant(blockState))
                 {
@@ -215,9 +215,9 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         }
     }
 
-    private void placeBlock(BlockPos pos, int slot)
+    private void placeBlock(BlockPos pos, BlockSlot blockItem)
     {
-        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, blockItem.block(), blockItem.slot(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {
@@ -273,10 +273,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
                 continue;
             }
 
-            if (mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, surroundPos, ShapeContext.absent()))
-            {
-                placements.add(surroundPos);
-            }
+            placements.add(surroundPos);
         }
         return placements;
     }

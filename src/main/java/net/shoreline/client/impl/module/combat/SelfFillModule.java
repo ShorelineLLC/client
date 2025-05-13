@@ -9,7 +9,6 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -21,8 +20,6 @@ import net.shoreline.client.init.Managers;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.position.PositionUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-
-import java.util.List;
 
 /**
  * @author linus
@@ -102,7 +99,14 @@ public class SelfFillModule extends ObsidianPlacerModule
 
                 double y = mc.player.getY();
                 Managers.POSITION.setPositionClient(mc.player.getX(), y + 1.167, mc.player.getZ());
-                attackPlace(pos);
+
+                BlockSlot blockItem = getResistantBlockItem();
+                if (blockItem == null)
+                {
+                    return;
+                }
+                attackPlace(pos, blockItem);
+
                 Managers.POSITION.setPositionClient(mc.player.getX(), y, mc.player.getZ());
 
                 Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(),
@@ -116,7 +120,7 @@ public class SelfFillModule extends ObsidianPlacerModule
                 {
                     return;
                 }
-                Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
+                Managers.INTERACT.placeBlock(pos, Blocks.COBWEB, slot, strictDirectionConfig.getValue(), false, (state, angles) ->
                 {
                     if (rotateConfig.getValue())
                     {
@@ -139,17 +143,7 @@ public class SelfFillModule extends ObsidianPlacerModule
         }
     }
 
-    private void attackPlace(BlockPos targetPos)
-    {
-        final int slot = getResistantBlockItem();
-        if (slot == -1)
-        {
-            return;
-        }
-        attackPlace(targetPos, slot);
-    }
-
-    private void attackPlace(BlockPos targetPos, int slot)
+    private void attackPlace(BlockPos targetPos, BlockSlot blockItem)
     {
         if (attackConfig.getValue())
         {
@@ -161,7 +155,7 @@ public class SelfFillModule extends ObsidianPlacerModule
             }
         }
 
-        Managers.INTERACT.placeBlock(targetPos, slot, false, strictDirectionConfig.getValue(), false, (state, angles) ->
+        Managers.INTERACT.placeBlock(targetPos, blockItem.block(), blockItem.slot(), false, strictDirectionConfig.getValue(), false, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {

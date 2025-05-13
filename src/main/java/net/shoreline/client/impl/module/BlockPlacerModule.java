@@ -52,4 +52,13 @@ public class BlockPlacerModule extends CombatModule
         }
         return -1;
     }
+
+    public record BlockSlot(Block block, int slot)
+    {
+        @Override
+        public boolean equals(Object obj)
+        {
+            return obj instanceof BlockSlot b && b.block() == block;
+        }
+    }
 }

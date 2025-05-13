@@ -1,14 +1,23 @@
 package net.shoreline.client.impl.manager.player.interaction;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.init.Managers;
@@ -18,9 +27,13 @@ import net.shoreline.client.util.player.MovementUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.world.SneakBlocks;
 import net.shoreline.eventbus.EventBus;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author xgraza
@@ -28,21 +41,20 @@ import java.util.Set;
  */
 public final class InteractionManager implements Globals
 {
-    public InteractionManager()
-    {
-        EventBus.INSTANCE.subscribe(this);
-    }
+    private final Map<Integer, Integer> placedOnEntities = new ConcurrentHashMap<>();
 
     public boolean placeBlock(final BlockPos pos,
+                              final Block block,
                               final int slot,
                               final boolean strictDirection,
                               final boolean clientSwing,
                               final RotationCallback rotationCallback)
     {
-        return placeBlock(pos, slot, strictDirection, clientSwing, rotationCallback, false);
+        return placeBlock(pos, block, slot, strictDirection, clientSwing, rotationCallback, false);
     }
 
     public boolean placeBlock(final BlockPos pos,
+                              final Block block,
                               final int slot,
                               final boolean strictDirection,
                               final boolean clientSwing,
@@ -59,21 +71,54 @@ public final class InteractionManager implements Globals
         {
             return false;
         }
+
+        VoxelShape shape = block.getDefaultState().getCollisionShape(mc.world, pos, ShapeContext.absent()).offset(pos.getX(), pos.getY(), pos.getZ());
+        boolean isEntityBlockingPlacement = false;
+        if (!shape.isEmpty())
+        {
+            for (Entity entity : mc.world.getOtherEntities(null, shape.getBoundingBox()))
+            {
+                if (entity.isRemoved() || !entity.intersectionChecked || !VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND))
+                {
+                    continue;
+                }
+
+                if (entity instanceof EndCrystalEntity)
+                {
+                    placedOnEntities.compute(entity.getId(), (k, attempts) -> attempts != null ? attempts + 1 : 1);
+                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > 10)
+                    {
+                        continue;
+                    }
+                }
+
+                isEntityBlockingPlacement = true;
+                break;
+            }
+        }
+
+        if (isEntityBlockingPlacement)
+        {
+            return false;
+        }
+
         final BlockPos neighbor = pos.offset(direction.getOpposite());
         return placeBlock(neighbor, direction, slot, clientSwing, false, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
+                              final Block block,
                               final int slot,
                               final boolean strictDirection,
                               final boolean clientSwing,
                               final boolean packet,
                               final RotationCallback rotationCallback)
     {
-        return placeBlock(pos, slot, strictDirection, clientSwing, packet, false, rotationCallback);
+        return placeBlock(pos, block, slot, strictDirection, clientSwing, packet, false, rotationCallback);
     }
 
     public boolean placeBlock(final BlockPos pos,
+                              final Block block,
                               final int slot,
                               final boolean strictDirection,
                               final boolean clientSwing,
@@ -91,6 +136,37 @@ public final class InteractionManager implements Globals
         {
             return false;
         }
+
+        VoxelShape shape = block.getDefaultState().getCollisionShape(mc.world, pos, ShapeContext.absent()).offset(pos.getX(), pos.getY(), pos.getZ());
+        boolean isEntityBlockingPlacement = false;
+        if (!shape.isEmpty())
+        {
+            for (Entity entity : mc.world.getOtherEntities(null, shape.getBoundingBox()))
+            {
+                if (entity.isRemoved() || !entity.intersectionChecked || !VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND))
+                {
+                    continue;
+                }
+
+                if (entity instanceof EndCrystalEntity)
+                {
+                    placedOnEntities.compute(entity.getId(), (k, attempts) -> attempts != null ? attempts + 1 : 1);
+                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > 10)
+                    {
+                        continue;
+                    }
+                }
+
+                isEntityBlockingPlacement = true;
+                break;
+            }
+        }
+
+        if (isEntityBlockingPlacement)
+        {
+            return false;
+        }
+
         final BlockPos neighbor = pos.offset(direction.getOpposite());
         return placeBlock(neighbor, direction, slot, clientSwing, false, packet, rotationCallback);
     }

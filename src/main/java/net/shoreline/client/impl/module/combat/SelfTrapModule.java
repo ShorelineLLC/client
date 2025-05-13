@@ -121,8 +121,8 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             return;
         }
 
-        final int slot = getResistantBlockItem();
-        if (slot == -1)
+        BlockSlot blockItem = getResistantBlockItem();
+        if (blockItem == null)
         {
             surround.clear();
             placements.clear();
@@ -169,7 +169,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             BlockPos targetPos = placements.get(blocksPlaced);
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
-            placeBlock(targetPos, slot);
+            placeBlock(targetPos, blockItem);
         }
 
         if (rotateConfig.getValue())
@@ -213,12 +213,12 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 if (blockState.isReplaceable() && mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, targetPos, ShapeContext.absent()))
                 {
-                    final int slot = getResistantBlockItem();
-                    if (slot == -1)
+                    BlockSlot blockItem = getResistantBlockItem();
+                    if (blockItem == null)
                     {
                         return;
                     }
-                    placeBlock(targetPos, slot);
+                    placeBlock(targetPos, blockItem);
                 }
                 else if (BlastResistantBlocks.isBlastResistant(blockState))
                 {
@@ -232,12 +232,12 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
             if (surround.contains(pos))
             {
-                final int slot = getResistantBlockItem();
-                if (slot == -1)
+                BlockSlot blockItem = getResistantBlockItem();
+                if (blockItem == null)
                 {
                     return;
                 }
-                placeBlock(pos, slot);
+                placeBlock(pos, blockItem);
             }
         }
 
@@ -251,20 +251,21 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                     continue;
                 }
 
-                final int slot = getResistantBlockItem();
-                if (slot == -1)
+                BlockSlot blockItem = getResistantBlockItem();
+                if (blockItem == null)
                 {
                     return;
                 }
-                placeBlock(pos, slot);
+                placeBlock(pos, blockItem);
                 break;
             }
         }
     }
 
-    private void placeBlock(BlockPos pos, int slot)
+    private void placeBlock(BlockPos pos, BlockSlot blockItem)
     {
-        Managers.INTERACT.placeBlock(pos, slot, strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        Managers.INTERACT.placeBlock(pos, blockItem.block(), blockItem.slot(),
+                strictDirectionConfig.getValue(), false, true, (state, angles) ->
         {
             if (rotateConfig.getValue() && state)
             {
@@ -310,10 +311,8 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             {
                 continue;
             }
-            if (mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, surroundPos, ShapeContext.absent()))
-            {
-                placements.add(surroundPos);
-            }
+
+            placements.add(surroundPos);
         }
         return placements;
     }
