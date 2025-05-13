@@ -66,12 +66,19 @@ public class BasePlaceModule extends ObsidianPlacerModule
         fadeList.clear();
     }
 
-    @EventListener
+    @EventListener(priority = -100)
     public void onTick(PlayerTickEvent event)
     {
         startCooldown--;
 
-        if (!AutoCrystalModule.getInstance().isEnabled() || AutoCrystalModule.getInstance().isPlacing() || startCooldown > 0)
+        if (!AutoCrystalModule.getInstance().isEnabled() || AutoCrystalModule.getInstance().isPlacing())
+        {
+            crystalBase = null;
+            startCooldown = 5;
+            return;
+        }
+
+        if (startCooldown > 0)
         {
             return;
         }
@@ -227,10 +234,5 @@ public class BasePlaceModule extends ObsidianPlacerModule
             }
         }
         return sphere;
-    }
-
-    public void startBasePlace()
-    {
-        startCooldown = 10;
     }
 }
