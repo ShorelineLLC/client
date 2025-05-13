@@ -9,10 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -51,8 +48,7 @@ public class SurroundModule extends ObsidianPlacerModule
     private static SurroundModule INSTANCE;
 
     Config<Timing> timingConfig = register(new EnumConfig<>("Timing", "Timing for replacing blocks", Timing.VANILLA, Timing.values()));
-    Config<Boolean> prePlaceExplosionConfig = register(new BooleanConfig("PrePlace-Explosions", "Pre places before explosions", false, () -> timingConfig.getValue() == Timing.SEQUENTIAL));
-    Config<Boolean> prePlaceTickConfig = register(new BooleanConfig("PrePlace-Tick", "Pre places before ticks", false, () -> timingConfig.getValue() == Timing.SEQUENTIAL));
+    Config<ReplaceMode> replaceConfig = register(new EnumConfig<>("Replace", "Pre places before explosions", ReplaceMode.NORMAL, ReplaceMode.values(), () -> timingConfig.getValue() == Timing.SEQUENTIAL));
     Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for surround", 0.0f, 4.0f, 6.0f));
     Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of surround", true));
     Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends surround if the player is not in the center of a block", true));
@@ -215,7 +211,7 @@ public class SurroundModule extends ObsidianPlacerModule
             final BlockPos targetPos = packet.getPos();
             if (surround.contains(targetPos))
             {
-                if (blockState.isReplaceable() && mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, targetPos, ShapeContext.absent()))
+                if (blockState.isReplaceable())
                 {
                     BlockSlot blockItem = getResistantBlockItem();
                     if (blockItem == null)
@@ -231,7 +227,7 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (serverPacket instanceof ExplosionS2CPacket packet && prePlaceExplosionConfig.getValue())
+        if (serverPacket instanceof ExplosionS2CPacket packet && replaceConfig.getValue() == ReplaceMode.NORMAL)
         {
             BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
             if (surround.contains(pos))
@@ -245,8 +241,30 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
+        if (serverPacket instanceof EntitiesDestroyS2CPacket packet && replaceConfig.getValue() == ReplaceMode.FAST)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                final Entity entity = mc.world.getEntityById(id);
+                if (!(entity instanceof EndCrystalEntity))
+                {
+                    continue;
+                }
+                BlockPos targetPos = entity.getBlockPos();
+                if (surround.contains(targetPos))
+                {
+                    BlockSlot blockItem = getResistantBlockItem();
+                    if (blockItem == null)
+                    {
+                        return;
+                    }
+                    placeBlock(targetPos, blockItem);
+                }
+            }
+        }
+
         if (serverPacket instanceof EntitySpawnS2CPacket packet
-                && packet.getEntityType().equals(EntityType.END_CRYSTAL) && prePlaceTickConfig.getValue())
+                && packet.getEntityType().equals(EntityType.END_CRYSTAL) && replaceConfig.getValue() == ReplaceMode.STRICT)
         {
             for (BlockPos pos : surround)
             {
@@ -459,5 +477,12 @@ public class SurroundModule extends ObsidianPlacerModule
     {
         VANILLA,
         SEQUENTIAL
+    }
+
+    public enum ReplaceMode
+    {
+        NORMAL,
+        STRICT,
+        FAST
     }
 }

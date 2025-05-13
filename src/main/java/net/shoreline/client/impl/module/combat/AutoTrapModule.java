@@ -198,7 +198,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             final BlockPos targetPos = packet.getPos();
             if (surround.contains(targetPos))
             {
-                if (blockState.isReplaceable() && mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, targetPos, ShapeContext.absent()))
+                if (blockState.isReplaceable())
                 {
                     BlockSlot blockItem = getResistantBlockItem();
                     if (blockItem == null)
