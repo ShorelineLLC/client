@@ -31,7 +31,7 @@ public class AnticheatModule extends ConcurrentModule
     private static AnticheatModule INSTANCE;
 
     Config<Anticheats> modeConfig = register(new EnumConfig<>("Mode", "Applies anticheat optimizations", Anticheats.VANILLA, Anticheats.values()));
-    Config<Integer> entityPlaceConfig = register(new NumberConfig<>("EntityPlaceThreshold", "The max ticks to place on entities", 10, 20, 50));
+    Config<Integer> entityPlaceConfig = register(new NumberConfig<>("PlaceThreshold", "The max ticks to place on entities", 10, 20, 50));
     // GRIM
     Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> modeConfig.getValue() == Anticheats.GRIM));
     Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false, () -> modeConfig.getValue() == Anticheats.GRIM));

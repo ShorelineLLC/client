@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -458,6 +459,10 @@ public class SurroundModule extends ObsidianPlacerModule
 
             for (BlockPos pos : placements)
             {
+                if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, pos, ShapeContext.absent()))
+                {
+                    continue;
+                }
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(pos, animation);
             }

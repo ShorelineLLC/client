@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -429,7 +430,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
                         continue;
                     }
                     BlockPos blockerPos = surroundPos.offset(direction);
-                    if (playerBlocks.contains(blockerPos)
+                    if (playerBlocks.contains(blockerPos) || playerBlocks.stream().map(BlockPos::up).anyMatch(p -> p.equals(blockerPos))
                             || AutoMineModule.getInstance().getMiningBlock() == blockerPos) // Dont want to help our opponent surround
                     {
                         continue;
@@ -481,6 +482,10 @@ public final class SelfTrapModule extends ObsidianPlacerModule
 
             for (BlockPos pos : placements)
             {
+                if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, pos, ShapeContext.absent()))
+                {
+                    continue;
+                }
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(pos, animation);
             }
