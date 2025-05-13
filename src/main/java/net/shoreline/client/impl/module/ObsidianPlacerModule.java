@@ -6,7 +6,10 @@ import net.minecraft.block.Blocks;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.impl.module.combat.SurroundModule;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author linus

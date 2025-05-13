@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.event.render;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.shoreline.eventbus.annotation.Cancelable;
 import net.shoreline.eventbus.event.Event;
 

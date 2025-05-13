@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.option.Perspective;
 import net.minecraft.world.GameMode;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;

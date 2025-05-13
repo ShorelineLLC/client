@@ -7,7 +7,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.SocialsModule;
-import net.shoreline.loader.Loader;
 
 import java.util.Map;
 import java.util.Optional;

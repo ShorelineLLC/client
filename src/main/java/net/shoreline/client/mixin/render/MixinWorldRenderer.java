@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.math.RotationAxis;
 import net.shoreline.client.impl.event.PerspectiveEvent;
 import net.shoreline.client.impl.event.render.RenderEntityInWorldEvent;

@@ -7,7 +7,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;

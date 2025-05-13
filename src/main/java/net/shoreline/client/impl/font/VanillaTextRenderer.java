@@ -11,7 +11,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.TextColor;
 import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.mixin.accessor.AccessorTextRenderer;
 import net.shoreline.client.util.Globals;
 import org.jetbrains.annotations.Nullable;

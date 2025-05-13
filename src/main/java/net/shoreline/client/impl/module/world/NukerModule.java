@@ -25,7 +25,6 @@ import net.shoreline.client.impl.module.CombatModule;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.player.RotationUtil;
 import net.shoreline.client.util.render.ColorUtil;
 import net.shoreline.client.util.render.animation.Animation;
@@ -34,8 +33,9 @@ import net.shoreline.eventbus.annotation.EventListener;
 import net.shoreline.eventbus.event.StageEvent;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
 
 public class NukerModule extends CombatModule
 {

@@ -11,7 +11,6 @@ import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
 import net.shoreline.client.impl.event.network.CapesEvent;
 import net.shoreline.client.impl.event.network.GameJoinEvent;
 import net.shoreline.client.impl.irc.IRCManager;
-import net.shoreline.client.impl.irc.packet.client.CPacketPing;
 import net.shoreline.client.impl.irc.user.OnlineUser;
 import net.shoreline.client.mixin.accessor.AccessorGameOptions;
 import net.shoreline.eventbus.annotation.EventListener;

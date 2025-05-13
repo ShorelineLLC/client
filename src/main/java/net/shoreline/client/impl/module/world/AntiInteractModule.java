@@ -2,23 +2,17 @@ package net.shoreline.client.impl.module.world;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BlockListConfig;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.module.ModuleCategory;
 import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.InteractBlockEvent;
 import net.shoreline.client.impl.event.network.InteractBorderEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.world.BlastResistantBlocks;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.List;

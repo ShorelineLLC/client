@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;

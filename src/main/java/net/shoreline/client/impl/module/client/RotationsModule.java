@@ -1,25 +1,11 @@
 package net.shoreline.client.impl.module.client;
 
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.RaycastContext;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
 import net.shoreline.client.api.module.ConcurrentModule;
 import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
-import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.exploit.DisablerModule;
-import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
-import net.shoreline.client.util.math.position.DirectionUtil;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
 /**
  * @author linus
