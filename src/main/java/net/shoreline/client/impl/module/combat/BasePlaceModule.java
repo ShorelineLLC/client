@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -49,7 +50,8 @@ public class BasePlaceModule extends ObsidianPlacerModule
 
     public BasePlaceModule()
     {
-        super("BasePlace", "Places obsidian for crystal placements", ModuleCategory.COMBAT);
+        super("BasePlace", "Places obsidian for crystal placements\n"
+                + Formatting.RED + "(Requires AutoCrystal to be enabled)", ModuleCategory.COMBAT);
         INSTANCE = this;
     }
 

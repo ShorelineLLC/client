@@ -18,6 +18,8 @@ import net.shoreline.client.util.render.animation.Easing;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -44,7 +46,7 @@ public class ClickGuiScreen extends Screen implements Globals
     private final List<CategoryFrame> frames = new CopyOnWriteArrayList<>();
     private final ClickGuiModule module;
     //
-    private String text;
+    private String[] text;
     private final Animation animation = new Animation(false, 200L, Easing.LINEAR);
 
     private boolean shouldCloseOnEsc = true;
@@ -89,7 +91,7 @@ public class ClickGuiScreen extends Screen implements Globals
             {
                 if (moduleButton.isWithin(mouseX, mouseY))
                 {
-                    text = moduleButton.getModule().getDescription();
+                    text = moduleButton.getModule().getDescription().split("\n");
                     hovering = true;
                     break;
                 }
@@ -101,9 +103,14 @@ public class ClickGuiScreen extends Screen implements Globals
 
                 for (ConfigButton<?> configButton : moduleButton.getConfigButtons())
                 {
+                    if (!configButton.getConfig().isVisible())
+                    {
+                        continue;
+                    }
+
                     if (configButton.isWithin(mouseX, mouseY))
                     {
-                        text = configButton.getConfig().getDescription();
+                        text = configButton.getConfig().getDescription().split("\n");
                         hovering = true;
                         break;
                     }
@@ -119,11 +126,24 @@ public class ClickGuiScreen extends Screen implements Globals
             {
                 context.getMatrices().scale(ClickGuiModule.CLICK_GUI_SCALE, ClickGuiModule.CLICK_GUI_SCALE, 0.0f);
                 float j = 1.0f / ClickGuiModule.CLICK_GUI_SCALE;
-                int width = RenderManager.textWidth(text);
                 int hoverAlpha = (int) (60 * animation.getFactor());
                 int unfilledColor = ClickGuiModule.getInstance().fixTransparency(new Color(0, 0, 0, 50 + hoverAlpha).getRGB());
-                RenderManager.rect(context.getMatrices(), (mouseX + 10.0f) * j, (mouseY - 8.0f) * j, (width + 4.0f), (RenderManager.textHeight() + 2.0f) * j, unfilledColor);
-                RenderManager.renderText(context, text, (mouseX + 12.0f) * j, (mouseY - 6.0f) * j, ColorUtil.fixTransparency(-1, (float) animation.getFactor()));
+                int width = 0;
+                for (String s : text)
+                {
+                    int w = RenderManager.textWidth(s);
+                    if (w > width)
+                    {
+                        width = w;
+                    }
+                }
+                RenderManager.rect(context.getMatrices(), (mouseX + 10.0f) * j, (mouseY - 8.0f) * j, (width + 4.0f), ((RenderManager.textHeight() + 2.0f) * text.length) * j, unfilledColor);
+
+                for (int i = 0; i < text.length; i++)
+                {
+                    RenderManager.renderText(context, text[i], (mouseX + 12.0f) * j, ((mouseY - 6.0f) + ((RenderManager.textHeight() + 2.0f) * i)) * j, ColorUtil.fixTransparency(-1, (float) animation.getFactor()));
+                }
+
                 context.getMatrices().scale(j, j, 0.0f);
             }
         }
