@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
@@ -123,7 +124,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         {
             attackBlockingCrystals(surround);
         }
-        placements = getPlacementsFromSurround(surround);
+        placements = getPlacementsFromSurround(surround, blockItem.block());
         if (placements.isEmpty())
         {
             if (autoDisableConfig.getValue())
@@ -250,7 +251,7 @@ public final class AutoTrapModule extends ObsidianPlacerModule
         }
     }
 
-    public List<BlockPos> getPlacementsFromSurround(List<BlockPos> surround)
+    public List<BlockPos> getPlacementsFromSurround(List<BlockPos> surround, Block block)
     {
         List<BlockPos> placements = new ArrayList<>();
         for (BlockPos surroundPos : surround)
@@ -266,6 +267,11 @@ public final class AutoTrapModule extends ObsidianPlacerModule
             }
             double dist = mc.player.squaredDistanceTo(surroundPos.toCenterPos());
             if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
+            {
+                continue;
+            }
+
+            if (!Managers.INTERACT.canPlace(surroundPos, block))
             {
                 continue;
             }
@@ -383,10 +389,6 @@ public final class AutoTrapModule extends ObsidianPlacerModule
 
             for (BlockPos pos : placements)
             {
-                if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, pos, ShapeContext.absent()))
-                {
-                    continue;
-                }
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(pos, animation);
             }

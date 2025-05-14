@@ -106,6 +106,10 @@ public class AutoWebModule extends BlockPlacerModule
             double dist = mc.player.getEyePos().squaredDistanceTo(feetPos.toCenterPos());
             if (mc.world.getBlockState(feetPos).isAir() && dist <= ((NumberConfig) rangeConfig).getValueSq())
             {
+                if (!Managers.INTERACT.canPlace(feetPos, Blocks.COBWEB))
+                {
+                    continue;
+                }
                 webPlacements.add(feetPos);
             }
             if (coverHeadConfig.getValue())
@@ -114,6 +118,10 @@ public class AutoWebModule extends BlockPlacerModule
                 double dist2 = mc.player.getEyePos().squaredDistanceTo(headPos.toCenterPos());
                 if (mc.world.getBlockState(headPos).isAir() && dist2 <= ((NumberConfig) rangeConfig).getValueSq())
                 {
+                    if (!Managers.INTERACT.canPlace(headPos, Blocks.COBWEB))
+                    {
+                        continue;
+                    }
                     webPlacements.add(headPos);
                 }
             }

@@ -288,6 +288,11 @@ public class AutoAnchorModule extends BlockPlacerModule
                     continue;
                 }
 
+                if (!Managers.INTERACT.canPlace(pos, Blocks.RESPAWN_ANCHOR))
+                {
+                    continue;
+                }
+
                 for (Entity entity : mc.world.getEntities())
                 {
                     if (entity.getBoundingBox().intersects(new Box(pos)))

@@ -1,17 +1,13 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -109,7 +105,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             return;
         }
 
-        placements = getPlacementsFromTrap(surround);
+        placements = getPlacementsFromTrap(surround, blockItem.block());
         if (placements.isEmpty())
         {
             return;
@@ -191,7 +187,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         packets.put(pos, System.currentTimeMillis());
     }
 
-    public List<BlockPos> getPlacementsFromTrap(List<BlockPos> surround)
+    public List<BlockPos> getPlacementsFromTrap(List<BlockPos> surround, Block block)
     {
         List<BlockPos> placements = new ArrayList<>();
         for (BlockPos surroundPos : surround)
@@ -202,11 +198,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                 continue;
             }
 
-            final Box surroundBox = new Box(surroundPos);
-            List<Entity> invalid = mc.world.getOtherEntities(null, surroundBox).stream().filter(e -> invalidEntity(e)).toList();
-            boolean serverCrawling = invalid.stream().allMatch(e -> Managers.HITBOX.isServerCrawling(e)
-                    && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox));
-
             if (!mc.world.getBlockState(surroundPos).isReplaceable()
                     && !(Managers.BLOCK.isPassed(surroundPos, 0.7f) && mineIgnoreConfig.getValue()))
             {
@@ -214,6 +205,11 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             }
             double dist = mc.player.squaredDistanceTo(surroundPos.toCenterPos());
             if (dist > ((NumberConfig) rangeConfig).getValueSq())
+            {
+                continue;
+            }
+
+            if (!Managers.INTERACT.canPlace(surroundPos, block))
             {
                 continue;
             }
@@ -256,11 +252,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         return crawlTrap;
     }
 
-    public boolean invalidEntity(Entity entity)
-    {
-        return !(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrbEntity) && !(entity instanceof ArrowEntity);
-    }
-
     @EventListener
     public void onRenderWorld(RenderWorldEvent event)
     {
@@ -286,10 +277,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
 
             for (BlockPos pos : placements)
             {
-                if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, pos, ShapeContext.absent()))
-                {
-                    continue;
-                }
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(pos, animation);
             }

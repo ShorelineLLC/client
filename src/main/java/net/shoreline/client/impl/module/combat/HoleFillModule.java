@@ -123,6 +123,11 @@ public class HoleFillModule extends ObsidianPlacerModule
                 continue;
             }
 
+            if (!Managers.INTERACT.canPlace(hole.getPos(), blockItem.block()))
+            {
+                continue;
+            }
+
             if (autoConfig.getValue())
             {
                 for (PlayerEntity entity : mc.world.getPlayers())
@@ -236,10 +241,6 @@ public class HoleFillModule extends ObsidianPlacerModule
 
             for (BlockPos pos : fills)
             {
-                if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, pos, ShapeContext.absent()))
-                {
-                    continue;
-                }
                 Animation animation = new Animation(true, fadeTimeConfig.getValue());
                 fadeList.put(pos, animation);
             }

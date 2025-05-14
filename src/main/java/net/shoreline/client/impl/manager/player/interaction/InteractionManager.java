@@ -39,6 +39,31 @@ public final class InteractionManager implements Globals
 {
     private final Map<Integer, Integer> placedOnEntities = new ConcurrentHashMap<>();
 
+    public boolean canPlace(BlockPos pos, Block block)
+    {
+        VoxelShape shape = block.getDefaultState().getCollisionShape(mc.world, pos, ShapeContext.absent()).offset(pos.getX(), pos.getY(), pos.getZ());
+        if (!shape.isEmpty())
+        {
+            for (Entity entity : mc.world.getOtherEntities(null, shape.getBoundingBox()))
+            {
+                if (entity.isRemoved() || !entity.intersectionChecked || !VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND))
+                {
+                    continue;
+                }
+
+                if (entity instanceof EndCrystalEntity && (!placedOnEntities.containsKey(entity.getId())
+                        || placedOnEntities.get(entity.getId()) <= AnticheatModule.getInstance().getEntityPlaceThreshold()))
+                {
+                    continue;
+                }
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean placeBlock(final BlockPos pos,
                               final Block block,
                               final int slot,
@@ -57,17 +82,6 @@ public final class InteractionManager implements Globals
                               final RotationCallback rotationCallback,
                               final boolean airPlace)
     {
-        Direction direction = getInteractDirectionInternal(pos, strictDirection);
-        if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
-        {
-            direction = Direction.DOWN;
-            return placeBlock(pos, direction, slot, clientSwing, AnticheatModule.getInstance().isGrim(), rotationCallback);
-        }
-        if (direction == null)
-        {
-            return false;
-        }
-
         VoxelShape shape = block.getDefaultState().getCollisionShape(mc.world, pos, ShapeContext.absent()).offset(pos.getX(), pos.getY(), pos.getZ());
         boolean isEntityBlockingPlacement = false;
         if (!shape.isEmpty())
@@ -82,7 +96,7 @@ public final class InteractionManager implements Globals
                 if (entity instanceof EndCrystalEntity)
                 {
                     placedOnEntities.compute(entity.getId(), (k, attempts) -> attempts != null ? attempts + 1 : 1);
-                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > AnticheatModule.getInstance().getEntityPlaceThreshold())
+                    if (!placedOnEntities.containsKey(entity.getId()) || placedOnEntities.get(entity.getId()) <= AnticheatModule.getInstance().getEntityPlaceThreshold())
                     {
                         continue;
                     }
@@ -94,6 +108,17 @@ public final class InteractionManager implements Globals
         }
 
         if (isEntityBlockingPlacement)
+        {
+            return false;
+        }
+
+        Direction direction = getInteractDirectionInternal(pos, strictDirection);
+        if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
+        {
+            direction = Direction.DOWN;
+            return placeBlock(pos, direction, slot, clientSwing, AnticheatModule.getInstance().isGrim(), rotationCallback);
+        }
+        if (direction == null)
         {
             return false;
         }
@@ -122,17 +147,6 @@ public final class InteractionManager implements Globals
                               final boolean airPlace,
                               final RotationCallback rotationCallback)
     {
-        Direction direction = getInteractDirectionInternal(pos, strictDirection);
-        if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
-        {
-            direction = Direction.DOWN;
-            return placeBlock(pos, direction, slot, clientSwing, AnticheatModule.getInstance().isGrim(), rotationCallback);
-        }
-        if (direction == null)
-        {
-            return false;
-        }
-
         VoxelShape shape = block.getDefaultState().getCollisionShape(mc.world, pos, ShapeContext.absent()).offset(pos.getX(), pos.getY(), pos.getZ());
         boolean isEntityBlockingPlacement = false;
         if (!shape.isEmpty())
@@ -147,7 +161,7 @@ public final class InteractionManager implements Globals
                 if (entity instanceof EndCrystalEntity)
                 {
                     placedOnEntities.compute(entity.getId(), (k, attempts) -> attempts != null ? attempts + 1 : 1);
-                    if (placedOnEntities.containsKey(entity.getId()) && placedOnEntities.get(entity.getId()) > AnticheatModule.getInstance().getEntityPlaceThreshold())
+                    if (!placedOnEntities.containsKey(entity.getId()) || placedOnEntities.get(entity.getId()) <= AnticheatModule.getInstance().getEntityPlaceThreshold())
                     {
                         continue;
                     }
@@ -159,6 +173,17 @@ public final class InteractionManager implements Globals
         }
 
         if (isEntityBlockingPlacement)
+        {
+            return false;
+        }
+
+        Direction direction = getInteractDirectionInternal(pos, strictDirection);
+        if (airPlace || AirPlaceModule.getInstance().isEnabled() && direction == null)
+        {
+            direction = Direction.DOWN;
+            return placeBlock(pos, direction, slot, clientSwing, AnticheatModule.getInstance().isGrim(), rotationCallback);
+        }
+        if (direction == null)
         {
             return false;
         }

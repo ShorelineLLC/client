@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Formatting;
@@ -204,7 +205,7 @@ public class BasePlaceModule extends ObsidianPlacerModule
                 continue;
             }
 
-            if (!mc.world.canPlace(DEFAULT_OBSIDIAN_STATE, basePos, ShapeContext.absent()))
+            if (!Managers.INTERACT.canPlace(pos, Blocks.OBSIDIAN))
             {
                 continue;
             }
