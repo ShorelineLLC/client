@@ -85,7 +85,6 @@ public class AutoMineModule extends CombatModule
 
     private boolean changedInstantMine;
     private boolean waitForPacketMine;
-    private boolean packetMineStuck;
 
     private boolean antiCrawlOverride;
     private int antiCrawlTicks;
@@ -137,7 +136,6 @@ public class AutoMineModule extends CombatModule
         manualOverride = false;
         antiCrawlOverride = false;
         waitForPacketMine = false;
-        packetMineStuck = false;
         if (packetSwapBack)
         {
             Managers.INVENTORY.syncToClient();
@@ -175,7 +173,6 @@ public class AutoMineModule extends CombatModule
         // Mining packet handling
         if (packetMine != null && packetMine.getTicksMining() > mineTicksConfig.getValue())
         {
-            packetMineStuck = true;
             packetMineAnim.animation.setState(false);
             if (packetSwapBack)
             {
@@ -196,16 +193,11 @@ public class AutoMineModule extends CombatModule
             packetMine.addBlockDamage(damageDelta);
 
             int slot = packetMine.getBestSlot();
-            float damageDone = packetMine.getBlockDamage() + (swapBeforeConfig.getValue()
-                    || packetMineStuck ? damageDelta : 0.0f);
-            if (damageDone >= 1.0f && slot != -1  && !checkMultitask())
+            float damageDone = packetMine.getBlockDamage() + (swapBeforeConfig.getValue() ? damageDelta : 0.0f);
+            if (damageDone >= 1.0f && slot != -1 && !checkMultitask())
             {
                 Managers.INVENTORY.setSlot(slot);
                 packetSwapBack = true;
-                if (packetMineStuck)
-                {
-                    packetMineStuck = false;
-                }
             }
         }
 
@@ -249,7 +241,7 @@ public class AutoMineModule extends CombatModule
             if (instantMine.getBlockDamage() >= speedConfig.getValue())
             {
                 boolean canMine = canMine(instantMine.getState());
-                boolean canPlace = mc.world.canPlace(instantMine.getState(), instantMine.getPos(), ShapeContext.absent());
+                boolean canPlace = mc.world.canPlace(Blocks.OBSIDIAN.getDefaultState(), instantMine.getPos(), ShapeContext.absent());
                 if (canMine)
                 {
                     instantMine.markAttemptedMine();
@@ -552,6 +544,11 @@ public class AutoMineModule extends CombatModule
         {
             BlockState state1 = mc.world.getBlockState(blockPos);
             if (!isAutoMineBlock(state1.getBlock())) // bedrock mine exploit!!
+            {
+                continue;
+            }
+
+            if (packetMine != null && packetMine.getPos().equals(blockPos))
             {
                 continue;
             }
