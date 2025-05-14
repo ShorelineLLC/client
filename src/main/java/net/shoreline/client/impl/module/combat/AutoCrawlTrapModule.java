@@ -126,6 +126,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
             placeBlock(targetPlacePos, blockItem);
+            blocksPlaced++;
         }
 
         if (rotateConfig.getValue())
@@ -189,7 +190,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             }
         });
         packets.put(pos, System.currentTimeMillis());
-        blocksPlaced++;
     }
 
     public List<BlockPos> getPlacementsFromTrap(List<BlockPos> surround)

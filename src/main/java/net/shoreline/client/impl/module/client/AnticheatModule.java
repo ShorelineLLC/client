@@ -31,7 +31,7 @@ public class AnticheatModule extends ConcurrentModule
     private static AnticheatModule INSTANCE;
 
     Config<Anticheats> modeConfig = register(new EnumConfig<>("Mode", "Applies anticheat optimizations", Anticheats.VANILLA, Anticheats.values()));
-    Config<Integer> entityPlaceConfig = register(new NumberConfig<>("PlaceThreshold", "The max ticks to place on entities", 10, 20, 50));
+    Config<Float> entityPlaceConfig = register(new NumberConfig<>("PlaceThreshold", "The max ticks to place on entities", 0.0f, 2.0f, 25.0f, () -> modeConfig.getValue() != Anticheats.VANILLA));
     // GRIM
     Config<Boolean> miningFixConfig = register(new BooleanConfig("MiningFix", "Fixes vanilla mining on GrimV3", false, () -> modeConfig.getValue() == Anticheats.GRIM));
     Config<Boolean> webJumpFixConfig = register(new BooleanConfig("WebJumpFix", "Fixes sprint jumping in webs on grim", false, () -> modeConfig.getValue() == Anticheats.GRIM));
@@ -153,7 +153,7 @@ public class AnticheatModule extends ConcurrentModule
 
     public int getEntityPlaceThreshold()
     {
-        return entityPlaceConfig.getValue();
+        return modeConfig.getValue() == Anticheats.VANILLA ? 0 : Math.round(entityPlaceConfig.getValue() * 10.0f);
     }
 
     private enum Anticheats

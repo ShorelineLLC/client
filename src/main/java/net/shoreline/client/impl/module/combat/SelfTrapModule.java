@@ -166,6 +166,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             // All rotations for shift ticks must send extra packet
             // This may not work on all servers
             placeBlock(targetPos, blockItem);
+            blocksPlaced++;
         }
 
         if (rotateConfig.getValue())
@@ -291,7 +292,6 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
         });
         packets.put(pos, System.currentTimeMillis());
-        blocksPlaced++;
     }
 
     public void attackBlockingCrystals(List<BlockPos> posList)
