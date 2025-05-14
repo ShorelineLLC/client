@@ -2,7 +2,6 @@ package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -229,7 +228,7 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (serverPacket instanceof ExplosionS2CPacket packet && replaceConfig.getValue() == ReplaceMode.NORMAL)
+        if (serverPacket instanceof ExplosionS2CPacket packet && replaceConfig.getValue() == ReplaceMode.FAST)
         {
             BlockPos pos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
             if (surround.contains(pos))
@@ -243,7 +242,7 @@ public class SurroundModule extends ObsidianPlacerModule
             }
         }
 
-        if (serverPacket instanceof EntitiesDestroyS2CPacket packet && replaceConfig.getValue() == ReplaceMode.FAST)
+        if (serverPacket instanceof EntitiesDestroyS2CPacket packet && replaceConfig.getValue() == ReplaceMode.NORMAL)
         {
             for (int id : packet.getEntityIds())
             {
