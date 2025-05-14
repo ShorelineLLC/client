@@ -41,7 +41,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     Config<Float> rangeConfig = register(new NumberConfig<>("PlaceRange", "The range to trap enemies", 0.1f, 4.0f, 6.0f));
     Config<Float> enemyRangeConfig = register(new NumberConfig<>("EnemyRange", "The maximum range of targets", 0.1f, 10.0f, 15.0f));
     Config<Boolean> downConfig = register(new BooleanConfig("PreventDownwards", "Prevents digging downwards", true));
-    Config<Boolean> serverHitboxConfig = register(new BooleanConfig("HitboxSync", "Places on serverside crawling hitboxes", false));
     Config<Boolean> mineIgnoreConfig = register(new BooleanConfig("PreventMine", "Prevents enemies from mining the trap", false));
     Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
     Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
@@ -209,7 +208,6 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
                     && Managers.HITBOX.getCrawlingBoundingBox(e).intersects(surroundBox));
 
             if (!mc.world.getBlockState(surroundPos).isReplaceable()
-                    && !(serverCrawling && serverHitboxConfig.getValue())
                     && !(Managers.BLOCK.isPassed(surroundPos, 0.7f) && mineIgnoreConfig.getValue()))
             {
                 continue;
