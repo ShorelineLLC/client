@@ -8,6 +8,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
@@ -76,7 +77,7 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
     {
         blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && checkMultitask())
+        if (!multitaskConfig.getValue() && checkMultitask() || stopMotionConfig.getValue() && !mc.player.isOnGround())
         {
             surround.clear();
             placements.clear();
@@ -111,6 +112,13 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
             return;
         }
         placements.sort(Comparator.comparingInt(Vec3i::getY));
+
+        Vec3d prevMotion = mc.player.getVelocity();
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(0.0, 0.0, 0.0);
+        }
+
         while (blocksPlaced < shiftTicksConfig.getValue())
         {
             if (blocksPlaced >= placements.size())
@@ -127,6 +135,11 @@ public class AutoCrawlTrapModule extends ObsidianPlacerModule
         if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
+        }
+
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(prevMotion);
         }
     }
 

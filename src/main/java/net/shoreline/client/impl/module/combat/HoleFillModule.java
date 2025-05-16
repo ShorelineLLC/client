@@ -10,6 +10,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
@@ -93,7 +94,7 @@ public class HoleFillModule extends ObsidianPlacerModule
         //
         int blocksPlaced = 0;
 
-        if (!multitaskConfig.getValue() && checkMultitask())
+        if (!multitaskConfig.getValue() && checkMultitask() || stopMotionConfig.getValue() && !mc.player.isOnGround())
         {
             fills.clear();
             return;
@@ -168,6 +169,13 @@ public class HoleFillModule extends ObsidianPlacerModule
         {
             attackBlockingCrystals(fills);
         }
+
+        Vec3d prevMotion = mc.player.getVelocity();
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(0.0, 0.0, 0.0);
+        }
+
         while (blocksPlaced < shiftTicksConfig.getValue())
         {
             if (blocksPlaced >= fills.size())
@@ -185,6 +193,11 @@ public class HoleFillModule extends ObsidianPlacerModule
         if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
+        }
+
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(prevMotion);
         }
     }
 

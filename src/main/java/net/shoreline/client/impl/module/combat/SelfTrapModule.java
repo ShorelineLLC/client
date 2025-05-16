@@ -11,10 +11,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.EnumConfig;
@@ -110,7 +107,7 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             return;
         }
 
-        if (!multitaskConfig.getValue() && checkMultitask())
+        if (!multitaskConfig.getValue() && checkMultitask() || stopMotionConfig.getValue() && !mc.player.isOnGround())
         {
             surround.clear();
             placements.clear();
@@ -156,6 +153,13 @@ public final class SelfTrapModule extends ObsidianPlacerModule
             }
         }
         placements.sort(Comparator.comparingInt(Vec3i::getY));
+
+        Vec3d prevMotion = mc.player.getVelocity();
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(0.0, 0.0, 0.0);
+        }
+
         while (blocksPlaced < shiftTicksConfig.getValue())
         {
             if (blocksPlaced >= placements.size())
@@ -172,6 +176,11 @@ public final class SelfTrapModule extends ObsidianPlacerModule
         if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
+        }
+
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(prevMotion);
         }
     }
 

@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.setting.BooleanConfig;
 import net.shoreline.client.api.config.setting.NumberConfig;
@@ -71,7 +72,7 @@ public class AutoWebModule extends BlockPlacerModule
     @EventListener
     public void onPlayerTick(PlayerTickEvent event)
     {
-        if (!multitaskConfig.getValue() && checkMultitask())
+        if (!multitaskConfig.getValue() && checkMultitask() || stopMotionConfig.getValue() && !mc.player.isOnGround())
         {
             webs.clear();
             return;
@@ -131,6 +132,13 @@ public class AutoWebModule extends BlockPlacerModule
         {
             return;
         }
+
+        Vec3d prevMotion = mc.player.getVelocity();
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(0.0, 0.0, 0.0);
+        }
+
         while (blocksPlaced < shiftTicksConfig.getValue())
         {
             if (blocksPlaced >= webs.size())
@@ -148,6 +156,11 @@ public class AutoWebModule extends BlockPlacerModule
         if (rotateConfig.getValue())
         {
             Managers.ROTATION.setRotationSilentSync();
+        }
+
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(prevMotion);
         }
     }
 

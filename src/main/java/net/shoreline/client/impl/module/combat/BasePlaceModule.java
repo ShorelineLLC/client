@@ -74,6 +74,12 @@ public class BasePlaceModule extends ObsidianPlacerModule
     {
         startCooldown--;
 
+        if (!multitaskConfig.getValue() && checkMultitask() || stopMotionConfig.getValue() && !mc.player.isOnGround())
+        {
+            crystalBase = null;
+            return;
+        }
+
         if (!AutoCrystalModule.getInstance().isEnabled() || AutoCrystalModule.getInstance().isPlacing())
         {
             crystalBase = null;
@@ -105,7 +111,18 @@ public class BasePlaceModule extends ObsidianPlacerModule
             return;
         }
 
+        Vec3d prevMotion = mc.player.getVelocity();
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(0.0, 0.0, 0.0);
+        }
+
         placeBlock(crystalBase, blockItem);
+
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(prevMotion);
+        }
     }
 
     @EventListener

@@ -105,7 +105,7 @@ public class AutoAnchorModule extends BlockPlacerModule
             return;
         }
 
-        if (!multitaskConfig.getValue() && checkMultitask())
+        if (!multitaskConfig.getValue() && checkMultitask() || stopMotionConfig.getValue() && !mc.player.isOnGround())
         {
             anchorCalc = null;
             return;
@@ -145,6 +145,13 @@ public class AutoAnchorModule extends BlockPlacerModule
             if (placeTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f))
             {
                 Managers.INVENTORY.setSlot(slot);
+
+                Vec3d prevMotion = mc.player.getVelocity();
+                if (stopMotionConfig.getValue())
+                {
+                    mc.player.setVelocity(0.0, 0.0, 0.0);
+                }
+
                 Managers.INTERACT.placeBlock(anchorPos, Blocks.RESPAWN_ANCHOR, slot,
                         grimConfig.getValue(), strictDirectionConfig.getValue(), false, (state, angles) ->
                 {
@@ -163,6 +170,12 @@ public class AutoAnchorModule extends BlockPlacerModule
                         }
                     }
                 });
+
+                if (stopMotionConfig.getValue())
+                {
+                    mc.player.setVelocity(prevMotion);
+                }
+
                 Managers.INVENTORY.syncToClient();
                 placeTimer.reset();
             }

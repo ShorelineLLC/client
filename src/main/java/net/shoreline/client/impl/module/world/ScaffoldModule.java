@@ -153,6 +153,13 @@ public final class ScaffoldModule extends BlockPlacerModule
         {
             Managers.INVENTORY.setSlot(slot);
         }
+
+        Vec3d prevMotion = mc.player.getVelocity();
+        if (stopMotionConfig.getValue())
+        {
+            mc.player.setVelocity(0.0, 0.0, 0.0);
+        }
+
         boolean result = Managers.INTERACT.placeBlock(blockData.getBlockPos(), blockItem.block(), slot,
                 false, false, false, (state, angles) ->
         {
@@ -184,8 +191,14 @@ public final class ScaffoldModule extends BlockPlacerModule
                 }
             }
         });
+
         if (result)
         {
+            if (stopMotionConfig.getValue())
+            {
+                mc.player.setVelocity(prevMotion);
+            }
+
             if (!isGrim() && towerConfig.getValue() && mc.options.jumpKey.isPressed())
             {
                 final Vec3d velocity = mc.player.getVelocity();

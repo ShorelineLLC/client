@@ -13,6 +13,7 @@ public class BlockPlacerModule extends CombatModule
 {
     protected Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Places on visible sides only", false));
     protected Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
+    protected Config<Boolean> stopMotionConfig = register(new BooleanConfig("StopMotion", "Stops movement before placing", false));
 
     public BlockPlacerModule(String name, String desc, ModuleCategory category)
     {
