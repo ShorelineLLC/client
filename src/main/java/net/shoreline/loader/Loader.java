@@ -98,7 +98,7 @@ public class Loader implements
 	private static void loadNatives() throws Throwable
 	{
         String ext = getExt();
-        URL url = new URL("https://api.shorelineclient.net/natives");
+        URL url = new URL("https://api.shorelineclient.dev/natives");
 
         HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
         urlConnection.addRequestProperty("User-Agent", "shoreline-client");
