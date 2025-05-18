@@ -18,13 +18,13 @@ public class BlockPlacerModule extends CombatModule
     public BlockPlacerModule(String name, String desc, ModuleCategory category)
     {
         super(name, desc, category);
-        register(strictDirectionConfig, rotateConfig);
+        register(strictDirectionConfig, rotateConfig, stopMotionConfig);
     }
 
     public BlockPlacerModule(String name, String desc, ModuleCategory category, int rotationPriority)
     {
         super(name, desc, category, rotationPriority);
-        register(strictDirectionConfig, rotateConfig);
+        register(strictDirectionConfig, rotateConfig, stopMotionConfig);
     }
 
     protected int getSlot(final Predicate<ItemStack> filter)

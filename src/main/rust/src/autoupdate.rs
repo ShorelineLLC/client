@@ -9,7 +9,7 @@ use crate::network;
 pub async unsafe fn download_loader(path: &str) -> Result<(), String>
 
 {
-    let server_address = obfstr!("https://api.shorelineclient.net/update").to_string();
+    let server_address = obfstr!("https://api.shorelineclient.dev/update").to_string();
 
     return match network::verify_server_integrity(&server_address)
     {

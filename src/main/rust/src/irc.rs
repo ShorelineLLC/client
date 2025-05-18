@@ -27,7 +27,7 @@ impl IRC
     pub unsafe fn create_instance<'a>(token: String,
                                       env: &mut JNIEnv) -> &'a mut Self
     {
-        let server_address = obfstr!("wss://irc.shorelineclient.net/").to_string();
+        let server_address = obfstr!("wss://irc.shorelineclient.dev/").to_string();
         match network::verify_server_integrity(&server_address)
         {
             Ok(()) => {
@@ -130,7 +130,7 @@ impl IRC
     pub unsafe fn reconnect<'a>(token: String,
                                 env: &mut JNIEnv)
     {
-        let server_address = obfstr!("wss://irc.shorelineclient.net/").to_string();
+        let server_address = obfstr!("wss://irc.shorelineclient.dev/").to_string();
         match network::verify_server_integrity(&server_address)
         {
             Ok(()) => {

@@ -44,7 +44,7 @@ pub unsafe extern "system" fn perform_version_check<'a>(mut env: JNIEnv,
 unsafe fn internal_version_check(current_version: &str,
                                  env: &mut JNIEnv) -> Result<(), String>
 {
-    let server_address = obfstr!("https://api.shorelineclient.net/versioncheck").to_string();
+    let server_address = obfstr!("https://api.shorelineclient.dev/versioncheck").to_string();
 
     match network::verify_server_integrity(&server_address)
     {

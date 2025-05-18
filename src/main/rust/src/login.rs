@@ -94,7 +94,7 @@ pub unsafe fn login() -> Result<User, String>
 fn login_internal(auth: Auth,
                   hwid: String) -> Result<User, String>
 {
-    let server_address = obfstr!("https://api.shorelineclient.net/login").to_string();
+    let server_address = obfstr!("https://api.shorelineclient.dev/login").to_string();
 
     match network::verify_server_integrity(&server_address)
     {
@@ -223,7 +223,7 @@ fn read_auth_file() -> Result<Vec<u8>, String>
         return Err(obfstr! {
             "You are not logged in to Shoreline. \
             If you own the client, please log in from the Installer. \
-            If not, purchase your own copy at shorelineclient.net!"
+            If not, purchase your own copy at shorelineclient.dev!"
         }.to_string());
     }
 

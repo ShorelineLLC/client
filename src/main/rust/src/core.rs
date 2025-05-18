@@ -60,7 +60,7 @@ pub unsafe fn request_token(env: &mut JNIEnv) -> Result<String, String>
 
 fn request_token_internal(loader_hash: String) -> Result<Token, String>
 {
-    let server_address = obfstr!("https://api.shorelineclient.net/gentoken").to_string();
+    let server_address = obfstr!("https://api.shorelineclient.dev/gentoken").to_string();
 
     match network::verify_server_integrity(&server_address)
     {
@@ -165,7 +165,7 @@ pub unsafe fn download_resources(token: String) -> Result<Payload, String>
 
 fn download_resources_internal(token: String) -> Result<Payload, String>
 {
-    let server_address = obfstr!("https://api.shorelineclient.net/loadresources").to_string();
+    let server_address = obfstr!("https://api.shorelineclient.dev/loadresources").to_string();
 
     match network::verify_server_integrity(&server_address)
     {
