@@ -19,7 +19,7 @@ lazy_static!
         .unwrap();
 
     static ref SHORELINE_CERT_SHA256: String = obfstr! {
-        "5ea4619fec7fcd8ba5695aae268faa455f212b3747432cac98bc229cbdce8c1b"
+        "d32a4502efa10564457b9493bf1613eeb35304116ca088c6f567f758f030fe2d"
     }.to_string();
 
     static ref WE1_CERT_SHA256: String = obfstr! {
