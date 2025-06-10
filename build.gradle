@@ -12,6 +12,7 @@ import java.util.jar.JarOutputStream
 plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'com.github.gmazzo.buildconfig' version '5.3.5'
+    id 'io.franzbecker.gradle-lombok' version '5.0.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_21
@@ -54,6 +55,15 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "cabaletta:baritone-api:${baritone_api_version}"
+
+    compileOnly("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("org.projectlombok:lombok:1.18.38")
+
+    testCompileOnly("org.projectlombok:lombok:1.18.38")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 
 processResources {

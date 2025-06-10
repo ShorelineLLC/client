@@ -4,14 +4,14 @@ import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * @author linus
- * @since 1.0
+ * @since 2.0
  */
 
 public class ShorelineMod
 {
     public static final String MOD_NAME = "Shoreline";
     public static final String MOD_VER = BuildConfig.VERSION;
-    public static final String MOD_MC_VER = "1.21.1";
+    public static final String MOD_MC_VER = "1.21.5";
 
     public ShorelineMod()
     {

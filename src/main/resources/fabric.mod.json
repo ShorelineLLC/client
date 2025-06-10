@@ -11,14 +11,6 @@
     "homepage": "https://shorelineclient.net/"
   },
   "environment": "client",
-  "entrypoints": {
-    "preLaunch": [
-      "net.shoreline.loader.Loader"
-    ],
-    "client": [
-      "net.shoreline.loader.Loader"
-    ]
-  },
   "mixins": [
     "mixins.shoreline.json"
   ],

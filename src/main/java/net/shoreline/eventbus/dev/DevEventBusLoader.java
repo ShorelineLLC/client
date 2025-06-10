@@ -18,9 +18,7 @@ import java.util.Map;
 @SuppressWarnings("unused") // Called natively
 public final class DevEventBusLoader
 {
-    /**
-     * Loads all the event types into the event bus map
-     */
+    /*
     public static void load()
     {
         try
@@ -79,4 +77,5 @@ public final class DevEventBusLoader
             }
         }
     }
+    */
 }
