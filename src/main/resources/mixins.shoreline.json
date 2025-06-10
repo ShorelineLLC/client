@@ -3,7 +3,8 @@
   "package": "net.shoreline.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-
+    "MixinMinecraftClient",
+    "gui.hud.MixinInGameHud"
   ],
   "injectors": {
     "defaultRequire": 1

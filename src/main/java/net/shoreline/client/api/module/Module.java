@@ -1,11 +1,14 @@
 package net.shoreline.client.api.module;
 
 import lombok.Getter;
+import net.minecraft.client.MinecraftClient;
 import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.config.Configuration;
 
 public class Module extends Configuration implements Identifiable
 {
+    protected static final MinecraftClient mc = MinecraftClient.getInstance();
+
     private final String name;
     private final String[] nameAliases;
 

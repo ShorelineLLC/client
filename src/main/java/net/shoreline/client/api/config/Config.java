@@ -21,6 +21,10 @@ public class Config<T> implements Identifiable, Serializable
 
     @Getter
     @Setter
+    private ConfigGroup configGroup;
+
+    @Getter
+    @Setter
     private T value;
 
     @Getter

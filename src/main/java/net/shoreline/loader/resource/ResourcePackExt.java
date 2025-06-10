@@ -7,7 +7,7 @@ import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackInfo;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.resource.metadata.ResourceMetadataReader;
+import net.minecraft.resource.metadata.ResourceMetadataSerializer;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,9 +87,9 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
 
     @Nullable
     @Override
-    public <T> T parseMetadata(ResourceMetadataReader<T> metaReader) throws IOException
+    public <T> T parseMetadata(ResourceMetadataSerializer<T> metadataSerializer) throws IOException
     {
-        return this.parent.parseMetadata(metaReader);
+        return this.parent.parseMetadata(metadataSerializer);
     }
 
     @Override

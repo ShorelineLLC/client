@@ -78,8 +78,10 @@ public final class EventBus
             Class<?> eventType = paramTypes[0];
             int priority = method.getAnnotation(EventListener.class).priority();
 
-            Invoker invoker = invokerCache.computeIfAbsent(method, m -> {
-                try {
+            Invoker invoker = invokerCache.computeIfAbsent(method, m ->
+            {
+                try
+                {
                     MethodHandle handle = lookup.unreflect(m);
 
                     MethodType factoryType = MethodType.methodType(Invoker.class, clazz);
@@ -96,7 +98,8 @@ public final class EventBus
                     );
 
                     return (Invoker) site.getTarget().invoke(subscriber);
-                } catch (Throwable t) {
+                } catch (Throwable t)
+                {
                     throw new RuntimeException("Failed to create invoker for: " + m, t);
                 }
             });
@@ -104,15 +107,18 @@ public final class EventBus
             Integer boxedPriority = priority;
             InvokerNode newNode = new InvokerNode(invoker, subscriber, boxedPriority);
 
-            event2InvokerMap.compute(eventType, (key, head) -> {
-                if (head == null) {
+            event2InvokerMap.compute(eventType, (key, head) ->
+            {
+                if (head == null)
+                {
                     head = new InvokerNode(null, null, null); // dummy head
                 }
 
                 InvokerNode prev = head;
                 InvokerNode curr = head.next;
 
-                while (curr != null && curr.priority >= priority) {
+                while (curr != null && curr.priority >= priority)
+                {
                     prev = curr;
                     curr = curr.next;
                 }
@@ -125,30 +131,40 @@ public final class EventBus
         }
     }
 
-    public void unsubscribe(Object subscriber) {
-        for (Map.Entry<Class<?>, InvokerNode> entry : event2InvokerMap.entrySet()) {
+    public void unsubscribe(Object subscriber)
+    {
+        for (Map.Entry<Class<?>, InvokerNode> entry : event2InvokerMap.entrySet())
+        {
             InvokerNode head = entry.getValue();
             InvokerNode prev = head;
             InvokerNode curr = head.next;
 
-            while (curr != null) {
-                if (curr.subscriber == subscriber) {
+            while (curr != null)
+            {
+                if (curr.subscriber == subscriber)
+                {
                     prev.next = curr.next;
-                } else {
+                } else
+                {
                     prev = curr;
                 }
+
                 curr = curr.next;
             }
         }
     }
 
-    public static final class InvokerNode {
+    public static final class InvokerNode
+    {
         private InvokerNode next;
         private final Invoker invoker;
         private final Object subscriber;
         private final Integer priority;
 
-        private InvokerNode(Invoker invoker, Object subscriber, Integer priority) {
+        private InvokerNode(Invoker invoker,
+                            Object subscriber,
+                            Integer priority)
+        {
             this.invoker = invoker;
             this.subscriber = subscriber;
             this.priority = priority;
@@ -156,7 +172,8 @@ public final class EventBus
     }
 
     @FunctionalInterface
-    public interface Invoker {
+    public interface Invoker
+    {
         void invoke(Object event);
     }
 }

@@ -1,5 +1,6 @@
 package net.shoreline.client;
 
+import net.shoreline.client.impl.Managers;
 import net.shoreline.loader.Loader;
 
 /**
@@ -24,6 +25,8 @@ public class Shoreline
         // Debug information - required when submitting a crash / bug report
         info("This build of Shoreline is on Git hash {} and was compiled on {}", BuildConfig.HASH, BuildConfig.BUILD_TIME);
         info("Starting preInit ...");
+
+        Managers.init();
 
         SHUTDOWN = new ShutdownHook();
         Runtime.getRuntime().addShutdownHook(SHUTDOWN);
