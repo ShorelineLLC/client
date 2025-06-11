@@ -5,6 +5,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.macro.ModuleKeybind;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.eventbus.EventBus;
 import org.lwjgl.glfw.GLFW;
 
@@ -65,7 +66,10 @@ public class Toggleable extends Module
 
     public void setKeybind(int keycode)
     {
-        keybind.setValue(new ModuleKeybind(keycode, this));
+        Managers.MACROS.unregister(getKeybind());
+        ModuleKeybind keybind1 = new ModuleKeybind(keycode, this);
+        keybind.setValue(keybind1);
+        Managers.MACROS.register(keybind1);
     }
 
     public Macro getKeybind()

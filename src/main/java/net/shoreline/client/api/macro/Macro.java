@@ -20,6 +20,9 @@ public class Macro
 
     public void onKeyPress()
     {
-        command.run();
+        if (getCommand() != null)
+        {
+            getCommand().run();
+        }
     }
 }

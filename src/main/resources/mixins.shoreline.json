@@ -3,6 +3,7 @@
   "package": "net.shoreline.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "MixinKeyboard",
     "MixinMinecraftClient",
     "gui.hud.MixinInGameHud"
   ],

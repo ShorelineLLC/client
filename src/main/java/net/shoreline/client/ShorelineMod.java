@@ -2,6 +2,7 @@ package net.shoreline.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 
 /**
  * @author linus

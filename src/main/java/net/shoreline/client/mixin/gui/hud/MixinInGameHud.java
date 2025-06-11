@@ -14,7 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinInGameHud
 {
     @Inject(method = "render", at = @At(value = "TAIL"))
-    private void hookRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void hookRender(DrawContext context,
+                            RenderTickCounter tickCounter,
+                            CallbackInfo ci)
     {
         EventBus.INSTANCE.dispatch(new HudOverlayEvent.Post(
                 context, tickCounter.getTickProgress(true)));

@@ -1,17 +1,10 @@
 package net.shoreline.client.api.module;
 
 import lombok.Getter;
-import net.minecraft.client.MinecraftClient;
-import net.shoreline.client.api.Identifiable;
 import net.shoreline.client.api.config.Configuration;
 
-public class Module extends Configuration implements Identifiable
+public class Module extends Configuration
 {
-    protected static final MinecraftClient mc = MinecraftClient.getInstance();
-
-    private final String name;
-    private final String[] nameAliases;
-
     @Getter
     private final String description;
 
@@ -22,8 +15,7 @@ public class Module extends Configuration implements Identifiable
                   final String description,
                   final GuiCategory category)
     {
-        this.name = name;
-        this.nameAliases = new String[0];
+        super(name, new String[0]);
         this.description = description;
         this.category = category;
     }
@@ -33,27 +25,14 @@ public class Module extends Configuration implements Identifiable
                   final String description,
                   final GuiCategory category)
     {
-        this.name = name;
-        this.nameAliases = nameAliases;
+        super(name, nameAliases);
         this.description = description;
         this.category = category;
     }
 
     @Override
-    public String getName()
-    {
-        return name;
-    }
-
-    @Override
-    public String[] getAliases()
-    {
-        return nameAliases;
-    }
-
-    @Override
     public String getId()
     {
-        return String.format("%s_module", name.toLowerCase());
+        return String.format("%s_module", getName().toLowerCase());
     }
 }

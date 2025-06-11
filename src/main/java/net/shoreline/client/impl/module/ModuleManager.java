@@ -1,8 +1,9 @@
 package net.shoreline.client.impl.module;
 
 import net.shoreline.client.api.module.Module;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.HudModule;
-import net.shoreline.loader.Loader;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -15,6 +16,8 @@ public class ModuleManager
     public ModuleManager()
     {
         registerModules(
+                new ClickGuiModule(),
+                new ColorsModule(),
                 new HudModule()
         );
     }

@@ -2,12 +2,12 @@ package net.shoreline.client.impl.module.client;
 
 import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
-import net.shoreline.client.api.module.Concurrent;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-public class HudModule extends Concurrent
+public class HudModule extends Toggleable
 {
 
     public HudModule() {
