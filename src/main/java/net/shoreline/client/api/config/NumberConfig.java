@@ -3,14 +3,12 @@ package net.shoreline.client.api.config;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public class NumberConfig<T extends Number> extends Config<T>
 {
-    @Getter
-    @Setter
     private T min, max;
 
-    @Getter
-    @Setter
     private int roundingPlaces;
 
     public NumberConfig(String name, String description) {
@@ -48,12 +46,10 @@ public class NumberConfig<T extends Number> extends Config<T>
         public Config<T> build()
         {
             final NumberConfig build = (NumberConfig) super.build();
-
             if (min != null)
             {
                 build.setMin((Number) min);
             }
-
             if (max != null)
             {
                 build.setMax((Number) max);

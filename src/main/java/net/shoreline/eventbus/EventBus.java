@@ -12,36 +12,11 @@ public final class EventBus
 {
     public static final EventBus INSTANCE = new EventBus();
 
-    /**
-     * A Map<Class<Event>, Invoker> where the keys are the linked list for that event type.
-     *
-     * So the list may look like...
-     *
-     * <PacketEvent:Invoker>,
-     * <RenderEvent:Invoker>,
-     * <JoinGameEvent:Invoker>
-     *
-     * This way, instead of a single linked list that we iterate down each time an event is posted,
-     * we query the map to get the linked list associated with a certain event and invoke ALL the events
-     * on that chain of invokers, without checking if the methodType matches the eventType.
-     *
-     * If we are in a development environment, use reflection to gather every Event class instance.
-     * then put them in the map with a null invoker (stop_decompiling_1(null, null, null, null)).
-     * (@see DevEventBusLoader)
-     *
-     * If we are loading the client dynamically, each time the native class loader encounters a class that
-     * extends Event, it puts it on this map with a null invoker.
-     *
-     * So essentially there is no computeIfAbsent for this list, it is always filled when the DLL is loaded.
-     */
     private final Map<Class<?>, InvokerNode> event2InvokerMap = new ConcurrentHashMap<>();
     private final Map<Method, Invoker> invokerCache = new HashMap<>();
 
     private EventBus() {}
 
-    /**
-     * Iterate through the linked list for the event and invoke any entries matching the event type
-     */
     public void dispatch(Event event)
     {
         InvokerNode head = event2InvokerMap.get(event.getClass());
@@ -49,7 +24,6 @@ public final class EventBus
         {
             return;
         }
-
         InvokerNode current = head.next;
 
         while (current != null)
@@ -73,7 +47,10 @@ public final class EventBus
 
             method.setAccessible(true);
             Class<?>[] paramTypes = method.getParameterTypes();
-            if (paramTypes.length != 1 || !Event.class.isAssignableFrom(paramTypes[0])) continue;
+            if (paramTypes.length != 1 || !Event.class.isAssignableFrom(paramTypes[0]))
+            {
+                continue;
+            }
 
             Class<?> eventType = paramTypes[0];
             int priority = method.getAnnotation(EventListener.class).priority();
@@ -139,8 +116,7 @@ public final class EventBus
             InvokerNode prev = head;
             InvokerNode curr = head.next;
 
-            while (curr != null)
-            {
+            while (curr != null) {
                 if (curr.subscriber == subscriber)
                 {
                     prev.next = curr.next;
@@ -148,7 +124,6 @@ public final class EventBus
                 {
                     prev = curr;
                 }
-
                 curr = curr.next;
             }
         }

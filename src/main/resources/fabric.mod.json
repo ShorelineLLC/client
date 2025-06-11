@@ -11,6 +11,11 @@
     "homepage": "https://shorelineclient.net/"
   },
   "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.shoreline.client.ShorelineMod"
+    ]
+  },
   "mixins": [
     "mixins.shoreline.json"
   ],

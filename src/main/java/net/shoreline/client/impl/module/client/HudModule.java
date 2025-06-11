@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.client;
 
-import net.minecraft.text.Text;
 import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.module.Concurrent;
@@ -23,7 +22,6 @@ public class HudModule extends Concurrent
                 !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
                 !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : "");
 
-        mc.inGameHud.getChatHud().addMessage(Text.of("lol"));
         event.getContext().drawText(mc.textRenderer, watermarkText, 2, 2, -1, true);
     }
 }

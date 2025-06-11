@@ -8,29 +8,19 @@ import net.shoreline.client.api.Serializable;
 
 import java.util.function.Supplier;
 
+@Getter
+@Setter
 public class Config<T> implements Identifiable, Serializable
 {
     private final String name;
 
-    @Getter
-    @Setter
     private String[] nameAliases;
-
-    @Getter
     private final String description;
-
-    @Getter
-    @Setter
     private ConfigGroup configGroup;
 
-    @Getter
-    @Setter
     private T value;
-
-    @Getter
     private final T defaultValue;
 
-    @Setter
     private Supplier<Boolean> visible;
 
     public Config(String name, String description)

@@ -1,5 +1,6 @@
 package net.shoreline.client;
 
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
 /**
@@ -7,22 +8,18 @@ import net.fabricmc.loader.api.FabricLoader;
  * @since 2.0
  */
 
-public class ShorelineMod
+public class ShorelineMod implements ClientModInitializer
 {
     public static final String MOD_NAME = "Shoreline";
     public static final String MOD_VER = BuildConfig.VERSION;
     public static final String MOD_MC_VER = "1.21.5";
-
-    public ShorelineMod()
-    {
-        System.exit(-1);
-    }
 
     /**
      * This code runs as soon as Minecraft is in a mod-load-ready state.
      * However, some things (like resources) may still be uninitialized.
      * Proceed with mild caution.
      */
+    @Override
     public void onInitializeClient()
     {
         Shoreline.init();

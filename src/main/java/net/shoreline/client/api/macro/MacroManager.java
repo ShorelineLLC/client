@@ -16,6 +16,6 @@ public class MacroManager
     @EventListener
     public void onTick(TickEvent event)
     {
-        
+
     }
 }

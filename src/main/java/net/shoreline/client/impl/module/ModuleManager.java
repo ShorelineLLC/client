@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module;
 
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.HudModule;
+import net.shoreline.loader.Loader;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;

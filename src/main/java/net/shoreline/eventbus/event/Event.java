@@ -1,23 +1,15 @@
 package net.shoreline.eventbus.event;
 
+import lombok.Getter;
 import net.shoreline.eventbus.annotation.Cancelable;
 
+@Getter
 public class Event
 {
     private final boolean cancelable =
             getClass().isAnnotationPresent(Cancelable.class);
 
     private boolean canceled;
-
-    public boolean isCancelable()
-    {
-        return cancelable;
-    }
-
-    public boolean isCanceled()
-    {
-        return canceled;
-    }
 
     public void setCanceled(boolean cancel)
     {

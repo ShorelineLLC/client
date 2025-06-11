@@ -21,46 +21,46 @@ import java.util.List;
 import java.util.Set;
 
 public class Loader implements
-		ClientModInitializer, PreLaunchEntrypoint, // Fabric
+		// ClientModInitializer, PreLaunchEntrypoint, // Fabric
 		IMixinConfigPlugin // Sponge
 {
 	private static final Logger LOGGER = LogManager.getLogger("Shoreline");
 	public static final String VERSION = "r1.0.2";
 
-	public static final UserSession SESSION;
+	//public static final UserSes sion SESSION;
 
 	static
 	{
 		info("Loading Shoreline...");
 
-		try
-		{
-			loadNatives();
-		} catch (Throwable t)
-		{
-			error("Failed to load Shoreline's dependant libraries.");
-
-			JOptionPane.showMessageDialog(
-					null,
-					"Failed to load Shoreline's dependant libraries.\n\n" + t.getMessage(),
-					"Error",
-					JOptionPane.ERROR_MESSAGE
-			);
-
-			System.exit(-1);
-		}
-
-		SESSION = UserSession.load();
-		performVersionCheck(VERSION);
+//		try
+//		{
+//			loadNatives();
+//		} catch (Throwable t)
+//		{
+//			error("Failed to load Shoreline's dependant libraries.");
+//
+//			JOptionPane.showMessageDialog(
+//					null,
+//					"Failed to load Shoreline's dependant libraries.\n\n" + t.getMessage(),
+//					"Error",
+//					JOptionPane.ERROR_MESSAGE
+//			);
+//
+//			System.exit(-1);
+//		}
+//
+//		SESSION = UserSession.load();
+//		performVersionCheck(VERSION);
 	}
 
 	/* -------------------------------- Fabric --------------------------------*/
 
-	@Override
-	public native void onPreLaunch();
+	// @Override
+	// public native void onPreLaunch();
 
-	@Override
-	public native void onInitializeClient();
+	// @Override
+	// public native void onInitializeClient();
 
 	/* -------------------------------- Sponge --------------------------------*/
 

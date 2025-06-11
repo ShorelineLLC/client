@@ -14,8 +14,7 @@ public class Toggleable extends Module
             .setNameAliases("Toggled").setDefaultValue(false).build();
 
     final Config<Macro> keybind = new MacroConfig.Builder("Bind", "The module keybind")
-            .setNameAliases("Keybind")
-            .setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
+            .setNameAliases("Keybind").setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
 
     public Toggleable(final String name,
                       final String description,

@@ -4,14 +4,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@Setter
 @RequiredArgsConstructor
 public class Macro
 {
-    @Getter
-    @Setter
     private int keycode;
-
-    @Getter
     private final Runnable command;
 
     public Macro(int keycode, Runnable command)
