@@ -8,12 +8,10 @@ import net.shoreline.eventbus.event.Event;
 public class HudOverlayEvent extends Event
 {
     @RequiredArgsConstructor
+    @Getter
     public static class Post extends HudOverlayEvent
     {
-        @Getter
         private final DrawContext context;
-
-        @Getter
         private final float tickDelta;
     }
 }

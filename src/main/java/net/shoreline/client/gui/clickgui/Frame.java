@@ -3,6 +3,11 @@ package net.shoreline.client.gui.clickgui;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
+import net.shoreline.client.gui.DrawableComponent;
+import net.shoreline.client.gui.Interactable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +25,9 @@ public class Frame extends DrawableComponent implements Interactable
 
     private boolean collapsed;
     private boolean dragging;
+
+    // Components can be added inside the frame
+    private final List<FrameComponent> components = new ArrayList<>();
 
     public Frame(String title, int x, int y, int width, int titleHeight)
     {
@@ -51,11 +59,11 @@ public class Frame extends DrawableComponent implements Interactable
         drawText(context, title, x + 3, y + 4, -1);
 
         drawRect(context, x, y + titleHeight, width, frameHeight, theme.getBackgroundColor());
+        drawOutline(context, x, y + titleHeight, width, frameHeight, 1, theme.getOutlineColor());
 
         px = mouse.getMouseX();
         py = mouse.getMouseY();
     }
-
 
     @Override
     public void mouseClicked(double mouseX,
@@ -95,5 +103,10 @@ public class Frame extends DrawableComponent implements Interactable
     public void charTyped(char chr,
                           int modifiers)
     {
+    }
+
+    protected void addComponent(FrameComponent component)
+    {
+        components.add(component);
     }
 }

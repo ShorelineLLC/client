@@ -1,10 +1,11 @@
-package net.shoreline.client.gui.clickgui;
+package net.shoreline.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.util.Window;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 
 public abstract class DrawableComponent
 {
@@ -23,6 +24,21 @@ public abstract class DrawableComponent
                             int color)
     {
         context.fill(x, y, x + width, y + height, color);
+    }
+
+    protected void drawOutline(DrawContext context,
+                               int x,
+                               int y,
+                               int width,
+                               int height,
+                               int thickness,
+                               int color)
+    {
+        int t2 = thickness * 2;
+        drawRect(context, x - thickness, y - thickness, width + t2, thickness, color);
+        drawRect(context, x - thickness, y, thickness, height, color);
+        drawRect(context, x + width, y, thickness, height, color);
+        drawRect(context, x - thickness, y + height, width + t2, thickness, color);
     }
 
     protected void drawText(DrawContext context,
