@@ -13,7 +13,7 @@ public class ConfigFactory<T>
         this.defaultValue = defaultValue;
     }
 
-    public Config<T> create(String name, String description)
+    public Config<T> create(final String name, final String description)
     {
         if (defaultValue instanceof Boolean)
         {
@@ -33,6 +33,9 @@ public class ConfigFactory<T>
         } else if (defaultValue instanceof Color)
         {
             return (Config<T>) new ColorConfig(name, description);
+        } else if (defaultValue instanceof String)
+        {
+            return (Config<T>) new StringConfig(name, description);
         } else if (defaultValue instanceof Macro)
         {
             return (Config<T>) new MacroConfig(name, description);

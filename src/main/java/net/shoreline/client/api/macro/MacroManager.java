@@ -29,12 +29,10 @@ public class MacroManager extends GenericFeature
 
         for (Macro macro : macros)
         {
-            if (macro.getKeycode() > GLFW.GLFW_KEY_LAST || event.getKey() != macro.getKeycode())
+            if (macro.getKeycode() <= GLFW.GLFW_KEY_LAST && event.getKey() == macro.getKeycode())
             {
-                continue;
+                macro.onKeyPress();
             }
-
-            macro.onKeyPress();
         }
     }
 

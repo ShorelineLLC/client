@@ -13,6 +13,16 @@ public class Mouse
 
     public boolean isInBounds(int x1, int y1, int x2, int y2)
     {
+        return isInBounds(mouseX, mouseY, x1, y1, x2, y2);
+    }
+
+    public static boolean isInBounds(double mouseX,
+                                     double mouseY,
+                                     int x1,
+                                     int y1,
+                                     int x2,
+                                     int y2)
+    {
         return mouseX >= x1 && mouseX <= x1 + x2 && mouseY >= y1 && mouseY <= y1 + y2;
     }
 }

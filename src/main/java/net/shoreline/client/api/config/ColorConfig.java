@@ -4,7 +4,8 @@ import com.google.gson.JsonObject;
 
 import java.awt.*;
 
-public class ColorConfig extends Config<Color> {
+public class ColorConfig extends Config<Color>
+{
     public ColorConfig(String name, String description) {
         super(name, description);
     }
@@ -27,9 +28,10 @@ public class ColorConfig extends Config<Color> {
             super(name, description);
         }
 
-        public void setRgb(int rgb)
+        public Builder setRgb(int rgb)
         {
             setDefaultValue(new Color(rgb));
+            return this;
         }
     }
 }

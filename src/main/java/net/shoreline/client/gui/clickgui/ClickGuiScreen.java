@@ -5,7 +5,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.gui.ScissorStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -19,9 +18,7 @@ public class ClickGuiScreen extends Screen
 
     @Getter
     private final Mouse mouse = new Mouse();
-
-    @Getter
-    private final ScissorStack scissorStack = new ScissorStack();
+    private boolean draggingMouse;
 
     @Getter
     private final Theme theme = new ThemeBuilder()
@@ -41,7 +38,7 @@ public class ClickGuiScreen extends Screen
         {
             Frame frame = new GuiCategoryFrame(category, frameOffset, 15, 120, 17);
             guiFrames.add(frame);
-            frameOffset += frame.getWidth() + 2;
+            frameOffset += frame.getWidth() + 4;
         }
     }
 
@@ -53,9 +50,10 @@ public class ClickGuiScreen extends Screen
     {
         for (Frame frame : guiFrames)
         {
-            if (mouse.isInBounds(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()) && mouse.isLeftHeld())
+            if (!draggingMouse && mouse.isInBounds(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()) && mouse.isLeftHeld())
             {
                 frame.setDragging(true);
+                draggingMouse = true;
             }
 
             frame.drawComponent(context, mouseX, mouseY, deltaTicks);
@@ -103,6 +101,12 @@ public class ClickGuiScreen extends Screen
 
         for (Frame frame : guiFrames)
         {
+            if (!frame.isCollapsed())
+            {
+                frame.setDragging(false);
+                draggingMouse = false;
+            }
+
             frame.mouseReleased(mouseX, mouseY, button);
         }
 

@@ -29,4 +29,9 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;
     }
+
+    protected boolean isInBounds(Mouse mouse)
+    {
+        return mouse.isInBounds(x, y, x + frameWidth, y + frameHeight);
+    }
 }

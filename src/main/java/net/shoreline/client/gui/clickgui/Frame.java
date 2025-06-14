@@ -5,6 +5,9 @@ import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
+import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.Easing;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,8 @@ public class Frame extends DrawableComponent implements Interactable
 
     // Components can be added inside the frame
     private final List<FrameComponent> components = new ArrayList<>();
+
+    private final Animation collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
 
     public Frame(String title, int x, int y, int width, int titleHeight)
     {
@@ -55,11 +60,16 @@ public class Frame extends DrawableComponent implements Interactable
 
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
-        drawText(context, title, x + 3, y + 4, -1);
+        drawRect(context, x - 1, y, width + 2, titleHeight, theme.getTitleColor());
+        drawText(context, title, x + 3, y + 5, -1);
 
-        drawRect(context, x, y + titleHeight, width, frameHeight, theme.getBackgroundColor());
-        drawOutline(context, x, y + titleHeight, width, frameHeight, 1, theme.getOutlineColor());
+        if (collapseAnim.getFactor() > 0.0)
+        {
+            context.enableScissor(x - 1, y + titleHeight, x + width + 2, y + titleHeight + (int) (frameHeight * collapseAnim.getFactor()) + 1);
+            drawRect(context, x, y + titleHeight, width, frameHeight, theme.getBackgroundColor());
+            drawOutline(context, x, y + titleHeight, width, frameHeight, 1, theme.getOutlineColor());
+            context.disableScissor();
+        }
 
         px = mouse.getMouseX();
         py = mouse.getMouseY();
@@ -70,6 +80,17 @@ public class Frame extends DrawableComponent implements Interactable
                              double mouseY,
                              int mouseButton)
     {
+        if (Mouse.isInBounds(mouseX, mouseY, x, y, width, titleHeight)
+                && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            this.collapsed = !collapsed;
+            collapseAnim.setState(collapsed);
+        }
+
+        for (FrameComponent component : components)
+        {
+            component.mouseClicked(mouseX, mouseY, mouseButton);
+        }
     }
 
     @Override
@@ -77,11 +98,11 @@ public class Frame extends DrawableComponent implements Interactable
                               double mouseY,
                               int button)
     {
-        if (!isCollapsed())
-        {
-            setDragging(false);
-        }
 
+        for (FrameComponent component : components)
+        {
+            component.mouseReleased(mouseX, mouseY, button);
+        }
     }
 
     @Override
@@ -90,6 +111,10 @@ public class Frame extends DrawableComponent implements Interactable
                               double horizontalAmount,
                               double verticalAmount)
     {
+        for (FrameComponent component : components)
+        {
+            component.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        }
     }
 
     @Override
@@ -97,12 +122,20 @@ public class Frame extends DrawableComponent implements Interactable
                            int scanCode,
                            int modifiers)
     {
+        for (FrameComponent component : components)
+        {
+            component.keyPressed(keyCode, scanCode, modifiers);
+        }
     }
 
     @Override
     public void charTyped(char chr,
                           int modifiers)
     {
+        for (FrameComponent component : components)
+        {
+            component.charTyped(chr, modifiers);
+        }
     }
 
     protected void addComponent(FrameComponent component)
