@@ -3,7 +3,7 @@ package net.shoreline.client.api.module;
 import lombok.Getter;
 import net.shoreline.client.api.config.Configuration;
 
-public class Module extends Configuration
+public abstract class Module extends Configuration
 {
     @Getter
     private final String description;

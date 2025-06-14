@@ -1,6 +1,5 @@
 package net.shoreline.client.api.config;
 
-import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.api.Identifiable;
@@ -10,7 +9,7 @@ import java.util.function.Supplier;
 
 @Getter
 @Setter
-public class Config<T> implements Identifiable, Serializable
+public abstract class Config<T> implements Identifiable, Serializable
 {
     private final String name;
 
@@ -46,18 +45,6 @@ public class Config<T> implements Identifiable, Serializable
     public String getId()
     {
         return String.format("%s_config", name.toLowerCase());
-    }
-
-    @Override
-    public JsonObject toJson()
-    {
-        return null;
-    }
-
-    @Override
-    public void fromJson(JsonObject jsonObject)
-    {
-
     }
 
     public boolean isVisible()

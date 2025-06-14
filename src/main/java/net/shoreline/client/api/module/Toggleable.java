@@ -1,5 +1,6 @@
 package net.shoreline.client.api.module;
 
+import com.google.gson.JsonObject;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
@@ -58,6 +59,18 @@ public class Toggleable extends Module
     protected void onEnable() {}
 
     protected void onDisable() {}
+
+    @Override
+    public JsonObject toJson()
+    {
+        return null;
+    }
+
+    @Override
+    public void fromJson(JsonObject jsonObject)
+    {
+
+    }
 
     public boolean isEnabled()
     {

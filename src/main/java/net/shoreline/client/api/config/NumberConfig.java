@@ -1,5 +1,6 @@
 package net.shoreline.client.api.config;
 
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,18 @@ public class NumberConfig<T extends Number> extends Config<T>
 
     public NumberConfig(String name, String description) {
         super(name, description);
+    }
+
+    @Override
+    public JsonObject toJson()
+    {
+        return null;
+    }
+
+    @Override
+    public void fromJson(JsonObject jsonObject)
+    {
+
     }
 
     public static class Builder<T extends Number> extends ConfigBuilder<T>

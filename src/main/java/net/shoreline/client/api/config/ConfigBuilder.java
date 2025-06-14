@@ -4,6 +4,8 @@ import java.util.function.Supplier;
 
 public abstract class ConfigBuilder<T>
 {
+    private ConfigFactory<T> factory;
+
     private final String name;
     private final String description;
 
@@ -26,6 +28,7 @@ public abstract class ConfigBuilder<T>
     public ConfigBuilder<T> setDefaultValue(T value)
     {
         this.defaultValue = value;
+        this.factory = new ConfigFactory<>(value);
         return this;
     }
 
@@ -37,7 +40,12 @@ public abstract class ConfigBuilder<T>
 
     public Config<T> build()
     {
-        final Config<T> build = new Config<>(name, description);
+        if (factory == null)
+        {
+            throw new IllegalStateException("Config has no default value!");
+        }
+
+        final Config<T> build = factory.create(name, description);
         if (nameAliases != null)
         {
             build.setNameAliases(nameAliases);

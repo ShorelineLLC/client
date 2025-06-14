@@ -7,7 +7,7 @@ import net.shoreline.client.api.Serializable;
 import java.util.LinkedHashMap;
 import java.util.SequencedCollection;
 
-public class Configuration extends GenericFeature implements Serializable
+public abstract class Configuration extends GenericFeature implements Serializable
 {
     private final LinkedHashMap<String, Config<?>> configs = new LinkedHashMap<>();
 
@@ -23,18 +23,6 @@ public class Configuration extends GenericFeature implements Serializable
     public Config<?> getConfig(String id)
     {
         return configs.get(id);
-    }
-
-    @Override
-    public JsonObject toJson()
-    {
-        return null;
-    }
-
-    @Override
-    public void fromJson(JsonObject jsonObject)
-    {
-
     }
 
     public SequencedCollection<Config<?>> getConfigs()

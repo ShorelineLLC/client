@@ -32,7 +32,7 @@ public class GenericFeature implements Identifiable
     @Override
     public String getId()
     {
-        return String.format("%s_service", name);
+        return String.format("%s_feature", name);
     }
 
     protected boolean checkNull()
