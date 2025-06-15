@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
+import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
 import org.lwjgl.glfw.GLFW;
@@ -30,9 +31,10 @@ public class Frame extends DrawableComponent implements Interactable
     private boolean dragging;
 
     // Components can be added inside the frame
+    private final ComponentFactory componentFactory = new ComponentFactory();
     private final List<FrameComponent> components = new ArrayList<>();
 
-    private final Animation collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
+    private final Animation collapseAnim = new Animation(true, 150L, Easing.CUBIC_IN_OUT);
 
     public Frame(String title, int x, int y, int width, int titleHeight)
     {
@@ -60,14 +62,21 @@ public class Frame extends DrawableComponent implements Interactable
 
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        drawRect(context, x - 1, y, width + 2, titleHeight, theme.getTitleColor());
+        drawOutline(context, x + 1, y + 1, width - 2, titleHeight + (int) (frameHeight * collapseAnim.getFactor()) - 2, 1, theme.getOutlineColor());
+        drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
+        drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
         drawText(context, title, x + 3, y + 5, -1);
 
         if (collapseAnim.getFactor() > 0.0)
         {
-            context.enableScissor(x - 1, y + titleHeight, x + width + 2, y + titleHeight + (int) (frameHeight * collapseAnim.getFactor()) + 1);
+            context.enableScissor(x, y + titleHeight, x + width, y + titleHeight + (int) (frameHeight * collapseAnim.getFactor()));
             drawRect(context, x, y + titleHeight, width, frameHeight, theme.getBackgroundColor());
-            drawOutline(context, x, y + titleHeight, width, frameHeight, 1, theme.getOutlineColor());
+
+            for (FrameComponent component : components)
+            {
+                component.drawComponent(context, mouseX, mouseY, delta);
+            }
+
             context.disableScissor();
         }
 

@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.gui.Mouse;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -22,11 +23,11 @@ public class ClickGuiScreen extends Screen
 
     @Getter
     private final Theme theme = new ThemeBuilder()
-            .setTitleColor(0xff000000)
-            .setBackgroundColor(0xff000000)
-            .setOutlineColor(0xff000000)
-            .setModuleColor(0xff000000)
-            .setSettingColor(0xff000000)
+            .setTitleColor(0xcc3500a4)
+            .setBackgroundColor(0xb32e0094)
+            .setOutlineColor(0xb37a3cf2)
+            .setComponentColor(0xcc3500a4)
+            .setTextColor(0xffffffff)
             .build();
 
     protected ClickGuiScreen()
@@ -48,6 +49,8 @@ public class ClickGuiScreen extends Screen
                        int mouseY,
                        float deltaTicks)
     {
+        applyBlur();
+
         for (Frame frame : guiFrames)
         {
             if (!draggingMouse && mouse.isInBounds(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()) && mouse.isLeftHeld())
@@ -101,15 +104,11 @@ public class ClickGuiScreen extends Screen
 
         for (Frame frame : guiFrames)
         {
-            if (!frame.isCollapsed())
-            {
-                frame.setDragging(false);
-                draggingMouse = false;
-            }
-
+            frame.setDragging(false);
             frame.mouseReleased(mouseX, mouseY, button);
         }
 
+        draggingMouse = false;
         return super.mouseReleased(mouseX, mouseY, button);
     }
 

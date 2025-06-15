@@ -15,11 +15,17 @@ public class GuiCategoryFrame extends Frame
         super(guiCategory.getName(), x, y, width, titleHeight);
         this.guiCategory = guiCategory;
 
+        int moduleY = getTitleHeight() + 2;
         for (Module module1 : Managers.MODULES.getModules())
         {
             if (module1.getCategory().equals(guiCategory))
             {
-                addComponent(new ModuleComponent(module1, this, x, y, width, titleHeight));
+                final ComponentFactory factory = getComponentFactory();
+                final ModuleComponent component = factory.createModuleComponent(
+                        module1, this, 2, moduleY, width - 4, 15);
+
+                addComponent(component);
+                moduleY += component.getHeight() + 1;
             }
         }
     }

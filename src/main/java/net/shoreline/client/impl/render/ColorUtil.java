@@ -1,0 +1,36 @@
+package net.shoreline.client.impl.render;
+
+import java.awt.*;
+
+public class ColorUtil
+{
+    public static int interpolateColor(float value, int c1, int c2)
+    {
+        Color start = new Color(c1);
+        Color end = new Color(c2);
+        float sr = start.getRed() / 255.0f;
+        float sg = start.getGreen() / 255.0f;
+        float sb = start.getBlue() / 255.0f;
+        float sa = start.getAlpha() / 255.0f;
+        float er = end.getRed() / 255.0f;
+        float eg = end.getGreen() / 255.0f;
+        float eb = end.getBlue() / 255.0f;
+        float ea = end.getAlpha() / 255.0f;
+        return new Color(sr * value + er * (1.0f - value),
+                sg * value + eg * (1.0f - value),
+                sb * value + eb * (1.0f - value),
+                sa * value + ea * (1.0f - value)).getRGB();
+    }
+
+    public static int withTransparency(int color, float alpha)
+    {
+        if (alpha == 1.0f)
+        {
+            return color;
+        }
+        float colorAlpha = (color >> 24) & 0xff;
+        alpha = Math.max(0.0f, Math.min(1.0f, alpha));
+        int colorAlphaInt = Math.max(10, (int) (colorAlpha * alpha));
+        return (colorAlphaInt << 24) | (color & 0xffffff);
+    }
+}

@@ -7,20 +7,17 @@ import net.shoreline.client.api.module.Module;
 @Getter
 public class ModuleComponent extends FrameComponent
 {
-    private final Module module;
-
-    private final GuiCategoryFrame frame;
+    protected final Module module;
 
     public ModuleComponent(Module module,
-                           GuiCategoryFrame frame,
+                           Frame frame,
                            int x,
                            int y,
                            int frameWidth,
                            int frameHeight)
     {
-        super(x, y, frameWidth, frameHeight);
+        super(frame, x, y, frameWidth, frameHeight);
         this.module = module;
-        this.frame = frame;
     }
 
     @Override
@@ -29,7 +26,10 @@ public class ModuleComponent extends FrameComponent
                               float mouseY,
                               float delta)
     {
+        Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
+        drawRect(context, getTx(), getTy(), width, height, theme.getComponentColor());
+        drawText(context, module.getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
     }
 
     @Override

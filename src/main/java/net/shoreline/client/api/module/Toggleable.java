@@ -36,12 +36,14 @@ public class Toggleable extends Module
     public void enable()
     {
         EventBus.INSTANCE.subscribe(this);
+        enabled.setValue(true);
         onEnable();
     }
 
     public void disable()
     {
         onDisable();
+        enabled.setValue(false);
         EventBus.INSTANCE.unsubscribe(this);
     }
 

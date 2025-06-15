@@ -1,4 +1,4 @@
-package net.shoreline.client.gui.clickgui;
+package net.shoreline.client.gui;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -10,6 +10,6 @@ public class Theme
     private final int titleColor;
     private final int backgroundColor;
     private final int outlineColor;
-    private final int moduleColor;
-    private final int settingColor;
+    private final int componentColor;
+    private final int textColor;
 }

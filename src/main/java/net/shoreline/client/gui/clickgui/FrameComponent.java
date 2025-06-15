@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
+import net.shoreline.client.gui.Mouse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,26 +13,41 @@ import java.util.List;
 @Setter
 public abstract class FrameComponent extends DrawableComponent implements Interactable
 {
+    protected final Frame frame;
+
+    // Positions inside the frame
     protected int x, y;
 
-    protected int frameWidth;
-    protected int frameHeight;
+    protected int width;
+    protected int height;
 
     private final List<FrameComponent> components = new ArrayList<>();
 
-    public FrameComponent(int x,
+    public FrameComponent(Frame frame,
+                          int x,
                           int y,
-                          int frameWidth,
-                          int frameHeight)
+                          int width,
+                          int height)
     {
+        this.frame = frame;
         this.x = x;
         this.y = y;
-        this.frameWidth = frameWidth;
-        this.frameHeight = frameHeight;
+        this.width = width;
+        this.height = height;
     }
 
     protected boolean isInBounds(Mouse mouse)
     {
-        return mouse.isInBounds(x, y, x + frameWidth, y + frameHeight);
+        return mouse.isInBounds(x, y, x + width, y + height);
+    }
+
+    public int getTx()
+    {
+        return frame.getX() + this.x;
+    }
+
+    public int getTy()
+    {
+        return frame.getY() + this.y;
     }
 }

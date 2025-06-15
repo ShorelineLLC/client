@@ -6,7 +6,7 @@ public class ThemeBuilder
     private int backgroundColor;
     private int outlineColor;
     private int moduleColor;
-    private int settingColor;
+    private int textColor;
 
     public ThemeBuilder setTitleColor(int color)
     {
@@ -26,20 +26,20 @@ public class ThemeBuilder
         return this;
     }
 
-    public ThemeBuilder setModuleColor(int color)
+    public ThemeBuilder setComponentColor(int color)
     {
         this.moduleColor = color;
         return this;
     }
 
-    public ThemeBuilder setSettingColor(int color)
+    public ThemeBuilder setTextColor(int color)
     {
-        this.settingColor = color;
+        this.textColor = color;
         return this;
     }
 
     public Theme build()
     {
-        return new Theme(titleColor, backgroundColor, outlineColor, moduleColor, settingColor);
+        return new Theme(titleColor, backgroundColor, outlineColor, moduleColor, textColor);
     }
 }
