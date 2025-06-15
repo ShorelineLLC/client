@@ -6,9 +6,6 @@ import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
 import net.shoreline.client.gui.Mouse;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @Setter
 public abstract class FrameComponent extends DrawableComponent implements Interactable
@@ -20,8 +17,6 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
 
     protected int width;
     protected int height;
-
-    private final List<FrameComponent> components = new ArrayList<>();
 
     public FrameComponent(Frame frame,
                           int x,

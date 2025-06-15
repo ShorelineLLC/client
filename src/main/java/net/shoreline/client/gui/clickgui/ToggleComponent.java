@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class ToggleComponent extends ModuleComponent
 {
-    private final Animation toggleAnim = new Animation(true, 200L, Easing.CUBIC_IN_OUT);
+    private final Animation toggleAnim;
 
     public ToggleComponent(Toggleable module,
                            Frame frame,
@@ -20,6 +20,7 @@ public class ToggleComponent extends ModuleComponent
                            int frameHeight)
     {
         super(module, frame, x, y, frameWidth, frameHeight);
+        this.toggleAnim = new Animation(module.isEnabled(), 200L, Easing.CUBIC_IN_OUT);
     }
 
     @Override
@@ -41,12 +42,17 @@ public class ToggleComponent extends ModuleComponent
                              double mouseY,
                              int mouseButton)
     {
-        if (Mouse.isInBounds(mouseX, mouseY, getTx(), getTy(), width, height)
-                && mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+        if (Mouse.isInBounds(mouseX, mouseY, getTx(), getTy(), width, height))
         {
-            final Toggleable module1 = (Toggleable) module;
-            module1.toggle();
-            toggleAnim.setState(module1.isEnabled());
+            if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+            {
+                final Toggleable module1 = (Toggleable) module;
+                module1.toggle();
+                toggleAnim.setState(module1.isEnabled());
+            } else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+            {
+
+            }
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);

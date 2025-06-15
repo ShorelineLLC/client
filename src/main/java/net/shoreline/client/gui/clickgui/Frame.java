@@ -32,7 +32,7 @@ public class Frame extends DrawableComponent implements Interactable
 
     // Components can be added inside the frame
     private final ComponentFactory componentFactory = new ComponentFactory();
-    private final List<FrameComponent> components = new ArrayList<>();
+    protected final List<FrameComponent> components = new ArrayList<>();
 
     private final Animation collapseAnim = new Animation(true, 150L, Easing.CUBIC_IN_OUT);
 
@@ -108,9 +108,12 @@ public class Frame extends DrawableComponent implements Interactable
                               int button)
     {
 
-        for (FrameComponent component : components)
+        if (!isCollapsed())
         {
-            component.mouseReleased(mouseX, mouseY, button);
+            for (FrameComponent component : components)
+            {
+                component.mouseReleased(mouseX, mouseY, button);
+            }
         }
     }
 
@@ -120,9 +123,12 @@ public class Frame extends DrawableComponent implements Interactable
                               double horizontalAmount,
                               double verticalAmount)
     {
-        for (FrameComponent component : components)
+        if (!isCollapsed())
         {
-            component.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            for (FrameComponent component : components)
+            {
+                component.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            }
         }
     }
 
@@ -131,9 +137,12 @@ public class Frame extends DrawableComponent implements Interactable
                            int scanCode,
                            int modifiers)
     {
-        for (FrameComponent component : components)
+        if (!isCollapsed())
         {
-            component.keyPressed(keyCode, scanCode, modifiers);
+            for (FrameComponent component : components)
+            {
+                component.keyPressed(keyCode, scanCode, modifiers);
+            }
         }
     }
 
@@ -141,14 +150,12 @@ public class Frame extends DrawableComponent implements Interactable
     public void charTyped(char chr,
                           int modifiers)
     {
-        for (FrameComponent component : components)
+        if (!isCollapsed())
         {
-            component.charTyped(chr, modifiers);
+            for (FrameComponent component : components)
+            {
+                component.charTyped(chr, modifiers);
+            }
         }
-    }
-
-    protected void addComponent(FrameComponent component)
-    {
-        components.add(component);
     }
 }

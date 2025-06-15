@@ -1,7 +1,9 @@
 package net.shoreline.client.gui.clickgui;
 
+import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 
 public class ComponentFactory
 {
@@ -18,5 +20,15 @@ public class ComponentFactory
         }
 
         return new ModuleComponent(module, frame, x, y, width, height);
+    }
+
+    public ConfigComponent<?> createConfigComponent(Config<?> config,
+                                                    Frame frame,
+                                                    int x,
+                                                    int y,
+                                                    int width,
+                                                    int height)
+    {
+        return null;
     }
 }
