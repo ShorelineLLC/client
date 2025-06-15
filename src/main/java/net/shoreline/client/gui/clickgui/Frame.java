@@ -25,16 +25,14 @@ public class Frame extends DrawableComponent implements Interactable
     private int width;
     private int titleHeight;
 
-    private int frameHeight;
-
     private boolean collapsed;
     private boolean dragging;
+
+    private final Animation collapseAnim;
 
     // Components can be added inside the frame
     private final ComponentFactory componentFactory = new ComponentFactory();
     protected final List<FrameComponent> components = new ArrayList<>();
-
-    private final Animation collapseAnim = new Animation(true, 150L, Easing.CUBIC_IN_OUT);
 
     public Frame(String title, int x, int y, int width, int titleHeight)
     {
@@ -43,7 +41,7 @@ public class Frame extends DrawableComponent implements Interactable
         this.y = y;
         this.width = width;
         this.titleHeight = titleHeight;
-        this.frameHeight = width;
+        this.collapseAnim = new Animation(true, 150L, Easing.CUBIC_IN_OUT);
     }
 
     @Override
@@ -62,6 +60,7 @@ public class Frame extends DrawableComponent implements Interactable
 
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
+        int frameHeight = getFrameHeight();
         drawOutline(context, x + 1, y + 1, width - 2, titleHeight + (int) (frameHeight * collapseAnim.getFactor()) - 2, 1, theme.getOutlineColor());
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
@@ -72,9 +71,15 @@ public class Frame extends DrawableComponent implements Interactable
             context.enableScissor(x, y + titleHeight, x + width, y + titleHeight + (int) (frameHeight * collapseAnim.getFactor()));
             drawRect(context, x, y + titleHeight, width, frameHeight, theme.getBackgroundColor());
 
+            int yOffset = 0;
             for (FrameComponent component : components)
             {
+                component.setYOffset(yOffset);
                 component.drawComponent(context, mouseX, mouseY, delta);
+                if (component instanceof ModuleComponent component1)
+                {
+                    yOffset += (int) (component1.getFrameHeight() * component1.getCollapseAnim().getFactor());
+                }
             }
 
             context.disableScissor();
@@ -157,5 +162,16 @@ public class Frame extends DrawableComponent implements Interactable
                 component.charTyped(chr, modifiers);
             }
         }
+    }
+
+    public int getFrameHeight()
+    {
+        int frameHeight = 0;
+        for (FrameComponent component : components)
+        {
+            int h = component instanceof ModuleComponent c1 ? c1.getFrameHeight() : component.getHeight();
+            frameHeight += h + 1;
+        }
+        return frameHeight + 2;
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -23,10 +24,10 @@ public class ClickGuiScreen extends Screen
 
     @Getter
     private final Theme theme = new ThemeBuilder()
-            .setTitleColor(0xcc3500a4)
-            .setBackgroundColor(0xb32e0094)
-            .setOutlineColor(0xb37a3cf2)
-            .setComponentColor(0xcc3500a4)
+            .setTitleColor(0x663500a4)
+            .setBackgroundColor(0x332e0094)
+            .setOutlineColor(0x1a7a3cf2)
+            .setComponentColor(0x663500a4)
             .setTextColor(0xffffffff)
             .build();
 
@@ -50,6 +51,7 @@ public class ClickGuiScreen extends Screen
                        float deltaTicks)
     {
         applyBlur();
+        renderDarkening(context);
 
         for (Frame frame : guiFrames)
         {
@@ -155,5 +157,12 @@ public class ClickGuiScreen extends Screen
     public boolean shouldPause()
     {
         return false;
+    }
+
+    @Override
+    public void close()
+    {
+        ClickGuiModule.INSTANCE.disable();
+        super.close();
     }
 }

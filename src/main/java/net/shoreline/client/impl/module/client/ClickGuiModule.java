@@ -7,10 +7,13 @@ import org.lwjgl.glfw.GLFW;
 
 public class ClickGuiModule extends Toggleable
 {
+    public static ClickGuiModule INSTANCE;
+
     public ClickGuiModule()
     {
         super("ClickGui", "The client mod menu", GuiCategory.CLIENT);
         setKeybind(GLFW.GLFW_KEY_RIGHT_SHIFT);
+        INSTANCE = this;
     }
 
     @Override
@@ -23,16 +26,5 @@ public class ClickGuiModule extends Toggleable
         }
 
         mc.setScreen(ClickGuiScreen.INSTANCE);
-    }
-
-    @Override
-    public void onDisable()
-    {
-        if (checkNull())
-        {
-            return;
-        }
-
-        mc.player.closeScreen();
     }
 }

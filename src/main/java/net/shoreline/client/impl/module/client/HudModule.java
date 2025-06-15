@@ -2,6 +2,8 @@ package net.shoreline.client.impl.module.client;
 
 import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
@@ -9,9 +11,14 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class HudModule extends Toggleable
 {
+    Config<Boolean> watermarkConfig = new BooleanConfig.Builder("Watermark", "Displays client watermark")
+            .setNameAliases("Logo")
+            .setDefaultValue(true).build();
 
-    public HudModule() {
+    public HudModule()
+    {
         super("HUD", "Heads up display", GuiCategory.CLIENT);
+        registerConfig(watermarkConfig);
     }
 
     @EventListener

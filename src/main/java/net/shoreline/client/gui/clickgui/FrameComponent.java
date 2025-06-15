@@ -18,6 +18,8 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
     protected int width;
     protected int height;
 
+    protected int yOffset;
+
     public FrameComponent(Frame frame,
                           int x,
                           int y,
@@ -43,6 +45,6 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
 
     public int getTy()
     {
-        return frame.getY() + this.y;
+        return frame.getY() + this.y + this.yOffset;
     }
 }

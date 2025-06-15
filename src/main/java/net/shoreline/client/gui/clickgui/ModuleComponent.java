@@ -23,7 +23,7 @@ public class ModuleComponent extends FrameComponent
 
     @Setter
     private boolean collapsed;
-    private final Animation collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
+    private final Animation collapseAnim;
 
     public ModuleComponent(Module module,
                            Frame frame,
@@ -40,13 +40,14 @@ public class ModuleComponent extends FrameComponent
         {
             final ComponentFactory factory = frame.getComponentFactory();
             ConfigComponent<?> component = factory.createConfigComponent(
-                    config, frame, 2, configY, frameWidth - 2, frameHeight);
+                    config, this, frame, 2, configY, frameWidth - 2, frameHeight);
 
             components.add(component);
             configY += component.getHeight() + 1;
         }
 
         collapsed = true;
+        this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
     }
 
     @Override
@@ -59,6 +60,18 @@ public class ModuleComponent extends FrameComponent
 
         drawRect(context, getTx(), getTy(), width, height, theme.getComponentColor());
         drawText(context, module.getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
+
+        if (collapseAnim.getFactor() > 0.0)
+        {
+            // context.enableScissor(x, y, x + width, y + getFrameHeight());
+
+            for (ConfigComponent<?> component : components)
+            {
+                component.drawComponent(context, mouseX, mouseY, delta);
+            }
+
+            // context.disableScissor();
+        }
     }
 
     @Override
@@ -136,5 +149,15 @@ public class ModuleComponent extends FrameComponent
                 component.charTyped(chr, modifiers);
             }
         }
+    }
+
+    public int getFrameHeight()
+    {
+        int frameHeight = 0;
+        for (ConfigComponent<?> component : components)
+        {
+            frameHeight += component.getHeight() + 1;
+        }
+        return (int) (frameHeight * collapseAnim.getFactor()) + getHeight() + 1;
     }
 }
