@@ -4,9 +4,9 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.gui.clickgui.config.CheckboxComponent;
-import net.shoreline.client.gui.clickgui.config.ConfigComponent;
-import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
+import net.shoreline.client.gui.clickgui.config.*;
+
+import java.awt.*;
 
 public class ComponentFactory
 {
@@ -41,6 +41,31 @@ public class ComponentFactory
         if (config.getValue() instanceof Boolean)
         {
             return new CheckboxComponent((Config<Boolean>) config, moduleComponent, frame, x, y, width, height);
+        }
+
+        if (config.getValue() instanceof Double)
+        {
+            return new SliderComponent<>((Config<Double>) config, moduleComponent, frame, x, y, width, height);
+        }
+
+        if (config.getValue() instanceof Float)
+        {
+            return new SliderComponent<>((Config<Float>) config, moduleComponent, frame, x, y, width, height);
+        }
+
+        if (config.getValue() instanceof Integer)
+        {
+            return new SliderComponent<>((Config<Integer>) config, moduleComponent, frame, x, y, width, height);
+        }
+
+        if (config.getValue() instanceof Enum<?>)
+        {
+            return new SelectorComponent((Config<Enum<?>>) config, moduleComponent, frame, x, y, width, height);
+        }
+
+        if (config.getValue() instanceof Color)
+        {
+            return new ColorPickerComponent((Config<Color>) config, moduleComponent, frame, x, y, width, height);
         }
 
         return null;

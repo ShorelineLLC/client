@@ -4,13 +4,11 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public class EnumConfig<T extends Enum<?>> extends Config<T>
 {
-    @Getter
-    @Setter
     private T[] values;
-
-    @Getter
     private int index;
 
     public EnumConfig(String name, String description)
@@ -30,6 +28,13 @@ public class EnumConfig<T extends Enum<?>> extends Config<T>
 
     }
 
+    @Override
+    public void setValue(T value)
+    {
+        super.setValue(value);
+        this.index = value.ordinal();
+    }
+
     public static class Builder<T extends Enum<?>> extends ConfigBuilder<T>
     {
         private T[] values;
@@ -38,14 +43,14 @@ public class EnumConfig<T extends Enum<?>> extends Config<T>
             super(name);
         }
 
-        public Builder<T> setValues(T[] values)
+        public ConfigBuilder<T> setValues(T[] values)
         {
             this.values = values;
             return this;
         }
 
         @Override
-        public Config<T> build()
+        public EnumConfig<T> build()
         {
             final EnumConfig<T> build = (EnumConfig<T>) super.build();
             build.setValues(values);

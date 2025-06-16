@@ -37,6 +37,17 @@ public class ClickGuiModule extends Toggleable
         mc.setScreen(ClickGuiScreen.INSTANCE);
     }
 
+    @Override
+    public void onDisable()
+    {
+        if (checkNull())
+        {
+            return;
+        }
+
+        mc.player.closeScreen();
+    }
+
     public boolean shouldBlur()
     {
         return blurConfig.getValue();

@@ -25,7 +25,7 @@ public class Frame extends DrawableComponent implements Interactable
     private int width;
     private int titleHeight;
 
-    private boolean collapsed;
+    private boolean frameOpen;
     private boolean dragging;
 
     private final Animation collapseAnim;
@@ -41,7 +41,7 @@ public class Frame extends DrawableComponent implements Interactable
         this.y = y;
         this.width = width;
         this.titleHeight = titleHeight;
-        this.collapsed = false;
+        this.frameOpen = true;
         this.collapseAnim = new Animation(true, 150L, Easing.CUBIC_IN_OUT);
     }
 
@@ -103,8 +103,8 @@ public class Frame extends DrawableComponent implements Interactable
         if (Mouse.isHovering(mouseX, mouseY, x, y, width, titleHeight)
                 && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
         {
-            this.collapsed = !collapsed;
-            collapseAnim.setState(collapsed);
+            this.frameOpen = !frameOpen;
+            collapseAnim.setState(frameOpen);
         }
 
         if (collapseAnim.getFactor() > 0.0)

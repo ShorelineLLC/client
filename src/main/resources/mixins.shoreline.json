@@ -5,7 +5,8 @@
   "client": [
     "MixinKeyboard",
     "MixinMinecraftClient",
-    "gui.hud.MixinInGameHud"
+    "gui.hud.MixinInGameHud",
+    "network.MixinClientConnection"
   ],
   "injectors": {
     "defaultRequire": 1

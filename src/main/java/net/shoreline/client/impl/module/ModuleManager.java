@@ -4,6 +4,7 @@ import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.HudModule;
+import net.shoreline.client.impl.module.render.NoWeatherModule;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -18,7 +19,9 @@ public class ModuleManager
         registerModules(
                 new ClickGuiModule(),
                 new ColorsModule(),
-                new HudModule()
+                new HudModule(),
+                // Render
+                new NoWeatherModule()
         );
 
         for (Module module : getModules())

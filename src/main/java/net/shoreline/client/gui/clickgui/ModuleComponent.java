@@ -22,7 +22,7 @@ public class ModuleComponent extends FrameComponent
     protected final List<ConfigComponent<?>> components = new ArrayList<>();
 
     @Setter
-    private boolean collapsed;
+    private boolean frameOpen;
     private final Animation collapseAnim;
 
     public ModuleComponent(Module module,
@@ -46,7 +46,6 @@ public class ModuleComponent extends FrameComponent
             configY += component.getHeight() + 1;
         }
 
-        collapsed = true;
         this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
     }
 
@@ -79,8 +78,8 @@ public class ModuleComponent extends FrameComponent
         if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
                 && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
         {
-            this.collapsed = !collapsed;
-            collapseAnim.setState(collapsed);
+            this.frameOpen = !frameOpen;
+            collapseAnim.setState(frameOpen);
         }
 
         if (collapseAnim.getFactor() > 0.0)

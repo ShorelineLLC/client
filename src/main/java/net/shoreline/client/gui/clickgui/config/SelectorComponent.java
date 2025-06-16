@@ -1,12 +1,23 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
+import net.shoreline.client.gui.clickgui.Theme;
+import net.shoreline.client.util.Formatter;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.Arrays;
 
 public class SelectorComponent extends ConfigComponent<Enum<?>>
 {
+    private int index;
+
     public SelectorComponent(Config<Enum<?>> config,
                              ModuleComponent moduleComponent,
                              Frame frame,
@@ -16,6 +27,7 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
                              int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
+        index = ((EnumConfig<?>) config).getIndex();
     }
 
     @Override
@@ -24,7 +36,10 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
                               float mouseY,
                               float delta)
     {
+        Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
+        String selectorText = Formatter.formatEnum(getConfig().getValue());
+        drawText(context, getConfig().getName() + " " + Formatting.GRAY + selectorText, getTx() + 3, getTy() + 4, theme.getTextColor());
     }
 
     @Override
@@ -32,6 +47,20 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
                              double mouseY,
                              int mouseButton)
     {
+        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height))
+        {
+            Enum<?> val = getConfig().getValue();
+            String[] values = Arrays.stream(val.getClass().getEnumConstants()).map(Enum::name).toArray(String[]::new);
+            if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+            {
+                index = index + 1 > values.length - 1 ? 0 : index + 1;
+                getConfig().setValue(Enum.valueOf(val.getClass(), values[index]));
+            } else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+            {
+                index = index - 1 < 0 ? values.length - 1 : index - 1;
+                getConfig().setValue(Enum.valueOf(val.getClass(), values[index]));
+            }
+        }
     }
 
     @Override

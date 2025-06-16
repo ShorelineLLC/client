@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ClickGuiScreen extends Screen
 {
-    public static final ClickGuiScreen INSTANCE = new ClickGuiScreen();
+    public static ClickGuiScreen INSTANCE = new ClickGuiScreen();
 
     private final List<Frame> guiFrames = new ArrayList<>();
 

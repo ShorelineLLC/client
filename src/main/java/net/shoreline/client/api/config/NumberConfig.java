@@ -31,10 +31,18 @@ public class NumberConfig<T extends Number> extends Config<T>
     public static class Builder<T extends Number> extends ConfigBuilder<T>
     {
         private T min, max;
-        private int roundingScale = 0;
+        private int roundingScale;
 
         public Builder(String name) {
             super(name);
+        }
+
+        @Override
+        public Builder<T> setDefaultValue(T defaultValue)
+        {
+            super.setDefaultValue(defaultValue);
+            this.roundingScale = defaultValue instanceof Float || defaultValue instanceof Double ? 1 : 0;
+            return this;
         }
 
         public Builder<T> setMin(T min)
