@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.client;
 
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
@@ -8,6 +10,13 @@ import org.lwjgl.glfw.GLFW;
 public class ClickGuiModule extends Toggleable
 {
     public static ClickGuiModule INSTANCE;
+
+    Config<Boolean> blurConfig = new BooleanConfig.Builder("Blur")
+            .setDescription("Blurs the screen background")
+            .setDefaultValue(true).build();
+    Config<Boolean> darkenConfig = new BooleanConfig.Builder("Darken")
+            .setDescription("Darkens the screen background")
+            .setDefaultValue(true).build();
 
     public ClickGuiModule()
     {
@@ -26,5 +35,15 @@ public class ClickGuiModule extends Toggleable
         }
 
         mc.setScreen(ClickGuiScreen.INSTANCE);
+    }
+
+    public boolean shouldBlur()
+    {
+        return blurConfig.getValue();
+    }
+
+    public boolean shouldDarken()
+    {
+        return darkenConfig.getValue();
     }
 }

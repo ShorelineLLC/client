@@ -1,10 +1,12 @@
 package net.shoreline.client.gui.clickgui;
 
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.config.CheckboxComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
+import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
 
 public class ComponentFactory
 {
@@ -31,6 +33,11 @@ public class ComponentFactory
                                                     int width,
                                                     int height)
     {
+        if (config.getValue() instanceof Macro)
+        {
+            return new KeyListenerComponent((Config<Macro>) config, moduleComponent, frame, x, y, width, height);
+        }
+
         if (config.getValue() instanceof Boolean)
         {
             return new CheckboxComponent((Config<Boolean>) config, moduleComponent, frame, x, y, width, height);

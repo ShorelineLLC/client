@@ -11,12 +11,12 @@ public class Mouse
     private boolean rightClicked, rightHeld;
     private boolean leftClicked, leftHeld;
 
-    public boolean isInBounds(int x1, int y1, int x2, int y2)
+    public boolean isHovering(int x1, int y1, int x2, int y2)
     {
-        return isInBounds(mouseX, mouseY, x1, y1, x2, y2);
+        return isHovering(mouseX, mouseY, x1, y1, x2, y2);
     }
 
-    public static boolean isInBounds(double mouseX,
+    public static boolean isHovering(double mouseX,
                                      double mouseY,
                                      int x1,
                                      int y1,

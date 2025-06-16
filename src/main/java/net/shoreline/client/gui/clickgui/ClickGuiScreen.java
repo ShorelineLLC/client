@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import org.lwjgl.glfw.GLFW;
 
@@ -50,12 +51,19 @@ public class ClickGuiScreen extends Screen
                        int mouseY,
                        float deltaTicks)
     {
-        applyBlur();
-        renderDarkening(context);
+        if (ClickGuiModule.INSTANCE.shouldBlur())
+        {
+            applyBlur();
+        }
+
+        if (ClickGuiModule.INSTANCE.shouldDarken())
+        {
+            renderDarkening(context);
+        }
 
         for (Frame frame : guiFrames)
         {
-            if (!draggingMouse && mouse.isInBounds(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()) && mouse.isLeftHeld())
+            if (!draggingMouse && mouse.isHovering(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()) && mouse.isLeftHeld())
             {
                 frame.setDragging(true);
                 draggingMouse = true;
@@ -157,6 +165,18 @@ public class ClickGuiScreen extends Screen
     public boolean shouldPause()
     {
         return false;
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc()
+    {
+        return guiFrames.stream()
+                .flatMap(frame -> frame.getComponents().stream())
+                .filter(ModuleComponent.class::isInstance)
+                .map(ModuleComponent.class::cast)
+                .flatMap(module -> module.getComponents().stream())
+                .noneMatch(component ->
+                        component instanceof KeyListenerComponent listener && listener.isListening());
     }
 
     @Override

@@ -22,8 +22,8 @@ public class StringConfig extends Config<String>
 
     public static class Builder extends ConfigBuilder<String>
     {
-        public Builder(String name, String description) {
-            super(name, description);
+        public Builder(String name) {
+            super(name);
         }
     }
 }

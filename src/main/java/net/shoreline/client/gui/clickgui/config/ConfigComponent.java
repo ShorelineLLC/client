@@ -24,4 +24,17 @@ public abstract class ConfigComponent<T> extends FrameComponent
         this.config = config;
         this.moduleComponent = moduleComponent;
     }
+
+    @Override
+    public int getTx()
+    {
+        return getModuleComponent().getTx();
+    }
+
+    @Override
+    public int getTy()
+    {
+        ModuleComponent parent = getModuleComponent();
+        return parent.getTy() + parent.getHeight() + this.y + this.yOffset;
+    }
 }

@@ -12,9 +12,9 @@ import java.util.function.Supplier;
 public abstract class Config<T> implements Identifiable, Serializable
 {
     private final String name;
+    private final String description;
 
     private String[] nameAliases;
-    private final String description;
     private ConfigGroup configGroup;
 
     private T value;

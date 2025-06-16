@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
-import net.shoreline.client.gui.Mouse;
 
 @Getter
 @Setter
@@ -31,11 +30,6 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
         this.y = y;
         this.width = width;
         this.height = height;
-    }
-
-    protected boolean isInBounds(Mouse mouse)
-    {
-        return mouse.isInBounds(x, y, x + width, y + height);
     }
 
     public int getTx()

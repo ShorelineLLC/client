@@ -6,8 +6,8 @@ import net.shoreline.client.impl.Managers;
 
 public class MacroConfig extends Config<Macro>
 {
-
-    public MacroConfig(String name, String description) {
+    public MacroConfig(String name, String description)
+    {
         super(name, description);
     }
 
@@ -23,10 +23,18 @@ public class MacroConfig extends Config<Macro>
 
     }
 
+    public void setValue(int keycode, Runnable runnable)
+    {
+        final Macro macro = new Macro(keycode, runnable);
+        Managers.MACROS.unregister(getValue());
+        super.setValue(macro);
+        Managers.MACROS.register(macro);
+    }
+
     public static class Builder extends ConfigBuilder<Macro>
     {
-        public Builder(String name, String description) {
-            super(name, description);
+        public Builder(String name) {
+            super(name);
         }
 
         @Override

@@ -7,16 +7,22 @@ public abstract class ConfigBuilder<T>
     private ConfigFactory<T> factory;
 
     private final String name;
-    private final String description;
 
+    private String description;
     private String[] nameAliases;
     private T defaultValue;
     private Supplier<Boolean> visible;
 
-    public ConfigBuilder(String name, String description)
+    public ConfigBuilder(String name)
     {
         this.name = name;
+        this.description = "No description found!";
+    }
+
+    public ConfigBuilder<T> setDescription(String description)
+    {
         this.description = description;
+        return this;
     }
 
     public ConfigBuilder<T> setNameAliases(String... aliases)

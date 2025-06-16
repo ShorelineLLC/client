@@ -2,21 +2,12 @@ package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.gui.Mouse;
-import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
-import net.shoreline.client.gui.clickgui.Theme;
-import net.shoreline.client.impl.render.Animation;
-import net.shoreline.client.impl.render.ColorUtil;
-import net.shoreline.client.impl.render.Easing;
-import org.lwjgl.glfw.GLFW;
 
-public class CheckboxComponent extends ConfigComponent<Boolean>
+public class SelectorComponent extends ConfigComponent<Enum<?>>
 {
-    private final Animation toggleAnim;
-
-    public CheckboxComponent(Config<Boolean> config,
+    public SelectorComponent(Config<Enum<?>> config,
                              ModuleComponent moduleComponent,
                              Frame frame,
                              int x,
@@ -25,7 +16,6 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                              int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
-        this.toggleAnim = new Animation(config.getValue(), 200L, Easing.CUBIC_IN_OUT);
     }
 
     @Override
@@ -34,11 +24,7 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                               float mouseY,
                               float delta)
     {
-        Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        drawRect(context, getTx(), getTy(), width, height, ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor()));
-        int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, textColor);
     }
 
     @Override
@@ -46,13 +32,6 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                              double mouseY,
                              int mouseButton)
     {
-        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
-                && mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
-        {
-            boolean val = !getConfig().getValue();
-            getConfig().setValue(val);
-            toggleAnim.setState(val);
-        }
     }
 
     @Override

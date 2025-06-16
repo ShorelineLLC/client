@@ -19,7 +19,7 @@ public class ModuleComponent extends FrameComponent
 {
     protected final Module module;
 
-    private final List<ConfigComponent<?>> components = new ArrayList<>();
+    protected final List<ConfigComponent<?>> components = new ArrayList<>();
 
     @Setter
     private boolean collapsed;
@@ -61,17 +61,14 @@ public class ModuleComponent extends FrameComponent
         drawRect(context, getTx(), getTy(), width, height, theme.getComponentColor());
         drawText(context, module.getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
 
-        if (collapseAnim.getFactor() > 0.0)
+        context.enableScissor(getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
+
+        for (ConfigComponent<?> component : components)
         {
-            // context.enableScissor(x, y, x + width, y + getFrameHeight());
-
-            for (ConfigComponent<?> component : components)
-            {
-                component.drawComponent(context, mouseX, mouseY, delta);
-            }
-
-            // context.disableScissor();
+            component.drawComponent(context, mouseX, mouseY, delta);
         }
+
+        context.disableScissor();
     }
 
     @Override
@@ -79,14 +76,14 @@ public class ModuleComponent extends FrameComponent
                              double mouseY,
                              int mouseButton)
     {
-        if (Mouse.isInBounds(mouseX, mouseY, x, y, width, height)
+        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
                 && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
         {
             this.collapsed = !collapsed;
             collapseAnim.setState(collapsed);
         }
 
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -100,7 +97,7 @@ public class ModuleComponent extends FrameComponent
                               double mouseY,
                               int button)
     {
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -115,7 +112,7 @@ public class ModuleComponent extends FrameComponent
                               double horizontalAmount,
                               double verticalAmount)
     {
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -129,7 +126,7 @@ public class ModuleComponent extends FrameComponent
                            int scanCode,
                            int modifiers)
     {
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -142,7 +139,7 @@ public class ModuleComponent extends FrameComponent
     public void charTyped(char chr,
                           int modifiers)
     {
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -151,13 +148,13 @@ public class ModuleComponent extends FrameComponent
         }
     }
 
-    public int getFrameHeight()
+    public int getComponentHeight()
     {
-        int frameHeight = 0;
+        int frameHeight = 2;
         for (ConfigComponent<?> component : components)
         {
             frameHeight += component.getHeight() + 1;
         }
-        return (int) (frameHeight * collapseAnim.getFactor()) + getHeight() + 1;
+        return (int) (frameHeight * collapseAnim.getFactor());
     }
 }

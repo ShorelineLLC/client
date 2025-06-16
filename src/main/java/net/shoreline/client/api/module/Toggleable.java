@@ -12,17 +12,22 @@ import org.lwjgl.glfw.GLFW;
 
 public class Toggleable extends Module
 {
-    final Config<Boolean> enabled = new BooleanConfig.Builder("Enabled", "Module enabled state")
-            .setNameAliases("Toggled").setDefaultValue(false).build();
+    final Config<Boolean> enabled = new BooleanConfig.Builder("Enabled")
+            .setDescription("Module enabled state")
+            .setNameAliases("Toggled")
+            .setDefaultValue(false).build();
 
-    final Config<Macro> keybind = new MacroConfig.Builder("Bind", "The module keybind")
-            .setNameAliases("Keybind").setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
+    final Config<Macro> keybind = new MacroConfig.Builder("Bind")
+            .setDescription("The module keybind")
+            .setNameAliases("Keybind")
+            .setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
 
     public Toggleable(final String name,
                       final String description,
                       final GuiCategory category)
     {
         super(name, description, category);
+        registerConfig(keybind);
     }
 
     public Toggleable(final String name,

@@ -22,8 +22,8 @@ public class BooleanConfig extends Config<Boolean>
 
     public static class Builder extends ConfigBuilder<Boolean>
     {
-        public Builder(String name, String description) {
-            super(name, description);
+        public Builder(String name) {
+            super(name);
         }
     }
 }

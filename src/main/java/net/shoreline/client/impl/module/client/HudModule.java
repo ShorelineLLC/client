@@ -11,24 +11,27 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class HudModule extends Toggleable
 {
-    Config<Boolean> watermarkConfig = new BooleanConfig.Builder("Watermark", "Displays client watermark")
+    Config<Boolean> watermarkConfig = new BooleanConfig.Builder("Watermark")
+            .setDescription("Displays client watermark")
             .setNameAliases("Logo")
             .setDefaultValue(true).build();
 
     public HudModule()
     {
         super("HUD", "Heads up display", GuiCategory.CLIENT);
-        registerConfig(watermarkConfig);
     }
 
     @EventListener
     public void onHudOverlay(HudOverlayEvent.Post event)
     {
-        String watermarkText = String.format("%s %s (%s%s%s)",
-                ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
-                !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
-                !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : "");
+        if (watermarkConfig.getValue())
+        {
+            String watermarkText = String.format("%s %s (%s%s%s)",
+                    ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
+                    !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
+                    !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : "");
 
-        event.getContext().drawText(mc.textRenderer, watermarkText, 2, 2, -1, true);
+            event.getContext().drawText(mc.textRenderer, watermarkText, 2, 2, -1, true);
+        }
     }
 }

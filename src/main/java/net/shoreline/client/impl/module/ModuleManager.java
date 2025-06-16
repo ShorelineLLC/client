@@ -20,6 +20,11 @@ public class ModuleManager
                 new ColorsModule(),
                 new HudModule()
         );
+
+        for (Module module : getModules())
+        {
+            module.reflectConfigs();
+        }
     }
 
     private void registerModule(Module module)

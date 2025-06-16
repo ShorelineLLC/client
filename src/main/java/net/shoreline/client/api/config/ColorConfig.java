@@ -24,8 +24,8 @@ public class ColorConfig extends Config<Color>
 
     public static class Builder extends ConfigBuilder<Color>
     {
-        public Builder(String name, String description) {
-            super(name, description);
+        public Builder(String name) {
+            super(name);
         }
 
         public Builder setRgb(int rgb)

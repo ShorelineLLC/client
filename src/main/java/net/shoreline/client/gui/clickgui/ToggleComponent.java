@@ -3,6 +3,7 @@ package net.shoreline.client.gui.clickgui;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -35,6 +36,18 @@ public class ToggleComponent extends ModuleComponent
                 ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor()));
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
         drawText(context, module.getName(), getTx() + 3, getTy() + 4, textColor);
+
+        if (getCollapseAnim().getFactor() > 0.0)
+        {
+            context.enableScissor(getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
+
+            for (ConfigComponent<?> component : components)
+            {
+                component.drawComponent(context, mouseX, mouseY, delta);
+            }
+
+            context.disableScissor();
+        }
     }
 
     @Override
@@ -42,17 +55,12 @@ public class ToggleComponent extends ModuleComponent
                              double mouseY,
                              int mouseButton)
     {
-        if (Mouse.isInBounds(mouseX, mouseY, getTx(), getTy(), width, height))
+        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
+                && mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
         {
-            if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
-            {
-                final Toggleable module1 = (Toggleable) module;
-                module1.toggle();
-                toggleAnim.setState(module1.isEnabled());
-            } else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
-            {
-
-            }
+            final Toggleable module1 = (Toggleable) module;
+            module1.toggle();
+            toggleAnim.setState(module1.isEnabled());
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);

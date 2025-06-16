@@ -41,6 +41,7 @@ public class Frame extends DrawableComponent implements Interactable
         this.y = y;
         this.width = width;
         this.titleHeight = titleHeight;
+        this.collapsed = false;
         this.collapseAnim = new Animation(true, 150L, Easing.CUBIC_IN_OUT);
     }
 
@@ -60,7 +61,7 @@ public class Frame extends DrawableComponent implements Interactable
 
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        int frameHeight = getFrameHeight();
+        int frameHeight = getComponentHeight();
         drawOutline(context, x + 1, y + 1, width - 2, titleHeight + (int) (frameHeight * collapseAnim.getFactor()) - 2, 1, theme.getOutlineColor());
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
@@ -78,7 +79,12 @@ public class Frame extends DrawableComponent implements Interactable
                 component.drawComponent(context, mouseX, mouseY, delta);
                 if (component instanceof ModuleComponent component1)
                 {
-                    yOffset += (int) (component1.getFrameHeight() * component1.getCollapseAnim().getFactor());
+                    int height = 0;
+                    if (component instanceof ModuleComponent c1)
+                    {
+                        height += c1.getComponentHeight();
+                    }
+                    yOffset += (int) (height * component1.getCollapseAnim().getFactor());
                 }
             }
 
@@ -94,16 +100,19 @@ public class Frame extends DrawableComponent implements Interactable
                              double mouseY,
                              int mouseButton)
     {
-        if (Mouse.isInBounds(mouseX, mouseY, x, y, width, titleHeight)
+        if (Mouse.isHovering(mouseX, mouseY, x, y, width, titleHeight)
                 && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
         {
             this.collapsed = !collapsed;
             collapseAnim.setState(collapsed);
         }
 
-        for (FrameComponent component : components)
+        if (collapseAnim.getFactor() > 0.0)
         {
-            component.mouseClicked(mouseX, mouseY, mouseButton);
+            for (FrameComponent component : components)
+            {
+                component.mouseClicked(mouseX, mouseY, mouseButton);
+            }
         }
     }
 
@@ -112,8 +121,7 @@ public class Frame extends DrawableComponent implements Interactable
                               double mouseY,
                               int button)
     {
-
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (FrameComponent component : components)
             {
@@ -128,7 +136,7 @@ public class Frame extends DrawableComponent implements Interactable
                               double horizontalAmount,
                               double verticalAmount)
     {
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (FrameComponent component : components)
             {
@@ -142,7 +150,7 @@ public class Frame extends DrawableComponent implements Interactable
                            int scanCode,
                            int modifiers)
     {
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (FrameComponent component : components)
             {
@@ -155,7 +163,7 @@ public class Frame extends DrawableComponent implements Interactable
     public void charTyped(char chr,
                           int modifiers)
     {
-        if (!isCollapsed())
+        if (collapseAnim.getFactor() > 0.0)
         {
             for (FrameComponent component : components)
             {
@@ -164,14 +172,18 @@ public class Frame extends DrawableComponent implements Interactable
         }
     }
 
-    public int getFrameHeight()
+    public int getComponentHeight()
     {
-        int frameHeight = 0;
+        int frameHeight = 2;
         for (FrameComponent component : components)
         {
-            int h = component instanceof ModuleComponent c1 ? c1.getFrameHeight() : component.getHeight();
-            frameHeight += h + 1;
+            int height = component.getHeight() + 1;
+            if (component instanceof ModuleComponent c1)
+            {
+                height += c1.getComponentHeight();
+            }
+            frameHeight += height;
         }
-        return frameHeight + 2;
+        return frameHeight;
     }
 }

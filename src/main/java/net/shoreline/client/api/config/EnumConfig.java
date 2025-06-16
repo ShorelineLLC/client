@@ -34,8 +34,8 @@ public class EnumConfig<T extends Enum<?>> extends Config<T>
     {
         private T[] values;
 
-        public Builder(String name, String description) {
-            super(name, description);
+        public Builder(String name) {
+            super(name);
         }
 
         public Builder<T> setValues(T[] values)

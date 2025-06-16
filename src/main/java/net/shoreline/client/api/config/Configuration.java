@@ -1,9 +1,11 @@
 package net.shoreline.client.api.config;
 
-import com.google.gson.JsonObject;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.api.Serializable;
+import net.shoreline.loader.Loader;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.SequencedCollection;
 
@@ -15,9 +17,40 @@ public abstract class Configuration extends GenericFeature implements Serializab
         super(name, nameAliases);
     }
 
+    /** Only in the dev environment **/
+    public void reflectConfigs()
+    {
+        for (Field field : getClass().getDeclaredFields())
+        {
+            if (Config.class.isAssignableFrom(field.getType()))
+            {
+                try
+                {
+                    field.setAccessible(true);
+                    Config<?> config = (Config<?>) field.get(this);
+                    if (config == null)
+                    {
+                        continue;
+                    }
+
+                    registerConfig(config);
+                } catch (IllegalArgumentException | IllegalAccessException e)
+                {
+                    Loader.error("Failed to build config from field {}!", field.getName());
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     protected void registerConfig(Config<?> config)
     {
         configs.put(config.getId(), config);
+    }
+
+    protected void registerConfigs(Config<?>... config)
+    {
+        Arrays.stream(config).forEach(this::registerConfig);
     }
 
     public Config<?> getConfig(String id)

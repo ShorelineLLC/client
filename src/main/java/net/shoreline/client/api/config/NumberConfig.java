@@ -33,8 +33,8 @@ public class NumberConfig<T extends Number> extends Config<T>
         private T min, max;
         private int roundingScale = 0;
 
-        public Builder(String name, String description) {
-            super(name, description);
+        public Builder(String name) {
+            super(name);
         }
 
         public Builder<T> setMin(T min)
