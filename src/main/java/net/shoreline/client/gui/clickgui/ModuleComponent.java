@@ -35,15 +35,13 @@ public class ModuleComponent extends FrameComponent
         super(frame, x, y, frameWidth, frameHeight);
         this.module = module;
 
-        int configY = 2;
         for (Config<?> config : module.getConfigs())
         {
             final ComponentFactory factory = frame.getComponentFactory();
             ConfigComponent<?> component = factory.createConfigComponent(
-                    config, this, frame, 2, configY, frameWidth - 2, frameHeight);
+                    config, this, frame, 2, 0, frameWidth - 2, frameHeight);
 
             components.add(component);
-            configY += component.getHeight() + 1;
         }
 
         this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
@@ -62,9 +60,15 @@ public class ModuleComponent extends FrameComponent
 
         context.enableScissor(getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
 
+        int configY = 2;
         for (ConfigComponent<?> component : components)
         {
-            component.drawComponent(context, mouseX, mouseY, delta);
+            if (component.getConfig().isVisible())
+            {
+                component.drawComponent(context, mouseX, mouseY, delta);
+                component.setYOffset(configY);
+                configY += component.getHeight() + 1;
+            }
         }
 
         context.disableScissor();

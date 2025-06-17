@@ -51,7 +51,8 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
 
         String numberText = getConfig().getValue() instanceof Integer || numberConfig.getRoundingPlaces() == 0
                 ? String.valueOf(getConfig().getValue().intValue()) : String.valueOf(getConfig().getValue());
-        drawText(context, getConfig().getName() + " " + Formatting.GRAY + numberText, getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, getConfig().getName() + " " + Formatting.GRAY + numberText + numberConfig.getFormat().getUnits(),
+                getTx() + 3, getTy() + 4, theme.getTextColor());
     }
 
     @Override

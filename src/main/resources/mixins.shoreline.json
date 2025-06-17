@@ -5,8 +5,10 @@
   "client": [
     "MixinKeyboard",
     "MixinMinecraftClient",
+    "entity.MixinLivingEntity",
     "gui.hud.MixinInGameHud",
     "network.MixinClientConnection",
+    "network.MixinClientPlayerEntity",
     "render.MixinLightmapTextureManager"
   ],
   "injectors": {

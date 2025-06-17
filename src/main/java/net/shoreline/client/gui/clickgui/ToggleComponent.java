@@ -41,11 +41,14 @@ public class ToggleComponent extends ModuleComponent
         {
             context.enableScissor(getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
 
+            int configY = 2;
             for (ConfigComponent<?> component : components)
             {
                 if (component.getConfig().isVisible())
                 {
                     component.drawComponent(context, mouseX, mouseY, delta);
+                    component.setYOffset(configY);
+                    configY += component.getHeight() + 1;
                 }
             }
 

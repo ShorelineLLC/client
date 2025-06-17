@@ -66,6 +66,15 @@ public class ConfigContainerFile extends JsonConfigFile
         if (config.getValue() instanceof Boolean)
         {
             ((Config<Boolean>) config).setValue(value.getAsBoolean());
+        } else if (config.getValue() instanceof Enum<?>)
+        {
+            try
+            {
+                ((Config<Enum<?>>) config).setValue((Enum<?>) Enum.valueOf((Class<Enum>) config.getValue().getClass(), value.getAsString()));
+            } catch (IllegalArgumentException ignored)
+            {
+
+            }
         } else if (config.getValue() instanceof Float)
         {
             ((Config<Float>) config).setValue(value.getAsFloat());
