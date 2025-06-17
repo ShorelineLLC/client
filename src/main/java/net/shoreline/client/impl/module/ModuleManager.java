@@ -4,6 +4,9 @@ import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.HudModule;
+import net.shoreline.client.impl.module.movement.SprintModule;
+import net.shoreline.client.impl.module.movement.VelocityModule;
+import net.shoreline.client.impl.module.render.FullbrightModule;
 import net.shoreline.client.impl.module.render.NoWeatherModule;
 
 import java.util.Arrays;
@@ -20,7 +23,11 @@ public class ModuleManager
                 new ClickGuiModule(),
                 new ColorsModule(),
                 new HudModule(),
+                // Movement
+                new SprintModule(),
+                new VelocityModule(),
                 // Render
+                new FullbrightModule(),
                 new NoWeatherModule()
         );
 

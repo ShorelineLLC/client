@@ -1,6 +1,9 @@
 package net.shoreline.client.impl.module.render;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
@@ -16,8 +19,13 @@ public class NoWeatherModule extends Toggleable
             .setValues(Weather.values())
             .setDescription("The client world weather")
             .setDefaultValue(Weather.CLEAR).build();
+    Config<Time> timeConfig = new EnumConfig.Builder<Time>("Time")
+            .setValues(Time.values())
+            .setDescription("The client world time")
+            .setDefaultValue(Time.AFTERNOON).build();
 
     private Weather prevWeather;
+    private long prevTime;
 
     public NoWeatherModule()
     {
@@ -32,6 +40,7 @@ public class NoWeatherModule extends Toggleable
             return;
         }
 
+        prevTime = mc.world.getLevelProperties().getTimeOfDay();
         if (mc.world.isThundering())
         {
             prevWeather = Weather.THUNDER;
@@ -50,6 +59,7 @@ public class NoWeatherModule extends Toggleable
         if (mc.world != null && prevWeather != null)
         {
             setWeather(prevWeather);
+            mc.world.getLevelProperties().setTimeOfDay(prevTime);
         }
     }
 
@@ -59,6 +69,7 @@ public class NoWeatherModule extends Toggleable
         if (!checkNull() && event.getStage() == StageEvent.EventStage.POST)
         {
             setWeather(weatherConfig.getValue());
+            mc.world.getLevelProperties().setTimeOfDay(timeConfig.getValue().getTime());
         }
     }
 
@@ -70,6 +81,11 @@ public class NoWeatherModule extends Toggleable
                 || packet.getReason() == GameStateChangeS2CPacket.RAIN_STOPPED
                 || packet.getReason() == GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED
                 || packet.getReason() == GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED))
+        {
+            event.cancel();
+        }
+
+        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket)
         {
             event.cancel();
         }
@@ -105,5 +121,20 @@ public class NoWeatherModule extends Toggleable
         CLEAR,
         RAIN,
         THUNDER
+    }
+
+    @RequiredArgsConstructor
+    private enum Time
+    {
+        SUNRISE(0),
+        MORNING(3000),
+        NOON(6000),
+        AFTERNOON(9000),
+        SUNSET(12000),
+        EVENING(15000),
+        MIDNIGHT(18000);
+
+        @Getter
+        private final long time;
     }
 }

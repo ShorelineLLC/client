@@ -1,5 +1,6 @@
 package net.shoreline.client.api.macro;
 
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import net.shoreline.client.api.module.Toggleable;
 
@@ -18,5 +19,14 @@ public class ModuleKeybind extends Macro
     public Runnable getCommand()
     {
         return module::toggle;
+    }
+
+    @Override
+    public JsonObject toJson()
+    {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("module", getModule().getId());
+        jsonObject.addProperty("keycode", getKeycode());
+        return jsonObject;
     }
 }

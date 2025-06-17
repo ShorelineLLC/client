@@ -19,13 +19,9 @@ public class EnumConfig<T extends Enum<?>> extends Config<T>
     @Override
     public JsonObject toJson()
     {
-        return null;
-    }
-
-    @Override
-    public void fromJson(JsonObject jsonObject)
-    {
-
+        JsonObject jsonObject = super.toJson();
+        jsonObject.addProperty("value", getValue().name());
+        return jsonObject;
     }
 
     @Override

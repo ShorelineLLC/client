@@ -17,6 +17,6 @@ public class ShutdownHook extends Thread
     @Override
     public void run()
     {
-
+        Shoreline.CONFIG.saveModConfiguration();
     }
 }

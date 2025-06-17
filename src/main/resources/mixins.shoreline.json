@@ -6,7 +6,8 @@
     "MixinKeyboard",
     "MixinMinecraftClient",
     "gui.hud.MixinInGameHud",
-    "network.MixinClientConnection"
+    "network.MixinClientConnection",
+    "render.MixinLightmapTextureManager"
   ],
   "injectors": {
     "defaultRequire": 1

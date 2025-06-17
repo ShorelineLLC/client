@@ -3,8 +3,11 @@ package net.shoreline.client.mixin.network;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.PacketListener;
+import net.minecraft.network.packet.BundlePacket;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.eventbus.EventBus;
 import org.jetbrains.annotations.Nullable;
@@ -13,6 +16,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @Mixin(ClientConnection.class)
 public class MixinClientConnection
@@ -45,6 +51,28 @@ public class MixinClientConnection
         PacketListener ownedPacketListener = packetListener;
         if (packet != null && ownedPacketListener != null && ownedPacketListener.accepts(packet))
         {
+            if (packet instanceof BundleS2CPacket bundlePacket)
+            {
+                final List<Packet<? super ClientPlayPacketListener>> filtered = new LinkedList<>();
+                for (Packet<? super ClientPlayPacketListener> packet1 : bundlePacket.getPackets())
+                {
+                    PacketEvent.Inbound packetInboundEvent =
+                            new PacketEvent.Inbound(packetListener, packet1);
+                    EventBus.INSTANCE.dispatch(packetInboundEvent);
+                    if (!packetInboundEvent.isCanceled())
+                    {
+                        filtered.add(packet1);
+                    }
+                }
+
+                if (filtered.isEmpty())
+                {
+                    return;
+                }
+
+                BundlePacket<?> bundlePacket1 = new BundleS2CPacket(filtered);
+            }
+
             PacketEvent.Inbound packetInboundEvent =
                     new PacketEvent.Inbound(packetListener, packet);
             EventBus.INSTANCE.dispatch(packetInboundEvent);

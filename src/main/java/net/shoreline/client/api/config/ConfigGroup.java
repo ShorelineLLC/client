@@ -16,10 +16,4 @@ public class ConfigGroup extends Config<List<Config<?>>>
     {
         return null;
     }
-
-    @Override
-    public void fromJson(JsonObject jsonObject)
-    {
-
-    }
 }

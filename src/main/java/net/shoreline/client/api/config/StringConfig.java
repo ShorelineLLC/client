@@ -11,13 +11,9 @@ public class StringConfig extends Config<String>
     @Override
     public JsonObject toJson()
     {
-        return null;
-    }
-
-    @Override
-    public void fromJson(JsonObject jsonObject)
-    {
-
+        JsonObject jsonObject = super.toJson();
+        jsonObject.addProperty("value", getValue());
+        return jsonObject;
     }
 
     public static class Builder extends ConfigBuilder<String>

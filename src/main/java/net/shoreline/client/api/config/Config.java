@@ -1,5 +1,6 @@
 package net.shoreline.client.api.config;
 
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.api.Identifiable;
@@ -27,6 +28,15 @@ public abstract class Config<T> implements Identifiable, Serializable
         this.name = name;
         this.description = description;
         this.defaultValue = value;
+    }
+
+    @Override
+    public JsonObject toJson()
+    {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name", getName());
+        jsonObject.addProperty("id", getId());
+        return jsonObject;
     }
 
     @Override

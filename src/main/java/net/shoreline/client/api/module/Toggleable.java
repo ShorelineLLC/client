@@ -1,6 +1,5 @@
 package net.shoreline.client.api.module;
 
-import com.google.gson.JsonObject;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
@@ -12,14 +11,14 @@ import org.lwjgl.glfw.GLFW;
 
 public class Toggleable extends Module
 {
-    final Config<Boolean> enabled = new BooleanConfig.Builder("Enabled")
+    private final Config<Boolean> enabled = new BooleanConfig.Builder("Enabled")
             .setDescription("Module enabled state")
             .setNameAliases("Toggled")
             .setDefaultValue(false).build();
 
-    final Config<Macro> keybind = new MacroConfig.Builder("Bind")
+    private final Config<Macro> keybind = new MacroConfig.Builder("Keybind")
             .setDescription("The module keybind")
-            .setNameAliases("Keybind")
+            .setNameAliases("Bind")
             .setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
 
     public Toggleable(final String name,
@@ -36,6 +35,7 @@ public class Toggleable extends Module
                       final GuiCategory category)
     {
         super(name, nameAliases, description, category);
+        registerConfig(keybind);
     }
 
     public void enable()
@@ -66,18 +66,6 @@ public class Toggleable extends Module
     protected void onEnable() {}
 
     protected void onDisable() {}
-
-    @Override
-    public JsonObject toJson()
-    {
-        return null;
-    }
-
-    @Override
-    public void fromJson(JsonObject jsonObject)
-    {
-
-    }
 
     public boolean isEnabled()
     {

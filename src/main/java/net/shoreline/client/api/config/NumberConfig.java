@@ -19,13 +19,9 @@ public class NumberConfig<T extends Number> extends Config<T>
     @Override
     public JsonObject toJson()
     {
-        return null;
-    }
-
-    @Override
-    public void fromJson(JsonObject jsonObject)
-    {
-
+        JsonObject jsonObject = super.toJson();
+        jsonObject.addProperty("value", getValue());
+        return jsonObject;
     }
 
     public static class Builder<T extends Number> extends ConfigBuilder<T>

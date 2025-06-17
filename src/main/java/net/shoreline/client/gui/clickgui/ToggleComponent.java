@@ -43,7 +43,10 @@ public class ToggleComponent extends ModuleComponent
 
             for (ConfigComponent<?> component : components)
             {
-                component.drawComponent(context, mouseX, mouseY, delta);
+                if (component.getConfig().isVisible())
+                {
+                    component.drawComponent(context, mouseX, mouseY, delta);
+                }
             }
 
             context.disableScissor();

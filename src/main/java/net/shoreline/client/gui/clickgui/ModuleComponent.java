@@ -86,7 +86,10 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                component.mouseClicked(mouseX, mouseY, mouseButton);
+                if (component.getConfig().isVisible())
+                {
+                    component.mouseClicked(mouseX, mouseY, mouseButton);
+                }
             }
         }
     }
@@ -100,7 +103,10 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                component.mouseReleased(mouseX, mouseY, button);
+                if (component.getConfig().isVisible())
+                {
+                    component.mouseReleased(mouseX, mouseY, button);
+                }
             }
         }
     }
@@ -115,7 +121,10 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                component.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+                if (component.getConfig().isVisible())
+                {
+                    component.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+                }
             }
         }
     }
@@ -129,7 +138,10 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                component.keyPressed(keyCode, scanCode, modifiers);
+                if (component.getConfig().isVisible())
+                {
+                    component.keyPressed(keyCode, scanCode, modifiers);
+                }
             }
         }
     }
@@ -142,7 +154,10 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                component.charTyped(chr, modifiers);
+                if (component.getConfig().isVisible())
+                {
+                    component.charTyped(chr, modifiers);
+                }
             }
         }
     }
@@ -152,7 +167,10 @@ public class ModuleComponent extends FrameComponent
         int frameHeight = 2;
         for (ConfigComponent<?> component : components)
         {
-            frameHeight += component.getHeight() + 1;
+            if (component.getConfig().isVisible())
+            {
+                frameHeight += component.getHeight() + 1;
+            }
         }
         return (int) (frameHeight * collapseAnim.getFactor());
     }

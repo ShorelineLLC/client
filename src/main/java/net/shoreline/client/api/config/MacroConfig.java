@@ -18,14 +18,8 @@ public class MacroConfig extends Config<Macro>
     }
 
     @Override
-    public void fromJson(JsonObject jsonObject)
+    public void setValue(Macro macro)
     {
-
-    }
-
-    public void setValue(int keycode, Runnable runnable)
-    {
-        final Macro macro = new Macro(keycode, runnable);
         Managers.MACROS.unregister(getValue());
         super.setValue(macro);
         Managers.MACROS.register(macro);

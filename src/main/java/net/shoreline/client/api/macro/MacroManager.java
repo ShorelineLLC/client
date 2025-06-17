@@ -1,5 +1,6 @@
 package net.shoreline.client.api.macro;
 
+import lombok.Getter;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.event.InputEvent;
 import net.shoreline.eventbus.EventBus;
@@ -10,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MacroManager extends GenericFeature
 {
+    @Getter
     private final CopyOnWriteArrayList<Macro> macros = new CopyOnWriteArrayList<>();
 
     public MacroManager()

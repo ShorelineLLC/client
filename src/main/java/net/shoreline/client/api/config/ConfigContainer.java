@@ -1,5 +1,7 @@
 package net.shoreline.client.api.config;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.api.Serializable;
 import net.shoreline.loader.Loader;
@@ -9,11 +11,11 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.SequencedCollection;
 
-public abstract class Configuration extends GenericFeature implements Serializable
+public abstract class ConfigContainer extends GenericFeature implements Serializable
 {
     private final LinkedHashMap<String, Config<?>> configs = new LinkedHashMap<>();
 
-    public Configuration(String name, String[] nameAliases) {
+    public ConfigContainer(String name, String[] nameAliases) {
         super(name, nameAliases);
     }
 
@@ -41,6 +43,25 @@ public abstract class Configuration extends GenericFeature implements Serializab
                 }
             }
         }
+    }
+
+    @Override
+    public JsonObject toJson()
+    {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("name", getName());
+        jsonObject.addProperty("id", getId());
+        final JsonArray array = new JsonArray();
+        for (Config<?> config : getConfigs())
+        {
+            if (config.getName().equalsIgnoreCase("Keybind"))
+            {
+                continue;
+            }
+            array.add(config.toJson());
+        }
+        jsonObject.add("configs", array);
+        return jsonObject;
     }
 
     protected void registerConfig(Config<?> config)

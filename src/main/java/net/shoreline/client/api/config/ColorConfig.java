@@ -13,13 +13,14 @@ public class ColorConfig extends Config<Color>
     @Override
     public JsonObject toJson()
     {
-        return null;
+        JsonObject jsonObject = super.toJson();
+        jsonObject.addProperty("value", Integer.toHexString(getRGB()));
+        return jsonObject;
     }
 
-    @Override
-    public void fromJson(JsonObject jsonObject)
+    public int getRGB()
     {
-
+        return getValue().getRGB();
     }
 
     public static class Builder extends ConfigBuilder<Color>

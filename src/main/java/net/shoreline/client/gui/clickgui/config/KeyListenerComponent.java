@@ -6,6 +6,8 @@ import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
 import net.shoreline.client.api.macro.Macro;
+import net.shoreline.client.api.macro.ModuleKeybind;
+import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
@@ -49,6 +51,7 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
     {
         if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height))
         {
+            MacroConfig config = (MacroConfig) getConfig();
             if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_1)
             {
                 listening = !listening;
@@ -56,7 +59,8 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
             else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_2 && !listening)
             {
                 // Reset the bind
-                ((MacroConfig) getConfig()).setValue(GLFW.GLFW_KEY_UNKNOWN, null);
+                config.setValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN,
+                        (Toggleable) getModuleComponent().getModule()));
             }
             else
             {
@@ -66,8 +70,8 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
                     if (mouseButton != GLFW.GLFW_MOUSE_BUTTON_2)
                     {
                         // Mouse bind
-                        ((MacroConfig) getConfig()).setValue(
-                                GLFW.GLFW_KEY_LAST + mouseButton, getConfig().getValue().getCommand());
+                        config.setValue(new ModuleKeybind(GLFW.GLFW_KEY_LAST + mouseButton,
+                                (Toggleable) getModuleComponent().getModule()));
                     }
                     listening = false;
                 }
@@ -100,13 +104,14 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
         if (listening)
         {
             // unbind
+            MacroConfig config = (MacroConfig) getConfig();
             if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_BACKSPACE)
             {
-                ((MacroConfig) getConfig()).setValue(GLFW.GLFW_KEY_UNKNOWN, null);
+                config.setValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, (Toggleable) getModuleComponent().getModule()));
             }
             else
             {
-                ((MacroConfig) getConfig()).setValue(keyCode, getConfig().getValue().getCommand());
+                config.setValue(new ModuleKeybind(keyCode, (Toggleable) getModuleComponent().getModule()));
             }
             listening = false;
         }

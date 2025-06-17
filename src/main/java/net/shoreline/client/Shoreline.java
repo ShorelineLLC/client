@@ -1,5 +1,6 @@
 package net.shoreline.client;
 
+import net.shoreline.client.api.file.ModConfiguration;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.loader.Loader;
 
@@ -13,6 +14,8 @@ import net.shoreline.loader.Loader;
  */
 public class Shoreline
 {
+    public static ModConfiguration CONFIG;
+
     // Client shutdown hooks which will run once when the MinecraftClient
     // game instance is shutdown.
     public static ShutdownHook SHUTDOWN;
@@ -22,11 +25,12 @@ public class Shoreline
      */
     public static void init()
     {
-        // Debug information - required when submitting a crash / bug report
-        info("This build of Shoreline is on Git hash {} and was compiled on {}", BuildConfig.HASH, BuildConfig.BUILD_TIME);
-        info("Starting preInit ...");
+        info("Starting Shoreline...");
 
         Managers.init();
+
+        CONFIG = new ModConfiguration();
+        CONFIG.loadModConfiguration();
 
         SHUTDOWN = new ShutdownHook();
         Runtime.getRuntime().addShutdownHook(SHUTDOWN);

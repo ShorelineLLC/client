@@ -1,9 +1,9 @@
 package net.shoreline.client.api.module;
 
 import lombok.Getter;
-import net.shoreline.client.api.config.Configuration;
+import net.shoreline.client.api.config.ConfigContainer;
 
-public abstract class Module extends Configuration
+public abstract class Module extends ConfigContainer
 {
     @Getter
     private final String description;
@@ -34,5 +34,10 @@ public abstract class Module extends Configuration
     public String getId()
     {
         return String.format("%s_module", getName().toLowerCase());
+    }
+
+    public String getModuleData()
+    {
+        return null;
     }
 }
