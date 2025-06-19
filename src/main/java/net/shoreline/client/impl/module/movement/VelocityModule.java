@@ -40,7 +40,7 @@ public class VelocityModule extends Toggleable
 
     public VelocityModule()
     {
-        super("Velocity", "Prevents player knockback", GuiCategory.MOVEMENT);
+        super("Velocity", new String[] {"AntiKB"}, "Prevents player knockback", GuiCategory.MOVEMENT);
     }
 
     @Override

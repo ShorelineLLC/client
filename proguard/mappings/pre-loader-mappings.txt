@@ -1,6 +1,6 @@
 net.shoreline.client.ShorelineMod -> net.shoreline.client.bs:
     void onInitializeClient() -> a
-net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
+net.shoreline.eventbus.Event -> net.shoreline.client.fR:
 
 net.shoreline.eventbus.EventBus -> net.shoreline.client.e:
     net.shoreline.eventbus.EventBus INSTANCE -> a

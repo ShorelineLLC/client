@@ -1,6 +1,6 @@
 package net.shoreline.eventbus.annotation;
 
-import net.shoreline.eventbus.event.Event;
+import net.shoreline.eventbus.Event;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

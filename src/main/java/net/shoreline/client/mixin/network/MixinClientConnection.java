@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.network;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketCallbacks;
@@ -27,6 +28,15 @@ public class MixinClientConnection
     @Nullable
     private volatile PacketListener packetListener;
 
+    @Shadow
+    private Channel channel;
+
+    @Shadow
+    private static <T extends PacketListener> void handlePacket(Packet<T> packet, PacketListener listener) {}
+
+    @Shadow
+    private int packetsReceivedCounter;
+
     @Inject(method = "sendImmediately", at = @At(value = "HEAD"), cancellable = true)
     private void hookSendImmediately(Packet<?> packet,
                                      @Nullable PacketCallbacks callbacks,
@@ -42,12 +52,16 @@ public class MixinClientConnection
         }
     }
 
-    @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;" +
-            "Lnet/minecraft/network/packet/Packet;)V", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V",
+            at = @At(value = "HEAD"), cancellable = true)
     private void hookChannelRead0(ChannelHandlerContext channelHandlerContext,
                                   Packet<?> packet,
                                   CallbackInfo ci)
     {
+        if (!channel.isOpen())
+        {
+            return;
+        }
         PacketListener ownedPacketListener = packetListener;
         if (packet != null && ownedPacketListener != null && ownedPacketListener.accepts(packet))
         {
@@ -71,6 +85,15 @@ public class MixinClientConnection
                 }
 
                 BundlePacket<?> bundlePacket1 = new BundleS2CPacket(filtered);
+                try {
+                    handlePacket(bundlePacket1, packetListener);
+                } catch (Exception ignored)
+                {
+
+                }
+
+                ++packetsReceivedCounter;
+                return;
             }
 
             PacketEvent.Inbound packetInboundEvent =

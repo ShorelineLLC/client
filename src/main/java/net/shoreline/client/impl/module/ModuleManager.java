@@ -4,6 +4,7 @@ import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.HudModule;
+import net.shoreline.client.impl.module.movement.NoSlowModule;
 import net.shoreline.client.impl.module.movement.SprintModule;
 import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.impl.module.render.FullbrightModule;
@@ -24,6 +25,7 @@ public class ModuleManager
                 new ColorsModule(),
                 new HudModule(),
                 // Movement
+                new NoSlowModule(),
                 new SprintModule(),
                 new VelocityModule(),
                 // Render

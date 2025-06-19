@@ -5,7 +5,7 @@ net.shoreline.client.api.render.layers.RenderLayersClient -> net.shoreline.clien
 
 net.shoreline.client.impl.imixin.IMixin -> net.shoreline.client.im:
 
-net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
+net.shoreline.eventbus.Event -> net.shoreline.client.fR:
 
 net.shoreline.eventbus.event.StageEvent$EventStage -> net.shoreline.client.es:
 

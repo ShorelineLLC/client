@@ -3,7 +3,7 @@ package net.shoreline.client.impl.event.entity;
 import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.eventbus.annotation.Cancelable;
-import net.shoreline.eventbus.event.Event;
+import net.shoreline.eventbus.Event;
 
 @Cancelable
 @Getter

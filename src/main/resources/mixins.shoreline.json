@@ -3,13 +3,19 @@
   "package": "net.shoreline.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "MixinKeyboard",
-    "MixinMinecraftClient",
+    "accessor.AccessorClientWorld",
+    "accessor.AccessorInput",
+    "accessor.AccessorKeyBinding",
+    "accessor.AccessorPlayerMoveC2SPacket",
     "entity.MixinLivingEntity",
     "gui.hud.MixinInGameHud",
     "network.MixinClientConnection",
     "network.MixinClientPlayerEntity",
-    "render.MixinLightmapTextureManager"
+    "network.MixinClientPlayNetworkHandler",
+    "render.entity.MixinPlayerEntityRenderer",
+    "render.MixinLightmapTextureManager",
+    "MixinKeyboard",
+    "MixinMinecraftClient"
   ],
   "injectors": {
     "defaultRequire": 1

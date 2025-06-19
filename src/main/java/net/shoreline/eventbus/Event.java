@@ -1,4 +1,4 @@
-package net.shoreline.eventbus.event;
+package net.shoreline.eventbus;
 
 import lombok.Getter;
 import net.shoreline.eventbus.annotation.Cancelable;

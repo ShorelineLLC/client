@@ -9116,7 +9116,7 @@ net.shoreline.eventbus.EventBus -> net.shoreline.client.e:
     net.shoreline.eventbus.EventBus INSTANCE -> a
     java.util.Map event2InvokerMap -> b
     37:38:void <init>() -> <init>
-    45:53:void dispatch(net.shoreline.eventbus.event.Event) -> a
+    45:53:void dispatch(net.shoreline.eventbus.Event) -> a
     java.lang.Object subscribe(java.lang.Object) -> a
     java.lang.Object unsubscribe(java.lang.Object) -> b
     9:9:void <clinit>() -> <clinit>
@@ -9137,7 +9137,7 @@ net.shoreline.eventbus.dev.DevEventBusLoader -> net.shoreline.client.sn:
     28:40:void load() -> h
     46:64:void loadSingleFile(java.io.File,java.lang.String) -> a
     69:81:void loadDirectory(java.io.File,java.lang.String) -> b
-net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
+net.shoreline.eventbus.Event -> net.shoreline.client.fR:
     boolean cancelable -> OP
     boolean canceled -> OQ
     5:8:void <init>() -> <init>

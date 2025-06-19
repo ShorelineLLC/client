@@ -46,8 +46,8 @@ public class ToggleComponent extends ModuleComponent
             {
                 if (component.getConfig().isVisible())
                 {
-                    component.drawComponent(context, mouseX, mouseY, delta);
                     component.setYOffset(configY);
+                    component.drawComponent(context, mouseX, mouseY, delta);
                     configY += component.getHeight() + 1;
                 }
             }

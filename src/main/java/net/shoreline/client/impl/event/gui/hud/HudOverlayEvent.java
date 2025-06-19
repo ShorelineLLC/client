@@ -3,7 +3,7 @@ package net.shoreline.client.impl.event.gui.hud;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.gui.DrawContext;
-import net.shoreline.eventbus.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class HudOverlayEvent extends Event
 {

@@ -2,7 +2,7 @@ package net.shoreline.client.impl.event;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.shoreline.eventbus.event.Event;
+import net.shoreline.eventbus.Event;
 
 public class InputEvent extends Event
 {

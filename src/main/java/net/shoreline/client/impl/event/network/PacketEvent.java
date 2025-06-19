@@ -4,12 +4,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
+import net.shoreline.eventbus.Event;
 import net.shoreline.eventbus.annotation.Cancelable;
-import net.shoreline.eventbus.event.StageEvent;
 
 @RequiredArgsConstructor
 @Getter
-public class PacketEvent extends StageEvent
+public class PacketEvent extends Event
 {
     private final Packet<?> packet;
 

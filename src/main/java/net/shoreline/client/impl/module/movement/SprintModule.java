@@ -7,13 +7,13 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.JumpYawEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
 public class SprintModule extends MovementModule
 {
@@ -42,9 +42,9 @@ public class SprintModule extends MovementModule
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTickPre(TickEvent.Post event)
     {
-        if (checkNull() || event.getStage() != StageEvent.EventStage.PRE || !canSprint())
+        if (checkNull() || !canSprint())
         {
             return;
         }
@@ -61,6 +61,18 @@ public class SprintModule extends MovementModule
             }
             case RAGE -> mc.player.setSprinting(true);
         }
+    }
+
+    @EventListener
+    public void onClientRotation(ClientRotationEvent event)
+    {
+        if (!rotateConfig.getValue())
+        {
+            return;
+        }
+        float sprintYaw = getYawFromInput();
+        event.cancel();
+        event.setYaw(sprintYaw);
     }
 
     @EventListener
@@ -108,7 +120,7 @@ public class SprintModule extends MovementModule
                 && !mc.player.isInLava()
                 && !mc.player.isHoldingOntoLadder()
                 && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                && mc.player.getHungerManager().getFoodLevel() > 6.0F;
+                && mc.player.getHungerManager().getFoodLevel() > 6.0f;
     }
 
     private enum SprintMode

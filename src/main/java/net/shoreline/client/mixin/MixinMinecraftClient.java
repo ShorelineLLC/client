@@ -1,9 +1,9 @@
 package net.shoreline.client.mixin;
 
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.eventbus.EventBus;
-import net.shoreline.eventbus.event.StageEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,19 +14,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinMinecraftClient
 {
     @Unique
-    final TickEvent tickEvent = new TickEvent();
+    private long startTime;
 
     @Inject(method = "tick", at = @At(value = "HEAD"))
     private void hookTickPre(CallbackInfo ci)
     {
-        tickEvent.setStage(StageEvent.EventStage.PRE);
+        final TickEvent.Pre tickEvent = new TickEvent.Pre();
         EventBus.INSTANCE.dispatch(tickEvent);
     }
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     private void hookTickPost(CallbackInfo ci)
     {
-        tickEvent.setStage(StageEvent.EventStage.POST);
+        final TickEvent.Post tickEvent = new TickEvent.Post();
         EventBus.INSTANCE.dispatch(tickEvent);
+    }
+
+    @Inject(method = "render", at = @At("HEAD"))
+    public void hookRender(boolean tick, CallbackInfo ci)
+    {
+        startTime = System.nanoTime();
     }
 }

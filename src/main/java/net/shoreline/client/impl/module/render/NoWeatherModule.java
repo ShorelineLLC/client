@@ -11,7 +11,6 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
 public class NoWeatherModule extends Toggleable
 {
@@ -64,9 +63,9 @@ public class NoWeatherModule extends Toggleable
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTickPost(TickEvent.Post event)
     {
-        if (!checkNull() && event.getStage() == StageEvent.EventStage.POST)
+        if (!checkNull())
         {
             setWeather(weatherConfig.getValue());
             mc.world.getLevelProperties().setTimeOfDay(timeConfig.getValue().getTime());

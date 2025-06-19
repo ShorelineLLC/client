@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.impl;
 
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 
@@ -16,6 +17,47 @@ public class MovementModule extends Toggleable
                           final GuiCategory category)
     {
         super(name, nameAliases, description, category);
+    }
+
+    protected float getYawFromInput()
+    {
+        float yaw = mc.player.getYaw();
+        boolean forward = mc.options.forwardKey.isPressed();
+        boolean backward = mc.options.backKey.isPressed();
+        boolean left = mc.options.leftKey.isPressed();
+        boolean right = mc.options.rightKey.isPressed();
+        if (forward && !backward)
+        {
+            if (left && !right)
+            {
+                yaw -= 45.0f;
+            }
+            else if (right && !left)
+            {
+                yaw += 45.0f;
+            }
+        }
+        else if (backward && !forward)
+        {
+            yaw += 180.0f;
+            if (left && !right)
+            {
+                yaw += 45.0f;
+            }
+            else if (right && !left)
+            {
+                yaw -= 45.0f;
+            }
+        }
+        else if (left && !right)
+        {
+            yaw -= 90.0f;
+        }
+        else if (right && !left)
+        {
+            yaw += 90.0f;
+        }
+        return MathHelper.wrapDegrees(yaw);
     }
 
     protected boolean isInputtingMovement()

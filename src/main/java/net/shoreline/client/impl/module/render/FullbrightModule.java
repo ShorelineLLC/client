@@ -18,7 +18,6 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.WorldGammaEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
 public class FullbrightModule extends Toggleable
 {
@@ -66,9 +65,9 @@ public class FullbrightModule extends Toggleable
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTickPost(TickEvent.Post event)
     {
-        if (checkNull() || event.getStage() != StageEvent.EventStage.POST)
+        if (checkNull())
         {
             return;
         }

@@ -1,0 +1,128 @@
+package net.shoreline.client.impl.module.movement;
+
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.client.gui.screen.ingame.SignEditScreen;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
+import net.minecraft.util.Hand;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.InputMovementEvent;
+import net.shoreline.client.mixin.accessor.AccessorInput;
+import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
+import net.shoreline.eventbus.annotation.EventListener;
+
+public class NoSlowModule extends Toggleable
+{
+    Config<Mode> modeConfig = new EnumConfig.Builder<Mode>("Mode")
+            .setValues(Mode.values())
+            .setDescription("The mode for bypassing anticheat slowdown detection")
+            .setDefaultValue(Mode.NORMAL).build();
+    Config<Boolean> inventoryMoveConfig = new BooleanConfig.Builder("InventoryMove")
+            .setDescription("Allows the player to move while inventories or menus are open")
+            .setDefaultValue(true).build();
+    Config<Boolean> itemsConfig = new BooleanConfig.Builder("Items")
+            .setDescription("Removes the slowdown from consuming items")
+            .setDefaultValue(true).build();
+    Config<Boolean> blockingConfig = new BooleanConfig.Builder("Blocking")
+            .setDescription("Removes the slowdown from blocking with a shield")
+            .setDefaultValue(false).build();
+    Config<Boolean> sneakingConfig = new BooleanConfig.Builder("Sneaking")
+            .setDescription("Removes the slowdown from sneaking")
+            .setDefaultValue(false).build();
+    Config<Boolean> crawlingConfig = new BooleanConfig.Builder("Crawling")
+            .setDescription("Removes the slowdown from crawling")
+            .setDefaultValue(false).build();
+
+    public NoSlowModule()
+    {
+        super("NoSlow", new String[] {"NoSlowdown"}, "Prevents client from slowing the player", GuiCategory.MOVEMENT);
+    }
+
+    @EventListener
+    public void onTickPre(TickEvent.Pre event)
+    {
+        if (checkNull())
+        {
+            return;
+        }
+
+        if (inventoryMoveConfig.getValue() && mc.currentScreen != null
+                && !(mc.currentScreen instanceof ChatScreen
+                || mc.currentScreen instanceof SignEditScreen
+                || mc.currentScreen instanceof DeathScreen))
+        {
+            final long handle = mc.getWindow().getHandle();
+            KeyBinding[] keys = new KeyBinding[] { mc.options.jumpKey, mc.options.forwardKey, mc.options.backKey, mc.options.rightKey, mc.options.leftKey };
+            for (KeyBinding binding : keys)
+            {
+                binding.setPressed(InputUtil.isKeyPressed(handle, ((AccessorKeyBinding) binding).getBoundKey().getCode()));
+            }
+        }
+
+        if (modeConfig.getValue() == Mode.GRIM_V2 && shouldCancelSlowedDown())
+        {
+            if (mc.player.getActiveHand() == Hand.OFF_HAND && !canUseItem(mc.player.getMainHandStack()))
+            {
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+            } else if (!canUseItem(mc.player.getOffHandStack()))
+            {
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+            }
+        }
+    }
+
+    @EventListener
+    public void onInputMovement(InputMovementEvent event)
+    {
+        Input playerInput = event.getInput();
+        if (sneakingConfig.getValue() && mc.player.isSneaking()
+                || crawlingConfig.getValue() && mc.player.isCrawling())
+        {
+            float f = 1.0f / (float) mc.player.getAttributeValue(EntityAttributes.SNEAKING_SPEED);
+            ((AccessorInput) event.getInput()).setMovementVector(playerInput.getMovementInput().multiply(f));
+        }
+
+        if (shouldCancelSlowedDown())
+        {
+            ((AccessorInput) event.getInput()).setMovementVector(playerInput.getMovementInput().multiply(5.0f));
+        }
+    }
+
+    private boolean canUseItem(ItemStack stack)
+    {
+        return stack.getComponents().contains(DataComponentTypes.FOOD) || stack.getItem() == Items.BOW || stack.getItem() == Items.CROSSBOW || stack.getItem() == Items.SHIELD;
+    }
+
+    public boolean shouldCancelSlowedDown()
+    {
+        return !mc.player.isRiding() && (mc.player.isUsingItem() && itemsConfig.getValue()
+                || mc.player.isBlocking() && blockingConfig.getValue());
+    }
+
+    private boolean checkGrimNew()
+    {
+        return !mc.player.isSneaking() && !mc.player.isCrawling() && !mc.player.isRiding() &&
+                mc.player.getItemUseTimeLeft() < 5 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
+    }
+
+    private enum Mode
+    {
+        NORMAL,
+        STRICT,
+        GRIM_V2,
+        GRIM_V3
+    }
+}

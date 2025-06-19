@@ -1,7 +1,6 @@
 package net.shoreline.eventbus;
 
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.Event;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
