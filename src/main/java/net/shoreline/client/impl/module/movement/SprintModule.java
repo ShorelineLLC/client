@@ -9,7 +9,7 @@ import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.entity.JumpYawEvent;
+import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.util.Formatter;
@@ -85,7 +85,7 @@ public class SprintModule extends MovementModule
     }
 
     @EventListener
-    public void onJumpYaw(JumpYawEvent event)
+    public void onJumpYaw(PlayerJumpEvent.Yaw event)
     {
         if (jumpFixConfig.getValue() && modeConfig.getValue() == SprintMode.RAGE)
         {

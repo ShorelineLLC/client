@@ -38,10 +38,8 @@ public class MixinClientPlayerEntity
         }
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
-            shift = At.Shift.AFTER))
-    private void hookTick(CallbackInfo ci)
+    @Inject(method = "sendMovementPackets", at = @At(value = "HEAD"))
+    private void hookSendMovementPackets(CallbackInfo ci)
     {
         if ((Object) this != MinecraftClient.getInstance().player)
         {
@@ -52,8 +50,8 @@ public class MixinClientPlayerEntity
         EventBus.INSTANCE.dispatch(event);
     }
 
-    @Inject(method = "tick", at = @At(value = "TAIL"))
-    private void hookTickPost(CallbackInfo ci)
+    @Inject(method = "sendMovementPackets", at = @At(value = "TAIL"))
+    private void hookSendMovementPacketsPost(CallbackInfo ci)
     {
         if ((Object) this != MinecraftClient.getInstance().player)
         {

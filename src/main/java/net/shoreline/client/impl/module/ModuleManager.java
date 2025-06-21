@@ -4,6 +4,9 @@ import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.ColorsModule;
 import net.shoreline.client.impl.module.client.HudModule;
+import net.shoreline.client.impl.module.client.RotationsModule;
+import net.shoreline.client.impl.module.combat.AuraModule;
+import net.shoreline.client.impl.module.misc.FakePlayerModule;
 import net.shoreline.client.impl.module.movement.NoSlowModule;
 import net.shoreline.client.impl.module.movement.SprintModule;
 import net.shoreline.client.impl.module.movement.VelocityModule;
@@ -24,6 +27,11 @@ public class ModuleManager
                 new ClickGuiModule(),
                 new ColorsModule(),
                 new HudModule(),
+                new RotationsModule(),
+                // Combat
+                new AuraModule(),
+                // Misc
+                new FakePlayerModule(),
                 // Movement
                 new NoSlowModule(),
                 new SprintModule(),

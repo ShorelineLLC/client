@@ -3,12 +3,10 @@ package net.shoreline.client.api.module;
 import lombok.Getter;
 import net.shoreline.client.api.config.ConfigContainer;
 
+@Getter
 public abstract class Module extends ConfigContainer
 {
-    @Getter
     private final String description;
-
-    @Getter
     private final GuiCategory category;
 
     public Module(final String name,

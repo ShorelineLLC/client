@@ -18,12 +18,12 @@ public class VelocityModule extends Toggleable
             .setValues(VelocityMode.values())
             .setDescription("The bypass mode for anti knockback")
             .setDefaultValue(VelocityMode.NORMAL).build();
-    Config<Number> horizontalConfig = new NumberConfig.Builder<>("Horizontal")
+    Config<Integer> horizontalConfig = new NumberConfig.Builder<Integer>("Horizontal")
             .setDefaultValue(0).setMin(0).setMax(100)
             .setFormat(NumberFormat.PERCENT)
             .setVisible(() -> modeConfig.getValue() == VelocityMode.NORMAL)
             .setDescription("The horizontal velocity reduction").build();
-    Config<Number> verticalConfig = new NumberConfig.Builder<>("Vertical")
+    Config<Integer> verticalConfig = new NumberConfig.Builder<Integer>("Vertical")
             .setDefaultValue(0).setMin(0).setMax(100)
             .setFormat(NumberFormat.PERCENT)
             .setVisible(() -> modeConfig.getValue() == VelocityMode.NORMAL)

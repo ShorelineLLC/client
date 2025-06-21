@@ -1637,7 +1637,7 @@ net.shoreline.client.impl.event.entity.player.LedgeClipEvent -> net.shoreline.cl
     7:7:void <init>() -> <init>
     13:14:void setClipped(boolean) -> j
     18:18:boolean isClipped() -> cQ
-net.shoreline.client.impl.event.entity.player.PlayerJumpEvent -> net.shoreline.client.dg:
+net.shoreline.client.impl.event.entity.PlayerJumpEvent -> net.shoreline.client.dg:
     7:7:void <init>() -> <init>
 net.shoreline.client.impl.event.entity.player.PlayerMoveEvent -> net.shoreline.client.dh:
     net.minecraft.class_1313 type -> eP
@@ -3352,7 +3352,7 @@ net.shoreline.client.impl.manager.player.rotation.RotationManager -> net.shoreli
     142:147:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
     152:163:void onKeyboardTick(net.shoreline.client.impl.event.keyboard.KeyboardTickEvent) -> a
     168:173:void onUpdateVelocity(net.shoreline.client.impl.event.entity.UpdateVelocityEvent) -> a
-    178:199:void onPlayerJump(net.shoreline.client.impl.event.entity.player.PlayerJumpEvent) -> a
+    178:199:void onPlayerJump(net.shoreline.client.impl.event.entity.PlayerJumpEvent) -> a
     204:213:void onRenderPlayer(net.shoreline.client.impl.event.render.entity.RenderPlayerEvent) -> a
     221:243:void setRotation(net.shoreline.client.impl.manager.player.rotation.Rotation) -> a
     251:257:void setRotationClient(float,float) -> f
@@ -5922,7 +5922,7 @@ net.shoreline.client.impl.module.movement.JesusModule -> net.shoreline.client.lK
     58:58:java.lang.String getModuleData() -> aW
     64:68:void onDisable() -> ba
     73:94:void onBlockCollision(net.shoreline.client.impl.event.world.BlockCollisionEvent) -> a
-    99:103:void onPlayerJump(net.shoreline.client.impl.event.entity.player.PlayerJumpEvent) -> a
+    99:103:void onPlayerJump(net.shoreline.client.impl.event.entity.PlayerJumpEvent) -> a
     108:146:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     151:190:void onPlayerUpdate(net.shoreline.client.impl.event.network.PlayerUpdateEvent) -> a
     195:221:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a

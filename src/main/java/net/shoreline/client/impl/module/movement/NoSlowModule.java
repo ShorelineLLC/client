@@ -88,10 +88,10 @@ public class NoSlowModule extends Toggleable
     public void onInputMovement(InputMovementEvent event)
     {
         Input playerInput = event.getInput();
+        float f = 1.0f / (float) mc.player.getAttributeValue(EntityAttributes.SNEAKING_SPEED);
         if (sneakingConfig.getValue() && mc.player.isSneaking()
                 || crawlingConfig.getValue() && mc.player.isCrawling())
         {
-            float f = 1.0f / (float) mc.player.getAttributeValue(EntityAttributes.SNEAKING_SPEED);
             ((AccessorInput) event.getInput()).setMovementVector(playerInput.getMovementInput().multiply(f));
         }
 

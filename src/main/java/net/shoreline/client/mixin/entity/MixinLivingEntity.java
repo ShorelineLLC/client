@@ -3,20 +3,46 @@ package net.shoreline.client.mixin.entity;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
-import net.shoreline.client.impl.event.entity.JumpYawEvent;
+import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public class MixinLivingEntity
 {
-    @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
-    private float hookJump$getYaw(float original)
+    @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
+    private void hookJumpPre(CallbackInfo ci)
     {
         if ((Object) this == MinecraftClient.getInstance().player)
         {
-            JumpYawEvent event = new JumpYawEvent(original);
+            PlayerJumpEvent.Pre event = new PlayerJumpEvent.Pre();
+            EventBus.INSTANCE.dispatch(event);
+            if (event.isCanceled())
+            {
+                ci.cancel();
+            }
+        }
+    }
+
+    @Inject(method = "jump", at = @At(value = "TAIL"))
+    private void hookJumpPost(CallbackInfo ci)
+    {
+        if ((Object) this == MinecraftClient.getInstance().player)
+        {
+            PlayerJumpEvent.Post event = new PlayerJumpEvent.Post();
+            EventBus.INSTANCE.dispatch(event);
+        }
+    }
+
+    @ModifyExpressionValue(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
+    private float hookJumpYaw(float original)
+    {
+        if ((Object) this == MinecraftClient.getInstance().player)
+        {
+            PlayerJumpEvent.Yaw event = new PlayerJumpEvent.Yaw(original);
             EventBus.INSTANCE.dispatch(event);
             if (event.isCanceled())
             {

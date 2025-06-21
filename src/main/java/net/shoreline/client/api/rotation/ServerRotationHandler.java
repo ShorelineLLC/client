@@ -1,5 +1,6 @@
 package net.shoreline.client.api.rotation;
 
+import lombok.Getter;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
@@ -7,6 +8,7 @@ import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 
 public class ServerRotationHandler extends GenericFeature
 {
+    @Getter
     private Rotation cachedRotation;
 
     public ServerRotationHandler()
