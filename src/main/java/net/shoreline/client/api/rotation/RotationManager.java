@@ -147,6 +147,9 @@ public class RotationManager extends GenericFeature
         if (rotationEvent.isCanceled())
         {
             setClientRotation(rotationEvent.getRotation());
+        } else if (hasClientRotation())
+        {
+            handler.resetRotations(playerRotation, 1.0f);
         }
     }
 

@@ -3,6 +3,7 @@ package net.shoreline.client.gui.clickgui;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.gui.Mouse;
@@ -56,7 +57,7 @@ public class ModuleComponent extends FrameComponent
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         drawRect(context, getTx(), getTy(), width, height, theme.getComponentColor());
-        drawText(context, module.getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, Text.literal(module.getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
 
         context.enableScissor(getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
 

@@ -2,7 +2,9 @@ package net.shoreline.client.mixin.network;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,5 +22,24 @@ public class MixinClientPlayNetworkHandler
         RotationUpdateEvent event = new RotationUpdateEvent(MinecraftClient.getInstance().player.getYaw(),
                 MinecraftClient.getInstance().player.getPitch());
         EventBus.INSTANCE.dispatch(event);
+    }
+
+    @Inject(method = "onExplosion", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/world/ClientWorld;addParticleClient(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
+            shift = At.Shift.AFTER), cancellable = true)
+    private void hookExplosion(ExplosionS2CPacket packet, CallbackInfo ci)
+    {
+        if (packet.playerKnockback().isEmpty())
+        {
+            return;
+        }
+
+        final ExplosionEvent event = new ExplosionEvent(packet.playerKnockback().get());
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
+            MinecraftClient.getInstance().player.addVelocityInternal(event.getPlayerVelocity());
+        }
     }
 }

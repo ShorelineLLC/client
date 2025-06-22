@@ -1,12 +1,15 @@
 package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -32,6 +35,9 @@ public class VelocityModule extends Toggleable
             .setDescription("Only applies wall velocity when grounded.")
             .setVisible(() -> modeConfig.getValue().equals(VelocityMode.WALLS))
             .setDefaultValue(false).build();
+    Config<Boolean> concealConfig = new BooleanConfig.Builder("Conceal")
+            .setDescription("Prevents excessive lagbacks on servers with strict movement anticheats")
+            .setDefaultValue(false).build();
 
     private boolean concealVelocity;
     private boolean cancelVelocity;
@@ -56,6 +62,12 @@ public class VelocityModule extends Toggleable
         return Formatter.formatEnum(modeConfig.getValue());
     }
 
+    @Override
+    public void onDisable()
+    {
+        concealVelocity = false;
+    }
+
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
@@ -76,21 +88,38 @@ public class VelocityModule extends Toggleable
             if (shouldCancelKnockback())
             {
                 event.cancel();
-            } else
+            } else if (modeConfig.getValue() == VelocityMode.NORMAL)
             {
-
+                double e = packet.getVelocityX() * (horizontalConfig.getValue() / 100.0f);
+                double f = packet.getVelocityY() * (verticalConfig.getValue() / 100.0f);
+                double g = packet.getVelocityZ() * (horizontalConfig.getValue() / 100.0f);
+                ((AccessorEntityVelocityUpdateS2CPacket) packet).setX((int) (e * 8000.0));
+                ((AccessorEntityVelocityUpdateS2CPacket) packet).setY((int) (f * 8000.0));
+                ((AccessorEntityVelocityUpdateS2CPacket) packet).setZ((int) (g * 8000.0));
             }
         }
 
-        if (event.getPacket() instanceof ExplosionS2CPacket packet)
+        if (event.getPacket() instanceof PlayerPositionLookS2CPacket && concealConfig.getValue())
         {
-            if (shouldCancelExplosions())
-            {
-                event.cancel();
-            } else
-            {
+            concealVelocity = true;
+        }
+    }
 
-            }
+    @EventListener
+    public void onExplosion(ExplosionEvent event)
+    {
+        if (shouldCancelExplosions())
+        {
+            event.cancel();
+            event.setPlayerVelocity(Vec3d.ZERO);
+        } else if (modeConfig.getValue() == VelocityMode.NORMAL)
+        {
+            Vec3d knockback = event.getPlayerVelocity();
+            double e = knockback.x * (horizontalConfig.getValue() / 100.0f);
+            double f = knockback.y * (verticalConfig.getValue() / 100.0f);
+            double g = knockback.z * (horizontalConfig.getValue() / 100.0f);
+            event.cancel();
+            event.setPlayerVelocity(new Vec3d(e, f, g));
         }
     }
 
@@ -102,6 +131,9 @@ public class VelocityModule extends Toggleable
         } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
         {
 
+        } else if (modeConfig.getValue() == VelocityMode.NORMAL)
+        {
+            return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
         }
 
         return true;
@@ -115,6 +147,9 @@ public class VelocityModule extends Toggleable
         } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
         {
 
+        } else if (modeConfig.getValue() == VelocityMode.NORMAL)
+        {
+            return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
         }
 
         return true;

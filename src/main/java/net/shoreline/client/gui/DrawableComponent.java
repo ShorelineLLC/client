@@ -44,30 +44,19 @@ public abstract class DrawableComponent
     }
 
     protected void drawText(DrawContext context,
-                            String text,
+                            Text text,
                             int x,
-                            int y,
-                            int color,
-                            boolean shadow)
-    {
-        context.drawText(mc.textRenderer, text, x, y, color, shadow);
-    }
-
-    protected void drawText(DrawContext context,
-                            String text,
-                            int x,
-                            int y,
-                            int color)
+                            int y)
     {
         if (FontModule.INSTANCE.isEnabled())
         {
             buffer.clear();
-            buffer.addText(FontManager.FONT, Text.literal(text).styled(it -> it.withColor(color)), 0.0f, 0.0f);
+            buffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
             buffer.offsetToTopLeft();
             buffer.draw(context, x, y);
             return;
         }
 
-        context.drawText(mc.textRenderer, text, x, y, color, true);
+        context.drawText(mc.textRenderer, text, x, y, -1, true);
     }
 }

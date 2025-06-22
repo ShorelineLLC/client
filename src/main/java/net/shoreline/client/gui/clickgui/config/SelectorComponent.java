@@ -1,6 +1,8 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
@@ -39,7 +41,10 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         String selectorText = Formatter.formatEnum(getConfig().getValue());
-        drawText(context, getConfig().getName() + " " + Formatting.GRAY + selectorText, getTx() + 3, getTy() + 4, theme.getTextColor());
+        Text formattedText = Text.empty()
+                .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
+                .append(Text.literal(" " + selectorText).formatted(Formatting.GRAY));
+        drawText(context, formattedText, getTx() + 3, getTy() + 4);
     }
 
     @Override

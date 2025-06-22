@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.clickgui;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
@@ -35,7 +36,7 @@ public class ToggleComponent extends ModuleComponent
         drawRect(context, getTx(), getTy(), width, height,
                 ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor()));
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, module.getName(), getTx() + 3, getTy() + 4, textColor);
+        drawText(context, Text.literal(module.getName()).withColor(textColor), getTx() + 3, getTy() + 4);
 
         if (getCollapseAnim().getFactor() > 0.0)
         {

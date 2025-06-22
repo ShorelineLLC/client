@@ -8,6 +8,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.impl.render.ColorUtil;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -65,10 +66,7 @@ public class ClickGuiScreen extends Screen
             applyBlur(context);
         }
 
-        if (ClickGuiModule.INSTANCE.shouldDarken())
-        {
-            renderDarkening(context);
-        }
+        renderAndScaleGUI(context);
 
         for (Frame frame : guiFrames)
         {
@@ -191,7 +189,49 @@ public class ClickGuiScreen extends Screen
     @Override
     public void close()
     {
+        for (Frame frame : guiFrames)
+        {
+            frame.setDragging(false);
+        }
+        draggingMouse = false;
+        mouse.setLeftClicked(false);
+        mouse.setRightClicked(false);
+        mouse.setLeftHeld(false);
+        mouse.setRightHeld(false);
         ClickGuiModule.INSTANCE.disable();
         super.close();
+    }
+
+    /** @author bon gone but not forgotten **/
+    private void renderAndScaleGUI(DrawContext context)
+    {
+        if (ClickGuiModule.INSTANCE.shouldDarken())
+        {
+            int backgroundColor = ColorUtil.withTransparency(0x66000000, (float) ClickGuiModule.INSTANCE.getFadeFactor());
+
+            context.fill(
+                    0,
+                    0,
+                    context.getScaledWindowWidth(),
+                    context.getScaledWindowHeight(),
+                    backgroundColor
+            );
+        }
+
+        float currentProgress = (float) ClickGuiModule.INSTANCE.getAnimFactor(); // [0.0 .. 1.0]
+
+        if (currentProgress == 1.0F)
+        {
+            return;
+        }
+
+        // Translate the scale to the center of the screen
+        context.getMatrices().translate(context.getScaledWindowHeight(), context.getScaledWindowHeight() / 2.0F);
+
+        float goal = currentProgress * 0.2F;
+        context.getMatrices().scale(0.8F + goal, 0.8F + goal);
+
+        // Translate back
+        context.getMatrices().translate(-context.getScaledWindowHeight(), -context.getScaledWindowHeight() / 2.0F);
     }
 }

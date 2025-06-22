@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 
@@ -17,6 +18,11 @@ public class MovementModule extends Toggleable
                           final GuiCategory category)
     {
         super(name, nameAliases, description, category);
+    }
+
+    public void onMove(final Vec3d movement)
+    {
+
     }
 
     protected float getYawFromInput()

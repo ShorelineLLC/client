@@ -10,13 +10,16 @@ public class RotationsModule extends Concurrent
 {
     public static RotationsModule INSTANCE;
 
-    Config<Boolean> renderRotationsConfig = new BooleanConfig.Builder("ShowServerRotations")
+    Config<Boolean> renderRotationsConfig = new BooleanConfig.Builder("ShowRotations")
             .setDescription("Renders the serverside rotations")
             .setDefaultValue(true).build();
     Config<MoveFix> moveFixConfig = new EnumConfig.Builder<MoveFix>("MovementFix")
             .setValues(MoveFix.values())
             .setDescription("Applies movement corrections when rotating")
             .setDefaultValue(MoveFix.OFF).build();
+    Config<Boolean> gcdFixConfig = new BooleanConfig.Builder("MouseSensFix")
+            .setDescription("Corrects rotations based on mouse sensitivity")
+            .setDefaultValue(true).build();
 
     public RotationsModule()
     {

@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
@@ -38,7 +39,7 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
 
         drawRect(context, getTx(), getTy(), width, height, ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor()));
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, textColor);
+        drawText(context, Text.literal(getConfig().getName()).withColor(textColor), getTx() + 3, getTy() + 4);
     }
 
     @Override

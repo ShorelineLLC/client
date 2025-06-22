@@ -69,26 +69,6 @@ public class ServerRotationHandler extends GenericFeature
             return;
         }
 
-        Rotation clientRotation = Managers.ROTATION.getClientRotation();
-
-        Rotation updated = clientRotation
-                .smoothedTurn(playerRotation, speed)
-                .correctSensitivity(playerRotation);
-
-        if (clientRotation.equals(updated))
-        {
-            Rotation corrected = playerRotation.correctSensitivity(playerRotation);
-            Managers.ROTATION.clearClientRotation();
-
-            if (mc.player != null)
-            {
-                corrected.apply(mc.player);
-                mc.player.renderYaw = corrected.getYaw();
-                mc.player.lastRenderYaw = corrected.getYaw();
-            }
-        } else
-        {
-            Managers.ROTATION.setClientRotation(updated);
-        }
+        Managers.ROTATION.clearClientRotation();
     }
 }

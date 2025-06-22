@@ -8,6 +8,7 @@ import net.shoreline.client.impl.module.movement.NoSlowModule;
 import net.shoreline.client.impl.module.movement.SprintModule;
 import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.impl.module.render.FullbrightModule;
+import net.shoreline.client.impl.module.render.NoBobModule;
 import net.shoreline.client.impl.module.render.NoWeatherModule;
 
 import java.util.Arrays;
@@ -36,6 +37,7 @@ public class ModuleManager
                 new VelocityModule(),
                 // Render
                 new FullbrightModule(),
+                new NoBobModule(),
                 new NoWeatherModule()
         );
 

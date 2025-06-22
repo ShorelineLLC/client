@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
@@ -29,7 +30,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
                               float delta)
     {
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
-        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, Text.literal(getConfig().getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
 
         drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 1, 0x33000000);
         drawRect(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, getConfig().getValue().getRGB());

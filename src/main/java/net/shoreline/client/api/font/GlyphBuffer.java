@@ -130,14 +130,6 @@ public class GlyphBuffer {
         stack.popMatrix();
     }
 
-    private static ScreenRect createBounds(DrawContext c, float x, float y, float w, float h) {
-        Matrix3x2fStack mat = c.getMatrices();
-        DrawContext.ScissorStack ss = ((AccessorDrawContext) c).getScissorStack();
-        ScreenRect scissor = ss.stack.peekLast();
-        ScreenRect screenRect = new ScreenRect((int) Math.floor(x), (int) Math.floor(y), (int) Math.ceil(w), (int) Math.ceil(h)).transformEachVertex(mat);
-        return scissor != null ? scissor.intersection(screenRect) : screenRect;
-    }
-
     /**
      * Draw this GlyphBuffer to a given DrawContext
      *

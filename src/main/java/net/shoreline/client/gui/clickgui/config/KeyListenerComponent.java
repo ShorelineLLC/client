@@ -2,6 +2,8 @@ package net.shoreline.client.gui.clickgui.config;
 
 import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
@@ -41,7 +43,10 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         String keyText = listening ? "..." : Keyboard.getKeyName(getConfig().getValue().getKeycode()).toUpperCase();
-        drawText(context, getConfig().getName() + " " + Formatting.GRAY + keyText, getTx() + 3, getTy() + 4, theme.getTextColor());
+        Text formattedText = Text.empty()
+                .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
+                .append(Text.literal(" " + keyText).formatted(Formatting.GRAY));
+        drawText(context, formattedText, getTx() + 3, getTy() + 4);
     }
 
     @Override

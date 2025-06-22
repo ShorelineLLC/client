@@ -5,6 +5,7 @@
   "client": [
     "accessor.AccessorClientWorld",
     "accessor.AccessorDrawContext",
+    "accessor.AccessorEntityVelocityUpdateS2CPacket",
     "accessor.AccessorInput",
     "accessor.AccessorKeyBinding",
     "accessor.AccessorNativeImage",

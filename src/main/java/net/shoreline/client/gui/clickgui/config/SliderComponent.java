@@ -1,6 +1,8 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
@@ -51,8 +53,11 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
 
         String numberText = getConfig().getValue() instanceof Integer || numberConfig.getRoundingPlaces() == 0
                 ? String.valueOf(getConfig().getValue().intValue()) : String.valueOf(getConfig().getValue());
-        drawText(context, getConfig().getName() + " " + Formatting.GRAY + numberText + numberConfig.getFormat().getUnits(),
-                getTx() + 3, getTy() + 4, theme.getTextColor());
+        Text formattedText = Text.empty()
+                .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
+                .append(Text.literal(" " + numberText + numberConfig.getFormat().getUnits()).formatted(Formatting.GRAY));
+
+        drawText(context, formattedText, getTx() + 3, getTy() + 4);
     }
 
     @Override

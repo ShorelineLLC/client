@@ -32,8 +32,14 @@ public class AuraModule extends Toggleable
     @EventListener(priority = -1000)
     public void onClientRotation(ClientRotationEvent event)
     {
+        target = null;
         for (Entity entity : mc.world.getEntities())
         {
+            if (entity.equals(mc.player) || !entity.isAlive())
+            {
+                continue;
+            }
+
             double dist = mc.player.squaredDistanceTo(entity);
             if (dist > rangeConfig.getValue() * rangeConfig.getValue())
             {
@@ -44,6 +50,11 @@ public class AuraModule extends Toggleable
             {
                 target = entity;
             }
+        }
+
+        if (target == null)
+        {
+            return;
         }
 
         float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), target.getEyePos());
