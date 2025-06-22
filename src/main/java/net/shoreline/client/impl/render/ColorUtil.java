@@ -1,10 +1,13 @@
 package net.shoreline.client.impl.render;
 
+import lombok.experimental.UtilityClass;
+
 import java.awt.*;
 
+@UtilityClass
 public class ColorUtil
 {
-    public static int interpolateColor(float value, int c1, int c2)
+    public int interpolateColor(float value, int c1, int c2)
     {
         Color start = new Color(c1);
         Color end = new Color(c2);
@@ -22,7 +25,7 @@ public class ColorUtil
                 sa * value + ea * (1.0f - value)).getRGB();
     }
 
-    public static int withTransparency(int color, float alpha)
+    public int withTransparency(int color, float alpha)
     {
         if (alpha == 1.0f)
         {

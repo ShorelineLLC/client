@@ -4,8 +4,10 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "accessor.AccessorClientWorld",
+    "accessor.AccessorDrawContext",
     "accessor.AccessorInput",
     "accessor.AccessorKeyBinding",
+    "accessor.AccessorNativeImage",
     "accessor.AccessorPlayerMoveC2SPacket",
     "entity.MixinEntity",
     "entity.MixinLivingEntity",

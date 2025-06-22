@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.misc;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.util.entity.FakePlayerEntity;
-import net.shoreline.loader.Loader;
 
 public class FakePlayerModule extends Toggleable
 {

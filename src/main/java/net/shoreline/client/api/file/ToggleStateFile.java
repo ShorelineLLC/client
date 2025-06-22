@@ -28,7 +28,7 @@ public class ToggleStateFile extends JsonConfigFile
                 moduleArray.add(toggleable.getId());
             }
         }
-        FileUtils.writeFile(getFilepath(), GSON.toJson(moduleArray));
+        IOUtils.writeFile(getFilepath(), GSON.toJson(moduleArray));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ToggleStateFile extends JsonConfigFile
             return;
         }
 
-        JsonArray object = parseJson(FileUtils.readFile(filepath), JsonArray.class);
+        JsonArray object = parseJson(IOUtils.readFile(filepath), JsonArray.class);
         if (object == null)
         {
             return;

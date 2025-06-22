@@ -53,7 +53,7 @@ public class ClickGuiScreen extends Screen
     {
         if (ClickGuiModule.INSTANCE.shouldBlur())
         {
-            applyBlur();
+            // applyBlur(context);
         }
 
         if (ClickGuiModule.INSTANCE.shouldDarken())

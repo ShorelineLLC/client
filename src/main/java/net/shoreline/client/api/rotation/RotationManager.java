@@ -88,10 +88,9 @@ public class RotationManager extends GenericFeature
         if (!checkNull() && hasClientRotation() && RotationsModule.INSTANCE.shouldApplyMoveFix())
         {
             float deltaYaw = mc.player.getYaw() - clientRotation.getYaw();
-            final float[] corrected = moveFix.correctMovement(deltaYaw, event.getMovementInput().y, event.getMovementInput().x);
-            float g = RotationsModule.INSTANCE.isGrimMoveFix() ? Math.round(corrected[0]) : corrected[0];
-            float f = RotationsModule.INSTANCE.isGrimMoveFix() ? Math.round(corrected[1]) : corrected[1];
-            event.setMovementInput(new Vec2f(g, f));
+            final Vec2f corrected = moveFix.correctMovement(deltaYaw, event.getMovementInput().y, event.getMovementInput().x);
+            event.cancel();
+            event.setMovementInput(corrected);
         }
     }
 

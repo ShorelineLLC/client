@@ -24,7 +24,7 @@ public class ConfigContainerFile extends JsonConfigFile
     public void saveFile() throws IOException
     {
         JsonObject jsonObject = container.toJson();
-        FileUtils.writeFile(getFilepath(), GSON.toJson(jsonObject));
+        IOUtils.writeFile(getFilepath(), GSON.toJson(jsonObject));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ConfigContainerFile extends JsonConfigFile
             return;
         }
 
-        JsonObject jsonObject = parseJson(FileUtils.readFile(filepath), JsonObject.class);
+        JsonObject jsonObject = parseJson(IOUtils.readFile(filepath), JsonObject.class);
         if (jsonObject == null || !jsonObject.has("configs"))
         {
             return;

@@ -1,10 +1,12 @@
 package net.shoreline.client.util;
 
+import lombok.experimental.UtilityClass;
 import org.lwjgl.glfw.GLFW;
 
+@UtilityClass
 public class Keyboard
 {
-    public static String getKeyName(int keycode, int scancode)
+    public String getKeyName(int keycode, int scancode)
     {
         return switch (keycode)
         {
@@ -44,7 +46,7 @@ public class Keyboard
         };
     }
 
-    public static String getKeyName(int keycode)
+    public String getKeyName(int keycode)
     {
         return getKeyName(keycode, keycode < GLFW.GLFW_KEY_LAST ? GLFW.glfwGetKeyScancode(keycode) : 0);
     }
@@ -53,7 +55,7 @@ public class Keyboard
      * @param key
      * @return
      */
-    public static int getKeyCode(String key)
+    public int getKeyCode(String key)
     {
         if (key.equalsIgnoreCase("NONE"))
         {

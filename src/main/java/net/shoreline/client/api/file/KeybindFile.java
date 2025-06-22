@@ -30,7 +30,7 @@ public class KeybindFile extends JsonConfigFile
                 macroArray.add(keybind.toJson());
             }
         }
-        FileUtils.writeFile(getFilepath(), GSON.toJson(macroArray));
+        IOUtils.writeFile(getFilepath(), GSON.toJson(macroArray));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class KeybindFile extends JsonConfigFile
             return;
         }
 
-        JsonArray object = parseJson(FileUtils.readFile(filepath), JsonArray.class);
+        JsonArray object = parseJson(IOUtils.readFile(filepath), JsonArray.class);
         if (object == null)
         {
             return;

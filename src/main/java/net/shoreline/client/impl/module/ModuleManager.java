@@ -1,10 +1,7 @@
 package net.shoreline.client.impl.module;
 
 import net.shoreline.client.api.module.Module;
-import net.shoreline.client.impl.module.client.ClickGuiModule;
-import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.client.HudModule;
-import net.shoreline.client.impl.module.client.RotationsModule;
+import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.AuraModule;
 import net.shoreline.client.impl.module.misc.FakePlayerModule;
 import net.shoreline.client.impl.module.movement.NoSlowModule;
@@ -26,6 +23,7 @@ public class ModuleManager
         registerModules(
                 new ClickGuiModule(),
                 new ColorsModule(),
+                new FontModule(),
                 new HudModule(),
                 new RotationsModule(),
                 // Combat

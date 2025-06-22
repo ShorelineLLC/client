@@ -581,16 +581,16 @@ net.shoreline.client.api.module.file.ModuleFile -> net.shoreline.client.af:
     29:31:void <init>(java.nio.file.Path,net.shoreline.client.api.module.Module) -> <init>
     41:55:void save() -> g
     65:78:void load() -> h
-net.shoreline.client.api.render.BoxRender -> net.shoreline.client.ag:
-    net.shoreline.client.api.render.BoxRender FILL -> bq
-    net.shoreline.client.api.render.BoxRender OUTLINE -> br
-    net.shoreline.client.api.render.BoxRender[] $VALUES -> bs
-    3:3:net.shoreline.client.api.render.BoxRender[] values() -> values
-    3:3:net.shoreline.client.api.render.BoxRender valueOf(java.lang.String) -> valueOf
+net.shoreline.client.api.font.BoxRender -> net.shoreline.client.ag:
+    net.shoreline.client.api.font.BoxRender FILL -> bq
+    net.shoreline.client.api.font.BoxRender OUTLINE -> br
+    net.shoreline.client.api.font.BoxRender[] $VALUES -> bs
+    3:3:net.shoreline.client.api.font.BoxRender[] values() -> values
+    3:3:net.shoreline.client.api.font.BoxRender valueOf(java.lang.String) -> valueOf
     3:3:void <init>(java.lang.String,int) -> <init>
-    3:3:net.shoreline.client.api.render.BoxRender[] $values() -> bg
+    3:3:net.shoreline.client.api.font.BoxRender[] $values() -> bg
     3:6:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.Interpolation -> net.shoreline.client.ah:
+net.shoreline.client.api.font.Interpolation -> net.shoreline.client.ah:
     14:14:void <init>() -> <init>
     18:20:net.minecraft.class_243 getRenderPosition(net.minecraft.class_243,net.minecraft.class_243,float) -> a
     33:35:net.minecraft.class_243 getRenderPosition(net.minecraft.class_1297,float) -> a
@@ -599,10 +599,10 @@ net.shoreline.client.api.render.Interpolation -> net.shoreline.client.ah:
     69:69:double interpolateDouble(double,double,double) -> a
     80:87:net.minecraft.class_238 getInterpolatedBox(net.minecraft.class_238,net.minecraft.class_238) -> a
     96:98:net.minecraft.class_238 getInterpolatedEntityBox(net.minecraft.class_1297) -> a
-net.shoreline.client.api.render.RenderBuffers -> net.shoreline.client.ai:
-    net.shoreline.client.api.render.RenderBuffers$Buffer QUADS -> bt
-    net.shoreline.client.api.render.RenderBuffers$Buffer TEXTURE_QUADS -> bu
-    net.shoreline.client.api.render.RenderBuffers$Buffer LINES -> bv
+net.shoreline.client.api.font.RenderBuffers -> net.shoreline.client.ai:
+    net.shoreline.client.api.font.RenderBuffers$Buffer QUADS -> bt
+    net.shoreline.client.api.font.RenderBuffers$Buffer TEXTURE_QUADS -> bu
+    net.shoreline.client.api.font.RenderBuffers$Buffer LINES -> bv
     java.util.List postRenderCallbacks -> bw
     boolean isSetup -> bx
     19:19:void <init>() -> <init>
@@ -611,7 +611,7 @@ net.shoreline.client.api.render.RenderBuffers -> net.shoreline.client.ai:
     57:65:void post(java.lang.Runnable) -> a
     69:72:org.joml.Matrix4d toMatrix4d(org.joml.Matrix4f) -> a
     21:25:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.RenderBuffers$Buffer -> net.shoreline.client.aj:
+net.shoreline.client.api.font.RenderBuffers$Buffer -> net.shoreline.client.aj:
     net.minecraft.class_287 buffer -> by
     net.minecraft.class_293$class_5596 drawMode -> bz
     net.minecraft.class_293 vertexFormat -> bA
@@ -622,12 +622,12 @@ net.shoreline.client.api.render.RenderBuffers$Buffer -> net.shoreline.client.aj:
     93:95:void begin(net.minecraft.class_4587) -> a
     99:103:void updateMatrices(net.minecraft.class_4587) -> b
     110:111:void end() -> bj
-    115:122:net.shoreline.client.api.render.RenderBuffers$Buffer vertex(double,double,double) -> b
-    127:134:net.shoreline.client.api.render.RenderBuffers$Buffer vertexTex(double,double,double,float,float) -> a
-    139:157:net.shoreline.client.api.render.RenderBuffers$Buffer vertexLine(double,double,double,double,double,double) -> a
+    115:122:net.shoreline.client.api.font.RenderBuffers$Buffer vertex(double,double,double) -> b
+    127:134:net.shoreline.client.api.font.RenderBuffers$Buffer vertexTex(double,double,double,float,float) -> a
+    139:157:net.shoreline.client.api.font.RenderBuffers$Buffer vertexLine(double,double,double,double,double,double) -> a
     162:163:void color(int) -> f
     167:190:void draw() -> bk
-net.shoreline.client.api.render.RenderManager -> net.shoreline.client.ak:
+net.shoreline.client.api.font.RenderManager -> net.shoreline.client.ak:
     net.minecraft.class_289 TESSELLATOR -> bE
     net.shoreline.client.impl.gui.click.component.ScissorStack SCISSOR_STACK -> bF
     30:30:void <init>() -> <init>
@@ -675,7 +675,7 @@ net.shoreline.client.api.render.RenderManager -> net.shoreline.client.ak:
     380:397:void lambda$renderSign$1(net.minecraft.class_4587,java.lang.String,float,int) -> a
     272:273:void lambda$drawBoundingBox$0(double,double,double,double,double,double,double,double,double) -> a
     33:34:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.chams.ChamsModelRenderer -> net.shoreline.client.al:
+net.shoreline.client.api.font.chams.ChamsModelRenderer -> net.shoreline.client.al:
     float SINE_45_DEGREES -> bG
     net.minecraft.class_4587 matrices -> bH
     org.joml.Vector4f pos1 -> bI
@@ -683,7 +683,7 @@ net.shoreline.client.api.render.chams.ChamsModelRenderer -> net.shoreline.client
     org.joml.Vector4f pos3 -> bK
     org.joml.Vector4f pos4 -> bL
     47:47:void <init>() -> <init>
-    59:81:void renderStaticPlayerModel(net.minecraft.class_4587,net.minecraft.class_742,net.shoreline.client.api.render.model.StaticBipedEntityModel,float,int,int,float,boolean,boolean,boolean) -> a
+    59:81:void renderStaticPlayerModel(net.minecraft.class_4587,net.minecraft.class_742,net.shoreline.client.api.font.model.StaticBipedEntityModel,float,int,int,float,boolean,boolean,boolean) -> a
     85:122:void setupPlayerTransforms(net.minecraft.class_742,net.minecraft.class_4587,float,float,float) -> a
     126:161:void setupTransforms(net.minecraft.class_1309,net.minecraft.class_4587,float,float,float) -> a
     165:171:float getYaw(net.minecraft.class_2350) -> a
@@ -698,23 +698,23 @@ net.shoreline.client.api.render.chams.ChamsModelRenderer -> net.shoreline.client
     313:313:void lambda$render$1(net.minecraft.class_4587,double,double,double,int,int,float,boolean,boolean,boolean,net.minecraft.class_630) -> c
     296:296:void lambda$render$0(net.minecraft.class_4587,double,double,double,int,int,float,boolean,boolean,boolean,net.minecraft.class_630) -> d
     49:55:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.chams.ChamsModelRenderer$1 -> net.shoreline.client.am:
+net.shoreline.client.api.font.chams.ChamsModelRenderer$1 -> net.shoreline.client.am:
     int[] $SwitchMap$net$minecraft$util$math$Direction -> bM
     165:165:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType -> net.shoreline.client.an:
-    net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType RENDER_BOTH_HANDS -> bN
-    net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType RENDER_MAIN_HAND_ONLY -> bO
-    net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType RENDER_OFF_HAND_ONLY -> bP
+net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType -> net.shoreline.client.an:
+    net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType RENDER_BOTH_HANDS -> bN
+    net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType RENDER_MAIN_HAND_ONLY -> bO
+    net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType RENDER_OFF_HAND_ONLY -> bP
     boolean renderMainHand -> bQ
     boolean renderOffHand -> bR
-    net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType[] $VALUES -> bS
-    678:678:net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType[] values() -> values
-    678:678:net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType valueOf(java.lang.String) -> valueOf
+    net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType[] $VALUES -> bS
+    678:678:net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType[] values() -> values
+    678:678:net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType valueOf(java.lang.String) -> valueOf
     688:691:void <init>(java.lang.String,int,boolean,boolean) -> <init>
-    695:695:net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType shouldOnlyRender(net.minecraft.class_1268) -> a
-    678:678:net.shoreline.client.api.render.chams.ChamsModelRenderer$HandRenderType[] $values() -> bn
+    695:695:net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType shouldOnlyRender(net.minecraft.class_1268) -> a
+    678:678:net.shoreline.client.api.font.chams.ChamsModelRenderer$HandRenderType[] $values() -> bn
     678:682:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.layers.LightmapManager -> net.shoreline.client.ao:
+net.shoreline.client.api.font.layers.LightmapManager -> net.shoreline.client.ao:
     net.minecraft.class_1043 texture -> bT
     net.minecraft.class_1011 image -> bU
     net.minecraft.class_2960 textureIdentifier -> bV
@@ -734,7 +734,7 @@ net.shoreline.client.api.render.layers.LightmapManager -> net.shoreline.client.a
     221:222:float easeOutQuart(float) -> b
     227:229:float getBrightness(net.minecraft.class_2874,int) -> a
     234:234:int pack(int,int) -> a
-net.shoreline.client.api.render.layers.RenderLayersClient -> net.shoreline.client.lc:
+net.shoreline.client.api.font.layers.RenderLayersClient -> net.shoreline.client.lc:
     net.minecraft.class_2960 SHULKER_BOXES_ATLAS_TEXTURE -> bZ
     net.minecraft.class_2960 CHEST_ATLAS_TEXTURE -> ca
     net.minecraft.class_1921 GLINT -> cb
@@ -770,15 +770,15 @@ net.shoreline.client.api.render.layers.RenderLayersClient -> net.shoreline.clien
     32:33:net.minecraft.class_1921 lambda$static$1(net.minecraft.class_2960,java.lang.Boolean) -> b
     28:29:net.minecraft.class_1921 lambda$static$0(net.minecraft.class_2960) -> l
     20:76:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.layers.RenderLayersClient$DepthTest -> net.shoreline.client.ap:
+net.shoreline.client.api.font.layers.RenderLayersClient$DepthTest -> net.shoreline.client.ap:
     84:85:void <init>() -> <init>
     90:93:void method_23516() -> method_23516
     98:103:void method_23518() -> method_23518
-net.shoreline.client.api.render.layers.RenderLayersClient$Lightmap -> net.shoreline.client.aq:
+net.shoreline.client.api.font.layers.RenderLayersClient$Lightmap -> net.shoreline.client.aq:
     110:119:void <init>() -> <init>
     117:118:void lambda$new$1() -> bo
     113:114:void lambda$new$0() -> bf
-net.shoreline.client.api.render.model.StaticBipedEntityModel -> net.shoreline.client.ar:
+net.shoreline.client.api.font.model.StaticBipedEntityModel -> net.shoreline.client.ar:
     net.minecraft.class_742 player -> cs
     float limbSwing -> ct
     float limbSwingAmount -> cu
@@ -801,7 +801,7 @@ net.shoreline.client.api.render.model.StaticBipedEntityModel -> net.shoreline.cl
     86:86:double getX() -> bv
     91:91:double getY() -> bw
     96:96:double getZ() -> bx
-net.shoreline.client.api.render.satin.FramebufferWrapper -> net.shoreline.client.as:
+net.shoreline.client.api.font.satin.FramebufferWrapper -> net.shoreline.client.as:
     java.lang.String name -> cC
     net.minecraft.class_276 wrapped -> cD
     30:32:void <init>(java.lang.String) -> <init>
@@ -813,34 +813,34 @@ net.shoreline.client.api.render.satin.FramebufferWrapper -> net.shoreline.client
     69:72:void draw(int,int,boolean) -> a
     76:77:void clear() -> S
     81:84:void clear(boolean) -> g
-net.shoreline.client.api.render.satin.ManagedCoreShader -> net.shoreline.client.at:
+net.shoreline.client.api.font.satin.ManagedCoreShader -> net.shoreline.client.at:
     net.minecraft.class_5944 getProgram() -> bz
     void release() -> bA
-net.shoreline.client.api.render.satin.ManagedFramebuffer -> net.shoreline.client.au:
+net.shoreline.client.api.font.satin.ManagedFramebuffer -> net.shoreline.client.au:
     net.minecraft.class_276 getFramebuffer() -> by
     void beginWrite(boolean) -> f
     void draw() -> bk
     void draw(int,int,boolean) -> a
     void clear() -> S
     void clear(boolean) -> g
-net.shoreline.client.api.render.satin.ManagedSamplerUniformBase -> net.shoreline.client.av:
-    net.shoreline.client.api.render.satin.SamplerAccess[] targets -> cE
+net.shoreline.client.api.font.satin.ManagedSamplerUniformBase -> net.shoreline.client.av:
+    net.shoreline.client.api.font.satin.SamplerAccess[] targets -> cE
     int[] locations -> cF
     java.lang.Object cachedValue -> cG
     33:39:void <init>(java.lang.String) -> <init>
     43:56:boolean findUniformTargets(java.util.List) -> a
-    60:60:int getSamplerLoc(net.shoreline.client.api.render.satin.SamplerAccess) -> a
+    60:60:int getSamplerLoc(net.shoreline.client.api.font.satin.SamplerAccess) -> a
     65:66:boolean findUniformTarget(net.minecraft.class_5944) -> a
-    70:76:boolean findUniformTarget1(net.shoreline.client.api.render.satin.SamplerAccess) -> b
+    70:76:boolean findUniformTarget1(net.shoreline.client.api.font.satin.SamplerAccess) -> b
     80:85:void syncCurrentValues() -> bB
     void set(java.lang.Object) -> f
-net.shoreline.client.api.render.satin.ManagedSamplerUniformV1 -> net.shoreline.client.aw:
+net.shoreline.client.api.font.satin.ManagedSamplerUniformV1 -> net.shoreline.client.aw:
     26:27:void <init>(java.lang.String) -> <init>
     31:32:void set(net.minecraft.class_1044) -> a
     36:37:void set(net.minecraft.class_276) -> a
     41:42:void set(int) -> g
     46:53:void set(java.lang.Object) -> f
-net.shoreline.client.api.render.satin.ManagedSamplerUniformV2 -> net.shoreline.client.ax:
+net.shoreline.client.api.font.satin.ManagedSamplerUniformV2 -> net.shoreline.client.ax:
     30:31:void <init>(java.lang.String) -> <init>
     35:36:void set(net.minecraft.class_1044) -> a
     40:41:void set(net.minecraft.class_276) -> a
@@ -848,19 +848,19 @@ net.shoreline.client.api.render.satin.ManagedSamplerUniformV2 -> net.shoreline.c
     50:51:void set(java.lang.Object) -> f
     55:62:void set(java.util.function.IntSupplier) -> a
     45:45:int lambda$set$0(int) -> h
-net.shoreline.client.api.render.satin.ManagedShaderEffect -> net.shoreline.client.ay:
+net.shoreline.client.api.font.satin.ManagedShaderEffect -> net.shoreline.client.ay:
     net.minecraft.class_279 getShaderEffect() -> bC
     void release() -> bA
     void render(float) -> e
-    net.shoreline.client.api.render.satin.ManagedFramebuffer getTarget(java.lang.String) -> E
+    net.shoreline.client.api.font.satin.ManagedFramebuffer getTarget(java.lang.String) -> E
     void setUniformValue(java.lang.String,int) -> a
     void setUniformValue(java.lang.String,float) -> a
     void setUniformValue(java.lang.String,float,float) -> a
     void setUniformValue(java.lang.String,float,float,float) -> a
     void setUniformValue(java.lang.String,float,float,float,float) -> a
-    net.shoreline.client.api.render.satin.uniform.SamplerUniformV2 findSampler(java.lang.String) -> F
-    24:24:net.shoreline.client.api.render.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
-net.shoreline.client.api.render.satin.ManagedUniform -> net.shoreline.client.az:
+    net.shoreline.client.api.font.satin.uniform.SamplerUniformV2 findSampler(java.lang.String) -> F
+    24:24:net.shoreline.client.api.font.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
+net.shoreline.client.api.font.satin.ManagedUniform -> net.shoreline.client.az:
     net.minecraft.class_284[] NO_TARGETS -> cH
     int count -> cI
     net.minecraft.class_284[] targets -> cJ
@@ -892,29 +892,29 @@ net.shoreline.client.api.render.satin.ManagedUniform -> net.shoreline.client.az:
     250:257:void set(org.joml.Matrix4f) -> b
     261:272:void setFromArray(float[]) -> a
     32:37:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.satin.ManagedUniformBase -> net.shoreline.client.aA:
+net.shoreline.client.api.font.satin.ManagedUniformBase -> net.shoreline.client.aA:
     java.lang.String name -> cU
     28:30:void <init>(java.lang.String) -> <init>
     boolean findUniformTargets(java.util.List) -> a
     boolean findUniformTarget(net.minecraft.class_5944) -> a
     37:37:java.lang.String getName() -> C
-net.shoreline.client.api.render.satin.ReloadableShaderEffectManager -> net.shoreline.client.aB:
-    net.shoreline.client.api.render.satin.ReloadableShaderEffectManager INSTANCE -> cV
+net.shoreline.client.api.font.satin.ReloadableShaderEffectManager -> net.shoreline.client.aB:
+    net.shoreline.client.api.font.satin.ReloadableShaderEffectManager INSTANCE -> cV
     java.util.Set managedShaders -> cW
     35:39:void <init>() -> <init>
     44:45:void onResolution(net.shoreline.client.impl.event.ResolutionEvent) -> a
-    49:49:net.shoreline.client.api.render.satin.ManagedShaderEffect manage(net.minecraft.class_2960) -> m
-    55:57:net.shoreline.client.api.render.satin.ManagedShaderEffect manage(net.minecraft.class_2960,java.util.function.Consumer) -> a
-    62:62:net.shoreline.client.api.render.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960) -> n
-    67:67:net.shoreline.client.api.render.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293) -> a
-    73:75:net.shoreline.client.api.render.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293,java.util.function.Consumer) -> a
+    49:49:net.shoreline.client.api.font.satin.ManagedShaderEffect manage(net.minecraft.class_2960) -> m
+    55:57:net.shoreline.client.api.font.satin.ManagedShaderEffect manage(net.minecraft.class_2960,java.util.function.Consumer) -> a
+    62:62:net.shoreline.client.api.font.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960) -> n
+    67:67:net.shoreline.client.api.font.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293) -> a
+    73:75:net.shoreline.client.api.font.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293,java.util.function.Consumer) -> a
     79:82:void reload(net.minecraft.class_5912) -> a
     85:86:void onResolutionChanged(int,int) -> c
     89:96:void runShaderSetup(int,int) -> d
-    68:68:void lambda$manageCoreShader$1(net.shoreline.client.api.render.satin.ManagedCoreShader) -> a
-    50:50:void lambda$manage$0(net.shoreline.client.api.render.satin.ManagedShaderEffect) -> a
+    68:68:void lambda$manageCoreShader$1(net.shoreline.client.api.font.satin.ManagedCoreShader) -> a
+    50:50:void lambda$manage$0(net.shoreline.client.api.font.satin.ManagedShaderEffect) -> a
     33:33:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.satin.ResettableManagedCoreShader -> net.shoreline.client.aC:
+net.shoreline.client.api.font.satin.ResettableManagedCoreShader -> net.shoreline.client.aC:
     java.util.function.Consumer initCallback -> cX
     net.minecraft.class_293 vertexFormat -> cY
     java.util.Map managedSamplers -> cZ
@@ -922,12 +922,12 @@ net.shoreline.client.api.render.satin.ResettableManagedCoreShader -> net.shoreli
     48:48:net.minecraft.class_5944 parseShader(net.minecraft.class_5912,net.minecraft.class_310,net.minecraft.class_2960) -> a
     53:58:void setup(int,int) -> e
     62:62:net.minecraft.class_5944 getProgram() -> bz
-    68:68:boolean setupUniform(net.shoreline.client.api.render.satin.ManagedUniformBase,net.minecraft.class_5944) -> a
-    73:73:net.shoreline.client.api.render.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
+    68:68:boolean setupUniform(net.shoreline.client.api.font.satin.ManagedUniformBase,net.minecraft.class_5944) -> a
+    73:73:net.shoreline.client.api.font.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
     78:79:void logInitError(java.io.IOException) -> a
-    35:35:boolean setupUniform(net.shoreline.client.api.render.satin.ManagedUniformBase,java.lang.AutoCloseable) -> a
+    35:35:boolean setupUniform(net.shoreline.client.api.font.satin.ManagedUniformBase,java.lang.AutoCloseable) -> a
     35:35:java.lang.AutoCloseable parseShader(net.minecraft.class_5912,net.minecraft.class_310,net.minecraft.class_2960) -> b
-net.shoreline.client.api.render.satin.ResettableManagedShaderBase -> net.shoreline.client.aD:
+net.shoreline.client.api.font.satin.ResettableManagedShaderBase -> net.shoreline.client.aD:
     net.minecraft.class_2960 location -> da
     java.util.Map managedUniforms -> db
     java.util.List allUniforms -> dc
@@ -941,33 +941,33 @@ net.shoreline.client.api.render.satin.ResettableManagedShaderBase -> net.shoreli
     java.lang.AutoCloseable parseShader(net.minecraft.class_5912,net.minecraft.class_310,net.minecraft.class_2960) -> b
     63:73:void release() -> bA
     76:76:java.util.Collection getManagedUniforms() -> bD
-    boolean setupUniform(net.shoreline.client.api.render.satin.ManagedUniformBase,java.lang.AutoCloseable) -> a
+    boolean setupUniform(net.shoreline.client.api.font.satin.ManagedUniformBase,java.lang.AutoCloseable) -> a
     82:82:boolean isInitialized() -> bE
     86:86:boolean isErrored() -> bF
     90:90:net.minecraft.class_2960 getLocation() -> bG
-    94:107:net.shoreline.client.api.render.satin.ManagedUniformBase manageUniform(java.util.Map,java.util.function.Function,java.lang.String,java.lang.String) -> a
-    112:112:net.shoreline.client.api.render.satin.uniform.Uniform1i findUniform1i(java.lang.String) -> H
-    117:117:net.shoreline.client.api.render.satin.uniform.Uniform2i findUniform2i(java.lang.String) -> I
-    122:122:net.shoreline.client.api.render.satin.uniform.Uniform3i findUniform3i(java.lang.String) -> J
-    127:127:net.shoreline.client.api.render.satin.uniform.Uniform4i findUniform4i(java.lang.String) -> K
-    132:132:net.shoreline.client.api.render.satin.uniform.Uniform1f findUniform1f(java.lang.String) -> L
-    137:137:net.shoreline.client.api.render.satin.uniform.Uniform2f findUniform2f(java.lang.String) -> M
-    142:142:net.shoreline.client.api.render.satin.uniform.Uniform3f findUniform3f(java.lang.String) -> N
-    147:147:net.shoreline.client.api.render.satin.uniform.Uniform4f findUniform4f(java.lang.String) -> O
-    152:152:net.shoreline.client.api.render.satin.uniform.UniformMat4 findUniformMat4(java.lang.String) -> P
+    94:107:net.shoreline.client.api.font.satin.ManagedUniformBase manageUniform(java.util.Map,java.util.function.Function,java.lang.String,java.lang.String) -> a
+    112:112:net.shoreline.client.api.font.satin.uniform.Uniform1i findUniform1i(java.lang.String) -> H
+    117:117:net.shoreline.client.api.font.satin.uniform.Uniform2i findUniform2i(java.lang.String) -> I
+    122:122:net.shoreline.client.api.font.satin.uniform.Uniform3i findUniform3i(java.lang.String) -> J
+    127:127:net.shoreline.client.api.font.satin.uniform.Uniform4i findUniform4i(java.lang.String) -> K
+    132:132:net.shoreline.client.api.font.satin.uniform.Uniform1f findUniform1f(java.lang.String) -> L
+    137:137:net.shoreline.client.api.font.satin.uniform.Uniform2f findUniform2f(java.lang.String) -> M
+    142:142:net.shoreline.client.api.font.satin.uniform.Uniform3f findUniform3f(java.lang.String) -> N
+    147:147:net.shoreline.client.api.font.satin.uniform.Uniform4f findUniform4f(java.lang.String) -> O
+    152:152:net.shoreline.client.api.font.satin.uniform.UniformMat4 findUniformMat4(java.lang.String) -> P
     void setup(int,int) -> e
     159:159:java.lang.String toString() -> toString
-    152:152:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniformMat4$8(java.lang.String) -> Q
-    147:147:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform4f$7(java.lang.String) -> R
-    142:142:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform3f$6(java.lang.String) -> S
-    137:137:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform2f$5(java.lang.String) -> T
-    132:132:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform1f$4(java.lang.String) -> U
-    127:127:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform4i$3(java.lang.String) -> V
-    122:122:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform3i$2(java.lang.String) -> W
-    117:117:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform2i$1(java.lang.String) -> X
-    112:112:net.shoreline.client.api.render.satin.ManagedUniform lambda$findUniform1i$0(java.lang.String) -> Y
+    152:152:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniformMat4$8(java.lang.String) -> Q
+    147:147:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform4f$7(java.lang.String) -> R
+    142:142:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform3f$6(java.lang.String) -> S
+    137:137:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform2f$5(java.lang.String) -> T
+    132:132:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform1f$4(java.lang.String) -> U
+    127:127:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform4i$3(java.lang.String) -> V
+    122:122:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform3i$2(java.lang.String) -> W
+    117:117:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform2i$1(java.lang.String) -> X
+    112:112:net.shoreline.client.api.font.satin.ManagedUniform lambda$findUniform1i$0(java.lang.String) -> Y
     30:30:void <clinit>() -> <clinit>
-net.shoreline.client.api.render.satin.ResettableManagedShaderEffect -> net.shoreline.client.aE:
+net.shoreline.client.api.font.satin.ResettableManagedShaderEffect -> net.shoreline.client.aE:
     java.util.function.Consumer initCallback -> dg
     java.util.Map managedTargets -> dh
     java.util.Map managedSamplers -> di
@@ -976,101 +976,101 @@ net.shoreline.client.api.render.satin.ResettableManagedShaderEffect -> net.shore
     40:40:net.minecraft.class_279 parseShader(net.minecraft.class_5912,net.minecraft.class_310,net.minecraft.class_2960) -> c
     45:57:void setup(int,int) -> e
     61:72:void render(float) -> e
-    76:76:net.shoreline.client.api.render.satin.ManagedFramebuffer getTarget(java.lang.String) -> E
+    76:76:net.shoreline.client.api.font.satin.ManagedFramebuffer getTarget(java.lang.String) -> E
     87:88:void setUniformValue(java.lang.String,int) -> a
     92:93:void setUniformValue(java.lang.String,float) -> a
     97:98:void setUniformValue(java.lang.String,float,float) -> a
     102:103:void setUniformValue(java.lang.String,float,float,float) -> a
     107:108:void setUniformValue(java.lang.String,float,float,float,float) -> a
-    112:112:net.shoreline.client.api.render.satin.uniform.SamplerUniformV2 findSampler(java.lang.String) -> F
-    117:117:boolean setupUniform(net.shoreline.client.api.render.satin.ManagedUniformBase,net.minecraft.class_279) -> a
+    112:112:net.shoreline.client.api.font.satin.uniform.SamplerUniformV2 findSampler(java.lang.String) -> F
+    117:117:boolean setupUniform(net.shoreline.client.api.font.satin.ManagedUniformBase,net.minecraft.class_279) -> a
     122:123:void logInitError(java.io.IOException) -> a
     126:129:net.minecraft.class_279 getShaderOrLog() -> bH
-    21:21:boolean setupUniform(net.shoreline.client.api.render.satin.ManagedUniformBase,java.lang.AutoCloseable) -> a
+    21:21:boolean setupUniform(net.shoreline.client.api.font.satin.ManagedUniformBase,java.lang.AutoCloseable) -> a
     21:21:java.lang.AutoCloseable parseShader(net.minecraft.class_5912,net.minecraft.class_310,net.minecraft.class_2960) -> b
-    21:21:net.shoreline.client.api.render.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
-    77:81:net.shoreline.client.api.render.satin.FramebufferWrapper lambda$getTarget$0(java.lang.String) -> Z
-net.shoreline.client.api.render.satin.SamplerAccess -> net.shoreline.client.aF:
+    21:21:net.shoreline.client.api.font.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
+    77:81:net.shoreline.client.api.font.satin.FramebufferWrapper lambda$getTarget$0(java.lang.String) -> Z
+net.shoreline.client.api.font.satin.SamplerAccess -> net.shoreline.client.aF:
     boolean hasSampler(java.lang.String) -> aa
     java.util.List getSamplerNames() -> bI
     java.util.List getSamplerShaderLocs() -> bJ
-net.shoreline.client.api.render.satin.ShaderEffectManager -> net.shoreline.client.aG:
-    30:30:net.shoreline.client.api.render.satin.ShaderEffectManager getInstance() -> bK
-    net.shoreline.client.api.render.satin.ManagedShaderEffect manage(net.minecraft.class_2960) -> m
-    net.shoreline.client.api.render.satin.ManagedShaderEffect manage(net.minecraft.class_2960,java.util.function.Consumer) -> a
-    net.shoreline.client.api.render.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960) -> n
-    net.shoreline.client.api.render.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293) -> a
-    net.shoreline.client.api.render.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293,java.util.function.Consumer) -> a
-net.shoreline.client.api.render.satin.uniform.SamplerUniform -> net.shoreline.client.aH:
+net.shoreline.client.api.font.satin.ShaderEffectManager -> net.shoreline.client.aG:
+    30:30:net.shoreline.client.api.font.satin.ShaderEffectManager getInstance() -> bK
+    net.shoreline.client.api.font.satin.ManagedShaderEffect manage(net.minecraft.class_2960) -> m
+    net.shoreline.client.api.font.satin.ManagedShaderEffect manage(net.minecraft.class_2960,java.util.function.Consumer) -> a
+    net.shoreline.client.api.font.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960) -> n
+    net.shoreline.client.api.font.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293) -> a
+    net.shoreline.client.api.font.satin.ManagedCoreShader manageCoreShader(net.minecraft.class_2960,net.minecraft.class_293,java.util.function.Consumer) -> a
+net.shoreline.client.api.font.satin.uniform.SamplerUniform -> net.shoreline.client.aH:
     void set(net.minecraft.class_1044) -> a
     void set(net.minecraft.class_276) -> a
     void set(int) -> g
-net.shoreline.client.api.render.satin.uniform.SamplerUniformV2 -> net.shoreline.client.aI:
+net.shoreline.client.api.font.satin.uniform.SamplerUniformV2 -> net.shoreline.client.aI:
     void set(java.util.function.IntSupplier) -> a
-net.shoreline.client.api.render.satin.uniform.Uniform1f -> net.shoreline.client.aJ:
+net.shoreline.client.api.font.satin.uniform.Uniform1f -> net.shoreline.client.aJ:
     void set(float) -> f
-net.shoreline.client.api.render.satin.uniform.Uniform1i -> net.shoreline.client.aK:
+net.shoreline.client.api.font.satin.uniform.Uniform1i -> net.shoreline.client.aK:
     void set(int) -> g
-net.shoreline.client.api.render.satin.uniform.Uniform2f -> net.shoreline.client.aL:
+net.shoreline.client.api.font.satin.uniform.Uniform2f -> net.shoreline.client.aL:
     void set(float,float) -> a
     void set(org.joml.Vector2f) -> a
-net.shoreline.client.api.render.satin.uniform.Uniform2i -> net.shoreline.client.aM:
+net.shoreline.client.api.font.satin.uniform.Uniform2i -> net.shoreline.client.aM:
     void set(int,int) -> b
-net.shoreline.client.api.render.satin.uniform.Uniform3f -> net.shoreline.client.aN:
+net.shoreline.client.api.font.satin.uniform.Uniform3f -> net.shoreline.client.aN:
     void set(float,float,float) -> b
     void set(org.joml.Vector3f) -> b
-net.shoreline.client.api.render.satin.uniform.Uniform3i -> net.shoreline.client.aO:
+net.shoreline.client.api.font.satin.uniform.Uniform3i -> net.shoreline.client.aO:
     void set(int,int,int) -> a
-net.shoreline.client.api.render.satin.uniform.Uniform4f -> net.shoreline.client.aP:
+net.shoreline.client.api.font.satin.uniform.Uniform4f -> net.shoreline.client.aP:
     void set(float,float,float,float) -> a
     void set(org.joml.Vector4f) -> a
-net.shoreline.client.api.render.satin.uniform.Uniform4i -> net.shoreline.client.aQ:
+net.shoreline.client.api.font.satin.uniform.Uniform4i -> net.shoreline.client.aQ:
     void set(int,int,int,int) -> a
-net.shoreline.client.api.render.satin.uniform.UniformFinder -> net.shoreline.client.aR:
-    net.shoreline.client.api.render.satin.uniform.Uniform1i findUniform1i(java.lang.String) -> H
-    net.shoreline.client.api.render.satin.uniform.Uniform2i findUniform2i(java.lang.String) -> I
-    net.shoreline.client.api.render.satin.uniform.Uniform3i findUniform3i(java.lang.String) -> J
-    net.shoreline.client.api.render.satin.uniform.Uniform4i findUniform4i(java.lang.String) -> K
-    net.shoreline.client.api.render.satin.uniform.Uniform1f findUniform1f(java.lang.String) -> L
-    net.shoreline.client.api.render.satin.uniform.Uniform2f findUniform2f(java.lang.String) -> M
-    net.shoreline.client.api.render.satin.uniform.Uniform3f findUniform3f(java.lang.String) -> N
-    net.shoreline.client.api.render.satin.uniform.Uniform4f findUniform4f(java.lang.String) -> O
-    net.shoreline.client.api.render.satin.uniform.UniformMat4 findUniformMat4(java.lang.String) -> P
-    net.shoreline.client.api.render.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
-net.shoreline.client.api.render.satin.uniform.UniformMat4 -> net.shoreline.client.aS:
+net.shoreline.client.api.font.satin.uniform.UniformFinder -> net.shoreline.client.aR:
+    net.shoreline.client.api.font.satin.uniform.Uniform1i findUniform1i(java.lang.String) -> H
+    net.shoreline.client.api.font.satin.uniform.Uniform2i findUniform2i(java.lang.String) -> I
+    net.shoreline.client.api.font.satin.uniform.Uniform3i findUniform3i(java.lang.String) -> J
+    net.shoreline.client.api.font.satin.uniform.Uniform4i findUniform4i(java.lang.String) -> K
+    net.shoreline.client.api.font.satin.uniform.Uniform1f findUniform1f(java.lang.String) -> L
+    net.shoreline.client.api.font.satin.uniform.Uniform2f findUniform2f(java.lang.String) -> M
+    net.shoreline.client.api.font.satin.uniform.Uniform3f findUniform3f(java.lang.String) -> N
+    net.shoreline.client.api.font.satin.uniform.Uniform4f findUniform4f(java.lang.String) -> O
+    net.shoreline.client.api.font.satin.uniform.UniformMat4 findUniformMat4(java.lang.String) -> P
+    net.shoreline.client.api.font.satin.uniform.SamplerUniform findSampler(java.lang.String) -> G
+net.shoreline.client.api.font.satin.uniform.UniformMat4 -> net.shoreline.client.aS:
     void set(org.joml.Matrix4f) -> b
     void setFromArray(float[]) -> a
-net.shoreline.client.api.render.shader.ShaderFramebuffer -> net.shoreline.client.aT:
+net.shoreline.client.api.font.shader.ShaderFramebuffer -> net.shoreline.client.aT:
     11:15:void <init>(int,int) -> <init>
-net.shoreline.client.api.render.shader.ShaderManager -> net.shoreline.client.aU:
+net.shoreline.client.api.font.shader.ShaderManager -> net.shoreline.client.aU:
     net.minecraft.class_4618 vertexConsumerProvider -> dj
     java.util.function.Function layerCreator -> dk
     net.minecraft.class_4668$class_4678 target -> dl
-    net.shoreline.client.api.render.shader.ShaderFramebuffer framebuffer -> dm
-    net.shoreline.client.api.render.satin.ManagedShaderEffect filledShaderEffect -> dn
-    net.shoreline.client.api.render.satin.ManagedShaderEffect gradientShaderEffect -> do
-    net.shoreline.client.api.render.satin.ManagedShaderEffect imageShaderEffect -> dp
-    net.shoreline.client.api.render.satin.ManagedShaderEffect glowingShaderEffect -> dq
-    net.shoreline.client.api.render.satin.ManagedShaderEffect rainbowShaderEffect -> dr
+    net.shoreline.client.api.font.shader.ShaderFramebuffer framebuffer -> dm
+    net.shoreline.client.api.font.satin.ManagedShaderEffect filledShaderEffect -> dn
+    net.shoreline.client.api.font.satin.ManagedShaderEffect gradientShaderEffect -> do
+    net.shoreline.client.api.font.satin.ManagedShaderEffect imageShaderEffect -> dp
+    net.shoreline.client.api.font.satin.ManagedShaderEffect glowingShaderEffect -> dq
+    net.shoreline.client.api.font.satin.ManagedShaderEffect rainbowShaderEffect -> dr
     27:44:void <init>() -> <init>
     48:52:void reloadShaders() -> bL
     56:62:void reloadShadersInternal() -> bM
-    66:98:void applyShader(net.shoreline.client.api.render.satin.ManagedShaderEffect,java.lang.Runnable,java.lang.Runnable) -> a
+    66:98:void applyShader(net.shoreline.client.api.font.satin.ManagedShaderEffect,java.lang.Runnable,java.lang.Runnable) -> a
     102:102:net.minecraft.class_4597 createVertexConsumers(net.minecraft.class_4597,java.awt.Color) -> a
     119:119:java.util.function.Function memoizeTexture(java.util.function.Function) -> a
-    133:133:net.shoreline.client.api.render.satin.ManagedShaderEffect getFilledShaderEffect() -> bN
-    138:138:net.shoreline.client.api.render.satin.ManagedShaderEffect getGradientShaderEffect() -> bO
-    143:143:net.shoreline.client.api.render.satin.ManagedShaderEffect getImageShaderEffect() -> bP
-    148:148:net.shoreline.client.api.render.satin.ManagedShaderEffect getGlowingShaderEffect() -> bQ
-    153:153:net.shoreline.client.api.render.satin.ManagedShaderEffect getRainbowShaderEffect() -> bR
+    133:133:net.shoreline.client.api.font.satin.ManagedShaderEffect getFilledShaderEffect() -> bN
+    138:138:net.shoreline.client.api.font.satin.ManagedShaderEffect getGradientShaderEffect() -> bO
+    143:143:net.shoreline.client.api.font.satin.ManagedShaderEffect getImageShaderEffect() -> bP
+    148:148:net.shoreline.client.api.font.satin.ManagedShaderEffect getGlowingShaderEffect() -> bQ
+    153:153:net.shoreline.client.api.font.satin.ManagedShaderEffect getRainbowShaderEffect() -> bR
     104:113:net.minecraft.class_4588 lambda$createVertexConsumers$3(net.minecraft.class_4597,java.awt.Color,net.minecraft.class_1921) -> a
     42:43:net.minecraft.class_1921 lambda$new$2(net.minecraft.class_4668$class_5939) -> a
     41:41:void lambda$new$1() -> bo
     41:41:void lambda$new$0() -> bf
-net.shoreline.client.api.render.shader.ShaderManager$1 -> net.shoreline.client.aV:
+net.shoreline.client.api.font.shader.ShaderManager$1 -> net.shoreline.client.aV:
     java.util.Map cache -> ds
     java.util.function.Function val$function -> dt
-    120:121:void <init>(net.shoreline.client.api.render.shader.ShaderManager,java.util.function.Function) -> <init>
+    120:121:void <init>(net.shoreline.client.api.font.shader.ShaderManager,java.util.function.Function) -> <init>
     125:125:net.minecraft.class_1921 apply(net.minecraft.class_4668$class_5939) -> b
     120:120:java.lang.Object apply(java.lang.Object) -> apply
     125:125:net.minecraft.class_1921 lambda$apply$0(java.util.function.Function,net.minecraft.class_4668$class_5939,net.minecraft.class_2960) -> a
@@ -6392,9 +6392,9 @@ net.shoreline.client.impl.module.render.ChamsModule$ChamsMode -> net.shoreline.c
     376:376:net.shoreline.client.impl.module.render.ChamsModule$ChamsMode[] $values() -> mb
     376:381:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.render.ChamsModule$PopChamEntity -> net.shoreline.client.mp:
-    net.shoreline.client.api.render.model.StaticBipedEntityModel model -> Fn
+    net.shoreline.client.api.font.model.StaticBipedEntityModel model -> Fn
     390:395:void <init>(net.minecraft.class_1657,float) -> <init>
-    399:399:net.shoreline.client.api.render.model.StaticBipedEntityModel getModel() -> mc
+    399:399:net.shoreline.client.api.font.model.StaticBipedEntityModel getModel() -> mc
 net.shoreline.client.impl.module.render.CrosshairModule -> net.shoreline.client.mq:
     net.shoreline.client.api.config.Config lengthConfig -> Fo
     net.shoreline.client.api.config.Config thicknessConfig -> Fp
@@ -6920,25 +6920,25 @@ net.shoreline.client.impl.module.render.ShadersModule -> net.shoreline.client.mU
     769:778:boolean checkShaders(net.minecraft.class_1297) -> L
     783:785:boolean checkStorageShaders(net.minecraft.class_2586) -> b
     614:617:void lambda$onReloadShader$46(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> c
-    600:612:void lambda$onReloadShader$45(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> a
+    600:612:void lambda$onReloadShader$45(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> a
     586:589:void lambda$onReloadShader$44(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> d
-    569:584:void lambda$onReloadShader$43(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> b
+    569:584:void lambda$onReloadShader$43(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> b
     555:558:void lambda$onReloadShader$42(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> e
-    541:553:void lambda$onReloadShader$41(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> c
+    541:553:void lambda$onReloadShader$41(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> c
     527:530:void lambda$onReloadShader$40(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> f
-    511:525:void lambda$onReloadShader$39(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> d
+    511:525:void lambda$onReloadShader$39(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> d
     497:500:void lambda$onReloadShader$38(net.shoreline.client.impl.event.render.RenderWorldEvent$Hand) -> g
-    483:495:void lambda$onReloadShader$37(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> e
+    483:495:void lambda$onReloadShader$37(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> e
     307:308:void lambda$onRenderEntityWorld$36(net.shoreline.client.impl.event.render.RenderShaderEvent) -> b
-    293:305:void lambda$onRenderEntityWorld$35(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> f
+    293:305:void lambda$onRenderEntityWorld$35(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> f
     281:282:void lambda$onRenderEntityWorld$34(net.shoreline.client.impl.event.render.RenderShaderEvent) -> c
-    264:279:void lambda$onRenderEntityWorld$33(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> g
+    264:279:void lambda$onRenderEntityWorld$33(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> g
     252:253:void lambda$onRenderEntityWorld$32(net.shoreline.client.impl.event.render.RenderShaderEvent) -> d
-    237:250:void lambda$onRenderEntityWorld$31(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> h
+    237:250:void lambda$onRenderEntityWorld$31(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> h
     225:226:void lambda$onRenderEntityWorld$30(net.shoreline.client.impl.event.render.RenderShaderEvent) -> e
-    209:223:void lambda$onRenderEntityWorld$29(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> i
+    209:223:void lambda$onRenderEntityWorld$29(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> i
     197:198:void lambda$onRenderEntityWorld$28(net.shoreline.client.impl.event.render.RenderShaderEvent) -> f
-    183:195:void lambda$onRenderEntityWorld$27(net.shoreline.client.api.render.satin.ManagedShaderEffect,float) -> j
+    183:195:void lambda$onRenderEntityWorld$27(net.shoreline.client.api.font.satin.ManagedShaderEffect,float) -> j
     117:117:java.lang.Boolean lambda$new$26() -> mA
     115:115:java.lang.Boolean lambda$new$25() -> mB
     113:113:java.lang.Boolean lambda$new$24() -> mC
@@ -7733,9 +7733,9 @@ net.shoreline.client.init.Managers -> net.shoreline.client.lI:
     net.shoreline.client.impl.manager.player.interaction.InteractionManager INTERACT -> MA
     net.shoreline.client.impl.manager.world.sound.SoundManager SOUND -> MB
     net.shoreline.client.impl.manager.client.cape.CapeManager CAPES -> MC
-    net.shoreline.client.api.render.shader.ShaderManager SHADER -> MD
+    net.shoreline.client.api.font.shader.ShaderManager SHADER -> MD
     net.shoreline.client.impl.manager.mojang.LookupManager LOOKUP -> ME
-    net.shoreline.client.api.render.layers.LightmapManager LIGHT_MAP -> MF
+    net.shoreline.client.api.font.layers.LightmapManager LIGHT_MAP -> MF
     net.shoreline.client.impl.manager.world.BlockManager BLOCK -> MG
     net.shoreline.client.impl.manager.combat.HitboxManager HITBOX -> MH
     net.shoreline.client.impl.manager.combat.PearlManager PEARL -> MI

@@ -42,10 +42,9 @@ loom {
 }
 
 repositories {
-    mavenCentral() {
-        url "https://jitpack.io"
-        url "https://impactdevelopment.github.io/maven/"
-    }
+    mavenCentral()
+    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://impactdevelopment.github.io/maven/") }
 }
 
 dependencies {
@@ -53,8 +52,11 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_version}:v2"
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "cabaletta:baritone-api:${baritone_api_version}"
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") {
+        exclude group: "net.fabricmc.fabric-api", module: "fabric-loot-api-v3"
+    }
+    modImplementation "cabaletta:baritone-api:${project.baritone_api_version}"
+    implementation "org.lwjgl:lwjgl-harfbuzz:3.3.3"
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")

@@ -1,5 +1,7 @@
 package net.shoreline.client.api.file;
 
+import lombok.experimental.UtilityClass;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,9 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileUtils
+@UtilityClass
+public class IOUtils
 {
-    public static String readFile(Path path) throws IOException
+    public String readFile(Path path) throws IOException
     {
         StringBuilder content = new StringBuilder();
         InputStream in = Files.newInputStream(path);
@@ -23,8 +26,8 @@ public class FileUtils
         return content.toString();
     }
 
-    public static void writeFile(Path path,
-                                 String content) throws IOException
+    public void writeFile(Path path,
+                          String content) throws IOException
     {
         OutputStream out = Files.newOutputStream(path);
         byte[] bytes = content.getBytes(StandardCharsets.UTF_8);

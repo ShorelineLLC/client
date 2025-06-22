@@ -1,8 +1,11 @@
 package net.shoreline.client.util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class Formatter
 {
-    public static String formatEnum(final Enum<?> in)
+    public String formatEnum(final Enum<?> in)
     {
         String name = in.name();
         // no capitalization
