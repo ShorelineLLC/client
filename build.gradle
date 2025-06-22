@@ -54,9 +54,15 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") {
         exclude group: "net.fabricmc.fabric-api", module: "fabric-loot-api-v3"
+        exclude group: "net.fabricmc.fabric-api", module: "fabric-loot-api-v2"
     }
     modImplementation "cabaletta:baritone-api:${project.baritone_api_version}"
+
+    implementation platform("org.lwjgl:lwjgl-bom:3.3.3")
     implementation "org.lwjgl:lwjgl-harfbuzz:3.3.3"
+    implementation "org.lwjgl:lwjgl-freetype"
+    runtimeOnly "org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-macos-arm64"
+    runtimeOnly "org.lwjgl:lwjgl-freetype:3.3.3:natives-macos-arm64"
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")

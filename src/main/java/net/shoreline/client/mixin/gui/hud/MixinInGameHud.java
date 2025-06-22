@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InGameHud.class)
 public class MixinInGameHud
 {
-    @Inject(method = "render", at = @At(value = "TAIL"))
+    @Inject(method = "render", at = @At(value = "RETURN"))
     private void hookRender(DrawContext context,
                             RenderTickCounter tickCounter,
                             CallbackInfo ci)

@@ -2,10 +2,16 @@ package net.shoreline.client.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.api.font.GlyphBuffer;
+import net.shoreline.client.impl.module.client.FontModule;
 
 public abstract class DrawableComponent
 {
     protected final MinecraftClient mc = MinecraftClient.getInstance();
+
+    private final GlyphBuffer buffer = new GlyphBuffer();
 
     public abstract void drawComponent(DrawContext context,
                                        float mouseX,
@@ -53,6 +59,15 @@ public abstract class DrawableComponent
                             int y,
                             int color)
     {
+        if (FontModule.INSTANCE.isEnabled())
+        {
+            buffer.clear();
+            buffer.addText(FontManager.FONT, Text.literal(text).styled(it -> it.withColor(color)), 0.0f, 0.0f);
+            buffer.offsetToTopLeft();
+            buffer.draw(context, x, y);
+            return;
+        }
+
         context.drawText(mc.textRenderer, text, x, y, color, true);
     }
 }

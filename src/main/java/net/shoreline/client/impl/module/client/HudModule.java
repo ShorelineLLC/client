@@ -4,6 +4,8 @@ import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
@@ -16,10 +18,13 @@ public class HudModule extends Toggleable
             .setNameAliases("Logo")
             .setDefaultValue(true).build();
 
+    private final GlyphBuffer buffer = new GlyphBuffer();
+
     public HudModule()
     {
         super("HUD", "Heads up display", GuiCategory.CLIENT);
     }
+
 
     @EventListener
     public void onHudOverlay(HudOverlayEvent.Post event)
@@ -31,7 +36,13 @@ public class HudModule extends Toggleable
                     !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
                     !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : "");
 
-            event.getContext().drawText(mc.textRenderer, watermarkText, 2, 2, -1, true);
+            buffer.clear();
+            buffer.addString(FontManager.FONT, watermarkText, 0, 0);
+            buffer.offsetToTopLeft();
+
+            buffer.draw(event.getContext(), 2, 2);
+
+            // event.getContext().drawText(mc.textRenderer, watermarkText, 2, 2, -1, true);
         }
     }
 }

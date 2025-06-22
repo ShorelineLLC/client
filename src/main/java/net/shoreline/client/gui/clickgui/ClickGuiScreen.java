@@ -46,6 +46,15 @@ public class ClickGuiScreen extends Screen
     }
 
     @Override
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks)
+    {
+        if (client.world == null)
+        {
+            renderPanoramaBackground(context, deltaTicks);
+        }
+    }
+
+    @Override
     public void render(DrawContext context,
                        int mouseX,
                        int mouseY,
@@ -53,7 +62,7 @@ public class ClickGuiScreen extends Screen
     {
         if (ClickGuiModule.INSTANCE.shouldBlur())
         {
-            // applyBlur(context);
+            applyBlur(context);
         }
 
         if (ClickGuiModule.INSTANCE.shouldDarken())

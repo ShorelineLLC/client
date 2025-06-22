@@ -9,8 +9,8 @@ public class RenderLayers
     public static final RenderPipeline PIPELINE_TEXT_CUSTOM = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.TEXT_SNIPPET, RenderPipelines.FOG_SNIPPET)
                     .withLocation(Identifier.of("shoreline", "pipeline/text_lumi"))
-                    .withVertexShader(Identifier.of("shoreline", "core/custom_text"))
-                    .withFragmentShader(Identifier.of("shoreline", "core/custom_text"))
+                    .withVertexShader(Identifier.of("shoreline", "core/text"))
+                    .withFragmentShader(Identifier.of("shoreline", "core/text"))
                     .withSampler("Sampler0")
                     .withSampler("Sampler2")
                     .withDepthBias(-1.0f, -10.0f)

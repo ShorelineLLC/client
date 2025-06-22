@@ -1,6 +1,8 @@
 package net.shoreline.client.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.client.api.font.FontScalingRegistry;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.eventbus.EventBus;
@@ -28,6 +30,13 @@ public class MixinMinecraftClient
     {
         final TickEvent.Post tickEvent = new TickEvent.Post();
         EventBus.INSTANCE.dispatch(tickEvent);
+    }
+
+    @Inject(method = "onResolutionChanged", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/util/Window;setScaleFactor(I)V"))
+    private void hookOnResolutionChanged(CallbackInfo ci, @Local(ordinal = 0) int i)
+    {
+        FontScalingRegistry.resize(i);
     }
 
     @Inject(method = "render", at = @At("HEAD"))
