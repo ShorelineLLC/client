@@ -25,6 +25,7 @@ public class GuiCategoryFrame extends Frame
                         module1, this, 2, moduleY, width - 4, 15);
 
                 components.add(component);
+                allComponents.add(component);
                 moduleY += component.getHeight() + 1;
             }
         }

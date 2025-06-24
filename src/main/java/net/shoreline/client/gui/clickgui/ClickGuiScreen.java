@@ -33,6 +33,8 @@ public class ClickGuiScreen extends Screen
             .setTextColor(0xffffffff)
             .build();
 
+    private boolean shouldCloseOnEsc = true;
+
     protected ClickGuiScreen()
     {
         super(Text.of("Shoreline-ClickGui"));
@@ -148,8 +150,19 @@ public class ClickGuiScreen extends Screen
                               int scanCode,
                               int modifiers)
     {
+        shouldCloseOnEsc = true;
         for (Frame frame : guiFrames)
         {
+            for (FrameComponent component : frame.getAllComponents())
+            {
+                if (component instanceof KeyListenerComponent keyListener && keyListener.isListening()
+                        || component instanceof TextComponent text && text.isTyping())
+                {
+                    shouldCloseOnEsc = false;
+                    break;
+                }
+            }
+
             frame.keyPressed(keyCode, scanCode, modifiers);
         }
 
@@ -177,13 +190,7 @@ public class ClickGuiScreen extends Screen
     @Override
     public boolean shouldCloseOnEsc()
     {
-        return guiFrames.stream()
-                .flatMap(frame -> frame.getComponents().stream())
-                .filter(ModuleComponent.class::isInstance)
-                .map(ModuleComponent.class::cast)
-                .flatMap(module -> module.getComponents().stream())
-                .noneMatch(component ->
-                        component instanceof KeyListenerComponent listener && listener.isListening());
+        return shouldCloseOnEsc;
     }
 
     @Override

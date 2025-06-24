@@ -3,7 +3,10 @@ package net.shoreline.client.mixin.network;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.MovementType;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.network.InputMovementEvent;
+import net.shoreline.client.impl.event.network.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
 import net.shoreline.eventbus.EventBus;
@@ -11,8 +14,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity
@@ -60,6 +65,20 @@ public class MixinClientPlayerEntity
 
         final PlayerUpdateEvent.Post event = new PlayerUpdateEvent.Post();
         EventBus.INSTANCE.dispatch(event);
+    }
+
+    @ModifyArgs(method = "move", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V"))
+    private void hookMove(Args args)
+    {
+        final MovementType par1 = args.get(0);
+        final Vec3d par2 = args.get(1);
+        PlayerMoveEvent event = new PlayerMoveEvent(par1, par2);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            args.set(1, event.getMovement());
+        }
     }
 
     @Inject(method = "tickMovement", at = @At(value = "INVOKE",

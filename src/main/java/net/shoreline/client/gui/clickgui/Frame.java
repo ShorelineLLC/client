@@ -34,6 +34,7 @@ public class Frame extends DrawableComponent implements Interactable
     // Components can be added inside the frame
     private final ComponentFactory componentFactory = new ComponentFactory();
     protected final List<FrameComponent> components = new ArrayList<>();
+    protected final List<FrameComponent> allComponents = new ArrayList<>();
 
     public Frame(String title, int x, int y, int width, int titleHeight)
     {

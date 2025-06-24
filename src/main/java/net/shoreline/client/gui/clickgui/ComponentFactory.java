@@ -68,6 +68,11 @@ public class ComponentFactory
             return new ColorPickerComponent((Config<Color>) config, moduleComponent, frame, x, y, width, height);
         }
 
-        return null;
+        if (config.getValue() instanceof String)
+        {
+            return new TextboxComponent((Config<String>) config, moduleComponent, frame, x, y, width, height);
+        }
+
+        throw new IllegalArgumentException("No component exists for the config type!");
     }
 }

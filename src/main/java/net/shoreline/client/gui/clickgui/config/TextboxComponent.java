@@ -1,12 +1,15 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.gui.clickgui.Frame;
-import net.shoreline.client.gui.clickgui.ModuleComponent;
+import net.shoreline.client.gui.clickgui.*;
+import org.lwjgl.glfw.GLFW;
 
 public class TextboxComponent extends ConfigComponent<String>
 {
+    private final TextComponent textComponent;
 
     public TextboxComponent(Config<String> config,
                             ModuleComponent moduleComponent,
@@ -17,6 +20,10 @@ public class TextboxComponent extends ConfigComponent<String>
                             int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
+        textComponent = new TextComponent(frame, x, y, frameWidth, frameHeight,
+                GLFW.GLFW_MOUSE_BUTTON_LEFT,
+                config::getValue, config::setValue);
+        frame.getAllComponents().add(textComponent);
     }
 
     @Override
@@ -25,7 +32,22 @@ public class TextboxComponent extends ConfigComponent<String>
                               float mouseY,
                               float delta)
     {
+        Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
+        textComponent.setYOffset(getYOffset());
+        textComponent.setX(getTx());
+        textComponent.setY(getTy());
+
+        if (textComponent.isTyping())
+        {
+            textComponent.drawComponent(context, mouseX, mouseY, delta);
+        } else
+        {
+            Text formattedText = Text.empty()
+                    .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
+                    .append(Text.literal(" " + getConfig().getValue()).formatted(Formatting.GRAY));
+            drawText(context, formattedText, getTx() + 3, getTy() + 4);
+        }
     }
 
     @Override
@@ -33,7 +55,7 @@ public class TextboxComponent extends ConfigComponent<String>
                              double mouseY,
                              int mouseButton)
     {
-
+        textComponent.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -58,13 +80,13 @@ public class TextboxComponent extends ConfigComponent<String>
                            int scanCode,
                            int modifiers)
     {
-
+        textComponent.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public void charTyped(char chr,
                           int modifiers)
     {
-
+        textComponent.charTyped(chr, modifiers);
     }
 }

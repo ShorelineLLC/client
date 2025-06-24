@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 
@@ -20,9 +20,40 @@ public class MovementModule extends Toggleable
         super(name, nameAliases, description, category);
     }
 
-    public void onMove(final Vec3d movement)
+    protected Vec2f strafe(float speed)
     {
-
+        float forward = mc.player.input.getMovementInput().y;
+        float strafe = mc.player.input.getMovementInput().x;
+        float yaw = mc.player.lastYaw + (mc.player.getYaw() - mc.player.lastYaw) * mc.getRenderTickCounter().getTickProgress(true);
+        if (forward == 0.0f && strafe == 0.0f)
+        {
+            return Vec2f.ZERO;
+        }
+        else if (forward != 0.0f)
+        {
+            if (strafe >= 1.0f)
+            {
+                yaw += forward > 0.0f ? -45 : 45;
+                strafe = 0.0f;
+            }
+            else if (strafe <= -1.0f)
+            {
+                yaw += forward > 0.0f ? 45 : -45;
+                strafe = 0.0f;
+            }
+            if (forward > 0.0f)
+            {
+                forward = 1.0f;
+            }
+            else if (forward < 0.0f)
+            {
+                forward = -1.0f;
+            }
+        }
+        float rx = (float) Math.cos(Math.toRadians(yaw));
+        float rz = (float) -Math.sin(Math.toRadians(yaw));
+        return new Vec2f((forward * speed * rz) + (strafe * speed * rx),
+                (forward * speed * rx) - (strafe * speed * rz));
     }
 
     protected float getYawFromInput()

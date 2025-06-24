@@ -43,6 +43,7 @@ public class ModuleComponent extends FrameComponent
                     config, this, frame, 2, 0, frameWidth - 2, frameHeight);
 
             components.add(component);
+            frame.getAllComponents().add(component);
         }
 
         this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);

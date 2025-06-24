@@ -2,16 +2,28 @@ package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.Theme;
+import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.Easing;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
 public class ColorPickerComponent extends ConfigComponent<Color>
 {
+    private boolean pickerOpen;
+    private final Animation collapseAnim;
+
+    private float[] selectedColor;
+
+    private final ColorConfig colorConfig;
+
     public ColorPickerComponent(Config<Color> config,
                                 ModuleComponent moduleComponent,
                                 Frame frame,
@@ -21,6 +33,10 @@ public class ColorPickerComponent extends ConfigComponent<Color>
                                 int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
+        this.collapseAnim = new Animation(false, 200, Easing.CUBIC_IN_OUT);
+        this.colorConfig = (ColorConfig) config;
+        float[] hsb = colorConfig.getHsb();
+        selectedColor = new float[] { hsb[0], hsb[1], 1.0f - hsb[2], hsb[3] };
     }
 
     @Override
@@ -41,7 +57,12 @@ public class ColorPickerComponent extends ConfigComponent<Color>
                              double mouseY,
                              int mouseButton)
     {
-
+        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
+                && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            pickerOpen = !pickerOpen;
+            collapseAnim.setState(pickerOpen);
+        }
     }
 
     @Override

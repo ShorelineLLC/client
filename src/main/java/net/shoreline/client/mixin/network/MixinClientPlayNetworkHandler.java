@@ -15,6 +15,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayNetworkHandler.class)
 public class MixinClientPlayNetworkHandler
 {
+    @Inject(method = "onPlayerPositionLook", at = @At(value = "HEAD"))
+    private void hookPlayerPositionLookPre(PlayerPositionLookS2CPacket packet, CallbackInfo ci)
+    {
+        RotationUpdateEvent.Pre event = new RotationUpdateEvent.Pre();
+        EventBus.INSTANCE.dispatch(event);
+    }
+
+    @Inject(method = "onPlayerPositionLook", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V",
+            shift = At.Shift.BEFORE,
+            ordinal = 0))
+    private void hookPlayerPositionLookPrePacket(PlayerPositionLookS2CPacket packet, CallbackInfo ci)
+    {
+        RotationUpdateEvent.PrePacket event = new RotationUpdateEvent.PrePacket();
+        EventBus.INSTANCE.dispatch(event);
+    }
+
     @Inject(method = "onPlayerPositionLook", at = @At(value = "TAIL"))
     public void hookPlayerPositionLook(PlayerPositionLookS2CPacket packet,
                                        CallbackInfo ci)

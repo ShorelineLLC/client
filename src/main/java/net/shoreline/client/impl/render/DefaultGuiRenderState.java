@@ -16,12 +16,19 @@ public record DefaultGuiRenderState(
         ScreenRect scissorArea,
         ScreenRect bounds,
         BiConsumer<VertexConsumer, Float> vertices
-) implements SimpleGuiElementRenderState {
-    public DefaultGuiRenderState(RenderPipeline pipeline, TextureSetup ts, DrawContext context, ScreenRect bounds, BiConsumer<VertexConsumer, Float> vertices) {
+) implements SimpleGuiElementRenderState
+{
+    public DefaultGuiRenderState(RenderPipeline pipeline,
+                                 TextureSetup ts,
+                                 DrawContext context,
+                                 ScreenRect bounds,
+                                 BiConsumer<VertexConsumer, Float> vertices)
+    {
         this(pipeline, ts, ((AccessorDrawContext) context).getScissorStack().peekLast(), bounds, vertices);
     }
     @Override
-    public void setupVertices(VertexConsumer vertices, float depth) {
+    public void setupVertices(VertexConsumer vertices, float depth)
+    {
         this.vertices.accept(vertices, depth);
     }
 }

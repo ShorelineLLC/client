@@ -2,9 +2,7 @@ package net.shoreline.client.api.config;
 
 import com.google.gson.JsonObject;
 
-import java.util.List;
-
-public class ConfigGroup extends Config<List<Config<?>>>
+public class ConfigGroup<T> extends Config<T>
 {
     public ConfigGroup(String name, String description)
     {

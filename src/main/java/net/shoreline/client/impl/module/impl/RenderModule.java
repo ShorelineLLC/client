@@ -28,6 +28,11 @@ public class RenderModule extends Toggleable
 
     protected void drawText(DrawContext context, Text text, int x, int y)
     {
+        if (text.getString().isEmpty())
+        {
+            return;
+        }
+
         if (FontModule.INSTANCE.isEnabled())
         {
             buffer.clear();

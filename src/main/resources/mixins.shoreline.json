@@ -3,6 +3,7 @@
   "package": "net.shoreline.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "accessor.AccessorBufferBuilder",
     "accessor.AccessorClientWorld",
     "accessor.AccessorDrawContext",
     "accessor.AccessorEntityVelocityUpdateS2CPacket",

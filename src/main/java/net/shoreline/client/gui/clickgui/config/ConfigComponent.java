@@ -6,6 +6,9 @@ import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.FrameComponent;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 public abstract class ConfigComponent<T> extends FrameComponent
 {

@@ -6758,7 +6758,7 @@ net.shoreline.client.impl.module.render.NoRenderModule$ItemRender -> net.shoreli
     374:374:void <init>(java.lang.String,int) -> <init>
     374:374:net.shoreline.client.impl.module.render.NoRenderModule$ItemRender[] $values() -> mv
     374:378:void <clinit>() -> <clinit>
-net.shoreline.client.impl.module.render.NoRotateModule -> net.shoreline.client.mN:
+net.shoreline.client.impl.module.world.NoRotateModule -> net.shoreline.client.mN:
     net.shoreline.client.api.config.Config positionAdjustConfig -> wI
     17:22:void <init>() -> <init>
     27:40:void onServerRotation(net.shoreline.client.impl.event.network.ServerRotationEvent) -> a

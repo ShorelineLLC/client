@@ -48,6 +48,11 @@ public abstract class DrawableComponent
                             int x,
                             int y)
     {
+        if (text.getString().isEmpty())
+        {
+            return;
+        }
+
         if (FontModule.INSTANCE.isEnabled())
         {
             buffer.clear();
@@ -58,5 +63,23 @@ public abstract class DrawableComponent
         }
 
         context.drawText(mc.textRenderer, text, x, y, -1, true);
+    }
+
+    protected int getTextWidth(Text text)
+    {
+        if (text.getString().isEmpty())
+        {
+            return 0;
+        }
+
+        if (FontModule.INSTANCE.isEnabled())
+        {
+            buffer.clear();
+            buffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
+            buffer.recalculateBounds();
+            return Math.round(buffer.maxX - buffer.minX);
+        }
+
+        return mc.textRenderer.getWidth(text);
     }
 }

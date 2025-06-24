@@ -2,16 +2,12 @@ package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.gui.Mouse;
-import net.shoreline.client.gui.clickgui.ClickGuiScreen;
-import net.shoreline.client.gui.clickgui.Frame;
-import net.shoreline.client.gui.clickgui.ModuleComponent;
-import net.shoreline.client.gui.clickgui.Theme;
+import net.shoreline.client.gui.clickgui.*;
 import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
@@ -19,6 +15,8 @@ import java.math.RoundingMode;
 
 public class SliderComponent<T extends Number> extends ConfigComponent<T>
 {
+    private final TextComponent textComponent;
+
     public SliderComponent(Config<T> config,
                            ModuleComponent moduleComponent,
                            Frame frame,
@@ -28,6 +26,31 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                            int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
+        textComponent = new TextComponent(frame, x, y, frameWidth, frameHeight,
+                GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+                c -> c >= '0' && c <= '9', // Filter numbers only
+                () -> String.valueOf(config.getValue()),
+                value ->
+                {
+                    try
+                    {
+                        if (config.getValue() instanceof Integer)
+                        {
+                            ((Config<Integer>) config).setValue(Integer.parseInt(value));
+                        } else if (config.getValue() instanceof Float)
+                        {
+                            ((Config<Float>) config).setValue(Float.parseFloat(value));
+                        } else if (config.getValue() instanceof Double)
+                        {
+                            ((Config<Double>) config).setValue(Double.parseDouble(value));
+                        }
+                    } catch (NumberFormatException ignored)
+                    {
+                        
+                    }
+                });
+
+        frame.getAllComponents().add(textComponent);
     }
 
     @Override
@@ -36,6 +59,17 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                               float mouseY,
                               float delta)
     {
+        textComponent.setYOffset(getYOffset());
+        textComponent.setX(getTx());
+        textComponent.setY(getTy());
+
+        Theme theme = ClickGuiScreen.INSTANCE.getTheme();
+        if (textComponent.isTyping())
+        {
+            textComponent.drawComponent(context, mouseX, mouseY, delta);
+            return;
+        }
+
         Mouse mouse = ClickGuiScreen.INSTANCE.getMouse();
         NumberConfig<T> numberConfig = (NumberConfig<T>) getConfig();
         Number min = numberConfig.getMin();
@@ -44,8 +78,6 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
         {
             setSliderValue(mouseX, min, max);
         }
-
-        Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         float fill = (getConfig().getValue().floatValue() - min.floatValue())
                 / (max.floatValue() - min.floatValue());
@@ -71,6 +103,8 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
             setSliderValue(mouseX, ((NumberConfig<T>) getConfig()).getMin(),
                     ((NumberConfig<T>) getConfig()).getMax());
         }
+
+        textComponent.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -95,14 +129,14 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                            int scanCode,
                            int modifiers)
     {
-
+        textComponent.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public void charTyped(char chr,
                           int modifiers)
     {
-
+        textComponent.charTyped(chr, modifiers);
     }
 
     private void setSliderValue(double mouseX, Number min, Number max)

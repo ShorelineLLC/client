@@ -5,10 +5,12 @@ import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.AuraModule;
 import net.shoreline.client.impl.module.misc.FakePlayerModule;
 import net.shoreline.client.impl.module.movement.NoSlowModule;
+import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.impl.module.movement.SprintModule;
 import net.shoreline.client.impl.module.movement.VelocityModule;
 import net.shoreline.client.impl.module.render.FullbrightModule;
 import net.shoreline.client.impl.module.render.NoBobModule;
+import net.shoreline.client.impl.module.world.NoRotateModule;
 import net.shoreline.client.impl.module.render.NoWeatherModule;
 
 import java.util.Arrays;
@@ -33,12 +35,15 @@ public class ModuleManager
                 new FakePlayerModule(),
                 // Movement
                 new NoSlowModule(),
+                new SpeedModule(),
                 new SprintModule(),
                 new VelocityModule(),
                 // Render
                 new FullbrightModule(),
                 new NoBobModule(),
-                new NoWeatherModule()
+                new NoWeatherModule(),
+                // World
+                new NoRotateModule()
         );
 
         for (Module module : getModules())
