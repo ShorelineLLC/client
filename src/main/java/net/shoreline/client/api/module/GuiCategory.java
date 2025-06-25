@@ -5,7 +5,7 @@ import lombok.Getter;
 public enum GuiCategory
 {
     COMBAT("Combat"),
-    EXPLOITS("Exploits"),
+    EXPLOIT("Exploit"),
     MISCELLANEOUS("Miscellaneous"),
     MOVEMENT("Movement"),
     RENDER("Render"),

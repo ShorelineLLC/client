@@ -5,10 +5,7 @@ import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.event.network.InputMovementEvent;
-import net.shoreline.client.impl.event.network.PlayerMoveEvent;
-import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
-import net.shoreline.client.impl.event.network.StopSprintingEvent;
+import net.shoreline.client.impl.event.network.*;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -99,6 +96,17 @@ public class MixinClientPlayerEntity
         {
             cir.cancel();
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "pushOutOfBlocks", at = @At(value = "HEAD"), cancellable = true)
+    private void hookPushOutOfBlocks(double x, double z, CallbackInfo ci)
+    {
+        PushOutOfBlocksEvent event = new PushOutOfBlocksEvent();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
         }
     }
 }

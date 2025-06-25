@@ -4,7 +4,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.*;
+import net.shoreline.client.impl.render.ColorUtil;
 import org.lwjgl.glfw.GLFW;
 
 public class TextboxComponent extends ConfigComponent<String>
@@ -32,6 +34,7 @@ public class TextboxComponent extends ConfigComponent<String>
                               float mouseY,
                               float delta)
     {
+        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         textComponent.setYOffset(getYOffset());
@@ -43,10 +46,13 @@ public class TextboxComponent extends ConfigComponent<String>
             textComponent.drawComponent(context, mouseX, mouseY, delta);
         } else
         {
+            int color = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());
+            drawRect(context, getTx(), getTy(), width, height, color);
+
             Text formattedText = Text.empty()
                     .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
                     .append(Text.literal(" " + getConfig().getValue()).formatted(Formatting.GRAY));
-            drawText(context, formattedText, getTx() + 3, getTy() + 4);
+            drawText(context, textBuffer, formattedText, getTx() + 3, getTy() + 4);
         }
     }
 
@@ -62,15 +68,6 @@ public class TextboxComponent extends ConfigComponent<String>
     public void mouseReleased(double mouseX,
                               double mouseY,
                               int button)
-    {
-
-    }
-
-    @Override
-    public void mouseScrolled(double mouseX,
-                              double mouseY,
-                              double horizontalAmount,
-                              double verticalAmount)
     {
 
     }

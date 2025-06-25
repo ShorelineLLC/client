@@ -35,11 +35,14 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                               float mouseY,
                               float delta)
     {
+        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        drawRect(context, getTx(), getTy(), width, height, ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor()));
+        int color = ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor());
+        color = ColorUtil.brighten(toggleAnim.getFactor() > 0.0 ? color : 0x00646464, 70, (float) hoverAnim.getFactor());
+        drawRect(context, getTx(), getTy(), width, height, color);
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, Text.literal(getConfig().getName()).withColor(textColor), getTx() + 3, getTy() + 4);
+        drawText(context, textBuffer, Text.literal(getConfig().getName()).withColor(textColor), getTx() + 3, getTy() + 4);
     }
 
     @Override
@@ -60,14 +63,6 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
     public void mouseReleased(double mouseX,
                               double mouseY,
                               int button)
-    {
-    }
-
-    @Override
-    public void mouseScrolled(double mouseX,
-                              double mouseY,
-                              double horizontalAmount,
-                              double verticalAmount)
     {
     }
 

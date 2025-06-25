@@ -1,9 +1,12 @@
 package net.shoreline.client.api.file;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigContainer;
+import net.shoreline.client.api.config.ConfigGroup;
+import net.shoreline.client.api.config.NumberConfig;
 
 import java.awt.*;
 import java.io.IOException;
@@ -52,17 +55,21 @@ public class ConfigContainerFile extends JsonConfigFile
             }
             final JsonElement id = configObj.get("id");
             Config<?> config = container.getConfig(id.getAsString());
-            if (config == null)
+            if (config == null || config instanceof ConfigGroup)
             {
                 continue;
             }
-            updateConfigFromJson(config, configObj);
+
+            final JsonElement value = configObj.get("value");
+            if (value != null)
+            {
+                updateConfigFromJson(config, value);
+            }
         }
     }
 
-    private void updateConfigFromJson(Config<?> config, JsonObject jsonObject)
+    private void updateConfigFromJson(Config<?> config, JsonElement value)
     {
-        final JsonElement value = jsonObject.get("value");
         if (config.getValue() instanceof Boolean)
         {
             ((Config<Boolean>) config).setValue(value.getAsBoolean());
@@ -77,13 +84,13 @@ public class ConfigContainerFile extends JsonConfigFile
             }
         } else if (config.getValue() instanceof Float)
         {
-            ((Config<Float>) config).setValue(value.getAsFloat());
+            ((NumberConfig) config).setValue(value.getAsFloat());
         } else if (config.getValue() instanceof Double)
         {
-            ((Config<Double>) config).setValue(value.getAsDouble());
+            ((NumberConfig) config).setValue(value.getAsDouble());
         } else if (config.getValue() instanceof Integer)
         {
-            ((Config<Integer>) config).setValue(value.getAsInt());
+            ((NumberConfig) config).setValue(value.getAsInt());
         } else if (config.getValue() instanceof String)
         {
             ((Config<String>) config).setValue(value.getAsString());

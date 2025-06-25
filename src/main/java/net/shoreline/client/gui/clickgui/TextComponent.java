@@ -73,12 +73,14 @@ public class TextComponent extends FrameComponent
         String buffer = bufferToString();
         Text formattedText1 = Text.literal(buffer.isEmpty() ? getInsertionPoint(true) : buffer + getInsertionPoint(false))
                 .withColor(theme.getTextColor());
-        context.enableScissor(getX() + 3, getY(), getX() + width, getY() + height);
+        enableScissor(context, getX() + 3, getY(), getX() + width, getY() + height);
+
         context.getMatrices().pushMatrix();
         context.getMatrices().translate(-typedX, 0.0f);
-        drawText(context, formattedText1, getX() + 3, getY() + 4);
+        drawText(context, textBuffer, formattedText1, getX() + 3, getY() + 4);
         context.getMatrices().popMatrix();
-        context.disableScissor();
+
+        disableScissor(context);
     }
 
     @Override
@@ -86,7 +88,8 @@ public class TextComponent extends FrameComponent
                              double mouseY,
                              int button)
     {
-        if (Mouse.isHovering(mouseX, mouseY, getX(), getY(), width, height) && button == mouseButton)
+        if (Mouse.isHovering(mouseX, mouseY, getX(), getY(), width, height)
+                && button == mouseButton)
         {
             if (typing)
             {
@@ -104,14 +107,6 @@ public class TextComponent extends FrameComponent
     public void mouseReleased(double mouseX,
                               double mouseY,
                               int button)
-    {
-    }
-
-    @Override
-    public void mouseScrolled(double mouseX,
-                              double mouseY,
-                              double horizontalAmount,
-                              double verticalAmount)
     {
     }
 
@@ -163,7 +158,7 @@ public class TextComponent extends FrameComponent
 
     private void updateScrolling()
     {
-        int textW = getTextWidth(Text.literal(bufferToString()));
+        int textW = getTextWidth(textBuffer, Text.literal(bufferToString()));
         int componentWidth = width - 6;
 
         if (textW - typedX > componentWidth)

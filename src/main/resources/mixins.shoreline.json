@@ -9,6 +9,7 @@
     "accessor.AccessorEntityVelocityUpdateS2CPacket",
     "accessor.AccessorInput",
     "accessor.AccessorKeyBinding",
+    "accessor.AccessorMinecraftClient",
     "accessor.AccessorNativeImage",
     "accessor.AccessorPlayerMoveC2SPacket",
     "entity.MixinEntity",
@@ -21,6 +22,7 @@
     "network.MixinClientPlayNetworkHandler",
     "render.entity.MixinPlayerEntityRenderer",
     "render.MixinLightmapTextureManager",
+    "render.MixinRenderTickCounter",
     "MixinKeyboard",
     "MixinMinecraftClient"
   ],

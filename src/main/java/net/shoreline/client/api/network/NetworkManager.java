@@ -7,8 +7,13 @@ import net.minecraft.network.packet.Packet;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 
+import java.util.*;
+
 public class NetworkManager extends GenericFeature
 {
+    private final Set<Packet<?>> sentFromClient = Collections.synchronizedSet(
+            Collections.newSetFromMap(new IdentityHashMap<>()));
+
     public NetworkManager()
     {
         super("Network");
@@ -19,6 +24,7 @@ public class NetworkManager extends GenericFeature
         if (mc.world != null && mc.getNetworkHandler() != null)
         {
             mc.getNetworkHandler().sendPacket(packet);
+            sentFromClient.add(packet);
         }
     }
 
@@ -33,6 +39,12 @@ public class NetworkManager extends GenericFeature
             int i = pendingUpdateManager.getSequence();
             Packet<ServerPlayPacketListener> packet = packetCreator.predict(i);
             mc.getNetworkHandler().sendPacket(packet);
+            sentFromClient.add(packet);
         }
+    }
+
+    public boolean wasSentFromClient(Packet<?> packet)
+    {
+        return sentFromClient.contains(packet);
     }
 }

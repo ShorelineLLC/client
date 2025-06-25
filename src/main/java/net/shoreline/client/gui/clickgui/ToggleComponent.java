@@ -4,7 +4,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
+import net.shoreline.client.gui.clickgui.config.GroupComponent;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -31,16 +33,18 @@ public class ToggleComponent extends ModuleComponent
                               float mouseY,
                               float delta)
     {
+        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        drawRect(context, getTx(), getTy(), width, height,
-                ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor()));
+        int color = ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor());
+        color = ColorUtil.brighten(toggleAnim.getFactor() > 0.0 ? color : 0x00646464, 70, (float) hoverAnim.getFactor());
+        drawRect(context, getTx(), getTy(), width, height, color);
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, Text.literal(module.getName()).withColor(textColor), getTx() + 3, getTy() + 4);
+        drawText(context, textBuffer, Text.literal(module.getName()).withColor(textColor), getTx() + 3, getTy() + 4);
 
         if (getCollapseAnim().getFactor() > 0.0)
         {
-            context.enableScissor(getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
+            enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 
             int configY = 2;
             for (ConfigComponent<?> component : components)
@@ -50,10 +54,17 @@ public class ToggleComponent extends ModuleComponent
                     component.setYOffset(configY);
                     component.drawComponent(context, mouseX, mouseY, delta);
                     configY += component.getHeight() + 1;
+                    if (component instanceof GroupComponent c)
+                    {
+                        configY += c.getScaledHeight();
+                    } else if (component instanceof ColorPickerComponent c1)
+                    {
+                        configY += c1.getComponentHeight();
+                    }
                 }
             }
 
-            context.disableScissor();
+            disableScissor(context);
         }
     }
 

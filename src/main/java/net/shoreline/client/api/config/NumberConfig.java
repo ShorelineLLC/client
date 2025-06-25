@@ -9,11 +9,26 @@ import lombok.Setter;
 public class NumberConfig<T extends Number> extends Config<T>
 {
     private T min, max;
-    private NumberFormat format;
+    private String format;
     private int roundingPlaces;
 
     public NumberConfig(String name, String description) {
         super(name, description);
+    }
+
+    @Override
+    public void setValue(T val)
+    {
+        if (min != null && val.doubleValue() < min.doubleValue())
+        {
+            super.setValue(min);
+        } else if (max != null && val.doubleValue() > max.doubleValue())
+        {
+            super.setValue(max);
+        } else
+        {
+            super.setValue(val);
+        }
     }
 
     @Override
@@ -27,7 +42,7 @@ public class NumberConfig<T extends Number> extends Config<T>
     public static class Builder<T extends Number> extends ConfigBuilder<T>
     {
         private T min, max;
-        private NumberFormat format;
+        private String format;
         private int roundingScale;
 
         public Builder(String name) {
@@ -54,7 +69,7 @@ public class NumberConfig<T extends Number> extends Config<T>
             return this;
         }
 
-        public Builder<T> setFormat(NumberFormat format)
+        public Builder<T> setFormat(String format)
         {
             this.format = format;
             return this;

@@ -36,4 +36,20 @@ public class ColorUtil
         int colorAlphaInt = Math.max(10, (int) (colorAlpha * alpha));
         return (colorAlphaInt << 24) | (color & 0xffffff);
     }
+
+    public static int brighten(int color, int amount, float factor)
+    {
+        if (factor == 0.0f)
+        {
+            return color;
+        }
+
+        int a = (color >>> 24) & 0xff;
+        int r = (color >>> 16) & 0xff;
+        int g = (color >>> 8) & 0xff;
+        int b = color & 0xff;
+
+        a = Math.min(255, (int) (a + (amount * factor)));
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
 }

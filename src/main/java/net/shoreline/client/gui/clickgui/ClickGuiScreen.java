@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
@@ -139,7 +140,10 @@ public class ClickGuiScreen extends Screen
     {
         for (Frame frame : guiFrames)
         {
-            frame.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            int scrolledY = (int) (verticalAmount * ClickGuiModule.INSTANCE.getScrollSpeed());
+            int y = frame.getY() + scrolledY;
+            int minY = -frame.getComponentHeight();
+            frame.setY(MathHelper.clamp(y, minY, scrolledY > 0 ? 15 : Integer.MAX_VALUE));
         }
 
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);

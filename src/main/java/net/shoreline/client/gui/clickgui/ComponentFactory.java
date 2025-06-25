@@ -73,6 +73,11 @@ public class ComponentFactory
             return new TextboxComponent((Config<String>) config, moduleComponent, frame, x, y, width, height);
         }
 
+        if (config.isGroup())
+        {
+            return new GroupComponent((Config<Void>) config, moduleComponent, frame, x, y, width, height);
+        }
+
         throw new IllegalArgumentException("No component exists for the config type!");
     }
 }

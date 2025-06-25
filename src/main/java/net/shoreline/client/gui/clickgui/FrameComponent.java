@@ -2,8 +2,12 @@ package net.shoreline.client.gui.clickgui;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
+import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.Easing;
 
 @Getter
 @Setter
@@ -19,6 +23,8 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
 
     protected int yOffset;
 
+    protected final Animation hoverAnim;
+
     public FrameComponent(Frame frame,
                           int x,
                           int y,
@@ -30,6 +36,7 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
         this.y = y;
         this.width = width;
         this.height = height;
+        this.hoverAnim = new Animation(false, 150L, Easing.LINEAR);
     }
 
     public int getTx()

@@ -11,6 +11,7 @@ import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.Theme;
+import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.util.Formatter;
 import org.lwjgl.glfw.GLFW;
 
@@ -38,13 +39,17 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
                               float mouseY,
                               float delta)
     {
+        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
+
+        int color = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());
+        drawRect(context, getTx(), getTy(), width, height, color);
 
         String selectorText = Formatter.formatEnum(getConfig().getValue());
         Text formattedText = Text.empty()
                 .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
                 .append(Text.literal(" " + selectorText).formatted(Formatting.GRAY));
-        drawText(context, formattedText, getTx() + 3, getTy() + 4);
+        drawText(context, textBuffer, formattedText, getTx() + 3, getTy() + 4);
     }
 
     @Override
@@ -72,14 +77,6 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
     public void mouseReleased(double mouseX,
                               double mouseY,
                               int button)
-    {
-    }
-
-    @Override
-    public void mouseScrolled(double mouseX,
-                              double mouseY,
-                              double horizontalAmount,
-                              double verticalAmount)
     {
     }
 

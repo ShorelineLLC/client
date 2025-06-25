@@ -11,11 +11,6 @@ public interface Interactable
                        double mouseY,
                        int button);
 
-    void mouseScrolled(double mouseX,
-                       double mouseY,
-                       double horizontalAmount,
-                       double verticalAmount);
-
     void keyPressed(int keyCode,
                     int scanCode,
                     int modifiers);

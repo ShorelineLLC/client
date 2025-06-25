@@ -48,7 +48,7 @@ public class Keyboard
 
     public String getKeyName(int keycode)
     {
-        return getKeyName(keycode, keycode < GLFW.GLFW_KEY_LAST ? GLFW.glfwGetKeyScancode(keycode) : 0);
+        return getKeyName(keycode, keycode > 0 && keycode < GLFW.GLFW_KEY_LAST ? GLFW.glfwGetKeyScancode(keycode) : 0);
     }
 
     /**

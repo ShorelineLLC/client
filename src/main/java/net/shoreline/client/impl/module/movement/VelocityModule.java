@@ -1,5 +1,9 @@
 package net.shoreline.client.impl.module.movement;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityStatuses;
+import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.BlockPos;
@@ -7,8 +11,10 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.entity.PushEvent;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
 import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -21,14 +27,26 @@ public class VelocityModule extends Toggleable
             .setValues(VelocityMode.values())
             .setDescription("The bypass mode for anti knockback")
             .setDefaultValue(VelocityMode.NORMAL).build();
+    Config<Boolean> noPushEntitiesConfig = new BooleanConfig.Builder("Entities")
+            .setDescription("Prevents getting pushed by other entities")
+            .setDefaultValue(false).build();
+    Config<Boolean> noPushBlocksConfig = new BooleanConfig.Builder("Blocks")
+            .setDescription("Prevents being pushed out of blocks")
+            .setDefaultValue(false).build();
+    Config<Boolean> noPushLiquidsConfig = new BooleanConfig.Builder("Liquid")
+            .setDescription("Prevents getting pushed by liquids")
+            .setDefaultValue(false).build();
+    Config<Void> noPushGroup = new ConfigGroup.Builder("NoPush")
+            .addAll(noPushEntitiesConfig, noPushBlocksConfig, noPushLiquidsConfig).build();
+    Config<Boolean> fishhookConfig = new BooleanConfig.Builder("NoFishhook")
+            .setDescription("Prevents getting knocked back by fishing hooks")
+            .setDefaultValue(false).build();
     Config<Integer> horizontalConfig = new NumberConfig.Builder<Integer>("Horizontal")
-            .setDefaultValue(0).setMin(0).setMax(100)
-            .setFormat(NumberFormat.PERCENT)
+            .setDefaultValue(0).setMin(0).setMax(100).setFormat("%")
             .setVisible(() -> modeConfig.getValue() == VelocityMode.NORMAL)
             .setDescription("The horizontal velocity reduction").build();
     Config<Integer> verticalConfig = new NumberConfig.Builder<Integer>("Vertical")
-            .setDefaultValue(0).setMin(0).setMax(100)
-            .setFormat(NumberFormat.PERCENT)
+            .setDefaultValue(0).setMin(0).setMax(100).setFormat("%")
             .setVisible(() -> modeConfig.getValue() == VelocityMode.NORMAL)
             .setDescription("The vertical velocity reduction").build();
     Config<Boolean> groundOnlyConfig = new BooleanConfig.Builder("GroundOnly")
@@ -103,6 +121,16 @@ public class VelocityModule extends Toggleable
         {
             concealVelocity = true;
         }
+
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet
+                && packet.getStatus() == EntityStatuses.PULL_HOOKED_ENTITY && fishhookConfig.getValue())
+        {
+            final Entity entity = packet.getEntity(mc.world);
+            if (entity instanceof FishingBobberEntity hook && hook.getHookedEntity() == mc.player)
+            {
+                event.cancel();
+            }
+        }
     }
 
     @EventListener
@@ -120,6 +148,33 @@ public class VelocityModule extends Toggleable
             double g = knockback.z * (horizontalConfig.getValue() / 100.0f);
             event.cancel();
             event.setPlayerVelocity(new Vec3d(e, f, g));
+        }
+    }
+
+    @EventListener
+    public void onPushOutOfBlocks(PushOutOfBlocksEvent event)
+    {
+        if (noPushBlocksConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onPushEntity(PushEvent.Entity event)
+    {
+        if (noPushEntitiesConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onPushLiquid(PushEvent.Liquid event)
+    {
+        if (noPushLiquidsConfig.getValue())
+        {
+            event.cancel();
         }
     }
 

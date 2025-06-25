@@ -5,7 +5,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
-import net.shoreline.client.api.config.NumberFormat;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.api.rotation.ClientRotationEvent;
@@ -15,8 +14,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class AuraModule extends Toggleable
 {
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
-            .setDefaultValue(4.0f).setMin(0.5f).setMax(6.0f)
-            .setFormat(NumberFormat.METERS)
+            .setDefaultValue(4.0f).setMin(0.5f).setMax(6.0f).setFormat("m")
             .setDescription("The range to attack entities").build();
     Config<Boolean> rotateConfig = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates to the entity before attacking")

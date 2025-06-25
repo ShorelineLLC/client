@@ -61,4 +61,14 @@ public abstract class Config<T> implements Identifiable, Serializable
     {
         return visible != null ? visible.get() : true;
     }
+
+    public boolean isGroup()
+    {
+        return false;
+    }
+
+    public boolean isGrouped()
+    {
+        return configGroup != null;
+    }
 }

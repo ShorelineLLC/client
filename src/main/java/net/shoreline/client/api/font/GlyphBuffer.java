@@ -93,43 +93,6 @@ public class GlyphBuffer {
         offsetY -= height / 2;
     }
 
-    public void drawDebuggingInformation(DrawContext dc, float x, float y) {
-        if (glyphs.isEmpty()) return;
-
-        Matrix3x2fStack stack = dc.getMatrices();
-
-        stack.pushMatrix();
-        stack.translate(x, y);
-
-        dc.drawBorder((int) (minX + offsetX), (int) (minY + offsetY), (int) Math.ceil(maxX - minX), (int) Math.ceil(maxY - minY), 0xFFFF0000);
-
-        float sf = (float) MinecraftClient.getInstance().getWindow().getScaleFactor();
-        stack.scale(1f / sf, 1f / sf);
-
-
-        for (Glyph glyph : glyphs) {
-            float glyphBaselineX = (glyph.x + offsetX) * sf;
-            float glyphBaselineY = (glyph.y + offsetY) * sf;
-
-            GlyphPage.Glyph theGlyph = glyph.font.getGlyph(glyph.glyphId);
-
-            // draw glyph
-            int bmpl = theGlyph.drawOffsetX();
-            int bmpt = theGlyph.drawOffsetY();
-            int wid = theGlyph.bitmapWidth();
-            int hei = theGlyph.bitmapHeight();
-            float topLeftX = glyphBaselineX + bmpl;
-            float topLeftY = glyphBaselineY - bmpt;
-
-            dc.drawBorder((int) topLeftX, (int) topLeftY, wid, hei, 0xFF00FF00);
-
-            dc.drawHorizontalLine((int) glyphBaselineX, (int) (glyphBaselineX + wid), ((int) glyphBaselineY), 0xFF0000FF);
-        }
-
-
-        stack.popMatrix();
-    }
-
     /**
      * Draw this GlyphBuffer to a given DrawContext
      *
@@ -144,14 +107,12 @@ public class GlyphBuffer {
 
         stack.pushMatrix();
         stack.translate(x, y);
+        float sf = (float) MinecraftClient.getInstance().getWindow().getScaleFactor();
+        stack.scale(1f / sf, 1f / sf);
         //		int offsetX = -minX;
         //		int offsetY = -minY;
 
-        float sf = (float) MinecraftClient.getInstance().getWindow().getScaleFactor();
-        stack.scale(1f / sf, 1f / sf);
-
         Matrix3x2f posmat = new Matrix3x2f(stack);
-
 
         Map<GlyphPage, List<Glyph>> pageToGlyphs = glyphs.stream().collect(Collectors.groupingBy(it -> it.font.getPage(it.glyphId)));
 

@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.client;
 
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
@@ -19,6 +20,9 @@ public class ClickGuiModule extends Toggleable
     Config<Boolean> darkenConfig = new BooleanConfig.Builder("Darken")
             .setDescription("Darkens the screen background")
             .setDefaultValue(true).build();
+    Config<Integer> scrollSpeedConfig = new NumberConfig.Builder<Integer>("ScrollSpeed")
+            .setMin(5).setMax(100).setDefaultValue(30).setFormat("dpi")
+            .setDescription("The speed for mouse scrolling").build();
 
     private final Animation openCloseAnim;
     private final Animation fadeInAnimation;
@@ -80,5 +84,10 @@ public class ClickGuiModule extends Toggleable
     public boolean shouldDarken()
     {
         return darkenConfig.getValue();
+    }
+
+    public int getScrollSpeed()
+    {
+        return scrollSpeedConfig.getValue();
     }
 }

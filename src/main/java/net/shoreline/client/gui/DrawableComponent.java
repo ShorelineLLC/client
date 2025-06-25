@@ -2,21 +2,34 @@ package net.shoreline.client.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.impl.module.client.FontModule;
+import net.shoreline.client.mixin.accessor.AccessorDrawContext;
+import org.joml.Matrix3x2fStack;
 
 public abstract class DrawableComponent
 {
     protected final MinecraftClient mc = MinecraftClient.getInstance();
 
-    private final GlyphBuffer buffer = new GlyphBuffer();
+    protected final GlyphBuffer textBuffer = new GlyphBuffer();;
 
     public abstract void drawComponent(DrawContext context,
                                        float mouseX,
                                        float mouseY,
                                        float delta);
+
+    protected ScreenRect createBounds(DrawContext c, float x, float y, float w, float h)
+    {
+        Matrix3x2fStack mat = c.getMatrices();
+        DrawContext.ScissorStack ss = ((AccessorDrawContext) c).getScissorStack();
+        ScreenRect scissor = ss.peekLast();
+        ScreenRect screenRect = new ScreenRect((int) Math.floor(x), (int) Math.floor(y), (int) Math.ceil(w), (int) Math.ceil(h)).transformEachVertex(mat);
+        return scissor != null ? scissor.intersection(screenRect) : screenRect;
+    }
 
     protected void drawRect(DrawContext context,
                             int x,
@@ -26,6 +39,16 @@ public abstract class DrawableComponent
                             int color)
     {
         context.fill(x, y, x + width, y + height, color);
+    }
+
+    protected void drawTexturedRect(DrawContext context,
+                                    Identifier sprite,
+                                    int x,
+                                    int y,
+                                    int width,
+                                    int height)
+    {
+        context.drawTexturedQuad(sprite, x, y, x + width, y + height, 0, 1, 0, 1);
     }
 
     protected void drawOutline(DrawContext context,
@@ -44,9 +67,12 @@ public abstract class DrawableComponent
     }
 
     protected void drawText(DrawContext context,
+                            GlyphBuffer glyphBuffer,
                             Text text,
                             int x,
-                            int y)
+                            int y,
+                            float offX,
+                            float offY)
     {
         if (text.getString().isEmpty())
         {
@@ -55,17 +81,36 @@ public abstract class DrawableComponent
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            buffer.clear();
-            buffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
-            buffer.offsetToTopLeft();
-            buffer.draw(context, x, y);
+            glyphBuffer.clear();
+            glyphBuffer.addText(FontManager.FONT, text, offX, offY);
+            glyphBuffer.offsetToTopLeft();
+            glyphBuffer.draw(context, x + offX, y + offY);
             return;
         }
 
         context.drawText(mc.textRenderer, text, x, y, -1, true);
     }
 
-    protected int getTextWidth(Text text)
+    protected void drawText(DrawContext context,
+                            GlyphBuffer glyphBuffer,
+                            Text text,
+                            int x,
+                            int y)
+    {
+        drawText(context, glyphBuffer, text, x, y, 0.0f, 0.0f);
+    }
+
+    protected void enableScissor(DrawContext context, int x1, int y1, int x2, int y2)
+    {
+        context.enableScissor(x1, y1, x2, y2);
+    }
+
+    protected void disableScissor(DrawContext context)
+    {
+        context.disableScissor();
+    }
+
+    protected int getTextWidth(GlyphBuffer glyphBuffer, Text text)
     {
         if (text.getString().isEmpty())
         {
@@ -74,10 +119,10 @@ public abstract class DrawableComponent
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            buffer.clear();
-            buffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
-            buffer.recalculateBounds();
-            return Math.round(buffer.maxX - buffer.minX);
+            glyphBuffer.clear();
+            glyphBuffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
+            glyphBuffer.recalculateBounds();
+            return Math.round(glyphBuffer.maxX - glyphBuffer.minX);
         }
 
         return mc.textRenderer.getWidth(text);

@@ -54,7 +54,7 @@ public abstract class ConfigContainer extends GenericFeature implements Serializ
         final JsonArray array = new JsonArray();
         for (Config<?> config : getConfigs())
         {
-            if (config.getName().equalsIgnoreCase("Keybind"))
+            if (config instanceof ConfigGroup || config.getName().equalsIgnoreCase("Keybind"))
             {
                 continue;
             }

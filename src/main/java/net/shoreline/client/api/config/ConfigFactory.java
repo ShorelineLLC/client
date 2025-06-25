@@ -15,6 +15,11 @@ public class ConfigFactory<T>
 
     public Config<T> create(final String name, final String description)
     {
+        if (defaultValue == null)
+        {
+            return (Config<T>) new ConfigGroup(name, description);
+        }
+
         if (defaultValue instanceof Boolean)
         {
             return (Config<T>) new BooleanConfig(name, description);

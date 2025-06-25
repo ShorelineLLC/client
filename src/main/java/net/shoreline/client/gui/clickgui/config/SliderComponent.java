@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
@@ -8,6 +9,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.*;
+import net.shoreline.client.impl.render.ColorUtil;
 import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
@@ -28,7 +30,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         textComponent = new TextComponent(frame, x, y, frameWidth, frameHeight,
                 GLFW.GLFW_MOUSE_BUTTON_RIGHT,
-                c -> c >= '0' && c <= '9', // Filter numbers only
+                c -> (c >= '0' && c <= '9') || c == '.', // Filter numbers only
                 () -> String.valueOf(config.getValue()),
                 value ->
                 {
@@ -36,13 +38,13 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                     {
                         if (config.getValue() instanceof Integer)
                         {
-                            ((Config<Integer>) config).setValue(Integer.parseInt(value));
+                            ((NumberConfig) config).setValue(Integer.parseInt(value));
                         } else if (config.getValue() instanceof Float)
                         {
-                            ((Config<Float>) config).setValue(Float.parseFloat(value));
+                            ((NumberConfig) config).setValue(Float.parseFloat(value));
                         } else if (config.getValue() instanceof Double)
                         {
-                            ((Config<Double>) config).setValue(Double.parseDouble(value));
+                            ((NumberConfig) config).setValue(Double.parseDouble(value));
                         }
                     } catch (NumberFormatException ignored)
                     {
@@ -59,6 +61,8 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                               float mouseY,
                               float delta)
     {
+        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+
         textComponent.setYOffset(getYOffset());
         textComponent.setX(getTx());
         textComponent.setY(getTy());
@@ -81,15 +85,23 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
 
         float fill = (getConfig().getValue().floatValue() - min.floatValue())
                 / (max.floatValue() - min.floatValue());
-        drawRect(context, getTx(), getTy(), (int) (fill * width), height, theme.getComponentColor());
+        int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
+        int color1 = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());
+        int sliderWidth = (int) (fill * width);
+        drawRect(context, getTx(), getTy(), sliderWidth, height, color);
+        drawRect(context, getTx() + sliderWidth, getTy(), width - sliderWidth, height, color1);
 
-        String numberText = getConfig().getValue() instanceof Integer || numberConfig.getRoundingPlaces() == 0
-                ? String.valueOf(getConfig().getValue().intValue()) : String.valueOf(getConfig().getValue());
-        Text formattedText = Text.empty()
+        boolean isInt = getConfig().getValue() instanceof Integer || numberConfig.getRoundingPlaces() == 0;
+        String numberText = isInt ? String.valueOf(getConfig().getValue().intValue()) : String.valueOf(getConfig().getValue());
+        MutableText formattedText = Text.empty()
                 .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
-                .append(Text.literal(" " + numberText + numberConfig.getFormat().getUnits()).formatted(Formatting.GRAY));
+                .append(" " + numberText).formatted(Formatting.GRAY);
+        if (numberConfig.getFormat() != null)
+        {
+            formattedText.append(Text.literal(numberConfig.getFormat()).formatted(Formatting.GRAY));
+        }
 
-        drawText(context, formattedText, getTx() + 3, getTy() + 4);
+        drawText(context, textBuffer, formattedText, getTx() + 3, getTy() + 4);
     }
 
     @Override
@@ -111,15 +123,6 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
     public void mouseReleased(double mouseX,
                               double mouseY,
                               int button)
-    {
-
-    }
-
-    @Override
-    public void mouseScrolled(double mouseX,
-                              double mouseY,
-                              double horizontalAmount,
-                              double verticalAmount)
     {
 
     }

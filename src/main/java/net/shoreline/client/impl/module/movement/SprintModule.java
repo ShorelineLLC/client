@@ -66,7 +66,7 @@ public class SprintModule extends MovementModule
     @EventListener
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (!rotateConfig.getValue())
+        if (!rotateConfig.getValue() || !isInputtingMovement())
         {
             return;
         }

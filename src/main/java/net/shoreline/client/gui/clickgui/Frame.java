@@ -67,11 +67,11 @@ public class Frame extends DrawableComponent implements Interactable
         drawOutline(context, x + 1, y + 1, width - 2, titleHeight + (int) (frameHeight * collapseAnim.getFactor()) - 2, 1, theme.getOutlineColor());
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
-        drawText(context, Text.literal(title).withColor(theme.getTextColor()), x + 3, y + 5);
+        drawText(context, textBuffer, Text.literal(title).withColor(theme.getTextColor()), x + 3, y + 5);
 
         if (collapseAnim.getFactor() > 0.0)
         {
-            context.enableScissor(x, y + titleHeight, x + width, y + titleHeight + (int) (frameHeight * collapseAnim.getFactor()));
+            enableScissor(context, x, y + titleHeight, x + width, y + titleHeight + (int) (frameHeight * collapseAnim.getFactor()));
             drawRect(context, x, y + titleHeight, width, frameHeight, theme.getBackgroundColor());
 
             int yOffset = 0;
@@ -84,13 +84,13 @@ public class Frame extends DrawableComponent implements Interactable
                     int height = 0;
                     if (component instanceof ModuleComponent c1)
                     {
-                        height += c1.getComponentHeight();
+                        height += c1.getScaledHeight();
                     }
                     yOffset += (int) (height * component1.getCollapseAnim().getFactor());
                 }
             }
 
-            context.disableScissor();
+            disableScissor(context);
         }
 
         px = mouse.getMouseX();
@@ -133,21 +133,6 @@ public class Frame extends DrawableComponent implements Interactable
     }
 
     @Override
-    public void mouseScrolled(double mouseX,
-                              double mouseY,
-                              double horizontalAmount,
-                              double verticalAmount)
-    {
-        if (collapseAnim.getFactor() > 0.0)
-        {
-            for (FrameComponent component : components)
-            {
-                component.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-            }
-        }
-    }
-
-    @Override
     public void keyPressed(int keyCode,
                            int scanCode,
                            int modifiers)
@@ -182,7 +167,7 @@ public class Frame extends DrawableComponent implements Interactable
             int height = component.getHeight() + 1;
             if (component instanceof ModuleComponent c1)
             {
-                height += c1.getComponentHeight();
+                height += c1.getScaledHeight();
             }
             frameHeight += height;
         }
