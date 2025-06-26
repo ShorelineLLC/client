@@ -5,6 +5,7 @@ import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.impl.imixin.IMixinClientPlayNetworkHandler;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 
 import java.util.*;
@@ -24,6 +25,15 @@ public class NetworkManager extends GenericFeature
         if (mc.world != null && mc.getNetworkHandler() != null)
         {
             mc.getNetworkHandler().sendPacket(packet);
+            sentFromClient.add(packet);
+        }
+    }
+
+    public void sendQuietPacket(Packet<?> packet)
+    {
+        if (mc.world != null && mc.getNetworkHandler() != null)
+        {
+            ((IMixinClientPlayNetworkHandler) mc.getNetworkHandler()).sendQuietPacket(packet);
             sentFromClient.add(packet);
         }
     }

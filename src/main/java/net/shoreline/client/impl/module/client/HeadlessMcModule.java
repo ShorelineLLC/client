@@ -2,10 +2,10 @@ package net.shoreline.client.impl.module.client;
 
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.StringConfig;
-import net.shoreline.client.api.module.Concurrent;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
 
-public class HeadlessMcModule extends Concurrent
+public class HeadlessMcModule extends Toggleable
 {
     Config<String> ipConfig = new StringConfig.Builder("IP")
             .setDefaultValue("127.0.0.1").build();

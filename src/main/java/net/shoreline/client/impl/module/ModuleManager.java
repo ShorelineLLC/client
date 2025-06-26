@@ -5,14 +5,14 @@ import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.AuraModule;
 import net.shoreline.client.impl.module.combat.AutoBowReleaseModule;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
+import net.shoreline.client.impl.module.exploit.PhaseModule;
 import net.shoreline.client.impl.module.misc.AntiAimModule;
 import net.shoreline.client.impl.module.misc.FakePlayerModule;
-import net.shoreline.client.impl.module.movement.NoSlowModule;
-import net.shoreline.client.impl.module.movement.SpeedModule;
-import net.shoreline.client.impl.module.movement.SprintModule;
-import net.shoreline.client.impl.module.movement.VelocityModule;
+import net.shoreline.client.impl.module.movement.*;
 import net.shoreline.client.impl.module.render.FullbrightModule;
 import net.shoreline.client.impl.module.render.NoBobModule;
+import net.shoreline.client.impl.module.render.NoRenderModule;
+import net.shoreline.client.impl.module.world.AutoToolModule;
 import net.shoreline.client.impl.module.world.FastPlaceModule;
 import net.shoreline.client.impl.module.world.NoRotateModule;
 import net.shoreline.client.impl.module.render.NoWeatherModule;
@@ -29,6 +29,7 @@ public class ModuleManager
     public ModuleManager()
     {
         registerModules(
+                new AnticheatModule(),
                 new ClickGuiModule(),
                 new ColorsModule(),
                 new FontModule(),
@@ -40,10 +41,14 @@ public class ModuleManager
                 new AutoBowReleaseModule(),
                 // Exploit
                 new AntiHungerModule(),
+                new PhaseModule(),
                 // Misc
                 new AntiAimModule(),
                 new FakePlayerModule(),
                 // Movement
+                new FastFallModule(),
+                new FlightModule(),
+                new NoJumpDelayModule(),
                 new NoSlowModule(),
                 new SpeedModule(),
                 new SprintModule(),
@@ -51,8 +56,10 @@ public class ModuleManager
                 // Render
                 new FullbrightModule(),
                 new NoBobModule(),
+                new NoRenderModule(),
                 new NoWeatherModule(),
                 // World
+                new AutoToolModule(),
                 new FastPlaceModule(),
                 new NoRotateModule(),
                 new TimerModule()

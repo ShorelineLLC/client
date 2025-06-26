@@ -40,7 +40,7 @@ public class GroupComponent extends ConfigComponent<Void>
         {
             final ComponentFactory factory = frame.getComponentFactory();
             ConfigComponent<?> component = factory.createConfigComponent(
-                    config1, moduleComponent, frame, 4, getTy(), frameWidth - 2, frameHeight);
+                    config1, moduleComponent, frame, 4, 0, frameWidth - 2, frameHeight);
 
             components.add(component);
             frame.getAllComponents().add(component);
@@ -67,24 +67,19 @@ public class GroupComponent extends ConfigComponent<Void>
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 
-        int configY = 2;
+        int configY = height + 3;
         for (ConfigComponent<?> component : components)
         {
             if (component.getConfig().isVisible())
             {
+                component.setY(getYOffset());
                 component.drawComponent(context, mouseX, mouseY, delta);
-                component.setYOffset(configY - getComponentHeight());
+                component.setYOffset(configY);
                 configY += component.getHeight() + 1;
             }
         }
 
         disableScissor(context);
-    }
-
-    @Override
-    public int getTy()
-    {
-        return super.getTy();
     }
 
     @Override

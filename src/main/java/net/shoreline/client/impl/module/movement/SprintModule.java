@@ -7,7 +7,7 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.player.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
@@ -66,7 +66,7 @@ public class SprintModule extends MovementModule
     @EventListener
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (!rotateConfig.getValue() || !isInputtingMovement())
+        if (modeConfig.getValue() != SprintMode.RAGE || !rotateConfig.getValue() || !isInputtingMovement())
         {
             return;
         }

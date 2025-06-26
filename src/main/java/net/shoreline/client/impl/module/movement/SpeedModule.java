@@ -4,31 +4,61 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerMoveEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
+import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.MathUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class SpeedModule extends MovementModule
 {
+    public static SpeedModule INSTANCE;
+
     Config<SpeedMode> modeConfig = new EnumConfig.Builder<SpeedMode>("Mode")
             .setValues(SpeedMode.values())
             .setDescription("The mode for accelerating the player")
             .setDefaultValue(SpeedMode.VANILLA).build();
+    Config<Float> speedConfig = new NumberConfig.Builder<Float>("Speed")
+            .setMin(0.1f).setMax(5.0f).setDefaultValue(0.5f)
+            .setVisible(() -> modeConfig.getValue() == SpeedMode.VANILLA)
+            .setDescription("Movement speed").build();
+    Config<Boolean> useTimerConfig = new BooleanConfig.Builder("UseTimer")
+            .setDescription("Uses timer to move faster")
+            .setVisible(() -> modeConfig.getValue() == SpeedMode.STRAFE || modeConfig.getValue() == SpeedMode.STRAFE_STRICT)
+            .setDefaultValue(false).build();
+    Config<Boolean> fastConfig = new BooleanConfig.Builder("Fast")
+            .setDescription("Falls to the ground faster")
+            .setVisible(() -> modeConfig.getValue() == SpeedMode.STRAFE_STRICT)
+            .setDefaultValue(false).build();
+    Config<Boolean> inWaterConfig = new BooleanConfig.Builder("InWater")
+            .setDescription("Applies speed when in water/lava")
+            .setDefaultValue(false).build();
 
     private int strafe = 4;
     private double speed;
     private double distance;
     private boolean accel;
 
+    private int strictTicks;
+
     private static final float AIR_FRICTION = 159.077f;
 
     public SpeedModule()
     {
         super("Speed", new String[] {"Strafe"}, "Move faster", GuiCategory.MOVEMENT);
+        INSTANCE = this;
+    }
+
+    @Override
+    public String getModuleData()
+    {
+        return Formatter.formatEnum(modeConfig.getValue());
     }
 
     @Override
@@ -38,7 +68,7 @@ public class SpeedModule extends MovementModule
     }
 
     @EventListener
-    public void onTick(TickEvent.Pre event)
+    public void onTick(TickEvent.Post event)
     {
         if (!checkNull())
         {
@@ -56,7 +86,7 @@ public class SpeedModule extends MovementModule
             return;
         }
 
-        if (!canStrafe())
+        if (!canApplySpeed())
         {
             resetStrafe();
             return;
@@ -85,6 +115,7 @@ public class SpeedModule extends MovementModule
         {
             jumpEffect += (mc.player.getStatusEffect(StatusEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1f;
         }
+
         switch (modeConfig.getValue())
         {
             case STRAFE ->
@@ -102,6 +133,7 @@ public class SpeedModule extends MovementModule
 
                     float jump = 0.3999999463558197f + jumpEffect;
                     moveY = jump;
+                    setMotionY(moveY);
                     speed *= accel ? 1.6835 : 1.395;
                 }
                 else if (strafe == 3)
@@ -126,6 +158,66 @@ public class SpeedModule extends MovementModule
                 event.setMovement(new Vec3d(moveX, moveY, moveZ));
                 strafe++;
             }
+            case STRAFE_STRICT ->
+            {
+                if (fastConfig.getValue() && MathUtil.round(mc.player.getY() - (int) mc.player.getY(), 3) == MathUtil.round(0.138, 3))
+                {
+                    addMotionY(-0.08);
+                    moveY = moveY - 0.09316090325960147;
+                    mc.player.setPosition(mc.player.getX(), mc.player.getY() - 0.09316090325960147, mc.player.getZ());
+                }
+
+                if (strafe == 1)
+                {
+                    speed = fastConfig.getValue() ? 1.38f : 1.35f * base - 0.01f;
+                }
+                else if (strafe == 2)
+                {
+                    if (mc.player.input.playerInput.jump() || !mc.player.isOnGround())
+                    {
+                        return;
+                    }
+                    float jump = 0.3999999463558197f + jumpEffect;
+                    moveY = jump;
+                    setMotionY(jump);
+                    speed *= 2.149;
+                }
+                else if (strafe == 3)
+                {
+                    double moveSpeed = 0.66 * (distance - base);
+                    speed = distance - moveSpeed;
+                }
+                else
+                {
+                    if ((!mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(0,
+                            mc.player.getVelocity().getY(), 0)) || mc.player.verticalCollision) && strafe > 0)
+                    {
+                        strafe = isInputtingMovement() ? 1 : 0;
+                    }
+                    speed = distance - distance / AIR_FRICTION;
+                }
+                strictTicks++;
+                speed = Math.max(speed, base);
+                double baseMax = 0.465 * speedEffect / slowEffect;
+                double baseMin = 0.44 * speedEffect / slowEffect;
+                speed = Math.min(speed, strictTicks > 25 ? baseMax : baseMin);
+                if (strictTicks > 50)
+                {
+                    strictTicks = 0;
+                }
+                final Vec2f motion = strafe((float) speed);
+                moveX = motion.x;
+                moveZ = motion.y;
+                event.setMovement(new Vec3d(moveX, moveY, moveZ));
+                strafe++;
+            }
+            case VANILLA ->
+            {
+                Vec2f motion = strafe(speedConfig.getValue());
+                moveX = motion.x;
+                moveZ = motion.y;
+                event.setMovement(new Vec3d(moveX, moveY, moveZ));
+            }
         }
     }
 
@@ -135,16 +227,18 @@ public class SpeedModule extends MovementModule
         speed = 0.0f;
         distance = 0.0;
         accel = false;
+        strictTicks = 0;
     }
 
-    private boolean canStrafe()
+    private boolean canApplySpeed()
     {
         return isInputtingMovement()
-                || !mc.player.getAbilities().flying
-                || !mc.player.isRiding()
-                || !mc.player.isGliding()
-                || !mc.player.isHoldingOntoLadder()
-                || mc.player.fallDistance <= 2.0f;
+                && !mc.player.getAbilities().flying
+                && !mc.player.isRiding()
+                && !mc.player.isGliding()
+                && !mc.player.isHoldingOntoLadder()
+                && mc.player.fallDistance <= 2.0f
+                && ((!mc.player.isInLava() && !mc.player.isTouchingWater()) || inWaterConfig.getValue());
     }
 
     public enum SpeedMode

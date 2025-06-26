@@ -1,4 +1,4 @@
-package net.shoreline.client.api.rotation;
+package net.shoreline.client.impl.player.rotation;
 
 import lombok.Getter;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -33,8 +33,8 @@ public class ServerRotationHandler extends GenericFeature
             return;
         }
 
-        Rotation rotation = Managers.ROTATION.getClientRotation();
-        rotation.apply(mc.player);
+        // Rotation rotation = Managers.ROTATION.getClientRotation();
+        // rotation.apply(mc.player);
         Managers.ROTATION.clearClientRotation();
     }
 

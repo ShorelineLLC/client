@@ -20,6 +20,36 @@ public class MovementModule extends Toggleable
         super(name, nameAliases, description, category);
     }
 
+    protected double getMotionX()
+    {
+        return mc.player.getVelocity().x;
+    }
+
+    protected double getMotionY()
+    {
+        return mc.player.getVelocity().y;
+    }
+
+    protected double getMotionZ()
+    {
+        return mc.player.getVelocity().z;
+    }
+
+    protected void setMotionY(double y)
+    {
+        mc.player.setVelocity(getMotionX(), y, getMotionZ());
+    }
+
+    protected void addMotionY(double y)
+    {
+        mc.player.setVelocity(mc.player.getVelocity().add(0.0, y, 0.0));
+    }
+
+    protected void setMotionXZ(double x, double z)
+    {
+        mc.player.setVelocity(x, getMotionY(), z);
+    }
+
     protected Vec2f strafe(float speed)
     {
         float forward = mc.player.input.getMovementInput().y;
@@ -31,29 +61,29 @@ public class MovementModule extends Toggleable
         }
         else if (forward != 0.0f)
         {
-            if (strafe >= 1.0f)
+            if (strafe > 0.0)
             {
-                yaw += forward > 0.0f ? -45 : 45;
-                strafe = 0.0f;
+                yaw += forward > 0.0 ? -45 : 45;
             }
-            else if (strafe <= -1.0f)
+            else if (strafe < 0.0)
             {
-                yaw += forward > 0.0f ? 45 : -45;
-                strafe = 0.0f;
+                yaw += forward > 0.0 ? 45 : -45;
             }
-            if (forward > 0.0f)
+
+            strafe = 0.0f;
+            if (forward > 0.0)
             {
                 forward = 1.0f;
             }
-            else if (forward < 0.0f)
+            else if (forward < 0.0)
             {
                 forward = -1.0f;
             }
         }
-        float rx = (float) Math.cos(Math.toRadians(yaw));
-        float rz = (float) -Math.sin(Math.toRadians(yaw));
-        return new Vec2f((forward * speed * rz) + (strafe * speed * rx),
-                (forward * speed * rx) - (strafe * speed * rz));
+        float cos = (float) Math.cos(Math.toRadians(yaw));
+        float sin = (float) -Math.sin(Math.toRadians(yaw));
+        return new Vec2f((forward * speed * sin) + (strafe * speed * cos),
+                (forward * speed * cos) - (strafe * speed * sin));
     }
 
     protected float getYawFromInput()

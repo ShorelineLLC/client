@@ -2,19 +2,27 @@ package net.shoreline.client.mixin.network;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.ClientConnection;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
+import net.shoreline.client.impl.imixin.IMixinClientPlayNetworkHandler;
+import net.shoreline.client.mixin.accessor.AccessorClientConnection;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public class MixinClientPlayNetworkHandler
+public abstract class MixinClientPlayNetworkHandler implements IMixinClientPlayNetworkHandler
 {
+    @Shadow
+    public abstract ClientConnection getConnection();
+
     @Inject(method = "onPlayerPositionLook", at = @At(value = "HEAD"))
     private void hookPlayerPositionLookPre(PlayerPositionLookS2CPacket packet, CallbackInfo ci)
     {
@@ -58,5 +66,11 @@ public class MixinClientPlayNetworkHandler
             ci.cancel();
             MinecraftClient.getInstance().player.addVelocityInternal(event.getPlayerVelocity());
         }
+    }
+
+    @Override
+    public void sendQuietPacket(Packet<?> packet)
+    {
+        ((AccessorClientConnection) getConnection()).hookSendInternal(packet, null, true);
     }
 }

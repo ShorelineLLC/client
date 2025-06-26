@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.movement;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
-import net.minecraft.client.input.Input;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
@@ -12,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
@@ -19,8 +19,8 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.network.InputMovementEvent;
-import net.shoreline.client.mixin.accessor.AccessorInput;
+import net.shoreline.client.impl.event.network.MovementFactorEvent;
+import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -71,7 +71,11 @@ public class NoSlowModule extends Toggleable
                 binding.setPressed(InputUtil.isKeyPressed(handle, ((AccessorKeyBinding) binding).getBoundKey().getCode()));
             }
         }
+    }
 
+    @EventListener
+    public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
+    {
         if (modeConfig.getValue() == Mode.GRIM_V2 && shouldCancelSlowedDown())
         {
             if (mc.player.getActiveHand() == Hand.OFF_HAND && !canUseItem(mc.player.getMainHandStack()))
@@ -85,19 +89,21 @@ public class NoSlowModule extends Toggleable
     }
 
     @EventListener
-    public void onInputMovement(InputMovementEvent event)
+    public void onItemSlowdown(MovementFactorEvent.Item event)
     {
-        Input playerInput = event.getInput();
-        float f = 1.0f / (float) mc.player.getAttributeValue(EntityAttributes.SNEAKING_SPEED);
+        if (shouldCancelSlowedDown())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onSlowdown(MovementFactorEvent.Slowdown event)
+    {
         if (sneakingConfig.getValue() && mc.player.isSneaking()
                 || crawlingConfig.getValue() && mc.player.isCrawling())
         {
-            ((AccessorInput) event.getInput()).setMovementVector(playerInput.getMovementInput().multiply(f));
-        }
-
-        if (shouldCancelSlowedDown())
-        {
-            ((AccessorInput) event.getInput()).setMovementVector(playerInput.getMovementInput().multiply(5.0f));
+            event.cancel();
         }
     }
 

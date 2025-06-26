@@ -48,7 +48,7 @@ public abstract class DrawableComponent
                                     int width,
                                     int height)
     {
-        context.drawTexturedQuad(sprite, x, y, x + width, y + height, 0, 1, 0, 1);
+        context.drawTexturedQuad(sprite, x, y, x + width, y + height, 0.0f, 1.0f, 0.0f, 1.0f);
     }
 
     protected void drawOutline(DrawContext context,

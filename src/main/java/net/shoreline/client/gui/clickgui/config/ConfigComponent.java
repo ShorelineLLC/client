@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.FrameComponent;
@@ -14,6 +15,9 @@ public abstract class ConfigComponent<T> extends FrameComponent
 {
     private final Config<T> config;
     private final ModuleComponent moduleComponent;
+
+    @Setter
+    private int moduleOffset;
 
     public ConfigComponent(Config<T> config,
                            ModuleComponent moduleComponent,

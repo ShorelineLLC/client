@@ -3,9 +3,11 @@ package net.shoreline.client.mixin.entity;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
+import net.shoreline.client.impl.event.entity.JumpDelayEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -13,6 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public class MixinLivingEntity
 {
+    @Shadow
+    private int jumpingCooldown;
+
     @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
     private void hookJumpPre(CallbackInfo ci)
     {
@@ -51,5 +56,19 @@ public class MixinLivingEntity
         }
 
         return original;
+    }
+
+    @Inject(method = "tickMovement", at = @At(value = "HEAD"))
+    private void hookTickMovement(CallbackInfo ci)
+    {
+        if ((Object) this == MinecraftClient.getInstance().player)
+        {
+            JumpDelayEvent jumpDelayEvent = new JumpDelayEvent();
+            EventBus.INSTANCE.dispatch(jumpDelayEvent);
+            if (jumpDelayEvent.isCanceled())
+            {
+                jumpingCooldown = 0;
+            }
+        }
     }
 }

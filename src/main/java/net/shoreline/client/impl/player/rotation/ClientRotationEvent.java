@@ -1,4 +1,4 @@
-package net.shoreline.client.api.rotation;
+package net.shoreline.client.impl.player.rotation;
 
 import lombok.Getter;
 import lombok.Setter;

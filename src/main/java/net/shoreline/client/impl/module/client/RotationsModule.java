@@ -20,6 +20,12 @@ public class RotationsModule extends Concurrent
     Config<Boolean> gcdFixConfig = new BooleanConfig.Builder("MouseSensFix")
             .setDescription("Corrects rotations based on mouse sensitivity")
             .setDefaultValue(true).build();
+    Config<Boolean> tickSyncConfig = new BooleanConfig.Builder("TickSync")
+            .setDescription("Sends rotation packets every tick")
+            .setDefaultValue(false).build();
+    Config<Boolean> lookSyncConfig = new BooleanConfig.Builder("RotateSync")
+            .setDescription("Sends rotation packets when player look changes")
+            .setDefaultValue(false).build();
 
     public RotationsModule()
     {

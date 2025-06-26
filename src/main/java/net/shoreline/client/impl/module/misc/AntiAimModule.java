@@ -5,8 +5,8 @@ import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.api.rotation.ClientRotationEvent;
-import net.shoreline.client.api.rotation.Rotation;
+import net.shoreline.client.impl.player.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.player.rotation.Rotation;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class AntiAimModule extends Toggleable

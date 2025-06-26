@@ -87,6 +87,8 @@ public class ModuleComponent extends FrameComponent
                 {
                     configY += c1.getComponentHeight();
                 }
+
+                component.setModuleOffset(configY);
             }
         }
 
