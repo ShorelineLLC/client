@@ -129,13 +129,13 @@ public class RotationManager extends GenericFeature
     @EventListener(priority = Integer.MIN_VALUE)
     public void onUpdatePre(PlayerUpdateEvent.PrePacket event)
     {
-        handler.onPacketUpdatePre();
+        handler.onPacketUpdatePre(mc.player);
     }
 
     @EventListener(priority = Integer.MAX_VALUE)
     public void onUpdatePost(PlayerUpdateEvent.Post event)
     {
-        handler.onPacketUpdatePost();
+        handler.onPacketUpdatePost(mc.player);
     }
 
     @EventListener

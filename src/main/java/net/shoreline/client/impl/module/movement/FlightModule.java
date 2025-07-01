@@ -18,6 +18,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class FlightModule extends MovementModule
 {
+    public static FlightModule INSTANCE;
+
     Config<FlightMode> modeConfig = new EnumConfig.Builder<FlightMode>("Mode")
             .setValues(FlightMode.values())
             .setDefaultValue(FlightMode.NORMAL).build();
@@ -42,6 +44,7 @@ public class FlightModule extends MovementModule
     public FlightModule()
     {
         super("Flight", "Fly like a bird", GuiCategory.MOVEMENT);
+        INSTANCE = this;
     }
 
     @Override

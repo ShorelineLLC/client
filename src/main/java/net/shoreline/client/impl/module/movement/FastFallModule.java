@@ -8,6 +8,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerMoveEvent;
 import net.shoreline.client.impl.event.network.TickMovementEvent;
@@ -33,7 +34,6 @@ public class FastFallModule extends MovementModule
             .setDescription("The number of ticks to shift").build();
 
     private boolean prevOnGround;
-    //
     private boolean cancelFallMovement;
     private int fallTicks;
     private final Timer fallTimer = new NanoTimer();
@@ -56,7 +56,9 @@ public class FastFallModule extends MovementModule
         prevOnGround = mc.player.isOnGround();
         if (modeConfig.getValue() == FallMode.STEP)
         {
-            if (!canFastFall() || SpeedModule.INSTANCE.isEnabled())
+            if (!canFastFall() || SpeedModule.INSTANCE.isEnabled()
+                    || FlightModule.INSTANCE.isEnabled()
+                    || !Managers.ANTICHEAT.hasPassedSinceSetback(1000))
             {
                 return;
             }
@@ -83,7 +85,10 @@ public class FastFallModule extends MovementModule
     {
         if (modeConfig.getValue() == FallMode.SHIFT)
         {
-            if (!canFastFall() || !fallTimer.hasPassed(1000) || SpeedModule.INSTANCE.isEnabled())
+            if (!canFastFall() || !fallTimer.hasPassed(1000)
+                    || SpeedModule.INSTANCE.isEnabled()
+                    || FlightModule.INSTANCE.isEnabled()
+                    || !Managers.ANTICHEAT.hasPassedSinceSetback(1000))
             {
                 return;
             }

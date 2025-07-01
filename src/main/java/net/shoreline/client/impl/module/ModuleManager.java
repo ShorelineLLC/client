@@ -2,21 +2,16 @@ package net.shoreline.client.impl.module;
 
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.*;
-import net.shoreline.client.impl.module.combat.AuraModule;
-import net.shoreline.client.impl.module.combat.AutoBowReleaseModule;
+import net.shoreline.client.impl.module.combat.*;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
+import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PhaseModule;
 import net.shoreline.client.impl.module.misc.AntiAimModule;
+import net.shoreline.client.impl.module.misc.ChestSwapModule;
 import net.shoreline.client.impl.module.misc.FakePlayerModule;
 import net.shoreline.client.impl.module.movement.*;
-import net.shoreline.client.impl.module.render.FullbrightModule;
-import net.shoreline.client.impl.module.render.NoBobModule;
-import net.shoreline.client.impl.module.render.NoRenderModule;
-import net.shoreline.client.impl.module.world.AutoToolModule;
-import net.shoreline.client.impl.module.world.FastPlaceModule;
-import net.shoreline.client.impl.module.world.NoRotateModule;
-import net.shoreline.client.impl.module.render.NoWeatherModule;
-import net.shoreline.client.impl.module.world.TimerModule;
+import net.shoreline.client.impl.module.render.*;
+import net.shoreline.client.impl.module.world.*;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -33,17 +28,29 @@ public class ModuleManager
                 new ClickGuiModule(),
                 new ColorsModule(),
                 new FontModule(),
-                new HeadlessMcModule(),
+                new HeadlessMCModule(),
                 new HudModule(),
                 new RotationsModule(),
                 // Combat
                 new AuraModule(),
                 new AutoBowReleaseModule(),
+                new AutoCrystalModule(),
+                new AutoMineModule(),
+                new AutoTotemModule(),
+                new AutoTrapModule(),
+                new AutoXPModule(),
+                new CriticalsModule(),
+                new OffhandGappleModule(),
+                new ReplenishModule(),
+                new SelfTrapModule(),
+                new SurroundModule(),
                 // Exploit
                 new AntiHungerModule(),
+                new FastLatencyModule(),
                 new PhaseModule(),
                 // Misc
                 new AntiAimModule(),
+                new ChestSwapModule(),
                 new FakePlayerModule(),
                 // Movement
                 new FastFallModule(),
@@ -54,14 +61,19 @@ public class ModuleManager
                 new SprintModule(),
                 new VelocityModule(),
                 // Render
+                new FreecamModule(),
                 new FullbrightModule(),
+                new NametagsModule(),
                 new NoBobModule(),
                 new NoRenderModule(),
                 new NoWeatherModule(),
+                new ViewClipModule(),
                 // World
                 new AutoToolModule(),
                 new FastPlaceModule(),
                 new NoRotateModule(),
+                new ScaffoldModule(),
+                new SpeedMineModule(),
                 new TimerModule()
         );
 

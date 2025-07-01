@@ -5,15 +5,17 @@ import net.shoreline.client.api.config.StringConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 
-public class HeadlessMcModule extends Toggleable
+public class HeadlessMCModule extends Toggleable
 {
     Config<String> ipConfig = new StringConfig.Builder("IP")
             .setDefaultValue("127.0.0.1").build();
     Config<String> portConfig = new StringConfig.Builder("Port")
             .setDefaultValue("25565").build();
 
-    public HeadlessMcModule()
+
+
+    public HeadlessMCModule()
     {
-        super("HeadlessMc", "Allows you to connect to a HeadlessMC instance", GuiCategory.CLIENT);
+        super("HeadlessMC", "Allows you to connect to a HeadlessMC instance", GuiCategory.CLIENT);
     }
 }

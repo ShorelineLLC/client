@@ -76,6 +76,15 @@ public class GroupComponent extends ConfigComponent<Void>
                 component.drawComponent(context, mouseX, mouseY, delta);
                 component.setYOffset(configY);
                 configY += component.getHeight() + 1;
+                if (component instanceof GroupComponent c)
+                {
+                    configY += c.getScaledHeight();
+                } else if (component instanceof ColorPickerComponent c1)
+                {
+                    configY += c1.getComponentHeight();
+                }
+
+                component.setModuleOffset(configY);
             }
         }
 
@@ -164,6 +173,13 @@ public class GroupComponent extends ConfigComponent<Void>
             if (component.getConfig().isVisible())
             {
                 frameHeight += component.getHeight() + 1;
+                if (component instanceof GroupComponent c)
+                {
+                    frameHeight += c.getScaledHeight();
+                } else if (component instanceof ColorPickerComponent c1)
+                {
+                    frameHeight += c1.getComponentHeight();
+                }
             }
         }
         return frameHeight;

@@ -1,20 +1,15 @@
 package net.shoreline.client.impl.player.rotation;
 
 import lombok.Getter;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
 
-public class ServerRotationHandler extends GenericFeature
+public class ServerRotationHandler
 {
     @Getter
     private Rotation cachedRotation;
-
-    public ServerRotationHandler()
-    {
-        super("Rotations-Handler");
-    }
 
     public void onRotationOutbound(PlayerMoveC2SPacket packet)
     {
@@ -38,27 +33,27 @@ public class ServerRotationHandler extends GenericFeature
         Managers.ROTATION.clearClientRotation();
     }
 
-    public void onPacketUpdatePre()
+    public void onPacketUpdatePre(ClientPlayerEntity player)
     {
-        if (mc.player == null || !Managers.ROTATION.hasClientRotation())
+        if (player == null || !Managers.ROTATION.hasClientRotation())
         {
             return;
         }
 
-        cachedRotation = new Rotation(mc.player);
+        cachedRotation = new Rotation(player);
 
         Rotation curr = Managers.ROTATION.getClientRotation();
-        curr.apply(mc.player);
+        curr.apply(player);
     }
 
-    public void onPacketUpdatePost()
+    public void onPacketUpdatePost(ClientPlayerEntity player)
     {
-        if (mc.player == null || cachedRotation == null)
+        if (player == null || cachedRotation == null)
         {
             return;
         }
 
-        cachedRotation.apply(mc.player);
+        cachedRotation.apply(player);
         cachedRotation = null;
     }
 

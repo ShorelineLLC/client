@@ -1,0 +1,55 @@
+package net.shoreline.client.impl.module.combat.helper;
+
+import lombok.experimental.UtilityClass;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.util.world.ExplosionUtil;
+
+@UtilityClass
+public class DamageUtil
+{
+    public float getHealth(LivingEntity entity)
+    {
+        return entity.getHealth() + entity.getAbsorptionAmount();
+    }
+
+    public double potentialDamage(LivingEntity entity, boolean explosions)
+    {
+        double potential = 0.5;
+        potential += getFallDamage(entity, entity.fallDistance, 1.0f);
+        if (explosions)
+        {
+            potential += getCrystalDamage(entity);
+        }
+        return potential;
+    }
+
+    public double getCrystalDamage(LivingEntity entity)
+    {
+        double crystalDmg = 0.0;
+        for (Entity e : MinecraftClient.getInstance().world.getEntities())
+        {
+            if (e instanceof EndCrystalEntity crystal && entity.squaredDistanceTo(e) <= 144.0)
+            {
+                double damage = ExplosionUtil.damageToEntity(entity, crystal.getPos());
+                if (damage > crystalDmg)
+                {
+                    crystalDmg = damage;
+                }
+            }
+        }
+        return crystalDmg;
+    }
+
+    public int getFallDamage(LivingEntity entity, double fallDistance, float damageMultiplier)
+    {
+        final StatusEffectInstance statusEffectInstance = entity.getStatusEffect(StatusEffects.JUMP_BOOST);
+        final float f = statusEffectInstance == null ? 0.0f : (float) (statusEffectInstance.getAmplifier() + 1);
+        return MathHelper.ceil((fallDistance - 3.0f - f) * damageMultiplier);
+    }
+}

@@ -27,6 +27,7 @@
     "network.MixinClientPlayNetworkHandler",
     "render.entity.feature.MixinArmorFeatureRenderer",
     "render.entity.MixinPlayerEntityRenderer",
+    "render.MixinCamera",
     "render.MixinGameRenderer",
     "render.MixinLightmapTextureManager",
     "render.MixinRenderTickCounter",

@@ -13,11 +13,11 @@ import net.shoreline.eventbus.annotation.EventListener;
 @Getter
 public class InventoryManager extends GenericFeature
 {
+    private final SwapData current = new SwapData();
+
     private int serverSlot;
 
     private final Object swapLock = new Object();
-
-    private final SwapData current = new SwapData();
 
     public InventoryManager()
     {

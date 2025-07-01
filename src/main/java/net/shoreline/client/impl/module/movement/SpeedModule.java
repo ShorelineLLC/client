@@ -13,7 +13,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerMoveEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.util.Formatter;
-import net.shoreline.client.util.MathUtil;
+import net.shoreline.client.util.math.MathUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class SpeedModule extends MovementModule

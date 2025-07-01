@@ -1,7 +1,10 @@
 package net.shoreline.client.api.module;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
+@Getter
 public enum GuiCategory
 {
     COMBAT("Combat"),
@@ -12,11 +15,5 @@ public enum GuiCategory
     WORLD("World"),
     CLIENT("Client");
 
-    @Getter
     private final String name;
-
-    GuiCategory(String name)
-    {
-        this.name = name;
-    }
 }

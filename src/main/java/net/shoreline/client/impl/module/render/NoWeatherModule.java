@@ -123,6 +123,7 @@ public class NoWeatherModule extends Toggleable
     }
 
     @RequiredArgsConstructor
+    @Getter
     private enum Time
     {
         SUNRISE(0),
@@ -133,7 +134,6 @@ public class NoWeatherModule extends Toggleable
         EVENING(15000),
         MIDNIGHT(18000);
 
-        @Getter
         private final long time;
     }
 }

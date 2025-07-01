@@ -6,7 +6,6 @@ import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
@@ -15,6 +14,7 @@ import net.shoreline.client.impl.event.entity.PushEvent;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
+import net.shoreline.client.impl.module.helper.PhaseUtil;
 import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -182,7 +182,7 @@ public class VelocityModule extends Toggleable
     {
         if (modeConfig.getValue() == VelocityMode.WALLS)
         {
-            return isInsideWall() && (!groundOnlyConfig.getValue() || mc.player.isOnGround());
+            return PhaseUtil.isInsideBlock(mc.player) && (!groundOnlyConfig.getValue() || mc.player.isOnGround());
         } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
         {
 
@@ -198,7 +198,7 @@ public class VelocityModule extends Toggleable
     {
         if (modeConfig.getValue() == VelocityMode.WALLS)
         {
-            return isInsideWall();
+            return PhaseUtil.isInsideBlock(mc.player);
         } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
         {
 
@@ -208,12 +208,6 @@ public class VelocityModule extends Toggleable
         }
 
         return true;
-    }
-
-    private boolean isInsideWall()
-    {
-        return BlockPos.stream(mc.player.getBoundingBox())
-                .anyMatch(blockPos -> !mc.world.getBlockState(blockPos).isReplaceable());
     }
 
     private enum VelocityMode

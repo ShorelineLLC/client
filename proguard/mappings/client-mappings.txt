@@ -7165,8 +7165,8 @@ net.shoreline.client.impl.module.world.AntiInteractModule -> net.shoreline.clien
     52:60:void onInteractBlock(net.shoreline.client.impl.event.network.InteractBlockEvent) -> a
     65:78:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     83:88:void onInteractBorder(net.shoreline.client.impl.event.network.InteractBorderEvent) -> a
-net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nl:
-    net.shoreline.client.impl.module.world.AutoMineModule INSTANCE -> JC
+net.shoreline.client.impl.module.combat.AutoMineModule -> net.shoreline.client.nl:
+    net.shoreline.client.impl.module.combat.AutoMineModule INSTANCE -> JC
     net.shoreline.client.api.config.Config autoConfig -> uW
     net.shoreline.client.api.config.Config selectionConfig -> JD
     net.shoreline.client.api.config.Config whitelistConfig -> JE
@@ -7194,8 +7194,8 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nl
     net.shoreline.client.api.config.Config fadeTimeConfig -> qP
     net.shoreline.client.api.config.Config smoothColorConfig -> JQ
     net.minecraft.class_1657 playerTarget -> JR
-    net.shoreline.client.impl.module.world.AutoMineModule$MineData packetMine -> JS
-    net.shoreline.client.impl.module.world.AutoMineModule$MineData instantMine -> JT
+    net.shoreline.client.impl.module.combat.AutoMineModule$MineData packetMine -> JS
+    net.shoreline.client.impl.module.combat.AutoMineModule$MineData instantMine -> JT
     boolean packetSwapBack -> JU
     boolean manualOverride -> JV
     net.shoreline.client.util.math.timer.Timer remineTimer -> JW
@@ -7205,29 +7205,29 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nl
     int antiCrawlTicks -> Ka
     java.util.Queue autoMineQueue -> Kb
     int autoMineTickDelay -> Kc
-    net.shoreline.client.impl.module.world.AutoMineModule$MineAnimation packetMineAnim -> Kd
-    net.shoreline.client.impl.module.world.AutoMineModule$MineAnimation instantMineAnim -> Ke
+    net.shoreline.client.impl.module.combat.AutoMineModule$MineAnimation packetMineAnim -> Kd
+    net.shoreline.client.impl.module.combat.AutoMineModule$MineAnimation instantMineAnim -> Ke
     52:103:void <init>() -> <init>
-    107:107:net.shoreline.client.impl.module.world.AutoMineModule getInstance() -> mM
+    107:107:net.shoreline.client.impl.module.combat.AutoMineModule getInstance() -> mM
     113:117:java.lang.String getModuleData() -> aW
     123:143:void onDisable() -> ba
     148:416:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     421:472:void onAttackBlock(net.shoreline.client.impl.event.network.AttackBlockEvent) -> a
     477:481:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
     486:515:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
-    519:558:void startAutoMine(net.shoreline.client.impl.module.world.AutoMineModule$MineData) -> a
-    562:592:net.shoreline.client.impl.module.world.AutoMineModule$MineData getInstantMine(java.util.List,boolean) -> a
+    519:558:void startAutoMine(net.shoreline.client.impl.module.combat.AutoMineModule$MineData) -> a
+    562:592:net.shoreline.client.impl.module.combat.AutoMineModule$MineData getInstantMine(java.util.List,boolean) -> a
     597:622:java.util.List getPhaseBlocks(net.minecraft.class_1657,net.minecraft.class_2338,boolean) -> a
     632:655:java.util.List getMiningBlocks(net.minecraft.class_1657,net.minecraft.class_2338,boolean) -> b
     660:683:net.minecraft.class_2338 getAntiCrawlPos(net.minecraft.class_1657) -> k
-    688:688:boolean checkDataY(net.shoreline.client.impl.module.world.AutoMineModule$MineData,net.minecraft.class_2338,boolean) -> a
+    688:688:boolean checkDataY(net.shoreline.client.impl.module.combat.AutoMineModule$MineData,net.minecraft.class_2338,boolean) -> a
     693:695:boolean intersectsPlayer(net.minecraft.class_2338) -> t
     701:719:void onRenderWorld(net.shoreline.client.impl.event.render.RenderWorldEvent) -> a
-    724:762:void renderMiningData(net.minecraft.class_4587,float,net.shoreline.client.impl.module.world.AutoMineModule$MineAnimation,boolean) -> a
-    766:835:void startMining(net.shoreline.client.impl.module.world.AutoMineModule$MineData) -> b
-    839:841:void abortMining(net.shoreline.client.impl.module.world.AutoMineModule$MineData) -> c
-    845:875:void stopMining(net.shoreline.client.impl.module.world.AutoMineModule$MineData) -> d
-    879:883:void stopMiningInternal(net.shoreline.client.impl.module.world.AutoMineModule$MineData) -> e
+    724:762:void renderMiningData(net.minecraft.class_4587,float,net.shoreline.client.impl.module.combat.AutoMineModule$MineAnimation,boolean) -> a
+    766:835:void startMining(net.shoreline.client.impl.module.combat.AutoMineModule$MineData) -> b
+    839:841:void abortMining(net.shoreline.client.impl.module.combat.AutoMineModule$MineData) -> c
+    845:875:void stopMining(net.shoreline.client.impl.module.combat.AutoMineModule$MineData) -> d
+    879:883:void stopMiningInternal(net.shoreline.client.impl.module.combat.AutoMineModule$MineData) -> e
     887:887:boolean isInstantMineComplete() -> mN
     892:900:net.minecraft.class_2338 getMiningBlock() -> mO
     905:911:void swapTo(int) -> X
@@ -7250,26 +7250,26 @@ net.shoreline.client.impl.module.world.AutoMineModule -> net.shoreline.client.nl
     57:57:java.lang.Boolean lambda$new$2() -> hq
     56:56:java.lang.Boolean lambda$new$1() -> be
     53:53:java.lang.Boolean lambda$new$0() -> hr
-net.shoreline.client.impl.module.world.AutoMineModule$MineAnimation -> net.shoreline.client.nm:
-    net.shoreline.client.impl.module.world.AutoMineModule$MineData data -> Kf
+net.shoreline.client.impl.module.combat.AutoMineModule$MineAnimation -> net.shoreline.client.nm:
+    net.shoreline.client.impl.module.combat.AutoMineModule$MineData data -> Kf
     net.shoreline.client.util.render.animation.Animation animation -> Kg
-    1073:1073:void <init>(net.shoreline.client.impl.module.world.AutoMineModule$MineData,net.shoreline.client.util.render.animation.Animation) -> <init>
+    1073:1073:void <init>(net.shoreline.client.impl.module.combat.AutoMineModule$MineData,net.shoreline.client.util.render.animation.Animation) -> <init>
     1073:1073:java.lang.String toString() -> toString
     1073:1073:int hashCode() -> hashCode
     1073:1073:boolean equals(java.lang.Object) -> equals
-    1073:1073:net.shoreline.client.impl.module.world.AutoMineModule$MineData data() -> mQ
+    1073:1073:net.shoreline.client.impl.module.combat.AutoMineModule$MineData data() -> mQ
     1073:1073:net.shoreline.client.util.render.animation.Animation animation() -> mR
-net.shoreline.client.impl.module.world.AutoMineModule$MineData -> net.shoreline.client.nn:
+net.shoreline.client.impl.module.combat.AutoMineModule$MineData -> net.shoreline.client.nn:
     net.minecraft.class_2338 pos -> Kh
     net.minecraft.class_2350 direction -> Ki
-    net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal goal -> Kj
+    net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal goal -> Kj
     int ticksMining -> Kk
     float blockDamage -> mi
     float lastDamage -> Kl
     962:966:void <init>(net.minecraft.class_2338,net.minecraft.class_2350) -> <init>
-    969:973:void <init>(net.minecraft.class_2338,net.minecraft.class_2350,net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal) -> <init>
+    969:973:void <init>(net.minecraft.class_2338,net.minecraft.class_2350,net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal) -> <init>
     977:983:double getPriority() -> mS
-    989:989:int compareTo(net.shoreline.client.impl.module.world.AutoMineModule$MineData) -> f
+    989:989:int compareTo(net.shoreline.client.impl.module.combat.AutoMineModule$MineData) -> f
     995:995:boolean equals(java.lang.Object) -> equals
     1000:1001:void resetMiningTicks() -> mT
     1005:1006:void markAttemptedMine() -> mU
@@ -7277,55 +7277,55 @@ net.shoreline.client.impl.module.world.AutoMineModule$MineData -> net.shoreline.
     1016:1018:void setTotalBlockDamage(float,float) -> i
     1022:1022:net.minecraft.class_2338 getPos() -> dD
     1027:1027:net.minecraft.class_2350 getDirection() -> dE
-    1032:1032:net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal getGoal() -> mV
+    1032:1032:net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal getGoal() -> mV
     1037:1037:int getTicksMining() -> mW
     1042:1042:float getBlockDamage() -> gV
     1047:1047:float getLastDamage() -> mX
-    1052:1052:net.shoreline.client.impl.module.world.AutoMineModule$MineData empty() -> mY
-    1057:1059:net.shoreline.client.impl.module.world.AutoMineModule$MineData copy() -> mZ
+    1052:1052:net.shoreline.client.impl.module.combat.AutoMineModule$MineData empty() -> mY
+    1057:1059:net.shoreline.client.impl.module.combat.AutoMineModule$MineData copy() -> mZ
     1064:1064:net.minecraft.class_2680 getState() -> cE
     1069:1069:int getBestSlot() -> na
     952:952:int compareTo(java.lang.Object) -> compareTo
-net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal -> net.shoreline.client.no:
-    net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal MANUAL -> Km
-    net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal MINING_ENEMY -> Kn
-    net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal PREVENT_CRAWL -> Ko
-    net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal[] $VALUES -> Kp
-    1075:1075:net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal[] values() -> values
-    1075:1075:net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal valueOf(java.lang.String) -> valueOf
+net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal -> net.shoreline.client.no:
+    net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal MANUAL -> Km
+    net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal MINING_ENEMY -> Kn
+    net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal PREVENT_CRAWL -> Ko
+    net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal[] $VALUES -> Kp
+    1075:1075:net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal[] values() -> values
+    1075:1075:net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal valueOf(java.lang.String) -> valueOf
     1075:1075:void <init>(java.lang.String,int) -> <init>
-    1075:1075:net.shoreline.client.impl.module.world.AutoMineModule$MiningGoal[] $values() -> nb
+    1075:1075:net.shoreline.client.impl.module.combat.AutoMineModule$MiningGoal[] $values() -> nb
     1075:1079:void <clinit>() -> <clinit>
-net.shoreline.client.impl.module.world.AutoMineModule$RemineMode -> net.shoreline.client.np:
-    net.shoreline.client.impl.module.world.AutoMineModule$RemineMode INSTANT -> Kq
-    net.shoreline.client.impl.module.world.AutoMineModule$RemineMode NORMAL -> Kr
-    net.shoreline.client.impl.module.world.AutoMineModule$RemineMode FAST -> Ks
-    net.shoreline.client.impl.module.world.AutoMineModule$RemineMode[] $VALUES -> Kt
-    1082:1082:net.shoreline.client.impl.module.world.AutoMineModule$RemineMode[] values() -> values
-    1082:1082:net.shoreline.client.impl.module.world.AutoMineModule$RemineMode valueOf(java.lang.String) -> valueOf
+net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode -> net.shoreline.client.np:
+    net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode INSTANT -> Kq
+    net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode NORMAL -> Kr
+    net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode FAST -> Ks
+    net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode[] $VALUES -> Kt
+    1082:1082:net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode[] values() -> values
+    1082:1082:net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode valueOf(java.lang.String) -> valueOf
     1082:1082:void <init>(java.lang.String,int) -> <init>
-    1082:1082:net.shoreline.client.impl.module.world.AutoMineModule$RemineMode[] $values() -> nc
+    1082:1082:net.shoreline.client.impl.module.combat.AutoMineModule$RemineMode[] $values() -> nc
     1082:1086:void <clinit>() -> <clinit>
-net.shoreline.client.impl.module.world.AutoMineModule$Selection -> net.shoreline.client.nq:
-    net.shoreline.client.impl.module.world.AutoMineModule$Selection WHITELIST -> Ku
-    net.shoreline.client.impl.module.world.AutoMineModule$Selection BLACKLIST -> Kv
-    net.shoreline.client.impl.module.world.AutoMineModule$Selection ALL -> Kw
-    net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $VALUES -> Kx
-    1089:1089:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] values() -> values
-    1089:1089:net.shoreline.client.impl.module.world.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
+net.shoreline.client.impl.module.combat.AutoMineModule$Selection -> net.shoreline.client.nq:
+    net.shoreline.client.impl.module.combat.AutoMineModule$Selection WHITELIST -> Ku
+    net.shoreline.client.impl.module.combat.AutoMineModule$Selection BLACKLIST -> Kv
+    net.shoreline.client.impl.module.combat.AutoMineModule$Selection ALL -> Kw
+    net.shoreline.client.impl.module.combat.AutoMineModule$Selection[] $VALUES -> Kx
+    1089:1089:net.shoreline.client.impl.module.combat.AutoMineModule$Selection[] values() -> values
+    1089:1089:net.shoreline.client.impl.module.combat.AutoMineModule$Selection valueOf(java.lang.String) -> valueOf
     1089:1089:void <init>(java.lang.String,int) -> <init>
-    1089:1089:net.shoreline.client.impl.module.world.AutoMineModule$Selection[] $values() -> nd
+    1089:1089:net.shoreline.client.impl.module.combat.AutoMineModule$Selection[] $values() -> nd
     1089:1093:void <clinit>() -> <clinit>
-net.shoreline.client.impl.module.world.AutoMineModule$Swap -> net.shoreline.client.nr:
-    net.shoreline.client.impl.module.world.AutoMineModule$Swap NORMAL -> Ky
-    net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT -> Kz
-    net.shoreline.client.impl.module.world.AutoMineModule$Swap SILENT_ALT -> KA
-    net.shoreline.client.impl.module.world.AutoMineModule$Swap OFF -> KB
-    net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $VALUES -> KC
-    1096:1096:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] values() -> values
-    1096:1096:net.shoreline.client.impl.module.world.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
+net.shoreline.client.impl.module.combat.AutoMineModule$Swap -> net.shoreline.client.nr:
+    net.shoreline.client.impl.module.combat.AutoMineModule$Swap NORMAL -> Ky
+    net.shoreline.client.impl.module.combat.AutoMineModule$Swap SILENT -> Kz
+    net.shoreline.client.impl.module.combat.AutoMineModule$Swap SILENT_ALT -> KA
+    net.shoreline.client.impl.module.combat.AutoMineModule$Swap OFF -> KB
+    net.shoreline.client.impl.module.combat.AutoMineModule$Swap[] $VALUES -> KC
+    1096:1096:net.shoreline.client.impl.module.combat.AutoMineModule$Swap[] values() -> values
+    1096:1096:net.shoreline.client.impl.module.combat.AutoMineModule$Swap valueOf(java.lang.String) -> valueOf
     1096:1096:void <init>(java.lang.String,int) -> <init>
-    1096:1096:net.shoreline.client.impl.module.world.AutoMineModule$Swap[] $values() -> ne
+    1096:1096:net.shoreline.client.impl.module.combat.AutoMineModule$Swap[] $values() -> ne
     1096:1101:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.world.AutoToolModule -> net.shoreline.client.ns:
     net.shoreline.client.impl.module.world.AutoToolModule INSTANCE -> KD

@@ -9,6 +9,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.util.item.EnchantUtil;
+import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class AutoToolModule extends Toggleable
@@ -44,7 +45,7 @@ public class AutoToolModule extends Toggleable
             for (int i = 0; i < 9; i++)
             {
                 final ItemStack stack = mc.player.getInventory().getStack(i);
-                if (stack.isEmpty() || !isSword(stack.getItem()))
+                if (stack.isEmpty() || !ItemUtil.isSword(stack.getItem()))
                 {
                     continue;
                 }
@@ -56,7 +57,7 @@ public class AutoToolModule extends Toggleable
         for (int i = 0; i < 9; i++)
         {
             final ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.isEmpty() || !isTool(stack.getItem()))
+            if (stack.isEmpty() || !ItemUtil.isTool(stack.getItem()))
             {
                 continue;
             }
@@ -73,16 +74,5 @@ public class AutoToolModule extends Toggleable
             }
         }
         return slot;
-    }
-
-    public boolean isTool(Item item)
-    {
-        return item.getTranslationKey().contains("shovel") || item.getTranslationKey().contains("axe")
-                || item.getTranslationKey().contains("pickaxe");
-    }
-
-    public boolean isSword(Item item)
-    {
-        return item.getTranslationKey().contains("sword");
     }
 }

@@ -15,11 +15,9 @@ public class NoBobModule extends Toggleable
     @EventListener
     public void onTick(TickEvent.Post event)
     {
-        if (checkNull())
+        if (!checkNull())
         {
-            return;
+            mc.player.distanceMoved = 4.0f;
         }
-
-        mc.player.distanceMoved = 4.0f;
     }
 }

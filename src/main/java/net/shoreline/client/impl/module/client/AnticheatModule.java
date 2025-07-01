@@ -25,15 +25,26 @@ public class AnticheatModule extends Concurrent
             .setMin(0).setMax(100).setDefaultValue(20)
             .setDescription("Max attempts to interact on blocks").build();
     Config<Void> interactConfig = new ConfigGroup.Builder("Interact")
-            .addAll(multiTask, rotateConfig, strictDirection, interactAttempts).build();
+            .addAll(multiTask, rotateConfig, strictDirection, interactAttempts)
+            .setVisible(() -> acModeConfig.getValue() != ACMode.VANILLA).build();
     Config<Boolean> raycastFixConfig = new BooleanConfig.Builder("RaytraceFix")
             .setDescription("Uses server rotations when raytracing crosshair")
+            .setVisible(() -> acModeConfig.getValue() != ACMode.VANILLA)
+            .setDefaultValue(false).build();
+    Config<Boolean> assumeEnchanted = new BooleanConfig.Builder("AssumeBestArmor")
+            .setDescription("Assumes that all enemy armor is max enchanted")
+            .setVisible(() -> acModeConfig.getValue() != ACMode.VANILLA)
             .setDefaultValue(false).build();
 
     public AnticheatModule()
     {
         super("Anticheat", "Configure client for different anticheats", GuiCategory.CLIENT);
         INSTANCE = this;
+    }
+
+    public boolean isAssumeEnchanted()
+    {
+        return assumeEnchanted.getValue();
     }
 
     public enum ACMode
