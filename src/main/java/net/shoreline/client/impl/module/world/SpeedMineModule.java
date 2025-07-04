@@ -12,6 +12,10 @@ public class SpeedMineModule extends Toggleable
     Config<MiningMode> modeConfig = new EnumConfig.Builder<MiningMode>("Mode")
             .setValues(MiningMode.values()).setDefaultValue(MiningMode.NORMAL)
             .setDescription("The mode for block click packets").build();
+    Config<Boolean> doubleMine = new BooleanConfig.Builder("DoubleMine")
+            .setDescription("Rotates before mining block")
+            .setVisible(() -> modeConfig.getValue() == MiningMode.GRIM)
+            .setDefaultValue(false).build();
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("The max range to mine").build();
@@ -23,10 +27,6 @@ public class SpeedMineModule extends Toggleable
             .setDefaultValue(true).build();
     Config<Boolean> rotateConfig = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates before mining block")
-            .setDefaultValue(false).build();
-    Config<Boolean> doubleMine = new BooleanConfig.Builder("DoubleMine")
-            .setDescription("Rotates before mining block")
-            .setVisible(() -> modeConfig.getValue() == MiningMode.GRIM)
             .setDefaultValue(false).build();
     Config<SilentSwapType> swapConfig = new EnumConfig.Builder<SilentSwapType>("Swap")
             .setValues(SilentSwapType.values())

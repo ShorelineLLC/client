@@ -92,4 +92,10 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
                           int modifiers)
     {
     }
+
+    @Override
+    protected void onConfigUpdate(Enum<?> value)
+    {
+        index = value.ordinal();
+    }
 }

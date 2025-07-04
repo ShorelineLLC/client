@@ -51,6 +51,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
                 ch -> (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f'), // hex chars
                 () -> "#" + Integer.toHexString(colorConfig.getRGB()),
                 c -> colorConfig.setValue(new Color((int) Long.parseLong(c, 16), true)));
+
         frame.getAllComponents().add(hexComponent);
     }
 
@@ -158,6 +159,12 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         {
             hexComponent.charTyped(chr, modifiers);
         }
+    }
+
+    @Override
+    protected void onConfigUpdate(Color value)
+    {
+        hexComponent.updateBuffer(Integer.toHexString(value.getRGB()));
     }
 
     private void drawGradientRect(DrawContext context,

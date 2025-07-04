@@ -114,14 +114,20 @@ public class NoSlowModule extends Toggleable
 
     public boolean shouldCancelSlowedDown()
     {
+        if (mc.player.isSneaking() && !sneakingConfig.getValue())
+        {
+            return false;
+        } else if (modeConfig.getValue() == Mode.GRIM_V3 && !canBypassGrimUseTime())
+        {
+            return false;
+        }
         return !mc.player.isRiding() && (mc.player.isUsingItem() && itemsConfig.getValue()
                 || mc.player.isBlocking() && blockingConfig.getValue());
     }
 
-    private boolean checkGrimNew()
+    private boolean canBypassGrimUseTime()
     {
-        return !mc.player.isSneaking() && !mc.player.isCrawling() && !mc.player.isRiding() &&
-                mc.player.getItemUseTimeLeft() < 5 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
+        return mc.player.getItemUseTimeLeft() < 5 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
     }
 
     private enum Mode

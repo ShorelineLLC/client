@@ -22,6 +22,11 @@ public class PhaseUtil
         return !intersectingBlocks(entity).isEmpty();
     }
 
+    public boolean isInsideWeb(Entity entity)
+    {
+        return false;
+    }
+
     public boolean isInsideWall(Entity entity)
     {
         BlockPos blockPos = entity.getBlockPos();

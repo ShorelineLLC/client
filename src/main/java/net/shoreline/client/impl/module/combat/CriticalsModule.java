@@ -20,6 +20,6 @@ public class CriticalsModule extends Toggleable
     {
         PACKET,
         PACKET_STRICT,
-        GRIM_V3
+        GRIM
     }
 }

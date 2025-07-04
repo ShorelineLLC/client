@@ -9,9 +9,11 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerMoveEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
+import net.shoreline.client.impl.module.world.TimerModule;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.client.util.math.MathUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -120,6 +122,11 @@ public class SpeedModule extends MovementModule
         {
             case STRAFE ->
             {
+                if (useTimerConfig.getValue())
+                {
+                    TimerModule.INSTANCE.setTimerTicks(1.0888f);
+                }
+
                 if (strafe == 1)
                 {
                     speed = 1.35f * base - 0.01f;
@@ -160,16 +167,21 @@ public class SpeedModule extends MovementModule
             }
             case STRAFE_STRICT ->
             {
+                if (useTimerConfig.getValue())
+                {
+                    TimerModule.INSTANCE.setTimerTicks(1.0888f);
+                }
+
                 if (fastConfig.getValue() && MathUtil.round(mc.player.getY() - (int) mc.player.getY(), 3) == MathUtil.round(0.138, 3))
                 {
                     addMotionY(-0.08);
-                    moveY = moveY - 0.09316090325960147;
-                    mc.player.setPosition(mc.player.getX(), mc.player.getY() - 0.09316090325960147, mc.player.getZ());
+                    moveY -= 0.09316090325960147;
+                    // mc.player.setPosition(mc.player.getX(), mc.player.getY() - 0.09316090325960147, mc.player.getZ());
                 }
 
                 if (strafe == 1)
                 {
-                    speed = fastConfig.getValue() ? 1.38f : 1.35f * base - 0.01f;
+                    speed = (fastConfig.getValue() ? 1.38f : 1.35f) * base - 0.01f;
                 }
                 else if (strafe == 2)
                 {
@@ -228,11 +240,13 @@ public class SpeedModule extends MovementModule
         distance = 0.0;
         accel = false;
         strictTicks = 0;
+        TimerModule.INSTANCE.setTimerTicks(1.0f);
     }
 
     private boolean canApplySpeed()
     {
-        return isInputtingMovement()
+        return Managers.ANTICHEAT.hasPassedSinceSetback(100)
+                && isInputtingMovement()
                 && !mc.player.getAbilities().flying
                 && !mc.player.isRiding()
                 && !mc.player.isGliding()

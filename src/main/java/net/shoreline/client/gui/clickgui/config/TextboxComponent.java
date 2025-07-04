@@ -25,6 +25,7 @@ public class TextboxComponent extends ConfigComponent<String>
         textComponent = new TextComponent(frame, x, y, frameWidth, frameHeight,
                 GLFW.GLFW_MOUSE_BUTTON_LEFT,
                 config::getValue, config::setValue);
+
         frame.getAllComponents().add(textComponent);
     }
 
@@ -85,5 +86,11 @@ public class TextboxComponent extends ConfigComponent<String>
                           int modifiers)
     {
         textComponent.charTyped(chr, modifiers);
+    }
+
+    @Override
+    protected void onConfigUpdate(String value)
+    {
+        textComponent.updateBuffer(value);
     }
 }

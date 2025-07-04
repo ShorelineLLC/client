@@ -6,14 +6,14 @@ import net.shoreline.client.impl.module.client.RotationsModule;
 
 public class MovementCorrection
 {
-    public Vec2f correctMovement(float deltaYaw, float forward, float sideways)
+    public Vec2f correctMovement(boolean grimMoveFix, float deltaYaw, float forward, float sideways)
     {
         float delta = deltaYaw * MathHelper.RADIANS_PER_DEGREE;
         float cos = MathHelper.cos(delta);
         float sin = MathHelper.sin(delta);
         float f = forward * cos + sideways * sin;
         float g = sideways * cos - forward * sin;
-        if (RotationsModule.INSTANCE.isGrimMoveFix())
+        if (grimMoveFix)
         {
             f = Math.round(f);
             g = Math.round(g);

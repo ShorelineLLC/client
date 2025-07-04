@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.combat.helper;
+package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
+import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.client.impl.module.helper.BlockScanner;
 import net.shoreline.client.util.world.ExplosionUtil;
 
@@ -24,13 +25,17 @@ public class CrystalBaseScanner extends BlockScanner
     @Override
     protected void visit(ClientWorld world, BlockPos pos, BlockState state)
     {
-        if (!CrystalUtil.canUseOnBlock(pos))
+        if (!CrystalUtil.canUseOnBlock(pos, state))
         {
             return;
         }
 
         Vec3d explosionCenter = Vec3d.of(pos).add(0.5, 1.0, 0.5);
         double local = ExplosionUtil.damageToEntity(localEntity, explosionCenter);
+        if (local > autoCrystal.getMaxSelfDamage().getValue() || DamageUtil.willDamageKillEntity(local, localEntity))
+        {
+            return;
+        }
 
         for (Entity entity : world.getEntities())
         {
@@ -43,5 +48,4 @@ public class CrystalBaseScanner extends BlockScanner
 
         }
     }
-
 }

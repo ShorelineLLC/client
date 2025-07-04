@@ -25,6 +25,7 @@
     "network.MixinClientPlayerEntity",
     "network.MixinClientPlayerInteractionManager",
     "network.MixinClientPlayNetworkHandler",
+    "particle.MixinParticleManager",
     "render.entity.feature.MixinArmorFeatureRenderer",
     "render.entity.MixinPlayerEntityRenderer",
     "render.MixinCamera",

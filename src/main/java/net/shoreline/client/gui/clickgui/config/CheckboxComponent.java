@@ -78,4 +78,10 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                           int modifiers)
     {
     }
+
+    @Override
+    protected void onConfigUpdate(Boolean value)
+    {
+        toggleAnim.setState(value);
+    }
 }

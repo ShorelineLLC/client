@@ -1,17 +1,16 @@
 package net.shoreline.client.impl.module.movement;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.player.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
+import net.shoreline.client.impl.module.helper.PhaseUtil;
 import net.shoreline.client.impl.module.impl.MovementModule;
+import net.shoreline.client.impl.player.rotation.ClientRotationEvent;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -109,10 +108,8 @@ public class SprintModule extends MovementModule
 
     private boolean canSprint()
     {
-        boolean inWeb = BlockPos.stream(mc.player.getBoundingBox())
-                .anyMatch(p -> mc.world.getBlockState(p).getBlock().equals(Blocks.COBWEB));
         return isInputtingMovement()
-                && !inWeb
+                && !PhaseUtil.isInsideWeb(mc.player)
                 && !mc.player.isSneaking()
                 && !mc.player.isRiding()
                 && !mc.player.isGliding()

@@ -26,12 +26,12 @@ public class ClickGuiScreen extends Screen
     private boolean draggingMouse;
 
     @Getter
-    private final Theme theme = new ThemeBuilder()
-            .setTitleColor(0x663500a4)
-            .setBackgroundColor(0x332e0094)
-            .setOutlineColor(0x1a7a3cf2)
-            .setComponentColor(0x663500a4)
-            .setTextColor(0xffffffff)
+    private final Theme theme = new Theme.ThemeBuilder()
+            .titleColor(0x663500a4)
+            .backgroundColor(0x332e0094)
+            .outlineColor(0x1a7a3cf2)
+            .componentColor(0x663500a4)
+            .textColor(0xffffffff)
             .build();
 
     private boolean shouldCloseOnEsc = true;

@@ -1,5 +1,6 @@
 package net.shoreline.client.api.module;
 
+import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
@@ -9,14 +10,14 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.eventbus.EventBus;
 import org.lwjgl.glfw.GLFW;
 
+@Getter
 public class Toggleable extends Module
 {
-    private final Config<Boolean> enabled = new BooleanConfig.Builder("Enabled")
+    protected final Config<Boolean> enabled = new BooleanConfig.Builder("Enabled")
             .setDescription("Module enabled state")
             .setNameAliases("Toggled")
             .setDefaultValue(false).build();
-
-    private final Config<Macro> keybind = new MacroConfig.Builder("Keybind")
+    protected final Config<Macro> keybind = new MacroConfig.Builder("Keybind")
             .setDescription("The module keybind")
             .setNameAliases("Bind")
             .setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
@@ -74,13 +75,13 @@ public class Toggleable extends Module
 
     public void setKeybind(int keycode)
     {
-        Managers.MACROS.unregister(getKeybind());
+        Managers.MACROS.unregister(getKeybindMacro());
         ModuleKeybind keybind1 = new ModuleKeybind(keycode, this);
         keybind.setValue(keybind1);
         Managers.MACROS.register(keybind1);
     }
 
-    public Macro getKeybind()
+    public Macro getKeybindMacro()
     {
         return keybind.getValue();
     }

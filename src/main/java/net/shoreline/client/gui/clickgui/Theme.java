@@ -1,29 +1,17 @@
 package net.shoreline.client.gui.clickgui;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
+@Builder
 public class Theme
 {
-    private int titleColor;
-    private int backgroundColor;
-    private int outlineColor;
-    private int componentColor;
-    private int textColor;
-
-    public Theme(int titleColor,
-                 int backgroundColor,
-                 int outlineColor,
-                 int componentColor,
-                 int textColor)
-    {
-        this.titleColor = titleColor;
-        this.backgroundColor = backgroundColor;
-        this.outlineColor = outlineColor;
-        this.componentColor = componentColor;
-        this.textColor = textColor;
-    }
+    private final int titleColor;
+    private final int backgroundColor;
+    private final int outlineColor;
+    private final int componentColor;
+    private final int textColor;
 }

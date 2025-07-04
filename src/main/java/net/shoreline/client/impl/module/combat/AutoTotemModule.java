@@ -10,7 +10,7 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.module.combat.helper.DamageUtil;
+import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class AutoTotemModule extends Toggleable
@@ -24,9 +24,6 @@ public class AutoTotemModule extends Toggleable
     Config<Boolean> damageCheck = new BooleanConfig.Builder("Safe")
             .setDescription("Swaps if potential damage will kill the player")
             .setDefaultValue(true).build();
-    Config<Boolean> syncConfig = new BooleanConfig.Builder("Sync")
-            .setDescription("Syncs totem item client side when you pop")
-            .setDefaultValue(false).build();
 
     Config<Boolean> mainhandTotem = new BooleanConfig.Builder("Totem")
             .setDescription("Holds a totem in your mainhand")

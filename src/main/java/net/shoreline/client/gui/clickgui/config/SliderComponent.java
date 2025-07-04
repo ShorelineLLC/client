@@ -142,6 +142,12 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
         textComponent.charTyped(chr, modifiers);
     }
 
+    @Override
+    protected void onConfigUpdate(Number value)
+    {
+        textComponent.updateBuffer(String.valueOf(value));
+    }
+
     private void setSliderValue(double mouseX, Number min, Number max)
     {
         double fill = (mouseX - getTx()) / width;

@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
@@ -8,6 +9,7 @@ import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
+import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
 import net.shoreline.client.impl.event.render.RenderNauseaEvent;
 import net.shoreline.client.impl.event.render.TiltViewEvent;
@@ -46,6 +48,35 @@ public class NoRenderModule extends Toggleable
     Config<Void> overlayConfig = new ConfigGroup.Builder("Overlays")
             .addAll(fireOverlay, waterOverlay, frostbiteOverlay, blockOverlay,
                     spyglassOverlay, bossBarOverlay, portalOverlay).build();
+
+    Config<Boolean> explosionsConfig = new BooleanConfig.Builder("Explosion")
+            .setDescription("Cancels the explosion particles")
+            .setDefaultValue(false).build();
+    Config<Boolean> effectsConfig = new BooleanConfig.Builder("StatusEffect")
+            .setDescription("Cancels the potion effect particles")
+            .setDefaultValue(false).build();
+    Config<Boolean> splashConfig = new BooleanConfig.Builder("BottleSplash")
+            .setDescription("Cancels the bottle splash particles")
+            .setDefaultValue(false).build();
+    Config<Boolean> portalConfig = new BooleanConfig.Builder("Portal")
+            .setDescription("Cancels the portal particles")
+            .setDefaultValue(false).build();
+    Config<Boolean> walkingConfig = new BooleanConfig.Builder("Walking")
+            .setDescription("Cancels the walking particles")
+            .setDefaultValue(false).build();
+    Config<Boolean> eatingConfig = new BooleanConfig.Builder("Eating")
+            .setDescription("Cancels the eating particles")
+            .setDefaultValue(false).build();
+    Config<Boolean> breakingConfig = new BooleanConfig.Builder("Breaking")
+            .setDescription("Cancels the block breaking particles")
+            .setDefaultValue(false).build();
+    Config<Boolean> cryingObsidianConfig = new BooleanConfig.Builder("CryingObsidian")
+            .setDescription("Cancels the crying obsidian particles")
+            .setDefaultValue(false).build();
+    Config<Void> particlesConfig = new ConfigGroup.Builder("Particles")
+            .addAll(explosionsConfig, effectsConfig, splashConfig, portalConfig,
+                    walkingConfig, eatingConfig, breakingConfig, cryingObsidianConfig).build();
+
     Config<FogRender> fogConfig = new EnumConfig.Builder<FogRender>("Fog")
             .setValues(FogRender.values())
             .setDescription("Prevents fog from rendering in the world")
@@ -141,6 +172,21 @@ public class NoRenderModule extends Toggleable
     public void onBossBarOverlay(OverlayEvent.BossBar event)
     {
         if (bossBarOverlay.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onParticle(ParticleEvent event)
+    {
+        if (event.getParticleEffect() == ParticleTypes.ENTITY_EFFECT && effectsConfig.getValue()
+                || event.getParticleEffect() == ParticleTypes.EXPLOSION && explosionsConfig.getValue()
+                || (event.getParticleEffect() == ParticleTypes.EFFECT || event.getParticleEffect() == ParticleTypes.INSTANT_EFFECT) && splashConfig.getValue()
+                || event.getParticleEffect() == ParticleTypes.PORTAL && portalConfig.getValue()
+                || event.getParticleEffect() == ParticleTypes.BLOCK && walkingConfig.getValue()
+                || event.getParticleEffect() == ParticleTypes.ITEM && eatingConfig.getValue()
+                || (event.getParticleEffect() == ParticleTypes.FALLING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.DRIPPING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.LANDING_OBSIDIAN_TEAR) && cryingObsidianConfig.getValue())
         {
             event.cancel();
         }

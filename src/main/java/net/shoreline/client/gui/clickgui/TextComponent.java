@@ -137,9 +137,7 @@ public class TextComponent extends FrameComponent
             }
             case GLFW.GLFW_KEY_ESCAPE ->
             {
-                buffer.clear();
-                value.get().chars().filter(charFilter).forEach(c -> buffer.addLast((char) c));
-                updateScrolling();
+                updateBuffer(value.get());
                 typing = false;
             }
         }
@@ -169,6 +167,13 @@ public class TextComponent extends FrameComponent
         {
             typedX = Math.max(0, textW - componentWidth);
         }
+    }
+
+    public void updateBuffer(String text)
+    {
+        buffer.clear();
+        text.chars().filter(charFilter).forEach(c -> buffer.addLast((char) c));
+        updateScrolling();
     }
 
     private String bufferToString()

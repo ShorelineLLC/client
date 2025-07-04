@@ -30,7 +30,11 @@ public abstract class ConfigComponent<T> extends FrameComponent
         super(frame, x, y, frameWidth, frameHeight);
         this.config = config;
         this.moduleComponent = moduleComponent;
+
+        config.addListener(this::onConfigUpdate);
     }
+
+    protected void onConfigUpdate(T value) {}
 
     @Override
     public int getTx()

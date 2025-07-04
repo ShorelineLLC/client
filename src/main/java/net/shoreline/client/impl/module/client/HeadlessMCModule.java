@@ -12,10 +12,11 @@ public class HeadlessMCModule extends Toggleable
     Config<String> portConfig = new StringConfig.Builder("Port")
             .setDefaultValue("25565").build();
 
-
-
     public HeadlessMCModule()
     {
         super("HeadlessMC", "Allows you to connect to a HeadlessMC instance", GuiCategory.CLIENT);
+        unregisterConfig(keybind);
     }
+    
+
 }

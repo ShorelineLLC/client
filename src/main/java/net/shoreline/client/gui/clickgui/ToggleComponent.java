@@ -25,6 +25,8 @@ public class ToggleComponent extends ModuleComponent
     {
         super(module, frame, x, y, frameWidth, frameHeight);
         this.toggleAnim = new Animation(module.isEnabled(), 200L, Easing.CUBIC_IN_OUT);
+
+        module.getEnabled().addListener(this::onModuleToggled);
     }
 
     @Override
@@ -82,5 +84,10 @@ public class ToggleComponent extends ModuleComponent
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    private void onModuleToggled(boolean enabled)
+    {
+        toggleAnim.setState(enabled);
     }
 }

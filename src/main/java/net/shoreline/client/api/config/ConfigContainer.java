@@ -74,6 +74,11 @@ public abstract class ConfigContainer extends GenericFeature implements Serializ
         Arrays.stream(config).forEach(this::registerConfig);
     }
 
+    protected void unregisterConfig(Config<?> config)
+    {
+        configs.remove(config.getId());
+    }
+
     public Config<?> getConfig(String id)
     {
         return configs.get(id);

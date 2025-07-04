@@ -25,6 +25,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 @Setter
 public class RotationManager extends GenericFeature
 {
+    private final RotationsModule rotationsConfig = RotationsModule.INSTANCE;
+
     private Rotation clientRotation;
 
     private final ServerRotationHandler handler;
@@ -52,7 +54,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onJumpPre(PlayerJumpEvent.Pre event)
     {
-        if (RotationsModule.INSTANCE.shouldApplyMoveFix())
+        if (rotationsConfig.shouldApplyMoveFix())
         {
             preJumpRotation = new Rotation(mc.player);
             if (hasClientRotation())
@@ -65,7 +67,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onJumpPost(PlayerJumpEvent.Post event)
     {
-        if (RotationsModule.INSTANCE.shouldApplyMoveFix())
+        if (rotationsConfig.shouldApplyMoveFix())
         {
             preJumpRotation.apply(mc.player);
         }
@@ -74,7 +76,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onPlayerVelocity(PlayerVelocityEvent event)
     {
-        if (hasClientRotation() && RotationsModule.INSTANCE.shouldApplyMoveFix())
+        if (hasClientRotation() && rotationsConfig.shouldApplyMoveFix())
         {
             event.cancel();
             event.setYaw(clientRotation.getYaw());
@@ -85,10 +87,11 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onPlayerInput(PlayerInputEvent event)
     {
-        if (!checkNull() && hasClientRotation() && RotationsModule.INSTANCE.shouldApplyMoveFix())
+        if (!checkNull() && hasClientRotation() && rotationsConfig.shouldApplyMoveFix())
         {
             float deltaYaw = mc.player.getYaw() - clientRotation.getYaw();
-            final Vec2f corrected = moveFix.correctMovement(deltaYaw, event.getMovementInput().y, event.getMovementInput().x);
+            final Vec2f corrected = moveFix.correctMovement(rotationsConfig.shouldRoundMoveFix(),
+                    deltaYaw, event.getMovementInput().y, event.getMovementInput().x);
             event.cancel();
             event.setMovementInput(corrected);
         }
@@ -156,7 +159,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onTickPost(TickEvent.Post event)
     {
-        if (checkNull() || !RotationsModule.INSTANCE.showServerRotation())
+        if (checkNull() || !rotationsConfig.showServerRotation())
         {
             return;
         }
@@ -168,7 +171,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onPlayerTransforms(PlayerTransformsEvent event)
     {
-        if (RotationsModule.INSTANCE.showServerRotation())
+        if (rotationsConfig.showServerRotation())
         {
             event.cancel();
             event.setPitch(serverRotation.getPitch());

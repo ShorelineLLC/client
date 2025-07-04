@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.combat.helper;
+package net.shoreline.client.impl.module.combat.util;
 
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.MinecraftClient;
@@ -16,6 +16,11 @@ public class DamageUtil
     public float getHealth(LivingEntity entity)
     {
         return entity.getHealth() + entity.getAbsorptionAmount();
+    }
+
+    public boolean willDamageKillEntity(double damage, LivingEntity entity)
+    {
+        return getHealth(entity) - damage < 0.5f;
     }
 
     public double potentialDamage(LivingEntity entity, boolean explosions)

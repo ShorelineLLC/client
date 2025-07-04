@@ -68,7 +68,9 @@ public class ModuleManager
                 new NoRenderModule(),
                 new NoWeatherModule(),
                 new ViewClipModule(),
+                new ViewModelModule(),
                 // World
+                new AirPlaceModule(),
                 new AutoToolModule(),
                 new FastPlaceModule(),
                 new NoRotateModule(),

@@ -43,15 +43,15 @@ public class RotationsModule extends Concurrent
         return moveFixConfig.getValue() != MoveFix.OFF;
     }
 
-    public boolean isGrimMoveFix()
+    public boolean shouldRoundMoveFix()
     {
-        return moveFixConfig.getValue() == MoveFix.GRIM_V2;
+        return moveFixConfig.getValue() == MoveFix.NORMAL;
     }
 
     public enum MoveFix
     {
-        GRIM_V2,
-        GRIM_V3,
+        NORMAL,
+        GRIM,
         OFF
     }
 }
