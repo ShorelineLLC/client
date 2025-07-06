@@ -11,7 +11,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.*;
 import net.shoreline.client.gui.clickgui.Frame;
-import net.shoreline.client.gui.clickgui.TextComponent;
+import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.*;
 import net.shoreline.client.mixin.accessor.AccessorDrawContext;
 import org.joml.Matrix3x2f;

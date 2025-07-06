@@ -1,4 +1,4 @@
-package net.shoreline.client.gui.clickgui;
+package net.shoreline.client.gui.clickgui.components;
 
 import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
@@ -6,6 +6,9 @@ import net.minecraft.text.Text;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
+import net.shoreline.client.gui.clickgui.Frame;
+import net.shoreline.client.gui.clickgui.Theme;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;
@@ -47,7 +50,7 @@ public class TextComponent extends FrameComponent
         this.charFilter = charFilter;
         this.value = value;
         this.setter = setter;
-        value.get().chars().filter(charFilter).forEach(c -> buffer.addLast((char) c));
+        collectToBuffer(value.get());
     }
 
     public TextComponent(Frame frame,
@@ -169,10 +172,15 @@ public class TextComponent extends FrameComponent
         }
     }
 
+    private void collectToBuffer(String text)
+    {
+        text.chars().filter(charFilter).forEach(c -> buffer.addLast((char) c));
+    }
+
     public void updateBuffer(String text)
     {
         buffer.clear();
-        text.chars().filter(charFilter).forEach(c -> buffer.addLast((char) c));
+        collectToBuffer(text);
         updateScrolling();
     }
 

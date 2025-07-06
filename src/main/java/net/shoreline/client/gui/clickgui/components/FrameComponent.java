@@ -1,11 +1,10 @@
-package net.shoreline.client.gui.clickgui;
+package net.shoreline.client.gui.clickgui.components;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
-import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
 

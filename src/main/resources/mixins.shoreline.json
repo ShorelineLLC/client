@@ -32,8 +32,10 @@
     "render.MixinGameRenderer",
     "render.MixinLightmapTextureManager",
     "render.MixinRenderTickCounter",
+    "render.MixinWorldRenderer",
     "MixinKeyboard",
-    "MixinMinecraftClient"
+    "MixinMinecraftClient",
+    "MixinMouse"
   ],
   "injectors": {
     "defaultRequire": 1

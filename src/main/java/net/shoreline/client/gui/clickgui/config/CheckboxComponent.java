@@ -3,19 +3,16 @@ package net.shoreline.client.gui.clickgui.config;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.Theme;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.gui.clickgui.components.ToggleComponent;
 import net.shoreline.client.impl.render.ColorUtil;
-import net.shoreline.client.impl.render.Easing;
-import org.lwjgl.glfw.GLFW;
 
 public class CheckboxComponent extends ConfigComponent<Boolean>
 {
-    private final Animation toggleAnim;
+    private final ToggleComponent toggleComponent;
 
     public CheckboxComponent(Config<Boolean> config,
                              ModuleComponent moduleComponent,
@@ -26,7 +23,12 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                              int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
-        this.toggleAnim = new Animation(config.getValue(), 200L, Easing.CUBIC_IN_OUT);
+        this.toggleComponent = new ToggleComponent(frame, x, y, frameWidth, frameHeight, config.getValue(), () ->
+        {
+            boolean val = !config.getValue();
+            config.setValue(val);
+            return val;
+        });
     }
 
     @Override
@@ -35,13 +37,14 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        int color = ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor());
-        color = ColorUtil.brighten(toggleAnim.getFactor() > 0.0 ? color : 0x00646464, 70, (float) hoverAnim.getFactor());
-        drawRect(context, getTx(), getTy(), width, height, color);
-        int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
+        toggleComponent.setYOffset(getYOffset());
+        toggleComponent.setX(getTx());
+        toggleComponent.setY(getTy());
+        toggleComponent.drawComponent(context, mouseX, mouseY, delta);
+
+        int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), 0xffaaaaaa, theme.getTextColor());
         drawText(context, textBuffer, Text.literal(getConfig().getName()).withColor(textColor), getTx() + 3, getTy() + 4);
     }
 
@@ -50,13 +53,7 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                              double mouseY,
                              int mouseButton)
     {
-        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
-                && mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
-        {
-            boolean val = !getConfig().getValue();
-            getConfig().setValue(val);
-            toggleAnim.setState(val);
-        }
+        toggleComponent.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -82,6 +79,6 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
     @Override
     protected void onConfigUpdate(Boolean value)
     {
-        toggleAnim.setState(value);
+        toggleComponent.setState(value);
     }
 }

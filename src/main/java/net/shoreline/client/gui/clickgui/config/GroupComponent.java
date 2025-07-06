@@ -1,13 +1,16 @@
 package net.shoreline.client.gui.clickgui.config;
 
+import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.gui.Mouse;
-import net.shoreline.client.gui.clickgui.*;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
+import net.shoreline.client.gui.clickgui.Frame;
+import net.shoreline.client.gui.clickgui.ModuleComponent;
+import net.shoreline.client.gui.clickgui.Theme;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -22,6 +25,7 @@ public class GroupComponent extends ConfigComponent<Void>
     private boolean groupOpen;
     private final Animation collapseAnim;
 
+    @Getter
     private final List<ConfigComponent<?>> components = new ArrayList<>();
 
     private final GlyphBuffer dotsBuffer = new GlyphBuffer();
@@ -35,17 +39,6 @@ public class GroupComponent extends ConfigComponent<Void>
                           int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
-        ConfigGroup group = (ConfigGroup) config;
-        for (Config<?> config1 : group)
-        {
-            final ComponentFactory factory = frame.getComponentFactory();
-            ConfigComponent<?> component = factory.createConfigComponent(
-                    config1, moduleComponent, frame, 4, 0, frameWidth - 2, frameHeight);
-
-            components.add(component);
-            frame.getAllComponents().add(component);
-        }
-
         this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
     }
 

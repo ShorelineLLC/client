@@ -61,6 +61,9 @@ public class NoRenderModule extends Toggleable
     Config<Boolean> portalConfig = new BooleanConfig.Builder("Portal")
             .setDescription("Cancels the portal particles")
             .setDefaultValue(false).build();
+    Config<Boolean> drippingBlocksConfig = new BooleanConfig.Builder("DrippingBlocks")
+            .setDescription("Cancels the block dripping particles")
+            .setDefaultValue(false).build();
     Config<Boolean> walkingConfig = new BooleanConfig.Builder("Walking")
             .setDescription("Cancels the walking particles")
             .setDefaultValue(false).build();
@@ -70,12 +73,9 @@ public class NoRenderModule extends Toggleable
     Config<Boolean> breakingConfig = new BooleanConfig.Builder("Breaking")
             .setDescription("Cancels the block breaking particles")
             .setDefaultValue(false).build();
-    Config<Boolean> cryingObsidianConfig = new BooleanConfig.Builder("CryingObsidian")
-            .setDescription("Cancels the crying obsidian particles")
-            .setDefaultValue(false).build();
     Config<Void> particlesConfig = new ConfigGroup.Builder("Particles")
             .addAll(explosionsConfig, effectsConfig, splashConfig, portalConfig,
-                    walkingConfig, eatingConfig, breakingConfig, cryingObsidianConfig).build();
+                    drippingBlocksConfig, walkingConfig, eatingConfig, breakingConfig).build();
 
     Config<FogRender> fogConfig = new EnumConfig.Builder<FogRender>("Fog")
             .setValues(FogRender.values())
@@ -186,7 +186,11 @@ public class NoRenderModule extends Toggleable
                 || event.getParticleEffect() == ParticleTypes.PORTAL && portalConfig.getValue()
                 || event.getParticleEffect() == ParticleTypes.BLOCK && walkingConfig.getValue()
                 || event.getParticleEffect() == ParticleTypes.ITEM && eatingConfig.getValue()
-                || (event.getParticleEffect() == ParticleTypes.FALLING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.DRIPPING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.LANDING_OBSIDIAN_TEAR) && cryingObsidianConfig.getValue())
+                || (event.getParticleEffect() == ParticleTypes.FALLING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.DRIPPING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.LANDING_OBSIDIAN_TEAR
+                || event.getParticleEffect() == ParticleTypes.FALLING_DRIPSTONE_WATER || event.getParticleEffect() == ParticleTypes.DRIPPING_DRIPSTONE_WATER || event.getParticleEffect() == ParticleTypes.FALLING_DRIPSTONE_LAVA
+                || event.getParticleEffect() == ParticleTypes.DRIPPING_DRIPSTONE_LAVA || event.getParticleEffect() == ParticleTypes.FALLING_LAVA || event.getParticleEffect() == ParticleTypes.DRIPPING_LAVA
+                || event.getParticleEffect() == ParticleTypes.FALLING_WATER || event.getParticleEffect() == ParticleTypes.DRIPPING_WATER || event.getParticleEffect() == ParticleTypes.FALLING_HONEY
+                || event.getParticleEffect() == ParticleTypes.DRIPPING_HONEY || event.getParticleEffect() == ParticleTypes.FALLING_NECTAR) && drippingBlocksConfig.getValue())
         {
             event.cancel();
         }

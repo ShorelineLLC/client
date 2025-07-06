@@ -1,5 +1,7 @@
 package net.shoreline.client.mixin.network;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec2f;
@@ -131,5 +133,13 @@ public abstract class MixinClientPlayerEntity
         {
             ci.cancel();
         }
+    }
+
+    /** Allows you to open screens in portals **/
+    @Redirect(method = "tickNausea", at = @At(value = "FIELD",
+            target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;"))
+    private Screen hookCurrentScreen(MinecraftClient instance)
+    {
+        return null;
     }
 }

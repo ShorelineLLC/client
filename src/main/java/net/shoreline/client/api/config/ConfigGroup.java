@@ -7,15 +7,15 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Getter
 @Setter
 public class ConfigGroup extends Config<Void> implements Iterable<Config<?>>
 {
-    private Map<String, Config<?>> configs;
+    private LinkedHashMap<String, Config<?>> configs;
 
     public ConfigGroup(String name, String description)
     {
@@ -23,15 +23,15 @@ public class ConfigGroup extends Config<Void> implements Iterable<Config<?>>
     }
 
     @Override
-    public void setConfigGroup(ConfigGroup group)
+    public @NotNull Iterator<Config<?>> iterator()
     {
-        throw new IllegalStateException("Cannot group a config group!");
+        return configs.sequencedValues().iterator();
     }
 
     @Override
-    public @NotNull Iterator<Config<?>> iterator()
+    public Collection<Config<?>> getChildren()
     {
-        return configs.values().iterator();
+        return configs.sequencedValues();
     }
 
     @Override
@@ -47,21 +47,9 @@ public class ConfigGroup extends Config<Void> implements Iterable<Config<?>>
         return json;
     }
 
-    @Override
-    public boolean isGroup()
-    {
-        return true;
-    }
-
-    @Override
-    public boolean isGrouped()
-    {
-        return false;
-    }
-
     public static class Builder extends ConfigBuilder<Void>
     {
-        private final Map<String, Config<?>> configs = new LinkedHashMap<>();
+        private final LinkedHashMap<String, Config<?>> configs = new LinkedHashMap<>();
 
         public Builder(String name) {
             super(name);

@@ -6,6 +6,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.render.RenderTickCounterEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -29,8 +31,6 @@ public class TimerModule extends ListeningToggleable
     {
         super("Timer", "Change the game tick speed", GuiCategory.WORLD);
         INSTANCE = this;
-
-        ticksConfig.addListener(this::onTicksConfigUpdate);
     }
 
     @Override
@@ -52,14 +52,24 @@ public class TimerModule extends ListeningToggleable
     }
 
     @EventListener
+    public void onWorldJoin(WorldEvent.Join event)
+    {
+        timerTicks = 1.0f;
+    }
+
+    @EventListener
+    public void onTickPre(TickEvent.Pre event)
+    {
+        if (isEnabled())
+        {
+            timerTicks = ticksConfig.getValue();
+        }
+    }
+
+    @EventListener
     public void onTickCounter(RenderTickCounterEvent event)
     {
         event.cancel();
         event.setTicks(timerTicks);
-    }
-
-    private void onTicksConfigUpdate(Float value)
-    {
-        timerTicks = value;
     }
 }

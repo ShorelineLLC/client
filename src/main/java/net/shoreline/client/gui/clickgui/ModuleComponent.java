@@ -7,6 +7,7 @@ import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.components.FrameComponent;
 import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.gui.clickgui.config.GroupComponent;
@@ -41,7 +42,7 @@ public class ModuleComponent extends FrameComponent
 
         for (Config<?> config : module.getConfigs())
         {
-            if (config.isGrouped())
+            if (config.getConfigGroup() != null)
             {
                 continue;
             }

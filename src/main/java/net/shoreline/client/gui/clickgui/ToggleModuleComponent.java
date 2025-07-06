@@ -3,28 +3,25 @@ package net.shoreline.client.gui.clickgui;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.components.ToggleComponent;
 import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.gui.clickgui.config.GroupComponent;
-import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
-import net.shoreline.client.impl.render.Easing;
-import org.lwjgl.glfw.GLFW;
 
-public class ToggleComponent extends ModuleComponent
+public class ToggleModuleComponent extends ModuleComponent
 {
-    private final Animation toggleAnim;
+    private final ToggleComponent toggleComponent;
 
-    public ToggleComponent(Toggleable module,
-                           Frame frame,
-                           int x,
-                           int y,
-                           int frameWidth,
-                           int frameHeight)
+    public ToggleModuleComponent(Toggleable module,
+                                 Frame frame,
+                                 int x,
+                                 int y,
+                                 int frameWidth,
+                                 int frameHeight)
     {
         super(module, frame, x, y, frameWidth, frameHeight);
-        this.toggleAnim = new Animation(module.isEnabled(), 200L, Easing.CUBIC_IN_OUT);
+        this.toggleComponent = new ToggleComponent(frame, x, y, frameWidth, frameHeight, module.isEnabled(), module::toggle);
 
         module.getEnabled().addListener(this::onModuleToggled);
     }
@@ -35,13 +32,14 @@ public class ToggleComponent extends ModuleComponent
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
-        int color = ColorUtil.withTransparency(theme.getComponentColor(), (float) toggleAnim.getFactor());
-        color = ColorUtil.brighten(toggleAnim.getFactor() > 0.0 ? color : 0x00646464, 70, (float) hoverAnim.getFactor());
-        drawRect(context, getTx(), getTy(), width, height, color);
-        int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleAnim.getFactor(), 0xffaaaaaa, theme.getTextColor());
+        toggleComponent.setYOffset(getYOffset());
+        toggleComponent.setX(getTx());
+        toggleComponent.setY(getTy());
+        toggleComponent.drawComponent(context, mouseX, mouseY, delta);
+
+        int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), 0xffaaaaaa, theme.getTextColor());
         drawText(context, textBuffer, Text.literal(module.getName()).withColor(textColor), getTx() + 3, getTy() + 4);
 
         if (getCollapseAnim().getFactor() > 0.0)
@@ -75,19 +73,12 @@ public class ToggleComponent extends ModuleComponent
                              double mouseY,
                              int mouseButton)
     {
-        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
-                && mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
-        {
-            final Toggleable module1 = (Toggleable) module;
-            module1.toggle();
-            toggleAnim.setState(module1.isEnabled());
-        }
-
+        toggleComponent.mouseClicked(mouseX, mouseY, mouseButton);
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     private void onModuleToggled(boolean enabled)
     {
-        toggleAnim.setState(enabled);
+        toggleComponent.setState(enabled);
     }
 }

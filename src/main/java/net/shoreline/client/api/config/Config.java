@@ -8,6 +8,8 @@ import net.shoreline.client.api.Observable;
 import net.shoreline.client.api.Serializable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -19,8 +21,9 @@ public abstract class Config<T> implements Identifiable, Observable<T>, Serializ
     private final String name;
     private final String description;
 
-    private String[] nameAliases;
     private ConfigGroup configGroup;
+
+    private String[] nameAliases;
 
     private T value;
     private final T defaultValue;
@@ -93,13 +96,8 @@ public abstract class Config<T> implements Identifiable, Observable<T>, Serializ
         return visible != null ? visible.get() : true;
     }
 
-    public boolean isGroup()
+    public Collection<Config<?>> getChildren()
     {
-        return false;
-    }
-
-    public boolean isGrouped()
-    {
-        return configGroup != null;
+        return Collections.emptyList();
     }
 }

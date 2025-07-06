@@ -2,7 +2,6 @@ package net.shoreline.client.gui;
 
 public interface Interactable
 {
-
     void mouseClicked(double mouseX,
                       double mouseY,
                       int mouseButton);

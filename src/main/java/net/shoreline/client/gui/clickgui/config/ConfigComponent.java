@@ -4,11 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.clickgui.Frame;
-import net.shoreline.client.gui.clickgui.FrameComponent;
+import net.shoreline.client.gui.clickgui.components.FrameComponent;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public abstract class ConfigComponent<T> extends FrameComponent

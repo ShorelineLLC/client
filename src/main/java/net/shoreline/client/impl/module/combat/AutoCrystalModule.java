@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.module.combat.crystal.CrystalBaseScanner;
 import net.shoreline.client.impl.player.inventory.SilentSwapType;
 
 @Getter
@@ -91,9 +92,13 @@ public class AutoCrystalModule extends Toggleable
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
             .addAll(autoSwap, antiWeakness, silentSwap).build();
 
+    private final CrystalBaseScanner baseScanner = new CrystalBaseScanner(10, mc.player);
+
     public AutoCrystalModule()
     {
         super("AutoCrystal", new String[] {"CrystalAura"}, "Best CA on the market", GuiCategory.COMBAT);
         INSTANCE = this;
     }
+
+
 }

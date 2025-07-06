@@ -2,7 +2,6 @@ package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;

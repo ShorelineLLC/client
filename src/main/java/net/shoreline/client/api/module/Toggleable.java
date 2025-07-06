@@ -53,7 +53,7 @@ public class Toggleable extends Module
         EventBus.INSTANCE.unsubscribe(this);
     }
 
-    public void toggle()
+    public boolean toggle()
     {
         if (isEnabled())
         {
@@ -62,6 +62,7 @@ public class Toggleable extends Module
         {
             enable();
         }
+        return isEnabled();
     }
 
     protected void onEnable() {}

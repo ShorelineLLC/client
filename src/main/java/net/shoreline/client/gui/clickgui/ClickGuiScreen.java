@@ -7,6 +7,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.components.FrameComponent;
+import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.ColorUtil;

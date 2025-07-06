@@ -7,6 +7,7 @@ import net.minecraft.text.Text;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
 import net.shoreline.client.gui.Mouse;
+import net.shoreline.client.gui.clickgui.components.FrameComponent;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
 import org.lwjgl.glfw.GLFW;
