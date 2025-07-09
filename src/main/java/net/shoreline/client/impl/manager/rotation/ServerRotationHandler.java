@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.player.rotation;
+package net.shoreline.client.impl.manager.rotation;
 
 import lombok.Getter;
 import net.minecraft.client.network.ClientPlayerEntity;

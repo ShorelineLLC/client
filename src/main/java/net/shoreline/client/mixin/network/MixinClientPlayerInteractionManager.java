@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
+import net.shoreline.client.impl.event.network.InteractSneakEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,6 +31,15 @@ public class MixinClientPlayerInteractionManager
         final ItemUseEvent event = new ItemUseEvent();
         EventBus.INSTANCE.dispatch(event);
         return event.isCanceled() ? event.getItemStack() : entity.getStackInHand(Hand.MAIN_HAND);
+    }
+
+    @Redirect(method = "interactBlockInternal", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;shouldCancelInteraction()Z"))
+    private boolean hookInteractBlockInternal(ClientPlayerEntity player)
+    {
+        InteractSneakEvent packetSneakingEvent = new InteractSneakEvent();
+        EventBus.INSTANCE.dispatch(packetSneakingEvent);
+        return player.isSneaking() || packetSneakingEvent.isCanceled();
     }
 
     @Inject(method = "attackBlock", at = @At(value = "HEAD"), cancellable = true)

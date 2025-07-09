@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.player.rotation;
+package net.shoreline.client.impl.manager.rotation;
 
 import lombok.experimental.UtilityClass;
 import net.minecraft.util.math.MathHelper;

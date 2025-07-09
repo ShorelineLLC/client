@@ -18,4 +18,14 @@ public class AirPlaceModule extends Toggleable
         super("AirPlace", "Place blocks in the air", GuiCategory.WORLD);
         INSTANCE = this;
     }
+
+    public boolean isGrim()
+    {
+        return grimConfig.getValue();
+    }
+
+    public boolean isForceAirPlace()
+    {
+        return false;
+    }
 }

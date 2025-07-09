@@ -15,15 +15,18 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.MouseEvent;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.PlayerVecEvent;
 import net.shoreline.client.impl.event.render.CameraEvent;
 import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
-import net.shoreline.client.impl.player.rotation.RotationUtil;
+import net.shoreline.client.impl.manager.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 @Getter
 public class FreecamModule extends Toggleable
 {
+    public static FreecamModule INSTANCE;
+
     Config<Float> speedConfig = new NumberConfig.Builder<Float>("Speed")
             .setMin(0.1f).setMax(10.0f).setDefaultValue(5.0f)
             .setDescription("The camera move speed").build();
@@ -41,6 +44,7 @@ public class FreecamModule extends Toggleable
     public FreecamModule()
     {
         super("Freecam", "Look around freely", GuiCategory.RENDER);
+        INSTANCE = this;
     }
 
     @Override
@@ -69,6 +73,12 @@ public class FreecamModule extends Toggleable
         }
 
         mc.player.input = new KeyboardInput(mc.options);
+    }
+
+    @EventListener
+    public void onWorldDisconnect(WorldEvent.Disconnect event)
+    {
+        disable();
     }
 
     @EventListener

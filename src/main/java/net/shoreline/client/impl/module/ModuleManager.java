@@ -6,9 +6,7 @@ import net.shoreline.client.impl.module.combat.*;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PhaseModule;
-import net.shoreline.client.impl.module.misc.AntiAimModule;
-import net.shoreline.client.impl.module.misc.ChestSwapModule;
-import net.shoreline.client.impl.module.misc.FakePlayerModule;
+import net.shoreline.client.impl.module.misc.*;
 import net.shoreline.client.impl.module.movement.*;
 import net.shoreline.client.impl.module.render.*;
 import net.shoreline.client.impl.module.world.*;
@@ -30,7 +28,6 @@ public class ModuleManager
                 new FontModule(),
                 new HeadlessMCModule(),
                 new HudModule(),
-                new RotationsModule(),
                 // Combat
                 new AuraModule(),
                 new AutoBowReleaseModule(),
@@ -52,6 +49,8 @@ public class ModuleManager
                 new AntiAimModule(),
                 new ChestSwapModule(),
                 new FakePlayerModule(),
+                new MiddleClickModule(),
+                new PacketSnifferModule(),
                 // Movement
                 new FastFallModule(),
                 new FlightModule(),

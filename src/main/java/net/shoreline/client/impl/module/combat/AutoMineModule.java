@@ -9,6 +9,8 @@ import net.shoreline.client.api.module.Toggleable;
 
 public class AutoMineModule extends Toggleable
 {
+    public static AutoMineModule INSTANCE;
+
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("TargetRange")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(6.0f).setFormat("m")
             .setDescription("The max range to target players").build();
@@ -36,5 +38,8 @@ public class AutoMineModule extends Toggleable
     public AutoMineModule()
     {
         super("AutoMine", "Mines blocks around enemies", GuiCategory.COMBAT);
+        INSTANCE = this;
     }
+
+
 }

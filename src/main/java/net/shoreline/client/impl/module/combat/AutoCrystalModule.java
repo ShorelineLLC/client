@@ -5,7 +5,7 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.module.combat.crystal.CrystalBaseScanner;
-import net.shoreline.client.impl.player.inventory.SilentSwapType;
+import net.shoreline.client.impl.manager.inventory.SilentSwapType;
 
 @Getter
 public class AutoCrystalModule extends Toggleable
@@ -19,7 +19,7 @@ public class AutoCrystalModule extends Toggleable
     Config<Float> targetRange = new NumberConfig.Builder<Float>("TargetRange")
             .setMin(1.0f).setMax(15.0f).setDefaultValue(10.0f).setFormat("m")
             .setDescription("The range to target entities").build();
-    Config<Boolean> targetPlayers = new BooleanConfig.Builder("Player")
+    Config<Boolean> targetPlayers = new BooleanConfig.Builder("Players")
             .setDescription("Targets players").setDefaultValue(true).build();
     Config<Boolean> targetHostiles = new BooleanConfig.Builder("Hostiles")
             .setDescription("Targets hostiles").setDefaultValue(false).build();
@@ -48,6 +48,9 @@ public class AutoCrystalModule extends Toggleable
             .setDescription("The delay between breaking crystals").build();
     Config<Void> breakConfig = new ConfigGroup.Builder("Break")
             .addAll(breakRange, breakDelay).build();
+
+    Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
+            .addAll().build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(4.0f)

@@ -75,7 +75,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         if (collapseAnim.getFactor() > 0.0)
         {
             float[] hsb = colorConfig.getHsb();
-            int color1 = Color.HSBtoRGB(hsb[0], 1.0f, 1.0f);
+            int color1 = Color.getHSBColor(hsb[0], 1.0f, 1.0f).getRGB();
 
             enableScissor(context, getTx() + 2, getTy() + height + 4, getTx() + width, getTy() + height + getComponentHeight() + 2);
 
@@ -86,7 +86,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             }
             // drawOutline(context, getTx() + pickerLength + 3, getTy() + height + 5, 10, pickerLength - 2, 1, Colors.BLACK);
 
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, color1, true);
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, colorConfig.getRGB(), true);
             drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0x00000000, 0xff000000, false);
 
             drawOutline(context, getTx() + 3, getTy() + height + pickerLength + 6, pickerLength - 24, 13, 1, theme.getComponentColor());

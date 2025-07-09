@@ -9,7 +9,7 @@ public class SurroundModule extends ObsidianPlacerModule
 
     public SurroundModule()
     {
-        super("Surround", "Surrounds feet in obsidian", GuiCategory.COMBAT);
+        super("Surround", new String[] {"FeetTrap"}, "Surrounds feet in obsidian", GuiCategory.COMBAT);
     }
 
 

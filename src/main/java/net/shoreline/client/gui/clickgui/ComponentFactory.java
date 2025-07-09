@@ -39,10 +39,6 @@ public class ComponentFactory
             GroupComponent groupComponent = new GroupComponent((Config<Void>) config, moduleComponent, frame, x, y, width, height);
             for (Config<?> cfg : (ConfigGroup) config)
             {
-                if (cfg.getConfigGroup() != null)
-                {
-                    continue;
-                }
                 ConfigComponent<?> component = createConfigComponent(cfg, moduleComponent, frame, x + 2, y, width - 2, height);
                 groupComponent.getComponents().add(component);
                 frame.getAllComponents().add(component);

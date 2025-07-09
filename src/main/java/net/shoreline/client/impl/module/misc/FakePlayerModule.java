@@ -2,7 +2,9 @@ package net.shoreline.client.impl.module.misc;
 
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.util.entity.FakePlayerEntity;
+import net.shoreline.eventbus.annotation.EventListener;
 
 public class FakePlayerModule extends Toggleable
 {
@@ -30,5 +32,11 @@ public class FakePlayerModule extends Toggleable
         {
             fakePlayer.despawnPlayer();
         }
+    }
+
+    @EventListener
+    public void onWorldDisconnect(WorldEvent.Disconnect event)
+    {
+        disable();
     }
 }

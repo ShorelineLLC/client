@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
+import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -24,6 +25,11 @@ public class AutoToolModule extends Toggleable
     @EventListener
     public void onAttackBlock(AttackBlockEvent event)
     {
+        if (!PlayerUtil.isInSurvival(mc.player))
+        {
+            return;
+        }
+
         int blockSlot = getBestToolNoFallback(event.getState());
         if (blockSlot != -1)
         {

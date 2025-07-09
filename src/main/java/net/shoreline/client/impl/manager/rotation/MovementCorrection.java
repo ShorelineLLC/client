@@ -1,8 +1,7 @@
-package net.shoreline.client.impl.player.rotation;
+package net.shoreline.client.impl.manager.rotation;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
-import net.shoreline.client.impl.module.client.RotationsModule;
 
 public class MovementCorrection
 {

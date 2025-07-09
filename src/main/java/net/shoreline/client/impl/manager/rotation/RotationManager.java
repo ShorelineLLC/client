@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.player.rotation;
+package net.shoreline.client.impl.manager.rotation;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
-import net.shoreline.client.impl.module.client.RotationsModule;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -25,7 +25,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 @Setter
 public class RotationManager extends GenericFeature
 {
-    private final RotationsModule rotationsConfig = RotationsModule.INSTANCE;
+    private final AnticheatModule rotationsConfig = AnticheatModule.INSTANCE;
 
     private Rotation clientRotation;
 

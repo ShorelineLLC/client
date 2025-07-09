@@ -3,6 +3,7 @@ package net.shoreline.client.api.config;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
+import net.shoreline.client.impl.render.ColorUtil;
 
 import java.awt.*;
 
@@ -26,6 +27,26 @@ public class ColorConfig extends Config<Color>
         return jsonObject;
     }
 
+    public int getRed()
+    {
+        return getValue().getRed();
+    }
+
+    public int getGreen()
+    {
+        return getValue().getGreen();
+    }
+
+    public int getBlue()
+    {
+        return getValue().getBlue();
+    }
+
+    public int getAlpha()
+    {
+        return getValue().getAlpha();
+    }
+
     public int getRGB()
     {
         return getValue().getRGB();
@@ -33,8 +54,8 @@ public class ColorConfig extends Config<Color>
 
     public float[] getHsb()
     {
-        float[] hsbVals = Color.RGBtoHSB(getValue().getRed(), getValue().getGreen(), getValue().getBlue(), null);
-        return new float[]{ hsbVals[0], hsbVals[1], hsbVals[2], transparency ? getValue().getAlpha() / 255.0f : 1.0f };
+        float[] hsbVals = Color.RGBtoHSB(getRed(), getGreen(), getBlue(), null);
+        return new float[] { hsbVals[0], hsbVals[1], hsbVals[2], transparency ? getAlpha() / 255.0f : 1.0f };
     }
 
     public static class Builder extends ConfigBuilder<Color>
@@ -47,7 +68,7 @@ public class ColorConfig extends Config<Color>
 
         public Builder setRgb(int rgb)
         {
-            setDefaultValue(new Color(rgb));
+            setDefaultValue(new Color(rgb, (rgb & 0xff000000) != 0xff000000));
             return this;
         }
 

@@ -5540,7 +5540,7 @@ net.shoreline.client.impl.module.misc.PMSoundModule$PMSounds -> net.shoreline.cl
     52:52:void <init>(java.lang.String,int) -> <init>
     52:52:net.shoreline.client.impl.module.misc.PMSoundModule$PMSounds[] $values() -> kW
     52:57:void <clinit>() -> <clinit>
-net.shoreline.client.impl.module.misc.PacketLoggerModule -> net.shoreline.client.ld:
+net.shoreline.client.impl.module.misc.PacketSnifferModule -> net.shoreline.client.ld:
     net.shoreline.client.api.config.Config logConfig -> Av
     net.shoreline.client.api.config.Config chatConfig -> Aw
     net.shoreline.client.api.config.Config disconnectConfig -> Ax
@@ -5570,8 +5570,8 @@ net.shoreline.client.impl.module.misc.PacketLoggerModule -> net.shoreline.client
     87:91:void onTick(net.shoreline.client.impl.event.TickEvent) -> b
     96:124:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     129:228:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
-    89:89:boolean lambda$onTick$0(net.shoreline.client.impl.module.misc.PacketLoggerModule$PacketLog) -> a
-net.shoreline.client.impl.module.misc.PacketLoggerModule$PacketLog -> net.shoreline.client.le:
+    89:89:boolean lambda$onTick$0(net.shoreline.client.impl.module.misc.PacketSnifferModule$PacketLog) -> a
+net.shoreline.client.impl.module.misc.PacketSnifferModule$PacketLog -> net.shoreline.client.le:
     net.minecraft.class_2596 packet -> AO
     long time -> AP
     230:230:void <init>(net.minecraft.class_2596,long) -> <init>
