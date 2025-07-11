@@ -2,8 +2,10 @@ package net.shoreline.client.mixin.network;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.network.*;
@@ -24,6 +26,9 @@ public abstract class MixinClientPlayerEntity
 {
     @Shadow
     public abstract void tick();
+
+    @Shadow
+    private int ticksSinceLastPositionPacketSent;
 
     @Unique
     private boolean ticking;
@@ -46,6 +51,13 @@ public abstract class MixinClientPlayerEntity
     {
         final PlayerUpdateEvent.PrePacket event = new PlayerUpdateEvent.PrePacket();
         EventBus.INSTANCE.dispatch(event);
+
+        MovementPacketsEvent.Update packetsEvent = new MovementPacketsEvent.Update();
+        EventBus.INSTANCE.dispatch(packetsEvent);
+        if (packetsEvent.isCanceled())
+        {
+            ticksSinceLastPositionPacketSent = 20;
+        }
     }
 
     @Inject(method = "sendMovementPackets", at = @At(value = "TAIL"))
@@ -53,6 +65,21 @@ public abstract class MixinClientPlayerEntity
     {
         final PlayerUpdateEvent.Post event = new PlayerUpdateEvent.Post();
         EventBus.INSTANCE.dispatch(event);
+    }
+
+    @Redirect(method = "sendMovementPackets", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"))
+    private void hookSendMovementPacket(ClientPlayNetworkHandler instance, Packet<?> packet)
+    {
+        MovementPacketsEvent.Send packetsEvent = new MovementPacketsEvent.Send(packet);
+        EventBus.INSTANCE.dispatch(packetsEvent);
+        if (packetsEvent.isCanceled())
+        {
+            instance.sendPacket(packetsEvent.getPacket());
+            return;
+        }
+
+        instance.sendPacket(packet);
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE",

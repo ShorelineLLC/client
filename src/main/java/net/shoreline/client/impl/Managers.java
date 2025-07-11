@@ -3,11 +3,11 @@ package net.shoreline.client.impl;
 import net.shoreline.client.api.macro.MacroManager;
 import net.shoreline.client.api.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
-import net.shoreline.client.impl.manager.MovementManager;
-import net.shoreline.client.impl.manager.interact.InteractManager;
-import net.shoreline.client.impl.manager.rotation.RotationManager;
+import net.shoreline.client.impl.movement.MovementManager;
+import net.shoreline.client.impl.interact.InteractManager;
+import net.shoreline.client.impl.rotation.RotationManager;
 import net.shoreline.client.impl.module.ModuleManager;
-import net.shoreline.client.impl.manager.inventory.InventoryManager;
+import net.shoreline.client.impl.inventory.InventoryManager;
 import net.shoreline.client.impl.render.RenderManager;
 
 public class Managers

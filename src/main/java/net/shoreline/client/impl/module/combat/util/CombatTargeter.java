@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager;
+package net.shoreline.client.impl.module.combat.util;
 
 import lombok.Getter;
 import net.minecraft.entity.Entity;

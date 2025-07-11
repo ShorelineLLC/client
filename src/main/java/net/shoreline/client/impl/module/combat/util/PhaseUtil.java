@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.helper;
+package net.shoreline.client.impl.module.combat.util;
 
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.MinecraftClient;

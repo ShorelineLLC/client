@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager.inventory;
+package net.shoreline.client.impl.inventory;
 
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.MinecraftClient;

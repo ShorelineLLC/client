@@ -8,9 +8,9 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
-import net.shoreline.client.impl.module.helper.PhaseUtil;
+import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.module.impl.MovementModule;
-import net.shoreline.client.impl.manager.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 

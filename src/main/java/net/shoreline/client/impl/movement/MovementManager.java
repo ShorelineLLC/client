@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager;
+package net.shoreline.client.impl.movement;
 
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;

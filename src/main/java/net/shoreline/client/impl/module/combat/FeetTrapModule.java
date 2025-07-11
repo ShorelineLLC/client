@@ -21,16 +21,13 @@ import net.shoreline.eventbus.annotation.EventListener;
 import java.util.EnumSet;
 import java.util.List;
 
-public class SelfTrapModule extends TrapModule
+public class FeetTrapModule extends TrapModule
 {
     Config<Float> placeRange = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("Range to place blocks").build();
-    Config<Boolean> extendFeet = new BooleanConfig.Builder("ExtendFeet")
+    Config<Boolean> extendFeet = new BooleanConfig.Builder("Extend")
             .setDescription("Extends feet trap when being mined")
-            .setDefaultValue(false).build();
-    Config<Boolean> extendBody = new BooleanConfig.Builder("ExtendBody")
-            .setDescription("Extends body trap when being mined")
             .setDefaultValue(false).build();
 
     Config<Boolean> instantReplace = new BooleanConfig.Builder("Instant")
@@ -48,9 +45,9 @@ public class SelfTrapModule extends TrapModule
 
     private double prevY;
 
-    public SelfTrapModule()
+    public FeetTrapModule()
     {
-        super("SelfTrap", "Traps the player", GuiCategory.COMBAT);
+        super("FeetTrap", new String[] {"Surround"}, "Surrounds feet in obsidian", GuiCategory.COMBAT);
     }
 
     @Override
@@ -78,7 +75,7 @@ public class SelfTrapModule extends TrapModule
         }
 
         Box boundingBox = mc.player.getBoundingBox();
-        EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET, TrapLayer.BODY);
+        EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET);
         if (headConfig.getValue())
         {
             layers.add(TrapLayer.HEAD);
@@ -87,7 +84,6 @@ public class SelfTrapModule extends TrapModule
         TrapSpec trapSpec = TrapSpec.builder()
                 .layers(layers)
                 .extendFeet(extendFeet.getValue())
-                .extendBody(extendBody.getValue())
                 .build();
 
         trapPos.calcTrap(boundingBox, trapSpec);

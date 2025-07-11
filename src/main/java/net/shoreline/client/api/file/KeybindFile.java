@@ -56,6 +56,11 @@ public class KeybindFile extends JsonConfigFile
                 JsonElement moduleId = jsonObject.get("module");
                 JsonElement keycode = jsonObject.get("keycode");
                 Toggleable module = (Toggleable) Managers.MODULES.getModule(moduleId.getAsString());
+                if (module == null)
+                {
+                    continue;
+                }
+
                 module.setKeybind(keycode.getAsInt());
             }
         }

@@ -1,23 +1,26 @@
 package net.shoreline.client.impl.module.client;
 
+import lombok.Getter;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.Concurrent;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.manager.inventory.SilentSwapType;
+import net.shoreline.client.impl.ac.Anticheat;
+import net.shoreline.client.impl.inventory.SilentSwapType;
 
+@Getter
 public class AnticheatModule extends Concurrent
 {
     public static AnticheatModule INSTANCE;
 
-    Config<ACMode> acModeConfig = new EnumConfig.Builder<ACMode>("AC")
-            .setValues(ACMode.values())
+    Config<Anticheat> acModeConfig = new EnumConfig.Builder<Anticheat>("AC")
+            .setValues(Anticheat.values())
             .setDescription("Set this to the main anticheat of the server")
-            .setDefaultValue(ACMode.VANILLA).build();
+            .setDefaultValue(Anticheat.VANILLA).build();
 
     Config<Boolean> multiTask = new BooleanConfig.Builder("Multitask")
             .setDescription("Allow using items while interacting")
             .setDefaultValue(true).build();
-    Config<Boolean> rotateConfig = new BooleanConfig.Builder("Rotate")
+    Config<Boolean> interactRotate = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates to face before interacting")
             .setDefaultValue(false).build();
     Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("BlocksPerTick")
@@ -37,8 +40,8 @@ public class AnticheatModule extends Concurrent
             .setDescription("Only places on visible faces")
             .setDefaultValue(false).build();
     Config<Void> interactConfig = new ConfigGroup.Builder("Interact")
-            .addAll(multiTask, rotateConfig, swapConfig, strictDirection, interactAttempts)
-            .setVisible(() -> acModeConfig.getValue() != ACMode.VANILLA).build();
+            .addAll(multiTask, interactRotate, bptConfig, interactDelay, interactAttempts, swapConfig, strictDirection)
+            .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
 
     Config<Boolean> renderRotationsConfig = new BooleanConfig.Builder("ShowRotations")
             .setDescription("Renders the serverside rotations")
@@ -56,17 +59,17 @@ public class AnticheatModule extends Concurrent
     Config<Boolean> lookSyncConfig = new BooleanConfig.Builder("RotateSync")
             .setDescription("Sends rotation packets when player look changes")
             .setDefaultValue(false).build();
-    Config<Void> rotationConfig = new ConfigGroup.Builder("Rotations")
+    Config<Void> rotateConfig = new ConfigGroup.Builder("Rotations")
             .addAll(renderRotationsConfig, moveFixConfig, gcdFixConfig, tickSyncConfig, lookSyncConfig)
-            .setVisible(() -> acModeConfig.getValue() != ACMode.VANILLA).build();
+            .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
 
     Config<Boolean> raycastFixConfig = new BooleanConfig.Builder("RaytraceFix")
             .setDescription("Uses server rotations when raytracing crosshair")
-            .setVisible(() -> acModeConfig.getValue() != ACMode.VANILLA)
+            .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA)
             .setDefaultValue(false).build();
     Config<Boolean> assumeEnchanted = new BooleanConfig.Builder("AssumeBestArmor")
             .setDescription("Assumes that all enemy armor is max enchanted")
-            .setVisible(() -> acModeConfig.getValue() != ACMode.VANILLA)
+            .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA)
             .setDefaultValue(false).build();
 
     public AnticheatModule()
@@ -75,14 +78,9 @@ public class AnticheatModule extends Concurrent
         INSTANCE = this;
     }
 
-    public boolean isGrim()
+    public boolean shouldInteractRotate()
     {
-        return acModeConfig.getValue() == ACMode.GRIM;
-    }
-
-    public boolean isAssumeEnchanted()
-    {
-        return assumeEnchanted.getValue();
+        return interactRotate.getValue();
     }
 
     public int getBlocksPerTick()
@@ -110,6 +108,16 @@ public class AnticheatModule extends Concurrent
         return renderRotationsConfig.getValue();
     }
 
+    public boolean syncTickRotation()
+    {
+        return tickSyncConfig.getValue();
+    }
+
+    public boolean syncLookRotation()
+    {
+        return lookSyncConfig.getValue();
+    }
+
     public boolean shouldApplyMoveFix()
     {
         return moveFixConfig.getValue() != MoveFix.OFF;
@@ -120,10 +128,9 @@ public class AnticheatModule extends Concurrent
         return moveFixConfig.getValue() == MoveFix.NORMAL;
     }
 
-    public enum ACMode
+    public boolean isAssumeEnchanted()
     {
-        VANILLA,
-        GRIM
+        return assumeEnchanted.getValue();
     }
 
     public enum MoveFix

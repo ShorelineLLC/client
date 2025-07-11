@@ -8,7 +8,7 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.manager.rotation.RotationUtil;
+import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.impl.module.render.FreecamModule;
 
 @UtilityClass

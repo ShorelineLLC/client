@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager.interact;
+package net.shoreline.client.impl.interact;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ShapeContext;
@@ -23,6 +23,8 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
+import net.shoreline.client.impl.rotation.Rotation;
+import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -70,10 +72,14 @@ public class InteractManager extends GenericFeature
         entitiesBlocking.forEach(e -> placedEntityIds.merge(e, 1, Integer::sum));
     }
 
+    public boolean canPlaceBlock(BlockPos blockPos, Block block)
+    {
+        return getEntitiesBlocking(blockPos, block).isEmpty();
+    }
+
     private boolean checkBlockDelay(BlockPos blockPos)
     {
         int bps = anticheat.getBlocksPerTick() * 20;
-
         long currTime = System.currentTimeMillis();
         if (placedBlocks.values().stream().filter(x -> currTime - x <= 1000L).count() >= bps)
         {
@@ -81,11 +87,6 @@ public class InteractManager extends GenericFeature
         }
 
         return currTime - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay();
-    }
-
-    public boolean canPlaceBlock(BlockPos blockPos, Block block)
-    {
-        return getEntitiesBlocking(blockPos, block).isEmpty();
     }
 
     public List<Entity> getEntitiesBlocking(BlockPos blockPos, Block block)
@@ -125,19 +126,22 @@ public class InteractManager extends GenericFeature
         Hand hand = interaction.getHand();
 
         boolean airPlacing = false;
-        boolean grimAirPlace = false;
 
         boolean noValidDir = airPlace.isForceAirPlace() || direction == null;
         if (hand == Hand.MAIN_HAND && noValidDir && airPlace.isEnabled())
         {
             airPlacing = true;
-            grimAirPlace = airPlace.isGrim();
             direction = Direction.DOWN;
-            if (grimAirPlace)
+            if (airPlace.isGrim())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
                 hand = Hand.OFF_HAND;
             }
+        }
+
+        if (direction == null)
+        {
+            return;
         }
 
         BlockPos blockPos = interaction.getPos().offset(direction.getOpposite());
@@ -150,8 +154,14 @@ public class InteractManager extends GenericFeature
         }
 
         ActionResult actionResult;
-        Vec3d interactionVec = getVecFromDirection(direction);
-        BlockHitResult result = new BlockHitResult(blockPos.toCenterPos().add(interactionVec), direction, blockPos, false);
+        Vec3d interactionVec = blockPos.toCenterPos().add(interaction.getHitVec());
+        if (anticheat.shouldInteractRotate())
+        {
+            float[] rots = RotationUtil.getRotationsTo(mc.player.getEyePos(), interactionVec);
+            Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
+        }
+
+        BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, false);
         if (interaction.isPacketPlace())
         {
             Hand finalHand = hand;
@@ -172,14 +182,17 @@ public class InteractManager extends GenericFeature
             Managers.MOVEMENT.setSilentSneaking(playerInput, false);
         }
 
-        if (grimAirPlace)
+        if (airPlacing && airPlace.isGrim())
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
         }
     }
 
-    private Vec3d getVecFromDirection(Direction direction)
+    public void endPlacement()
     {
-        return new Vec3d(direction.getUnitVector()).multiply(0.5);
+        if (anticheat.shouldInteractRotate())
+        {
+            Managers.ROTATION.setSilentRotation(new Rotation(mc.player));
+        }
     }
 }

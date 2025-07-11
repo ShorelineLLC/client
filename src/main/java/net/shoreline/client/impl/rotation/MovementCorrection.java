@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager.rotation;
+package net.shoreline.client.impl.rotation;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;

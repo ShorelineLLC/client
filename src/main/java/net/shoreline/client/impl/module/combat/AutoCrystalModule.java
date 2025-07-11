@@ -5,7 +5,7 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.module.combat.crystal.CrystalBaseScanner;
-import net.shoreline.client.impl.manager.inventory.SilentSwapType;
+import net.shoreline.client.impl.inventory.SilentSwapType;
 
 @Getter
 public class AutoCrystalModule extends Toggleable
@@ -49,8 +49,11 @@ public class AutoCrystalModule extends Toggleable
     Config<Void> breakConfig = new ConfigGroup.Builder("Break")
             .addAll(breakRange, breakDelay).build();
 
+    Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
+            .setDescription("Targets dropped items blocking placements")
+            .setDefaultValue(false).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
-            .addAll().build();
+            .addAll(targetItems).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(4.0f)

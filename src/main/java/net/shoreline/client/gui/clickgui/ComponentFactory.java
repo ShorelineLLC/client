@@ -88,6 +88,6 @@ public class ComponentFactory
             }
         }
 
-        throw new IllegalArgumentException("No component exists for the config type!");
+        throw new IllegalArgumentException("No component exists for the config type: " + config.getClass().getCanonicalName());
     }
 }

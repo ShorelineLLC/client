@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager.inventory;
+package net.shoreline.client.impl.inventory;
 
 import lombok.Getter;
 import net.minecraft.entity.player.PlayerInventory;
@@ -6,9 +6,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.ac.Anticheat;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -23,6 +25,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Getter
 public class InventoryManager extends GenericFeature
 {
+    private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
+
     private final SwapData.Mutable current = new SwapData.Mutable();
     private final List<SwapData> trackedSwaps = new CopyOnWriteArrayList<>();
     private HotbarCache swapCache;
@@ -77,7 +81,8 @@ public class InventoryManager extends GenericFeature
         }
 
         if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet
-                && AnticheatModule.INSTANCE.isGrim() && !InventoryUtil.isInInventoryScreen())
+                && anticheat.getAcModeConfig().getValue() == Anticheat.GRIM
+                && !InventoryUtil.isInInventoryScreen())
         {
             int slot = packet.getSlot() > PlayerInventory.getHotbarSize() ? packet.getSlot() - 36 : packet.getSlot();
             if (packet.getStack().isEmpty() || !PlayerInventory.isValidHotbarIndex(slot))
@@ -121,7 +126,6 @@ public class InventoryManager extends GenericFeature
             return true;
         }
 
-        int toSlot = itemSlot < PlayerInventory.getHotbarSize() ? itemSlot + playerInventory.getMainStacks().size() : itemSlot;
         int fromSlot = playerInventory.getSelectedSlot();
         synchronized (swapLock)
         {
@@ -139,9 +143,11 @@ public class InventoryManager extends GenericFeature
                     swapCache = new HotbarCache(playerInventory);
                     trackedSwaps.add(new SwapData(swapCache, itemSlot, fromSlot));
                 }
-
-                case INVENTORY -> mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        toSlot, fromSlot, SlotActionType.SWAP, mc.player);
+                case INVENTORY ->
+                {
+                    int toSlot = itemSlot < PlayerInventory.getHotbarSize() ? itemSlot + playerInventory.getMainStacks().size() : itemSlot;
+                    internalSwapSlot(playerInventory, toSlot, fromSlot);
+                }
             }
 
             current.setSlotTo(itemSlot);
@@ -163,7 +169,6 @@ public class InventoryManager extends GenericFeature
                 return;
             }
 
-            int toSlot = current.getSlotTo() < PlayerInventory.getHotbarSize() ? current.getSlotTo() + playerInventory.getMainStacks().size() : current.getSlotTo();
             switch (current.getSwapType())
             {
                 case HOTBAR ->
@@ -173,12 +178,38 @@ public class InventoryManager extends GenericFeature
                         Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(playerInventory.getSelectedSlot()));
                     }
                 }
-
-                case INVENTORY -> mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                        toSlot, current.getSlotFrom(), SlotActionType.SWAP, mc.player);
+                case INVENTORY ->
+                {
+                    int toSlot = current.getSlotTo() < PlayerInventory.getHotbarSize() ? current.getSlotTo() + playerInventory.getMainStacks().size() : current.getSlotTo();
+                    internalSwapSlot(playerInventory, toSlot, current.getSlotFrom());
+                }
             }
 
             current.reset();
         }
+    }
+
+    private void internalSwapSlot(PlayerInventory playerInventory, int toSlot, int fromSlot)
+    {
+        ScreenHandler handler = mc.player.currentScreenHandler;
+        mc.interactionManager.clickSlot(handler.syncId, toSlot, fromSlot, SlotActionType.SWAP, mc.player);
+
+//        DefaultedList<Slot> defaultedList = handler.slots;
+//        int i = defaultedList.size();
+//        ArrayList<ItemStack> list = Lists.newArrayListWithCapacity(i);
+//        for (Slot slot : defaultedList) {
+//            list.add(slot.getStack().copy());
+//        }
+//        handler.onSlotClick(toSlot, fromSlot, SlotActionType.SWAP, mc.player);
+//        Int2ObjectOpenHashMap<ItemStackHash> int2ObjectMap = new Int2ObjectOpenHashMap<ItemStackHash>();
+//        for (int j = 0; j < i; ++j) {
+//            ItemStack itemStack2;
+//            ItemStack itemStack = (ItemStack)list.get(j);
+//            if (ItemStack.areEqual(itemStack, itemStack2 = defaultedList.get(j).getStack())) continue;
+//            int2ObjectMap.put(j, ItemStackHash.fromItemStack(itemStack2, mc.getNetworkHandler().getComponentHasher()));
+//        }
+//        ItemStackHash itemStackHash = ItemStackHash.fromItemStack(handler.getCursorStack(), mc.getNetworkHandler().getComponentHasher());
+//        Managers.NETWORK.sendPacket(new ClickSlotC2SPacket(handler.syncId, handler.getRevision(),
+//                Shorts.checkedCast(toSlot), SignedBytes.checkedCast(fromSlot), SlotActionType.SWAP, int2ObjectMap, itemStackHash));
     }
 }

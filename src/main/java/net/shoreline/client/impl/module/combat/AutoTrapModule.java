@@ -1,9 +1,9 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
+import net.shoreline.client.impl.module.combat.trap.TrapModule;
 
-public class AutoTrapModule extends ObsidianPlacerModule
+public class AutoTrapModule extends TrapModule
 {
 
     public AutoTrapModule()

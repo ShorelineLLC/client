@@ -7,8 +7,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.impl.manager.rotation.ClientRotationEvent;
-import net.shoreline.client.impl.manager.rotation.RotationUtil;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class AuraModule extends Toggleable

@@ -14,7 +14,7 @@ import net.shoreline.client.impl.event.entity.PushEvent;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
-import net.shoreline.client.impl.module.helper.PhaseUtil;
+import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;

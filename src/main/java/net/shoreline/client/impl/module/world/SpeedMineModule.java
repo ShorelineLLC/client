@@ -3,7 +3,7 @@ package net.shoreline.client.impl.module.world;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.impl.manager.inventory.SilentSwapType;
+import net.shoreline.client.impl.inventory.SilentSwapType;
 
 import java.awt.*;
 

@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager;
+package net.shoreline.client.impl.social;
 
 import net.shoreline.client.api.GenericFeature;
 

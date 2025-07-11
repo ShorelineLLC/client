@@ -19,7 +19,7 @@ import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.PlayerVecEvent;
 import net.shoreline.client.impl.event.render.CameraEvent;
 import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
-import net.shoreline.client.impl.manager.rotation.RotationUtil;
+import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 @Getter

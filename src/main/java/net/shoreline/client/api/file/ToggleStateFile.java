@@ -50,6 +50,11 @@ public class ToggleStateFile extends JsonConfigFile
         {
             String id = element.getAsString();
             Toggleable module = (Toggleable) Managers.MODULES.getModule(id);
+            if (module == null)
+            {
+                continue;
+            }
+
             module.enable();
         }
     }

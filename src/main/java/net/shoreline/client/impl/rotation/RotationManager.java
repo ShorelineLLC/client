@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager.rotation;
+package net.shoreline.client.impl.rotation;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +13,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
 import net.shoreline.client.impl.event.input.PlayerInputEvent;
+import net.shoreline.client.impl.event.network.MovementPacketsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
@@ -157,6 +158,42 @@ public class RotationManager extends GenericFeature
     }
 
     @EventListener
+    public void onMovementPackets(MovementPacketsEvent.Update event)
+    {
+        if (rotationsConfig.syncTickRotation())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onMovementPackets(MovementPacketsEvent.Send event)
+    {
+        if (rotationsConfig.syncLookRotation())
+        {
+            if (event.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround posGround)
+            {
+                event.cancel();
+                event.setPacket(new PlayerMoveC2SPacket.Full(posGround.getX(0.0),
+                        posGround.getY(0.0),
+                        posGround.getZ(0.0),
+                        mc.player.getYaw(),
+                        mc.player.getPitch(),
+                        mc.player.isOnGround(),
+                        mc.player.horizontalCollision));
+            } else if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround lookGround)
+            {
+                event.cancel();
+                event.setPacket(new PlayerMoveC2SPacket.Full(mc.player.getPos(),
+                        lookGround.getYaw(0.0f),
+                        lookGround.getPitch(0.0f),
+                        mc.player.isOnGround(),
+                        mc.player.horizontalCollision));
+            }
+        }
+    }
+
+    @EventListener
     public void onTickPost(TickEvent.Post event)
     {
         if (checkNull() || !rotationsConfig.showServerRotation())
@@ -182,12 +219,11 @@ public class RotationManager extends GenericFeature
      * Should instantly update server rotations
      * @param rotation
      */
-    public void setInstantRotation(Rotation rotation)
+    public void setSilentRotation(Rotation rotation)
     {
         setClientRotation(rotation);
         Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
-                mc.player.getX(), mc.player.getY(), mc.player.getZ(),
-                rotation.getYaw(), rotation.getPitch(),
+                mc.player.getPos(), rotation.getYaw(), rotation.getPitch(),
                 mc.player.isOnGround(), mc.player.horizontalCollision));
     }
 

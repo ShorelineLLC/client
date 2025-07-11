@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.manager.inventory;
+package net.shoreline.client.impl.inventory;
 
 public enum SilentSwapType
 {

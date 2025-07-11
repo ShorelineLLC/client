@@ -37,10 +37,10 @@ public class ModuleManager
                 new AutoTrapModule(),
                 new AutoXPModule(),
                 new CriticalsModule(),
+                new FeetTrapModule(),
                 new OffhandGappleModule(),
                 new ReplenishModule(),
                 new SelfTrapModule(),
-                new SurroundModule(),
                 // Exploit
                 new AntiHungerModule(),
                 new FastLatencyModule(),
