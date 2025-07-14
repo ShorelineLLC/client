@@ -16,7 +16,7 @@ public class GuiCategoryFrame extends Frame
         this.guiCategory = guiCategory;
 
         int moduleY = getTitleHeight() + 2;
-        for (Module module1 : Managers.MODULES.getModules())
+        for (Module module1 : Managers.MODULES.getAllModules())
         {
             if (module1.getCategory().equals(guiCategory))
             {

@@ -99,6 +99,7 @@ public class FastFallModule extends MovementModule
                 {
                     setMotionXZ(getMotionX() * 0.05, getMotionZ() * 0.05);
                 }
+
                 if (getMotionY() < 0 && prevOnGround && !mc.player.isOnGround())
                 {
                     fallTimer.reset();

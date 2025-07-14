@@ -13,7 +13,8 @@ public enum GuiCategory
     MOVEMENT("Movement"),
     RENDER("Render"),
     WORLD("World"),
-    CLIENT("Client");
+    CLIENT("Client"),
+    HUD("HUD");
 
     private final String name;
 }

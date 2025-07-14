@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 import net.shoreline.client.api.font.FontScalingRegistry;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.OpenScreenEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.eventbus.EventBus;
@@ -48,6 +49,13 @@ public class MixinMinecraftClient
     {
         final TickEvent.Post tickEvent = new TickEvent.Post();
         EventBus.INSTANCE.dispatch(tickEvent);
+    }
+
+    @Inject(method = "setScreen", at = @At(value = "TAIL"))
+    private void hookSetScreen(Screen screen, CallbackInfo ci)
+    {
+        OpenScreenEvent screenOpenEvent = new OpenScreenEvent(screen);
+        EventBus.INSTANCE.dispatch(screenOpenEvent);
     }
 
     @Inject(method = "onResolutionChanged", at = @At(value = "INVOKE",

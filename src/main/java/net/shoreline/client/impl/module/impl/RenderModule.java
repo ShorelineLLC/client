@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.font.GlyphBuffer;
@@ -43,5 +42,23 @@ public class RenderModule extends Toggleable
         }
 
         context.drawText(mc.textRenderer, text, x, y, -1, false);
+    }
+
+    protected int getTextWidth(Text text)
+    {
+        if (text.getString().isEmpty())
+        {
+            return 0;
+        }
+
+        if (FontModule.INSTANCE.isEnabled())
+        {
+            buffer.clear();
+            buffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
+            buffer.recalculateBounds();
+            return Math.round(buffer.maxX - buffer.minX);
+        }
+
+        return mc.textRenderer.getWidth(text);
     }
 }

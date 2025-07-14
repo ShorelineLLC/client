@@ -12,6 +12,7 @@ import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class SprintModule extends MovementModule
@@ -65,7 +66,7 @@ public class SprintModule extends MovementModule
     @EventListener
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (modeConfig.getValue() != SprintMode.RAGE || !rotateConfig.getValue() || !isInputtingMovement())
+        if (modeConfig.getValue() != SprintMode.RAGE || !rotateConfig.getValue() || !InputUtil.isInputtingMovement())
         {
             return;
         }
@@ -108,7 +109,7 @@ public class SprintModule extends MovementModule
 
     private boolean canSprint()
     {
-        return isInputtingMovement()
+        return InputUtil.isInputtingMovement()
                 && !PhaseUtil.isInsideWeb(mc.player)
                 && !mc.player.isSneaking()
                 && !mc.player.isRiding()

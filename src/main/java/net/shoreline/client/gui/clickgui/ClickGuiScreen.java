@@ -45,6 +45,10 @@ public class ClickGuiScreen extends Screen
         int frameOffset = 15;
         for (GuiCategory category : GuiCategory.values())
         {
+            if (category.equals(GuiCategory.HUD))
+            {
+                continue;
+            }
             Frame frame = new GuiCategoryFrame(category, frameOffset, 15, 120, 17);
             guiFrames.add(frame);
             frameOffset += frame.getWidth() + 4;

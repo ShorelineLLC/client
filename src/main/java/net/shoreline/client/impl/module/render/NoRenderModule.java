@@ -8,12 +8,14 @@ import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
 import net.shoreline.client.impl.event.render.RenderNauseaEvent;
 import net.shoreline.client.impl.event.render.TiltViewEvent;
 import net.shoreline.client.impl.event.render.entity.feature.RenderArmorEvent;
+import net.shoreline.client.impl.event.toast.RenderGuiToastEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class NoRenderModule extends Toggleable
@@ -76,6 +78,18 @@ public class NoRenderModule extends Toggleable
     Config<Void> particlesConfig = new ConfigGroup.Builder("Particles")
             .addAll(explosionsConfig, effectsConfig, splashConfig, portalConfig,
                     drippingBlocksConfig, walkingConfig, eatingConfig, breakingConfig).build();
+
+    Config<Boolean> potionsHud = new BooleanConfig.Builder("Effects")
+            .setDescription("Cancels the status effects hud element")
+            .setDefaultValue(false).build();
+    Config<Boolean> itemName = new BooleanConfig.Builder("ItemName")
+            .setDescription("Cancels the item name hud element")
+            .setDefaultValue(false).build();
+    Config<Boolean> toastConfig = new BooleanConfig.Builder("Toast")
+            .setDescription("Cancels the toast hud element")
+            .setDefaultValue(true).build();
+    Config<Void> hudConfig = new ConfigGroup.Builder("HUD")
+            .addAll(potionsHud, itemName, toastConfig).build();
 
     Config<FogRender> fogConfig = new EnumConfig.Builder<FogRender>("Fog")
             .setValues(FogRender.values())
@@ -191,6 +205,33 @@ public class NoRenderModule extends Toggleable
                 || event.getParticleEffect() == ParticleTypes.DRIPPING_DRIPSTONE_LAVA || event.getParticleEffect() == ParticleTypes.FALLING_LAVA || event.getParticleEffect() == ParticleTypes.DRIPPING_LAVA
                 || event.getParticleEffect() == ParticleTypes.FALLING_WATER || event.getParticleEffect() == ParticleTypes.DRIPPING_WATER || event.getParticleEffect() == ParticleTypes.FALLING_HONEY
                 || event.getParticleEffect() == ParticleTypes.DRIPPING_HONEY || event.getParticleEffect() == ParticleTypes.FALLING_NECTAR) && drippingBlocksConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onPotionsHudOverlay(HudOverlayEvent.Potions event)
+    {
+        if (potionsHud.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onItemNameHudOverlay(HudOverlayEvent.ItemName event)
+    {
+        if (itemName.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onRenderGuiToast(RenderGuiToastEvent event)
+    {
+        if (toastConfig.getValue())
         {
             event.cancel();
         }

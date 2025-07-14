@@ -19,6 +19,7 @@ import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.world.NoRotateModule;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -41,14 +42,17 @@ public class RotationManager extends GenericFeature
         super("Rotations");
         this.handler = new ServerRotationHandler();
         this.moveFix = new MovementCorrection();
-        this.serverRotation = new Rotation();
+        this.serverRotation = new Rotation(0.0f, 0.0f);
         EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener
     public void onRotationUpdate(RotationUpdateEvent event)
     {
-        setClientRotation(new Rotation(event.getYaw(), event.getPitch()));
+        if (!NoRotateModule.INSTANCE.isEnabled())
+        {
+            setClientRotation(new Rotation(event.getYaw(), event.getPitch()));
+        }
     }
 
     /** Standard vanilla rotation movement correction **/
@@ -98,21 +102,21 @@ public class RotationManager extends GenericFeature
         }
     }
 
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (checkNull())
-        {
-            return;
-        }
-
-        if (event.getPacket() instanceof PlayerPositionLookS2CPacket
-                || event.getPacket() instanceof EntityS2CPacket packet && packet.getEntity(mc.world) == mc.player
-                || event.getPacket() instanceof EntityPositionS2CPacket packet1 && mc.world.getEntityById(packet1.entityId()) == mc.player)
-        {
-            handler.onRotationInbound();
-        }
-    }
+//    @EventListener
+//    public void onPacketInbound(PacketEvent.Inbound event)
+//    {
+//        if (checkNull())
+//        {
+//            return;
+//        }
+//
+//        if (event.getPacket() instanceof PlayerPositionLookS2CPacket
+//                || event.getPacket() instanceof EntityS2CPacket packet && packet.getEntity(mc.world) == mc.player
+//                || event.getPacket() instanceof EntityPositionS2CPacket packet1 && mc.world.getEntityById(packet1.entityId()) == mc.player)
+//        {
+//            handler.onRotationInbound();
+//        }
+//    }
 
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event)

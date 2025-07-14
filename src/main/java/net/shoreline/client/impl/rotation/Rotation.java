@@ -17,8 +17,6 @@ public class Rotation
 {
     private float yaw, pitch;
 
-    public Rotation() {}
-
     public Rotation(float yaw, float pitch)
     {
         this.yaw = yaw;

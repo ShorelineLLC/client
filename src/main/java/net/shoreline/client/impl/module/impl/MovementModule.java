@@ -126,9 +126,4 @@ public class MovementModule extends Toggleable
         }
         return MathHelper.wrapDegrees(yaw);
     }
-
-    protected boolean isInputtingMovement()
-    {
-        return mc.options.forwardKey.isPressed() || mc.options.backKey.isPressed() || mc.options.leftKey.isPressed() || mc.options.rightKey.isPressed();
-    }
 }

@@ -15,6 +15,7 @@ import net.shoreline.client.impl.event.network.PlayerMoveEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.impl.module.world.TimerModule;
 import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.client.util.math.MathUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -154,7 +155,7 @@ public class SpeedModule extends MovementModule
                     if ((!mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(0,
                             mc.player.getVelocity().getY(), 0)) || mc.player.verticalCollision) && strafe > 0)
                     {
-                        strafe = isInputtingMovement() ? 1 : 0;
+                        strafe = 1;
                     }
                     speed = distance - distance / AIR_FRICTION;
                 }
@@ -204,7 +205,7 @@ public class SpeedModule extends MovementModule
                     if ((!mc.world.isSpaceEmpty(mc.player, mc.player.getBoundingBox().offset(0,
                             mc.player.getVelocity().getY(), 0)) || mc.player.verticalCollision) && strafe > 0)
                     {
-                        strafe = isInputtingMovement() ? 1 : 0;
+                        strafe = 1;
                     }
                     speed = distance - distance / AIR_FRICTION;
                 }
@@ -246,7 +247,7 @@ public class SpeedModule extends MovementModule
     private boolean canApplySpeed()
     {
         return Managers.ANTICHEAT.hasPassedSinceSetback(100)
-                && isInputtingMovement()
+                && InputUtil.isInputtingMovement()
                 && !mc.player.getAbilities().flying
                 && !mc.player.isRiding()
                 && !mc.player.isGliding()

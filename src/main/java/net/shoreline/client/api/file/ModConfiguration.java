@@ -70,7 +70,7 @@ public class ModConfiguration
                     new ToggleStateFile(saveDirectory)
             );
 
-            for (Module module : Managers.MODULES.getModules())
+            for (Module module : Managers.MODULES.getAllModules())
             {
                 registerFile(new ConfigContainerFile(modulesDirectory, module));
             }

@@ -34,6 +34,11 @@ public class AutoBowReleaseModule extends Toggleable
     @EventListener
     public void onTick(TickEvent.Pre event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         ItemStack mainhand = mc.player.getMainHandStack();
         if (mainhand.getItem() == Items.BOW)
         {

@@ -30,7 +30,32 @@ public class MixinInGameHud
                 context, tickCounter.getTickProgress(true)));
     }
 
-    @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderStatusEffectOverlay(DrawContext context,
+                                               RenderTickCounter tickCounter,
+                                               CallbackInfo ci)
+    {
+        HudOverlayEvent.Potions event = new HudOverlayEvent.Potions();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderHeldItemTooltip", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderHeldItemTooltip(DrawContext context,
+                                           CallbackInfo ci)
+    {
+        HudOverlayEvent.ItemName event = new HudOverlayEvent.ItemName();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderPortalOverlay", at = @At(value = "HEAD"), cancellable = true)
     private void hookRenderPortalOverlay(DrawContext context,
                                          float nauseaStrength,
                                          CallbackInfo ci)

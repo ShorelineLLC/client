@@ -21,15 +21,15 @@ public class ServerRotationHandler
         }
     }
 
-    public void onRotationInbound()
+    public void onRotationInbound(ClientPlayerEntity player)
     {
         if (!Managers.ROTATION.hasClientRotation())
         {
             return;
         }
 
-        // Rotation rotation = Managers.ROTATION.getClientRotation();
-        // rotation.apply(mc.player);
+        Rotation rotation = Managers.ROTATION.getClientRotation();
+        rotation.apply(player);
         Managers.ROTATION.clearClientRotation();
     }
 

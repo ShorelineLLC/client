@@ -21,7 +21,7 @@ public class ToggleStateFile extends JsonConfigFile
     public void saveFile() throws IOException
     {
         final JsonArray moduleArray = new JsonArray();
-        for (Module module : Managers.MODULES.getModules())
+        for (Module module : Managers.MODULES.getAllModules())
         {
             if (module instanceof Toggleable toggleable && toggleable.isEnabled())
             {

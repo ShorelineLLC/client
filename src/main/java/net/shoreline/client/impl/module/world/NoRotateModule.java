@@ -8,11 +8,14 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class NoRotateModule extends Toggleable
 {
+    public static NoRotateModule INSTANCE;
+
     private Rotation clientRotations;
 
     public NoRotateModule()
     {
         super("NoRotate", "Prevents server from rotating the player", GuiCategory.WORLD);
+        INSTANCE = this;
     }
 
     @Override

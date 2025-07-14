@@ -1,23 +1,28 @@
 package net.shoreline.client.impl.module;
 
+import lombok.Getter;
+import net.shoreline.client.api.module.HudModule;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.*;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PhaseModule;
+import net.shoreline.client.impl.module.hud.WatermarkHudModule;
 import net.shoreline.client.impl.module.misc.*;
 import net.shoreline.client.impl.module.movement.*;
 import net.shoreline.client.impl.module.render.*;
 import net.shoreline.client.impl.module.world.*;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.SequencedCollection;
+import java.util.*;
 
 public class ModuleManager
 {
+    @Getter
+    private final List<Module> allModules = new ArrayList<>();
+
     private final LinkedHashMap<String, Module> modules = new LinkedHashMap<>();
+    private final LinkedHashMap<String, HudModule> hudModules = new LinkedHashMap<>();
 
     public ModuleManager()
     {
@@ -27,7 +32,7 @@ public class ModuleManager
                 new ColorsModule(),
                 new FontModule(),
                 new HeadlessMCModule(),
-                new HudModule(),
+                new HudGuiModule(),
                 // Combat
                 new AuraModule(),
                 new AutoBowReleaseModule(),
@@ -47,6 +52,7 @@ public class ModuleManager
                 new PhaseModule(),
                 // Misc
                 new AntiAimModule(),
+                new AutoRespawnModule(),
                 new ChestSwapModule(),
                 new FakePlayerModule(),
                 new MiddleClickModule(),
@@ -78,7 +84,11 @@ public class ModuleManager
                 new TimerModule()
         );
 
-        for (Module module : getModules())
+        registerHudModule(
+                new WatermarkHudModule()
+        );
+
+        for (Module module : getAllModules())
         {
             module.reflectConfigs();
         }
@@ -87,6 +97,13 @@ public class ModuleManager
     private void registerModule(Module module)
     {
         modules.put(module.getId(), module);
+        allModules.add(module);
+    }
+
+    private void registerHudModule(HudModule module)
+    {
+        hudModules.put(module.getId(), module);
+        allModules.add(module);
     }
 
     private void registerModules(Module... modules)
@@ -94,13 +111,28 @@ public class ModuleManager
         Arrays.stream(modules).forEach(this::registerModule);
     }
 
+    private void registerHudModules(HudModule... modules)
+    {
+        Arrays.stream(modules).forEach(this::registerHudModule);
+    }
+
     public Module getModule(String id)
     {
         return modules.get(id);
     }
 
+    public Module getHudModule(String id)
+    {
+        return hudModules.get(id);
+    }
+
     public SequencedCollection<Module> getModules()
     {
         return modules.sequencedValues();
+    }
+
+    public SequencedCollection<HudModule> getHudModules()
+    {
+        return hudModules.sequencedValues();
     }
 }

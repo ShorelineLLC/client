@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
 
 public class HudOverlayEvent extends Event
 {
@@ -14,4 +15,10 @@ public class HudOverlayEvent extends Event
         private final DrawContext context;
         private final float tickDelta;
     }
+
+    @Cancelable
+    public static class Potions extends HudOverlayEvent {}
+
+    @Cancelable
+    public static class ItemName extends HudOverlayEvent {}
 }
