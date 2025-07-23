@@ -33,6 +33,7 @@
     "render.MixinLightmapTextureManager",
     "render.MixinRenderTickCounter",
     "render.MixinWorldRenderer",
+    "text.MixinTextColor",
     "toast.MixinToastManager",
     "MixinKeyboard",
     "MixinMinecraftClient",

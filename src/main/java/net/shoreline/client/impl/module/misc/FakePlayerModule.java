@@ -28,7 +28,7 @@ public class FakePlayerModule extends Toggleable
     @Override
     public void onDisable()
     {
-        if (fakePlayer != null && !fakePlayer.isRemoved())
+        if (!checkNull() && fakePlayer != null && !fakePlayer.isRemoved())
         {
             fakePlayer.despawnPlayer();
         }

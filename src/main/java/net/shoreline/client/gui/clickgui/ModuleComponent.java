@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.FrameComponent;
@@ -29,6 +30,8 @@ public class ModuleComponent extends FrameComponent
     @Setter
     private boolean frameOpen;
     private final Animation collapseAnim;
+
+    protected final GlyphBuffer dotsBuffer = new GlyphBuffer();
 
     public ModuleComponent(Module module,
                            Frame frame,
@@ -70,6 +73,12 @@ public class ModuleComponent extends FrameComponent
         int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
         drawRect(context, getTx(), getTy(), width, height, color);
         drawText(context, textBuffer, Text.literal(module.getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
+
+        if (components.size() > 1)
+        {
+            Text dotsText = Text.literal("...").withColor(theme.getTextColor());
+            drawText(context, dotsBuffer, dotsText, getTx() + width - getTextWidth(dotsBuffer, dotsText, true) - 1, getTy() + 4, 0.0f, 5.0f, true);
+        }
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 

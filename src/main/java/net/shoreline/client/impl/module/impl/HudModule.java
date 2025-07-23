@@ -1,9 +1,9 @@
-package net.shoreline.client.api.module;
+package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
-import net.shoreline.client.impl.module.impl.RenderModule;
+import net.shoreline.client.api.module.GuiCategory;
 
 public abstract class HudModule extends RenderModule
 {

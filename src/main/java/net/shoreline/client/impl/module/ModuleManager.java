@@ -1,7 +1,8 @@
 package net.shoreline.client.impl.module;
 
 import lombok.Getter;
-import net.shoreline.client.api.module.HudModule;
+import net.shoreline.client.impl.module.hud.FPSHudModule;
+import net.shoreline.client.impl.module.impl.HudModule;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.*;
@@ -68,6 +69,8 @@ public class ModuleManager
                 // Render
                 new FreecamModule(),
                 new FullbrightModule(),
+                new HoleESPModule(),
+                new MineESPModule(),
                 new NametagsModule(),
                 new NoBobModule(),
                 new NoRenderModule(),
@@ -84,7 +87,8 @@ public class ModuleManager
                 new TimerModule()
         );
 
-        registerHudModule(
+        registerHudModules(
+                new FPSHudModule(),
                 new WatermarkHudModule()
         );
 

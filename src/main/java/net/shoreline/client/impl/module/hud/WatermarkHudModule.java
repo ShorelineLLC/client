@@ -4,7 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
-import net.shoreline.client.api.module.HudModule;
+import net.shoreline.client.impl.module.impl.HudModule;
 
 public class WatermarkHudModule extends HudModule
 {
@@ -16,7 +16,7 @@ public class WatermarkHudModule extends HudModule
     @Override
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
-        drawText(context, Text.of(getWatermarkText()), getX(), getY());
+        drawText(context, Text.of(getWatermarkText()), getX() + 2, getY() + 2);
     }
 
     @Override

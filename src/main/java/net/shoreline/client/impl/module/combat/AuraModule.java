@@ -10,28 +10,33 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.particle.ParticlesMode;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TimeHelper;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
+import net.shoreline.client.impl.module.impl.CombatModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.apache.commons.lang3.mutable.MutableDouble;
 
-public class AuraModule extends Toggleable
+public class AuraModule extends CombatModule
 {
     public static AuraModule INSTANCE;
 
@@ -41,7 +46,9 @@ public class AuraModule extends Toggleable
     Config<Boolean> hitDelay = new BooleanConfig.Builder("HitDelay")
             .setDescription("Hits only after attack delay has passed")
             .setDefaultValue(true).build();
-
+    Config<Boolean> multitaskConfig = new BooleanConfig.Builder("Multitask")
+            .setDescription("Allows you to use items while attacking")
+            .setDefaultValue(true).build();
     Config<Boolean> swingConfig = new BooleanConfig.Builder("Swing")
             .setDescription("Swings the hand when attacking")
             .setDefaultValue(true).build();
@@ -95,11 +102,11 @@ public class AuraModule extends Toggleable
     }
 
     @EventListener(priority = -1000)
-    public void onClientRotation(TickEvent.Post event)
+    public void onClientRotation(ClientRotationEvent event)
     {
-        if (mc.player.isUsingItem())
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
         {
-            return;
+           return;
         }
 
         auraTarget = getAuraTarget();
@@ -112,9 +119,9 @@ public class AuraModule extends Toggleable
         Rotation rotation = new Rotation(rotations[0], rotations[1]);
         if (rotateConfig.getValue() == RotateMode.NORMAL)
         {
-//            event.cancel();
-//            event.setYaw(rotation.getYaw());
-//            event.setPitch(rotation.getPitch());
+            event.cancel();
+            event.setYaw(rotation.getYaw());
+            event.setPitch(rotation.getPitch());
         } else if (rotateConfig.getValue() == RotateMode.SILENT)
         {
             Managers.ROTATION.setSilentRotation(rotation);
@@ -131,14 +138,10 @@ public class AuraModule extends Toggleable
     private void attackEntity(final Entity entity)
     {
         PlayerInventory playerInventory = mc.player.getInventory();
-        int weaponSlot = getAuraWeaponSlot(playerInventory);
-        if (weaponSlot == -1)
-        {
-            return;
-        }
 
+        int weaponSlot = getAuraWeaponSlot();
         ItemStack stack = playerInventory.getStack(weaponSlot);
-        if (!Managers.INVENTORY.startSwap(weaponSlot, swapMode.getValue()))
+        if (weaponSlot == -1 || !Managers.INVENTORY.startSwap(weaponSlot, swapMode.getValue()))
         {
             return;
         }
@@ -151,10 +154,7 @@ public class AuraModule extends Toggleable
             attackDelayTimer.reset();
         }
 
-        if (silentSwap.getValue())
-        {
-            Managers.INVENTORY.endSwap();
-        }
+        Managers.INVENTORY.endSwap();
     }
 
     private void internalAttack(final Entity entity)
@@ -202,18 +202,13 @@ public class AuraModule extends Toggleable
         return attackSpeed.getValue();
     }
 
-    private int getAuraWeaponSlot(PlayerInventory playerInventory)
+    private int getAuraWeaponSlot()
     {
-        int slot = -1;
-        for (int i = 0; i < playerInventory.getMainStacks().size(); i++)
+        int slot = InventoryUtil.getInventorySlot(Items.NETHERITE_SWORD, swapMode.getValue());
+        if (slot == -1)
         {
-            ItemStack stack = playerInventory.getStack(i);
-            if (stack.isIn(ItemTags.SWORDS))
-            {
-                slot = i;
-            }
+            return InventoryUtil.getInventorySlot(Items.DIAMOND_SWORD, swapMode.getValue());
         }
-
         return slot;
     }
 
@@ -241,11 +236,7 @@ public class AuraModule extends Toggleable
 
     private boolean canTargetToAttack(Entity entity)
     {
-        return entity instanceof PlayerEntity || entity instanceof Monster || entity instanceof SheepEntity;
-    }
-
-    private enum RotateMode
-    {
-        NORMAL, SILENT, OFF
+        return entity instanceof PlayerEntity && targetPlayers.getValue()
+                || entity instanceof Monster || entity instanceof SheepEntity;
     }
 }

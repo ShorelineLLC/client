@@ -74,12 +74,24 @@ public abstract class DrawableComponent
                             float offX,
                             float offY)
     {
+        drawText(context, glyphBuffer, text, x, y, offX, offY, FontModule.INSTANCE.isEnabled());
+    }
+
+    protected void drawText(DrawContext context,
+                            GlyphBuffer glyphBuffer,
+                            Text text,
+                            int x,
+                            int y,
+                            float offX,
+                            float offY,
+                            boolean customFont)
+    {
         if (text.getString().isEmpty())
         {
             return;
         }
 
-        if (FontModule.INSTANCE.isEnabled())
+        if (customFont)
         {
             glyphBuffer.clear();
             glyphBuffer.addText(FontManager.FONT, text, offX, offY);
@@ -89,6 +101,16 @@ public abstract class DrawableComponent
         }
 
         context.drawText(mc.textRenderer, text, x, y, -1, true);
+    }
+
+    protected void drawText(DrawContext context,
+                            GlyphBuffer glyphBuffer,
+                            Text text,
+                            int x,
+                            int y,
+                            boolean customFont)
+    {
+        drawText(context, glyphBuffer, text, x, y, 0.0f, 0.0f, customFont);
     }
 
     protected void drawText(DrawContext context,
@@ -112,12 +134,17 @@ public abstract class DrawableComponent
 
     protected int getTextWidth(GlyphBuffer glyphBuffer, Text text)
     {
+        return getTextWidth(glyphBuffer, text, FontModule.INSTANCE.isEnabled());
+    }
+
+    protected int getTextWidth(GlyphBuffer glyphBuffer, Text text, boolean customFont)
+    {
         if (text.getString().isEmpty())
         {
             return 0;
         }
 
-        if (FontModule.INSTANCE.isEnabled())
+        if (customFont)
         {
             glyphBuffer.clear();
             glyphBuffer.addText(FontManager.FONT, text, 0.0f, 0.0f);

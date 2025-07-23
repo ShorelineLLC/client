@@ -42,6 +42,12 @@ public class ToggleModuleComponent extends ModuleComponent
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), 0xffaaaaaa, theme.getTextColor());
         drawText(context, textBuffer, Text.literal(module.getName()).withColor(textColor), getTx() + 3, getTy() + 4);
 
+        if (components.size() > 1)
+        {
+            Text dotsText = Text.literal("...").withColor(textColor);
+            drawText(context, dotsBuffer, dotsText, getTx() + width - getTextWidth(dotsBuffer, dotsText) - 1, getTy() + 4, 0.0f, 5.0f);
+        }
+
         if (getCollapseAnim().getFactor() > 0.0)
         {
             enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());

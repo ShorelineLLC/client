@@ -1,9 +1,12 @@
 package net.shoreline.client.impl.interact;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -21,6 +24,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.rotation.Rotation;
@@ -42,6 +46,8 @@ public class InteractManager extends GenericFeature
     private final ConcurrentMap<BlockPos, Long> placedBlocks = new ConcurrentHashMap<>();
     private final ConcurrentMap<Entity, Integer> placedEntityIds = new ConcurrentHashMap<>();
 
+    private boolean placementLock;
+
     public InteractManager()
     {
         super("Interactions");
@@ -60,8 +66,13 @@ public class InteractManager extends GenericFeature
     public void placeBlock(Interaction interaction)
     {
         final BlockPos blockPos = interaction.getPos();
-        List<Entity> entitiesBlocking = getEntitiesBlocking(blockPos, interaction.getBlock());
-        if (!entitiesBlocking.isEmpty())
+        if (!mc.world.isInBuildLimit(blockPos))
+        {
+            return;
+        }
+
+        List<EndCrystalEntity> crystalsBlocking = getCrystalsBlocking(blockPos, interaction.getBlock());
+        if (!crystalsBlocking.isEmpty())
         {
             return;
         }
@@ -69,12 +80,12 @@ public class InteractManager extends GenericFeature
         placeBlockInternal(interaction);
 
         placedBlocks.put(blockPos, System.currentTimeMillis());
-        entitiesBlocking.forEach(e -> placedEntityIds.merge(e, 1, Integer::sum));
+        crystalsBlocking.forEach(e -> placedEntityIds.merge(e, 1, Integer::sum));
     }
 
     public boolean canPlaceBlock(BlockPos blockPos, Block block)
     {
-        return getEntitiesBlocking(blockPos, block).isEmpty();
+        return getCrystalsBlocking(blockPos, block).isEmpty();
     }
 
     private boolean checkBlockDelay(BlockPos blockPos)
@@ -89,35 +100,32 @@ public class InteractManager extends GenericFeature
         return currTime - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay();
     }
 
-    public List<Entity> getEntitiesBlocking(BlockPos blockPos, Block block)
+    public List<EndCrystalEntity> getCrystalsBlocking(BlockPos blockPos, Block block)
     {
-        final List<Entity> entities = new ArrayList<>();
-        final VoxelShape shape = block.getDefaultState()
-                .getCollisionShape(mc.world, blockPos, ShapeContext.absent())
-                .offset(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        final BlockState state = block.getDefaultState();
+        final List<EndCrystalEntity> crystalEntities = new ArrayList<>();
+        final VoxelShape shape = state.getCollisionShape(mc.world, blockPos, ShapeContext.absent()).offset(blockPos);
 
         if (shape.isEmpty())
         {
-            return entities;
+            return crystalEntities;
         }
 
         for (Entity entity : mc.world.getOtherEntities(null, shape.getBoundingBox()))
         {
-            if (entity.isRemoved() || !entity.intersectionChecked)
-            {
-                continue;
-            } else if (!VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND))
+            if (!entity.isRemoved() && entity.intersectionChecked
+                    && VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND))
             {
                 continue;
             }
 
-            if (entity instanceof EndCrystalEntity && placedEntityIds.getOrDefault(entity, 0) > anticheat.getInteractAttempts())
+            if (entity instanceof EndCrystalEntity crystalEntity && placedEntityIds.getOrDefault(entity, 0) > anticheat.getInteractAttempts())
             {
-                entities.add(entity);
+                crystalEntities.add(crystalEntity);
             }
         }
 
-        return entities;
+        return crystalEntities;
     }
 
     private void placeBlockInternal(Interaction interaction)
@@ -188,11 +196,44 @@ public class InteractManager extends GenericFeature
         }
     }
 
+    public boolean startPlacement(Item blockItem)
+    {
+        return startPlacement(InventoryUtil.getInventorySlot(blockItem, anticheat.getSwapType()));
+    }
+
+    public boolean startPlacement(int slot)
+    {
+        if (placementLock || slot == -1)
+        {
+            return false;
+        }
+
+        if (mc.player.isUsingItem() && !anticheat.getMultiTask().getValue())
+        {
+            return false;
+        }
+
+        if (!Managers.INVENTORY.startSwap(slot, anticheat.getSwapType()))
+        {
+            return false;
+        }
+
+        return placementLock = true;
+    }
+
     public void endPlacement()
     {
+        if (!placementLock)
+        {
+            return;
+        }
+
         if (anticheat.shouldInteractRotate())
         {
             Managers.ROTATION.setSilentRotation(new Rotation(mc.player));
         }
+
+        Managers.INVENTORY.endSwap();
+        placementLock = false;
     }
 }

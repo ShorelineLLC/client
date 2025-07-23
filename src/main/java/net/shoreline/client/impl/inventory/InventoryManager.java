@@ -9,9 +9,12 @@ import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.ac.Anticheat;
 import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderHotbarItemEvent;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
@@ -29,8 +32,9 @@ public class InventoryManager extends GenericFeature
 
     private final SwapData.Mutable current = new SwapData.Mutable();
     private final List<SwapData> trackedSwaps = new CopyOnWriteArrayList<>();
-    private HotbarCache swapCache;
+    private final Timer lastSwapTimer = new NanoTimer();
 
+    private HotbarCache swapCache;
     private int serverSlot;
 
     private final Object swapLock = new Object();
@@ -39,31 +43,6 @@ public class InventoryManager extends GenericFeature
     {
         super("Inventory");
         EventBus.INSTANCE.subscribe(this);
-    }
-
-    @EventListener
-    public void onPacketOutbound(PacketEvent.Outbound event)
-    {
-        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet)
-        {
-            final int packetSlot = packet.getSelectedSlot();
-            if (serverSlot == packetSlot)
-            {
-                event.setCanceled(true);
-                return;
-            }
-            serverSlot = packetSlot;
-        }
-    }
-
-    @EventListener
-    public void onItemUse(ItemUseEvent event)
-    {
-        if (mc.player != null && isSilentSwapping())
-        {
-            event.cancel();
-            event.setItemStack(mc.player.getInventory().getStack(serverSlot));
-        }
     }
 
     @EventListener
@@ -108,6 +87,41 @@ public class InventoryManager extends GenericFeature
         }
     }
 
+    @EventListener
+    public void onPacketOutbound(PacketEvent.Outbound event)
+    {
+        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet)
+        {
+            final int packetSlot = packet.getSelectedSlot();
+            if (serverSlot == packetSlot)
+            {
+                event.setCanceled(true);
+                return;
+            }
+            serverSlot = packetSlot;
+        }
+    }
+
+    @EventListener
+    public void onItemUse(ItemUseEvent event)
+    {
+        if (mc.player != null && isSilentSwapping())
+        {
+            event.cancel();
+            event.setItemStack(mc.player.getInventory().getStack(serverSlot));
+        }
+    }
+
+    @EventListener
+    public void onRenderHotbarItem(RenderHotbarItemEvent event)
+    {
+        if (!lastSwapTimer.hasPassed(500) && swapCache != null)
+        {
+            event.cancel();
+            event.setStack(swapCache.getStack(event.getSeed()));
+        }
+    }
+
     public boolean isSilentSwapping()
     {
         return mc.player.getInventory().getSelectedSlot() != serverSlot;
@@ -126,6 +140,8 @@ public class InventoryManager extends GenericFeature
             return true;
         }
 
+        swapCache = new HotbarCache(playerInventory);
+
         int fromSlot = playerInventory.getSelectedSlot();
         synchronized (swapLock)
         {
@@ -139,14 +155,13 @@ public class InventoryManager extends GenericFeature
                 case HOTBAR ->
                 {
                     Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
-
-                    swapCache = new HotbarCache(playerInventory);
                     trackedSwaps.add(new SwapData(swapCache, itemSlot, fromSlot));
                 }
                 case INVENTORY ->
                 {
-                    int toSlot = itemSlot < PlayerInventory.getHotbarSize() ? itemSlot + playerInventory.getMainStacks().size() : itemSlot;
+                    int toSlot = itemSlot < PlayerInventory.getHotbarSize() ? itemSlot + PlayerInventory.MAIN_SIZE : itemSlot;
                     internalSwapSlot(playerInventory, toSlot, fromSlot);
+                    lastSwapTimer.reset();
                 }
             }
 
@@ -180,7 +195,7 @@ public class InventoryManager extends GenericFeature
                 }
                 case INVENTORY ->
                 {
-                    int toSlot = current.getSlotTo() < PlayerInventory.getHotbarSize() ? current.getSlotTo() + playerInventory.getMainStacks().size() : current.getSlotTo();
+                    int toSlot = current.getSlotTo() < PlayerInventory.getHotbarSize() ? current.getSlotTo() + PlayerInventory.MAIN_SIZE : current.getSlotTo();
                     internalSwapSlot(playerInventory, toSlot, current.getSlotFrom());
                 }
             }

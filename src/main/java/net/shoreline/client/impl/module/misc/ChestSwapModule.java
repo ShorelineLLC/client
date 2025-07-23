@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.misc;
 
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -84,7 +83,7 @@ public class ChestSwapModule extends Toggleable
         int slot = -1;
 
         double armorValue = 0.0;
-        for (int i = 0; i < playerInventory.getMainStacks().size(); i++)
+        for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++)
         {
             ItemStack stack = playerInventory.getStack(i);
             if (stack.isIn(ItemTags.CHEST_ARMOR))

@@ -11,6 +11,7 @@ import net.shoreline.client.gui.clickgui.components.FrameComponent;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import org.lwjgl.glfw.GLFW;
 
@@ -34,6 +35,7 @@ public class ClickGuiScreen extends Screen
             .outlineColor(0x1a7a3cf2)
             .componentColor(0x663500a4)
             .textColor(0xffffffff)
+            .fadeAnimation(ClickGuiModule.INSTANCE.getFadeAnimation())
             .build();
 
     private boolean shouldCloseOnEsc = true;
@@ -70,12 +72,23 @@ public class ClickGuiScreen extends Screen
                        int mouseY,
                        float deltaTicks)
     {
+        if (ClickGuiModule.INSTANCE.shouldDarken())
+        {
+            Animation animation = ClickGuiModule.INSTANCE.getFadeAnimation();
+            int backgroundColor = ColorUtil.withTransparency(0x66000000, (float) animation.getFactor());
+            context.fill(
+                    0,
+                    0,
+                    context.getScaledWindowWidth(),
+                    context.getScaledWindowHeight(),
+                    backgroundColor
+            );
+        }
+
         if (ClickGuiModule.INSTANCE.shouldBlur())
         {
             applyBlur(context);
         }
-
-        renderAndScaleGUI(context);
 
         for (Frame frame : guiFrames)
         {
@@ -217,38 +230,5 @@ public class ClickGuiScreen extends Screen
         mouse.setRightHeld(false);
         ClickGuiModule.INSTANCE.disable();
         super.close();
-    }
-
-    /** @author bon gone but not forgotten **/
-    private void renderAndScaleGUI(DrawContext context)
-    {
-        if (ClickGuiModule.INSTANCE.shouldDarken())
-        {
-            int backgroundColor = ColorUtil.withTransparency(0x66000000, (float) ClickGuiModule.INSTANCE.getFadeFactor());
-
-            context.fill(
-                    0,
-                    0,
-                    context.getScaledWindowWidth(),
-                    context.getScaledWindowHeight(),
-                    backgroundColor
-            );
-        }
-
-        float currentProgress = (float) ClickGuiModule.INSTANCE.getAnimFactor(); // [0.0 .. 1.0]
-
-        if (currentProgress == 1.0F)
-        {
-            return;
-        }
-
-        // Translate the scale to the center of the screen
-        context.getMatrices().translate(context.getScaledWindowHeight(), context.getScaledWindowHeight() / 2.0F);
-
-        float goal = currentProgress * 0.2F;
-        context.getMatrices().scale(0.8F + goal, 0.8F + goal);
-
-        // Translate back
-        context.getMatrices().translate(-context.getScaledWindowHeight(), -context.getScaledWindowHeight() / 2.0F);
     }
 }

@@ -2,7 +2,7 @@ package net.shoreline.client.impl.module.client;
 
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.HudModule;
+import net.shoreline.client.impl.module.impl.HudModule;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.gui.hud.HudGuiScreen;
 import net.shoreline.client.impl.Managers;
@@ -28,6 +28,7 @@ public class HudGuiModule extends ListeningToggleable
             return;
         }
 
+        ClickGuiModule.INSTANCE.setFadeState(true);
         mc.setScreen(HudGuiScreen.INSTANCE);
     }
 
@@ -39,6 +40,7 @@ public class HudGuiModule extends ListeningToggleable
             return;
         }
 
+        ClickGuiModule.INSTANCE.setFadeState(false);
         mc.player.closeScreen();
     }
 

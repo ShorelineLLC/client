@@ -27,7 +27,7 @@ public class InventoryUtil
     public int getInventorySlot(Item item)
     {
         PlayerInventory inventory = MinecraftClient.getInstance().player.getInventory();
-        for (int i = 0; i < inventory.getMainStacks().size(); i++)
+        for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++)
         {
             ItemStack stack = inventory.getStack(i);
             if (stack.getItem().equals(item))
@@ -51,5 +51,27 @@ public class InventoryUtil
         }
 
         return -1;
+    }
+
+    public int getItemCount(Item item)
+    {
+        int count = 0;
+        PlayerInventory inventory = MinecraftClient.getInstance().player.getInventory();
+        for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++)
+        {
+            ItemStack stack = inventory.getStack(i);
+            if (stack.getItem().equals(item))
+            {
+                count++;
+            }
+        }
+
+        ItemStack offhand = inventory.getStack(PlayerInventory.OFF_HAND_SLOT);
+        if (offhand.getItem().equals(item))
+        {
+            count++;
+        }
+
+        return count;
     }
 }

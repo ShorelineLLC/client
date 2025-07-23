@@ -6,13 +6,16 @@ import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderHotbarItemEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(InGameHud.class)
 public class MixinInGameHud
@@ -20,6 +23,20 @@ public class MixinInGameHud
     @Shadow
     @Final
     private static Identifier POWDER_SNOW_OUTLINE;
+
+    @ModifyArgs(method = "renderHotbar", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHotbarItem(Lnet/minecraft/client/gui/DrawContext;IILnet/minecraft/client/render/RenderTickCounter;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;I)V",
+            ordinal = 0))
+    private void hookRenderHotbarItem(Args args)
+    {
+        int seed = (Integer) args.get(6) - 1;
+        RenderHotbarItemEvent event = new RenderHotbarItemEvent(seed);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            args.set(5, event.getStack());
+        }
+    }
 
     @Inject(method = "render", at = @At(value = "RETURN"))
     private void hookRender(DrawContext context,

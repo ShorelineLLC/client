@@ -6,7 +6,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.shoreline.client.impl.ac.Anticheat;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 
 @UtilityClass

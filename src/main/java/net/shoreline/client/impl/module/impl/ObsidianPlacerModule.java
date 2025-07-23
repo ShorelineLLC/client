@@ -29,12 +29,6 @@ public class ObsidianPlacerModule extends PlacerModule
 
     protected void placeObby(BlockPos placePos)
     {
-        int obbySlot = findBestObbySlot();
-        if (obbySlot == -1 || !Managers.INVENTORY.startSwap(obbySlot, anticheat.getSwapType()))
-        {
-            return;
-        }
-
         final Interaction interaction = Interaction.builder()
                 .pos(placePos)
                 .direction(StrictDirection.getInteractDirection(placePos))
@@ -43,10 +37,21 @@ public class ObsidianPlacerModule extends PlacerModule
                 .build();
 
         Managers.INTERACT.placeBlock(interaction);
-        Managers.INVENTORY.endSwap();
     }
 
-    private int findBestObbySlot()
+    protected void runSingleObbyPlacement(BlockPos placePos)
+    {
+        int obbySlot = findBestObbySlot();
+        if (!Managers.INTERACT.startPlacement(obbySlot))
+        {
+            return;
+        }
+
+        placeObby(placePos);
+        Managers.INTERACT.endPlacement();
+    }
+
+    protected int findBestObbySlot()
     {
         int slot = InventoryUtil.getInventorySlot(Items.OBSIDIAN, anticheat.getSwapType());
         if (slot == -1)

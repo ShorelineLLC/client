@@ -24,15 +24,13 @@ public class ClickGuiModule extends Toggleable
             .setMin(5).setMax(100).setDefaultValue(30).setFormat("dpi")
             .setDescription("The speed for mouse scrolling").build();
 
-    private final Animation openCloseAnim;
     private final Animation fadeInAnimation;
 
     public ClickGuiModule()
     {
         super("ClickGui", "The client mod menu", GuiCategory.CLIENT);
         setKeybind(GLFW.GLFW_KEY_RIGHT_SHIFT);
-        this.openCloseAnim = new Animation(false, 300, Easing.CUBIC_IN_OUT);
-        this.fadeInAnimation = new Animation(false, 400, Easing.BACK_OUT);
+        this.fadeInAnimation = new Animation(false, 500, Easing.SINE_OUT);
         INSTANCE = this;
     }
 
@@ -45,11 +43,7 @@ public class ClickGuiModule extends Toggleable
             return;
         }
 
-        openCloseAnim.setState(true);
-        openCloseAnim.reset();
-        fadeInAnimation.setState(true);
-        fadeInAnimation.reset();
-
+        setFadeState(true);
         mc.setScreen(ClickGuiScreen.INSTANCE);
     }
 
@@ -62,18 +56,24 @@ public class ClickGuiModule extends Toggleable
         }
 
         mc.player.closeScreen();
-        openCloseAnim.setState(false);
-        fadeInAnimation.setState(false);
+        setFadeState(false);
     }
 
-    public double getFadeFactor()
+    public void setFadeState(boolean fadeState)
     {
-        return fadeInAnimation.getFactor();
+        if (fadeState)
+        {
+            fadeInAnimation.setState(true);
+            fadeInAnimation.reset();
+        } else
+        {
+            fadeInAnimation.setState(false);
+        }
     }
 
-    public double getAnimFactor()
+    public Animation getFadeAnimation()
     {
-        return openCloseAnim.getFactor();
+        return fadeInAnimation;
     }
 
     public boolean shouldBlur()

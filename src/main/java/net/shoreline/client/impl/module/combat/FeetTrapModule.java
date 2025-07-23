@@ -74,7 +74,14 @@ public class FeetTrapModule extends TrapModule
             return;
         }
 
-        Box boundingBox = mc.player.getBoundingBox();
+        int obbySlot = findBestObbySlot();
+        if (!Managers.INTERACT.startPlacement(obbySlot))
+        {
+            return;
+        }
+
+        final Box playerBox = mc.player.getBoundingBox();
+        Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
         EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET);
         if (headConfig.getValue())
         {
@@ -110,7 +117,7 @@ public class FeetTrapModule extends TrapModule
             BlockPos blockPos = packet.getPos();
             if (trapPos.getTrapPositions().contains(blockPos))
             {
-                placeObby(blockPos);
+                runSingleObbyPlacement(blockPos);
             }
         }
 
@@ -119,7 +126,7 @@ public class FeetTrapModule extends TrapModule
             BlockPos blockPos = BlockPos.ofFloored(packet.center());
             if (trapPos.getTrapPositions().contains(blockPos))
             {
-                placeObby(blockPos);
+                runSingleObbyPlacement(blockPos);
             }
         }
     }

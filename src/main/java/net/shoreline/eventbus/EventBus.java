@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** @author bon gone but not forgotten **/
 public final class EventBus
 {
     public static final EventBus INSTANCE = new EventBus();
