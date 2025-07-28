@@ -3,6 +3,7 @@ package net.shoreline.client.impl;
 import net.shoreline.client.api.macro.MacroManager;
 import net.shoreline.client.api.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
+import net.shoreline.client.impl.command.CommandManager;
 import net.shoreline.client.impl.movement.MovementManager;
 import net.shoreline.client.impl.interact.InteractManager;
 import net.shoreline.client.impl.rotation.RotationManager;
@@ -14,6 +15,7 @@ public class Managers
 {
     public static MacroManager MACROS;
     public static ModuleManager MODULES;
+    public static CommandManager COMMANDS;
     public static NetworkManager NETWORK;
     public static AnticheatManager ANTICHEAT;
     public static RotationManager ROTATION;
@@ -26,6 +28,7 @@ public class Managers
     {
         MACROS = new MacroManager();
         MODULES = new ModuleManager();
+        COMMANDS = new CommandManager();
         NETWORK = new NetworkManager();
         ANTICHEAT = new AnticheatManager();
         ROTATION = new RotationManager();

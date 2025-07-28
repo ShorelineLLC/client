@@ -18,6 +18,8 @@
     "gui.hud.MixinBossBarHud",
     "gui.hud.MixinInGameHud",
     "gui.hud.MixinInGameOverlayRenderer",
+    "gui.screen.MixinChatInputSuggestor",
+    "gui.screen.MixinChatScreen",
     "input.MixinKeyboardInput",
     "input.MixinInput",
     "item.MixinItemUsageContext",

@@ -30,10 +30,10 @@ public class ClickGuiScreen extends Screen
 
     @Getter
     private final Theme theme = Theme.builder()
-            .titleColor(0x66d1d1ff)
+            .titleColor(0x665f5fde)
             .backgroundColor(0x33000000)
-            .outlineColor(0x1ad1d1ff)
-            .componentColor(0x66d1d1ff)
+            .outlineColor(0x1a5f5fde)
+            .componentColor(0x665f5fde)
             .textColor(0xffffffff)
             .fadeAnimation(ClickGuiModule.INSTANCE.getFadeAnimation())
             .build();

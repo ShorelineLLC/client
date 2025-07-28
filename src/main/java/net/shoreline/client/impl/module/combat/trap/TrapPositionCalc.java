@@ -53,16 +53,9 @@ public class TrapPositionCalc
             }
         }
 
-        if (bodyY == y)
+        if (bodyY == y && layers.contains(TrapLayer.BODY))
         {
-            if (layers.contains(TrapLayer.BODY))
-            {
-                extendTrapAroundPos(blockPos, origin, false);
-            }
-            if (layers.contains(TrapLayer.CRAWL))
-            {
-                trapPositions.add(blockPos);
-            }
+            extendTrapAroundPos(blockPos, origin, false);
         }
     }
 

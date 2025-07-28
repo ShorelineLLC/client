@@ -69,7 +69,7 @@ public class AutoXPModule extends Toggleable
         Rotation xpThrow = new Rotation(mc.player.getYaw(), 90.0f);
 
         Managers.ROTATION.setSilentRotation(xpThrow);
-        xpThrow.apply(mc.player);
+        xpThrow.applyToPlayer();
 
         if (!Managers.INVENTORY.startSwap(itemSlot, swapConfig.getValue()))
         {
@@ -80,30 +80,18 @@ public class AutoXPModule extends Toggleable
         Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
         Managers.INVENTORY.endSwap();
-        playerRotation.apply(mc.player);
+        playerRotation.applyToPlayer();
     }
 
     private boolean isPlayerFullDurability()
     {
         for (ItemStack stack : EntityUtil.getEquippedItems(mc.player))
         {
-            if (!isItemFullDurability(stack))
+            if (!stack.isEmpty() && stack.isDamaged())
             {
                 return false;
             }
         }
         return true;
-    }
-
-    private boolean isItemFullDurability(ItemStack stack)
-    {
-        if (stack.isEmpty())
-        {
-            return true;
-        }
-
-        int maxDura = stack.getMaxDamage();
-        int currentDura = stack.getDamage();
-        return currentDura == 0 || maxDura == 0;
     }
 }

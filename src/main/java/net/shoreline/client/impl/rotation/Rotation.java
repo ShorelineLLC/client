@@ -49,6 +49,11 @@ public class Rotation
         entity.setPitch(pitch);
     }
 
+    public void applyToPlayer()
+    {
+        apply(MinecraftClient.getInstance().player);
+    }
+
     public static Rotation calculateNewRotation(Rotation prev,
                                                 double dx,
                                                 double dy)

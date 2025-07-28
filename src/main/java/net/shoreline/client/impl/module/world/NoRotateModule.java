@@ -38,7 +38,7 @@ public class NoRotateModule extends Toggleable
     {
         if (!checkNull() && clientRotations != null)
         {
-            clientRotations.apply(mc.player);
+            clientRotations.applyToPlayer();
             clientRotations = null;
         }
     }

@@ -26,6 +26,7 @@ public record DefaultGuiRenderState(
     {
         this(pipeline, ts, ((AccessorDrawContext) context).getScissorStack().peekLast(), bounds, vertices);
     }
+
     @Override
     public void setupVertices(VertexConsumer vertices, float depth)
     {

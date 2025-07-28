@@ -64,7 +64,7 @@ public class RotationManager extends GenericFeature
             preJumpRotation = new Rotation(mc.player);
             if (hasClientRotation())
             {
-                clientRotation.apply(mc.player);
+                clientRotation.applyToPlayer();
             }
         }
     }
@@ -74,7 +74,7 @@ public class RotationManager extends GenericFeature
     {
         if (rotationsConfig.shouldApplyMoveFix())
         {
-            preJumpRotation.apply(mc.player);
+            preJumpRotation.applyToPlayer();
         }
     }
 

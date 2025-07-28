@@ -24,7 +24,8 @@ public class ReplenishModule extends Toggleable
     @EventListener
     public void onTick(TickEvent.Pre event)
     {
-
         cache = new HotbarCache(mc.player.getInventory());
+
+
     }
 }
