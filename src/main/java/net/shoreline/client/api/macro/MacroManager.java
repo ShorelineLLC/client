@@ -23,7 +23,7 @@ public class MacroManager extends GenericFeature
     @EventListener
     public void onKeyboardInput(InputEvent.Keyboard event)
     {
-        if (checkNull() || mc.currentScreen != null || event.getAction() != GLFW.GLFW_PRESS
+        if (mc.currentScreen != null || event.getAction() != GLFW.GLFW_PRESS
                 || event.getKey() == GLFW.GLFW_KEY_UNKNOWN)
         {
             return;

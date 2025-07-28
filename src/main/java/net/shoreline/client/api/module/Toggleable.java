@@ -74,9 +74,14 @@ public class Toggleable extends Module
         return enabled.getValue();
     }
 
-    public void setKeybind(int keycode)
+    public void resetKeybind()
     {
         Managers.MACROS.unregister(getKeybindMacro());
+    }
+
+    public void setKeybind(int keycode)
+    {
+        resetKeybind();
         ModuleKeybind keybind1 = new ModuleKeybind(keycode, this);
         keybind.setValue(keybind1);
         Managers.MACROS.register(keybind1);

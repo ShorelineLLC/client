@@ -56,7 +56,7 @@ public class GroupComponent extends ConfigComponent<Void>
 
         drawText(context, textBuffer, Text.literal(getConfig().getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
         Text dotsText = Text.literal("...").withColor(theme.getTextColor());
-        drawText(context, dotsBuffer, dotsText, getTx() + width - getTextWidth(dotsBuffer, dotsText) - 1, getTy() + 4, 0.0f, 5.0f);
+        drawText(context, dotsBuffer, dotsText, getTx() + width - getTextWidth(dotsBuffer, dotsText, true) - 1, getTy() + 4, 0.0f, 5.0f, true);
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 

@@ -5,6 +5,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -73,5 +75,20 @@ public class InventoryUtil
         }
 
         return count;
+    }
+
+    public int getPacketSlotIndex(int slot)
+    {
+        if (slot == PlayerInventory.OFF_HAND_SLOT)
+        {
+            return 45;
+        }
+
+        if (slot > PlayerInventory.MAIN_SIZE)
+        {
+            return slot - PlayerInventory.MAIN_SIZE + 1;
+        }
+
+        return slot < PlayerInventory.getHotbarSize() ? slot + PlayerInventory.MAIN_SIZE : slot;
     }
 }

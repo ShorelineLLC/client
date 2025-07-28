@@ -29,11 +29,11 @@ public class ClickGuiScreen extends Screen
     private boolean draggingMouse;
 
     @Getter
-    private final Theme theme = new Theme.ThemeBuilder()
-            .titleColor(0x663500a4)
-            .backgroundColor(0x332e0094)
-            .outlineColor(0x1a7a3cf2)
-            .componentColor(0x663500a4)
+    private final Theme theme = Theme.builder()
+            .titleColor(0x66d1d1ff)
+            .backgroundColor(0x33000000)
+            .outlineColor(0x1ad1d1ff)
+            .componentColor(0x66d1d1ff)
             .textColor(0xffffffff)
             .fadeAnimation(ClickGuiModule.INSTANCE.getFadeAnimation())
             .build();

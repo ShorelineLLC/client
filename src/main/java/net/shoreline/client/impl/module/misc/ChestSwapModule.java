@@ -2,9 +2,12 @@ package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.BooleanConfig;
@@ -21,6 +24,8 @@ public class ChestSwapModule extends Toggleable
     Config<Boolean> fireworkConfig = new BooleanConfig.Builder("AutoFirework")
             .setDescription("Automatically uses a firework when swapping to elytra")
             .setDefaultValue(false).build();
+
+    private Item chestplateItem = Items.DIAMOND_CHESTPLATE;
 
     public ChestSwapModule()
     {
@@ -42,16 +47,7 @@ public class ChestSwapModule extends Toggleable
             int slot = InventoryUtil.getInventorySlot(Items.ELYTRA);
             if (slot != -1)
             {
-                swapChestSlot(slot);
-            }
-        }
-
-        else if (chestStack.getItem() == Items.ELYTRA)
-        {
-            int slot = getBestChestplateSlot(playerInventory);
-            if (slot != -1)
-            {
-                swapChestSlot(slot);
+                Managers.INVENTORY.clickSwap(slot, PlayerInventory.BODY_SLOT, Items.ELYTRA);
             }
 
             if (fireworkConfig.getValue() && !mc.player.isOnGround())
@@ -60,22 +56,26 @@ public class ChestSwapModule extends Toggleable
                 mc.player.startGliding();
 
                 int fireworkSlot = InventoryUtil.getInventorySlot(Items.FIREWORK_ROCKET);
-                if (fireworkSlot == -1 || Managers.INVENTORY.startSwap(fireworkSlot, SilentSwapType.INVENTORY))
+                if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot, SilentSwapType.INVENTORY))
                 {
-                    return;
+                    Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id,
+                            mc.player.getYaw(), mc.player.getPitch()));
+                    Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                    Managers.INVENTORY.endSwap();
                 }
+            }
+        }
 
-                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                Managers.INVENTORY.endSwap();
+        else if (chestStack.getItem() == Items.ELYTRA)
+        {
+            int slot = getBestChestplateSlot(playerInventory);
+            if (slot != -1)
+            {
+                Managers.INVENTORY.clickSwap(slot, PlayerInventory.BODY_SLOT, chestplateItem);
             }
         }
 
         disable();
-    }
-
-    private void swapChestSlot(int slot)
-    {
-        int toSlot = slot < PlayerInventory.getHotbarSize() ? slot + 36 : slot;
     }
 
     private int getBestChestplateSlot(PlayerInventory playerInventory)
@@ -93,6 +93,7 @@ public class ChestSwapModule extends Toggleable
                 {
                     slot = i;
                     armorValue = value;
+                    chestplateItem = stack.getItem();
                 }
             }
         }

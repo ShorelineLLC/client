@@ -18,8 +18,6 @@ import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.util.Keyboard;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
-
 @Getter
 public class KeyListenerComponent extends ConfigComponent<Macro>
 {

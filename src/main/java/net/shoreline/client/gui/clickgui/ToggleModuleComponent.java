@@ -45,7 +45,7 @@ public class ToggleModuleComponent extends ModuleComponent
         if (components.size() > 1)
         {
             Text dotsText = Text.literal("...").withColor(textColor);
-            drawText(context, dotsBuffer, dotsText, getTx() + width - getTextWidth(dotsBuffer, dotsText) - 1, getTy() + 4, 0.0f, 5.0f);
+            drawText(context, dotsBuffer, dotsText, getTx() + width - getTextWidth(dotsBuffer, dotsText, true) - 1, getTy() + 4, 0.0f, 5.0f, true);
         }
 
         if (getCollapseAnim().getFactor() > 0.0)

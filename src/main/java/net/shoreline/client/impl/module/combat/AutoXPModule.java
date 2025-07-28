@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -17,6 +16,7 @@ import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class AutoXPModule extends Toggleable
@@ -52,15 +52,10 @@ public class AutoXPModule extends Toggleable
             return;
         }
 
-        if (isItemFullDurability(mc.player.getMainHandStack())
-                && isItemFullDurability(mc.player.getOffHandStack())
-                && isItemFullDurability(mc.player.getEquippedStack(EquipmentSlot.HEAD))
-                && isItemFullDurability(mc.player.getEquippedStack(EquipmentSlot.CHEST))
-                && isItemFullDurability(mc.player.getEquippedStack(EquipmentSlot.LEGS))
-                && isItemFullDurability(mc.player.getEquippedStack(EquipmentSlot.FEET)))
+        if (!isPlayerFullDurability())
         {
-            // disable();
-            // return;
+            disable();
+            return;
         }
 
         int itemSlot = InventoryUtil.getInventorySlot(Items.EXPERIENCE_BOTTLE, swapConfig.getValue());
@@ -86,6 +81,18 @@ public class AutoXPModule extends Toggleable
 
         Managers.INVENTORY.endSwap();
         playerRotation.apply(mc.player);
+    }
+
+    private boolean isPlayerFullDurability()
+    {
+        for (ItemStack stack : EntityUtil.getEquippedItems(mc.player))
+        {
+            if (!isItemFullDurability(stack))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isItemFullDurability(ItemStack stack)

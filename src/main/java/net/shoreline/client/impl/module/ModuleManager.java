@@ -77,6 +77,7 @@ public class ModuleManager
                 new NoWeatherModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
+                new ZoomModule(),
                 // World
                 new AirPlaceModule(),
                 new AutoToolModule(),
