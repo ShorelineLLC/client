@@ -58,16 +58,16 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
     {
         if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height))
         {
-            Enum<?> val = getConfig().getValue();
-            String[] values = Arrays.stream(val.getClass().getEnumConstants()).map(Enum::name).toArray(String[]::new);
+            Enum<?>[] values = ((EnumConfig<?>) getConfig()).getValues();
             if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
             {
-                index = index + 1 > values.length - 1 ? 0 : index + 1;
-                getConfig().setValue(Enum.valueOf(val.getClass(), values[index]));
-            } else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+                index = (index + 1) % values.length;
+                getConfig().setValue(values[index]);
+            }
+            else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
             {
-                index = index - 1 < 0 ? values.length - 1 : index - 1;
-                getConfig().setValue(Enum.valueOf(val.getClass(), values[index]));
+                index = (index - 1 + values.length) % values.length;
+                getConfig().setValue(values[index]);
             }
         }
     }
