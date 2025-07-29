@@ -4,12 +4,8 @@ import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.interact.Interaction;
-import net.shoreline.client.impl.interact.StrictDirection;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 
 @Getter
@@ -29,26 +25,13 @@ public class ObsidianPlacerModule extends PlacerModule
 
     protected void placeObby(BlockPos placePos)
     {
-        final Interaction interaction = Interaction.builder()
-                .pos(placePos)
-                .direction(StrictDirection.getInteractDirection(placePos))
-                .hand(Hand.MAIN_HAND)
-                .block(currentObbyBlock)
-                .build();
-
-        Managers.INTERACT.placeBlock(interaction);
+        placeBlock(placePos, currentObbyBlock);
     }
 
     protected void runSingleObbyPlacement(BlockPos placePos)
     {
         int obbySlot = findBestObbySlot();
-        if (!Managers.INTERACT.startPlacement(obbySlot))
-        {
-            return;
-        }
-
-        placeObby(placePos);
-        Managers.INTERACT.endPlacement();
+        runSingleBlockPlacement(placePos, currentObbyBlock, obbySlot);
     }
 
     protected int findBestObbySlot()

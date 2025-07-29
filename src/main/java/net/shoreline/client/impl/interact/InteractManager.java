@@ -139,6 +139,8 @@ public class InteractManager extends GenericFeature
         {
             airPlacing = true;
             direction = Direction.DOWN;
+            interaction.setDirection(direction);
+
             if (airPlace.isGrim())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));

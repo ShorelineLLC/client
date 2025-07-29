@@ -13,7 +13,6 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -33,8 +32,6 @@ public class AutoTotemModule extends Toggleable
             .setDescription("Holds a totem in your mainhand")
             .setDefaultValue(false).build();
 
-    private Item offhandItem;
-
     public AutoTotemModule()
     {
         super("AutoTotem", "Automatically replaces totems when you pop", GuiCategory.COMBAT);
@@ -53,7 +50,7 @@ public class AutoTotemModule extends Toggleable
 
         boolean lowHealth = playerHealth - potentialDamage <= healthConfig.getValue();
 
-        offhandItem = modeConfig.getValue().getItem();
+        Item offhandItem = modeConfig.getValue().getItem();
         if (lowHealth)
         {
             offhandItem = Items.TOTEM_OF_UNDYING;
@@ -69,8 +66,7 @@ public class AutoTotemModule extends Toggleable
         {
             if (mc.player.getInventory().getStack(n).getItem() == offhandItem)
             {
-                int slot = InventoryUtil.getPacketSlotIndex(n);
-                Managers.INVENTORY.clickSwap(slot, PlayerInventory.OFF_HAND_SLOT, offhandItem);
+                Managers.INVENTORY.clickSwap(n, PlayerInventory.OFF_HAND_SLOT, offhandItem);
 
                 if (mc.player.getOffHandStack().getItem().equals(offhandItem))
                 {

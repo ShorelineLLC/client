@@ -9,20 +9,12 @@ public class ColorUtil
 {
     public int interpolateColor(float value, int c1, int c2)
     {
-        Color start = new Color(c1);
-        Color end = new Color(c2);
-        float sr = start.getRed() / 255.0f;
-        float sg = start.getGreen() / 255.0f;
-        float sb = start.getBlue() / 255.0f;
-        float sa = start.getAlpha() / 255.0f;
-        float er = end.getRed() / 255.0f;
-        float eg = end.getGreen() / 255.0f;
-        float eb = end.getBlue() / 255.0f;
-        float ea = end.getAlpha() / 255.0f;
-        return new Color(sr * value + er * (1.0f - value),
-                sg * value + eg * (1.0f - value),
-                sb * value + eb * (1.0f - value),
-                sa * value + ea * (1.0f - value)).getRGB();
+        float[] s = getRGBValues(c1);
+        float[] e = getRGBValues(c2);
+        return new Color(s[0] * value + e[0] * (1.0f - value),
+                s[1] * value + e[1] * (1.0f - value),
+                s[2] * value + e[2] * (1.0f - value),
+                s[3] * value + e[3] * (1.0f - value)).getRGB();
     }
 
     public int withTransparency(int color, float alpha)
@@ -51,5 +43,15 @@ public class ColorUtil
 
         a = Math.min(255, (int) (a + (amount * factor)));
         return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    public float[] getRGBValues(int color)
+    {
+        Color c = new Color(color);
+        float r = c.getRed() / 255.0f;
+        float g = c.getGreen() / 255.0f;
+        float b = c.getBlue() / 255.0f;
+        float a = c.getAlpha() / 255.0f;
+        return new float[] { r, g, b, a };
     }
 }

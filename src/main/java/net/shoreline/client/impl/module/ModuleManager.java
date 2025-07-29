@@ -38,6 +38,7 @@ public class ModuleManager
                 new AuraModule(),
                 new AutoBowReleaseModule(),
                 new AutoCrystalModule(),
+                new AutoDisconnectModule(),
                 new AutoMineModule(),
                 new AutoTotemModule(),
                 new AutoTrapModule(),

@@ -62,7 +62,7 @@ public class InventoryManager extends GenericFeature
                 && anticheat.getAcModeConfig().getValue() == Anticheat.GRIM
                 && !InventoryUtil.isInInventoryScreen())
         {
-            int slot = packet.getSlot() > PlayerInventory.getHotbarSize() ? packet.getSlot() - 36 : packet.getSlot();
+            int slot = packet.getSlot() > PlayerInventory.getHotbarSize() ? packet.getSlot() - PlayerInventory.MAIN_SIZE : packet.getSlot();
             if (packet.getStack().isEmpty() || !PlayerInventory.isValidHotbarIndex(slot))
             {
                 return;
