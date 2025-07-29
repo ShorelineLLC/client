@@ -108,6 +108,7 @@ public class Frame extends DrawableComponent implements Interactable
         {
             this.frameOpen = !frameOpen;
             collapseAnim.setState(frameOpen);
+            collapseAnim.setEasing(frameOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
         if (collapseAnim.getFactor() > 0.0)

@@ -11,7 +11,8 @@ public class Animation
     private long last;
     private boolean state;
 
-    private final Easing easing;
+    @Setter
+    private Easing easing;
 
     public Animation(float length)
     {

@@ -58,7 +58,7 @@ public class ModuleComponent extends FrameComponent
             frame.getAllComponents().add(component);
         }
 
-        this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
+        this.collapseAnim = new Animation(false, 200, Easing.CUBIC_IN_OUT);
     }
 
     @Override
@@ -115,6 +115,7 @@ public class ModuleComponent extends FrameComponent
         {
             this.frameOpen = !frameOpen;
             collapseAnim.setState(frameOpen);
+            collapseAnim.setEasing(frameOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
         if (collapseAnim.getFactor() > 0.0)

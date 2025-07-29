@@ -40,7 +40,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
                                 int frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
-        this.collapseAnim = new Animation(false, 200, Easing.CUBIC_IN_OUT);
+        this.collapseAnim = new Animation(false, 200, Easing.CUBIC_OUT);
         this.colorConfig = (ColorConfig) config;
         this.pickerLength = width - 14;
         float[] hsb = colorConfig.getHsb();
@@ -72,7 +72,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 1, 0x33000000);
         drawRect(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, getConfig().getValue().getRGB());
 
-        if (collapseAnim.getFactor() > 0.0)
+        if (collapseAnim.getFactor() > 0.001)
         {
             float[] hsb = colorConfig.getHsb();
             int color1 = Color.getHSBColor(hsb[0], 1.0f, 1.0f).getRGB();
@@ -124,6 +124,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         {
             pickerOpen = !pickerOpen;
             collapseAnim.setState(pickerOpen);
+            collapseAnim.setEasing(pickerOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
         if (collapseAnim.getFactor() > 0.0)

@@ -94,6 +94,7 @@ public class GroupComponent extends ConfigComponent<Void>
         {
             this.groupOpen = !groupOpen;
             collapseAnim.setState(groupOpen);
+            collapseAnim.setEasing(groupOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
         if (collapseAnim.getFactor() > 0.0)
