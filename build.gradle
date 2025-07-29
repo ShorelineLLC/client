@@ -63,6 +63,8 @@ dependencies {
     implementation "org.lwjgl:lwjgl-freetype"
     runtimeOnly "org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-macos-arm64"
     runtimeOnly "org.lwjgl:lwjgl-freetype:3.3.3:natives-macos-arm64"
+    runtimeOnly "org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl-freetype:3.3.3:natives-windows"
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
