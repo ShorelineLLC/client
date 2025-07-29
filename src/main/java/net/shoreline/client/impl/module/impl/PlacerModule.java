@@ -103,7 +103,7 @@ public class PlacerModule extends Toggleable
             BlockPos blockPos = animations.getKey();
             float boxAlpha = (float) (40 * animations.getValue().getFactor()) / 255.0f;
             int color = ColorUtil.withTransparency(0x5f5fde, boxAlpha);
-            Managers.RENDER.renderBox(event.getMatrixStack(), event.getImmediate(), blockPos, -1);
+            Managers.RENDER.renderBox(event.getMatrixStack(), blockPos, -1);
         }
 
         Managers.RENDER.endRender();

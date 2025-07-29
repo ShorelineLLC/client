@@ -1,12 +1,16 @@
 package net.shoreline.client.impl.render;
 
+import com.mojang.blaze3d.vertex.VertexFormat;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShapes;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 @Getter
@@ -27,24 +31,56 @@ public class RenderManager
     }
 
     public void renderBox(MatrixStack matrixStack,
-                          VertexConsumerProvider.Immediate vertexConsumers,
                           BlockPos blockPos,
                           int color)
     {
-        renderBox(matrixStack, vertexConsumers, new Box(blockPos), color);
+        renderBox(matrixStack, new Box(blockPos), color);
     }
 
     public void renderBox(MatrixStack matrixStack,
-                          VertexConsumerProvider.Immediate vertexConsumers,
                           Box box,
                           int color)
     {
+        Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
+        float minX = (float) (box.minX - camera.getX());
+        float minY = (float) (box.minY - camera.getY());
+        float minZ = (float) (box.minZ - camera.getZ());
+        float maxX = (float) (box.maxX - camera.getX());
+        float maxY = (float) (box.maxY - camera.getY());
+        float maxZ = (float) (box.maxZ - camera.getZ());
 
-        float[] rgb = ColorUtil.getRGBValues(color);
-        VertexConsumer consumer = vertexConsumers.getBuffer(RenderLayer.getDebugFilledBox());
-        VertexRendering.drawFilledBox(matrixStack, consumer, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, rgb[0], rgb[1], rgb[2], rgb[3]);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        buffer.vertex(matrix, minX, minY, minZ).color(color);
+        buffer.vertex(matrix, maxX, minY, minZ).color(color);
+        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
+        buffer.vertex(matrix, minX, minY, maxZ).color(color);
 
-        VertexConsumer consumer1 = vertexConsumers.getBuffer(RenderLayer.getLines());
-        VertexRendering.drawOutline(matrixStack, consumer1, VoxelShapes.cuboid(box), 0.0f, 0.0f, 0.0f, color);
+        buffer.vertex(matrix, minX, maxY, minZ).color(color);
+        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
+        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
+        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
+
+        buffer.vertex(matrix, minX, minY, minZ).color(color);
+        buffer.vertex(matrix, minX, maxY, minZ).color(color);
+        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
+        buffer.vertex(matrix, maxX, minY, minZ).color(color);
+
+        buffer.vertex(matrix, maxX, minY, minZ).color(color);
+        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
+        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
+        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
+
+        buffer.vertex(matrix, minX, minY, maxZ).color(color);
+        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
+        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
+        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
+
+        buffer.vertex(matrix, minX, minY, minZ).color(color);
+        buffer.vertex(matrix, minX, minY, maxZ).color(color);
+        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
+        buffer.vertex(matrix, minX, maxY, minZ).color(color);
+
+        CustomRenderLayers.QUADS.draw(buffer.end());
     }
 }

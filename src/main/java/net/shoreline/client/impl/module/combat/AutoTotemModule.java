@@ -37,7 +37,7 @@ public class AutoTotemModule extends Toggleable
         super("AutoTotem", "Automatically replaces totems when you pop", GuiCategory.COMBAT);
     }
 
-    @EventListener(priority = Integer.MAX_VALUE - 1)
+    @EventListener(priority = 2147483646)
     public void onTick(final TickEvent.Pre event)
     {
         if (checkNull())
@@ -49,32 +49,26 @@ public class AutoTotemModule extends Toggleable
         double potentialDamage = DamageUtil.potentialDamage(mc.player, damageCheck.getValue());
 
         boolean lowHealth = playerHealth - potentialDamage <= healthConfig.getValue();
-
-        Item offhandItem = modeConfig.getValue().getItem();
-        if (lowHealth)
-        {
-            offhandItem = Items.TOTEM_OF_UNDYING;
-        }
+        Item offhandItem = lowHealth ? Items.TOTEM_OF_UNDYING : modeConfig.getValue().getItem();
 
         if (mc.player.getOffHandStack().getItem().equals(offhandItem))
         {
             return;
         }
 
-        int n = PlayerInventory.MAIN_SIZE - 1;
-        while (n >= 0)
+        int n = PlayerInventory.MAIN_SIZE;
+        while (n > 0)
         {
+            n--;
+
             if (mc.player.getInventory().getStack(n).getItem() == offhandItem)
             {
                 Managers.INVENTORY.clickSwap(n, PlayerInventory.OFF_HAND_SLOT, offhandItem);
-
                 if (mc.player.getOffHandStack().getItem().equals(offhandItem))
                 {
                     return;
                 }
             }
-
-            n--;
         }
     }
 
