@@ -82,12 +82,10 @@ public class Frame extends DrawableComponent implements Interactable
                 component.drawComponent(context, mouseX, mouseY, delta);
                 if (component instanceof ModuleComponent component1)
                 {
-                    int height = 0;
                     if (component instanceof ModuleComponent c1)
                     {
-                        height += c1.getScaledHeight();
+                        yOffset += c1.getScaledHeight();
                     }
-                    yOffset += (int) (height * component1.getCollapseAnim().getFactor());
                 }
             }
 

@@ -1,6 +1,5 @@
 package net.shoreline.client.gui.clickgui.config;
 
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.texture.TextureSetup;
@@ -22,7 +21,13 @@ import java.awt.*;
 public class ColorPickerComponent extends ConfigComponent<Color>
 {
     private final ColorConfig colorConfig;
+    private final Smoother colorSmootherX;
+    private final Smoother colorSmootherY;
+    private final Smoother hueSmootherY;
+
     private float[] selectedColor;
+    private boolean draggingHue;
+    private boolean draggingPicker;
 
     private final int pickerLength;
 
@@ -42,6 +47,9 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         this.collapseAnim = new Animation(false, 200, Easing.CUBIC_OUT);
         this.colorConfig = (ColorConfig) config;
+        this.colorSmootherX = new Smoother();
+        this.colorSmootherY = new Smoother();
+        this.hueSmootherY = new Smoother();
         this.pickerLength = width - 14;
         float[] hsb = colorConfig.getHsb();
         selectedColor = new float[] { hsb[0], hsb[1], hsb[2], hsb[3] };
@@ -86,7 +94,8 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             }
             // drawOutline(context, getTx() + pickerLength + 3, getTy() + height + 5, 10, pickerLength - 2, 1, Colors.BLACK);
 
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, colorConfig.getRGB(), true);
+            drawRect(context, getTx() + 2, getTy() + height + 4, pickerLength - 2, pickerLength - 2, getConfig().getValue().getRGB());
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, 0, true);
             drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0x00000000, 0xff000000, false);
 
             drawOutline(context, getTx() + 3, getTy() + height + pickerLength + 6, pickerLength - 24, 13, 1, theme.getComponentColor());
@@ -110,6 +119,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             drawRect(context, syncX, syncY, 15, 15, theme.getComponentColor());
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
 
+            drawSelectors(context, mouseX, mouseY, delta);
             disableScissor(context);
         }
     }
@@ -131,6 +141,15 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         {
             hexComponent.mouseClicked(mouseX, mouseY, mouseButton);
         }
+
+        if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + 2 + height + 4, pickerLength, pickerLength))
+        {
+            draggingPicker = true;
+        }
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength + 4, getTy() + height + 3, 10, pickerLength - 2))
+        {
+            draggingHue = true;
+        }
     }
 
     @Override
@@ -138,7 +157,8 @@ public class ColorPickerComponent extends ConfigComponent<Color>
                               double mouseY,
                               int button)
     {
-
+        draggingHue = false;
+        draggingPicker = false;
     }
 
     @Override
@@ -169,47 +189,85 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     }
 
     private void drawGradientRect(DrawContext context,
-                                  int x1,
-                                  int y1,
-                                  int x2,
-                                  int y2,
-                                  int startColor,
-                                  int endColor,
-                                  boolean sideways)
-    {
+                                  int x1, int y1, int x2, int y2,
+                                  int startColor, int endColor,
+                                  boolean sideways) {
         Matrix3x2f matrices = new Matrix3x2f(context.getMatrices());
         DefaultGuiRenderState state = new DefaultGuiRenderState(
-                RenderPipelines.GUI, TextureSetup.empty(), context,
+                CustomRenderPipelines.QUADS, TextureSetup.empty(), context,
                 createBounds(context, x1, y1, x2, y2),
-                (bb, z) ->
-                {
-                    float f = (startColor >> 24 & 255) / 255.0F;
-                    float f1 = (startColor >> 16 & 255) / 255.0F;
-                    float f2 = (startColor >> 8 & 255) / 255.0F;
-                    float f3 = (startColor & 255) / 255.0F;
-                    float f4 = (endColor >> 24 & 255) / 255.0F;
-                    float f5 = (endColor >> 16 & 255) / 255.0F;
-                    float f6 = (endColor >> 8 & 255) / 255.0F;
-                    float f7 = (endColor & 255) / 255.0F;
+                (bb, z) -> {
+                    float a1 = (startColor >> 24 & 255) / 255.0F;
+                    float r1 = (startColor >> 16 & 255) / 255.0F;
+                    float g1 = (startColor >> 8 & 255) / 255.0F;
+                    float b1 = (startColor & 255) / 255.0F;
+
+                    float a2 = (endColor >> 24 & 255) / 255.0F;
+                    float r2 = (endColor >> 16 & 255) / 255.0F;
+                    float g2 = (endColor >> 8 & 255) / 255.0F;
+                    float b2 = (endColor & 255) / 255.0F;
 
                     DirectVertexConsumer bufferBuilder = new DirectVertexConsumer((BufferBuilder) bb, false);
-                    if (sideways)
-                    {
-                        bufferBuilder.vertex(matrices, x1, y1, z).color(f1, f2, f3, f);
-                        bufferBuilder.vertex(matrices, x1, y2, z).color(f1, f2, f3, f);
-                        bufferBuilder.vertex(matrices, x2, y2, z).color(f5, f6, f7, f4);
-                        bufferBuilder.vertex(matrices, x2, y1, z).color(f5, f6, f7, f4);
-                    }
-                    else
-                    {
-                        bufferBuilder.vertex(matrices, x2, y1, z).color(f1, f2, f3, f);
-                        bufferBuilder.vertex(matrices, x1, y1, z).color(f1, f2, f3, f);
-                        bufferBuilder.vertex(matrices, x1, y2, z).color(f5, f6, f7, f4);
-                        bufferBuilder.vertex(matrices, x2, y2, z).color(f5, f6, f7, f4);
+
+                    if (sideways) {
+                        // Left side = startColor, right side = endColor
+                        bufferBuilder.vertex(matrices, x1, y1, z).color(r1, g1, b1, a1);
+                        bufferBuilder.vertex(matrices, x1, y2, z).color(r1, g1, b1, a1);
+                        bufferBuilder.vertex(matrices, x2, y2, z).color(r2, g2, b2, a2);
+                        bufferBuilder.vertex(matrices, x2, y1, z).color(r2, g2, b2, a2);
+                    } else {
+                        // Top = startColor, bottom = endColor
+                        bufferBuilder.vertex(matrices, x1, y1, z).color(r1, g1, b1, a1);
+                        bufferBuilder.vertex(matrices, x2, y1, z).color(r1, g1, b1, a1);
+                        bufferBuilder.vertex(matrices, x2, y2, z).color(r2, g2, b2, a2);
+                        bufferBuilder.vertex(matrices, x1, y2, z).color(r2, g2, b2, a2);
                     }
                 });
 
         ((AccessorDrawContext) context).getState().addSimpleElement(state);
+    }
+
+    public void drawSelectors(DrawContext context, float mouseX, float mouseY, float delta)
+    {
+        float[] hsb = colorConfig.getHsb();
+        int hueX = getTx() + pickerLength + 4;
+        int hueW = 10;
+        int hueY = getTy() + height + 3;
+        int hueH = pickerLength - 2;
+
+        int pickerX = getTx() + 2;
+        int pickerY = getTy() + height + 4;
+        int pickerW = pickerLength - 2;
+        int pickerH = pickerLength - 2;
+
+        int posX = (int) (pickerX + hsb[1] * pickerW);
+        int posY = (int) (pickerY + (1.0f - hsb[2]) * pickerH);
+        int smootherX = (int) colorSmootherX.smooth(posX, 0.5f, delta);
+        int smootherY = (int) colorSmootherY.smooth(posY, 0.5f, delta);
+        drawRect(context, smootherX - 2, smootherY - 2, 4, 4, 0xFF000000);
+        drawRect(context, smootherX - 1, smootherY - 1, 2, 2, 0xFFFFFFFF);
+
+        int hueSelectorY = (int) (hueY + hsb[0] * hueH);
+        int hueSmoothY = (int) hueSmootherY.smooth(hueSelectorY - 2, 0.5f, delta);
+        drawRect(context, hueX - 1, hueSmoothY, hueW + 2, 3, 0xFF000000);
+        drawRect(context, hueX, hueSmoothY + 1, hueW + 1, 1, 0xFFFFFFFF);
+
+        if (draggingPicker)
+        {
+            float sat = Math.max(0, Math.min(1, (mouseX - pickerX) / pickerW));
+            float bri = 1.0f - Math.max(0, Math.min(1, (mouseY - pickerY) / pickerH));
+
+            selectedColor[1] = sat;
+            selectedColor[2] = bri;
+            colorConfig.setValue(new Color(Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2])));
+        }
+
+        if (draggingHue)
+        {
+            float hue = Math.max(0, Math.min(1, (mouseY - hueY) / hueH));
+            selectedColor[0] = hue;
+            colorConfig.setValue(new Color(Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2])));
+        }
     }
 
     public int getComponentHeight()
