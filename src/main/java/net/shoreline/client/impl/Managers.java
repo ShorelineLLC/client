@@ -3,6 +3,7 @@ package net.shoreline.client.impl;
 import net.shoreline.client.api.macro.MacroManager;
 import net.shoreline.client.api.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
+import net.shoreline.client.impl.combat.TotemManager;
 import net.shoreline.client.impl.command.CommandManager;
 import net.shoreline.client.impl.movement.MovementManager;
 import net.shoreline.client.impl.interact.InteractManager;
@@ -23,6 +24,7 @@ public class Managers
     public static MovementManager MOVEMENT;
     public static InteractManager INTERACT;
     public static RenderManager RENDER;
+    public static TotemManager TOTEM;
 
     public static void init()
     {
@@ -36,5 +38,6 @@ public class Managers
         MOVEMENT = new MovementManager();
         INTERACT = new InteractManager();
         RENDER = new RenderManager();
+        TOTEM = new TotemManager();
     }
 }
