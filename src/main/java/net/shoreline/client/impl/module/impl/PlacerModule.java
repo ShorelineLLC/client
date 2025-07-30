@@ -18,12 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class PlacerModule extends Toggleable
 {
     protected final AnticheatModule anticheat = AnticheatModule.INSTANCE;
 
-    private final Map<BlockPos, Animation> fadeOutAnimations = new ConcurrentHashMap<>();
+    private final ConcurrentMap<BlockPos, Animation> fadeOutAnimations = new ConcurrentHashMap<>();
 
     public PlacerModule(String name, String description, GuiCategory category) {
         super(name, description, category);
@@ -96,7 +97,6 @@ public class PlacerModule extends Toggleable
     @EventListener
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
-        Managers.RENDER.startRender();
         for (Map.Entry<BlockPos, Animation> animations : fadeOutAnimations.entrySet())
         {
             animations.getValue().setState(false);
@@ -105,7 +105,5 @@ public class PlacerModule extends Toggleable
             int color = ColorUtil.withTransparency(0x5f5fde, boxAlpha);
             Managers.RENDER.renderBox(event.getMatrixStack(), blockPos, -1);
         }
-
-        Managers.RENDER.endRender();
     }
 }

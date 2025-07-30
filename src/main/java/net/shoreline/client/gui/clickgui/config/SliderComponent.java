@@ -11,6 +11,7 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.*;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;

@@ -15,6 +15,7 @@ import net.shoreline.client.gui.clickgui.config.GroupComponent;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;

@@ -78,13 +78,10 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         drawText(context, textBuffer, Text.literal(getConfig().getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
 
         drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 1, 0x33000000);
-        drawRect(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, getConfig().getValue().getRGB());
+        drawRect(context, getTx() + getWidth() - 14, getTy() + 2, 12, 12, getConfig().getValue().getRGB());
 
         if (collapseAnim.getFactor() > 0.001)
         {
-            float[] hsb = colorConfig.getHsb();
-            int color1 = Color.getHSBColor(hsb[0], 1.0f, 1.0f).getRGB();
-
             enableScissor(context, getTx() + 2, getTy() + height + 4, getTx() + width, getTy() + height + getComponentHeight() + 2);
 
             for (int i = 0; i < pickerLength - 2; i++)
@@ -277,6 +274,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         {
             pickerHeight += 14;
         }
+
         return (int) (pickerHeight * collapseAnim.getFactor());
     }
 }

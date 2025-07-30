@@ -13,6 +13,7 @@ import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -27,16 +28,6 @@ public class ClickGuiScreen extends Screen
     @Getter
     private final Mouse mouse = new Mouse();
     private boolean draggingMouse;
-
-    @Getter
-    private final Theme theme = Theme.builder()
-            .titleColor(0x665f5fde)
-            .backgroundColor(0x33000000)
-            .outlineColor(0x1a5f5fde)
-            .componentColor(0x665f5fde)
-            .textColor(0xffffffff)
-            .fadeAnimation(ClickGuiModule.INSTANCE.getFadeAnimation())
-            .build();
 
     private boolean shouldCloseOnEsc = true;
 
@@ -230,5 +221,10 @@ public class ClickGuiScreen extends Screen
         mouse.setRightHeld(false);
         ClickGuiModule.INSTANCE.disable();
         super.close();
+    }
+
+    public Theme getTheme()
+    {
+        return ClickGuiModule.INSTANCE.getTheme();
     }
 }

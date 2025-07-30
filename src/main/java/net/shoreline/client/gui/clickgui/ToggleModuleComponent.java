@@ -8,6 +8,7 @@ import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.gui.clickgui.config.GroupComponent;
 import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Theme;
 
 public class ToggleModuleComponent extends ModuleComponent
 {

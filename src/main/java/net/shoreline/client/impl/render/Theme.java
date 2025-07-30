@@ -1,19 +1,44 @@
-package net.shoreline.client.gui.clickgui;
+package net.shoreline.client.impl.render;
 
-import lombok.Builder;
-import net.shoreline.client.impl.render.Animation;
-import net.shoreline.client.impl.render.ColorUtil;
+import lombok.RequiredArgsConstructor;
 
-@Builder
+import java.awt.*;
+
+@RequiredArgsConstructor
 public class Theme
 {
     private final Animation fadeAnimation;
 
-    private final int titleColor;
-    private final int componentColor;
-    private final int textColor;
-    private final int backgroundColor;
-    private final int outlineColor;
+    private int titleColor;
+    private int componentColor;
+    private int textColor;
+    private int backgroundColor;
+    private int outlineColor;
+
+    public void setTitleColor(Color color)
+    {
+        this.titleColor = ColorUtil.withTransparency(color, 0.4f);
+    }
+
+    public void setComponentColor(Color color)
+    {
+        this.componentColor = ColorUtil.withTransparency(color, 0.4f);
+    }
+
+    public void setTextColor(Color color)
+    {
+        this.textColor = color.getRGB();
+    }
+
+    public void setBackgroundColor(Color color)
+    {
+        this.backgroundColor = ColorUtil.withTransparency(color, 0.2f);
+    }
+
+    public void setOutlineColor(Color color)
+    {
+        this.outlineColor = ColorUtil.withTransparency(color, 0.4f);
+    }
 
     public int getTitleColor()
     {

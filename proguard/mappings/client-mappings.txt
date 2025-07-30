@@ -3637,11 +3637,11 @@ net.shoreline.client.impl.module.client.ClickGuiModule -> net.shoreline.client.i
     189:189:float getScaleFactor() -> hB
     194:194:int getScrollSpeed() -> hC
     35:35:void <clinit>() -> <clinit>
-net.shoreline.client.impl.module.client.ColorsModule -> net.shoreline.client.iC:
-    net.shoreline.client.impl.module.client.ColorsModule INSTANCE -> nP
+net.shoreline.client.impl.module.client.ThemeModule -> net.shoreline.client.iC:
+    net.shoreline.client.impl.module.client.ThemeModule INSTANCE -> nP
     net.shoreline.client.api.config.Config colorConfig -> nQ
     22:32:void <init>() -> <init>
-    36:36:net.shoreline.client.impl.module.client.ColorsModule getInstance() -> hD
+    36:36:net.shoreline.client.impl.module.client.ThemeModule getInstance() -> hD
     42:43:void onClientColor(net.shoreline.client.impl.event.ClientColorEvent) -> a
     47:47:java.awt.Color getColor() -> cp
     52:53:java.awt.Color getColor(float) -> B

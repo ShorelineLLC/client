@@ -17,6 +17,12 @@ public class ColorUtil
                 s[3] * value + e[3] * (1.0f - value)).getRGB();
     }
 
+    public int withTransparency(Color color, float alpha)
+    {
+        float[] rgb = getRGBValues(color.getRGB());
+        return new Color(rgb[0], rgb[1], rgb[2], alpha).getRGB();
+    }
+
     public int withTransparency(int color, float alpha)
     {
         if (alpha == 1.0f)

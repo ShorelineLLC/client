@@ -9,12 +9,10 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
-import net.shoreline.client.gui.clickgui.Theme;
+import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.util.Formatter;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Arrays;
 
 public class SelectorComponent extends ConfigComponent<Enum<?>>
 {

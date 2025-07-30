@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.client;
 
+import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
@@ -8,6 +9,7 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
 public class ClickGuiModule extends Toggleable
@@ -24,6 +26,8 @@ public class ClickGuiModule extends Toggleable
             .setMin(5).setMax(100).setDefaultValue(30).setFormat("dpi")
             .setDescription("The speed for mouse scrolling").build();
 
+    @Getter
+    private final Theme theme;
     private final Animation fadeInAnimation;
 
     public ClickGuiModule()
@@ -31,6 +35,7 @@ public class ClickGuiModule extends Toggleable
         super("ClickGui", "The client mod menu", GuiCategory.CLIENT);
         setKeybind(GLFW.GLFW_KEY_RIGHT_SHIFT);
         this.fadeInAnimation = new Animation(false, 400, Easing.SINE_OUT);
+        this.theme = new Theme(fadeInAnimation);
         INSTANCE = this;
     }
 
@@ -42,6 +47,13 @@ public class ClickGuiModule extends Toggleable
             disable();
             return;
         }
+
+        ThemeModule primaryTheme = ThemeModule.INSTANCE;
+        theme.setComponentColor(primaryTheme.getPrimaryColor());
+        theme.setTitleColor(primaryTheme.getTitleColor());
+        theme.setBackgroundColor(primaryTheme.getBackgroundColor());
+        theme.setOutlineColor(primaryTheme.getOutlineColor());
+        theme.setTextColor(primaryTheme.getTextColor());
 
         setFadeState(true);
         mc.setScreen(ClickGuiScreen.INSTANCE);

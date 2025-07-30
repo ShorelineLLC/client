@@ -14,6 +14,7 @@ import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -26,9 +27,6 @@ public class BlockHighlightModule extends RenderModule
             .setValues(BoxRender.values())
             .setDescription("Box rendering mode")
             .setDefaultValue(BoxRender.FILL).build();
-
-    Config<Color> colorConfig = new ColorConfig.Builder("Color")
-            .setRgb(0xFFFFFFFF).build();
 
     public BlockHighlightModule()
     {
@@ -59,7 +57,7 @@ public class BlockHighlightModule extends RenderModule
                     double maxY = pos.getY() + box.maxY;
                     double maxZ = pos.getZ() + box.maxZ;
                     Box bb = new Box(minX, minY, minZ, maxX, maxY, maxZ);
-                    modeConfig.getValue().render(event.getMatrixStack(), bb, colorConfig.getValue().getRGB());
+                    modeConfig.getValue().render(event.getMatrixStack(), bb, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
                 }
             }
         }

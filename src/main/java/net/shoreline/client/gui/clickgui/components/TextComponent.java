@@ -8,7 +8,7 @@ import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
-import net.shoreline.client.gui.clickgui.Theme;
+import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;

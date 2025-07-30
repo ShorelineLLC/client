@@ -6,7 +6,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
-import net.shoreline.client.gui.clickgui.Theme;
+import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.gui.clickgui.components.ToggleComponent;
 import net.shoreline.client.impl.render.ColorUtil;
 
