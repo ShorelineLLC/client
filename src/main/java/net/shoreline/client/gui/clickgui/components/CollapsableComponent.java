@@ -14,6 +14,7 @@ import java.util.List;
 public class CollapsableComponent extends FrameComponent
 {
     private final List<FrameComponent> subComponents = new ArrayList<>();
+
     @Setter
     private boolean frameOpen;
     private final Animation collapseAnim;

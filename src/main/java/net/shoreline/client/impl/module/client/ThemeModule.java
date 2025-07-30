@@ -13,19 +13,19 @@ public class ThemeModule extends Concurrent
     public static ThemeModule INSTANCE;
 
     Config<Color> primaryColor = new ColorConfig.Builder("PrimaryColor")
-            .setRgb(0x5f5fde)
+            .setRgb(0xff5f5fde)
             .setDescription("The primary Clickgui color").build();
     Config<Color> titleColor = new ColorConfig.Builder("TitleColor")
-            .setRgb(0x5f5fde)
+            .setRgb(0xff5f5fde)
             .setDescription("The Clickgui title color").build();
     Config<Color> backgroundColor = new ColorConfig.Builder("BackgroundColor")
-            .setRgb(0x000000)
+            .setRgb(0xff000000)
             .setDescription("The Clickgui background color").build();
     Config<Color> outlineColor = new ColorConfig.Builder("OutlineColor")
-            .setRgb(0x000000)
+            .setRgb(0x00000000)
             .setDescription("The Clickgui outline color").build();
     Config<Color> textColor = new ColorConfig.Builder("TextColor")
-            .setRgb(0xffffff)
+            .setRgb(0xffffffff)
             .setDescription("The Clickgui text color").build();
 
     public ThemeModule()

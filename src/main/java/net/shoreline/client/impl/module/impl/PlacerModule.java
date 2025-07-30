@@ -1,18 +1,18 @@
 package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.interact.StrictDirection;
 import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
-import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,16 +94,20 @@ public class PlacerModule extends Toggleable
         return placements;
     }
 
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent.Post event)
+    public void renderBlockPlacements(MatrixStack matrixStack)
     {
         for (Map.Entry<BlockPos, Animation> animations : fadeOutAnimations.entrySet())
         {
+            if (animations.getValue().getFactor() <= 0.01)
+            {
+                fadeOutAnimations.remove(animations.getKey());
+            }
+
             animations.getValue().setState(false);
             BlockPos blockPos = animations.getKey();
-            float boxAlpha = (float) (40 * animations.getValue().getFactor()) / 255.0f;
-            int color = ColorUtil.withTransparency(0x5f5fde, boxAlpha);
-            Managers.RENDER.renderBox(event.getMatrixStack(), blockPos, -1);
+            int color = ThemeModule.INSTANCE.getPrimaryColor().getRGB();
+            Managers.RENDER.renderBoundingBox(matrixStack, blockPos, ColorUtil.withTransparency(color, (float) (0.75f * animations.getValue().getFactor())));
+            Managers.RENDER.renderBox(matrixStack, blockPos, ColorUtil.withTransparency(color, (float) (0.3f * animations.getValue().getFactor())));
         }
     }
 }

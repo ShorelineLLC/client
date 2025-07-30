@@ -13,6 +13,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.combat.trap.TrapLayer;
 import net.shoreline.client.impl.module.combat.trap.TrapModule;
 import net.shoreline.client.impl.module.combat.trap.TrapSpec;
@@ -133,5 +134,11 @@ public class SelfTrapModule extends TrapModule
                 runSingleObbyPlacement(blockPos);
             }
         }
+    }
+
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent.Post event)
+    {
+        renderBlockPlacements(event.getMatrixStack());
     }
 }
