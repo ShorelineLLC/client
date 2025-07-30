@@ -4,6 +4,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.impl.event.render.RenderBlockOutlineEvent;
 import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
 import net.shoreline.client.impl.event.render.RenderNauseaEvent;
 import net.shoreline.client.impl.event.render.TiltViewEvent;
@@ -13,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer
@@ -50,6 +52,18 @@ public class MixinGameRenderer
         if (renderFloatingItemEvent.isCanceled())
         {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "shouldRenderBlockOutline", at = @At(value = "HEAD"), cancellable = true)
+    private void hookShouldRenderBlockOutline(CallbackInfoReturnable<Boolean> cir)
+    {
+        RenderBlockOutlineEvent renderBlockOutlineEvent = new RenderBlockOutlineEvent();
+        EventBus.INSTANCE.dispatch(renderBlockOutlineEvent);
+        if (renderBlockOutlineEvent.isCanceled())
+        {
+            cir.setReturnValue(false);
+            cir.cancel();
         }
     }
 }
