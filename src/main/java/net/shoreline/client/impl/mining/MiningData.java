@@ -2,22 +2,18 @@ package net.shoreline.client.impl.mining;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffectUtil;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
-import net.shoreline.client.util.item.EnchantUtil;
 
 @Builder
 @Data
@@ -28,14 +24,37 @@ public class MiningData
     private final BlockPos blockPos;
     private final Direction direction;
 
+    private final float maxProgress;
+
+    @EqualsAndHashCode.Exclude
     private final ItemStack miningStack;
 
+    @EqualsAndHashCode.Exclude
     private float blockDamage, lastDamage;
 
-    public float tickBlockDamage()
+    @EqualsAndHashCode.Exclude
+    private transient int ticksMining;
+
+    @Builder.Default
+    @EqualsAndHashCode.Exclude
+    private final Animation fadeOutAnim = new Animation(true, 300L);
+
+    public float tickDelta()
     {
         this.lastDamage = blockDamage;
-        return blockDamage += getBlockBreakingDelta();
+        this.blockDamage += getBlockBreakingDelta();
+
+        if (blockDamage > maxProgress)
+        {
+            ticksMining++;
+        }
+
+        return blockDamage;
+    }
+
+    public void resetTick()
+    {
+        ticksMining = 0;
     }
 
     public double squaredDistanceTo()
@@ -56,74 +75,43 @@ public class MiningData
         {
             return 0.0f;
         }
-        int i = canHarvest(state) ? 30 : 100;
-        return getBlockBreakingSpeed(state) / f / (float)i;
-    }
-
-    private float getBlockBreakingSpeed(BlockState block)
-    {
-        float f = miningStack.getMiningSpeedMultiplier(block);
-        if (f > 1.0f)
-        {
-            int lvl = EnchantUtil.getLevel(Enchantments.EFFICIENCY, miningStack);
-            f += (float) lvl * lvl;
-        }
-        if (StatusEffectUtil.hasHaste(player))
-        {
-            f *= 1.0f + (float) (StatusEffectUtil.getHasteAmplifier(player) + 1) * 0.2f;
-        }
-
-        if (player.hasStatusEffect(StatusEffects.MINING_FATIGUE))
-        {
-            float g = switch (player.getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier())
-            {
-                case 0 -> 0.3f;
-                case 1 -> 0.09f;
-                case 2 -> 0.0027f;
-                default -> 8.1E-4f;
-            };
-            f *= g;
-        }
-        f *= (float) player.getAttributeValue(EntityAttributes.BLOCK_BREAK_SPEED);
-        if (!player.isOnGround())
-        {
-            f /= 5.0f;
-        }
-        return f;
-    }
-
-    private boolean canHarvest(BlockState state)
-    {
-        return !state.isToolRequired() || miningStack.isSuitableFor(state);
+        int i = MiningUtil.canHarvest(miningStack, state) ? 30 : 100;
+        return MiningUtil.getBlockBreakingSpeed(player, miningStack, state) / f / (float) i;
     }
 
     public void render(MatrixStack matrixStack,
                        float tickDelta,
-                       float miningSpeed,
                        int startColor,
                        int endColor)
     {
-        VoxelShape outlineShape = VoxelShapes.fullCube();
-        if (blockDamage < miningSpeed)
+        final BlockState state = getBlockState();
+        Box fullBox = VoxelShapes.fullCube().getBoundingBox();
+
+        double scale;
+        Box outlineShape;
+        if (!MiningUtil.canMineBlock(state) || ticksMining >= 30)
         {
-            outlineShape = getBlockState().getOutlineShape(MinecraftClient.getInstance().world, blockPos);
-            outlineShape = outlineShape.isEmpty() ? VoxelShapes.fullCube() : outlineShape;
+            scale = 1.0;
+            outlineShape = fullBox;
+            fadeOutAnim.setState(false);
+        } else
+        {
+            scale = Easing.SMOOTH_STEP.ease(getLinearScale(maxProgress, tickDelta));
+            outlineShape = state.getOutlineShape(MinecraftClient.getInstance().world, blockPos).getBoundingBox();
         }
 
-        int color = ColorUtil.interpolateColor(Math.min(blockDamage, 1.0f), startColor, endColor);
-        Box render1 = outlineShape.getBoundingBox();
-        Vec3d center = render1.offset(blockPos).getCenter();
-        double scale = Easing.SMOOTH_STEP.ease(getLinearScale(miningSpeed, tickDelta));
+        int color = ColorUtil.interpolateColor(Math.min(blockDamage, 1.0f), endColor, startColor);
+        Vec3d center = outlineShape.offset(blockPos).getCenter();
 
-        double dx = (render1.maxX - render1.minX) * scale;
-        double dy = (render1.maxY - render1.minY) * scale;
-        double dz = (render1.maxZ - render1.minZ) * scale;
+        double dx = (outlineShape.maxX - outlineShape.minX) * scale;
+        double dy = (outlineShape.maxY - outlineShape.minY) * scale;
+        double dz = (outlineShape.maxZ - outlineShape.minZ) * scale;
         Box scaled = Box.of(center, dx, dy, dz);
 
-        BoxRender.FILL.render(matrixStack, scaled, color);
+        BoxRender.FILL.render(matrixStack, scaled, color, (float) fadeOutAnim.getFactor());
     }
 
-    public float getLinearScale(float maxProgress, float tickDelta)
+    private float getLinearScale(float maxProgress, float tickDelta)
     {
         return MathHelper.clamp((blockDamage + (blockDamage - lastDamage) * tickDelta) / maxProgress, 0.0f, 1.0f);
     }

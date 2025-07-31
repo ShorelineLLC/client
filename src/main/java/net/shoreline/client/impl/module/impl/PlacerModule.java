@@ -12,6 +12,7 @@ import net.shoreline.client.impl.interact.StrictDirection;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
 
 import java.util.ArrayList;
@@ -106,8 +107,8 @@ public class PlacerModule extends ListeningToggleable
             animations.getValue().setState(false);
             BlockPos blockPos = animations.getKey();
             int color = ThemeModule.INSTANCE.getPrimaryColor().getRGB();
-            Managers.RENDER.renderBoundingBox(matrixStack, blockPos, ColorUtil.withTransparency(color, (float) (0.75f * animations.getValue().getFactor())));
-            Managers.RENDER.renderBox(matrixStack, blockPos, ColorUtil.withTransparency(color, (float) (0.3f * animations.getValue().getFactor())));
+
+            BoxRender.FILL.render(matrixStack, blockPos, color, (float) animations.getValue().getFactor());
         }
     }
 }

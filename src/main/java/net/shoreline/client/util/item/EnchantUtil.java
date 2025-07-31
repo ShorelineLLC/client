@@ -7,7 +7,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -18,11 +17,10 @@ import java.util.Set;
 @UtilityClass
 public class EnchantUtil
 {
-    private static final RegistryWrapper.WrapperLookup lookup = BuiltinRegistries.createWrapperLookup();
-
     public RegistryEntry<Enchantment> getEntry(RegistryKey<Enchantment> key)
     {
-        return lookup.getOrThrow(RegistryKeys.ENCHANTMENT).getOptional(key).orElse(null);
+        RegistryWrapper.WrapperLookup mcLookup = MinecraftClient.getInstance().world.getRegistryManager();
+        return mcLookup.getOrThrow(RegistryKeys.ENCHANTMENT).getOptional(key).orElse(null);
     }
 
     public int getLevel(RegistryKey<Enchantment> key, ItemStack stack)

@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.eventbus.EventBus;
@@ -28,10 +29,17 @@ public class MiningManager extends GenericFeature
     public MiningManager()
     {
         super("Mining");
-        EventBus.INSTANCE.subscribe(this);
-
         this.maxPickaxeStack = new ItemStack(Items.NETHERITE_PICKAXE);
-        this.maxPickaxeStack.addEnchantment(EnchantUtil.getEntry(Enchantments.EFFICIENCY), 5);
+        EventBus.INSTANCE.subscribe(this);
+    }
+
+    @EventListener
+    public void onEntityDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() == mc.player)
+        {
+            miningBlocks.clear();
+        }
     }
 
     @EventListener
@@ -42,9 +50,20 @@ public class MiningManager extends GenericFeature
             return;
         }
 
+        if (maxPickaxeStack.getEnchantments().isEmpty())
+        {
+            maxPickaxeStack.addEnchantment(EnchantUtil.getEntry(Enchantments.EFFICIENCY), 5);
+        }
+
         for (MiningData data : miningBlocks.values())
         {
-            data.tickBlockDamage();
+            if (data.squaredDistanceTo() > 36.0f || data.getFadeOutAnim().getFactor() < 0.01)
+            {
+                miningBlocks.remove(data.getBlockPos());
+                continue;
+            }
+
+            data.tickDelta();
         }
     }
 
@@ -58,13 +77,13 @@ public class MiningManager extends GenericFeature
 
         if (event.getPacket() instanceof BlockBreakingProgressS2CPacket packet)
         {
-            Entity entity = mc.world.getEntityById(packet.getEntityId());
-            if (!(entity instanceof PlayerEntity playerEntity))
+            if (packet.getProgress() > 0 || miningBlocks.containsKey(packet.getPos()))
             {
                 return;
             }
 
-            if (miningBlocks.containsKey(packet.getPos()))
+            Entity entity = mc.world.getEntityById(packet.getEntityId());
+            if (!(entity instanceof PlayerEntity playerEntity))
             {
                 return;
             }
@@ -72,26 +91,44 @@ public class MiningManager extends GenericFeature
             MiningData data = MiningData.builder()
                     .blockPos(packet.getPos())
                     .direction(Direction.UP)
+                    .maxProgress(0.7f)
                     .player(playerEntity)
                     .miningStack(maxPickaxeStack)
                     .build();
 
-            if (mc.player.squaredDistanceTo(data.getBlockPos().toCenterPos()) > 144.0f || data.squaredDistanceTo() > 144.0f)
+            if (mc.player.squaredDistanceTo(data.getBlockPos().toCenterPos()) > 144.0f)
             {
                 return;
             }
 
-            long count = miningBlocks.values().stream().filter(d -> d.getPlayer().equals(playerEntity)).count();
+            long count = getMiningCount(playerEntity);
             if (count >= 2)
             {
-                miningBlocks.entrySet().stream()
-                        .filter(e -> e.getValue().getPlayer().equals(playerEntity))
-                        .findFirst()
-                        .ifPresent(d -> miningBlocks.remove(d.getKey()));
+                for (var entry : miningBlocks.entrySet())
+                {
+                    if (entry.getValue().getPlayer().equals(playerEntity))
+                    {
+                        miningBlocks.remove(entry.getKey());
+                        break;
+                    }
+                }
             }
 
             miningBlocks.put(packet.getPos(), data);
         }
+    }
+
+    public int getMiningCount(PlayerEntity playerEntity)
+    {
+        int count = 0;
+        for (MiningData data : miningBlocks.values())
+        {
+            if (data.getPlayer().equals(playerEntity) && ++count >= 2)
+            {
+                break;
+            }
+        }
+        return count;
     }
 
     public float getMiningProgress(BlockPos blockPos)

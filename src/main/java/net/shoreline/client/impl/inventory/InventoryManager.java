@@ -115,7 +115,7 @@ public class InventoryManager extends GenericFeature
     @EventListener
     public void onRenderHotbarItem(RenderHotbarItemEvent event)
     {
-        if (!lastSwapTimer.hasPassed(500) && swapCache != null)
+        if (!lastSwapTimer.hasPassed(1000) && swapCache != null)
         {
             event.cancel();
             event.setStack(swapCache.getStack(event.getSeed()));
@@ -137,14 +137,14 @@ public class InventoryManager extends GenericFeature
             return false;
         }
 
-        if (serverSlot == itemSlot)
+        if (playerInventory.getSelectedSlot() == itemSlot)
         {
             return true;
         }
 
         swapCache = new HotbarCache(playerInventory);
 
-        int fromSlot = serverSlot;
+        int fromSlot = playerInventory.getSelectedSlot();
 
         if (current.isSwapped())
         {
@@ -153,11 +153,7 @@ public class InventoryManager extends GenericFeature
 
         switch (swapType)
         {
-            case HOTBAR ->
-            {
-                Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
-                trackedSwaps.add(new SwapData(swapCache, itemSlot, fromSlot));
-            }
+            case HOTBAR -> Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
             case INVENTORY ->
             {
                 int toSlot = InventoryUtil.getPacketSlotIndex(itemSlot);
@@ -165,6 +161,8 @@ public class InventoryManager extends GenericFeature
                 lastSwapTimer.reset();
             }
         }
+
+        trackedSwaps.add(new SwapData(swapCache, itemSlot, fromSlot));
 
         current.setSlotTo(itemSlot);
         current.setSlotFrom(fromSlot);

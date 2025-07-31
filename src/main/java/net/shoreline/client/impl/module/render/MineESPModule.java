@@ -20,10 +20,10 @@ public class MineESPModule extends RenderModule
             .build();
     Config<Color> miningColor = new ColorConfig.Builder("Mining")
             .setDescription("The color when mining a block")
-            .setDefaultValue(Color.YELLOW).build();
+            .setDefaultValue(Color.MAGENTA.darker()).build();
     Config<Color> breakingColor = new ColorConfig.Builder("Breaking")
             .setDescription("The color when breaking a block")
-            .setDefaultValue(Color.ORANGE).build();
+            .setDefaultValue(Color.MAGENTA.brighter()).build();
 
     public MineESPModule()
     {
@@ -36,12 +36,12 @@ public class MineESPModule extends RenderModule
         for (MiningData data : Managers.MINING.getMiningBlocks())
         {
             float rangeSq = rangeConfig.getValue() * rangeConfig.getValue();
-            if (mc.player.squaredDistanceTo(data.getBlockPos().toCenterPos()) > rangeSq || data.squaredDistanceTo() > rangeSq)
+            if (mc.player.squaredDistanceTo(data.getBlockPos().toCenterPos()) > rangeSq)
             {
                 continue;
             }
 
-            data.render(event.getMatrixStack(), event.getTickDelta(), 0.7f,
+            data.render(event.getMatrixStack(), event.getTickDelta(),
                     miningColor.getValue().getRGB(), breakingColor.getValue().getRGB());
         }
     }

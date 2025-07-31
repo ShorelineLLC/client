@@ -1,7 +1,5 @@
 package net.shoreline.client.impl.module.world;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
@@ -12,6 +10,8 @@ import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
+import net.shoreline.client.impl.mining.MiningPackets;
+import net.shoreline.client.impl.mining.MiningUtil;
 import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -19,12 +19,12 @@ import java.awt.*;
 
 public class SpeedMineModule extends Toggleable
 {
-    Config<MiningMode> modeConfig = new EnumConfig.Builder<MiningMode>("Mode")
-            .setValues(MiningMode.values()).setDefaultValue(MiningMode.NORMAL)
+    Config<MiningPackets> miningPackets = new EnumConfig.Builder<MiningPackets>("Mode")
+            .setValues(MiningPackets.values()).setDefaultValue(MiningPackets.NORMAL)
             .setDescription("The mode for block click packets").build();
     Config<Boolean> doubleMine = new BooleanConfig.Builder("DoubleMine")
             .setDescription("Rotates before mining block")
-            .setVisible(() -> modeConfig.getValue() == MiningMode.GRIM)
+            .setVisible(() -> miningPackets.getValue() == MiningPackets.GRIM)
             .setDefaultValue(false).build();
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
@@ -59,6 +59,13 @@ public class SpeedMineModule extends Toggleable
         super("SpeedMine", new String[] {"SpeedyGonzales"}, "Mine faster", GuiCategory.WORLD);
     }
 
+    @Override
+    public void onDisable()
+    {
+        mainMiningBlock = null;
+        packetMiningBlock = null;
+    }
+
     @EventListener
     public void onTickEvent(TickEvent.Pre event)
     {
@@ -67,25 +74,13 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
-        if (mainMiningBlock != null)
-        {
-            float blockDamage = mainMiningBlock.tickBlockDamage();
-            if (blockDamage >= speedConfig.getValue())
-            {
-                int slot = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
-                if (slot != -1 && Managers.INVENTORY.startSwap(slot, swapConfig.getValue()))
-                {
-                    stopMiningBlock(mainMiningBlock);
-                    Managers.INVENTORY.endSwap();
-                }
-            }
-        }
+        tickMain();
     }
 
     @EventListener
     public void onAttackBlock(AttackBlockEvent event)
     {
-        if (!PlayerUtil.isInSurvival(mc.player) || !canMineBlock(event.getState()))
+        if (!PlayerUtil.isInSurvival(mc.player) || !MiningUtil.canMineBlock(event.getState()))
         {
             return;
         }
@@ -96,27 +91,13 @@ public class SpeedMineModule extends Toggleable
         mainMiningBlock = MiningData.builder()
                 .blockPos(event.getPos())
                 .direction(event.getDirection())
+                .maxProgress(speedConfig.getValue())
                 .player(mc.player)
                 .miningStack(AutoToolModule.INSTANCE.getToolStack())
                 .build();
 
-        startMiningBlock(mainMiningBlock);
+        miningPackets.getValue().sendStartPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
         mc.player.swingHand(Hand.MAIN_HAND, false);
-    }
-
-    private void startMiningBlock(MiningData data)
-    {
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getBlockPos(), data.getDirection()));
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getBlockPos(), data.getDirection()));
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getBlockPos(), data.getDirection()));
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getBlockPos(), data.getDirection()));
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getBlockPos(), data.getDirection()));
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getBlockPos(), data.getDirection()));
-    }
-
-    private void stopMiningBlock(MiningData data)
-    {
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getBlockPos(), data.getDirection(), id));
     }
 
     @EventListener
@@ -124,19 +105,31 @@ public class SpeedMineModule extends Toggleable
     {
         if (mainMiningBlock != null)
         {
-            mainMiningBlock.render(event.getMatrixStack(), event.getTickDelta(), speedConfig.getValue(),
+            mainMiningBlock.render(event.getMatrixStack(), event.getTickDelta(),
                     miningColor.getValue().getRGB(), breakingColor.getValue().getRGB());
         }
     }
 
-    private boolean canMineBlock(BlockState state)
+    private void tickMain()
     {
-        return state.getBlock().getHardness() != -1.0f && !state.isAir() && state.getFluidState().isEmpty();
-    }
+        if (mainMiningBlock == null)
+        {
+            return;
+        }
 
-    private enum MiningMode
-    {
-        NORMAL,
-        GRIM
+        float blockDamage = mainMiningBlock.tickDelta();
+        if (blockDamage < speedConfig.getValue())
+        {
+            return;
+        }
+
+        int slot = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
+        if (slot == -1 || !Managers.INVENTORY.startSwap(slot, swapConfig.getValue()))
+        {
+            return;
+        }
+
+        miningPackets.getValue().sendStopPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
+        Managers.INVENTORY.endSwap();
     }
 }
