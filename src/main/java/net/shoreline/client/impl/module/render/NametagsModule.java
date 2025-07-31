@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
@@ -21,6 +22,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Interpolation;
 import net.shoreline.eventbus.annotation.EventListener;
+import org.lwjgl.opengl.GL11C;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -70,43 +72,39 @@ public class NametagsModule extends RenderModule
             return;
         }
 
-        Vec3d interpolate = Interpolation.getRenderPosition(mc.getCameraEntity(), event.getTickDelta());
-        Camera camera = mc.gameRenderer.getCamera();
-        Vec3d pos = camera.getPos();
-
+        MatrixStack matrices = event.getMatrixStack();
+        Camera camera = mc.getEntityRenderDispatcher().camera;
         for (PlayerEntry playerEntry : players)
         {
             PlayerEntity player = playerEntry.getPlayer();
             String info = playerEntry.getInfo();
 
             Vec3d interp = Interpolation.getRenderPosition(player, event.getTickDelta());
-
-            double rx = player.getX() - interp.getX();
-            double ry = player.getY() - interp.getY();
-            double rz = player.getZ() - interp.getZ();
-            float width = mc.textRenderer.getWidth(info);
-            float hwidth = width / 2.0f;
-            double dx = (pos.getX() - interpolate.getX()) - rx;
-            double dy = (pos.getY() - interpolate.getY()) - ry;
-            double dz = (pos.getZ() - interpolate.getZ()) - rz;
-            double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            if (dist > 4096.0)
+            double x = interp.x - camera.getPos().x;
+            double y = interp.y + (player.isSneaking() ? 2.0f : 2.2f) - camera.getPos().y;
+            double z = interp.z - camera.getPos().z;
+            float distance = (float) Math.sqrt(camera.getPos().squaredDistanceTo(interp.x, interp.y, interp.z));
+            float scaling = 0.0018f + scalingConfig.getValue() * distance;
+            if (distance <= 8.0)
             {
-                continue;
+                scaling = 0.0245f;
             }
 
-            float scaling = 0.0018f + scalingConfig.getValue() * (float) dist;
-            MatrixStack matrices = new MatrixStack();
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));
-            matrices.translate(rx - pos.getX(),
-                    ry + player.getHeight() + (player.isSneaking() ? 0.4f : 0.43f) - pos.getY(),
-                    rz - pos.getZ());
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
-            matrices.scale(-scaling, -scaling, 1.0f);
+            matrices.push();
+            matrices.translate(x, y, z);
+            matrices.multiply(mc.getEntityRenderDispatcher().getRotation());
+            matrices.scale(scaling, -scaling, scaling);
 
+            GL11C.glEnable(GL11C.GL_POLYGON_OFFSET_FILL);
+            GL11C.glPolygonOffset(1.0f, -32500000);
+
+            float hwidth = mc.textRenderer.getWidth(info) / 2f;
             mc.textRenderer.draw(info, -hwidth, 0, 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), mc.getBufferBuilders().getEntityVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+            mc.getBufferBuilders().getEntityVertexConsumers().draw();
+
+            GL11C.glPolygonOffset(1.0f, 32500000);
+            GL11C.glDisable(GL11C.GL_POLYGON_OFFSET_FILL);
+            matrices.pop();
         }
     }
 
@@ -121,7 +119,7 @@ public class NametagsModule extends RenderModule
 
         for (Entity entity : mc.world.getEntities())
         {
-            if (!(entity instanceof PlayerEntity playerEntity))
+            if (!(entity instanceof PlayerEntity playerEntity) )
             {
                 continue;
             }
