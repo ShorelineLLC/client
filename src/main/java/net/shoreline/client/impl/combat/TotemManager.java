@@ -1,8 +1,7 @@
 package net.shoreline.client.impl.combat;
 
-import net.minecraft.client.MinecraftClient;
+import lombok.Getter;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.event.WorldEvent;
@@ -28,32 +27,32 @@ public class TotemManager extends GenericFeature
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (event.getPacket() instanceof EntityStatusS2CPacket p && mc.world != null)
+        if (checkNull())
+        {
+            return;
+        }
+
+        if (event.getPacket() instanceof EntityStatusS2CPacket p)
         {
             Entity entity = p.getEntity(mc.world);
-            if (entity != null)
+            if (entity == null)
             {
-                switch (p.getStatus())
+                return;
+            }
+
+            switch (p.getStatus())
+            {
+                case 3 ->
                 {
-                    case 3 ->
+                    EventBus.INSTANCE.dispatch(new EntityDeathEvent(entity));
+                    totems.remove(entity.getUuid());
+                }
+                case 35 ->
+                {
+                    if (entity.isAlive())
                     {
-                        EventBus.INSTANCE.dispatch(new EntityDeathEvent(entity));
-                        totems.remove(entity.getUuid());
-                    }
-                    case 35 ->
-                    {
-                        if (entity.isAlive())
-                        {
-                            if (totems.containsKey(entity.getUuid()))
-                            {
-                                totems.replace(entity.getUuid(), new TotemData(System.currentTimeMillis(),
-                                        totems.get(entity.getUuid()).getPops() + 1));
-                            }
-                            else
-                            {
-                                totems.put(entity.getUuid(), new TotemData(System.currentTimeMillis(), 1));
-                            }
-                        }
+                        totems.compute(entity.getUuid(), (uuid, data) ->
+                                new TotemData(System.currentTimeMillis(), data == null ? 1 : data.getPops() + 1));
                     }
                 }
             }
@@ -82,6 +81,7 @@ public class TotemManager extends GenericFeature
         return totems.getOrDefault(entity.getUuid(), new TotemData(-1, 0)).getLastPopTime();
     }
 
+    @Getter
     public static class TotemData
     {
         private final long lastPopTime;
@@ -91,16 +91,6 @@ public class TotemManager extends GenericFeature
         {
             this.lastPopTime = lastPopTime;
             this.pops = pops;
-        }
-
-        public int getPops()
-        {
-            return pops;
-        }
-
-        public long getLastPopTime()
-        {
-            return lastPopTime;
         }
     }
 }

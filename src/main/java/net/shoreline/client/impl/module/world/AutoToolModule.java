@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.world;
 
+import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
@@ -16,6 +17,9 @@ public class AutoToolModule extends Toggleable
 {
     public static AutoToolModule INSTANCE;
 
+    @Getter
+    private ItemStack toolStack = ItemStack.EMPTY;
+
     public AutoToolModule()
     {
         super("AutoTool", "Automatically switches to a tool before mining", GuiCategory.WORLD);
@@ -30,7 +34,7 @@ public class AutoToolModule extends Toggleable
             return;
         }
 
-        int blockSlot = getBestToolNoFallback(event.getState());
+        int blockSlot = getBestTool(event.getState());
         if (blockSlot != -1)
         {
             mc.player.getInventory().setSelectedSlot(blockSlot);
@@ -38,12 +42,6 @@ public class AutoToolModule extends Toggleable
     }
 
     public int getBestTool(final BlockState state)
-    {
-        int slot = getBestToolNoFallback(state);
-        return slot != -1 ? slot : mc.player.getInventory().getSelectedSlot();
-    }
-
-    public int getBestToolNoFallback(final BlockState state)
     {
         if (state.getBlock() == Blocks.COBWEB)
         {
@@ -75,6 +73,7 @@ public class AutoToolModule extends Toggleable
             if (speed > bestTool)
             {
                 bestTool = speed;
+                toolStack = stack.copy();
                 slot = i;
             }
         }

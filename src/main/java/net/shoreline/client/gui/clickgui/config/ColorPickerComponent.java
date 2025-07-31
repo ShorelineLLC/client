@@ -191,7 +191,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
                                   boolean sideways) {
         Matrix3x2f matrices = new Matrix3x2f(context.getMatrices());
         DefaultGuiRenderState state = new DefaultGuiRenderState(
-                CustomRenderPipelines.QUADS, TextureSetup.empty(), context,
+                Pipelines.QUADS, TextureSetup.empty(), context,
                 createBounds(context, x1, y1, x2, y2),
                 (bb, z) -> {
                     float a1 = (startColor >> 24 & 255) / 255.0F;

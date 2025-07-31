@@ -7,6 +7,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.BuiltinRegistries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
@@ -15,14 +16,18 @@ import net.minecraft.registry.entry.RegistryEntry;
 import java.util.Set;
 
 @UtilityClass
-public class EnchantUtil {
+public class EnchantUtil
+{
+    private static final RegistryWrapper.WrapperLookup lookup = BuiltinRegistries.createWrapperLookup();
+
+    public RegistryEntry<Enchantment> getEntry(RegistryKey<Enchantment> key)
+    {
+        return lookup.getOrThrow(RegistryKeys.ENCHANTMENT).getOptional(key).orElse(null);
+    }
 
     public int getLevel(RegistryKey<Enchantment> key, ItemStack stack)
     {
-        RegistryWrapper.WrapperLookup registryLookup = MinecraftClient.getInstance().world.getRegistryManager();
-        RegistryWrapper<Enchantment> enchantmentWrapper = registryLookup.getOrThrow(RegistryKeys.ENCHANTMENT);
-
-        RegistryEntry<Enchantment> entry = enchantmentWrapper.getOptional(key).orElse(null);
+        RegistryEntry<Enchantment> entry = getEntry(key);
         return EnchantmentHelper.getLevel(entry, stack);
     }
 
@@ -30,6 +35,7 @@ public class EnchantUtil {
     {
         Set<Object2IntMap.Entry<RegistryEntry<Enchantment>>> enchants =
                 EnchantmentHelper.getEnchantments(itemStack).getEnchantmentEntries();
+
         if (enchants.size() > 1)
         {
             return false;

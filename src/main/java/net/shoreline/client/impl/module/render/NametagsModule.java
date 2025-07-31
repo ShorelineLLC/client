@@ -18,10 +18,8 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Interpolation;
-import net.shoreline.client.impl.render.RenderManager;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.math.BigDecimal;
@@ -31,7 +29,8 @@ import java.util.List;
 
 public class NametagsModule extends RenderModule
 {
-    private static NametagsModule INSTANCE;
+    public static NametagsModule INSTANCE;
+
     Config<Boolean> entityIdConfig = new BooleanConfig.Builder("EntityId")
             .setDescription("Displays the players entity id")
             .setDefaultValue(false).build();
@@ -60,11 +59,7 @@ public class NametagsModule extends RenderModule
     public NametagsModule()
     {
         super("Nametags", "Adds info to player nametags", GuiCategory.RENDER);
-    }
-
-    public static NametagsModule getInstance()
-    {
-        return INSTANCE;
+        INSTANCE = this;
     }
 
     @EventListener
@@ -126,20 +121,24 @@ public class NametagsModule extends RenderModule
 
         for (Entity entity : mc.world.getEntities())
         {
-            if (!(entity instanceof PlayerEntity))
+            if (!(entity instanceof PlayerEntity playerEntity))
             {
                 continue;
             }
 
-            players.add(new PlayerEntry((PlayerEntity) entity));
+            if (entity == mc.player)
+            {
+                continue;
+            }
+
+            players.add(new PlayerEntry(playerEntity));
         }
     }
 
+    @Getter
     public class PlayerEntry
     {
-        @Getter
         private final PlayerEntity player;
-        @Getter
         private final String info;
 
         public PlayerEntry(PlayerEntity player)

@@ -34,4 +34,10 @@ public class ListeningToggleable extends Toggleable
         onDisable();
         enabled.setValue(false);
     }
+
+    @Override
+    public boolean checkNull()
+    {
+        return super.checkNull() || !isEnabled();
+    }
 }

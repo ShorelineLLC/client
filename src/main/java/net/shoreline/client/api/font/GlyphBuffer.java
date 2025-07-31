@@ -13,7 +13,7 @@ import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
-import net.shoreline.client.impl.render.CustomRenderPipelines;
+import net.shoreline.client.impl.render.Pipelines;
 import net.shoreline.client.impl.render.DefaultGuiRenderState;
 import net.shoreline.client.mixin.accessor.AccessorDrawContext;
 import org.joml.Matrix3x2f;
@@ -120,7 +120,7 @@ public class GlyphBuffer {
             GlyphPage page = glyphPageListEntry.getKey();
             GpuTextureView glId = page.tex.getGlTextureView();
             SimpleGuiElementRenderState state = new DefaultGuiRenderState(
-                    CustomRenderPipelines.TEXT_CUSTOM, TextureSetup.of(glId), context,
+                    Pipelines.TEXT_CUSTOM, TextureSetup.of(glId), context,
                     new ScreenRect(0, 0,
                             MinecraftClient.getInstance().getWindow().getScaledWidth(),
                             MinecraftClient.getInstance().getWindow().getScaledHeight()),

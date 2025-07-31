@@ -72,6 +72,11 @@ public class SelfTrapModule extends TrapModule
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         if (autoDisable.getValue() && (mc.player.getY() - prevY > 0.5 || mc.player.fallDistance > 1.5f))
         {
             disable();

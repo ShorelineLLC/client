@@ -5,7 +5,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.interact.StrictDirection;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class PlacerModule extends Toggleable
+public class PlacerModule extends ListeningToggleable
 {
     protected final AnticheatModule anticheat = AnticheatModule.INSTANCE;
 

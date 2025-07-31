@@ -5,6 +5,7 @@ import net.shoreline.client.api.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
 import net.shoreline.client.impl.combat.TotemManager;
 import net.shoreline.client.impl.command.CommandManager;
+import net.shoreline.client.impl.mining.MiningManager;
 import net.shoreline.client.impl.movement.MovementManager;
 import net.shoreline.client.impl.interact.InteractManager;
 import net.shoreline.client.impl.rotation.RotationManager;
@@ -23,6 +24,7 @@ public class Managers
     public static InventoryManager INVENTORY;
     public static MovementManager MOVEMENT;
     public static InteractManager INTERACT;
+    public static MiningManager MINING;
     public static RenderManager RENDER;
     public static TotemManager TOTEM;
 
@@ -37,6 +39,7 @@ public class Managers
         INVENTORY = new InventoryManager();
         MOVEMENT = new MovementManager();
         INTERACT = new InteractManager();
+        MINING = new MiningManager();
         RENDER = new RenderManager();
         TOTEM = new TotemManager();
     }

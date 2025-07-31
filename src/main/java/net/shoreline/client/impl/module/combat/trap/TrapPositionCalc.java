@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
+import net.shoreline.client.impl.Managers;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -66,10 +67,10 @@ public class TrapPositionCalc
     {
         for (BlockPos blockPos : trapPositions)
         {
-//            if (Managers.MINING.getMiningProgress(blockPos) < 0.75f)
-//            {
-//                continue;
-//            }
+            if (Managers.MINING.getMiningProgress(blockPos) < 0.7f)
+            {
+                continue;
+            }
 
             int y = blockPos.getY();
             if (feetY == y && spec.isExtendFeet() || bodyY == y && spec.isExtendBody())

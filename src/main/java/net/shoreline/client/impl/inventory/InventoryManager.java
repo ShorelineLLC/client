@@ -137,14 +137,14 @@ public class InventoryManager extends GenericFeature
             return false;
         }
 
-        if (playerInventory.getSelectedSlot() == itemSlot)
+        if (serverSlot == itemSlot)
         {
             return true;
         }
 
         swapCache = new HotbarCache(playerInventory);
 
-        int fromSlot = playerInventory.getSelectedSlot();
+        int fromSlot = serverSlot;
 
         if (current.isSwapped())
         {

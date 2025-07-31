@@ -8,7 +8,7 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 
-public class CustomRenderPipelines
+public class Pipelines
 {
     public static final RenderPipeline QUADS = RenderPipelines
             .register(RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)

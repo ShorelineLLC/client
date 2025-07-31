@@ -2,7 +2,7 @@ package net.shoreline.client.api.config;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.api.LoggingFeature;
 import net.shoreline.client.api.Serializable;
 import net.shoreline.loader.Loader;
 
@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.SequencedCollection;
 
-public abstract class ConfigContainer extends GenericFeature implements Serializable
+public abstract class ConfigContainer extends LoggingFeature implements Serializable
 {
     private final LinkedHashMap<String, Config<?>> configs = new LinkedHashMap<>();
 

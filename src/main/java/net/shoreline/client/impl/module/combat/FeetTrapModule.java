@@ -13,6 +13,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.combat.trap.TrapLayer;
 import net.shoreline.client.impl.module.combat.trap.TrapModule;
 import net.shoreline.client.impl.module.combat.trap.TrapSpec;
@@ -43,6 +44,7 @@ public class FeetTrapModule extends TrapModule
             .setDescription("Disables when player y-level changes")
             .setDefaultValue(false).build();
 
+    private List<BlockPos> placements;
     private double prevY;
 
     public FeetTrapModule()
@@ -68,6 +70,11 @@ public class FeetTrapModule extends TrapModule
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         if (autoDisable.getValue() && (mc.player.getY() - prevY > 0.5 || mc.player.fallDistance > 1.5f))
         {
             disable();
@@ -95,7 +102,7 @@ public class FeetTrapModule extends TrapModule
 
         trapPos.calcTrap(boundingBox, trapSpec);
 
-        List<BlockPos> placements = getPlacements(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
+        placements = getPlacements(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
         for (BlockPos placement : placements)
         {
             placeObby(placement);
@@ -129,5 +136,11 @@ public class FeetTrapModule extends TrapModule
                 runSingleObbyPlacement(blockPos);
             }
         }
+    }
+
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent.Post event)
+    {
+        renderBlockPlacements(event.getMatrixStack());
     }
 }

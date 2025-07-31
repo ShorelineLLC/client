@@ -253,7 +253,16 @@ public enum Easing
                 {
                     return factor < 0.5 ? (1 - bounceOut(1 - 2 * factor)) / 2 : (1 + bounceOut(2 * factor - 1)) / 2;
                 }
-            };
+            },
+    SMOOTH_STEP
+    {
+        @Override
+        public double ease(double factor)
+        {
+            // Smoothstep(0,1) * (1 - Smoothstep(0,1))
+            return factor * factor * (3 - 2 * factor); // standard smoothstep
+        }
+    };
 
     public abstract double ease(double factor);
 

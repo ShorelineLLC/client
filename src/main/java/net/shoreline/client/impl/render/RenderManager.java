@@ -9,7 +9,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShapes;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -18,17 +17,6 @@ import org.lwjgl.opengl.GL11;
 public class RenderManager
 {
     private double deltaTime;
-
-    public void startRender()
-    {
-        GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
-    }
-
-    public void endRender()
-    {
-        GL11.glDisable(GL11.GL_LINE_SMOOTH);
-    }
 
     public void renderBox(MatrixStack matrixStack,
                           BlockPos blockPos,
@@ -81,7 +69,7 @@ public class RenderManager
         buffer.vertex(matrix, minX, maxY, maxZ).color(color);
         buffer.vertex(matrix, minX, maxY, minZ).color(color);
 
-        CustomRenderLayers.QUADS.draw(buffer.end());
+        Layers.QUADS.draw(buffer.end());
     }
 
     public void renderBoundingBox(MatrixStack matrixStack, BlockPos pos, int color)
@@ -130,6 +118,6 @@ public class RenderManager
         buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
         buffer.vertex(matrix, minX, minY, maxZ).color(color);
         buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-        CustomRenderLayers.DEBUG_LINES.draw(buffer.end());
+        Layers.DEBUG_LINES.draw(buffer.end());
     }
 }
