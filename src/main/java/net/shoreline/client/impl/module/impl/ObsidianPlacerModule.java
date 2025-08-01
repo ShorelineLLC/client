@@ -36,11 +36,11 @@ public class ObsidianPlacerModule extends PlacerModule
 
     protected int findBestObbySlot()
     {
-        int slot = InventoryUtil.getInventorySlot(Items.OBSIDIAN, anticheat.getSwapType());
+        int slot = InventoryUtil.getItemSlot(Items.OBSIDIAN);
         if (slot == -1)
         {
             currentObbyBlock = Blocks.ENDER_CHEST;
-            return InventoryUtil.getInventorySlot(Items.ENDER_CHEST, anticheat.getSwapType());
+            return InventoryUtil.getItemSlot(Items.ENDER_CHEST);
         }
 
         currentObbyBlock = Blocks.OBSIDIAN;

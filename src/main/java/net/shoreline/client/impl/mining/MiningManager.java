@@ -50,10 +50,7 @@ public class MiningManager extends GenericFeature
             return;
         }
 
-        if (maxPickaxeStack.getEnchantments().isEmpty())
-        {
-            maxPickaxeStack.addEnchantment(EnchantUtil.getEntry(Enchantments.EFFICIENCY), 5);
-        }
+        maxPickaxeStack.addEnchantment(EnchantUtil.getEntry(Enchantments.EFFICIENCY), 5);
 
         for (MiningData data : miningBlocks.values())
         {

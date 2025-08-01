@@ -22,7 +22,6 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
-import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.impl.CombatModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;
@@ -68,12 +67,8 @@ public class AuraModule extends CombatModule
             .setDescription("Swaps to a weapon silently")
             .setVisible(() -> autoSwap.getValue())
             .setDefaultValue(false).build();
-    Config<SilentSwapType> swapMode = new EnumConfig.Builder<SilentSwapType>("Swap")
-            .setValues(SilentSwapType.values()).setDefaultValue(SilentSwapType.HOTBAR)
-            .setDescription("The silent swap mode")
-            .setVisible(() -> autoSwap.getValue() && silentSwap.getValue()).build();
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
-            .addAll(autoSwap, silentSwap, swapMode).build();
+            .addAll(autoSwap, silentSwap).build();
 
     private final Timer attackDelayTimer = new NanoTimer();
     private Entity auraTarget;
@@ -136,7 +131,7 @@ public class AuraModule extends CombatModule
 
         int weaponSlot = getAuraWeaponSlot();
         ItemStack stack = playerInventory.getStack(weaponSlot);
-        if (weaponSlot == -1 || !Managers.INVENTORY.startSwap(weaponSlot, swapMode.getValue()))
+        if (weaponSlot == -1 || !Managers.INVENTORY.startSwap(weaponSlot))
         {
             return;
         }
@@ -199,10 +194,10 @@ public class AuraModule extends CombatModule
 
     private int getAuraWeaponSlot()
     {
-        int slot = InventoryUtil.getInventorySlot(Items.NETHERITE_SWORD, swapMode.getValue());
+        int slot = InventoryUtil.getItemSlot(Items.NETHERITE_SWORD);
         if (slot == -1)
         {
-            return InventoryUtil.getInventorySlot(Items.DIAMOND_SWORD, swapMode.getValue());
+            return InventoryUtil.getItemSlot(Items.DIAMOND_SWORD);
         }
         return slot;
     }

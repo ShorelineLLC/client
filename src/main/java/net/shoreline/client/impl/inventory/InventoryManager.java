@@ -127,6 +127,11 @@ public class InventoryManager extends GenericFeature
         return mc.player.getInventory().getSelectedSlot() != serverSlot;
     }
 
+    public boolean startSwap(int itemSlot)
+    {
+        return startSwap(itemSlot, anticheat.getSilentSwapType());
+    }
+
     public boolean startSwap(int itemSlot, SilentSwapType swapType)
     {
         PlayerInventory playerInventory = mc.player.getInventory();
@@ -166,13 +171,17 @@ public class InventoryManager extends GenericFeature
 
         current.setSlotTo(itemSlot);
         current.setSlotFrom(fromSlot);
-        current.setSwapType(swapType);
         current.setSwapped(true);
 
         return true;
     }
 
     public void endSwap()
+    {
+        endSwap(anticheat.getSilentSwapType());
+    }
+
+    public void endSwap(SilentSwapType swapType)
     {
         PlayerInventory playerInventory = mc.player.getInventory();
         ScreenHandler handler = mc.player.currentScreenHandler;
@@ -182,7 +191,7 @@ public class InventoryManager extends GenericFeature
             return;
         }
 
-        switch (current.getSwapType())
+        switch (swapType)
         {
             case HOTBAR ->
             {

@@ -16,7 +16,7 @@ public class Interpolation
      * @param tickDelta The render time
      * @return The interpolated vector of an entity
      */
-    public static Vec3d getRenderPosition(Entity entity, float tickDelta)
+    public Vec3d getRenderPosition(Entity entity, float tickDelta)
     {
         return new Vec3d(MathHelper.lerp(tickDelta, entity.lastRenderX, entity.getX()),
                 MathHelper.lerp(tickDelta, entity.lastRenderY, entity.getY()),

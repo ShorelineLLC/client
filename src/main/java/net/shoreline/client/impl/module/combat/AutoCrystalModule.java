@@ -5,7 +5,6 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.module.combat.crystal.CrystalBaseScanner;
-import net.shoreline.client.impl.inventory.SilentSwapType;
 
 @Getter
 public class AutoCrystalModule extends Toggleable
@@ -88,15 +87,14 @@ public class AutoCrystalModule extends Toggleable
     Config<Boolean> autoSwap = new BooleanConfig.Builder("AutoSwap")
             .setDescription("Automatically swaps to crystals before placing")
             .setDefaultValue(false).build();
+    Config<Boolean> silentSwap = new BooleanConfig.Builder("SilentSwap")
+            .setDescription("Silently swaps to crystals before placing")
+            .setDefaultValue(false).setVisible(() -> autoSwap.getValue()).build();
     Config<Boolean> antiWeakness = new BooleanConfig.Builder("AntiWeakness")
             .setDescription("Swaps to sword before attacking crystals")
             .setDefaultValue(false).build();
-    Config<SilentSwapType> silentSwap = new EnumConfig.Builder<SilentSwapType>("Swap")
-            .setValues(SilentSwapType.values()).setDefaultValue(SilentSwapType.HOTBAR)
-            .setDescription("The silent swap mode for placing crystals")
-            .setVisible(() -> autoSwap.getValue() || antiWeakness.getValue()).build();
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
-            .addAll(autoSwap, antiWeakness, silentSwap).build();
+            .addAll(autoSwap, silentSwap, antiWeakness).build();
 
     private final CrystalBaseScanner baseScanner = new CrystalBaseScanner(10, mc.player);
 

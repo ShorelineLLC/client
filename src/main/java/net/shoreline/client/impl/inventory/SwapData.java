@@ -16,8 +16,6 @@ public class SwapData
     public static class Mutable
     {
         private boolean swapped;
-        private SilentSwapType swapType;
-
         private int slotFrom, slotTo = -1;
 
         public void reset()
@@ -25,7 +23,6 @@ public class SwapData
             swapped = false;
             slotFrom = -1;
             slotTo = -1;
-            swapType = null;
         }
     }
 }

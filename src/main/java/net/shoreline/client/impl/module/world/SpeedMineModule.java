@@ -8,7 +8,6 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningPackets;
 import net.shoreline.client.impl.mining.MiningUtil;
@@ -38,10 +37,6 @@ public class SpeedMineModule extends Toggleable
     Config<Boolean> rotateConfig = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates before mining block")
             .setDefaultValue(false).build();
-    Config<SilentSwapType> swapConfig = new EnumConfig.Builder<SilentSwapType>("Swap")
-            .setValues(SilentSwapType.values())
-            .setDescription("The mode for swapping to pearls")
-            .setDefaultValue(SilentSwapType.HOTBAR).build();
 
     Config<Color> miningColor = new ColorConfig.Builder("Mining")
             .setDescription("The color when mining a block")
@@ -124,7 +119,7 @@ public class SpeedMineModule extends Toggleable
         }
 
         int slot = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
-        if (slot == -1 || !Managers.INVENTORY.startSwap(slot, swapConfig.getValue()))
+        if (slot == -1 || !Managers.INVENTORY.startSwap(slot))
         {
             return;
         }

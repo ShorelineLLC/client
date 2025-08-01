@@ -8,13 +8,11 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.InputEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
-import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.util.world.RaytraceUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.lwjgl.glfw.GLFW;
@@ -30,10 +28,6 @@ public class MiddleClickModule extends Toggleable
     Config<Boolean> fireworkConfig = new BooleanConfig.Builder("Firework")
             .setDescription("Middle click to boost an elytra using a firework")
             .setDefaultValue(false).build();
-    Config<SilentSwapType> swapConfig = new EnumConfig.Builder<SilentSwapType>("Swap")
-            .setValues(SilentSwapType.values())
-            .setDescription("The mode for swapping to items")
-            .setDefaultValue(SilentSwapType.HOTBAR).build();
 
     public MiddleClickModule()
     {
@@ -76,8 +70,8 @@ public class MiddleClickModule extends Toggleable
 
     private void useItem(Item item)
     {
-        int slot = InventoryUtil.getInventorySlot(item, swapConfig.getValue());
-        if (slot == -1 || !Managers.INVENTORY.startSwap(slot, swapConfig.getValue()))
+        int slot = InventoryUtil.getItemSlot(item);
+        if (slot == -1 || !Managers.INVENTORY.startSwap(slot))
         {
             return;
         }

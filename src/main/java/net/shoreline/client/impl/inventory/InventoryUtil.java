@@ -5,11 +5,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.shoreline.client.impl.module.client.AnticheatModule;
 
 @UtilityClass
 public class InventoryUtil
@@ -21,9 +20,9 @@ public class InventoryUtil
                 || MinecraftClient.getInstance().currentScreen instanceof InventoryScreen;
     }
 
-    public int getInventorySlot(Item item, SilentSwapType swapType)
+    public int getItemSlot(Item item)
     {
-        return swapType == SilentSwapType.INVENTORY ? getInventorySlot(item) : getHotbarSlot(item);
+        return AnticheatModule.INSTANCE.getSilentSwapType() == SilentSwapType.INVENTORY ? getInventorySlot(item) : getHotbarSlot(item);
     }
 
     public int getInventorySlot(Item item)

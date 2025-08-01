@@ -13,7 +13,6 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
-import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.util.entity.EntityUtil;
@@ -28,10 +27,6 @@ public class AutoXPModule extends Toggleable
             .setValues(RotateMode.values())
             .setDescription("Rotate down before using XP")
             .setDefaultValue(RotateMode.OFF).build();
-    Config<SilentSwapType> swapConfig = new EnumConfig.Builder<SilentSwapType>("Swap")
-            .setValues(SilentSwapType.values())
-            .setDescription("The mode for swapping to pearls")
-            .setDefaultValue(SilentSwapType.HOTBAR).build();
 
     public AutoXPModule()
     {
@@ -58,7 +53,7 @@ public class AutoXPModule extends Toggleable
             return;
         }
 
-        int itemSlot = InventoryUtil.getInventorySlot(Items.EXPERIENCE_BOTTLE, swapConfig.getValue());
+        int itemSlot = InventoryUtil.getItemSlot(Items.EXPERIENCE_BOTTLE);
         if (itemSlot == -1)
         {
             disable();
@@ -71,7 +66,7 @@ public class AutoXPModule extends Toggleable
         Managers.ROTATION.setSilentRotation(xpThrow);
         xpThrow.applyToPlayer();
 
-        if (!Managers.INVENTORY.startSwap(itemSlot, swapConfig.getValue()))
+        if (!Managers.INVENTORY.startSwap(itemSlot))
         {
             return;
         }

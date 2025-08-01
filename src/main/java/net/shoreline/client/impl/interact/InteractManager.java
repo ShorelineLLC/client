@@ -199,7 +199,7 @@ public class InteractManager extends GenericFeature
 
     public boolean startPlacement(Item blockItem)
     {
-        return startPlacement(InventoryUtil.getInventorySlot(blockItem, anticheat.getSwapType()));
+        return startPlacement(InventoryUtil.getItemSlot(blockItem));
     }
 
     public boolean startPlacement(int slot)
@@ -214,7 +214,7 @@ public class InteractManager extends GenericFeature
             return false;
         }
 
-        if (!Managers.INVENTORY.startSwap(slot, anticheat.getSwapType()))
+        if (!Managers.INVENTORY.startSwap(slot))
         {
             return false;
         }

@@ -32,15 +32,11 @@ public class AnticheatModule extends Concurrent
     Config<Integer> interactAttempts = new NumberConfig.Builder<Integer>("Limit")
             .setMin(0).setMax(100).setDefaultValue(20)
             .setDescription("Max attempts to interact on blocks").build();
-    Config<SilentSwapType> swapConfig = new EnumConfig.Builder<SilentSwapType>("Swap")
-            .setValues(SilentSwapType.values())
-            .setDescription("The mode for swapping to blocks")
-            .setDefaultValue(SilentSwapType.HOTBAR).build();
     Config<Boolean> strictDirection = new BooleanConfig.Builder("StrictDirection")
             .setDescription("Only places on visible faces")
             .setDefaultValue(false).build();
     Config<Void> interactConfig = new ConfigGroup.Builder("Interact")
-            .addAll(multiTask, interactRotate, bptConfig, interactDelay, interactAttempts, swapConfig, strictDirection)
+            .addAll(multiTask, interactRotate, bptConfig, interactDelay, interactAttempts, strictDirection)
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
 
     Config<Boolean> renderRotationsConfig = new BooleanConfig.Builder("ShowRotations")
@@ -62,20 +58,34 @@ public class AnticheatModule extends Concurrent
     Config<Void> rotateConfig = new ConfigGroup.Builder("Rotations")
             .addAll(renderRotationsConfig, moveFixConfig, gcdFixConfig, tickSyncConfig, lookSyncConfig)
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
+    
+    Config<SilentSwapType> silentSwap = new EnumConfig.Builder<SilentSwapType>("SilentSwap")
+            .setValues(SilentSwapType.values())
+            .setDescription("The mode for silent swapping to items")
+            .setDefaultValue(SilentSwapType.HOTBAR)
+            .build();
 
     Config<Boolean> raycastFixConfig = new BooleanConfig.Builder("RaytraceFix")
             .setDescription("Uses server rotations when raytracing crosshair")
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA)
-            .setDefaultValue(false).build();
+            .setDefaultValue(false)
+            .build();
+
     Config<Boolean> assumeEnchanted = new BooleanConfig.Builder("AssumeBestArmor")
             .setDescription("Assumes that all enemy armor is max enchanted")
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA)
-            .setDefaultValue(false).build();
+            .setDefaultValue(false)
+            .build();
 
     public AnticheatModule()
     {
         super("Anticheat", "Configure client for different anticheats", GuiCategory.CLIENT);
         INSTANCE = this;
+    }
+
+    public SilentSwapType getSilentSwapType()
+    {
+        return silentSwap.getValue();
     }
 
     public boolean shouldInteractRotate()
@@ -96,11 +106,6 @@ public class AnticheatModule extends Concurrent
     public int getInteractAttempts()
     {
         return interactAttempts.getValue();
-    }
-
-    public SilentSwapType getSwapType()
-    {
-        return swapConfig.getValue();
     }
 
     public boolean showServerRotation()

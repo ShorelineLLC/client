@@ -16,7 +16,6 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.inventory.InventoryUtil;
-import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.util.item.ArmorUtil;
 
 public class ChestSwapModule extends Toggleable
@@ -44,7 +43,7 @@ public class ChestSwapModule extends Toggleable
         ItemStack chestStack = mc.player.getEquippedStack(EquipmentSlot.CHEST);
         if (chestStack.isIn(ItemTags.CHEST_ARMOR))
         {
-            int slot = InventoryUtil.getInventorySlot(Items.ELYTRA);
+            int slot = InventoryUtil.getItemSlot(Items.ELYTRA);
             if (slot != -1)
             {
                 Managers.INVENTORY.clickSwap(slot, PlayerInventory.BODY_SLOT, Items.ELYTRA);
@@ -55,8 +54,8 @@ public class ChestSwapModule extends Toggleable
                 Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
                 mc.player.startGliding();
 
-                int fireworkSlot = InventoryUtil.getInventorySlot(Items.FIREWORK_ROCKET);
-                if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot, SilentSwapType.INVENTORY))
+                int fireworkSlot = InventoryUtil.getItemSlot(Items.FIREWORK_ROCKET);
+                if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot))
                 {
                     Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id,
                             mc.player.getYaw(), mc.player.getPitch()));
