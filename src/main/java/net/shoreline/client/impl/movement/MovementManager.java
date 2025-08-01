@@ -50,7 +50,8 @@ public class MovementManager extends GenericFeature
                 float modifier = MathHelper.clamp(0.3f + (EnchantUtil.getLevel(Enchantments.SWIFT_SNEAK,
                         mc.player.getEquippedStack(EquipmentSlot.FEET)) * 0.15F), 0.0f, 1.0f);
                 Vec2f modified = mc.player.input.getMovementInput().multiply(modifier);
-                ((AccessorInput) mc.player.input).setMovementVector(modified);
+                mc.player.input.movementForward = modified.x;
+                mc.player.input.movementSideways = modified.y;
             }
         }
 

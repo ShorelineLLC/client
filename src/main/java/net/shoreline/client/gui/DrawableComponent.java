@@ -22,15 +22,6 @@ public abstract class DrawableComponent
                                        float mouseY,
                                        float delta);
 
-    protected ScreenRect createBounds(DrawContext c, float x, float y, float w, float h)
-    {
-        Matrix3x2fStack mat = c.getMatrices();
-        DrawContext.ScissorStack ss = ((AccessorDrawContext) c).getScissorStack();
-        ScreenRect scissor = ss.peekLast();
-        ScreenRect screenRect = new ScreenRect((int) Math.floor(x), (int) Math.floor(y), (int) Math.ceil(w), (int) Math.ceil(h)).transformEachVertex(mat);
-        return scissor != null ? scissor.intersection(screenRect) : screenRect;
-    }
-
     protected void drawRect(DrawContext context,
                             int x,
                             int y,
@@ -48,7 +39,7 @@ public abstract class DrawableComponent
                                     int width,
                                     int height)
     {
-        context.drawTexturedQuad(sprite, x, y, x + width, y + height, 0.0f, 1.0f, 0.0f, 1.0f);
+        //context.drawTexturedQuad(sprite, x, y, x + width, y + height, 0.0f, 1.0f, 0.0f, 1.0f);
     }
 
     protected void drawOutline(DrawContext context,

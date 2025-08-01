@@ -8,6 +8,4 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(Input.class)
 public interface AccessorInput
 {
-    @Accessor
-    void setMovementVector(Vec2f movementVector);
 }

@@ -86,47 +86,6 @@ public class GlyphPage implements AutoCloseable {
 
 
     private void fill() {
-        FT_Face ftf = font.freetypeFont;
-        for (int i = glyphStart; i < glyphEnd; i++) {
-            FT_Load_Glyph(ftf, i, FT_LOAD_BITMAP_METRICS_ONLY);
-            FT_GlyphSlot gl = ftf.glyph();
-            FT_Bitmap bmp = gl.bitmap();
-            int width = bmp.width();
-            int height = bmp.rows();
-            int xO = gl.bitmap_left();
-            int yO = gl.bitmap_top();
-            FT_Glyph_Metrics met = gl.metrics();
-            GlyphMetrics metrics = new GlyphMetrics(met.width(), met.height(), met.horiBearingX(), met.horiBearingY(), met.horiAdvance());
-            glyphs[i - glyphStart] = new Glyph(i, width, height, xO, yO, new AtomicInteger(), new AtomicInteger(), metrics);
-        }
-        int currentWidth = Integer.MAX_VALUE;
-        for (int i = 0; i < 10; i++) {
-            layout(currentWidth);
-            if (Math.abs(texWidth - texHeight) < 50) break;
-            currentWidth = (texWidth + texHeight) / 2;
-        }
 
-        NativeImage ni = new NativeImage(NativeImage.Format.LUMINANCE, texWidth, texHeight, false);
-        tex = new NativeImageBackedTexture(() -> String.format("renderer/glyphPage/%s-%s/%d-%d", font.freetypeFont.family_nameString(), font.freetypeFont.style_nameString(), glyphStart, glyphEnd), ni);
-        long ptr = ((AccessorNativeImage) (Object) ni).getPointer();
-
-        for (Glyph glyph : glyphs) {
-            FT_Load_Glyph(ftf, glyph.id, FT_LOAD_RENDER);
-            FT_GlyphSlot gl = ftf.glyph();
-            FT_Bitmap bmp = gl.bitmap();
-            int width = bmp.width();
-            int height = bmp.rows();
-            ByteBuffer buffer = bmp.buffer(width * height);
-            for (int y = 0; y < height; y++) {
-                int rowOffset = (glyph.y.get() + y) * texWidth; // which row are we in?
-                MemoryUtil.memCopy(MemoryUtil.memAddress(buffer) + (long) y * width, ptr + rowOffset + glyph.x.get(), width);
-            }
-        }
-        tex.upload();
-        try {
-            ni.writeTo(new File(String.format("%d-%d.png", glyphStart, glyphEnd)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

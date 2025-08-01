@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.render;
 
-import com.mojang.blaze3d.vertex.VertexFormat;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
@@ -69,7 +68,7 @@ public class RenderManager
         buffer.vertex(matrix, minX, maxY, maxZ).color(color);
         buffer.vertex(matrix, minX, maxY, minZ).color(color);
 
-        Layers.QUADS.draw(buffer.end());
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 
     public void renderBoundingBox(MatrixStack matrixStack, BlockPos pos, int color)
@@ -118,6 +117,6 @@ public class RenderManager
         buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
         buffer.vertex(matrix, minX, minY, maxZ).color(color);
         buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-        Layers.DEBUG_LINES.draw(buffer.end());
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
     }
 }

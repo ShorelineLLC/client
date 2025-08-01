@@ -1,10 +1,8 @@
 package net.shoreline.client.mixin.render;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.FramePass;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.ObjectAllocator;
@@ -35,18 +33,16 @@ public class MixinWorldRenderer
                                  RenderTickCounter tickCounter,
                                  boolean renderBlockOutline,
                                  Camera camera,
+                                 GameRenderer gameRenderer,
                                  Matrix4f positionMatrix,
                                  Matrix4f projectionMatrix,
-                                 GpuBufferSlice fog,
-                                 Vector4f fogColor,
-                                 boolean shouldRenderSky,
                                  CallbackInfo ci)
     {
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(client.gameRenderer.getCamera().getPitch()));
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(client.gameRenderer.getCamera().getYaw() + 180f));
 
-        RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickCounter.getTickProgress(true));
+        RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickCounter.getTickDelta(true));
         EventBus.INSTANCE.dispatch(renderWorldEvent);
     }
 

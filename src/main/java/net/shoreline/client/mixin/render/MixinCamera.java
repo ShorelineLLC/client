@@ -15,19 +15,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinCamera
 {
     @Shadow
-    private float lastTickProgress;
-
-    @Shadow
     protected abstract void setPos(double x, double y, double z);
 
     @Shadow
     protected abstract void setRotation(float yaw, float pitch);
 
+    @Shadow
+    private float lastTickDelta;
+
     @Redirect(method = "update", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/Camera;setPos(DDD)V"))
     private void hookUpdatePosition(Camera instance, double x, double y, double z)
     {
-        CameraEvent.Position cameraPositionEvent = new CameraEvent.Position(x, y, z, lastTickProgress);
+        CameraEvent.Position cameraPositionEvent = new CameraEvent.Position(x, y, z, lastTickDelta);
         EventBus.INSTANCE.dispatch(cameraPositionEvent);
         if (cameraPositionEvent.isCanceled())
         {
@@ -42,7 +42,7 @@ public abstract class MixinCamera
             target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V"))
     private void hookUpdateRotation(Camera instance, float yaw, float pitch)
     {
-        CameraEvent.Rotation cameraRotationEvent = new CameraEvent.Rotation(yaw, pitch, lastTickProgress);
+        CameraEvent.Rotation cameraRotationEvent = new CameraEvent.Rotation(yaw, pitch, lastTickDelta);
         EventBus.INSTANCE.dispatch(cameraRotationEvent);
         if (cameraRotationEvent.isCanceled())
         {

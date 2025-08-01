@@ -242,7 +242,8 @@ public class FreecamModule extends Toggleable
         private void unset()
         {
             this.playerInput = new PlayerInput(false, false, false, false, false, false, false);
-            this.movementVector = Vec2f.ZERO;
+            this.movementForward = 0;
+            this.movementSideways = 0;
         }
     }
 }

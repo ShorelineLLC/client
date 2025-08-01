@@ -103,7 +103,7 @@ public class InteractManager extends GenericFeature
     {
         final BlockState state = block.getDefaultState();
         final List<EndCrystalEntity> crystalEntities = new ArrayList<>();
-        final VoxelShape shape = state.getCollisionShape(mc.world, blockPos, ShapeContext.absent()).offset(blockPos);
+        final VoxelShape shape = state.getCollisionShape(mc.world, blockPos, ShapeContext.absent()).offset(new Vec3d(blockPos));
 
         if (shape.isEmpty())
         {

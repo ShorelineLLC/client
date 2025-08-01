@@ -78,7 +78,7 @@ public class ClickGuiScreen extends Screen
 
         if (ClickGuiModule.INSTANCE.shouldBlur())
         {
-            applyBlur(context);
+            applyBlur();
         }
 
         for (Frame frame : guiFrames)

@@ -2,7 +2,6 @@ package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.ColorConfig;
@@ -188,40 +187,9 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     private void drawGradientRect(DrawContext context,
                                   int x1, int y1, int x2, int y2,
                                   int startColor, int endColor,
-                                  boolean sideways) {
-        Matrix3x2f matrices = new Matrix3x2f(context.getMatrices());
-        DefaultGuiRenderState state = new DefaultGuiRenderState(
-                Pipelines.QUADS, TextureSetup.empty(), context,
-                createBounds(context, x1, y1, x2, y2),
-                (bb, z) -> {
-                    float a1 = (startColor >> 24 & 255) / 255.0F;
-                    float r1 = (startColor >> 16 & 255) / 255.0F;
-                    float g1 = (startColor >> 8 & 255) / 255.0F;
-                    float b1 = (startColor & 255) / 255.0F;
+                                  boolean sideways)
+    {
 
-                    float a2 = (endColor >> 24 & 255) / 255.0F;
-                    float r2 = (endColor >> 16 & 255) / 255.0F;
-                    float g2 = (endColor >> 8 & 255) / 255.0F;
-                    float b2 = (endColor & 255) / 255.0F;
-
-                    DirectVertexConsumer bufferBuilder = new DirectVertexConsumer((BufferBuilder) bb, false);
-
-                    if (sideways) {
-                        // Left side = startColor, right side = endColor
-                        bufferBuilder.vertex(matrices, x1, y1, z).color(r1, g1, b1, a1);
-                        bufferBuilder.vertex(matrices, x1, y2, z).color(r1, g1, b1, a1);
-                        bufferBuilder.vertex(matrices, x2, y2, z).color(r2, g2, b2, a2);
-                        bufferBuilder.vertex(matrices, x2, y1, z).color(r2, g2, b2, a2);
-                    } else {
-                        // Top = startColor, bottom = endColor
-                        bufferBuilder.vertex(matrices, x1, y1, z).color(r1, g1, b1, a1);
-                        bufferBuilder.vertex(matrices, x2, y1, z).color(r1, g1, b1, a1);
-                        bufferBuilder.vertex(matrices, x2, y2, z).color(r2, g2, b2, a2);
-                        bufferBuilder.vertex(matrices, x1, y2, z).color(r2, g2, b2, a2);
-                    }
-                });
-
-        ((AccessorDrawContext) context).getState().addSimpleElement(state);
     }
 
     public void drawSelectors(DrawContext context, float mouseX, float mouseY, float delta)

@@ -1,36 +1,19 @@
 package net.shoreline.client.api.font;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.ScreenRect;
-import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
-import net.shoreline.client.impl.render.Layers;
-import net.shoreline.client.impl.render.Pipelines;
-import net.shoreline.client.impl.render.DefaultGuiRenderState;
-import net.shoreline.client.mixin.accessor.AccessorDrawContext;
-import org.joml.Matrix3x2f;
-import org.joml.Matrix3x2fStack;
-import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.harfbuzz.hb_glyph_info_t;
 import org.lwjgl.util.harfbuzz.hb_glyph_position_t;
 
 import java.nio.IntBuffer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.lwjgl.util.harfbuzz.HarfBuzz.*;
 
@@ -108,221 +91,11 @@ public class GlyphBuffer {
      */
     public void draw(DrawContext context, float x, float y) {
         if (glyphs.isEmpty()) return;
-
-        Matrix3x2fStack stack = context.getMatrices();
-
-        stack.pushMatrix();
-        stack.translate(x, y);
-        float sf = (float) MinecraftClient.getInstance().getWindow().getScaleFactor();
-        stack.scale(1f / sf, 1f / sf);
-        //		int offsetX = -minX;
-        //		int offsetY = -minY;
-
-        Matrix3x2f posmat = new Matrix3x2f(stack);
-
-        Map<GlyphPage, List<Glyph>> pageToGlyphs = glyphs.stream().collect(Collectors.groupingBy(it -> it.font.getPage(it.glyphId)));
-
-        for (Map.Entry<GlyphPage, List<Glyph>> glyphPageListEntry : pageToGlyphs.entrySet()) {
-            GlyphPage page = glyphPageListEntry.getKey();
-            GpuTextureView glId = page.tex.getGlTextureView();
-            SimpleGuiElementRenderState state = new DefaultGuiRenderState(
-                    Pipelines.TEXT_CUSTOM, TextureSetup.of(glId), context,
-                    new ScreenRect(0, 0,
-                            MinecraftClient.getInstance().getWindow().getScaledWidth(),
-                            MinecraftClient.getInstance().getWindow().getScaledHeight()),
-                    (buffer, aFloat) -> {
-                        for (Glyph glyph : glyphPageListEntry.getValue()) {
-                            float glyphBaselineX = (glyph.x + offsetX) * sf;
-                            float glyphBaselineY = (glyph.y + offsetY) * sf;
-                            int glyphIndex = glyph.glyphId;
-                            Style style = glyph.style;
-                            TextColor textCol = style.getColor();
-                            int actualColor = (textCol == null ? 0xFFFFFF : textCol.getRgb()) | (0xFF << 24);
-                            GlyphPage.Glyph theGlyph = page.getGlyph(glyphIndex);
-
-
-                            // draw glyph
-                            int bmpl = theGlyph.drawOffsetX();
-                            int bmpt = theGlyph.drawOffsetY();
-                            int wid = theGlyph.bitmapWidth();
-                            int hei = theGlyph.bitmapHeight();
-                            float topLeftX = glyphBaselineX + bmpl;
-                            float topLeftY = glyphBaselineY - bmpt;
-
-                            int glyphY = theGlyph.y().get();
-                            int glyphX = theGlyph.x().get();
-
-                            float w = page.getTexWidth();
-                            float h = page.getTexHeight();
-
-                            // small insets to make sure we're always INSIDE this char's bounds
-                            //@formatter:off
-                            buffer
-                                    .vertex(posmat, topLeftX, 	   topLeftY, 	  aFloat).color(actualColor).texture((glyphX + 0.01f) / w, 	  (glyphY + 0.01f) / h)		.light(0xf000f0)
-                                    .vertex(posmat, topLeftX, 	   topLeftY + hei, aFloat).color(actualColor).texture((glyphX + 0.01f) / w, 	  (glyphY + hei - 0.01f) / h).light(0xf000f0)
-                                    .vertex(posmat, topLeftX + wid, topLeftY + hei, aFloat).color(actualColor).texture((glyphX + wid - 0.01f) / w, (glyphY + hei - 0.01f) / h).light(0xf000f0)
-                                    .vertex(posmat, topLeftX + wid, topLeftY, 	  aFloat).color(actualColor).texture((glyphX + wid - 0.01f) / w, (glyphY + 0.01f) / h)		.light(0xf000f0);
-                            //@formatter:on
-                        }
-                    }
-            );
-            ((AccessorDrawContext) context).getState().addSimpleElement(state);
-        }
-
-        //		stack.pop();
-        //		posmat = stack.peek().getPositionMatrix();
-
-
-        boolean needsLines = glyphs.stream().anyMatch(g -> g.style.isUnderlined() || g.style.isStrikethrough());
-
-        if (needsLines) {
-            SimpleGuiElementRenderState state = new DefaultGuiRenderState(RenderPipelines.GUI, TextureSetup.empty(), context,
-                    new ScreenRect(0, 0,
-                            MinecraftClient.getInstance().getWindow().getScaledWidth(),
-                            MinecraftClient.getInstance().getWindow().getScaledHeight()),
-                    (quadBuffer, aFloat) -> {
-                        Map<Integer, List<Glyph>> runs = glyphs.stream().collect(Collectors.groupingBy(it -> it.runId));
-                        for (Map.Entry<Integer, List<Glyph>> integerListEntry : runs.entrySet()) {
-                            List<Glyph> glyphs = integerListEntry.getValue();
-                            assert !glyphs.isEmpty();
-                            List<Rectangle> rects = new ArrayList<>(Math.ceilDiv(glyphs.size(), 2));
-                            List<Rectangle> rectsStrike = new ArrayList<>(Math.ceilDiv(glyphs.size(), 2));
-
-                            Glyph firstGl = glyphs.getFirst();
-
-                            Float origSYO, origSH;
-                            boolean strikeoutSupported = (origSYO = firstGl.font.strikeoutCenterYOffset()) != null & (origSH = firstGl.font.strikeoutHeight()) != null;
-
-                            for (int i = 0; i < glyphs.size(); i++) {
-                                Glyph current = glyphs.get(i);
-                                Glyph prev = null;
-                                if (i > 0) prev = glyphs.get(i - 1);
-                                Style currentStyle = current.style;
-                                Style prevStyle = prev == null ? null : prev.style;
-
-                                float underlineY = -current.font.underlineCenterYOffset();
-                                float underlineHeight = current.font.underlineHeight();
-
-
-                                GlyphPage.GlyphMetrics gMet = current.font.getGlyph(current.glyphId).metrics();
-
-                                float left = ((current.x + offsetX) * sf + (gMet.hbX() / 64f));
-                                float right = (left + (gMet.width() / 64f));
-
-                                if (currentStyle.isUnderlined()) {
-                                    if (prevStyle != null && prevStyle.isUnderlined() && Objects.equals(prevStyle.getColor(), currentStyle.getColor())) {
-                                        // we're not the first glyph and the previous one has the same style as we do; add us
-                                        rects.getLast().endX.set(right);
-                                    } else {
-                                        // for some reason we cant merge with the previous rect
-                                        rects.add(new Rectangle(left, (current.y + offsetY) * sf + underlineY - underlineHeight, underlineHeight, new AtomicDouble(right), currentStyle.getColor()));
-                                    }
-                                }
-                                if (strikeoutSupported && currentStyle.isStrikethrough()) {
-                                    float strikeY = -origSYO;
-                                    float strikeHeight = origSH;
-                                    if (prevStyle != null && prevStyle.isStrikethrough() && Objects.equals(prevStyle.getColor(), currentStyle.getColor())) {
-                                        rectsStrike.getLast().endX.set(right);
-                                    } else {
-                                        rectsStrike.add(new Rectangle(left, (current.y + offsetY) * sf + strikeY, strikeHeight, new AtomicDouble(right), currentStyle.getColor()));
-                                    }
-                                }
-                            }
-
-                            for (int i = 0; i < 2; i++) {
-                                List<Rectangle> rcs = switch (i) {
-                                    case 0 -> rects;
-                                    case 1 -> rectsStrike;
-                                    default -> throw new IllegalStateException();
-                                };
-                                for (Rectangle rect : rcs) {
-                                    float le = rect.x;
-                                    float ri = (float) rect.endX.get();
-                                    float theY = rect.y;
-                                    float height = rect.height;
-                                    int actualColor = 0xFFFFFFFF;
-                                    if (rect.color != null) actualColor = (rect.color.getRgb()) | (0xFF << 24);
-
-                                    //@formatter:off
-                                    quadBuffer
-                                            .vertex(posmat, le, theY, 	   	 aFloat).color(actualColor)
-                                            .vertex(posmat, le, theY + height, aFloat).color(actualColor)
-                                            .vertex(posmat, ri, theY + height, aFloat).color(actualColor)
-                                            .vertex(posmat, ri, theY, 		 aFloat).color(actualColor);
-                                    //@formatter:on
-                                }
-                            }
-                        }
-                    }
-            );
-            ((AccessorDrawContext) context).getState().addSimpleElement(state);
-        }
-
-
-        stack.popMatrix();
     }
 
     public void draw(MatrixStack matrices, float x, float y)
     {
         if (glyphs.isEmpty()) return;
-
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
-        matrices.push();
-        matrices.translate(x, y, 0f);
-        float sf = (float) MinecraftClient.getInstance().getWindow().getScaleFactor();
-        matrices.scale(1f / sf, 1f / sf, 0f);
-        Map<GlyphPage, List<Glyph>> pageToGlyphs = glyphs.stream().collect(Collectors.groupingBy(it -> it.font.getPage(it.glyphId)));
-
-        for (Map.Entry<GlyphPage, List<Glyph>> glyphPageListEntry : pageToGlyphs.entrySet())
-        {
-            GlyphPage page = glyphPageListEntry.getKey();
-            GpuTextureView glId = page.tex.getGlTextureView();
-            try
-            {
-                RenderSystem.setShaderTexture(0, glId);
-            }
-            catch (Exception e)
-            {
-                continue;
-            }
-
-            VertexConsumer buffer = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().getBuffer(Layers.GUI);
-            for (Glyph glyph : glyphPageListEntry.getValue())
-            {
-                float glyphBaselineX = (glyph.x + offsetX) * sf;
-                float glyphBaselineY = (glyph.y + offsetY) * sf;
-                int glyphIndex = glyph.glyphId;
-                Style style = glyph.style;
-                TextColor textCol = style.getColor();
-                int actualColor = (textCol == null ? 0xFFFFFF : textCol.getRgb()) | (0xFF << 24);
-                GlyphPage.Glyph theGlyph = page.getGlyph(glyphIndex);
-
-
-                // draw glyph
-                int bmpl = theGlyph.drawOffsetX();
-                int bmpt = theGlyph.drawOffsetY();
-                int wid = theGlyph.bitmapWidth();
-                int hei = theGlyph.bitmapHeight();
-                float topLeftX = glyphBaselineX + bmpl;
-                float topLeftY = glyphBaselineY - bmpt;
-
-                int glyphY = theGlyph.y().get();
-                int glyphX = theGlyph.x().get();
-
-                float w = page.getTexWidth();
-                float h = page.getTexHeight();
-
-                // small insets to make sure we're always INSIDE this char's bounds
-                buffer.vertex(matrix, topLeftX, topLeftY, 0.0f).color(actualColor).texture((glyphX + 0.01f) / w, (glyphY + 0.01f) / h)
-                        .vertex(matrix, topLeftX, topLeftY + hei, 0.0f).color(actualColor).texture((glyphX + 0.01f) / w, (glyphY + hei - 0.01f) / h)
-                        .vertex(matrix, topLeftX + wid, topLeftY + hei, 0.0f).color(actualColor).texture((glyphX + wid - 0.01f) / w, (glyphY + hei - 0.01f) / h)
-                        .vertex(matrix, topLeftX + wid, topLeftY, 0.0f).color(actualColor).texture((glyphX + wid - 0.01f) / w, (glyphY + 0.01f) / h);
-            }
-
-            MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().draw(Layers.GUI);
-        }
-
-        matrices.pop();
     }
 
     record Rectangle(float x, float y, float height, AtomicDouble endX, TextColor color) {

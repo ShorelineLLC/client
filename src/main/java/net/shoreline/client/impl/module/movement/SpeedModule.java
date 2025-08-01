@@ -75,8 +75,8 @@ public class SpeedModule extends MovementModule
     {
         if (!checkNull())
         {
-            double dx = mc.player.getX() - mc.player.lastX;
-            double dz = mc.player.getZ() - mc.player.lastZ;
+            double dx = mc.player.getX() - mc.player.prevX;
+            double dz = mc.player.getZ() - mc.player.prevZ;
             distance = Math.sqrt(dx * dx + dz * dz);
         }
     }

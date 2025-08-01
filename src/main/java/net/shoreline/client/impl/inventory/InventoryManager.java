@@ -124,7 +124,7 @@ public class InventoryManager extends GenericFeature
 
     public boolean isSilentSwapping()
     {
-        return mc.player.getInventory().getSelectedSlot() != serverSlot;
+        return mc.player.getInventory().selectedSlot != serverSlot;
     }
 
     public boolean startSwap(int itemSlot)
@@ -142,14 +142,14 @@ public class InventoryManager extends GenericFeature
             return false;
         }
 
-        if (playerInventory.getSelectedSlot() == itemSlot)
+        if (playerInventory.selectedSlot == itemSlot)
         {
             return true;
         }
 
         swapCache = new HotbarCache(playerInventory);
 
-        int fromSlot = playerInventory.getSelectedSlot();
+        int fromSlot = playerInventory.selectedSlot;
 
         if (current.isSwapped())
         {
@@ -197,7 +197,7 @@ public class InventoryManager extends GenericFeature
             {
                 if (isSilentSwapping())
                 {
-                    Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(playerInventory.getSelectedSlot()));
+                    Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(playerInventory.selectedSlot));
                 }
             }
             case INVENTORY ->

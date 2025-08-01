@@ -1,5 +1,7 @@
 package net.shoreline.client.mixin.network;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -120,18 +122,17 @@ public abstract class MixinClientPlayerEntity
         }
     }
 
-    @Redirect(method = "applyMovementSpeedFactors", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
-    private boolean hookIsUsingItem(ClientPlayerEntity instance)
+    @WrapMethod(method = "isUsingItem")
+    private boolean hookIsUsingItem(Operation<Boolean> original)
     {
         MovementFactorEvent.Item event = new MovementFactorEvent.Item();
         EventBus.INSTANCE.dispatch(event);
-        return !event.isCanceled() && instance.isUsingItem();
+        return !event.isCanceled() && original.call();
     }
 
     // Fuck you fabric...
-    @Redirect(method = "applyMovementSpeedFactors", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/util/math/Vec2f;multiply(F)Lnet/minecraft/util/math/Vec2f;", ordinal = 2))
+    @Redirect(method = "tickMovement", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/util/math/Vec2f;multiply(F)Lnet/minecraft/util/math/Vec2f;", ordinal = 1))
     private Vec2f hookShouldSlowdown(Vec2f instance, float value)
     {
         MovementFactorEvent.Slowdown event = new MovementFactorEvent.Slowdown();

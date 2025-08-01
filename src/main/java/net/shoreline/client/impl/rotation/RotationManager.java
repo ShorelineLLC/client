@@ -96,9 +96,10 @@ public class RotationManager extends GenericFeature
         {
             float deltaYaw = mc.player.getYaw() - clientRotation.getYaw();
             final Vec2f corrected = moveFix.correctMovement(rotationsConfig.shouldRoundMoveFix(),
-                    deltaYaw, event.getMovementInput().y, event.getMovementInput().x);
+                    deltaYaw, event.getMovementForward(), event.getMovementSideways());
             event.cancel();
-            event.setMovementInput(corrected);
+            event.setMovementForward(corrected.x);
+            event.setMovementSideways(corrected.y);
         }
     }
 
@@ -188,7 +189,8 @@ public class RotationManager extends GenericFeature
             } else if (event.getPacket() instanceof PlayerMoveC2SPacket.LookAndOnGround lookGround)
             {
                 event.cancel();
-                event.setPacket(new PlayerMoveC2SPacket.Full(mc.player.getPos(),
+                event.setPacket(new PlayerMoveC2SPacket.Full(
+                        mc.player.getX(), mc.player.getY(), mc.player.getZ(),
                         lookGround.getYaw(0.0f),
                         lookGround.getPitch(0.0f),
                         mc.player.isOnGround(),
@@ -227,7 +229,8 @@ public class RotationManager extends GenericFeature
     {
         setClientRotation(rotation);
         Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
-                mc.player.getPos(), rotation.getYaw(), rotation.getPitch(),
+                mc.player.getX(), mc.player.getY(), mc.player.getZ(),
+                rotation.getYaw(), rotation.getPitch(),
                 mc.player.isOnGround(), mc.player.horizontalCollision));
     }
 

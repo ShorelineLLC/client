@@ -30,7 +30,7 @@ public class CommandManager extends GenericFeature
     {
         super("Commands");
         this.dispatcher = new CommandDispatcher<>();
-        this.source = new ClientCommandSource(mc.getNetworkHandler(), mc, false);
+        this.source = new ClientCommandSource(mc.getNetworkHandler(), mc);
 
         EventBus.INSTANCE.subscribe(this);
 

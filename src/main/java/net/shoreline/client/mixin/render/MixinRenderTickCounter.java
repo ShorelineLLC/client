@@ -19,17 +19,14 @@ public class MixinRenderTickCounter
     private FloatUnaryOperator targetMillisPerTick;
 
     @Shadow
-    private float dynamicDeltaTicks;
-
-    @Shadow
-    private float tickProgress;
-
-    @Shadow
-    private long lastTimeMillis;
-
-    @Shadow
     @Final
     private float tickTime;
+
+    @Shadow private float lastFrameDuration;
+
+    @Shadow private long prevTimeMillis;
+
+    @Shadow private float tickDelta;
 
     @Inject(method = "beginRenderTick(J)I", at = @At(value = "HEAD"), cancellable = true)
     private void hookBeginRenderTick(long timeMillis, CallbackInfoReturnable<Integer> cir)
@@ -38,12 +35,11 @@ public class MixinRenderTickCounter
         EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {
-            this.dynamicDeltaTicks = (float) (timeMillis - this.lastTimeMillis) / this.targetMillisPerTick.apply(this.tickTime);
-            this.dynamicDeltaTicks *= event.getTicks();
-            this.lastTimeMillis = timeMillis;
-            this.tickProgress += this.dynamicDeltaTicks;
-            int i = (int) this.tickProgress;
-            this.tickProgress -= (float) i;
+            lastFrameDuration = ((timeMillis - prevTimeMillis) / tickTime) * event.getTicks();
+            prevTimeMillis = timeMillis;
+            tickDelta += lastFrameDuration;
+            int i = (int) tickDelta;
+            tickDelta -= i;
             cir.setReturnValue(i);
         }
     }

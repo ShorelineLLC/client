@@ -1,8 +1,8 @@
 package net.shoreline.client.impl.render;
 
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.mixin.accessor.AccessorBufferBuilder;
@@ -28,7 +28,7 @@ public class DirectVertexConsumer implements VertexConsumer
         {
             ptr = ((AccessorBufferBuilder) original).getVertexPointer();
         }
-        into = MemoryUtil.memByteBuffer(ptr, format.getVertexSize());
+        into = MemoryUtil.memByteBuffer(ptr, format.getVertexSizeByte());
         into.order(ByteOrder.nativeOrder());
     }
 
@@ -42,7 +42,7 @@ public class DirectVertexConsumer implements VertexConsumer
 
     private void newVert()
     {
-        into = MemoryUtil.memByteBuffer(((AccessorBufferBuilder) original).beginNewVertex(), format.getVertexSize());
+        into = MemoryUtil.memByteBuffer(((AccessorBufferBuilder) original).beginNewVertex(), format.getVertexSizeByte());
         into.order(ByteOrder.nativeOrder());
     }
 

@@ -69,7 +69,7 @@ public class HudGuiScreen extends Screen
 
         if (ClickGuiModule.INSTANCE.shouldBlur())
         {
-            applyBlur(context);
+            applyBlur();
         }
 
         int screenWidth = context.getScaledWindowWidth();

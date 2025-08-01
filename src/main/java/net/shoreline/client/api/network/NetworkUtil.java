@@ -13,7 +13,7 @@ public class NetworkUtil
         ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
         if (handler == null)
         {
-            MinecraftClient.getInstance().world.disconnect(Text.of(disconnectReason));
+            MinecraftClient.getInstance().world.disconnect();
             return;
         }
 

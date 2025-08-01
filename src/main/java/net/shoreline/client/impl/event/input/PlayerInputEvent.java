@@ -11,10 +11,12 @@ import net.shoreline.eventbus.annotation.Cancelable;
 @Setter
 public class PlayerInputEvent extends Event
 {
-    private Vec2f movementInput;
+    private float movementForward;
+    private float movementSideways;
 
-    public PlayerInputEvent(Vec2f movementInput)
+    public PlayerInputEvent(float movementForward, float movementSideways)
     {
-        this.movementInput = movementInput;
+        this.movementForward = movementForward;
+        this.movementSideways = movementSideways;
     }
 }

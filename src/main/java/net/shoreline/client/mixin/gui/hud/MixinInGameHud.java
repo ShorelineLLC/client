@@ -44,7 +44,7 @@ public class MixinInGameHud
                             CallbackInfo ci)
     {
         EventBus.INSTANCE.dispatch(new HudOverlayEvent.Post(
-                context, tickCounter.getTickProgress(true)));
+                context, tickCounter.getTickDelta(true)));
     }
 
     @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"), cancellable = true)

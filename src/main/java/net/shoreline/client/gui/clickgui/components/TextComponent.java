@@ -78,10 +78,10 @@ public class TextComponent extends FrameComponent
                 .withColor(theme.getTextColor());
         enableScissor(context, getX() + 3, getY(), getX() + width, getY() + height);
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(-typedX, 0.0f);
+        context.getMatrices().push();
+        context.getMatrices().translate(-typedX, 0.0f, 0.0f);
         drawText(context, textBuffer, formattedText1, getX() + 3, getY() + 4);
-        context.getMatrices().popMatrix();
+        context.getMatrices().pop();
 
         disableScissor(context);
     }
