@@ -20,6 +20,19 @@ public class Pipelines
                     .withCull(false)
                     .build());
 
+    public static final RenderPipeline QUADS_GLINT = RenderPipelines
+            .register(RenderPipeline.builder(RenderPipelines.POSITION_TEX_COLOR_SNIPPET, RenderPipelines.GLOBALS_SNIPPET)
+                    .withLocation("pipeline/shoreline_quads_glint")
+                    .withVertexShader(Identifier.of("shoreline", "core/glint"))
+                    .withFragmentShader(Identifier.of("shoreline", "core/glint"))
+                    .withSampler("Sampler0")
+                    .withDepthWrite(false)
+                    .withCull(false)
+                    .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                    .withBlend(BlendFunction.GLINT)
+                    .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS)
+                    .build());
+
     public static final RenderPipeline DEBUG_LINES = RenderPipelines
             .register(RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
                     .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.DEBUG_LINES)
@@ -42,4 +55,15 @@ public class Pipelines
                     .withDepthBias(-1.0f, -10.0f)
                     .build()
     );
+
+    public static final RenderPipeline ENTITY = RenderPipelines
+            .register(RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+                    .withLocation("pipeline/shoreline_entity_translucent")
+                    .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+                    .withSampler("Sampler1")
+                    .withBlend(BlendFunction.TRANSLUCENT)
+                    .withDepthWrite(true)
+                    .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                    .withCull(false)
+                    .build());
 }

@@ -15,7 +15,7 @@ public abstract class DrawableComponent
 {
     protected final MinecraftClient mc = MinecraftClient.getInstance();
 
-    protected final GlyphBuffer textBuffer = new GlyphBuffer();;
+    protected final GlyphBuffer textBuffer = new GlyphBuffer();
 
     public abstract void drawComponent(DrawContext context,
                                        float mouseX,

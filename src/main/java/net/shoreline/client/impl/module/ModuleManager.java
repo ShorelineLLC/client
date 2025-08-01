@@ -69,6 +69,7 @@ public class ModuleManager
                 new VelocityModule(),
                 // Render
                 new BlockHighlightModule(),
+                new ChamsModule(),
                 new FreecamModule(),
                 new FullbrightModule(),
                 new HoleESPModule(),

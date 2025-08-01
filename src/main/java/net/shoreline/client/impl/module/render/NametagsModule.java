@@ -8,6 +8,7 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
@@ -15,6 +16,8 @@ import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
@@ -57,6 +60,7 @@ public class NametagsModule extends RenderModule
             .setMin(0.001f).setMax(0.01f).setDefaultValue(0.003f).build();
 
     private final List<PlayerEntry> players = new ArrayList<>();
+    protected final GlyphBuffer textBuffer = new GlyphBuffer();
 
     public NametagsModule()
     {
@@ -95,15 +99,13 @@ public class NametagsModule extends RenderModule
             matrices.multiply(mc.getEntityRenderDispatcher().getRotation());
             matrices.scale(scaling, -scaling, scaling);
 
-            GL11C.glEnable(GL11C.GL_POLYGON_OFFSET_FILL);
-            GL11C.glPolygonOffset(1.0f, -32500000);
-
             float hwidth = mc.textRenderer.getWidth(info) / 2f;
-            mc.textRenderer.draw(info, -hwidth, 0, 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), mc.getBufferBuilders().getEntityVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-            mc.getBufferBuilders().getEntityVertexConsumers().draw();
+            textBuffer.clear();
+            textBuffer.addText(FontManager.FONT, Text.of(info), -hwidth, 0);
+            textBuffer.draw(matrices, -hwidth, 0);
+            //mc.textRenderer.draw(info, -hwidth, 0, 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), mc.getBufferBuilders().getEntityVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+            //mc.getBufferBuilders().getEntityVertexConsumers().draw();
 
-            GL11C.glPolygonOffset(1.0f, 32500000);
-            GL11C.glDisable(GL11C.GL_POLYGON_OFFSET_FILL);
             matrices.pop();
         }
     }

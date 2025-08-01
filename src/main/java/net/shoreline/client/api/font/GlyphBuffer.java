@@ -1,6 +1,7 @@
 package net.shoreline.client.api.font;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,15 +10,20 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.texture.TextureSetup;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
+import net.shoreline.client.impl.render.Layers;
 import net.shoreline.client.impl.render.Pipelines;
 import net.shoreline.client.impl.render.DefaultGuiRenderState;
 import net.shoreline.client.mixin.accessor.AccessorDrawContext;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
+import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.harfbuzz.hb_glyph_info_t;
 import org.lwjgl.util.harfbuzz.hb_glyph_position_t;
@@ -254,6 +260,69 @@ public class GlyphBuffer {
 
 
         stack.popMatrix();
+    }
+
+    public void draw(MatrixStack matrices, float x, float y)
+    {
+        if (glyphs.isEmpty()) return;
+
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        matrices.push();
+        matrices.translate(x, y, 0f);
+        float sf = (float) MinecraftClient.getInstance().getWindow().getScaleFactor();
+        matrices.scale(1f / sf, 1f / sf, 0f);
+        Map<GlyphPage, List<Glyph>> pageToGlyphs = glyphs.stream().collect(Collectors.groupingBy(it -> it.font.getPage(it.glyphId)));
+
+        for (Map.Entry<GlyphPage, List<Glyph>> glyphPageListEntry : pageToGlyphs.entrySet())
+        {
+            GlyphPage page = glyphPageListEntry.getKey();
+            GpuTextureView glId = page.tex.getGlTextureView();
+            try
+            {
+                RenderSystem.setShaderTexture(0, glId);
+            }
+            catch (Exception e)
+            {
+                continue;
+            }
+
+            VertexConsumer buffer = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().getBuffer(Layers.GUI);
+            for (Glyph glyph : glyphPageListEntry.getValue())
+            {
+                float glyphBaselineX = (glyph.x + offsetX) * sf;
+                float glyphBaselineY = (glyph.y + offsetY) * sf;
+                int glyphIndex = glyph.glyphId;
+                Style style = glyph.style;
+                TextColor textCol = style.getColor();
+                int actualColor = (textCol == null ? 0xFFFFFF : textCol.getRgb()) | (0xFF << 24);
+                GlyphPage.Glyph theGlyph = page.getGlyph(glyphIndex);
+
+
+                // draw glyph
+                int bmpl = theGlyph.drawOffsetX();
+                int bmpt = theGlyph.drawOffsetY();
+                int wid = theGlyph.bitmapWidth();
+                int hei = theGlyph.bitmapHeight();
+                float topLeftX = glyphBaselineX + bmpl;
+                float topLeftY = glyphBaselineY - bmpt;
+
+                int glyphY = theGlyph.y().get();
+                int glyphX = theGlyph.x().get();
+
+                float w = page.getTexWidth();
+                float h = page.getTexHeight();
+
+                // small insets to make sure we're always INSIDE this char's bounds
+                buffer.vertex(matrix, topLeftX, topLeftY, 0.0f).color(actualColor).texture((glyphX + 0.01f) / w, (glyphY + 0.01f) / h)
+                        .vertex(matrix, topLeftX, topLeftY + hei, 0.0f).color(actualColor).texture((glyphX + 0.01f) / w, (glyphY + hei - 0.01f) / h)
+                        .vertex(matrix, topLeftX + wid, topLeftY + hei, 0.0f).color(actualColor).texture((glyphX + wid - 0.01f) / w, (glyphY + hei - 0.01f) / h)
+                        .vertex(matrix, topLeftX + wid, topLeftY, 0.0f).color(actualColor).texture((glyphX + wid - 0.01f) / w, (glyphY + 0.01f) / h);
+            }
+
+            MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().draw(Layers.GUI);
+        }
+
+        matrices.pop();
     }
 
     record Rectangle(float x, float y, float height, AtomicDouble endX, TextColor color) {
