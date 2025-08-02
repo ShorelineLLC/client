@@ -8,6 +8,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningPackets;
 import net.shoreline.client.impl.mining.MiningUtil;
@@ -119,12 +120,13 @@ public class SpeedMineModule extends Toggleable
         }
 
         int slot = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
-        if (slot == -1 || !Managers.INVENTORY.startSwap(slot))
+        if (slot == -1 || !Managers.INVENTORY.startSwap(slot, SilentSwapType.HOTBAR))
         {
             return;
         }
 
         miningPackets.getValue().sendStopPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
-        Managers.INVENTORY.endSwap();
+
+        Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
     }
 }

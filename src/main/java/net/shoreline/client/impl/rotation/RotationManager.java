@@ -98,8 +98,8 @@ public class RotationManager extends GenericFeature
             final Vec2f corrected = moveFix.correctMovement(rotationsConfig.shouldRoundMoveFix(),
                     deltaYaw, event.getMovementForward(), event.getMovementSideways());
             event.cancel();
-            event.setMovementForward(corrected.x);
-            event.setMovementSideways(corrected.y);
+            event.setMovementForward(corrected.y);
+            event.setMovementSideways(corrected.x);
         }
     }
 

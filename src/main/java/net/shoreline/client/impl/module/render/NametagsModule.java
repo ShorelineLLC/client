@@ -19,6 +19,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.event.render.entity.RenderEntityLabelEvent;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Interpolation;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -125,6 +126,12 @@ public class NametagsModule extends RenderModule
 
             players.add(new PlayerEntry(playerEntity));
         }
+    }
+
+    @EventListener
+    public void onRenderEntityLabel(RenderEntityLabelEvent event)
+    {
+        event.cancel();
     }
 
     @Getter
