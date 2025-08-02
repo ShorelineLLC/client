@@ -1,8 +1,10 @@
 package net.shoreline.client.impl.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -28,6 +30,7 @@ public class RenderManager
                           Box box,
                           int color)
     {
+        startRender();
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
         float minX = (float) (box.minX - camera.getX());
@@ -38,6 +41,7 @@ public class RenderManager
         float maxZ = (float) (box.maxZ - camera.getZ());
 
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         buffer.vertex(matrix, minX, minY, minZ).color(color);
         buffer.vertex(matrix, maxX, minY, minZ).color(color);
         buffer.vertex(matrix, maxX, minY, maxZ).color(color);
@@ -69,6 +73,7 @@ public class RenderManager
         buffer.vertex(matrix, minX, maxY, minZ).color(color);
 
         BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
     }
 
     public void renderBoundingBox(MatrixStack matrixStack, BlockPos pos, int color)
@@ -78,6 +83,7 @@ public class RenderManager
 
     public void renderBoundingBox(MatrixStack matrixStack, Box box, int color)
     {
+        startRender();
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
         float minX = (float) (box.minX - camera.getX());
@@ -88,6 +94,7 @@ public class RenderManager
         float maxZ = (float) (box.maxZ - camera.getZ());
 
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         buffer.vertex(matrix, minX, minY, minZ).color(color);
         buffer.vertex(matrix, minX, minY, maxZ).color(color);
         buffer.vertex(matrix, minX, minY, maxZ).color(color);
@@ -118,5 +125,19 @@ public class RenderManager
         buffer.vertex(matrix, minX, minY, maxZ).color(color);
         buffer.vertex(matrix, minX, maxY, maxZ).color(color);
         BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
+    private static void startRender()
+    {
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
+        RenderSystem.disableDepthTest();
+    }
+
+    private static void endRender()
+    {
+        RenderSystem.disableBlend();
+        RenderSystem.enableDepthTest();
     }
 }
