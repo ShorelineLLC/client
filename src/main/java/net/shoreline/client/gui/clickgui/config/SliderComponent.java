@@ -103,7 +103,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
             formattedText.append(Text.literal(numberConfig.getFormat()).formatted(Formatting.GRAY));
         }
 
-        drawText(context, textBuffer, formattedText, getTx() + 3, getTy() + 4);
+        drawText(context, formattedText, getTx() + 3, getTy() + 4);
     }
 
     @Override

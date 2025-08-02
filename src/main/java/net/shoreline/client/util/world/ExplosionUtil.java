@@ -7,12 +7,15 @@ import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.equipment.EquipmentType;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -91,21 +94,20 @@ public class ExplosionUtil
     {
         if (player instanceof LivingEntity livingEntity)
         {
-            float protLevel = getProtectionAmount(livingEntity, AttributeModifierSlot.ARMOR);
+            float protLevel = getProtectionAmount(livingEntity);
             return DamageUtil.getInflictedDamage((float) damage, protLevel);
         }
         return 0.0f;
     }
 
-    private float getProtectionAmount(LivingEntity livingEntity, AttributeModifierSlot slots)
+    private float getProtectionAmount(LivingEntity livingEntity)
     {
         MutableInt mutableInt = new MutableInt();
-        slots.forEach(i ->
+        livingEntity.getArmorItems().forEach(stack ->
         {
-            ItemStack stack = livingEntity.getEquippedStack(i);
             if (AnticheatModule.INSTANCE.isAssumeEnchanted() && EnchantUtil.isEnchantsObfuscated(stack))
             {
-                mutableInt.add(i.getEntitySlotId() == 1 ? 8 : 4);
+                mutableInt.add(livingEntity.getPreferredEquipmentSlot(stack) == EquipmentSlot.LEGS ? 8 : 4);
             }
             else
             {
@@ -113,6 +115,7 @@ public class ExplosionUtil
                 int modifier = EnchantUtil.getLevel(Enchantments.PROTECTION, stack);
                 mutableInt.add(modifierBlast * 2 + modifier);
             }
+
         });
         return mutableInt.intValue();
     }

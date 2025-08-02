@@ -10,12 +10,10 @@ import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.shoreline.client.api.GenericFeature;
-import net.shoreline.client.api.math.NanoTimer;
-import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.ac.Anticheat;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
-import net.shoreline.client.impl.event.gui.hud.RenderHotbarItemEvent;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
@@ -25,6 +23,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Getter
 public class InventoryManager extends GenericFeature
@@ -33,10 +33,11 @@ public class InventoryManager extends GenericFeature
 
     private final SwapData.Mutable current = new SwapData.Mutable();
     private final List<SwapData> trackedSwaps = new CopyOnWriteArrayList<>();
-    private final Timer lastSwapTimer = new NanoTimer();
 
-    private HotbarCache swapCache;
     private int serverSlot;
+
+    private final Lock swapLock = new ReentrantLock();
+    private final Lock clickLock = new ReentrantLock();
 
     public InventoryManager()
     {
@@ -51,18 +52,33 @@ public class InventoryManager extends GenericFeature
     }
 
     @EventListener
+    public void onDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() == mc.player)
+        {
+            trackedSwaps.clear();
+        }
+    }
+
+    @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof UpdateSelectedSlotS2CPacket(int slot))
         {
             serverSlot = slot;
         }
 
         if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet
-                && anticheat.getAcModeConfig().getValue() == Anticheat.GRIM
+                && packet.getSyncId() == mc.player.currentScreenHandler.syncId
                 && !InventoryUtil.isInInventoryScreen())
         {
-            int slot = packet.getSlot() > PlayerInventory.getHotbarSize() ? packet.getSlot() - PlayerInventory.MAIN_SIZE : packet.getSlot();
+            event.cancel();
+            int slot = packet.getSlot();
             if (packet.getStack().isEmpty() || !PlayerInventory.isValidHotbarIndex(slot))
             {
                 return;
@@ -79,7 +95,6 @@ public class InventoryManager extends GenericFeature
                 if (!ItemUtil.isSameItem(preStack, packet.getStack()))
                 {
                     event.cancel();
-                    trackedSwaps.remove(data);
                     break;
                 }
             }
@@ -113,13 +128,9 @@ public class InventoryManager extends GenericFeature
     }
 
     @EventListener
-    public void onRenderHotbarItem(RenderHotbarItemEvent event)
+    public void onTick(TickEvent.Pre event)
     {
-        if (!lastSwapTimer.hasPassed(1000) && swapCache != null)
-        {
-            event.cancel();
-            event.setStack(swapCache.getStack(event.getSeed()));
-        }
+        trackedSwaps.removeIf(swapData -> swapData.getSwapTime() > 1000);
     }
 
     public boolean isSilentSwapping()
@@ -147,31 +158,39 @@ public class InventoryManager extends GenericFeature
             return true;
         }
 
-        swapCache = new HotbarCache(playerInventory);
+        HotbarCache swapCache = new HotbarCache(playerInventory);
 
         int fromSlot = playerInventory.selectedSlot;
 
-        if (current.isSwapped())
+        swapLock.lock();
+        try
         {
-            return false;
-        }
-
-        switch (swapType)
-        {
-            case HOTBAR -> Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
-            case INVENTORY ->
+            if (current.isSwapped())
             {
-                int toSlot = InventoryUtil.getPacketSlotIndex(itemSlot);
-                mc.interactionManager.clickSlot(handler.syncId, toSlot, fromSlot, SlotActionType.SWAP, mc.player);
-                lastSwapTimer.reset();
+                return false;
             }
+
+            current.setSlotTo(itemSlot);
+            current.setSlotFrom(fromSlot);
+            current.setSwapped(true);
+
+            switch (swapType)
+            {
+                case HOTBAR -> Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
+                case INVENTORY ->
+                {
+                    int toSlot = InventoryUtil.getPacketSlotIndex(itemSlot);
+                    mc.interactionManager.clickSlot(handler.syncId, toSlot, fromSlot, SlotActionType.SWAP, mc.player);
+                    serverSlot = itemSlot;
+                }
+            }
+
+            trackedSwaps.add(new SwapData(swapCache, itemSlot, fromSlot));
         }
-
-        trackedSwaps.add(new SwapData(swapCache, itemSlot, fromSlot));
-
-        current.setSlotTo(itemSlot);
-        current.setSlotFrom(fromSlot);
-        current.setSwapped(true);
+        finally
+        {
+            swapLock.unlock();
+        }
 
         return true;
     }
@@ -186,28 +205,37 @@ public class InventoryManager extends GenericFeature
         PlayerInventory playerInventory = mc.player.getInventory();
         ScreenHandler handler = mc.player.currentScreenHandler;
 
-        if (!current.isSwapped())
+        swapLock.lock();
+        try
         {
-            return;
-        }
-
-        switch (swapType)
-        {
-            case HOTBAR ->
+            if (!current.isSwapped())
             {
-                if (isSilentSwapping())
+                return;
+            }
+
+            switch (swapType)
+            {
+                case HOTBAR ->
                 {
-                    Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(playerInventory.selectedSlot));
+                    if (isSilentSwapping())
+                    {
+                        Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(playerInventory.selectedSlot));
+                    }
+                }
+                case INVENTORY ->
+                {
+                    int toSlot = InventoryUtil.getPacketSlotIndex(current.getSlotTo());
+                    mc.interactionManager.clickSlot(handler.syncId, toSlot, current.getSlotFrom(), SlotActionType.SWAP, mc.player);
+                    serverSlot = playerInventory.selectedSlot;
                 }
             }
-            case INVENTORY ->
-            {
-                int toSlot = InventoryUtil.getPacketSlotIndex(current.getSlotTo());
-                mc.interactionManager.clickSlot(handler.syncId, toSlot, current.getSlotFrom(), SlotActionType.SWAP, mc.player);
-            }
-        }
 
-        current.reset();
+            current.reset();
+        }
+        finally
+        {
+            swapLock.unlock();
+        }
     }
 
     public void clickSwap(int fromSlot, int toSlot, Item item)
@@ -216,20 +244,28 @@ public class InventoryManager extends GenericFeature
 
         int slot1 = InventoryUtil.getPacketSlotIndex(fromSlot);
 
-        if (!handler.getCursorStack().getItem().equals(item))
+        clickLock.lock();
+        try
         {
-            mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
-        }
+            if (!handler.getCursorStack().getItem().equals(item))
+            {
+                mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
+            }
 
-        if (handler.getCursorStack().getItem().equals(item))
-        {
-            int slot = InventoryUtil.getPacketSlotIndex(toSlot);
-            mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
-        }
+            if (handler.getCursorStack().getItem().equals(item))
+            {
+                int slot = InventoryUtil.getPacketSlotIndex(toSlot);
+                mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
+            }
 
-        if (!handler.getCursorStack().isEmpty())
+            if (!handler.getCursorStack().isEmpty())
+            {
+                mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
+            }
+        }
+        finally
         {
-            mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
+            clickLock.unlock();
         }
     }
 }

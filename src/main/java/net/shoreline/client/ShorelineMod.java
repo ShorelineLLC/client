@@ -12,7 +12,7 @@ public class ShorelineMod implements ClientModInitializer
 {
     public static final String MOD_NAME = "Shoreline";
     public static final String MOD_VER = BuildConfig.VERSION;
-    public static final String MOD_MC_VER = "1.21.6";
+    public static final String MOD_MC_VER = "1.21.4";
 
     /**
      * This code runs as soon as Minecraft is in a mod-load-ready state.

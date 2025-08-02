@@ -80,7 +80,7 @@ public class TextComponent extends FrameComponent
 
         context.getMatrices().push();
         context.getMatrices().translate(-typedX, 0.0f, 0.0f);
-        drawText(context, textBuffer, formattedText1, getX() + 3, getY() + 4);
+        drawText(context, formattedText1, getX() + 3, getY() + 4);
         context.getMatrices().pop();
 
         disableScissor(context);
@@ -159,7 +159,7 @@ public class TextComponent extends FrameComponent
 
     private void updateScrolling()
     {
-        int textW = getTextWidth(textBuffer, Text.literal(bufferToString()));
+        int textW = getTextWidth(Text.literal(bufferToString()));
         int componentWidth = width - 6;
 
         if (textW - typedX > componentWidth)

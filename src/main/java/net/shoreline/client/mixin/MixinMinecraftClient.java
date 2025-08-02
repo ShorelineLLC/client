@@ -1,12 +1,10 @@
 package net.shoreline.client.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
-import net.shoreline.client.api.font.FontScalingRegistry;
-import net.shoreline.client.impl.Managers;
+import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.impl.event.OpenScreenEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
@@ -16,12 +14,20 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MinecraftClient.class)
 public class MixinMinecraftClient
 {
     @Unique
     private long startTime;
+
+    @Inject(method = "onInitFinished", at = @At(value = "RETURN"))
+    private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext,
+                                    CallbackInfoReturnable<Runnable> cir)
+    {
+        FontManager.init();
+    }
 
     @Inject(method = "joinWorld", at = @At(value = "TAIL"))
     private void hookJoinWorld(ClientWorld world, DownloadingTerrainScreen.WorldEntryReason worldEntryReason, CallbackInfo ci)
@@ -30,7 +36,7 @@ public class MixinMinecraftClient
         EventBus.INSTANCE.dispatch(worldEvent);
     }
 
-    @Inject(method = "disconnect", at = @At(value = "TAIL"))
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;Z)V", at = @At(value = "TAIL"))
     private void hookDisconnect(Screen disconnectionScreen, boolean transferring, CallbackInfo ci)
     {
         final WorldEvent.Disconnect worldEvent = new WorldEvent.Disconnect();
@@ -56,13 +62,6 @@ public class MixinMinecraftClient
     {
         OpenScreenEvent screenOpenEvent = new OpenScreenEvent(screen);
         EventBus.INSTANCE.dispatch(screenOpenEvent);
-    }
-
-    @Inject(method = "onResolutionChanged", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/util/Window;setScaleFactor(I)V"))
-    private void hookOnResolutionChanged(CallbackInfo ci, @Local(ordinal = 0) int i)
-    {
-        FontScalingRegistry.resize(i);
     }
 
     @Inject(method = "render", at = @At("HEAD"))

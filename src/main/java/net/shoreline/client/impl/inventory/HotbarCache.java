@@ -24,7 +24,7 @@ public class HotbarCache
             {
                 continue;
             }
-            hotbarItems[i] = stack.copy();
+            hotbarItems[i] = stack;
         }
     }
 

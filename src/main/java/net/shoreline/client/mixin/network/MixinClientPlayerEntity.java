@@ -1,14 +1,11 @@
 package net.shoreline.client.mixin.network;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.eventbus.EventBus;
@@ -122,22 +119,26 @@ public abstract class MixinClientPlayerEntity
         }
     }
 
-    @WrapMethod(method = "isUsingItem")
-    private boolean hookIsUsingItem(Operation<Boolean> original)
+    @Redirect(method = "tickMovement", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
+    private boolean hookIsUsingItem(ClientPlayerEntity instance)
     {
         MovementFactorEvent.Item event = new MovementFactorEvent.Item();
         EventBus.INSTANCE.dispatch(event);
-        return !event.isCanceled() && original.call();
+        return !event.isCanceled() && instance.isUsingItem();
     }
 
     // Fuck you fabric...
-    @Redirect(method = "tickMovement", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/util/math/Vec2f;multiply(F)Lnet/minecraft/util/math/Vec2f;", ordinal = 1))
-    private Vec2f hookShouldSlowdown(Vec2f instance, float value)
+    @Inject(method = "shouldSlowDown", at = @At(value = "HEAD"), cancellable = true)
+    private void hookShouldSlowdown(CallbackInfoReturnable<Boolean> cir)
     {
         MovementFactorEvent.Slowdown event = new MovementFactorEvent.Slowdown();
         EventBus.INSTANCE.dispatch(event);
-        return event.isCanceled() ? instance : instance.multiply(value);
+        if (event.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(false);
+        }
     }
 
     @Inject(method = "shouldStopSprinting", at = @At(value = "HEAD"), cancellable = true)

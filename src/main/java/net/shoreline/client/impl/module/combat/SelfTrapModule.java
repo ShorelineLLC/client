@@ -84,10 +84,11 @@ public class SelfTrapModule extends TrapModule
         }
 
         int obbySlot = findBestObbySlot();
-        if (!Managers.INTERACT.startPlacement(obbySlot))
+        if (obbySlot == -1)
         {
             return;
         }
+
 
         final Box playerBox = mc.player.getBoundingBox();
         Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
@@ -106,6 +107,11 @@ public class SelfTrapModule extends TrapModule
         trapPos.calcTrap(boundingBox, trapSpec);
 
         List<BlockPos> placements = getPlacements(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
+        if (placements.isEmpty() || !Managers.INTERACT.startPlacement(obbySlot))
+        {
+            return;
+        }
+
         for (BlockPos placement : placements)
         {
             placeObby(placement);

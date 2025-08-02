@@ -69,7 +69,7 @@ public class Frame extends DrawableComponent implements Interactable
         drawOutline(context, x + 1, y + 1, width - 2, titleHeight + (int) (frameHeight * collapseAnim.getFactor()) - 2, 1, theme.getOutlineColor());
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
-        drawText(context, textBuffer, Text.literal(title).withColor(theme.getTextColor()), x + 3, y + 5);
+        drawText(context, Text.literal(title).withColor(theme.getTextColor()), x + 3, y + 5);
 
         if (collapseAnim.getFactor() > 0.0)
         {

@@ -84,6 +84,15 @@ public class MiningData
                        int startColor,
                        int endColor)
     {
+        render(matrixStack, tickDelta, startColor, endColor, maxProgress);
+    }
+
+    public void render(MatrixStack matrixStack,
+                       float tickDelta,
+                       int startColor,
+                       int endColor,
+                       float miningSpeed)
+    {
         final BlockState state = getBlockState();
         Box fullBox = VoxelShapes.fullCube().getBoundingBox();
 
@@ -96,7 +105,7 @@ public class MiningData
             fadeOutAnim.setState(false);
         } else
         {
-            scale = Easing.SMOOTH_STEP.ease(getLinearScale(maxProgress, tickDelta));
+            scale = Easing.SMOOTH_STEP.ease(getLinearScale(miningSpeed, tickDelta));
             outlineShape = state.getOutlineShape(MinecraftClient.getInstance().world, blockPos).getBoundingBox();
         }
 

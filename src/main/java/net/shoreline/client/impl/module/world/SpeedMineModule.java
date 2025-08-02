@@ -28,8 +28,8 @@ public class SpeedMineModule extends Toggleable
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("The max range to mine").build();
-    Config<Float> speedConfig = new NumberConfig.Builder<Float>("Progress")
-            .setMin(0.1f).setMax(1.0f).setDefaultValue(1.0f)
+    Config<Float> speedConfig = new NumberConfig.Builder<Float>("Speed")
+            .setMin(0.5f).setMax(1.0f).setDefaultValue(1.0f)
             .setDescription("The mining progress before breaking").build();
     Config<Boolean> multitaskConfig = new BooleanConfig.Builder("Multitask")
             .setDescription("Allows using items while mining")

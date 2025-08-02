@@ -1,6 +1,5 @@
 package net.shoreline.client.mixin.network;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;
@@ -18,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public abstract class MixinClientPlayNetworkHandler implements IMixinClientPlayNetworkHandler
+public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNetworkHandler implements IMixinClientPlayNetworkHandler
 {
     @Shadow
     public abstract ClientConnection getConnection();
@@ -44,13 +43,12 @@ public abstract class MixinClientPlayNetworkHandler implements IMixinClientPlayN
     public void hookPlayerPositionLook(PlayerPositionLookS2CPacket packet,
                                        CallbackInfo ci)
     {
-        RotationUpdateEvent event = new RotationUpdateEvent(MinecraftClient.getInstance().player.getYaw(),
-                MinecraftClient.getInstance().player.getPitch());
+        RotationUpdateEvent event = new RotationUpdateEvent(client.player.getYaw(), client.player.getPitch());
         EventBus.INSTANCE.dispatch(event);
     }
 
     @Inject(method = "onExplosion", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/world/ClientWorld;addParticleClient(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
+            target = "Lnet/minecraft/client/world/ClientWorld;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
             shift = At.Shift.AFTER), cancellable = true)
     private void hookExplosion(ExplosionS2CPacket packet, CallbackInfo ci)
     {
@@ -64,7 +62,7 @@ public abstract class MixinClientPlayNetworkHandler implements IMixinClientPlayN
         if (event.isCanceled())
         {
             ci.cancel();
-            MinecraftClient.getInstance().player.addVelocityInternal(event.getPlayerVelocity());
+            client.player.addVelocityInternal(event.getPlayerVelocity());
         }
     }
 

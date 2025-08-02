@@ -14,5 +14,12 @@ import net.shoreline.eventbus.annotation.Cancelable;
 public class RenderHotbarItemEvent extends Event
 {
     private final int seed;
+
     private ItemStack stack;
+
+    public RenderHotbarItemEvent(int seed, ItemStack stack)
+    {
+        this(seed);
+        this.stack = stack;
+    }
 }

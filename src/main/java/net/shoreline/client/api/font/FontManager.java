@@ -2,6 +2,7 @@ package net.shoreline.client.api.font;
 
 import net.minecraft.util.Identifier;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -10,14 +11,11 @@ import java.nio.file.StandardCopyOption;
 
 public class FontManager
 {
-    private static FreeTypeLibrary FT;
-    public static Font FONT;
+    public static FontRenderer FONT;
 
     public static void init()
     {
-        FT = new FreeTypeLibrary();
-        FONT = fromResource(FT, "/assets/shoreline/font/verdana.ttf", 9);
-        FontScalingRegistry.register(FONT);
+        FONT = fromResource("/assets/shoreline/font/verdana.ttf", 9);
     }
 
     public void loadFont(Identifier identifier)
@@ -25,7 +23,7 @@ public class FontManager
 
     }
 
-    public static Font fromResource(FreeTypeLibrary ft, String resPath, int pxHeight)
+    public static FontRenderer fromResource(String resPath, int pxHeight)
     {
         try (InputStream in = FontManager.class.getResourceAsStream(resPath))
         {
@@ -34,11 +32,7 @@ public class FontManager
                 throw new IllegalArgumentException("No resource " + resPath);
             }
 
-            Path tmp = Files.createTempFile("font", ".ttf");
-            Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
-            tmp.toFile().deleteOnExit();
-
-            return new Font(ft, tmp.toString(), 0, pxHeight);
+            return new FontRenderer(in, pxHeight);
 
         } catch (IOException ioe)
         {

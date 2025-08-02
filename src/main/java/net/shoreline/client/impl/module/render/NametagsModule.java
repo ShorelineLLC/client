@@ -10,14 +10,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.font.FontManager;
-import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
@@ -25,7 +22,6 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Interpolation;
 import net.shoreline.eventbus.annotation.EventListener;
-import org.lwjgl.opengl.GL11C;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -60,7 +56,6 @@ public class NametagsModule extends RenderModule
             .setMin(0.001f).setMax(0.01f).setDefaultValue(0.003f).build();
 
     private final List<PlayerEntry> players = new ArrayList<>();
-    protected final GlyphBuffer textBuffer = new GlyphBuffer();
 
     public NametagsModule()
     {
@@ -100,11 +95,8 @@ public class NametagsModule extends RenderModule
             matrices.scale(scaling, -scaling, scaling);
 
             float hwidth = mc.textRenderer.getWidth(info) / 2f;
-            textBuffer.clear();
-            textBuffer.addText(FontManager.FONT, Text.of(info), -hwidth, 0);
-            textBuffer.draw(matrices, -hwidth, 0);
-            //mc.textRenderer.draw(info, -hwidth, 0, 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), mc.getBufferBuilders().getEntityVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-            //mc.getBufferBuilders().getEntityVertexConsumers().draw();
+            mc.textRenderer.draw(info, -hwidth, 0, 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), mc.getBufferBuilders().getEntityVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+            mc.getBufferBuilders().getEntityVertexConsumers().draw();
 
             matrices.pop();
         }

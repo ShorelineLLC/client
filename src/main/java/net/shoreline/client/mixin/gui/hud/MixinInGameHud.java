@@ -3,6 +3,7 @@ package net.shoreline.client.mixin.gui.hud;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
@@ -29,8 +30,10 @@ public class MixinInGameHud
             ordinal = 0))
     private void hookRenderHotbarItem(Args args)
     {
+        ItemStack stack = args.get(5);
         int seed = (Integer) args.get(6) - 1;
-        RenderHotbarItemEvent event = new RenderHotbarItemEvent(seed);
+
+        RenderHotbarItemEvent event = new RenderHotbarItemEvent(seed, stack);
         EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {

@@ -5,7 +5,6 @@ import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
@@ -27,8 +26,6 @@ public class GroupComponent extends ConfigComponent<Void>
 
     @Getter
     private final List<ConfigComponent<?>> components = new ArrayList<>();
-
-    private final GlyphBuffer dotsBuffer = new GlyphBuffer();
 
     public GroupComponent(Config<Void> config,
                           ModuleComponent moduleComponent,
@@ -54,9 +51,9 @@ public class GroupComponent extends ConfigComponent<Void>
         int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
         drawRect(context, getTx(), getTy(), width, height, color);
 
-        drawText(context, textBuffer, Text.literal(getConfig().getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
+        drawText(context, Text.literal(getConfig().getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
         Text dotsText = Text.literal("...").withColor(theme.getTextColor());
-        drawText(context, dotsBuffer, dotsText, getTx() + width - getTextWidth(dotsBuffer, dotsText, true) - 1, getTy() + 4, 0.0f, 5.0f, true);
+        drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4);
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 

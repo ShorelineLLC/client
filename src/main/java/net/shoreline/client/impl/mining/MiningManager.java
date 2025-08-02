@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.util.item.EnchantUtil;
@@ -31,6 +32,12 @@ public class MiningManager extends GenericFeature
         super("Mining");
         this.maxPickaxeStack = new ItemStack(Items.NETHERITE_PICKAXE);
         EventBus.INSTANCE.subscribe(this);
+    }
+
+    @EventListener
+    public void onWorldDisconnect(WorldEvent.Disconnect event)
+    {
+        miningBlocks.clear();
     }
 
     @EventListener

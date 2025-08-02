@@ -33,8 +33,6 @@ public class Shoreline
         CONFIG = new ModConfiguration();
         CONFIG.loadModConfiguration();
 
-        FontManager.init();
-
         SHUTDOWN = new ShutdownHook();
         Runtime.getRuntime().addShutdownHook(SHUTDOWN);
     }

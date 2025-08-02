@@ -4,3 +4,4 @@ accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPa
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler
 accessible class net/minecraft/client/gui/DrawContext$ScissorStack
 accessible field net/minecraft/client/gui/DrawContext$ScissorStack stack Ljava/util/Deque;
+accessible class net/minecraft/client/MinecraftClient$LoadingContext

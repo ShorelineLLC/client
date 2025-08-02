@@ -50,7 +50,7 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
         Text formattedText = Text.empty()
                 .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
                 .append(Text.literal(" " + keyText).formatted(Formatting.GRAY));
-        drawText(context, textBuffer, formattedText, getTx() + 3, getTy() + 4);
+        drawText(context, formattedText, getTx() + 3, getTy() + 4);
     }
 
     @Override

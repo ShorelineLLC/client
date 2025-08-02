@@ -27,6 +27,7 @@
     "input.MixinKeyboardInput",
     "item.MixinItemUsageContext",
     "network.MixinClientConnection",
+    "network.MixinClientCommonNetworkHandler",
     "network.MixinClientPlayerEntity",
     "network.MixinClientPlayerInteractionManager",
     "network.MixinClientPlayNetworkHandler",

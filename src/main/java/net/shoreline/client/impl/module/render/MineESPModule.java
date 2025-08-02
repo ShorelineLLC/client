@@ -16,8 +16,10 @@ public class MineESPModule extends RenderModule
 {
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(12.0f).setDefaultValue(6.0f).setFormat("m")
-            .setDescription("The range to scan for mined blocks")
-            .build();
+            .setDescription("The range to scan for mined blocks").build();
+    Config<Float> miningSpeed = new NumberConfig.Builder<Float>("Speed")
+            .setMin(0.5f).setMax(1.0f).setDefaultValue(1.0f)
+            .setDescription("The mining progress speed").build();
     Config<Color> miningColor = new ColorConfig.Builder("Mining")
             .setDescription("The color when mining a block")
             .setDefaultValue(Color.MAGENTA.darker()).build();
@@ -42,7 +44,9 @@ public class MineESPModule extends RenderModule
             }
 
             data.render(event.getMatrixStack(), event.getTickDelta(),
-                    miningColor.getValue().getRGB(), breakingColor.getValue().getRGB());
+                    miningColor.getValue().getRGB(),
+                    breakingColor.getValue().getRGB(),
+                    miningSpeed.getValue());
         }
     }
 }

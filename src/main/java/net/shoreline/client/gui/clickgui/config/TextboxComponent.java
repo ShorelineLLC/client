@@ -55,7 +55,7 @@ public class TextboxComponent extends ConfigComponent<String>
             Text formattedText = Text.empty()
                     .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
                     .append(Text.literal(" " + getConfig().getValue()).formatted(Formatting.GRAY));
-            drawText(context, textBuffer, formattedText, getTx() + 3, getTy() + 4);
+            drawText(context, formattedText, getTx() + 3, getTy() + 4);
         }
     }
 

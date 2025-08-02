@@ -8,21 +8,35 @@ import lombok.Setter;
 @Getter
 public class SwapData
 {
+    private static final int INVALID_SLOT = -1;
+
     private final HotbarCache preHotbar;
     private final int slotFrom, slotTo;
+
+    private final long startTime;
+
+    public SwapData(HotbarCache preHotbar, int slotFrom, int slotTo)
+    {
+        this(preHotbar, slotFrom, slotTo, System.currentTimeMillis());
+    }
+
+    public long getSwapTime()
+    {
+        return System.currentTimeMillis() - startTime;
+    }
 
     @Getter
     @Setter
     public static class Mutable
     {
         private boolean swapped;
-        private int slotFrom, slotTo = -1;
+        private int slotFrom, slotTo = INVALID_SLOT;
 
         public void reset()
         {
             swapped = false;
-            slotFrom = -1;
-            slotTo = -1;
+            slotFrom = INVALID_SLOT;
+            slotTo = INVALID_SLOT;
         }
     }
 }

@@ -1,12 +1,10 @@
 package net.shoreline.client.mixin.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;

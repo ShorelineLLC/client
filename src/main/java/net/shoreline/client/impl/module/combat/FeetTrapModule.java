@@ -44,7 +44,6 @@ public class FeetTrapModule extends TrapModule
             .setDescription("Disables when player y-level changes")
             .setDefaultValue(false).build();
 
-    private List<BlockPos> placements;
     private double prevY;
 
     public FeetTrapModule()
@@ -82,7 +81,7 @@ public class FeetTrapModule extends TrapModule
         }
 
         int obbySlot = findBestObbySlot();
-        if (!Managers.INTERACT.startPlacement(obbySlot))
+        if (obbySlot == -1)
         {
             return;
         }
@@ -102,7 +101,12 @@ public class FeetTrapModule extends TrapModule
 
         trapPos.calcTrap(boundingBox, trapSpec);
 
-        placements = getPlacements(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
+        List<BlockPos> placements = getPlacements(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
+        if (placements.isEmpty() || !Managers.INTERACT.startPlacement(obbySlot))
+        {
+            return;
+        }
+
         for (BlockPos placement : placements)
         {
             placeObby(placement);

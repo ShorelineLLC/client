@@ -3,15 +3,12 @@ package net.shoreline.client.impl.module.impl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.font.FontManager;
-import net.shoreline.client.api.font.GlyphBuffer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.module.client.FontModule;
 
 public class RenderModule extends Toggleable
 {
-    private final GlyphBuffer buffer = new GlyphBuffer();
-
     public RenderModule(String name, String description, GuiCategory category)
     {
         super(name, description, category);
@@ -34,10 +31,7 @@ public class RenderModule extends Toggleable
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            buffer.clear();
-            buffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
-            buffer.offsetToTopLeft();
-            buffer.draw(context, x, y);
+            FontManager.FONT.drawString(context.getMatrices(), text.getString(), x, y, -1);
             return;
         }
 
@@ -53,10 +47,7 @@ public class RenderModule extends Toggleable
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            buffer.clear();
-            buffer.addText(FontManager.FONT, text, 0.0f, 0.0f);
-            buffer.recalculateBounds();
-            return Math.round(buffer.maxX - buffer.minX);
+            return (int) FontManager.FONT.getStringWidth(text.getString());
         }
 
         return mc.textRenderer.getWidth(text);

@@ -46,7 +46,7 @@ public class ChestSwapModule extends Toggleable
             int slot = InventoryUtil.getItemSlot(Items.ELYTRA);
             if (slot != -1)
             {
-                Managers.INVENTORY.clickSwap(slot, PlayerInventory.BODY_SLOT, Items.ELYTRA);
+                Managers.INVENTORY.clickSwap(slot, 6, Items.ELYTRA);
             }
 
             if (fireworkConfig.getValue() && !mc.player.isOnGround())
@@ -70,7 +70,7 @@ public class ChestSwapModule extends Toggleable
             int slot = getBestChestplateSlot(playerInventory);
             if (slot != -1)
             {
-                Managers.INVENTORY.clickSwap(slot, PlayerInventory.BODY_SLOT, chestplateItem);
+                Managers.INVENTORY.clickSwap(slot, 6, chestplateItem);
             }
         }
 
