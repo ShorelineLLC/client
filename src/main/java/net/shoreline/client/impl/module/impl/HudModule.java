@@ -1,14 +1,23 @@
 package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.Window;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.gui.hud.Anchor;
+import net.shoreline.client.impl.Managers;
 
 public abstract class HudModule extends RenderModule
 {
     Config<Integer> x = new NumberConfig.Builder<Integer>("X-Position").setDefaultValue(0).build();
     Config<Integer> y = new NumberConfig.Builder<Integer>("Y-Position").setDefaultValue(0).build();
+    Config<Integer> index = new NumberConfig.Builder<Integer>("Index").setDefaultValue(0).build();
+    Config<Anchor> anchor = new EnumConfig.Builder<Anchor>("Anchor")
+            .setValues(Anchor.values())
+            .setDefaultValue(Anchor.None).build();
 
     public HudModule(String name, String description, int x, int y)
     {
@@ -49,6 +58,26 @@ public abstract class HudModule extends RenderModule
     public void setY(int y)
     {
         this.y.setValue(y);
+    }
+
+    public Anchor getAnchor()
+    {
+        return anchor.getValue();
+    }
+
+    public void setAnchor(Anchor anchor)
+    {
+        this.anchor.setValue(anchor);
+    }
+
+    public int getIndex()
+    {
+        return index.getValue();
+    }
+
+    public void setIndex(int index)
+    {
+        this.index.setValue(index);
     }
 
     public abstract int getWidth();

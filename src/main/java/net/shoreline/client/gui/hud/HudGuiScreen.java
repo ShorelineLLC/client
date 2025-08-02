@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.hud;
 
 import lombok.Getter;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -14,6 +15,8 @@ import net.shoreline.client.impl.render.ColorUtil;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 public class HudGuiScreen extends Screen
@@ -91,11 +94,6 @@ public class HudGuiScreen extends Screen
                 draggingMouse = true;
             }
 
-            if (component.isDragging())
-            {
-                clampOverlap(component);
-            }
-
             HudModule module = component.getHudModule();
             if (module.isEnabled())
             {
@@ -126,6 +124,7 @@ public class HudGuiScreen extends Screen
 
         hudFrame.mouseClicked(mouseX, mouseY, mouseButton);
 
+        runAnchorTick();
         for (HudComponent component : hudComponents)
         {
             component.mouseClicked(mouseX, mouseY, mouseButton);
@@ -149,11 +148,6 @@ public class HudGuiScreen extends Screen
 
         for (HudComponent component : hudComponents)
         {
-            if (component.isDragging())
-            {
-                clampComponents(component);
-            }
-
             component.mouseReleased(mouseX, mouseY, button);
         }
 
@@ -184,80 +178,57 @@ public class HudGuiScreen extends Screen
         super.close();
     }
 
-    private void clampOverlap(HudComponent component)
+    public void runAnchorTick()
     {
-        for (HudComponent c : hudComponents)
+        for (Anchor anchor : Anchor.values())
         {
-            if (c.equals(component))
+            if (anchor == Anchor.None)
             {
                 continue;
             }
 
-            if (component.getX() < c.getX() + c.getWidth() &&
-                    component.getX() + component.getWidth() > c.getX() &&
-                    component.getY() < c.getY() + c.getHeight() &&
-                    component.getY() + component.getHeight() > c.getY())
-            {
-                if (component.getX() < c.getX())
-                {
-                    component.setX(c.getX() - component.getWidth());
-                } else
-                {
-                    component.setX(c.getX() + c.getWidth());
-                }
+            float offset = 2f;
+            Collection<HudComponent> sorted = hudComponents;
+            List<HudComponent> anchoredElements = sorted.stream()
+                    .filter(e -> e.getHudModule().getAnchor() == anchor)
+                    .sorted(Comparator.comparingInt(e -> e.getHudModule().getIndex()))
+                    .toList();
 
-                if (component.getY() < c.getY())
-                {
-                    component.setY(c.getY() + component.getHeight());
-                } else
-                {
-                    component.setY(c.getY() - c.getHeight());
-                }
-            }
-        }
-    }
-
-    private void clampComponents(HudComponent component)
-    {
-        int snapThreshold = 8;
-        for (HudComponent c : hudComponents)
-        {
-            if (c.equals(component))
+            if (anchoredElements.isEmpty())
             {
                 continue;
             }
 
-            int cx = c.getX();
-            int cy = c.getY();
-            int cw = c.getWidth();
-            int ch = c.getHeight();
+            int i = 0;
+            int currentY = (int) anchor.getY(MinecraftClient.getInstance().getWindow().getScaledHeight(), 0, offset);
+            for (HudComponent hudModule : anchoredElements)
+            {
+                if (hudModule.isDragging())
+                {
+                    continue;
+                }
 
-            if (Math.abs(component.getX() + component.getWidth() - cx) < snapThreshold)
-            {
-                component.setX(cx - component.getWidth());
-            } else if (Math.abs(component.getX() - (cx + cw)) < snapThreshold)
-            {
-                component.setX(cx + cw);
-            } else if (Math.abs(component.getX() - cx) < snapThreshold)
-            {
-                component.setX(cx);
-            } else if (Math.abs(component.getX() + component.getWidth() - (cx + cw)) < snapThreshold)
-            {
-                component.setX(cx + cw - component.getWidth());
-            }
+                hudModule.setIndex(i);
+                i++;
 
-            if (Math.abs(component.getY() + component.getHeight() - cy) < snapThreshold)
-            {
-                component.setY(cy - component.getHeight());
-            } else if (Math.abs(component.getY() - (cy + ch)) < snapThreshold)
-            {
-                component.setY(cy + ch);
-            } else if (Math.abs(component.getY() - cy) < snapThreshold)
-            {
-                component.setY(cy);
-            } else if (Math.abs(component.getY() + component.getHeight() - (cy + ch)) < snapThreshold)
-            {
-                component.setY(cy + ch - component.getHeight());
+                if (!hudModule.getHudModule().isEnabled())
+                {
+                    continue;
+                }
+
+                hudModule.setX((int) anchor.getX(MinecraftClient.getInstance().getWindow().getScaledWidth(), hudModule.getWidth()));
+                switch (anchor)
+                {
+                    case Top_Left:
+                    case Top_Right:
+                        hudModule.setY(currentY);
+                        currentY += hudModule.getHeight();
+                        break;
+                    case Bottom_Left:
+                    case Bottom_Right:
+                        hudModule.setY(currentY -= hudModule.getHeight());
+                        break;
+                }
             }
         }
     }

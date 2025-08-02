@@ -3,8 +3,10 @@ package net.shoreline.client.gui.hud;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.gui.Interactable;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.impl.HudModule;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Mouse;
@@ -17,9 +19,12 @@ import net.shoreline.client.impl.render.Easing;
 public class HudComponent extends DrawableComponent implements Interactable
 {
     private final HudModule hudModule;
+    private Anchor anchor;
+    private int index;
 
     private int x, y;
 
+    @Setter
     private int px, py;
 
     private int width;
@@ -35,6 +40,8 @@ public class HudComponent extends DrawableComponent implements Interactable
         this.x = x;
         this.y = y;
         this.hoverAnim = new Animation(false, 150L, Easing.LINEAR);
+        this.anchor = hudModule.getAnchor();
+        this.index = hudModule.getIndex();
     }
 
     @Override
@@ -54,6 +61,7 @@ public class HudComponent extends DrawableComponent implements Interactable
 
             x = MathHelper.clamp(x, 0, screenWidth - width);
             y = MathHelper.clamp(y, 0, screenHeight - height);
+            updateAnchor();
         }
 
         hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, x, y, width, height));
@@ -63,6 +71,8 @@ public class HudComponent extends DrawableComponent implements Interactable
 
         hudModule.setX(x);
         hudModule.setY(y);
+        hudModule.setAnchor(anchor);
+        hudModule.setIndex(index);
         hudModule.drawGuiComponent(context, delta);
 
         width = hudModule.getWidth();
@@ -84,32 +94,6 @@ public class HudComponent extends DrawableComponent implements Interactable
         if (dragging)
         {
             dragging = false;
-
-            int screenWidth = mc.getWindow().getScaledWidth();
-            int screenHeight = mc.getWindow().getScaledHeight();
-
-            int snapThreshold = 15;
-            if (Math.abs(x) < snapThreshold)
-            {
-                x = 0;
-            } else if (Math.abs(x + width - screenWidth) < snapThreshold)
-            {
-                x = screenWidth - width;
-            } else if (Math.abs(x + width / 2 - screenWidth / 2) < snapThreshold)
-            {
-                x = (screenWidth - width) / 2;
-            }
-
-            if (Math.abs(y) < snapThreshold)
-            {
-                y = 0;
-            } else if (Math.abs(y + height - screenHeight) < snapThreshold)
-            {
-                y = screenHeight - height;
-            } else if (Math.abs(y + height / 2 - screenHeight / 2) < snapThreshold)
-            {
-                y = (screenHeight - height) / 2;
-            }
         }
     }
 
@@ -119,4 +103,53 @@ public class HudComponent extends DrawableComponent implements Interactable
     @Override
     public void charTyped(char chr, int modifiers) {}
 
+    private void updateAnchor()
+    {
+        Window resolution = mc.getWindow();
+        float offset = 7;
+        boolean nearLeft = x <= offset + 1;
+        boolean nearRight = y >= resolution.getScaledWidth() - getWidth() - offset - 1;
+        boolean nearTop = x <= offset + 1;
+        boolean nearBottom = y >= resolution.getScaledHeight() - getHeight() - offset - 1;
+
+        float centerX = resolution.getScaledWidth() / 2.0f;
+        boolean nearTopMiddle = nearTop
+                && !nearLeft
+                && !nearRight
+                && Math.abs((getX() + getWidth() / 2.0f) - centerX) <= offset + 1;
+
+        Anchor found;
+        if (nearLeft && nearTop)
+        {
+            found = Anchor.Top_Left;
+        }
+        else if (nearRight && nearTop)
+        {
+            found = Anchor.Top_Right;
+        }
+        else if (nearLeft && nearBottom)
+        {
+            found = Anchor.Bottom_Left;
+        }
+        else if (nearRight && nearBottom)
+        {
+            found = Anchor.Bottom_Right;
+        }
+        else if (nearTopMiddle)
+        {
+            found = Anchor.Middle;
+        }
+        else
+        {
+            index = 0;
+            anchor = Anchor.None;
+            return;
+        }
+
+        if (getAnchor() != null)
+        {
+            index = Integer.MAX_VALUE;
+            anchor = found;
+        }
+    }
 }

@@ -12,6 +12,8 @@ import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.loader.Loader;
+import net.shoreline.loader.session.UserSession;
 
 public class ChamsModule extends Toggleable
 {

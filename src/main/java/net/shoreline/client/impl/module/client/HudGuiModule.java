@@ -9,6 +9,10 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+
 public class HudGuiModule extends ListeningToggleable
 {
     public static HudGuiModule INSTANCE;
@@ -57,6 +61,7 @@ public class HudGuiModule extends ListeningToggleable
             return;
         }
 
+        HudGuiScreen.INSTANCE.runAnchorTick();
         for (HudModule hudModule : Managers.MODULES.getHudModules())
         {
             if (hudModule.isEnabled())

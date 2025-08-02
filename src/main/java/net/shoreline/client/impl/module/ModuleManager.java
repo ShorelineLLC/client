@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module;
 
 import lombok.Getter;
 import net.shoreline.client.api.module.Module;
+import net.shoreline.client.gui.hud.Anchor;
 import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.*;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
