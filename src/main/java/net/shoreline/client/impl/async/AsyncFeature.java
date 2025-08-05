@@ -2,6 +2,7 @@ package net.shoreline.client.impl.async;
 
 import net.shoreline.client.api.GenericFeature;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -31,7 +32,7 @@ public class AsyncFeature<T> extends GenericFeature
     {
         if (currentResult == null || !currentResult.isDone())
         {
-            return null;
+            return new ArrayList<>();
         }
 
         try

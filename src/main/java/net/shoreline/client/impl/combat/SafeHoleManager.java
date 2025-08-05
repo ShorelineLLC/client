@@ -2,6 +2,7 @@ package net.shoreline.client.impl.combat;
 
 import net.shoreline.client.impl.async.AsyncFeature;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.module.combat.FillerModule;
 import net.shoreline.client.impl.module.render.HoleESPModule;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -24,7 +25,7 @@ public class SafeHoleManager extends AsyncFeature<HoleData>
             return;
         }
 
-        if (!HoleESPModule.INSTANCE.isEnabled())
+        if (!HoleESPModule.INSTANCE.isEnabled() && !FillerModule.INSTANCE.isEnabled())
         {
             return;
         }

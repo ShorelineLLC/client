@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentMap;
 @RequiredArgsConstructor
 public abstract class AsyncBlockScanner
 {
-    private final ConcurrentMap<BlockPos, BlockState> asyncSphere = new ConcurrentHashMap<>();
+    private final ConcurrentMap<BlockPos, BlockState> blockSphere = new ConcurrentHashMap<>();
 
     public void createSphere(ClientWorld world, BlockPos center)
     {
-        asyncSphere.clear();
+        blockSphere.clear();
 
         int radius = getRadius();
         for (int dx = -radius; dx <= radius; ++dx)
@@ -30,7 +30,7 @@ public abstract class AsyncBlockScanner
                             center.getY() + dy,
                             center.getZ() + dz);
 
-                    asyncSphere.put(pos, world.getBlockState(pos));
+                    blockSphere.put(pos, world.getBlockState(pos));
                 }
             }
         }
@@ -38,7 +38,7 @@ public abstract class AsyncBlockScanner
 
     public void scanSphere()
     {
-        for (Map.Entry<BlockPos, BlockState> entry : asyncSphere.entrySet())
+        for (Map.Entry<BlockPos, BlockState> entry : blockSphere.entrySet())
         {
             visit(entry.getKey(), entry.getValue());
         }
@@ -46,7 +46,7 @@ public abstract class AsyncBlockScanner
 
     protected BlockState getBlockState(BlockPos blockPos)
     {
-        return asyncSphere.getOrDefault(blockPos, Blocks.AIR.getDefaultState());
+        return blockSphere.getOrDefault(blockPos, Blocks.AIR.getDefaultState());
     }
 
     protected abstract void visit(BlockPos pos, BlockState state);

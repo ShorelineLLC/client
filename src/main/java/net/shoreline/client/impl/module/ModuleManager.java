@@ -46,6 +46,7 @@ public class ModuleManager
                 new AutoXPModule(),
                 new CriticalsModule(),
                 new FeetTrapModule(),
+                new FillerModule(),
                 new OffhandGappleModule(),
                 new ReplenishModule(),
                 new SelfTrapModule(),

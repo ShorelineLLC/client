@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.combat;
 
 import lombok.Data;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 
@@ -29,8 +30,41 @@ public class HoleData
         this.holePos = holePos;
     }
 
-    public Box getBoundingBox()
+    public double squaredDistanceTo(Entity entity)
     {
-        return new Box(holePos[0]);
+        return entity.getPos().squaredDistanceTo(getBoundingBox(1.0f).getCenter());
+    }
+
+    public Box getBoundingBox(double height)
+    {
+        final Box box1 = new Box(holePos[0]);
+        double minX = box1.minX;
+        double minY = box1.minY;
+        double minZ = box1.minZ;
+        double maxX = box1.maxX;
+        double maxZ = box1.maxZ;
+        for (BlockPos blockPos : holePos)
+        {
+            Box box = new Box(blockPos);
+
+            if (box.minX < minX)
+            {
+                minX = box.minX;
+            }
+            if (box.minZ < minZ)
+            {
+                minZ = box.minZ;
+            }
+            if (box.maxX > maxX)
+            {
+                maxX = box.maxX;
+            }
+            if (box.maxZ > maxZ)
+            {
+                maxZ = box.maxZ;
+            }
+        }
+
+        return new Box(minX, minY, minZ, maxX, minY + height, maxZ);
     }
 }

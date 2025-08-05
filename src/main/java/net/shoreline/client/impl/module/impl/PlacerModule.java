@@ -102,6 +102,7 @@ public class PlacerModule extends ListeningToggleable
             if (animations.getValue().getFactor() <= 0.01)
             {
                 fadeOutAnimations.remove(animations.getKey());
+                continue;
             }
 
             animations.getValue().setState(false);
