@@ -130,12 +130,12 @@ public class AuraModule extends CombatModule
         PlayerInventory playerInventory = mc.player.getInventory();
 
         int weaponSlot = getAuraWeaponSlot();
-        ItemStack stack = playerInventory.getStack(weaponSlot);
         if (weaponSlot == -1 || !Managers.INVENTORY.startSwap(weaponSlot))
         {
             return;
         }
 
+        ItemStack stack = playerInventory.getStack(weaponSlot);
         double attackDelay = 1.0 / getAttackSpeed(stack) * 20.0;
 
         if (attackDelayTimer.hasPassed(attackDelay * 50.0))

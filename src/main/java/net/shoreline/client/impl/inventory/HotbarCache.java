@@ -11,10 +11,10 @@ public class HotbarCache
 
     public HotbarCache(PlayerInventory playerInventory)
     {
-        this(playerInventory, true);
+        this(playerInventory, true, false);
     }
 
-    public HotbarCache(PlayerInventory playerInventory, boolean allowEmpty)
+    public HotbarCache(PlayerInventory playerInventory, boolean allowEmpty, boolean copyStack)
     {
         this.hotbarItems = new ItemStack[PlayerInventory.getHotbarSize()];
         for (int i = 0; i < hotbarItems.length; i++)
@@ -24,7 +24,7 @@ public class HotbarCache
             {
                 continue;
             }
-            hotbarItems[i] = stack;
+            hotbarItems[i] = copyStack ? stack.copy() : stack;
         }
     }
 

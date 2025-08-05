@@ -60,4 +60,13 @@ public class ColorUtil
         float a = c.getAlpha() / 255.0f;
         return new float[] { r, g, b, a };
     }
+
+    public int[] getRGBColorValues(int color)
+    {
+        int r = (color >> 16) & 0xff;
+        int g = (color >> 8) & 0xff;
+        int b = (color) & 0xff;
+        int a = (color & 0xff000000) != 0xff000000 ? 255 : (color >> 24) & 0xff;
+        return new int[] { r, g, b, a };
+    }
 }

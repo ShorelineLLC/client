@@ -3,6 +3,7 @@ package net.shoreline.client.impl;
 import net.shoreline.client.api.macro.MacroManager;
 import net.shoreline.client.api.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
+import net.shoreline.client.impl.combat.SafeHoleManager;
 import net.shoreline.client.impl.combat.TotemManager;
 import net.shoreline.client.impl.command.CommandManager;
 import net.shoreline.client.impl.mining.MiningManager;
@@ -26,6 +27,7 @@ public class Managers
     public static InteractManager INTERACT;
     public static MiningManager MINING;
     public static RenderManager RENDER;
+    public static SafeHoleManager HOLE;
     public static TotemManager TOTEM;
 
     public static void init()
@@ -41,6 +43,7 @@ public class Managers
         INTERACT = new InteractManager();
         MINING = new MiningManager();
         RENDER = new RenderManager();
+        HOLE = new SafeHoleManager();
         TOTEM = new TotemManager();
     }
 }

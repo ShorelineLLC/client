@@ -16,6 +16,7 @@ import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderHotbarItemEvent;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
@@ -125,6 +126,26 @@ public class InventoryManager extends GenericFeature
         {
             event.cancel();
             event.setItemStack(mc.player.getInventory().getStack(serverSlot));
+        }
+    }
+
+    @EventListener
+    public void onRenderHotbarItem(RenderHotbarItemEvent event)
+    {
+        for (SwapData data : trackedSwaps)
+        {
+            if (data.getSwapTime() > 500L)
+            {
+                trackedSwaps.remove(data);
+                continue;
+            }
+
+            if (data.getSlotTo() == event.getSeed() || data.getSlotFrom() == event.getSeed())
+            {
+                event.cancel();
+                event.setStack(data.getPreHotbar().getStack(event.getSeed()));
+                return;
+            }
         }
     }
 

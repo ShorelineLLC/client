@@ -1,5 +1,6 @@
 package net.shoreline.client.util.world;
 
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import lombok.experimental.UtilityClass;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -12,7 +13,7 @@ import java.util.Set;
 @UtilityClass
 public class BlockUtil
 {
-    private final Set<Block> INTERACTABLE_BLOCKS = Set.of(
+    private final Set<Block> INTERACTABLE_BLOCKS = new ReferenceOpenHashSet<>(Set.of(
             Blocks.CHEST,
             Blocks.ENDER_CHEST,
             Blocks.TRAPPED_CHEST,
@@ -62,7 +63,22 @@ public class BlockUtil
             Blocks.MANGROVE_TRAPDOOR,
             Blocks.OAK_TRAPDOOR,
             Blocks.CRIMSON_TRAPDOOR
-    );
+    ));
+
+    // All blocks that are resistant to explosions
+    private final Set<Block> EXPLOSION_RESISTANT = new ReferenceOpenHashSet<>(Set.of(
+            Blocks.OBSIDIAN,
+            Blocks.ANVIL,
+            Blocks.ENCHANTING_TABLE,
+            Blocks.ENDER_CHEST,
+            Blocks.BEACON
+    ));
+
+    // All blocks that are unbreakable with tools in survival mode
+    private final Set<Block> UNBREAKABLE = new ReferenceOpenHashSet<>(Set.of(
+            Blocks.BEDROCK,
+            Blocks.BARRIER
+    ));
 
     public boolean isInteractable(BlockPos blockPos)
     {
@@ -71,11 +87,31 @@ public class BlockUtil
 
     public boolean isInteractable(BlockState state)
     {
-        return INTERACTABLE_BLOCKS.contains(state.getBlock());
+        return isInteractable(state.getBlock());
     }
 
     public boolean isInteractable(Block block)
     {
         return INTERACTABLE_BLOCKS.contains(block);
+    }
+
+    public boolean isExplosionResistant(BlockPos blockPos)
+    {
+        return isExplosionResistant(MinecraftClient.getInstance().world.getBlockState(blockPos));
+    }
+
+    public boolean isExplosionResistant(BlockState state)
+    {
+        return EXPLOSION_RESISTANT.contains(state.getBlock());
+    }
+
+    public boolean isUnbreakable(BlockPos blockPos)
+    {
+        return isUnbreakable(MinecraftClient.getInstance().world.getBlockState(blockPos));
+    }
+
+    public boolean isUnbreakable(BlockState state)
+    {
+        return UNBREAKABLE.contains(state.getBlock());
     }
 }

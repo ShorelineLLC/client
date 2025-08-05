@@ -11,7 +11,7 @@ public abstract class BlockScanner
     protected final int radius;
     private final BlockPos.Mutable mPos = new BlockPos.Mutable();
 
-    public final void scan(ClientWorld world, BlockPos center)
+    public void scan(ClientWorld world, BlockPos center)
     {
         for (int dx = -radius; dx <= radius; ++dx)
         {

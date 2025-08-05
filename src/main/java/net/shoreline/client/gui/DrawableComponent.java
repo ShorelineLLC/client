@@ -2,6 +2,7 @@ package net.shoreline.client.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.font.FontManager;
@@ -33,7 +34,7 @@ public abstract class DrawableComponent
                                     int width,
                                     int height)
     {
-        //context.drawTexturedQuad(sprite, x, y, x + width, y + height, 0.0f, 1.0f, 0.0f, 1.0f);
+        context.drawTexture(RenderLayer::getGuiTextured, sprite, x, y, 0.0f, 0.0f, width, height, width, height, -1);
     }
 
     protected void drawOutline(DrawContext context,

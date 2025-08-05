@@ -6,9 +6,11 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.render.ColorUtil;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -45,6 +47,7 @@ public final class FontRenderer implements Closeable
             t.printStackTrace();
             this.font = new Font("Verdana", Font.PLAIN, Math.round(size));
         }
+
         this.size = size;
         createFont(font, size);
     }
@@ -109,7 +112,7 @@ public final class FontRenderer implements Closeable
         stack.translate(x, y, 0.0f);
         stack.scale(1.0f / scale, 1.0f / scale, 0.0f);
 
-
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
         Tessellator tessellator = Tessellator.getInstance();
         Matrix4f matrix4f = stack.peek().getPositionMatrix();
         char[] chars = text.toCharArray();
@@ -135,7 +138,7 @@ public final class FontRenderer implements Closeable
                     else
                     {
                         int colorCode = getColorFromCode(c);
-                        int[] col = toRgbComponents(colorCode);
+                        int[] col = ColorUtil.getRGBColorValues(colorCode);
                         r2 = col[0] / 255.0f * brightnessMultiplier;
                         g2 = col[1] / 255.0f * brightnessMultiplier;
                         b2 = col[2] / 255.0f * brightnessMultiplier;
@@ -265,8 +268,9 @@ public final class FontRenderer implements Closeable
         char[] c = stripControlCodes(text).toCharArray();
         if (c.length == 0)
         {
-            c = new char[]{' '};
+            c = new char[] {' '};
         }
+
         float currentLine = 0;
         float previous = 0;
         for (char c1 : c)
@@ -286,6 +290,7 @@ public final class FontRenderer implements Closeable
             float h = glyph == null ? 0 : glyph.height();
             currentLine = Math.max(h / (float) scale, currentLine);
         }
+
         return currentLine + previous;
     }
 
@@ -304,6 +309,7 @@ public final class FontRenderer implements Closeable
                 return map.getGlyph(c);
             }
         }
+
         int base = 256 * (int) Math.floor((double) c / (double) 256);
         GlyphCache glyphCache = new GlyphCache((char) base, (char) (base + 256), font, getGlyphIdentifier(), 5, true, false);
         caches.add(glyphCache);
@@ -344,15 +350,6 @@ public final class FontRenderer implements Closeable
             hexString.append(HEX_CHARS.charAt(index));
         }
         return hexString.toString();
-    }
-
-    public int[] toRgbComponents(int color)
-    {
-        float r = (color >> 16) & 0xff;
-        float g = (color >> 8) & 0xff;
-        float b = (color) & 0xff;
-        float a = (color & 0xff000000) != 0xff000000 ? 255.0f : (color >> 24) & 0xff;
-        return new int[]{(int) r, (int) g, (int) b, (int) a};
     }
 
     private int getColorFromCode(char code)

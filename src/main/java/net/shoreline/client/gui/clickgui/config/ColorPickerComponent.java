@@ -1,7 +1,9 @@
 package net.shoreline.client.gui.clickgui.config;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.ColorConfig;
@@ -13,6 +15,7 @@ import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.*;
 import net.shoreline.client.mixin.accessor.AccessorDrawContext;
 import org.joml.Matrix3x2f;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -90,8 +93,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             }
             // drawOutline(context, getTx() + pickerLength + 3, getTy() + height + 5, 10, pickerLength - 2, 1, Colors.BLACK);
 
-            drawRect(context, getTx() + 2, getTy() + height + 4, pickerLength - 2, pickerLength - 2, getConfig().getValue().getRGB());
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, 0, true);
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, getConfig().getValue().getRGB(), true);
             drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0x00000000, 0xff000000, false);
 
             drawOutline(context, getTx() + 3, getTy() + height + pickerLength + 6, pickerLength - 24, 13, 1, theme.getComponentColor());
@@ -185,11 +187,45 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     }
 
     private void drawGradientRect(DrawContext context,
-                                  int x1, int y1, int x2, int y2,
-                                  int startColor, int endColor,
+                                  int x1,
+                                  int y1,
+                                  int x2,
+                                  int y2,
+                                  int startColor,
+                                  int endColor,
                                   boolean sideways)
     {
+        float f = (startColor >> 24 & 255) / 255.0F;
+        float f1 = (startColor >> 16 & 255) / 255.0F;
+        float f2 = (startColor >> 8 & 255) / 255.0F;
+        float f3 = (startColor & 255) / 255.0F;
+        float f4 = (endColor >> 24 & 255) / 255.0F;
+        float f5 = (endColor >> 16 & 255) / 255.0F;
+        float f6 = (endColor >> 8 & 255) / 255.0F;
+        float f7 = (endColor & 255) / 255.0F;
+        Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
 
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        if (sideways)
+        {
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4);
+        }
+        else
+        {
+            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4);
+            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
+        }
+
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
     }
 
     public void drawSelectors(DrawContext context, float mouseX, float mouseY, float delta)
