@@ -21,7 +21,12 @@ public class HoleScanner extends AsyncBlockScanner
     @Override
     protected void visit(BlockPos pos, BlockState state)
     {
-        if (!state.isReplaceable() || getBlockState(pos.down()).isReplaceable() || visited.contains(pos))
+        if (!state.isReplaceable() || !getBlockState(pos.up()).isReplaceable() || !getBlockState(pos.up(2)).isReplaceable())
+        {
+            return;
+        }
+
+        if (getBlockState(pos.down()).isReplaceable() || visited.contains(pos))
         {
             return;
         }

@@ -8,12 +8,24 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.impl.module.render.FreecamModule;
 
 @UtilityClass
 public class RaytraceUtil
 {
+    public HitResult raycast(final double reach, Vec3d position, final float[] angles)
+    {
+        final Vec3d rotationVector = RotationUtil.getRotationVector(angles[0], angles[1]);
+        return MinecraftClient.getInstance().world.raycast(new RaycastContext(
+                position,
+                position.add(rotationVector.x * reach, rotationVector.y * reach, rotationVector.z * reach),
+                RaycastContext.ShapeType.COLLIDER,
+                RaycastContext.FluidHandling.NONE,
+                MinecraftClient.getInstance().player));
+    }
+
     public HitResult raycastFromCamera(final double reach)
     {
         Camera view = MinecraftClient.getInstance().gameRenderer.getCamera();

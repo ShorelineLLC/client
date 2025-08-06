@@ -3,6 +3,7 @@ package net.shoreline.client.mixin.entity;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
+import net.shoreline.client.impl.event.entity.HandSwingDurationEvent;
 import net.shoreline.client.impl.event.entity.JumpDelayEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.eventbus.EventBus;
@@ -11,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public class MixinLivingEntity
@@ -69,6 +71,18 @@ public class MixinLivingEntity
             {
                 jumpingCooldown = 0;
             }
+        }
+    }
+
+    @Inject(method = "getHandSwingDuration", at = @At("HEAD"), cancellable = true)
+    private void hookGetHandSwingDuration(CallbackInfoReturnable<Integer> cir)
+    {
+        HandSwingDurationEvent swingSpeedEvent = new HandSwingDurationEvent();
+        EventBus.INSTANCE.dispatch(swingSpeedEvent);
+        if (swingSpeedEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(swingSpeedEvent.getSwingDuration());
         }
     }
 }

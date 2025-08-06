@@ -25,7 +25,7 @@ public class BlockHighlightModule extends RenderModule
             .setDescription("Box rendering mode")
             .setDefaultValue(BoxRender.FILL).build();
 
-    Config<Boolean> debugEntitiesConfig = new BooleanConfig.Builder("Debug-Entities")
+    Config<Boolean> debugEntitiesConfig = new BooleanConfig.Builder("Entities")
             .setDescription("Render entity hitboxes for debugging")
             .setDefaultValue(false).build();
 

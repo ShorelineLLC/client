@@ -13,7 +13,6 @@ import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
-import net.shoreline.client.impl.render.ColorUtil;
 
 import java.util.ArrayList;
 import java.util.List;

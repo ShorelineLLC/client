@@ -172,6 +172,7 @@ public class Frame extends DrawableComponent implements Interactable
             }
             frameHeight += height;
         }
+
         return frameHeight;
     }
 }

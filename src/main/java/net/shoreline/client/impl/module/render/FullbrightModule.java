@@ -26,15 +26,16 @@ public class FullbrightModule extends Toggleable
             .setDescription("The client world brightness mode")
             .setDefaultValue(Brightness.GAMMA).build();
 
-    private static final RegistryEntry<StatusEffect> FULL_BRIGHT = Registry.registerReference(
-            Registries.STATUS_EFFECT,
-            Identifier.of("shoreline", "full_bright"),
-            new FullBrightEffect()
-    );
+    private final RegistryEntry<StatusEffect> fullBrightEffect;
 
     public FullbrightModule()
     {
         super("Fullbright", "Brightens the world", GuiCategory.RENDER);
+        this.fullBrightEffect = Registry.registerReference(
+                Registries.STATUS_EFFECT,
+                Identifier.of("shoreline", "full_bright"),
+                new FullBrightEffect()
+        );
     }
 
     @Override
@@ -42,16 +43,16 @@ public class FullbrightModule extends Toggleable
     {
         if (!checkNull() && modeConfig.getValue() == Brightness.POTION)
         {
-            mc.player.addStatusEffect(new StatusEffectInstance(FULL_BRIGHT, -1, 0)); // INFINITE
+            mc.player.addStatusEffect(new StatusEffectInstance(fullBrightEffect, -1, 0)); // INFINITE
         }
     }
 
     @Override
     public void onDisable()
     {
-        if (!checkNull() && mc.player.hasStatusEffect(FULL_BRIGHT) && modeConfig.getValue() == Brightness.POTION)
+        if (!checkNull() && mc.player.hasStatusEffect(fullBrightEffect) && modeConfig.getValue() == Brightness.POTION)
         {
-            mc.player.removeStatusEffect(FULL_BRIGHT);
+            mc.player.removeStatusEffect(fullBrightEffect);
         }
     }
 
@@ -74,14 +75,14 @@ public class FullbrightModule extends Toggleable
 
         if (modeConfig.getValue() == Brightness.POTION)
         {
-            if (!mc.player.hasStatusEffect(FULL_BRIGHT))
+            if (!mc.player.hasStatusEffect(fullBrightEffect))
             {
-                mc.player.addStatusEffect(new StatusEffectInstance(FULL_BRIGHT, -1, 0)); // INFINITE
+                mc.player.addStatusEffect(new StatusEffectInstance(fullBrightEffect, -1, 0)); // INFINITE
             }
         }
-        else if (mc.player.hasStatusEffect(FULL_BRIGHT))
+        else if (mc.player.hasStatusEffect(fullBrightEffect))
         {
-            mc.player.removeStatusEffect(FULL_BRIGHT);
+            mc.player.removeStatusEffect(fullBrightEffect);
         }
     }
 

@@ -59,12 +59,6 @@ public class TotemManager extends GenericFeature
         }
     }
 
-    @EventListener(priority = Integer.MIN_VALUE)
-    public void onRemoveEntity(EntityDeathEvent event)
-    {
-        totems.remove(event.getEntity().getUuid());
-    }
-
     @EventListener
     public void onDisconnect(WorldEvent.Disconnect event)
     {
@@ -73,17 +67,19 @@ public class TotemManager extends GenericFeature
 
     public int getTotems(Entity entity)
     {
-        return totems.getOrDefault(entity.getUuid(), new TotemData(0, 0)).getPops();
+        return totems.getOrDefault(entity.getUuid(), TotemData.EMPTY).getPops();
     }
 
     public long getLastPopTime(Entity entity)
     {
-        return totems.getOrDefault(entity.getUuid(), new TotemData(-1, 0)).getLastPopTime();
+        return totems.getOrDefault(entity.getUuid(), TotemData.EMPTY).getLastPopTime();
     }
 
     @Getter
     public static class TotemData
     {
+        public static final TotemData EMPTY = new TotemData(-1, 0);
+
         private final long lastPopTime;
         private final int pops;
 

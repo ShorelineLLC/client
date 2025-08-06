@@ -23,6 +23,7 @@
     "gui.hud.MixinInGameOverlayRenderer",
     "gui.screen.MixinChatInputSuggestor",
     "gui.screen.MixinChatScreen",
+    "gui.screen.slot.MixinShulkerBoxSlot",
     "input.MixinInput",
     "input.MixinKeyboardInput",
     "item.MixinItemUsageContext",
@@ -43,6 +44,7 @@
     "render.entity.feature.MixinArmorFeatureRenderer",
     "render.entity.MixinEndCrystalEntityRenderer",
     "render.entity.MixinLivingEntityRenderer",
+    "render.item.MixinHeldItemRenderer",
     "text.MixinTextColor",
     "toast.MixinToastManager"
   ],

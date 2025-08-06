@@ -4,6 +4,8 @@ import lombok.Getter;
 import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.PlayerInput;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
@@ -19,7 +21,10 @@ import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.PlayerVecEvent;
 import net.shoreline.client.impl.event.render.CameraEvent;
 import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
+import net.shoreline.client.impl.event.render.item.RenderHeldItemEvent;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotationUtil;
+import net.shoreline.client.util.world.RaytraceUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 @Getter
@@ -134,24 +139,27 @@ public class FreecamModule extends Toggleable
     }
 
     @EventListener
-    public void onTick(TickEvent.Pre event)
+    public void onClientRotation(ClientRotationEvent event)
     {
-        if (checkNull())
-        {
-            return;
-        }
-
         if (rotateConfig.getValue())
         {
-            float[] currentAngles = {yaw, pitch};
+            float[] currentAngles = { yaw, pitch };
             Vec3d eyePos = position;
-//            HitResult result = RayCastUtil.rayCast(mc.player.getBlockInteractionRange(), eyePos, currentAngles);
-//            if (result.getType() == HitResult.Type.BLOCK)
-//            {
-//                float[] newAngles = RotationUtil.getRotationsTo(mc.player.getEyePos(), result.getPos());
-//                Managers.ROTATION.setClientRotation(new Rotation(newAngles[0], newAngles[1]));
-//            }
+            HitResult result = RaytraceUtil.raycast(mc.player.getBlockInteractionRange(), eyePos, currentAngles);
+            if (result instanceof BlockHitResult blockResult)
+            {
+                float[] newAngles = RotationUtil.getRotationsTo(mc.player.getEyePos(), blockResult.getBlockPos().toCenterPos());
+                event.cancel();
+                event.setYaw(newAngles[0]);
+                event.setPitch(newAngles[1]);
+            }
         }
+    }
+
+    @EventListener
+    public void onRenderHeldItem(RenderHeldItemEvent.Pre event)
+    {
+        event.cancel();
     }
 
     /**

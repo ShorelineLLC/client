@@ -6,6 +6,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.eventbus.EventBus;
@@ -162,6 +163,13 @@ public abstract class MixinClientPlayerEntity
         {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "swingHand", at = @At(value = "RETURN"))
+    private void hookSwingHand(Hand hand, CallbackInfo ci)
+    {
+        SwingHandEvent swingEvent = new SwingHandEvent(hand);
+        EventBus.INSTANCE.dispatch(swingEvent);
     }
 
     /** Allows you to open screens in portals **/

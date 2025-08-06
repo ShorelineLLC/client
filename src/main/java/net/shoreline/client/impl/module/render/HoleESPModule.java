@@ -3,11 +3,13 @@ package net.shoreline.client.impl.module.render;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.combat.HoleBlockType;
 import net.shoreline.client.impl.combat.HoleData;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
+import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
@@ -23,6 +25,9 @@ public class HoleESPModule extends RenderModule
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(20.0f).setDefaultValue(10.0f).setFormat("m")
             .setDescription("The range to scan for holes").build();
+    Config<Boolean> showObsidian = new BooleanConfig.Builder("ShowObsidian")
+            .setDescription("Renders obsidian holes")
+            .setDefaultValue(true).build();
     Config<Boolean> doublesConfig = new BooleanConfig.Builder("Doubles")
             .setDescription("Scans for double holes")
             .setDefaultValue(false).build();
@@ -42,9 +47,11 @@ public class HoleESPModule extends RenderModule
             .setDefaultValue(Color.GREEN).build();
     Config<Color> obsidianColor = new ColorConfig.Builder("ObsidianColor")
             .setDescription("The color for bedrock obsidian")
+            .setVisible(() -> showObsidian.getValue())
             .setDefaultValue(Color.RED).build();
     Config<Color> mixedColor = new ColorConfig.Builder("MixedColor")
             .setDescription("The color for mixed holes")
+            .setVisible(() -> showObsidian.getValue())
             .setDefaultValue(Color.YELLOW).build();
 
     private final ConcurrentMap<HoleData, Animation> fadeAnimations = new ConcurrentHashMap<>();
@@ -62,6 +69,11 @@ public class HoleESPModule extends RenderModule
 
         for (HoleData hole : latestHoleData)
         {
+            if (hole.getBlockType() != HoleBlockType.BEDROCK && !showObsidian.getValue())
+            {
+                continue;
+            }
+
             fadeAnimations.computeIfAbsent(hole, h -> new Animation(false, 300));
         }
 
@@ -81,6 +93,11 @@ public class HoleESPModule extends RenderModule
                 anim.setState(latestHoleData.contains(holeData));
             }
 
+            if (holeData.getBlockType() != HoleBlockType.BEDROCK && !showObsidian.getValue())
+            {
+                return true;
+            }
+
             return anim.getFactor() <= 0.01 && !latestHoleData.contains(holeData);
         });
 
@@ -92,7 +109,7 @@ public class HoleESPModule extends RenderModule
             modeConfig.getValue().render(event.getMatrixStack(),
                     holeData.getBoundingBox(boxHeight.getValue()),
                     getHoleColor(holeData),
-                    (float) anim.getFactor());
+                    (float) Easing.SMOOTH_STEP.ease(anim.getFactor()));
         }
     }
 

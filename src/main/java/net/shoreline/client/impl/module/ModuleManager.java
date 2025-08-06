@@ -61,6 +61,7 @@ public class ModuleManager
                 new FakePlayerModule(),
                 new MiddleClickModule(),
                 new PacketSnifferModule(),
+                new ShulkerceptionModule(),
                 // Movement
                 new FastFallModule(),
                 new FlightModule(),
@@ -80,6 +81,7 @@ public class ModuleManager
                 new NoBobModule(),
                 new NoRenderModule(),
                 new NoWeatherModule(),
+                new SwingModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
                 new ZoomModule(),
