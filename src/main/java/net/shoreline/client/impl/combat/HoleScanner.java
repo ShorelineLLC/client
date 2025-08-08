@@ -3,7 +3,7 @@ package net.shoreline.client.impl.combat;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.shoreline.client.impl.async.AsyncBlockScanner;
+import net.shoreline.client.impl.block.AsyncBlockScanner;
 import net.shoreline.client.impl.module.combat.FillerModule;
 import net.shoreline.client.impl.module.render.HoleESPModule;
 import net.shoreline.client.util.world.BlockUtil;

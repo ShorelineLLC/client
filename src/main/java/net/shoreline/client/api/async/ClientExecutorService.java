@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.async;
+package net.shoreline.client.api.async;
 
 import java.util.concurrent.*;
 

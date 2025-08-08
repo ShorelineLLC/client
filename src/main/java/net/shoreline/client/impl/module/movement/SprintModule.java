@@ -70,6 +70,7 @@ public class SprintModule extends MovementModule
         {
             return;
         }
+
         float sprintYaw = getYawFromInput();
         event.cancel();
         event.setYaw(sprintYaw);

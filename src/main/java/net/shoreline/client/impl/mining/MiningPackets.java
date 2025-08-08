@@ -13,13 +13,15 @@ public enum MiningPackets
         @Override
         public void sendStartPackets(BlockPos blockPos, Direction direction)
         {
-
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, blockPos, direction));
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
 
         @Override
         public void sendStopPackets(BlockPos blockPos, Direction direction)
         {
-
+            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
         }
     },
 

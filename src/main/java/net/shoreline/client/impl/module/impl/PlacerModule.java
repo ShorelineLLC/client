@@ -53,7 +53,12 @@ public class PlacerModule extends ListeningToggleable
 
     protected void runSingleBlockPlacement(BlockPos placePos, Block block, int slot)
     {
-        if (!Managers.INTERACT.startPlacement(slot))
+        if (!mc.world.getBlockState(placePos).isReplaceable())
+        {
+            return;
+        }
+
+        if (!Managers.INTERACT.canPlaceBlock(placePos, block) || !Managers.INTERACT.startPlacement(slot))
         {
             return;
         }

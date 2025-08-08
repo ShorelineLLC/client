@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.async;
+package net.shoreline.client.impl.block;
 
 import lombok.RequiredArgsConstructor;
 import net.minecraft.block.BlockState;

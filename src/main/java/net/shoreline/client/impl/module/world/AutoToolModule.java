@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
+import net.shoreline.client.impl.inventory.ItemSlot;
 import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.client.util.item.ItemUtil;
@@ -16,9 +17,6 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class AutoToolModule extends Toggleable
 {
     public static AutoToolModule INSTANCE;
-
-    @Getter
-    private ItemStack toolStack = ItemStack.EMPTY;
 
     public AutoToolModule()
     {
@@ -34,14 +32,14 @@ public class AutoToolModule extends Toggleable
             return;
         }
 
-        int blockSlot = getBestTool(event.getState());
-        if (blockSlot != -1)
+        ItemSlot blockSlot = getBestTool(event.getState());
+        if (blockSlot != null)
         {
-            mc.player.getInventory().setSelectedSlot(blockSlot);
+            mc.player.getInventory().setSelectedSlot(blockSlot.getSlot());
         }
     }
 
-    public int getBestTool(final BlockState state)
+    public ItemSlot getBestTool(final BlockState state)
     {
         if (state.getBlock() == Blocks.COBWEB)
         {
@@ -52,10 +50,14 @@ public class AutoToolModule extends Toggleable
                 {
                     continue;
                 }
-                return i;
+
+                return new ItemSlot(i, stack);
             }
         }
+
         int slot = -1;
+        ItemStack toolStack = null;
+
         float bestTool = 0.0f;
         for (int i = 0; i < 9; i++)
         {
@@ -77,6 +79,12 @@ public class AutoToolModule extends Toggleable
                 slot = i;
             }
         }
-        return slot;
+
+        if (slot == -1 || toolStack == null)
+        {
+            return null;
+        }
+
+        return new ItemSlot(slot, toolStack);
     }
 }

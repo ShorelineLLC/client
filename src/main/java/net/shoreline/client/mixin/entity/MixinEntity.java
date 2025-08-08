@@ -2,7 +2,9 @@ package net.shoreline.client.mixin.entity;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.event.entity.EntityDamageEvent;
 import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
 import net.shoreline.client.impl.event.entity.PushEvent;
 import net.shoreline.client.impl.event.entity.PlayerVecEvent;
@@ -27,7 +29,8 @@ public abstract class MixinEntity
     public abstract void setVelocity(Vec3d velocity);
 
     @Inject(method = "getRotationVec", at = @At(value = "RETURN"), cancellable = true)
-    public void hookGetRotationVec(final float tickDelta, final CallbackInfoReturnable<Vec3d> info)
+    public void hookGetRotationVec(final float tickDelta,
+                                   final CallbackInfoReturnable<Vec3d> info)
     {
         if ((Object) this == MinecraftClient.getInstance().player)
         {
@@ -41,7 +44,8 @@ public abstract class MixinEntity
     }
 
     @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
-    public void hookGetCameraPosVec(float tickDelta, CallbackInfoReturnable<Vec3d> cir)
+    public void hookGetCameraPosVec(float tickDelta,
+                                    CallbackInfoReturnable<Vec3d> cir)
     {
         if ((Object) this == MinecraftClient.getInstance().player)
         {
@@ -55,7 +59,9 @@ public abstract class MixinEntity
     }
 
     @Inject(method = "updateVelocity", at = @At(value = "HEAD"), cancellable = true)
-    private void hookUpdateVelocity(float speed, Vec3d movementInput, CallbackInfo ci)
+    private void hookUpdateVelocity(float speed,
+                                    Vec3d movementInput,
+                                    CallbackInfo ci)
     {
         if ((Object) this == MinecraftClient.getInstance().player)
         {
@@ -71,7 +77,8 @@ public abstract class MixinEntity
     }
 
     @Inject(method = "pushAwayFrom", at = @At(value = "HEAD"), cancellable = true)
-    private void hookPushAwayFrom(Entity entity, CallbackInfo ci)
+    private void hookPushAwayFrom(Entity entity,
+                                  CallbackInfo ci)
     {
         if ((Object) this == MinecraftClient.getInstance().player)
         {
@@ -97,5 +104,14 @@ public abstract class MixinEntity
                 cir.cancel();
             }
         }
+    }
+
+    @Inject(method = "sidedDamage", at = @At(value = "RETURN"))
+    private void hookSidedDamage(DamageSource source,
+                                 float amount,
+                                 CallbackInfoReturnable<Boolean> cir)
+    {
+        EntityDamageEvent event = new EntityDamageEvent((Entity) (Object) this, source, amount);
+        EventBus.INSTANCE.dispatch(event);
     }
 }

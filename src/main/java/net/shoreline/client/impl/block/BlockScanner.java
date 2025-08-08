@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.helper;
+package net.shoreline.client.impl.block;
 
 import lombok.RequiredArgsConstructor;
 import net.minecraft.block.BlockState;

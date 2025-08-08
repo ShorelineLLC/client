@@ -117,7 +117,7 @@ public class AuraModule extends CombatModule
             Managers.ROTATION.setSilentRotation(rotation);
         }
 
-        attackEntity(auraTarget);
+        runAttack(auraTarget);
 
         if (rotateConfig.getValue() == RotateMode.SILENT)
         {
@@ -125,7 +125,7 @@ public class AuraModule extends CombatModule
         }
     }
 
-    private void attackEntity(final Entity entity)
+    private void runAttack(final Entity entity)
     {
         PlayerInventory playerInventory = mc.player.getInventory();
 
@@ -140,14 +140,14 @@ public class AuraModule extends CombatModule
 
         if (attackDelayTimer.hasPassed(attackDelay * 50.0))
         {
-            internalAttack(entity);
+            attackEntity(entity);
             attackDelayTimer.reset();
         }
 
         Managers.INVENTORY.endSwap();
     }
 
-    private void internalAttack(final Entity entity)
+    public void attackEntity(final Entity entity)
     {
         boolean sprinting = mc.player.isSprinting();
         if (sprinting)
@@ -155,19 +155,26 @@ public class AuraModule extends CombatModule
             Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
         }
 
+        sendAttackPackets(entity, swingConfig.getValue());
+        mc.player.resetLastAttackedTicks();
+
+        if (sprinting)
+        {
+            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+        }
+    }
+
+    public void sendAttackPackets(final Entity entity,
+                                  final boolean swing)
+    {
         PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity, mc.player.isSneaking());
         Managers.NETWORK.sendPacket(packet);
-        if (swingConfig.getValue())
+        if (swing)
         {
             mc.player.swingHand(Hand.MAIN_HAND);
         } else
         {
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-        }
-
-        if (sprinting)
-        {
-            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
         }
     }
 

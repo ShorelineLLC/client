@@ -24,16 +24,10 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class NoSlowModule extends Toggleable
 {
-    Config<Mode> modeConfig = new EnumConfig.Builder<Mode>("Mode")
-            .setValues(Mode.values())
-            .setDescription("The mode for bypassing anticheat slowdown detection")
-            .setDefaultValue(Mode.NORMAL).build();
-    Config<Boolean> inventoryMoveConfig = new BooleanConfig.Builder("InventoryMove")
-            .setDescription("Allows the player to move while inventories or menus are open")
-            .setDefaultValue(true).build();
-    Config<Boolean> itemsConfig = new BooleanConfig.Builder("Items")
+    Config<ItemMode> itemMode = new EnumConfig.Builder<ItemMode>("Item")
+            .setValues(ItemMode.values())
             .setDescription("Removes the slowdown from consuming items")
-            .setDefaultValue(true).build();
+            .setDefaultValue(ItemMode.NORMAL).build();
     Config<Boolean> blockingConfig = new BooleanConfig.Builder("Blocking")
             .setDescription("Removes the slowdown from blocking with a shield")
             .setDefaultValue(false).build();
@@ -43,6 +37,9 @@ public class NoSlowModule extends Toggleable
     Config<Boolean> crawlingConfig = new BooleanConfig.Builder("Crawling")
             .setDescription("Removes the slowdown from crawling")
             .setDefaultValue(false).build();
+    Config<Boolean> inventoryMoveConfig = new BooleanConfig.Builder("InventoryMove")
+            .setDescription("Allows the player to move while inventories or menus are open")
+            .setDefaultValue(true).build();
 
     public NoSlowModule()
     {
@@ -74,7 +71,7 @@ public class NoSlowModule extends Toggleable
     @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
     {
-        if (modeConfig.getValue() == Mode.GRIM_V2 && shouldCancelSlowedDown())
+        if (itemMode.getValue() == ItemMode.GRIM_V2 && shouldCancelSlowedDown())
         {
             if (mc.player.getActiveHand() == Hand.OFF_HAND && !canUseItem(mc.player.getMainHandStack()))
             {
@@ -112,15 +109,13 @@ public class NoSlowModule extends Toggleable
 
     public boolean shouldCancelSlowedDown()
     {
-        if (mc.player.isSneaking() && !sneakingConfig.getValue())
-        {
-            return false;
-        } else if (modeConfig.getValue() == Mode.GRIM_V3 && !canBypassGrimUseTime())
+        if (itemMode.getValue() == ItemMode.GRIM_V3 && !canBypassGrimUseTime())
         {
             return false;
         }
-        return !mc.player.isRiding() && (mc.player.isUsingItem() && itemsConfig.getValue()
-                || mc.player.isBlocking() && blockingConfig.getValue());
+
+        return mc.player.isUsingItem() && itemMode.getValue() != ItemMode.OFF
+                || mc.player.isBlocking() && blockingConfig.getValue();
     }
 
     private boolean canBypassGrimUseTime()
@@ -128,11 +123,12 @@ public class NoSlowModule extends Toggleable
         return mc.player.getItemUseTimeLeft() < 5 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
     }
 
-    private enum Mode
+    private enum ItemMode
     {
         NORMAL,
         STRICT,
         GRIM_V2,
-        GRIM_V3
+        GRIM_V3,
+        OFF
     }
 }

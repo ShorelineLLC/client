@@ -6,6 +6,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 
 @Getter

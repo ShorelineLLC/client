@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.render;
 
-import lombok.Getter;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
@@ -10,6 +9,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.entity.HandSwingDurationEvent;
 import net.shoreline.client.impl.event.network.SwingHandEvent;
+import net.shoreline.client.impl.event.render.item.SwingAnimFactorEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class SwingModule extends Toggleable
@@ -64,6 +64,15 @@ public class SwingModule extends Toggleable
     {
         event.cancel();
         event.setSwingDuration(Math.max(2, 20 - swingSpeed.getValue()));
+    }
+
+    @EventListener
+    public void onSwingAnimFactor(SwingAnimFactorEvent event)
+    {
+        if (oldSwingAnim.getValue())
+        {
+            event.cancel();
+        }
     }
 
     public Hand getSwingHand()

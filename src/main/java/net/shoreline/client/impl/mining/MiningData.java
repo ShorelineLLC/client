@@ -19,7 +19,8 @@ import net.shoreline.client.impl.render.Easing;
 @Data
 public class MiningData
 {
-    private final PlayerEntity player;
+    @Builder.Default
+    private final PlayerEntity player = MinecraftClient.getInstance().player;
 
     private final BlockPos blockPos;
     private final Direction direction;
@@ -30,7 +31,7 @@ public class MiningData
     private final ItemStack miningStack;
 
     @EqualsAndHashCode.Exclude
-    private float blockDamage, lastDamage;
+    private transient float blockDamage, lastDamage;
 
     @EqualsAndHashCode.Exclude
     private transient int ticksMining;
@@ -44,7 +45,7 @@ public class MiningData
         this.lastDamage = blockDamage;
         this.blockDamage += getBlockBreakingDelta();
 
-        if (blockDamage > maxProgress)
+        if (blockDamage >= maxProgress)
         {
             ticksMining++;
         }
@@ -55,28 +56,6 @@ public class MiningData
     public void resetTick()
     {
         ticksMining = 0;
-    }
-
-    public double squaredDistanceTo()
-    {
-        return player.squaredDistanceTo(blockPos.toCenterPos());
-    }
-
-    public BlockState getBlockState()
-    {
-        return MinecraftClient.getInstance().world.getBlockState(blockPos);
-    }
-
-    public float getBlockBreakingDelta()
-    {
-        BlockState state = getBlockState();
-        float f = state.getHardness(MinecraftClient.getInstance().world, blockPos);
-        if (f == -1.0f)
-        {
-            return 0.0f;
-        }
-        int i = MiningUtil.canHarvest(miningStack, state) ? 30 : 100;
-        return MiningUtil.getBlockBreakingSpeed(player, miningStack, state) / f / (float) i;
     }
 
     public void render(MatrixStack matrixStack,
@@ -98,7 +77,7 @@ public class MiningData
 
         double scale;
         Box outlineShape;
-        if (!MiningUtil.canMineBlock(state) || ticksMining >= 30)
+        if (isBlockMined() || hasMinedFor(30))
         {
             scale = 1.0;
             outlineShape = fullBox;
@@ -123,5 +102,51 @@ public class MiningData
     private float getLinearScale(float maxProgress, float tickDelta)
     {
         return MathHelper.clamp((blockDamage + (blockDamage - lastDamage) * tickDelta) / maxProgress, 0.0f, 1.0f);
+    }
+
+    public double getSquaredDistanceTo()
+    {
+        return player.squaredDistanceTo(blockPos.toCenterPos());
+    }
+
+    public BlockState getBlockState()
+    {
+        return MinecraftClient.getInstance().world.getBlockState(blockPos);
+    }
+
+    public float getBlockBreakingDelta()
+    {
+        BlockState state = getBlockState();
+        float f = state.getHardness(MinecraftClient.getInstance().world, blockPos);
+        if (f == -1.0f)
+        {
+            return 0.0f;
+        }
+        int i = MiningUtil.canHarvest(miningStack, state) ? 30 : 100;
+        return MiningUtil.getBlockBreakingSpeed(player, miningStack, state) / f / (float) i;
+    }
+
+    public boolean isBlockMined()
+    {
+        return blockDamage >= maxProgress && !MiningUtil.canMineBlock(getBlockState());
+    }
+
+    public boolean hasMinedFor(int ticksMining)
+    {
+        return this.ticksMining >= ticksMining;
+    }
+
+    public MiningData copy(float maxProgress)
+    {
+        return MiningData.builder()
+                .player(this.player)
+                .blockPos(this.blockPos)
+                .direction(this.direction)
+                .maxProgress(maxProgress)
+                .miningStack(this.miningStack.copy())
+                .blockDamage(this.blockDamage)
+                .lastDamage(this.lastDamage)
+                .ticksMining(this.ticksMining)
+                .build();
     }
 }

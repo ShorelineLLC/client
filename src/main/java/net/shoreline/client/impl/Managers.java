@@ -1,7 +1,7 @@
 package net.shoreline.client.impl;
 
 import net.shoreline.client.api.macro.MacroManager;
-import net.shoreline.client.api.network.NetworkManager;
+import net.shoreline.client.impl.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
 import net.shoreline.client.impl.combat.SafeHoleManager;
 import net.shoreline.client.impl.combat.TotemManager;

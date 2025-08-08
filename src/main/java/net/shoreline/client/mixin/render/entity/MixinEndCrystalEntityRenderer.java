@@ -85,7 +85,8 @@ public class MixinEndCrystalEntityRenderer
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/render/entity/model/EndCrystalEntityModel;" +
-                            "setAngles(Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;)V"))
+                            "setAngles(Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;)V",
+                    shift = At.Shift.AFTER))
     private void setAnglesHook(EndCrystalEntityRenderState endCrystalEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo info)
     {
         boolean valid = ChamsModule.getInstance().isValid(last);

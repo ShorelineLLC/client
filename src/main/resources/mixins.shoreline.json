@@ -11,6 +11,7 @@
     "accessor.AccessorClientWorld",
     "accessor.AccessorDrawContext",
     "accessor.AccessorEntityVelocityUpdateS2CPacket",
+    "accessor.AccessorExplosionImpl",
     "accessor.AccessorInput",
     "accessor.AccessorKeyBinding",
     "accessor.AccessorMinecraftClient",
@@ -32,6 +33,7 @@
     "network.MixinClientPlayerEntity",
     "network.MixinClientPlayerInteractionManager",
     "network.MixinClientPlayNetworkHandler",
+    "network.packet.c2s.MixinPlayerInteractC2SPacket",
     "particle.MixinParticleManager",
     "render.MixinCamera",
     "render.MixinGameRenderer",
@@ -46,7 +48,8 @@
     "render.entity.MixinLivingEntityRenderer",
     "render.item.MixinHeldItemRenderer",
     "text.MixinTextColor",
-    "toast.MixinToastManager"
+    "toast.MixinToastManager",
+    "world.MixinServerWorld"
   ],
   "injectors": {
     "defaultRequire": 1

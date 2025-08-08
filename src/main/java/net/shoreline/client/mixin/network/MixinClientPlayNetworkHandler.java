@@ -57,7 +57,7 @@ public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNet
             return;
         }
 
-        final ExplosionEvent event = new ExplosionEvent(packet.playerKnockback().get());
+        final ExplosionEvent event = new ExplosionEvent(packet.center(), packet.playerKnockback().get());
         EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {

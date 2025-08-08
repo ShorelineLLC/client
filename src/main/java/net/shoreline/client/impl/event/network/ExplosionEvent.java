@@ -11,10 +11,13 @@ import net.shoreline.eventbus.annotation.Cancelable;
 @Setter
 public class ExplosionEvent extends Event
 {
+    private final Vec3d center;
+
     private Vec3d playerVelocity;
 
-    public ExplosionEvent(Vec3d playerVelocity)
+    public ExplosionEvent(Vec3d center, Vec3d playerVelocity)
     {
+        this.center = center;
         this.playerVelocity = playerVelocity;
     }
 }

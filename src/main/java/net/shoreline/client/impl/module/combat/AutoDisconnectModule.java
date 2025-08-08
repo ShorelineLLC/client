@@ -6,7 +6,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.api.network.NetworkUtil;
+import net.shoreline.client.impl.network.NetworkUtil;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;

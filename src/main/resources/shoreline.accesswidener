@@ -5,3 +5,6 @@ accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPa
 accessible class net/minecraft/client/gui/DrawContext$ScissorStack
 accessible field net/minecraft/client/gui/DrawContext$ScissorStack stack Ljava/util/Deque;
 accessible class net/minecraft/client/MinecraftClient$LoadingContext
+accessible field net/minecraft/entity/LivingEntity lastDamageSource Lnet/minecraft/entity/damage/DamageSource;
+accessible field net/minecraft/entity/LivingEntity lastDamageTime J
+accessible field net/minecraft/entity/player/PlayerEntity ABSORPTION_AMOUNT Lnet/minecraft/entity/data/TrackedData;

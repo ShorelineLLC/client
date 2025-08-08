@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
-import net.shoreline.client.impl.module.helper.BlockScanner;
+import net.shoreline.client.impl.block.BlockScanner;
 import net.shoreline.client.util.world.ExplosionUtil;
 
 public class CrystalBaseScanner extends BlockScanner

@@ -4,5 +4,4 @@ package net.shoreline.client.impl.imixin;
 public interface IModel
 {
     void cancelModel(boolean cancelModel);
-
 }

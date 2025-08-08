@@ -1,4 +1,4 @@
-package net.shoreline.client.api.network;
+package net.shoreline.client.impl.network;
 
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.network.SequencedPacketCreator;
