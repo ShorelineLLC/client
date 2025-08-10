@@ -17,11 +17,11 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.explosion.ExplosionImpl;
 import net.shoreline.client.impl.network.NetworkUtil;
-import net.shoreline.client.mixin.accessor.AccessorExplosionImpl;
 import net.shoreline.client.util.item.EnchantUtil;
+import net.shoreline.client.util.world.ExplosionUtil;
 
 import java.util.Optional;
 
@@ -97,7 +97,7 @@ public class DamageableFakePlayer extends FakePlayerEntity
             }
         }
 
-        if (itemStack.isIn(ItemTags.SWORDS))
+        if (itemStack.isIn(ItemTags.SWORDS) && itemStack.hasEnchantments())
         {
             entity.addEnchantedHitParticles(this);
         }
@@ -105,31 +105,17 @@ public class DamageableFakePlayer extends FakePlayerEntity
         damage(world, damageSource, f);
     }
 
-    public void simulateExplosionFrom(ClientWorld world, ExplosionImpl explosion)
+    public void simulateExplosionFrom(ClientWorld world, Vec3d vec3d)
     {
-        float damage = ExplosionImpl.calculateReceivedDamage(explosion.getPosition(), this);
-        float amount = ((AccessorExplosionImpl) explosion).getExplosionBehavior().calculateDamage(explosion, this, damage);
-        damage(world, explosion.getDamageSource(), amount);
+        double damage = ExplosionUtil.damageToEntity(this, vec3d);
+        damage(world, getDamageSources().explosion(null), (float) damage);
     }
 
     protected void damage(ClientWorld world, DamageSource source, float amount)
     {
         if (source.isScaledWithDifficulty())
         {
-            if (world.getDifficulty() == Difficulty.PEACEFUL)
-            {
-                amount = 0.0f;
-            }
-
-            if (world.getDifficulty() == Difficulty.EASY)
-            {
-                amount = Math.min(amount / 2.0f + 1.0f, amount);
-            }
-
-            if (world.getDifficulty() == Difficulty.HARD)
-            {
-                amount = amount * 3.0f / 2.0f;
-            }
+            amount = amount * 3.0f / 2.0f;
         }
 
         if (amount == 0.0f)

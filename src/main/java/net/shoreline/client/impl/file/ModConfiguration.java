@@ -1,7 +1,9 @@
-package net.shoreline.client.api.file;
+package net.shoreline.client.impl.file;
 
 import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.client.api.file.ConfigContainerFile;
+import net.shoreline.client.api.file.JsonConfigFile;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.loader.Loader;

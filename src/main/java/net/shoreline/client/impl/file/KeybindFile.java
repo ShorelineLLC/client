@@ -1,8 +1,10 @@
-package net.shoreline.client.api.file;
+package net.shoreline.client.impl.file;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.shoreline.client.api.file.IOUtils;
+import net.shoreline.client.api.file.JsonConfigFile;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.macro.ModuleKeybind;
 import net.shoreline.client.api.module.Toggleable;

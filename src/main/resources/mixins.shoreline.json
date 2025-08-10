@@ -19,6 +19,7 @@
     "accessor.AccessorPlayerMoveC2SPacket",
     "entity.MixinEntity",
     "entity.MixinLivingEntity",
+    "entity.decoration.MixinEndCrystalEntity",
     "gui.hud.MixinBossBarHud",
     "gui.hud.MixinInGameHud",
     "gui.hud.MixinInGameOverlayRenderer",

@@ -51,6 +51,9 @@ public class AutoCrystalModule extends Toggleable
     Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
             .setDescription("Targets dropped items blocking placements")
             .setDefaultValue(false).build();
+    Config<Boolean> forcePlace = new BooleanConfig.Builder("ForcePlace")
+            .setDescription("Attempts to force crystal placements in blocked positions")
+            .setDefaultValue(false).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
             .addAll(targetItems).build();
 
@@ -74,13 +77,16 @@ public class AutoCrystalModule extends Toggleable
     Config<Void> damageConfig = new ConfigGroup.Builder("Damage")
             .addAll(minDamage, maxSelfDamage, overrideConfig, minArmorDamage, damageMultiplier).build();
 
-    Config<Boolean> rotatePacket = new BooleanConfig.Builder("SilentRotate")
+    Config<Boolean> shouldRotate = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates before placing crystals")
             .setDefaultValue(false).build();
-    Config<Float> yawLimit = new NumberConfig.Builder<Float>("FovLimit")
+    Config<Boolean> rotatePacket = new BooleanConfig.Builder("SilentRotate")
+            .setDescription("Rotates without looking at the crystal")
+            .setVisible(() -> shouldRotate.getValue())
+            .setDefaultValue(false).build();
+    Config<Float> yawLimit = new NumberConfig.Builder<Float>("FOV")
             .setMin(1.0f).setMax(180.0f).setDefaultValue(180.0f).setFormat("deg")
-            .setVisible(() -> rotatePacket.getValue())
-            .setDescription("The range to target entities").build();
+            .setDescription("The field of view for attacking").build();
     Config<Void> rotateConfig = new ConfigGroup.Builder("Rotate")
             .addAll(rotatePacket, yawLimit).build();
 
@@ -89,14 +95,16 @@ public class AutoCrystalModule extends Toggleable
             .setDefaultValue(false).build();
     Config<Boolean> silentSwap = new BooleanConfig.Builder("SilentSwap")
             .setDescription("Silently swaps to crystals before placing")
-            .setDefaultValue(false).setVisible(() -> autoSwap.getValue()).build();
+            .setVisible(() -> autoSwap.getValue())
+            .setDefaultValue(false).build();
     Config<Boolean> antiWeakness = new BooleanConfig.Builder("AntiWeakness")
             .setDescription("Swaps to sword before attacking crystals")
+            .setVisible(() -> autoSwap.getValue() && silentSwap.getValue())
             .setDefaultValue(false).build();
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
             .addAll(autoSwap, silentSwap, antiWeakness).build();
 
-    private final CrystalBaseScanner baseScanner = new CrystalBaseScanner(10, mc.player);
+    private final CrystalBaseScanner baseScanner = new CrystalBaseScanner();
 
     public AutoCrystalModule()
     {

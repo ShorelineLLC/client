@@ -1,7 +1,9 @@
-package net.shoreline.client.api.file;
+package net.shoreline.client.impl.file;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import net.shoreline.client.api.file.IOUtils;
+import net.shoreline.client.api.file.JsonConfigFile;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
@@ -28,6 +30,7 @@ public class ToggleStateFile extends JsonConfigFile
                 moduleArray.add(toggleable.getId());
             }
         }
+
         IOUtils.writeFile(getFilepath(), GSON.toJson(moduleArray));
     }
 

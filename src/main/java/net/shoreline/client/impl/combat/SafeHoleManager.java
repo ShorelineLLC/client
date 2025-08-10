@@ -32,7 +32,7 @@ public class SafeHoleManager extends AsyncFeature<HoleData>
 
         if (currentResult == null || currentResult.isDone())
         {
-            scanner.createSphere(mc.world, mc.player.getBlockPos());
+            scanner.createCube(mc.world, mc.player.getBlockPos());
 
             runAsync(scanner::scanHoles);
         }

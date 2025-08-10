@@ -8,16 +8,15 @@ import net.minecraft.util.math.BlockPos;
 @RequiredArgsConstructor
 public abstract class BlockScanner
 {
-    protected final int radius;
     private final BlockPos.Mutable mPos = new BlockPos.Mutable();
 
     public void scan(ClientWorld world, BlockPos center)
     {
-        for (int dx = -radius; dx <= radius; ++dx)
+        for (int dx = -getRadius(); dx <= getRadius(); ++dx)
         {
-            for (int dy = -radius; dy <= radius; ++dy)
+            for (int dy = -getRadius(); dy <= getRadius(); ++dy)
             {
-                for (int dz = -radius; dz <= radius; ++dz)
+                for (int dz = -getRadius(); dz <= getRadius(); ++dz)
                 {
                     mPos.set(center.getX() + dx,
                             center.getY() + dy,
@@ -29,5 +28,7 @@ public abstract class BlockScanner
     }
 
     protected abstract void visit(ClientWorld world, BlockPos pos, BlockState state);
+
+    protected abstract int getRadius();
 }
 

@@ -13,11 +13,13 @@ import java.util.concurrent.ConcurrentMap;
 @RequiredArgsConstructor
 public abstract class AsyncBlockScanner
 {
-    private final ConcurrentMap<BlockPos, BlockState> blockSphere = new ConcurrentHashMap<>();
+    private final BlockPos.Mutable mPos = new BlockPos.Mutable();
 
-    public void createSphere(ClientWorld world, BlockPos center)
+    private final ConcurrentMap<BlockPos, BlockState> blocks = new ConcurrentHashMap<>();
+
+    public void createCube(ClientWorld world, BlockPos center)
     {
-        blockSphere.clear();
+        blocks.clear();
 
         int radius = getRadius();
         for (int dx = -radius; dx <= radius; ++dx)
@@ -26,19 +28,49 @@ public abstract class AsyncBlockScanner
             {
                 for (int dz = -radius; dz <= radius; ++dz)
                 {
-                    BlockPos pos = BlockPos.ofFloored(center.getX() + dx,
+                    mPos.set(center.getX() + dx,
                             center.getY() + dy,
                             center.getZ() + dz);
+                    BlockPos key = mPos.toImmutable();
 
-                    blockSphere.put(pos, world.getBlockState(pos));
+                    blocks.put(key, world.getBlockState(key));
                 }
             }
         }
     }
 
-    public void scanSphere()
+    public void createSphere(ClientWorld world, BlockPos center)
     {
-        for (Map.Entry<BlockPos, BlockState> entry : blockSphere.entrySet())
+        blocks.clear();
+
+        final int r  = getRadius();
+        final int r2 = r * r;
+
+        for (int dx = -r; dx <= r; ++dx)
+        {
+            final int dx2 = dx * dx;
+            for (int dy = -r; dy <= r; ++dy)
+            {
+                final int dxy2 = dx2 + dy * dy;
+                for (int dz = -r; dz <= r; ++dz)
+                {
+                    if (dxy2 + dz * dz <= r2)
+                    {
+                        mPos.set(center.getX() + dx,
+                                center.getY() + dy,
+                                center.getZ() + dz);
+                        BlockPos key = mPos.toImmutable();
+
+                        blocks.put(key, world.getBlockState(key));
+                    }
+                }
+            }
+        }
+    }
+
+    public void scanBlocks()
+    {
+        for (Map.Entry<BlockPos, BlockState> entry : blocks.entrySet())
         {
             visit(entry.getKey(), entry.getValue());
         }
@@ -46,7 +78,7 @@ public abstract class AsyncBlockScanner
 
     protected BlockState getBlockState(BlockPos blockPos)
     {
-        return blockSphere.getOrDefault(blockPos, Blocks.AIR.getDefaultState());
+        return blocks.getOrDefault(blockPos, Blocks.AIR.getDefaultState());
     }
 
     protected abstract void visit(BlockPos pos, BlockState state);

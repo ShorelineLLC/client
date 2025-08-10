@@ -1,6 +1,7 @@
 package net.shoreline.client.impl;
 
 import net.shoreline.client.api.macro.MacroManager;
+import net.shoreline.client.impl.combat.KitManager;
 import net.shoreline.client.impl.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
 import net.shoreline.client.impl.combat.SafeHoleManager;
@@ -29,6 +30,7 @@ public class Managers
     public static RenderManager RENDER;
     public static SafeHoleManager HOLE;
     public static TotemManager TOTEM;
+    public static KitManager KIT;
 
     public static void init()
     {
@@ -45,5 +47,6 @@ public class Managers
         RENDER = new RenderManager();
         HOLE = new SafeHoleManager();
         TOTEM = new TotemManager();
+        KIT = new KitManager();
     }
 }

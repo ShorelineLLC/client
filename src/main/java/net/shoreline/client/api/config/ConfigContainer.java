@@ -51,6 +51,7 @@ public abstract class ConfigContainer extends LoggingFeature implements Serializ
         final JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("name", getName());
         jsonObject.addProperty("id", getId());
+
         final JsonArray array = new JsonArray();
         for (Config<?> config : getConfigs())
         {
@@ -58,8 +59,10 @@ public abstract class ConfigContainer extends LoggingFeature implements Serializ
             {
                 continue;
             }
+
             array.add(config.toJson());
         }
+
         jsonObject.add("configs", array);
         return jsonObject;
     }

@@ -23,17 +23,6 @@ public class DamageUtil
         return getHealth(entity) - damage < 0.5f;
     }
 
-    public double potentialDamage(LivingEntity entity, boolean explosions)
-    {
-        double potential = 0.5;
-        potential += getFallDamage(entity, entity.fallDistance, 1.0f);
-        if (explosions)
-        {
-            potential += getCrystalDamage(entity);
-        }
-        return potential;
-    }
-
     public double getCrystalDamage(LivingEntity entity)
     {
         double crystalDmg = 0.0;

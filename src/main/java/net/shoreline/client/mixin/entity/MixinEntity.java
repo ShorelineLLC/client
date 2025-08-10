@@ -28,6 +28,9 @@ public abstract class MixinEntity
     @Shadow
     public abstract void setVelocity(Vec3d velocity);
 
+    @Shadow
+    public abstract Vec3d getPos();
+
     @Inject(method = "getRotationVec", at = @At(value = "RETURN"), cancellable = true)
     public void hookGetRotationVec(final float tickDelta,
                                    final CallbackInfoReturnable<Vec3d> info)
