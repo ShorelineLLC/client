@@ -1,16 +1,22 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.item.Items;
+import net.minecraft.network.encryption.NetworkEncryptionUtils;
+import net.minecraft.network.message.LastSeenMessageList;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.impl.network.NetworkUtil;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.time.Instant;
+import java.util.BitSet;
 
 public class AutoDisconnectModule extends Toggleable
 {
@@ -23,6 +29,9 @@ public class AutoDisconnectModule extends Toggleable
     Config<Float> invincibilityTime = new NumberConfig.Builder<Float>("SpawnInvincibility")
             .setMin(0.0f).setMax(10.0f).setDefaultValue(0.0f).setFormat("s")
             .setDescription("The invincibility time when logging into a server").build();
+    Config<Boolean> illegalDisconnect = new BooleanConfig.Builder("IllegalDisconnect")
+            .setDescription("Disconnects from the server by kicking you")
+            .setDefaultValue(false).build();
     Config<Boolean> autoDisable = new BooleanConfig.Builder("AutoDisable")
             .setDescription("Disables after disconnecting")
             .setDefaultValue(false).build();
@@ -53,12 +62,25 @@ public class AutoDisconnectModule extends Toggleable
         }
 
         String logMessage = String.format("[AutoDisconnect] disconnected with %d totems and %d hearts remaining.", totems, (int) health);
-        NetworkUtil.disconnect(logMessage);
+        disconnectFromServer(logMessage);
         if (autoDisable.getValue())
         {
             disable();
         }
     }
 
+    private void disconnectFromServer(String disconnectReason)
+    {
+        if (!illegalDisconnect.getValue())
+        {
+            Managers.NETWORK.disconnect(disconnectReason);
+            return;
+        }
 
+        Managers.NETWORK.sendPacket(new ChatMessageC2SPacket("§",
+                Instant.now(),
+                NetworkEncryptionUtils.SecureRandomUtil.nextLong(),
+                null,
+                new LastSeenMessageList.Acknowledgment(1, new BitSet(2))));
+    }
 }

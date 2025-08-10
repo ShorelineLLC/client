@@ -31,13 +31,13 @@ public class SpeedModule extends MovementModule
             .setMin(0.1f).setMax(5.0f).setDefaultValue(0.5f)
             .setVisible(() -> modeConfig.getValue() == SpeedMode.VANILLA)
             .setDescription("Movement speed").build();
-    Config<Boolean> useTimerConfig = new BooleanConfig.Builder("UseTimer")
-            .setDescription("Uses timer to move faster")
-            .setVisible(() -> modeConfig.getValue() == SpeedMode.STRAFE || modeConfig.getValue() == SpeedMode.STRAFE_STRICT)
-            .setDefaultValue(false).build();
     Config<Boolean> fastConfig = new BooleanConfig.Builder("Fast")
             .setDescription("Falls to the ground faster")
             .setVisible(() -> modeConfig.getValue() == SpeedMode.STRAFE_STRICT)
+            .setDefaultValue(false).build();
+    Config<Boolean> useTimerConfig = new BooleanConfig.Builder("UseTimer")
+            .setDescription("Uses timer to move faster")
+            .setVisible(() -> modeConfig.getValue() == SpeedMode.STRAFE || modeConfig.getValue() == SpeedMode.STRAFE_STRICT)
             .setDefaultValue(false).build();
     Config<Boolean> inWaterConfig = new BooleanConfig.Builder("InWater")
             .setDescription("Applies speed when in water/lava")
@@ -81,7 +81,7 @@ public class SpeedModule extends MovementModule
         }
     }
 
-    @EventListener
+    @EventListener(priority = -1001)
     public void onPlayerMove(PlayerMoveEvent event)
     {
         if (checkNull() || event.getType() != MovementType.SELF)

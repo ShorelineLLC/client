@@ -36,8 +36,11 @@ public class AutoCrystalModule extends Toggleable
     Config<Boolean> strictDirection = new BooleanConfig.Builder("StrictDirection")
             .setDescription("Only places crystals on visible faces")
             .setDefaultValue(false).build();
+    Config<Boolean> protocolPlace = new BooleanConfig.Builder("Protocol")
+            .setDescription("Prevents placements in 1x1 areas")
+            .setDefaultValue(false).build();
     Config<Void> placeConfig = new ConfigGroup.Builder("Place")
-            .addAll(placeRange, placeDelay, strictDirection).build();
+            .addAll(placeRange, placeDelay, strictDirection, protocolPlace).build();
 
     Config<Float> breakRange = new NumberConfig.Builder<Float>("BreakRange")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
@@ -55,7 +58,7 @@ public class AutoCrystalModule extends Toggleable
             .setDescription("Attempts to force crystal placements in blocked positions")
             .setDefaultValue(false).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
-            .addAll(targetItems).build();
+            .addAll(targetItems, forcePlace).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(4.0f)
@@ -74,8 +77,12 @@ public class AutoCrystalModule extends Toggleable
             .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f)
             .setVisible(() -> overrideConfig.getValue())
             .setDescription("Place if we can kill target in this many crystals").build();
+    Config<Boolean> ignoreTerrain = new BooleanConfig.Builder("IgnoreTerrain")
+            .setDescription("Ignores explodable terrain during damage calculations")
+            .setDefaultValue(false).build();
     Config<Void> damageConfig = new ConfigGroup.Builder("Damage")
-            .addAll(minDamage, maxSelfDamage, overrideConfig, minArmorDamage, damageMultiplier).build();
+            .addAll(minDamage, maxSelfDamage, overrideConfig, minArmorDamage,
+                    damageMultiplier, ignoreTerrain).build();
 
     Config<Boolean> shouldRotate = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates before placing crystals")

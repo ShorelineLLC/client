@@ -32,7 +32,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         textComponent = new TextComponent(frame, x, y, frameWidth, frameHeight,
                 GLFW.GLFW_MOUSE_BUTTON_RIGHT,
-                c -> (c >= '0' && c <= '9') || c == '.', // Filter numbers only
+                c -> (c >= '0' && c <= '9') || c == '.' || c == '-', // Filter numbers only
                 () -> String.valueOf(config.getValue()),
                 value ->
                 {

@@ -129,6 +129,15 @@ public abstract class MixinClientPlayerEntity
         return !event.isCanceled() && instance.isUsingItem();
     }
 
+    @Redirect(method = "shouldStopSprinting", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
+    private boolean hookIsUsingItem$2(ClientPlayerEntity instance)
+    {
+        MovementFactorEvent.Item event = new MovementFactorEvent.Item();
+        EventBus.INSTANCE.dispatch(event);
+        return !event.isCanceled() && instance.isUsingItem();
+    }
+
     // Fuck you fabric...
     @Inject(method = "shouldSlowDown", at = @At(value = "HEAD"), cancellable = true)
     private void hookShouldSlowdown(CallbackInfoReturnable<Boolean> cir)

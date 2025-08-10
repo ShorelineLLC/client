@@ -44,7 +44,7 @@ public class SprintModule extends MovementModule
     @EventListener
     public void onTickPre(TickEvent.Post event)
     {
-        if (checkNull() || !canSprint())
+        if (checkNull() || !canSprint() || !checkCollisions())
         {
             return;
         }
@@ -53,12 +53,12 @@ public class SprintModule extends MovementModule
         {
             case LEGIT ->
             {
-                if (mc.player.input.hasForwardMovement()
-                        && (!mc.player.horizontalCollision || mc.player.collidedSoftly))
+                if (mc.player.input.hasForwardMovement())
                 {
                     mc.player.setSprinting(true);
                 }
             }
+
             case RAGE -> mc.player.setSprinting(true);
         }
     }
@@ -120,6 +120,11 @@ public class SprintModule extends MovementModule
                 && !mc.player.isHoldingOntoLadder()
                 && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
                 && mc.player.getHungerManager().getFoodLevel() > 6.0f;
+    }
+
+    private boolean checkCollisions()
+    {
+        return !mc.player.horizontalCollision || mc.player.collidedSoftly;
     }
 
     private enum SprintMode

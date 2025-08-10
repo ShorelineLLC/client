@@ -87,7 +87,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                     "Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/entity/model/EntityModel;setAngles(Lnet/minecraft/client/render/entity/state/EntityRenderState;)V"))
+                    target = "Lnet/minecraft/client/render/entity/model/EntityModel;setAngles(Lnet/minecraft/client/render/entity/state/EntityRenderState;)V",
+                    shift = At.Shift.AFTER))
     private void setAnglesHook(S livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo info)
     {
         boolean valid = ChamsModule.getInstance().isValid(last);
@@ -101,7 +102,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                 model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(ThemeModule.INSTANCE.getPrimaryColor(), 1.0f));
                 Layers.QUADS_GLINT.endDrawing();
             }
-
         }
     }
 }

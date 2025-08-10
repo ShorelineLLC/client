@@ -9043,19 +9043,19 @@ net.shoreline.client.util.world.BlockUtil -> net.shoreline.client.sd:
 net.shoreline.client.util.world.DimensionUtil -> net.shoreline.client.se:
     7:7:void <init>() -> <init>
     11:24:int getDimension() -> bV
-net.shoreline.client.util.world.ExplosionUtil -> net.shoreline.client.sf:
+net.shoreline.client.impl.world.explosion.ExplosionUtil -> net.shoreline.client.sf:
     34:34:void <init>() -> <init>
     45:45:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,boolean) -> a
     59:59:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,boolean,boolean) -> a
     68:68:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,boolean,int,boolean) -> a
-    76:76:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain,boolean) -> a
-    85:85:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain,int,boolean) -> a
-    95:118:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain,float,int,boolean) -> a
+    76:76:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain,boolean) -> a
+    85:85:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain,int,boolean) -> a
+    95:118:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain,float,int,boolean) -> a
     127:127:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,boolean,java.util.Set,boolean) -> a
     137:137:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,boolean,java.util.Set,int,boolean) -> a
     148:171:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,boolean,float,java.util.Set,int,boolean) -> a
-    180:180:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain,java.util.Set,boolean) -> a
-    191:214:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain,float,java.util.Set,int,boolean) -> a
+    180:180:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain,java.util.Set,boolean) -> a
+    191:214:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain,float,java.util.Set,int,boolean) -> a
     229:252:double getDamageTo(net.minecraft.class_1297,net.minecraft.class_243,boolean,float,int,boolean) -> a
     268:280:double getDamageToPos(net.minecraft.class_243,net.minecraft.class_1297,net.minecraft.class_243,boolean,boolean) -> a
     290:307:double getReduction(net.minecraft.class_1297,net.minecraft.class_1282,double,boolean) -> a
@@ -9064,24 +9064,24 @@ net.shoreline.client.util.world.ExplosionUtil -> net.shoreline.client.sf:
     327:341:float getProtectionAmount(java.lang.Iterable,boolean) -> a
     346:353:double getResistanceReduction(net.minecraft.class_1309,double) -> a
     358:358:net.minecraft.class_5132 getDefaultForEntity(net.minecraft.class_1309) -> f
-    372:373:float getExposure(net.minecraft.class_243,net.minecraft.class_238,net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain,java.util.Set) -> a
-    386:387:float getExposure(net.minecraft.class_243,net.minecraft.class_238,net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain) -> a
-    399:444:float getExposure(net.minecraft.class_243,net.minecraft.class_238,net.shoreline.client.util.world.ExplosionUtil$RaycastFactory) -> a
-    449:469:net.shoreline.client.util.world.ExplosionUtil$RaycastFactory getRaycastFactory(net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain,java.util.Set) -> a
-    483:499:net.shoreline.client.util.world.ExplosionUtil$RaycastFactory getRaycastFactory(net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain) -> a
-    511:511:net.minecraft.class_3965 raycast(net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext,net.shoreline.client.util.world.ExplosionUtil$RaycastFactory) -> a
-    511:511:net.minecraft.class_3965 lambda$raycast$7(net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext) -> a
-    501:502:net.minecraft.class_3965 lambda$getRaycastFactory$6(net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> a
-    495:495:net.minecraft.class_3965 lambda$getRaycastFactory$5(net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> b
-    487:490:net.minecraft.class_3965 lambda$getRaycastFactory$4(net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> c
-    471:476:net.minecraft.class_3965 lambda$getRaycastFactory$3(java.util.Set,net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> a
-    465:465:net.minecraft.class_3965 lambda$getRaycastFactory$2(net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> d
-    453:460:net.minecraft.class_3965 lambda$getRaycastFactory$1(java.util.Set,net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> b
+    372:373:float getExposure(net.minecraft.class_243,net.minecraft.class_238,net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain,java.util.Set) -> a
+    386:387:float getExposure(net.minecraft.class_243,net.minecraft.class_238,net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain) -> a
+    399:444:float getExposure(net.minecraft.class_243,net.minecraft.class_238,net.shoreline.client.impl.world.explosion.ExplosionUtil$RaycastFactory) -> a
+    449:469:net.shoreline.client.impl.world.explosion.ExplosionUtil$RaycastFactory getRaycastFactory(net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain,java.util.Set) -> a
+    483:499:net.shoreline.client.impl.world.explosion.ExplosionUtil$RaycastFactory getRaycastFactory(net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain) -> a
+    511:511:net.minecraft.class_3965 raycast(net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext,net.shoreline.client.impl.world.explosion.ExplosionUtil$RaycastFactory) -> a
+    511:511:net.minecraft.class_3965 lambda$raycast$7(net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext) -> a
+    501:502:net.minecraft.class_3965 lambda$getRaycastFactory$6(net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> a
+    495:495:net.minecraft.class_3965 lambda$getRaycastFactory$5(net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> b
+    487:490:net.minecraft.class_3965 lambda$getRaycastFactory$4(net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> c
+    471:476:net.minecraft.class_3965 lambda$getRaycastFactory$3(java.util.Set,net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> a
+    465:465:net.minecraft.class_3965 lambda$getRaycastFactory$2(net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> d
+    453:460:net.minecraft.class_3965 lambda$getRaycastFactory$1(java.util.Set,net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext,net.minecraft.class_2338) -> b
     330:340:void lambda$getProtectionAmount$0(boolean,org.apache.commons.lang3.mutable.MutableInt,net.minecraft.class_1799) -> a
-net.shoreline.client.util.world.ExplosionUtil$1 -> net.shoreline.client.sg:
+net.shoreline.client.impl.world.explosion.ExplosionUtil$1 -> net.shoreline.client.sg:
     int[] $SwitchMap$net$minecraft$world$Difficulty -> OG
     292:292:void <clinit>() -> <clinit>
-net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext -> net.shoreline.client.sh:
+net.shoreline.client.impl.world.explosion.ExplosionUtil$ExposureRaycastContext -> net.shoreline.client.sh:
     net.minecraft.class_243 start -> OH
     net.minecraft.class_243 end -> OI
     514:514:void <init>(net.minecraft.class_243,net.minecraft.class_243) -> <init>
@@ -9090,17 +9090,17 @@ net.shoreline.client.util.world.ExplosionUtil$ExposureRaycastContext -> net.shor
     514:514:boolean equals(java.lang.Object) -> equals
     514:514:net.minecraft.class_243 start() -> pi
     514:514:net.minecraft.class_243 end() -> pj
-net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain -> net.shoreline.client.si:
-    net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain ALL -> OJ
-    net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain BLAST -> OK
-    net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain NONE -> OL
-    net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain[] $VALUES -> OM
-    523:523:net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain[] values() -> values
-    523:523:net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain valueOf(java.lang.String) -> valueOf
+net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain -> net.shoreline.client.si:
+    net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain ALL -> OJ
+    net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain BLAST -> OK
+    net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain NONE -> OL
+    net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain[] $VALUES -> OM
+    523:523:net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain[] values() -> values
+    523:523:net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain valueOf(java.lang.String) -> valueOf
     523:523:void <init>(java.lang.String,int) -> <init>
-    523:523:net.shoreline.client.util.world.ExplosionUtil$IgnoreTerrain[] $values() -> pk
+    523:523:net.shoreline.client.impl.world.explosion.ExplosionUtil$IgnoreTerrain[] $values() -> pk
     523:527:void <clinit>() -> <clinit>
-net.shoreline.client.util.world.ExplosionUtil$RaycastFactory -> net.shoreline.client.sj:
+net.shoreline.client.impl.world.explosion.ExplosionUtil$RaycastFactory -> net.shoreline.client.sj:
 net.shoreline.client.util.world.ItemUtil -> net.shoreline.client.sk:
     java.util.Set SHULKERS -> ON
     8:8:void <init>() -> <init>

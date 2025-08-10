@@ -8,7 +8,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.MathHelper;
-import net.shoreline.client.util.world.ExplosionUtil;
+import net.shoreline.client.impl.world.explosion.ExplosionUtil;
 
 @UtilityClass
 public class DamageUtil
@@ -30,7 +30,7 @@ public class DamageUtil
         {
             if (e instanceof EndCrystalEntity crystal && entity.squaredDistanceTo(e) <= 144.0)
             {
-                double damage = ExplosionUtil.damageToEntity(entity, crystal.getPos());
+                double damage = ExplosionUtil.crystalDamageToEntity(MinecraftClient.getInstance().world, entity, crystal.getPos());
                 if (damage > crystalDmg)
                 {
                     crystalDmg = damage;

@@ -2,13 +2,13 @@ package net.shoreline.client.impl.module;
 
 import lombok.Getter;
 import net.shoreline.client.api.module.Module;
-import net.shoreline.client.gui.hud.Anchor;
 import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.*;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PhaseModule;
 import net.shoreline.client.impl.module.hud.FPSHudModule;
+import net.shoreline.client.impl.module.hud.SpeedHudModule;
 import net.shoreline.client.impl.module.hud.WatermarkHudModule;
 import net.shoreline.client.impl.module.impl.HudModule;
 import net.shoreline.client.impl.module.misc.*;
@@ -65,6 +65,7 @@ public class ModuleManager
                 // Movement
                 new FastFallModule(),
                 new FlightModule(),
+                new NoAccelModule(),
                 new NoJumpDelayModule(),
                 new NoSlowModule(),
                 new SpeedModule(),
@@ -96,6 +97,7 @@ public class ModuleManager
 
                 // HUD
                 new FPSHudModule(),
+                new SpeedHudModule(),
                 new WatermarkHudModule()
         );
 

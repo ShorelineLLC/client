@@ -18,10 +18,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Difficulty;
-import net.shoreline.client.impl.network.NetworkUtil;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.util.item.EnchantUtil;
-import net.shoreline.client.util.world.ExplosionUtil;
+import net.shoreline.client.impl.world.explosion.ExplosionUtil;
 
 import java.util.Optional;
 
@@ -107,7 +106,7 @@ public class DamageableFakePlayer extends FakePlayerEntity
 
     public void simulateExplosionFrom(ClientWorld world, Vec3d vec3d)
     {
-        double damage = ExplosionUtil.damageToEntity(this, vec3d);
+        double damage = ExplosionUtil.crystalDamageToEntity(world, this, vec3d);
         damage(world, getDamageSources().explosion(null), (float) damage);
     }
 
@@ -223,6 +222,6 @@ public class DamageableFakePlayer extends FakePlayerEntity
         addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 100, 1));
         setAbsorptionHealth(8.0f);
 
-        NetworkUtil.receivePacket(new EntityStatusS2CPacket(this, EntityStatuses.USE_TOTEM_OF_UNDYING));
+        Managers.NETWORK.receivePacket(new EntityStatusS2CPacket(this, EntityStatuses.USE_TOTEM_OF_UNDYING));
     }
 }

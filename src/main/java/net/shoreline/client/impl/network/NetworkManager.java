@@ -1,14 +1,21 @@
 package net.shoreline.client.impl.network;
 
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.network.SequencedPacketCreator;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IMixinClientPlayNetworkHandler;
 import net.shoreline.client.mixin.accessor.AccessorClientWorld;
+import net.shoreline.eventbus.EventBus;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 public class NetworkManager extends GenericFeature
 {
@@ -20,37 +27,71 @@ public class NetworkManager extends GenericFeature
         super("Network");
     }
 
+    public void disconnect(String disconnectReason)
+    {
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (handler == null)
+        {
+            mc.world.disconnect();
+            return;
+        }
+
+        handler.getConnection().disconnect(Text.of(disconnectReason));
+    }
+
     public void sendPacket(Packet<?> packet)
     {
-        if (mc.world != null && mc.getNetworkHandler() != null)
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (mc.world != null && handler != null)
         {
-            mc.getNetworkHandler().sendPacket(packet);
+            handler.sendPacket(packet);
             sentFromClient.add(packet);
         }
     }
 
     public void sendQuietPacket(Packet<?> packet)
     {
-        if (mc.world != null && mc.getNetworkHandler() != null)
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (mc.world != null && handler != null)
         {
-            ((IMixinClientPlayNetworkHandler) mc.getNetworkHandler()).sendQuietPacket(packet);
+            ((IMixinClientPlayNetworkHandler) handler).sendQuietPacket(packet);
             sentFromClient.add(packet);
         }
     }
 
     public void sendSequencedPacket(SequencedPacketCreator packetCreator)
     {
-        if (mc.world == null || mc.getNetworkHandler() == null)
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (mc.world == null || handler == null)
         {
             return;
         }
+
         try (PendingUpdateManager pendingUpdateManager = ((AccessorClientWorld) mc.world).getUpdateManager().incrementSequence())
         {
             int i = pendingUpdateManager.getSequence();
             Packet<ServerPlayPacketListener> packet = packetCreator.predict(i);
-            mc.getNetworkHandler().sendPacket(packet);
+            handler.sendPacket(packet);
             sentFromClient.add(packet);
         }
+    }
+
+    public void receivePacket(Packet<ClientPlayPacketListener> packet)
+    {
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (handler == null)
+        {
+            return;
+        }
+
+        PacketEvent.Inbound event = new PacketEvent.Inbound(handler, packet);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            return;
+        }
+
+        packet.apply(handler);
     }
 
     public boolean wasSentFromClient(Packet<?> packet)
