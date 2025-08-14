@@ -11,13 +11,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
-import net.shoreline.client.impl.world.AsyncWorldScanner;
+import net.shoreline.client.impl.network.NetworkUtil;
 import net.shoreline.client.impl.world.EntityState;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class CrystalBaseScanner extends AsyncWorldScanner
+public class CrystalBaseScanner extends CrystalEntityScanner
 {
     private static final Box FULL_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 2.0, 1.0);
     private static final Box HALF_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
@@ -103,9 +103,8 @@ public class CrystalBaseScanner extends AsyncWorldScanner
             return false;
         } else
         {
-            final Box bb = FULL_CRYSTAL_BB;
-            List<EntityState> list = getEntitiesBlockingCrystal(bb.offset(p2.getX(), p2.getY(), p2.getZ()));
-            return list.isEmpty();
+            final Box bb = NetworkUtil.getServerIp().contains("crystalpvp.cc") ? HALF_CRYSTAL_BB : FULL_CRYSTAL_BB;
+            return getEntitiesBlockingCrystal(bb.offset(p2.getX(), p2.getY(), p2.getZ())).isEmpty();
         }
     }
 

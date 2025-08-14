@@ -15,7 +15,7 @@ import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
 import net.shoreline.client.impl.module.combat.util.PhaseUtil;
-import net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket;
+import net.shoreline.client.impl.imixin.IEntityVelocityUpdateS2CPacket;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -111,9 +111,9 @@ public class VelocityModule extends Toggleable
                 double e = packet.getVelocityX() * (horizontalConfig.getValue() / 100.0f);
                 double f = packet.getVelocityY() * (verticalConfig.getValue() / 100.0f);
                 double g = packet.getVelocityZ() * (horizontalConfig.getValue() / 100.0f);
-                ((AccessorEntityVelocityUpdateS2CPacket) packet).setX((int) (e * 8000.0));
-                ((AccessorEntityVelocityUpdateS2CPacket) packet).setY((int) (f * 8000.0));
-                ((AccessorEntityVelocityUpdateS2CPacket) packet).setZ((int) (g * 8000.0));
+                ((IEntityVelocityUpdateS2CPacket) packet).setX((int) (e * 8000.0));
+                ((IEntityVelocityUpdateS2CPacket) packet).setY((int) (f * 8000.0));
+                ((IEntityVelocityUpdateS2CPacket) packet).setZ((int) (g * 8000.0));
             }
         }
 

@@ -7835,7 +7835,7 @@ net.shoreline.client.mixin.accessor.AccessorEntity -> net.shoreline.client.oj:
     void hookSetFlag(int,boolean) -> a
 net.shoreline.client.mixin.accessor.AccessorEntityTrackerUpdateS2CPacket -> net.shoreline.client.ok:
     void hookSetTrackedValues(java.util.List) -> f
-net.shoreline.client.mixin.accessor.AccessorEntityVelocityUpdateS2CPacket -> net.shoreline.client.ol:
+net.shoreline.client.impl.imixin.IEntityVelocityUpdateS2CPacket -> net.shoreline.client.ol:
     void setVelocityX(int) -> aa
     void setVelocityY(int) -> ab
     void setVelocityZ(int) -> ac
@@ -7855,7 +7855,7 @@ net.shoreline.client.mixin.accessor.AccessorItemRenderer -> net.shoreline.client
     net.minecraft.class_756 hookGetBuiltinModelItemRenderer() -> ob
     net.minecraft.class_325 hookGetItemColors() -> oc
     void hookRenderBakedItemModel(net.minecraft.class_1087,net.minecraft.class_1799,int,int,net.minecraft.class_4587,net.minecraft.class_4588) -> b
-net.shoreline.client.mixin.accessor.AccessorKeyBinding -> net.shoreline.client.or:
+net.shoreline.client.impl.imixin.IKeyBinding -> net.shoreline.client.or:
     net.minecraft.class_3675$class_306 getBoundKey() -> od
 net.shoreline.client.mixin.accessor.AccessorLightmapTextureManager -> net.shoreline.client.os:
     void setUpdateLightmap(boolean) -> x
@@ -7875,11 +7875,11 @@ net.shoreline.client.mixin.accessor.AccessorMultiPhase -> net.shoreline.client.o
 net.shoreline.client.mixin.accessor.AccessorMultiPhaseParameters -> net.shoreline.client.ow:
     net.minecraft.class_1921$class_4750 hookGetOutlineMode() -> oh
     net.minecraft.class_4668$class_5939 hookGetTexture() -> oi
-net.shoreline.client.mixin.accessor.AccessorNativeImage -> net.shoreline.client.ox:
+net.shoreline.client.impl.imixin.INativeImage -> net.shoreline.client.ox:
     long hookGetPointer() -> oj
 net.shoreline.client.mixin.accessor.AccessorPlayerInteractEntityC2SPacket -> net.shoreline.client.oy:
     void hookSetEntityId(int) -> af
-net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket -> net.shoreline.client.oz:
+net.shoreline.client.impl.imixin.IPlayerMoveC2SPacket -> net.shoreline.client.oz:
     void hookSetOnGround(boolean) -> z
     void hookSetX(double) -> o
     void hookSetY(double) -> p

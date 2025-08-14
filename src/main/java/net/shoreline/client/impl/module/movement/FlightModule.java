@@ -12,7 +12,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
-import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
+import net.shoreline.client.impl.imixin.IPlayerMoveC2SPacket;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -155,7 +155,7 @@ public class FlightModule extends MovementModule
             {
                 if (modifyY)
                 {
-                    ((AccessorPlayerMoveC2SPacket) packet).setY(lastY - 0.04);
+                    ((IPlayerMoveC2SPacket) packet).setY(lastY - 0.04);
                     modifyY = false;
                     return;
                 }

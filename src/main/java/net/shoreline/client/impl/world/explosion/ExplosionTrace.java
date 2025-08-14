@@ -2,7 +2,6 @@ package net.shoreline.client.impl.world.explosion;
 
 import lombok.experimental.UtilityClass;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -10,6 +9,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.shoreline.client.util.world.RaytraceContext;
 
 import java.util.Collections;
 import java.util.Set;
@@ -83,7 +83,7 @@ public class ExplosionTrace
                     {
                         Vec3d position = new Vec3d(x, y, z);
 
-                        if (raycast(new ExposureRaycastContext(position, source), raycastFactory) == null)
+                        if (raycast(new RaytraceContext(position, source), raycastFactory) == null)
                         {
                             misses++;
                         }
@@ -129,13 +129,11 @@ public class ExplosionTrace
         };
     }
 
-    private BlockHitResult raycast(ExposureRaycastContext context, RaycastFactory raycastFactory)
+    private BlockHitResult raycast(RaytraceContext context, RaycastFactory raycastFactory)
     {
-        return BlockView.raycast(context.start, context.end, context, raycastFactory, ctx -> null);
+        return BlockView.raycast(context.start(), context.end(), context, raycastFactory, ctx -> null);
     }
 
-    private record ExposureRaycastContext(Vec3d start, Vec3d end) {}
-
     @FunctionalInterface
-    public interface RaycastFactory extends BiFunction<ExposureRaycastContext, BlockPos, BlockHitResult> {}
+    public interface RaycastFactory extends BiFunction<RaytraceContext, BlockPos, BlockHitResult> {}
 }

@@ -10,10 +10,12 @@ import net.minecraft.network.packet.BundlePacket;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.imixin.IClientConnection;
 import net.shoreline.eventbus.EventBus;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,7 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Mixin(ClientConnection.class)
-public class MixinClientConnection
+public abstract class MixinClientConnection implements IClientConnection
 {
     @Shadow
     @Nullable
@@ -36,6 +38,10 @@ public class MixinClientConnection
 
     @Shadow
     private int packetsReceivedCounter;
+
+    @Override
+    @Invoker("sendInternal")
+    public abstract void hookSendInternal(Packet<?> packet, @Nullable PacketCallbacks callbacks, boolean flush);
 
     @Inject(method = "sendImmediately", at = @At(value = "HEAD"), cancellable = true)
     private void hookSendImmediately(Packet<?> packet,

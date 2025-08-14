@@ -53,7 +53,7 @@ public class MiningData
         return blockDamage;
     }
 
-    public void resetTick()
+    public void resetTicksMining()
     {
         ticksMining = 0;
     }
@@ -72,6 +72,11 @@ public class MiningData
                        int endColor,
                        float miningSpeed)
     {
+        if (fadeOutAnim.getFactor() < 0.01)
+        {
+            return;
+        }
+
         final BlockState state = getBlockState();
         Box fullBox = VoxelShapes.fullCube().getBoundingBox();
 

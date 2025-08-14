@@ -19,7 +19,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.MovementFactorEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
-import net.shoreline.client.mixin.accessor.AccessorKeyBinding;
+import net.shoreline.client.impl.imixin.IKeyBinding;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class NoSlowModule extends Toggleable
@@ -63,7 +63,7 @@ public class NoSlowModule extends Toggleable
             KeyBinding[] keys = new KeyBinding[] { mc.options.jumpKey, mc.options.forwardKey, mc.options.backKey, mc.options.rightKey, mc.options.leftKey };
             for (KeyBinding binding : keys)
             {
-                binding.setPressed(InputUtil.isKeyPressed(handle, ((AccessorKeyBinding) binding).getBoundKey().getCode()));
+                binding.setPressed(InputUtil.isKeyPressed(handle, ((IKeyBinding) binding).getBoundKey().getCode()));
             }
         }
     }

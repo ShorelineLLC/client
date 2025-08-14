@@ -4,7 +4,7 @@ import lombok.Getter;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.mixin.accessor.AccessorPlayerMoveC2SPacket;
+import net.shoreline.client.impl.imixin.IPlayerMoveC2SPacket;
 
 public class ServerRotationHandler
 {
@@ -16,8 +16,8 @@ public class ServerRotationHandler
         if (Managers.ROTATION.hasClientRotation())
         {
             Rotation rotation = Managers.ROTATION.getClientRotation();
-            ((AccessorPlayerMoveC2SPacket) packet).setYaw(rotation.getYaw());
-            ((AccessorPlayerMoveC2SPacket) packet).setPitch(rotation.getPitch());
+            ((IPlayerMoveC2SPacket) packet).setYaw(rotation.getYaw());
+            ((IPlayerMoveC2SPacket) packet).setPitch(rotation.getPitch());
         }
     }
 

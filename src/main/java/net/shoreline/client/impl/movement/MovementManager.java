@@ -10,7 +10,6 @@ import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.InteractSneakEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
-import net.shoreline.client.mixin.accessor.AccessorInput;
 import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.eventbus.EventBus;

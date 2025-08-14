@@ -13,7 +13,7 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.mixin.accessor.AccessorMinecraftClient;
+import net.shoreline.client.impl.imixin.IMinecraftClient;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class FastPlaceModule extends Toggleable
@@ -34,14 +34,14 @@ public class FastPlaceModule extends Toggleable
     public void onTick(TickEvent.Pre event)
     {
         if (mc.options.useKey.isPressed() && checkItem(mc.player.getMainHandStack())
-                && ((AccessorMinecraftClient) mc).getItemUseCooldown() > delayConfig.getValue())
+                && ((IMinecraftClient) mc).getItemUseCooldown() > delayConfig.getValue())
         {
             if (ghostFixConfig.getValue())
             {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(
-                        mc.player.getActiveHand(), id, mc.player.getYaw(), mc.player.getPitch()));
+                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(mc.player.getActiveHand(), id, mc.player.getYaw(), mc.player.getPitch()));
             }
-            ((AccessorMinecraftClient) mc).setItemUseCooldown(delayConfig.getValue());
+
+            ((IMinecraftClient) mc).setItemUseCooldown(delayConfig.getValue());
         }
     }
 

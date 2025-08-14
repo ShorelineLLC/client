@@ -9,8 +9,8 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.imixin.IClientWorld;
 import net.shoreline.client.impl.imixin.IMixinClientPlayNetworkHandler;
-import net.shoreline.client.mixin.accessor.AccessorClientWorld;
 import net.shoreline.eventbus.EventBus;
 
 import java.util.Collections;
@@ -67,7 +67,7 @@ public class NetworkManager extends GenericFeature
             return;
         }
 
-        try (PendingUpdateManager pendingUpdateManager = ((AccessorClientWorld) mc.world).getUpdateManager().incrementSequence())
+        try (PendingUpdateManager pendingUpdateManager = ((IClientWorld) mc.world).getUpdateManager().incrementSequence())
         {
             int i = pendingUpdateManager.getSequence();
             Packet<ServerPlayPacketListener> packet = packetCreator.predict(i);

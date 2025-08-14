@@ -13,8 +13,6 @@ import net.shoreline.client.gui.clickgui.*;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.*;
-import net.shoreline.client.mixin.accessor.AccessorDrawContext;
-import org.joml.Matrix3x2f;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 

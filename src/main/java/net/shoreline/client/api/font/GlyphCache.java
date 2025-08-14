@@ -7,7 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.mixin.accessor.AccessorNativeImage;
+import net.shoreline.client.impl.imixin.INativeImage;
 import org.lwjgl.system.MemoryUtil;
 
 import java.awt.*;
@@ -136,7 +136,7 @@ public class GlyphCache
             int imageWidth = bufferedImage.getWidth();
             int imageHeight = bufferedImage.getHeight();
             NativeImage image = new NativeImage(NativeImage.Format.RGBA, imageWidth, imageHeight, false);
-            long ptr = ((AccessorNativeImage) (Object) image).getPointer();
+            long ptr = ((INativeImage) (Object) image).getPointer();
             IntBuffer backingBuffer = MemoryUtil.memIntBuffer(ptr, image.getWidth() * image.getHeight());
             WritableRaster raster = bufferedImage.getRaster();
             ColorModel colorModel = bufferedImage.getColorModel();

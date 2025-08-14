@@ -14,7 +14,6 @@ import java.util.List;
 public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
 {
     private final CrystalBaseScanner baseScanner = new CrystalBaseScanner();
-    private final CrystalEntityScanner entityScanner = new CrystalEntityScanner();
 
     public CrystalCalcManager()
     {
@@ -39,13 +38,12 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
         if (currentResult == null || currentResult.isDone())
         {
             baseScanner.createSphere(mc.world, EntityUtil.getRoundedBlockPos(mc.player));
-            entityScanner.createEntityLookup(mc.world, mc.player.getEyePos());
+            baseScanner.createEntityLookup(mc.world, mc.player.getEyePos());
 
-            // run these during the same time so we can leverage the attack calc when we calc placement
             runAsync(() ->
             {
                 List<CrystalData<?>> crystalData = baseScanner.scanCrystalBases();
-                crystalData.addAll(entityScanner.scanCrystalEntities());
+                crystalData.addAll(baseScanner.scanCrystalEntities());
 
                 return crystalData;
             });

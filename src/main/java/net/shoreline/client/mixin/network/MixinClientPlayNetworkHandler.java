@@ -7,8 +7,8 @@ import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
+import net.shoreline.client.impl.imixin.IClientConnection;
 import net.shoreline.client.impl.imixin.IMixinClientPlayNetworkHandler;
-import net.shoreline.client.mixin.accessor.AccessorClientConnection;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -69,6 +69,6 @@ public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNet
     @Override
     public void sendQuietPacket(Packet<?> packet)
     {
-        ((AccessorClientConnection) getConnection()).hookSendInternal(packet, null, true);
+        ((IClientConnection) getConnection()).hookSendInternal(packet, null, true);
     }
 }

@@ -1,9 +1,7 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
@@ -11,15 +9,15 @@ import net.shoreline.client.impl.world.EntityState;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class CrystalEntityScanner extends AsyncWorldScanner
+public abstract class CrystalEntityScanner extends AsyncWorldScanner
 {
     private final AutoCrystalModule autoCrystal = AutoCrystalModule.INSTANCE;
 
-    private final List<CrystalData<?>> crystalEntites = new CopyOnWriteArrayList<>();
+    private final List<CrystalData<?>> crystalEntities = new CopyOnWriteArrayList<>();
 
     public List<CrystalData<?>> scanCrystalEntities()
     {
-        crystalEntites.clear();
+        crystalEntities.clear();
 
         for (EntityState state : getEntities())
         {
@@ -31,7 +29,7 @@ public class CrystalEntityScanner extends AsyncWorldScanner
             visitEndCrystal(state);
         }
 
-        return crystalEntites;
+        return crystalEntities;
     }
 
     private void visitEndCrystal(EntityState entityState)
@@ -78,12 +76,9 @@ public class CrystalEntityScanner extends AsyncWorldScanner
 
             float damage = CrystalUtil.getCrystalDamage(this, entityState.getPos(), entity, autoCrystal.getIgnoreTerrain().getValue());
 
-            crystalEntites.add(new CrystalData<>(entityState, entity, damage, local));
+            crystalEntities.add(new CrystalData<>(entityState, entity, damage, local));
         }
     }
-
-    @Override
-    protected void visit(BlockPos pos, BlockState state) {}
 
     @Override
     protected int getRadius()
