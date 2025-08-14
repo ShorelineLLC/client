@@ -47,22 +47,6 @@ public class RenderModule extends Toggleable
         mc.getBufferBuilders().getEntityVertexConsumers().draw();
     }
 
-    protected void drawText(DrawContext context, Text text, int x, int y)
-    {
-        if (text.getString().isEmpty())
-        {
-            return;
-        }
-
-        if (FontModule.INSTANCE.isEnabled())
-        {
-            FontManager.FONT.drawString(context.getMatrices(), text.getString(), x, y, -1);
-            return;
-        }
-
-        context.drawText(mc.textRenderer, text, x, y, -1, false);
-    }
-
     protected int getTextWidth(Text text)
     {
         if (text.getString().isEmpty())

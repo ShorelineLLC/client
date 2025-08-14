@@ -16,7 +16,7 @@ public class WatermarkHudModule extends HudModule
     @Override
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
-        drawText(context, Text.of(getWatermarkText()), getX() + 2, getY() + 2);
+        drawText(context.getMatrices(), Text.of(getWatermarkText()), getX() + 2, getY() + 2);
     }
 
     @Override

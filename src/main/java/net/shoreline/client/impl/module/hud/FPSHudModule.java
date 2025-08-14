@@ -18,7 +18,7 @@ public class FPSHudModule extends HudModule
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
         fps.count();
-        drawText(context, getFPSText(), getX() + 2, getY() + 2);
+        drawText(context.getMatrices(), getFPSText(), getX() + 2, getY() + 2);
     }
 
     @Override

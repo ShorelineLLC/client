@@ -101,6 +101,8 @@ public class NametagsModule extends RenderModule
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         GL11.glDepthFunc(GL11.GL_ALWAYS);
+        RenderSystem.enablePolygonOffset();
+        RenderSystem.polygonOffset(1.0f, -32500000);
         for (PlayerEntry playerEntry : players)
         {
             PlayerEntity player = playerEntry.getPlayer();
@@ -128,6 +130,8 @@ public class NametagsModule extends RenderModule
             matrices.pop();
         }
 
+        RenderSystem.disablePolygonOffset();
+        RenderSystem.polygonOffset(1.0f, 32500000);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
         RenderSystem.disableBlend();
     }
