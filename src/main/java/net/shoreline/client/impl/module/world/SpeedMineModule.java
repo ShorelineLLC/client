@@ -8,6 +8,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.inventory.ItemSlot;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningPackets;
@@ -83,13 +84,13 @@ public class SpeedMineModule extends Toggleable
 
         event.cancel();
 
-        int slot = AutoToolModule.INSTANCE.getBestTool(event.getState());
+        ItemSlot slot = AutoToolModule.INSTANCE.getBestTool(event.getState());
         mainMiningBlock = MiningData.builder()
                 .blockPos(event.getPos())
                 .direction(event.getDirection())
                 .maxProgress(speedConfig.getValue())
                 .player(mc.player)
-                .miningStack(AutoToolModule.INSTANCE.getToolStack())
+                .miningStack(slot.getItemStack())
                 .build();
 
         miningPackets.getValue().sendStartPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
@@ -119,7 +120,7 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
-        int slot = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
+        int slot = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState()).getSlot();
         if (slot == -1 || !Managers.INVENTORY.startSwap(slot, SilentSwapType.HOTBAR))
         {
             return;
