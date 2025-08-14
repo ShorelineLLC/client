@@ -3,12 +3,20 @@ package net.shoreline.client.impl.module.combat.crystal;
 import lombok.experimental.UtilityClass;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
+import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 
 @UtilityClass
 public class CrystalUtil
 {
-    public boolean canUseOnBlock(BlockPos pos, BlockState state)
+    public float getCrystalDamage(final BlockView blockView,
+                                  final Vec3d pos,
+                                  final EntityState entity,
+                                  final boolean ignoreTerrain)
     {
-        return false;
+        return ExplosionTrace.getDamageToPos(blockView, pos, entity.getPos(),
+                entity.getBoundingBox(), 12.0f, ignoreTerrain);
     }
 }

@@ -4,6 +4,7 @@ import net.shoreline.client.api.async.AsyncFeature;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.combat.FillerModule;
 import net.shoreline.client.impl.module.render.HoleESPModule;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -27,13 +28,13 @@ public class SafeHoleManager extends AsyncFeature<HoleData>
 
         if (!HoleESPModule.INSTANCE.isEnabled() && !FillerModule.INSTANCE.isEnabled())
         {
+            currentResult = null;
             return;
         }
 
         if (currentResult == null || currentResult.isDone())
         {
-            scanner.createCube(mc.world, mc.player.getBlockPos());
-
+            scanner.createCube(mc.world, EntityUtil.getRoundedBlockPos(mc.player));
             runAsync(scanner::scanHoles);
         }
     }

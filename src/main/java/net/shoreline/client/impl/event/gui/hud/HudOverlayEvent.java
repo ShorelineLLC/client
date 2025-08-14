@@ -21,4 +21,12 @@ public class HudOverlayEvent extends Event
 
     @Cancelable
     public static class ItemName extends HudOverlayEvent {}
+
+    @RequiredArgsConstructor
+    @Cancelable
+    @Getter
+    public static class Crosshair extends HudOverlayEvent
+    {
+        private final DrawContext context;
+    }
 }

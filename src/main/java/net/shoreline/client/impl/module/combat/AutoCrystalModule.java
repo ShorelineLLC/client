@@ -1,13 +1,39 @@
 package net.shoreline.client.impl.module.combat;
 
 import lombok.Getter;
-import net.shoreline.client.api.config.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.ConfigGroup;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.impl.module.combat.crystal.CrystalBaseScanner;
+import net.shoreline.client.api.module.ListeningToggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.client.ThemeModule;
+import net.shoreline.client.impl.module.combat.crystal.CrystalData;
+import net.shoreline.client.impl.module.combat.util.TickPriorities;
+import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.BoxRender;
+import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.explosion.ExplosionUtil;
+import net.shoreline.client.util.entity.EntityUtil;
+import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Getter
-public class AutoCrystalModule extends Toggleable
+public class AutoCrystalModule extends ListeningToggleable
 {
     public static AutoCrystalModule INSTANCE;
 
@@ -48,8 +74,11 @@ public class AutoCrystalModule extends Toggleable
     Config<Integer> breakDelay = new NumberConfig.Builder<Integer>("BreakDelay")
             .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
             .setDescription("The delay between breaking crystals").build();
+    Config<Integer> ticksExisted = new NumberConfig.Builder<Integer>("TicksExisted")
+            .setMin(0).setMax(10).setDefaultValue(0)
+            .setDescription("The minimum ticks existed before breaking crystals").build();
     Config<Void> breakConfig = new ConfigGroup.Builder("Break")
-            .addAll(breakRange, breakDelay).build();
+            .addAll(breakRange, breakDelay, ticksExisted).build();
 
     Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
             .setDescription("Targets dropped items blocking placements")
@@ -111,7 +140,9 @@ public class AutoCrystalModule extends Toggleable
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
             .addAll(autoSwap, silentSwap, antiWeakness).build();
 
-    private final CrystalBaseScanner baseScanner = new CrystalBaseScanner();
+    private CrystalData<BlockPos> currentPlace;
+
+    private final ConcurrentMap<BlockPos, Animation> fadeAnimations = new ConcurrentHashMap<>();
 
     public AutoCrystalModule()
     {
@@ -119,5 +150,103 @@ public class AutoCrystalModule extends Toggleable
         INSTANCE = this;
     }
 
+    @Override
+    public void onDisable()
+    {
+        currentPlace = null;
+    }
 
+    @EventListener
+    public void onWorldDisconnect(WorldEvent.Disconnect event)
+    {
+        disable();
+    }
+
+    @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
+    public void onTick(TickEvent.Pre event)
+    {
+        if (checkNull())
+        {
+            return;
+        }
+
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        {
+            return;
+        }
+
+        List<CrystalData<BlockPos>> latestCrystalBases = Managers.CRYSTAL.getBaseResults();
+        List<CrystalData<EntityState>> latestCrystalEntities = Managers.CRYSTAL.getEntityResults();
+
+        currentPlace = getPlacement(latestCrystalBases);
+    }
+
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent.Post event)
+    {
+        if (currentPlace != null)
+        {
+            fadeAnimations.put(currentPlace.getCrystalData(), new Animation(true, 250));
+        }
+
+        for (Map.Entry<BlockPos, Animation> entry : fadeAnimations.entrySet())
+        {
+            BlockPos placeData = entry.getKey();
+            Animation anim = entry.getValue();
+
+            if (anim.getFactor() <= 0.01)
+            {
+                fadeAnimations.remove(placeData);
+                continue;
+            }
+
+            anim.setState(false);
+            BoxRender.FILL.render(event.getMatrixStack(),
+                    placeData, ThemeModule.INSTANCE.getPrimaryColor().getRGB(),
+                    (float) Easing.SMOOTH_STEP.ease(anim.getFactor()));
+        }
+    }
+
+    private CrystalData<BlockPos> getPlacement(List<CrystalData<BlockPos>> crystalBases)
+    {
+        if (crystalBases.isEmpty())
+        {
+            return null;
+        }
+
+        CrystalData<BlockPos> bestPlace = null;
+        float bestDamage = 0.0f;
+
+        for (CrystalData<BlockPos> base : crystalBases)
+        {
+            LivingEntity entity = (LivingEntity) base.getTarget().getEntity();
+            float baseDamage = (float) base.getDamageToTarget();
+
+            if (entity.isDead() || baseDamage < bestDamage)
+            {
+                continue;
+            }
+
+            float damage = ExplosionUtil.getAppliedDamageToEntity(entity, baseDamage);
+            if (damage > bestDamage)
+            {
+                bestDamage = damage;
+                bestPlace = base;
+            }
+        }
+
+        if (bestDamage < minDamage.getValue())
+        {
+            return null;
+        }
+
+        return bestPlace;
+    }
+
+    public boolean canTargetEntity(Entity entity)
+    {
+        return entity instanceof PlayerEntity && targetPlayers.getValue()
+                || EntityUtil.isHostile(entity) && targetHostiles.getValue()
+                || EntityUtil.isPassive(entity) && targetPassives.getValue();
+    }
 }

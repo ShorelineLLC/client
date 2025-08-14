@@ -178,7 +178,7 @@ public class VelocityModule extends Toggleable
         }
     }
 
-    public boolean shouldCancelKnockback()
+    private boolean shouldCancelKnockback()
     {
         if (modeConfig.getValue() == VelocityMode.WALLS)
         {
@@ -194,7 +194,7 @@ public class VelocityModule extends Toggleable
         return true;
     }
 
-    public boolean shouldCancelExplosions()
+    private boolean shouldCancelExplosions()
     {
         if (modeConfig.getValue() == VelocityMode.WALLS)
         {

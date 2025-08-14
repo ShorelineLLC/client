@@ -7,6 +7,7 @@ import net.shoreline.client.impl.module.combat.*;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PhaseModule;
+import net.shoreline.client.impl.module.hud.CrosshairHudModule;
 import net.shoreline.client.impl.module.hud.FPSHudModule;
 import net.shoreline.client.impl.module.hud.SpeedHudModule;
 import net.shoreline.client.impl.module.hud.WatermarkHudModule;

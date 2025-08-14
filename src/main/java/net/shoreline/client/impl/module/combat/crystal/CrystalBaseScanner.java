@@ -13,7 +13,6 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
-import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,7 +24,7 @@ public class CrystalBaseScanner extends AsyncWorldScanner
 
     private final AutoCrystalModule autoCrystal = AutoCrystalModule.INSTANCE;
 
-    private final List<CrystalData<BlockPos>> crystalBases = new CopyOnWriteArrayList<>();
+    private final List<CrystalData<?>> crystalBases = new CopyOnWriteArrayList<>();
 
     @Override
     protected void visit(BlockPos pos, BlockState state)
@@ -36,9 +35,9 @@ public class CrystalBaseScanner extends AsyncWorldScanner
         }
 
         Vec3d explosionCenter = pos.toBottomCenterPos().add(0.0, 1.0, 0.0);
-        float local = getCrystalDamage(explosionCenter, localEntity);
+        float local = CrystalUtil.getCrystalDamage(this, explosionCenter, getLocalEntity(), autoCrystal.getIgnoreTerrain().getValue());
 
-        boolean willKillPlayer = localEntity.getTotalHealth() - local < 0.5f;
+        boolean willKillPlayer = getLocalEntity().getTotalHealth() - local < 0.5f;
         if (local > autoCrystal.getMaxSelfDamage().getValue() || willKillPlayer)
         {
             return;
@@ -46,7 +45,7 @@ public class CrystalBaseScanner extends AsyncWorldScanner
 
         for (EntityState entity : getEntities())
         {
-            if (!(entity.getEntity() instanceof LivingEntity))
+            if (!(entity.getEntity() instanceof LivingEntity) || !autoCrystal.canTargetEntity(entity.getEntity()))
             {
                 continue;
             }
@@ -58,28 +57,23 @@ public class CrystalBaseScanner extends AsyncWorldScanner
             }
 
             float targetRange = autoCrystal.getTargetRange().getValue();
-            double dist = localEntity.squaredDistanceTo(entity.getPos());
+            double dist = getLocalEntity().squaredDistanceTo(entity.getPos());
             if (dist > targetRange * targetRange)
             {
                 continue;
             }
 
-            float damage = getCrystalDamage(explosionCenter, entity);
+            float damage = CrystalUtil.getCrystalDamage(this, explosionCenter, entity, autoCrystal.getIgnoreTerrain().getValue());
 
-            crystalBases.add(new CrystalData<>(pos, damage, local));
+            crystalBases.add(new CrystalData<>(pos, entity, damage, local));
         }
     }
 
-    public List<CrystalData<BlockPos>> scanCrystalBases()
+    public List<CrystalData<?>> scanCrystalBases()
     {
         crystalBases.clear();
-        try
-        {
-            scanBlocks();
-        } catch (Throwable ignored)
-        {
 
-        }
+        scanBlocks();
 
         return crystalBases;
     }
@@ -132,10 +126,5 @@ public class CrystalBaseScanner extends AsyncWorldScanner
         }
 
         return entities;
-    }
-
-    private float getCrystalDamage(Vec3d pos, EntityState entity)
-    {
-        return ExplosionTrace.getDamageToPos(this, pos, entity.getPos(), entity.getBoundingBox(), 12.0f, autoCrystal.getIgnoreTerrain().getValue());
     }
 }

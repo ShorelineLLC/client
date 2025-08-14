@@ -117,4 +117,17 @@ public class MixinInGameHud
             }
         }
     }
+
+    @Inject(method = "renderCrosshair", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderCrosshair(DrawContext context,
+                                     RenderTickCounter tickCounter,
+                                     CallbackInfo ci)
+    {
+        HudOverlayEvent.Crosshair renderCrosshairEvent = new HudOverlayEvent.Crosshair(context);
+        EventBus.INSTANCE.dispatch(renderCrosshairEvent);
+        if (renderCrosshairEvent.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
 }

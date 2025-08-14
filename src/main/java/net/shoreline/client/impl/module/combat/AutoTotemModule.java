@@ -12,6 +12,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
+import net.shoreline.client.impl.module.combat.util.TickPriorities;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -45,7 +46,7 @@ public class AutoTotemModule extends InventorySwapModule
         INSTANCE = this;
     }
 
-    @EventListener(priority = 2147483646)
+    @EventListener(priority = TickPriorities.AUTO_TOTEM)
     public void onTick(final TickEvent.Pre event)
     {
         if (checkNull())

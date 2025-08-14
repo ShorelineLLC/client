@@ -5,6 +5,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.combat.HoleBlockType;
 import net.shoreline.client.impl.combat.HoleData;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Animation;
@@ -28,12 +29,18 @@ public class HoleESPModule extends RenderModule
     Config<Boolean> showObsidian = new BooleanConfig.Builder("ShowObsidian")
             .setDescription("Renders obsidian holes")
             .setDefaultValue(true).build();
-    Config<Boolean> doublesConfig = new BooleanConfig.Builder("Doubles")
+    Config<Boolean> showMixed = new BooleanConfig.Builder("ShowMixed")
+            .setDescription("Renders mixed holes")
+            .setDefaultValue(true).build();
+
+    Config<Boolean> doublesConfig = new BooleanConfig.Builder("2x1")
             .setDescription("Scans for double holes")
             .setDefaultValue(false).build();
-    Config<Boolean> quadsConfig = new BooleanConfig.Builder("Quads")
+    Config<Boolean> quadsConfig = new BooleanConfig.Builder("2x2")
             .setDescription("Scans for quad holes")
             .setDefaultValue(false).build();
+    Config<Void> typesConfig = new ConfigGroup.Builder("Types")
+            .addAll(doublesConfig, quadsConfig).build();
 
     Config<BoxRender> modeConfig = new EnumConfig.Builder<BoxRender>("Mode")
             .setValues(BoxRender.values())
@@ -51,7 +58,7 @@ public class HoleESPModule extends RenderModule
             .setDefaultValue(Color.RED).build();
     Config<Color> mixedColor = new ColorConfig.Builder("MixedColor")
             .setDescription("The color for mixed holes")
-            .setVisible(() -> showObsidian.getValue())
+            .setVisible(() -> showMixed.getValue())
             .setDefaultValue(Color.YELLOW).build();
 
     private final ConcurrentMap<HoleData, Animation> fadeAnimations = new ConcurrentHashMap<>();
@@ -63,13 +70,20 @@ public class HoleESPModule extends RenderModule
     }
 
     @EventListener
+    public void onTick(TickEvent.Pre event)
+    {
+
+    }
+
+    @EventListener
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
         List<HoleData> latestHoleData = Managers.HOLE.getResults();
 
         for (HoleData hole : latestHoleData)
         {
-            if (hole.getBlockType() != HoleBlockType.BEDROCK && !showObsidian.getValue())
+            if (hole.getBlockType() == HoleBlockType.OBSIDIAN && !showObsidian.getValue() ||
+                    hole.getBlockType() == HoleBlockType.MIXED && !showMixed.getValue())
             {
                 continue;
             }
@@ -93,7 +107,8 @@ public class HoleESPModule extends RenderModule
                 anim.setState(latestHoleData.contains(holeData));
             }
 
-            if (holeData.getBlockType() != HoleBlockType.BEDROCK && !showObsidian.getValue())
+            if (holeData.getBlockType() == HoleBlockType.OBSIDIAN && !showObsidian.getValue() ||
+                    holeData.getBlockType() == HoleBlockType.MIXED && !showMixed.getValue())
             {
                 return true;
             }

@@ -10,6 +10,7 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.module.combat.util.TickPriorities;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -37,7 +38,7 @@ public class OffhandGappleModule extends InventorySwapModule
         INSTANCE = this;
     }
 
-    @EventListener(priority = 2147483645)
+    @EventListener(priority = TickPriorities.OFFHAND)
     public void onTick(TickEvent.Pre event)
     {
         if (checkNull() || AutoTotemModule.INSTANCE.isTotemInOffHand())

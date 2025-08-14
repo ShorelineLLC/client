@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.block;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
@@ -12,24 +11,23 @@ import java.util.concurrent.ConcurrentMap;
 
 public abstract class AsyncBlockView implements BlockView
 {
-    protected final ConcurrentMap<BlockPos, BlockState> blockStates = new ConcurrentHashMap<>();
-    protected final ConcurrentMap<BlockPos, FluidState> fluidStates = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<BlockPos, AsyncBlockState> blockStates = new ConcurrentHashMap<>();
 
     @Override
     public BlockState getBlockState(BlockPos blockPos)
     {
-        return blockStates.getOrDefault(blockPos, Blocks.AIR.getDefaultState());
+        return blockStates.getOrDefault(blockPos, AsyncBlockState.getDefaultState()).getBlockState();
     }
 
     @Override
     public FluidState getFluidState(BlockPos pos)
     {
-        return fluidStates.getOrDefault(pos, Blocks.AIR.getDefaultState().getFluidState());
+        return blockStates.getOrDefault(pos, AsyncBlockState.getDefaultState()).getFluidState();
     }
 
     @Override
     public BlockEntity getBlockEntity(BlockPos pos)
     {
-        return null;
+        return blockStates.getOrDefault(pos, AsyncBlockState.getDefaultState()).getBlockEntity();
     }
 }

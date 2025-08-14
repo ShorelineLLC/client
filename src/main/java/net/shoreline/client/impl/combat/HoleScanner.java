@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.combat;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.block.AsyncBlockScanner;
@@ -58,13 +59,7 @@ public class HoleScanner extends AsyncBlockScanner
         visited.clear();
         safeHoles.clear();
 
-        try
-        {
-            scanBlocks();
-        } catch (Throwable t)
-        {
-            t.printStackTrace();
-        }
+        scanBlocks();
 
         return safeHoles;
     }

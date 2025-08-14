@@ -79,7 +79,7 @@ public class SprintModule extends MovementModule
     @EventListener
     public void onStopSprinting(StopSprintingEvent event)
     {
-        if (canSprint() && modeConfig.getValue() == SprintMode.RAGE)
+        if (canSprint() && checkCollisions() && modeConfig.getValue() == SprintMode.RAGE)
         {
             event.cancel();
         }

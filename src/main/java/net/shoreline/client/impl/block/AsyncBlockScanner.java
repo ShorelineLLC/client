@@ -17,7 +17,6 @@ public abstract class AsyncBlockScanner extends AsyncBlockView
     public void createCube(ClientWorld world, BlockPos center)
     {
         blockStates.clear();
-        fluidStates.clear();
 
         int radius = getRadius();
 
@@ -34,8 +33,9 @@ public abstract class AsyncBlockScanner extends AsyncBlockView
                             center.getZ() + dz);
                     BlockPos key = mPos.toImmutable();
 
-                    blockStates.put(key, world.getBlockState(key));
-                    fluidStates.put(key, world.getFluidState(key));
+                    AsyncBlockState blockState = new AsyncBlockState(world.getBlockState(key),
+                            world.getFluidState(key), world.getBlockEntity(key));
+                    blockStates.put(key, blockState);
                 }
             }
         }
@@ -44,7 +44,6 @@ public abstract class AsyncBlockScanner extends AsyncBlockView
     public void createSphere(ClientWorld world, BlockPos center)
     {
         blockStates.clear();
-        fluidStates.clear();
 
         final int r = getRadius();
         final int r2 = r * r;
@@ -66,8 +65,9 @@ public abstract class AsyncBlockScanner extends AsyncBlockView
                                 center.getZ() + dz);
                         BlockPos key = mPos.toImmutable();
 
-                        blockStates.put(key, world.getBlockState(key));
-                        fluidStates.put(key, world.getFluidState(key));
+                        AsyncBlockState blockState = new AsyncBlockState(world.getBlockState(key),
+                                world.getFluidState(key), world.getBlockEntity(key));
+                        blockStates.put(key, blockState);
                     }
                 }
             }
@@ -76,9 +76,9 @@ public abstract class AsyncBlockScanner extends AsyncBlockView
 
     public void scanBlocks()
     {
-        for (Map.Entry<BlockPos, BlockState> entry : blockStates.entrySet())
+        for (Map.Entry<BlockPos, AsyncBlockState> entry : blockStates.entrySet())
         {
-            visit(entry.getKey(), entry.getValue());
+            visit(entry.getKey(), entry.getValue().getBlockState());
         }
     }
 
