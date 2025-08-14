@@ -104,6 +104,7 @@ public final class FontRenderer implements Closeable
             close();
             createFont(font, size);
         }
+
         float r2 = r;
         float g2 = g;
         float b2 = b;
@@ -120,6 +121,7 @@ public final class FontRenderer implements Closeable
         float yOffset = 0;
         boolean formatting = false;
         int lineStart = 0;
+
         glyphs.clear();
         synchronized (cache)
         {
@@ -169,21 +171,13 @@ public final class FontRenderer implements Closeable
                     xOffset += glyph.width();
                 }
             }
+
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.disableCull();
             for (Identifier identifier : cache.keySet())
             {
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                RenderSystem.disableCull();
-                RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-                RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-                try
-                {
-                    RenderSystem.setShaderTexture(0, identifier);
-                }
-                catch (Exception e)
-                {
-                    continue;
-                }
+                RenderSystem.setShaderTexture(0, identifier);
 
                 List<CharLocation> objects = cache.get(identifier);
 
@@ -208,12 +202,15 @@ public final class FontRenderer implements Closeable
                     bufferBuilder.vertex(matrix4f, xo + w, yo + 0, 0).color(cr, cg, cb, a).texture(u2, v1);
                     bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).color(cr, cg, cb, a).texture(u1, v1);
                 }
+
                 BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-                RenderSystem.disableBlend();
             }
 
+            RenderSystem.enableCull();
+            RenderSystem.disableBlend();
             cache.clear();
         }
+
         stack.pop();
     }
 
