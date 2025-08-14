@@ -1,13 +1,21 @@
 package net.shoreline.client.impl.module.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Getter;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.*;
+import net.minecraft.client.render.item.ItemRenderState;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
@@ -20,14 +28,23 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.entity.RenderEntityLabelEvent;
+import net.shoreline.client.impl.imixin.IItemRenderState;
+import net.shoreline.client.impl.imixin.IItemRenderer;
+import net.shoreline.client.impl.imixin.ILayerRenderState;
 import net.shoreline.client.impl.module.impl.RenderModule;
+import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Interpolation;
 import net.shoreline.eventbus.annotation.EventListener;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NametagsModule extends RenderModule
 {
@@ -36,27 +53,33 @@ public class NametagsModule extends RenderModule
     Config<Boolean> entityIdConfig = new BooleanConfig.Builder("EntityId")
             .setDescription("Displays the players entity id")
             .setDefaultValue(false).build();
-
     Config<Boolean> gamemodeConfig = new BooleanConfig.Builder("Gamemode")
             .setDescription("Displays the players gamemode")
             .setDefaultValue(false).build();
-
     Config<Boolean> pingConfig = new BooleanConfig.Builder("Ping")
             .setDescription("Displays the players ping")
             .setDefaultValue(true).build();
-
     Config<Boolean> healthConfig = new BooleanConfig.Builder("Health")
             .setDescription("Displays the players current health")
             .setDefaultValue(true).build();
-
     Config<Boolean> totemsConfig = new BooleanConfig.Builder("Totems")
             .setDescription("Displays the totem count")
             .setDefaultValue(true).build();
-
+    Config<Boolean> itemConfig = new BooleanConfig.Builder("Item")
+            .setDescription("Displays the name of the players equipped stack")
+            .setDefaultValue(true).build();
+    Config<Boolean> armorConfig = new BooleanConfig.Builder("Armor")
+            .setDescription("Displays the players equipped armor")
+            .setDefaultValue(true).build();
+    Config<Boolean> enchantmentsConfig = new BooleanConfig.Builder("Enchantments")
+            .setDescription("Displays the enchantments of equipped armor")
+            .setVisible(armorConfig::getValue)
+            .setDefaultValue(true).build();
     Config<Float> scalingConfig = new NumberConfig.Builder<Float>("Scaling")
             .setMin(0.001f).setMax(0.01f).setDefaultValue(0.003f).build();
 
     private final List<PlayerEntry> players = new ArrayList<>();
+    private final ItemRenderState itemRenderState = new ItemRenderState();
 
     public NametagsModule()
     {
@@ -74,6 +97,10 @@ public class NametagsModule extends RenderModule
 
         MatrixStack matrices = event.getMatrixStack();
         Camera camera = mc.getEntityRenderDispatcher().camera;
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        GL11.glDepthFunc(GL11.GL_ALWAYS);
         for (PlayerEntry playerEntry : players)
         {
             PlayerEntity player = playerEntry.getPlayer();
@@ -96,11 +123,13 @@ public class NametagsModule extends RenderModule
             matrices.scale(scaling, -scaling, scaling);
 
             float hwidth = mc.textRenderer.getWidth(info) / 2f;
-            mc.textRenderer.draw(info, -hwidth, 0, 0xFFFFFFFF, true, matrices.peek().getPositionMatrix(), mc.getBufferBuilders().getEntityVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-            mc.getBufferBuilders().getEntityVertexConsumers().draw();
-
+            drawText(matrices, Text.of(info), (int) -hwidth, 0);
+            renderItems(matrices, player, armorConfig.getValue());
             matrices.pop();
         }
+
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
+        RenderSystem.disableBlend();
     }
 
     @EventListener
@@ -132,6 +161,187 @@ public class NametagsModule extends RenderModule
     public void onRenderEntityLabel(RenderEntityLabelEvent event)
     {
         event.cancel();
+    }
+
+    private void renderItems(MatrixStack matrices, PlayerEntity player, boolean icons)
+    {
+        List<ItemStack> displayItems = new CopyOnWriteArrayList<>();
+        if (!player.getOffHandStack().isEmpty())
+        {
+            displayItems.add(player.getOffHandStack());
+        }
+
+        player.getInventory().armor.forEach(armorStack ->
+        {
+            if (!armorStack.isEmpty())
+            {
+                displayItems.add(armorStack);
+            }
+        });
+
+        if (!player.getMainHandStack().isEmpty())
+        {
+            displayItems.add(player.getMainHandStack());
+        }
+
+        Collections.reverse(displayItems);
+        float xOffset = 0;
+        int yOffset = 0;
+        for (ItemStack stack : displayItems)
+        {
+            xOffset -= 8;
+            if (stack.getEnchantments().getEnchantments().size() > yOffset)
+            {
+                yOffset = stack.getEnchantments().getEnchantments().size();
+            }
+        }
+
+        float enchY = icons ? enchantOffset(yOffset) : -5.f;
+        for (ItemStack stack : displayItems)
+        {
+            if (icons)
+            {
+                matrices.push();
+                matrices.translate(xOffset + 8.0f, enchY + 8.0f, 0.0f);
+                matrices.scale(16.0f, 16.0f, 0.0f);
+                matrices.multiplyPositionMatrix(new Matrix4f().scaling(1.0f, -1.0f, 1.0f));
+                renderItem(stack, matrices);
+                matrices.pop();
+            }
+
+            matrices.push();
+            if (icons)
+            {
+                renderItemOverlay(matrices, stack, (int) xOffset, (int) enchY);
+            }
+
+            matrices.scale(0.5f, 0.5f, 0.5f);
+            renderDurability(matrices, stack, xOffset + 2.0f, enchY - 4.5f);
+            if (enchantmentsConfig.getValue() && icons)
+            {
+                renderEnchants(matrices, stack, xOffset + 2.0f, enchY);
+            }
+
+            matrices.scale(2.0f, 2.0f, 2.0f);
+            matrices.pop();
+            xOffset += 16;
+        }
+
+        ItemStack heldItem = player.getMainHandStack();
+        if (heldItem.isEmpty())
+        {
+            return;
+        }
+
+        matrices.scale(0.5f, 0.5f, 0.5f);
+        if (itemConfig.getValue())
+        {
+            renderItemName(matrices, heldItem, 0, enchY - 10.0f);
+        }
+
+        matrices.scale(2.0f, 2.0f, 2.0f);
+    }
+
+    private void renderEnchants(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
+    {
+        if (!itemStack.hasEnchantments())
+        {
+            return;
+        }
+
+        Set<Object2IntMap.Entry<RegistryEntry<Enchantment>>> enchants = EnchantmentHelper.getEnchantments(itemStack).getEnchantmentEntries();
+        float n2 = 0;
+        for (Object2IntMap.Entry<RegistryEntry<Enchantment>> e : enchants)
+        {
+            int lvl = e.getIntValue();
+            StringBuilder enchantString = new StringBuilder();
+            String translatedName = Enchantment.getName(e.getKey(), lvl).getString();
+            if (translatedName.contains("Vanish"))
+            {
+                enchantString.append("Van");
+            }
+            else if (translatedName.contains("Bind"))
+            {
+                enchantString.append("Bind");
+            }
+            else
+            {
+                int maxLen = lvl > 1 ? 2 : 3;
+                if (translatedName.length() > maxLen)
+                {
+                    translatedName = translatedName.substring(0, maxLen);
+                }
+                enchantString.append(translatedName);
+                enchantString.append(lvl);
+            }
+
+            drawText(matrixStack, Text.of(enchantString.toString()), (int) (x * 2), (int) ((y + n2) * 2), -1);
+            n2 += 4.5f;
+        }
+    }
+
+    private void renderItemOverlay(MatrixStack matrixStack, ItemStack stack, int x, int y)
+    {
+        if (stack.getCount() != 1)
+        {
+            Text count = Text.of(String.valueOf(stack.getCount()));
+            drawText(matrixStack, count, x + 17 - getTextWidth(count), y + 9);
+        }
+    }
+
+    private void renderDurability(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
+    {
+        if (!itemStack.isDamageable())
+        {
+            return;
+        }
+
+        int n = itemStack.getMaxDamage();
+        int n2 = itemStack.getDamage();
+        int durability = (int) ((n - n2) / ((float) n) * 100.0f);
+        int color = ColorUtil.hslToColor((float) (n - n2) / (float) n * 120.0f, 100.0f, 50.0f, 1.0f).getRGB();
+        drawText(matrixStack, Text.of(durability + "%"), (int) (x * 2), (int) (y * 2), color);
+    }
+
+    private void renderItem(ItemStack stack, MatrixStack matrices)
+    {
+        VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
+        ((IItemRenderer) mc.getItemRenderer()).getItemModelManager().update(itemRenderState, stack, ModelTransformationMode.GUI, false, mc.world, mc.player, 0);
+        RenderLayer renderLayer = RenderLayer.getGuiTextured(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+        for (int i = 0; i < ((IItemRenderState) itemRenderState).getLayerCount(); i++)
+        {
+            ItemRenderState.LayerRenderState layer = ((IItemRenderState) itemRenderState).getLayers()[i];
+            ((ILayerRenderState) layer).setRenderLayer(renderLayer);
+        }
+
+        itemRenderState.render(matrices, vertexConsumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
+        vertexConsumers.draw();
+    }
+
+    private void renderItemName(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
+    {
+        Text itemName = itemStack.getName();
+        float width = getTextWidth(itemName) / 4.0f;
+        drawText(matrixStack, itemName, (int) ((x - width) * 2), (int) (y * 2), -1);
+    }
+
+    private float enchantOffset(final int n)
+    {
+        if (!enchantmentsConfig.getValue() || n <= 3)
+        {
+            return -18.0f;
+        }
+
+        float n2 = -14.0f;
+        n2 -= (n - 3) * 4.5f;
+        return n2;
+    }
+
+    private String getEnchantmentName(String id, int level)
+    {
+        id = id.replace("minecraft:", "");
+        id = level > 1 ? id.substring(0, 2) : id.substring(0, 3);
+        return id.substring(0, 1).toUpperCase() + id.substring(1) + (level > 1 ? level : "");
     }
 
     @Getter

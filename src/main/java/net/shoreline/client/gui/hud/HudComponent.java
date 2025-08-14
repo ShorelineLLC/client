@@ -23,8 +23,6 @@ public class HudComponent extends DrawableComponent implements Interactable
     private int index;
 
     private int x, y;
-
-    @Setter
     private int px, py;
 
     private int width;
@@ -91,10 +89,7 @@ public class HudComponent extends DrawableComponent implements Interactable
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button)
     {
-        if (dragging)
-        {
-            dragging = false;
-        }
+        dragging = false;
     }
 
     @Override

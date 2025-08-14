@@ -86,6 +86,7 @@ public class HudGuiScreen extends Screen
 
         hudFrame.drawComponent(context, mouseX, mouseY, deltaTicks);
 
+        runAnchorTick();
         for (HudComponent component : hudComponents)
         {
             if (!draggingMouse && mouse.isHovering(component.getX(), component.getY(), component.getWidth(), component.getHeight()) && mouse.isLeftHeld())
@@ -124,7 +125,6 @@ public class HudGuiScreen extends Screen
 
         hudFrame.mouseClicked(mouseX, mouseY, mouseButton);
 
-        runAnchorTick();
         for (HudComponent component : hudComponents)
         {
             component.mouseClicked(mouseX, mouseY, mouseButton);
@@ -188,10 +188,9 @@ public class HudGuiScreen extends Screen
             }
 
             float offset = 2f;
-            Collection<HudComponent> sorted = hudComponents;
-            List<HudComponent> anchoredElements = sorted.stream()
-                    .filter(e -> e.getHudModule().getAnchor() == anchor)
-                    .sorted(Comparator.comparingInt(e -> e.getHudModule().getIndex()))
+            List<HudComponent> anchoredElements = hudComponents.stream()
+                    .filter(e -> e.getAnchor() == anchor)
+                    .sorted(Comparator.comparingInt(HudComponent::getIndex))
                     .toList();
 
             if (anchoredElements.isEmpty())
