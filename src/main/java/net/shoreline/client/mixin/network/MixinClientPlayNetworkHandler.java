@@ -8,7 +8,7 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
 import net.shoreline.client.impl.imixin.IClientConnection;
-import net.shoreline.client.impl.imixin.IMixinClientPlayNetworkHandler;
+import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNetworkHandler implements IMixinClientPlayNetworkHandler
+public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNetworkHandler implements IClientPlayNetworkHandler
 {
     @Shadow
     public abstract ClientConnection getConnection();

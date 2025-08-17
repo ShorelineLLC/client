@@ -8,7 +8,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.interact.Interaction;
-import net.shoreline.client.impl.interact.StrictDirection;
+import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Animation;
@@ -42,7 +42,7 @@ public class PlacerModule extends ListeningToggleable
     {
         final Interaction interaction = Interaction.builder()
                 .pos(placePos)
-                .direction(StrictDirection.getInteractDirection(placePos))
+                .direction(InteractDirection.getInteractDirection(placePos))
                 .hand(Hand.MAIN_HAND)
                 .block(block)
                 .build();
@@ -53,12 +53,7 @@ public class PlacerModule extends ListeningToggleable
 
     protected void runSingleBlockPlacement(BlockPos placePos, Block block, int slot)
     {
-        if (!mc.world.getBlockState(placePos).isReplaceable())
-        {
-            return;
-        }
-
-        if (!Managers.INTERACT.canPlaceBlock(placePos, block) || !Managers.INTERACT.startPlacement(slot))
+        if (!canPlaceBlock(placePos, block) || !Managers.INTERACT.startPlacement(slot))
         {
             return;
         }
@@ -83,12 +78,7 @@ public class PlacerModule extends ListeningToggleable
                 continue;
             }
 
-            if (!mc.world.getBlockState(blockPos).isReplaceable())
-            {
-                continue;
-            }
-
-            if (!Managers.INTERACT.canPlaceBlock(blockPos, block))
+            if (!canPlaceBlock(blockPos, block))
             {
                 continue;
             }
@@ -115,5 +105,10 @@ public class PlacerModule extends ListeningToggleable
 
             BoxRender.FILL.render(matrixStack, blockPos, color, (float) animations.getValue().getFactor());
         }
+    }
+
+    protected boolean canPlaceBlock(BlockPos blockPos, Block block)
+    {
+        return mc.world.getBlockState(blockPos).isReplaceable() && Managers.INTERACT.canPlaceBlock(blockPos, block);
     }
 }

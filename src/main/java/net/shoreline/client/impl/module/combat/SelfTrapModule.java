@@ -89,7 +89,6 @@ public class SelfTrapModule extends TrapModule
             return;
         }
 
-
         final Box playerBox = mc.player.getBoundingBox();
         Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
         EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET, TrapLayer.BODY);

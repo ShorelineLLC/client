@@ -9,7 +9,7 @@ import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 
 @UtilityClass
-public class StrictDirection
+public class InteractDirection
 {
     private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
 

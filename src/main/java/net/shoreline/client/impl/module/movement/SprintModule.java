@@ -71,7 +71,7 @@ public class SprintModule extends MovementModule
             return;
         }
 
-        float sprintYaw = getYawFromInput();
+        float sprintYaw = InputUtil.getYawFromInput(mc.player.getYaw());
         event.cancel();
         event.setYaw(sprintYaw);
     }

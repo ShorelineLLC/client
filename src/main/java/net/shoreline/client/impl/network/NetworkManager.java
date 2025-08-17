@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IClientWorld;
-import net.shoreline.client.impl.imixin.IMixinClientPlayNetworkHandler;
+import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
 import net.shoreline.eventbus.EventBus;
 
 import java.util.Collections;
@@ -54,7 +54,7 @@ public class NetworkManager extends GenericFeature
         ClientPlayNetworkHandler handler = mc.getNetworkHandler();
         if (mc.world != null && handler != null)
         {
-            ((IMixinClientPlayNetworkHandler) handler).sendQuietPacket(packet);
+            ((IClientPlayNetworkHandler) handler).sendQuietPacket(packet);
             sentFromClient.add(packet);
         }
     }
