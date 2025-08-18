@@ -58,12 +58,12 @@ public class InteractManager extends GenericFeature
         }
 
         placedBlocks.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
-        if (placedBlocks.size() >= anticheat.getBlocksPerTick() * 20)
+        if (placedBlocks.size() >= anticheat.getBptConfig().getValue() * 20)
         {
             return;
         }
 
-        if (System.currentTimeMillis() - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay())
+        if (System.currentTimeMillis() - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay().getValue())
         {
             return;
         }
@@ -104,7 +104,7 @@ public class InteractManager extends GenericFeature
                 continue;
             }
 
-            if (entity instanceof EndCrystalEntity crystalEntity && placedEntityIds.getOrDefault(entity, 0) > anticheat.getInteractAttempts())
+            if (entity instanceof EndCrystalEntity crystalEntity && placedEntityIds.getOrDefault(entity, 0) > anticheat.getInteractAttempts().getValue())
             {
                 crystalEntities.add(crystalEntity);
             }
@@ -150,7 +150,7 @@ public class InteractManager extends GenericFeature
 
         ActionResult actionResult;
         Vec3d interactionVec = blockPos.toCenterPos().add(interaction.getHitVec());
-        if (anticheat.shouldInteractRotate())
+        if (anticheat.getInteractRotate().getValue())
         {
             float[] rots = RotationUtil.getRotationsTo(mc.player.getEyePos(), interactionVec);
             Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
@@ -210,12 +210,12 @@ public class InteractManager extends GenericFeature
             return;
         }
 
-        if (anticheat.shouldInteractRotate())
+        if (anticheat.getInteractRotate().getValue())
         {
             Managers.ROTATION.setSilentRotation(new Rotation(mc.player));
         }
 
-        Managers.INVENTORY.endSwap();
+        Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
         placementLock = false;
     }
 }

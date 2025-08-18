@@ -29,7 +29,7 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
             return;
         }
 
-        if (!AutoCrystalModule.INSTANCE.isEnabled())
+        if (!AutoCrystalModule.INSTANCE.shouldRunCalcs())
         {
             currentResult = null;
             return;
@@ -44,7 +44,6 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
             {
                 List<CrystalData<?>> crystalData = baseScanner.scanCrystalBases();
                 crystalData.addAll(baseScanner.scanCrystalEntities());
-
                 return crystalData;
             });
         }

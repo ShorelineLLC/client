@@ -35,7 +35,7 @@ public class AnticheatModule extends Concurrent
     Config<Boolean> strictDirection = new BooleanConfig.Builder("StrictDirection")
             .setDescription("Only places on visible faces")
             .setDefaultValue(false).build();
-    Config<Void> interactConfig = new ConfigGroup.Builder("Interact")
+    Config<Void> interactConfig = new ConfigGroup.Builder("Interactions")
             .addAll(multiTask, interactRotate, bptConfig, interactDelay, interactAttempts, strictDirection)
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
 
@@ -46,6 +46,9 @@ public class AnticheatModule extends Concurrent
             .setValues(MoveFix.values())
             .setDescription("Applies movement corrections when rotating")
             .setDefaultValue(MoveFix.OFF).build();
+    Config<Boolean> normalizeMovement = new BooleanConfig.Builder("Normalize")
+            .setDescription("Normalizes the movement vector")
+            .setDefaultValue(false).build();
     Config<Boolean> gcdFixConfig = new BooleanConfig.Builder("MouseSensFix")
             .setDescription("Corrects rotations based on mouse sensitivity")
             .setDefaultValue(true).build();
@@ -56,7 +59,7 @@ public class AnticheatModule extends Concurrent
             .setDescription("Sends rotation packets when player look changes")
             .setDefaultValue(false).build();
     Config<Void> rotateConfig = new ConfigGroup.Builder("Rotations")
-            .addAll(renderRotationsConfig, moveFixConfig, gcdFixConfig, tickSyncConfig, lookSyncConfig)
+            .addAll(renderRotationsConfig, moveFixConfig, normalizeMovement, gcdFixConfig, tickSyncConfig, lookSyncConfig)
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
     
     Config<SilentSwapType> silentSwap = new EnumConfig.Builder<SilentSwapType>("SilentSwap")
@@ -86,56 +89,6 @@ public class AnticheatModule extends Concurrent
     public SilentSwapType getSilentSwapType()
     {
         return silentSwap.getValue();
-    }
-
-    public boolean shouldInteractRotate()
-    {
-        return interactRotate.getValue();
-    }
-
-    public int getBlocksPerTick()
-    {
-        return bptConfig.getValue();
-    }
-
-    public int getInteractDelay()
-    {
-        return interactDelay.getValue();
-    }
-
-    public int getInteractAttempts()
-    {
-        return interactAttempts.getValue();
-    }
-
-    public boolean showServerRotation()
-    {
-        return renderRotationsConfig.getValue();
-    }
-
-    public boolean syncTickRotation()
-    {
-        return tickSyncConfig.getValue();
-    }
-
-    public boolean syncLookRotation()
-    {
-        return lookSyncConfig.getValue();
-    }
-
-    public boolean shouldApplyMoveFix()
-    {
-        return moveFixConfig.getValue() != MoveFix.OFF;
-    }
-
-    public boolean shouldRoundMoveFix()
-    {
-        return moveFixConfig.getValue() == MoveFix.NORMAL;
-    }
-
-    public boolean isAssumeEnchanted()
-    {
-        return assumeEnchanted.getValue();
     }
 
     public enum MoveFix

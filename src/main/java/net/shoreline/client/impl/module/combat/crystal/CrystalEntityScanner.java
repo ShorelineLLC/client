@@ -1,10 +1,12 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.util.entity.PlayerUtil;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -46,7 +48,8 @@ public abstract class CrystalEntityScanner extends AsyncWorldScanner
             return;
         }
 
-        float local = CrystalUtil.getCrystalDamage(this, entityState.getPos(), getLocalEntity(), autoCrystal.getIgnoreTerrain().getValue());
+        float local = !PlayerUtil.isInSurvival(MinecraftClient.getInstance().player) ? 0.0f :
+                CrystalUtil.getCrystalDamage(this, entityState.getPos(), getLocalEntity(), autoCrystal.getIgnoreTerrain().getValue());
 
         boolean willKillPlayer = getLocalEntity().getTotalHealth() - local < 0.5f;
         if (local > autoCrystal.getMaxSelfDamage().getValue() || willKillPlayer)

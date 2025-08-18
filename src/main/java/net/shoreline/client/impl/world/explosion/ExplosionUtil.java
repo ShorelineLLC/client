@@ -100,7 +100,7 @@ public class ExplosionUtil
         MutableInt mutableInt = new MutableInt();
         livingEntity.getArmorItems().forEach(stack ->
         {
-            if (AnticheatModule.INSTANCE.isAssumeEnchanted() && EnchantUtil.isEnchantsObfuscated(stack))
+            if (AnticheatModule.INSTANCE.getAssumeEnchanted().getValue() && EnchantUtil.isEnchantsObfuscated(stack))
             {
                 mutableInt.add(livingEntity.getPreferredEquipmentSlot(stack) == EquipmentSlot.LEGS ? 8 : 4);
             }

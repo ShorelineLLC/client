@@ -3,9 +3,6 @@ package net.shoreline.client.impl.rotation;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntityS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
@@ -19,6 +16,7 @@ import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
 import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.client.AnticheatModule.MoveFix;
 import net.shoreline.client.impl.module.world.NoRotateModule;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -59,7 +57,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onJumpPre(PlayerJumpEvent.Pre event)
     {
-        if (rotationsConfig.shouldApplyMoveFix())
+        if (rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF)
         {
             preJumpRotation = new Rotation(mc.player);
             if (hasClientRotation())
@@ -72,7 +70,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onJumpPost(PlayerJumpEvent.Post event)
     {
-        if (rotationsConfig.shouldApplyMoveFix())
+        if (rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF)
         {
             preJumpRotation.applyToPlayer();
         }
@@ -81,7 +79,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onPlayerVelocity(PlayerVelocityEvent event)
     {
-        if (hasClientRotation() && rotationsConfig.shouldApplyMoveFix())
+        if (hasClientRotation() && rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF)
         {
             event.cancel();
             event.setYaw(clientRotation.getYaw());
@@ -92,11 +90,10 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onPlayerInput(PlayerInputEvent event)
     {
-        if (!checkNull() && hasClientRotation() && rotationsConfig.shouldApplyMoveFix())
+        if (!checkNull() && hasClientRotation() && rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF)
         {
             float deltaYaw = mc.player.getYaw() - clientRotation.getYaw();
-            final Vec2f corrected = moveFix.correctMovement(rotationsConfig.shouldRoundMoveFix(),
-                    deltaYaw, event.getMovementForward(), event.getMovementSideways());
+            final Vec2f corrected = moveFix.correctMovement(deltaYaw, event.getMovementForward(), event.getMovementSideways());
             event.cancel();
             event.setMovementForward(corrected.y);
             event.setMovementSideways(corrected.x);
@@ -136,7 +133,7 @@ public class RotationManager extends GenericFeature
         Rotation playerRotation = new Rotation(mc.player);
         ClientRotationEvent rotationEvent = new ClientRotationEvent(playerRotation);
         EventBus.INSTANCE.dispatch(rotationEvent);
-        if (rotationEvent.isCanceled())
+        if (rotationEvent.isReceiveCanceled())
         {
             setClientRotation(rotationEvent.getRotation());
         } else if (hasClientRotation())
@@ -148,7 +145,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onMovementPackets(MovementPacketsEvent.Update event)
     {
-        if (rotationsConfig.syncTickRotation())
+        if (rotationsConfig.getTickSyncConfig().getValue())
         {
             event.cancel();
         }
@@ -157,7 +154,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onMovementPackets(MovementPacketsEvent.Send event)
     {
-        if (rotationsConfig.syncLookRotation())
+        if (rotationsConfig.getLookSyncConfig().getValue())
         {
             if (event.getPacket() instanceof PlayerMoveC2SPacket.PositionAndOnGround posGround)
             {
@@ -187,7 +184,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onTickPost(TickEvent.Post event)
     {
-        if (checkNull() || !rotationsConfig.showServerRotation())
+        if (checkNull() || !rotationsConfig.getRenderRotationsConfig().getValue())
         {
             return;
         }
@@ -199,7 +196,7 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onPlayerTransforms(PlayerTransformsEvent event)
     {
-        if (rotationsConfig.showServerRotation())
+        if (rotationsConfig.getRenderRotationsConfig().getValue())
         {
             event.cancel();
             event.setPitch(serverRotation.getPitch());

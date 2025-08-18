@@ -62,9 +62,8 @@ public class AntiAimModule extends Toggleable
             return;
         }
 
-
         current = new Rotation(getYaw(), getPitch());
-        event.cancel();
+        event.receiveCanceled();
         event.setRotation(current);
     }
 

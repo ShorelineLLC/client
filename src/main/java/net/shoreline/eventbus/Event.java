@@ -1,6 +1,7 @@
 package net.shoreline.eventbus;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.shoreline.eventbus.annotation.Cancelable;
 
 @Getter
@@ -10,6 +11,7 @@ public class Event
             getClass().isAnnotationPresent(Cancelable.class);
 
     private boolean canceled;
+    private boolean receiveCanceled;
 
     public void setCanceled(boolean cancel)
     {
@@ -19,6 +21,11 @@ public class Event
             return;
         }
         throw new IllegalStateException("Cannot set event canceled");
+    }
+
+    public void receiveCanceled()
+    {
+        receiveCanceled = true;
     }
 
     public void cancel()

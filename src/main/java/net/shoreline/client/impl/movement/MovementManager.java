@@ -10,6 +10,7 @@ import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.InteractSneakEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.client.AnticheatModule.MoveFix;
 import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.eventbus.EventBus;
@@ -44,7 +45,7 @@ public class MovementManager extends GenericFeature
         {
             playerInput = InputUtil.inputSneaking(playerInput, true);
 
-            if (anticheat.shouldApplyMoveFix())
+            if (anticheat.getMoveFixConfig().getValue() != MoveFix.OFF)
             {
                 float modifier = MathHelper.clamp(0.3f + (EnchantUtil.getLevel(Enchantments.SWIFT_SNEAK,
                         mc.player.getEquippedStack(EquipmentSlot.FEET)) * 0.15F), 0.0f, 1.0f);

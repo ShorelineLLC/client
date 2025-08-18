@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 public class EntityState
 {
     private final Entity entity;
+    private final int id;
 
     private final Vec3d pos;
     private final Vec3d eyePos;
@@ -23,6 +24,7 @@ public class EntityState
     public EntityState(Entity entity)
     {
         this.entity = entity;
+        this.id = entity.getId();
         this.pos = entity.getPos();
         this.eyePos = entity.getEyePos();
         this.boundingBox = entity.getBoundingBox();

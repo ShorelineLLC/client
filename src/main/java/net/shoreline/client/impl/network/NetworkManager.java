@@ -3,6 +3,7 @@ package net.shoreline.client.impl.network;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.network.SequencedPacketCreator;
+import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -91,7 +92,13 @@ public class NetworkManager extends GenericFeature
             return;
         }
 
-        packet.apply(handler);
+        if (mc.isOnThread())
+        {
+            packet.apply(handler);
+        } else
+        {
+            mc.executeSync(() -> packet.apply(handler));
+        }
     }
 
     public boolean wasSentFromClient(Packet<?> packet)

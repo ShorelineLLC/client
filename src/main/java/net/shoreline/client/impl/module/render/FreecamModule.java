@@ -149,7 +149,7 @@ public class FreecamModule extends Toggleable
             if (result instanceof BlockHitResult blockResult)
             {
                 float[] newAngles = RotationUtil.getRotationsTo(mc.player.getEyePos(), blockResult.getBlockPos().toCenterPos());
-                event.cancel();
+                event.receiveCanceled();
                 event.setYaw(newAngles[0]);
                 event.setPitch(newAngles[1]);
             }

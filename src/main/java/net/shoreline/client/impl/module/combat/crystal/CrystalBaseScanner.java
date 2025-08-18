@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
@@ -13,6 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.network.NetworkUtil;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.util.entity.PlayerUtil;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,8 +36,17 @@ public class CrystalBaseScanner extends CrystalEntityScanner
             return;
         }
 
+        float placeRange = autoCrystal.getPlaceRange().getValue();
+        double placeDist = getLocalEntity().getEyePos().squaredDistanceTo(pos.toCenterPos());
+        if (placeDist > placeRange * placeRange)
+        {
+            return;
+        }
+
         Vec3d explosionCenter = pos.toBottomCenterPos().add(0.0, 1.0, 0.0);
-        float local = CrystalUtil.getCrystalDamage(this, explosionCenter, getLocalEntity(), autoCrystal.getIgnoreTerrain().getValue());
+
+        float local = !PlayerUtil.isInSurvival(MinecraftClient.getInstance().player) ? 0.0f :
+                CrystalUtil.getCrystalDamage(this, explosionCenter, getLocalEntity(), autoCrystal.getIgnoreTerrain().getValue());
 
         boolean willKillPlayer = getLocalEntity().getTotalHealth() - local < 0.5f;
         if (local > autoCrystal.getMaxSelfDamage().getValue() || willKillPlayer)

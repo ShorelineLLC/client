@@ -22,6 +22,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.impl.module.combat.util.TickPriorities;
 import net.shoreline.client.impl.module.impl.CombatModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;
@@ -91,7 +92,7 @@ public class AuraModule extends CombatModule
         disable();
     }
 
-    @EventListener(priority = -1000)
+    @EventListener(priority = TickPriorities.KILL_AURA)
     public void onClientRotation(ClientRotationEvent event)
     {
         if (mc.player.isUsingItem() && !multitaskConfig.getValue())
@@ -109,7 +110,7 @@ public class AuraModule extends CombatModule
         Rotation rotation = new Rotation(rotations[0], rotations[1]);
         if (rotateConfig.getValue() == RotateMode.NORMAL)
         {
-            event.cancel();
+            event.receiveCanceled();
             event.setYaw(rotation.getYaw());
             event.setPitch(rotation.getPitch());
         } else if (rotateConfig.getValue() == RotateMode.SILENT)

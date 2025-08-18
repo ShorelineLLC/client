@@ -72,7 +72,7 @@ public class SprintModule extends MovementModule
         }
 
         float sprintYaw = InputUtil.getYawFromInput(mc.player.getYaw());
-        event.cancel();
+        event.receiveCanceled();
         event.setYaw(sprintYaw);
     }
 
@@ -103,7 +103,7 @@ public class SprintModule extends MovementModule
                 yaw -= 180.0f;
             }
 
-            event.cancel();
+            event.receiveCanceled();
             event.setYaw(yaw);
         }
     }

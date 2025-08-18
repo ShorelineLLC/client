@@ -28,6 +28,11 @@ public final class EventBus
 
         while (current != null)
         {
+            if (event.isReceiveCanceled())
+            {
+                return;
+            }
+
             current.invoker.invoke(event);
             current = current.next;
         }
