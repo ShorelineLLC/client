@@ -103,22 +103,6 @@ public class RotationManager extends GenericFeature
         }
     }
 
-//    @EventListener
-//    public void onPacketInbound(PacketEvent.Inbound event)
-//    {
-//        if (checkNull())
-//        {
-//            return;
-//        }
-//
-//        if (event.getPacket() instanceof PlayerPositionLookS2CPacket
-//                || event.getPacket() instanceof EntityS2CPacket packet && packet.getEntity(mc.world) == mc.player
-//                || event.getPacket() instanceof EntityPositionS2CPacket packet1 && mc.world.getEntityById(packet1.entityId()) == mc.player)
-//        {
-//            handler.onRotationInbound();
-//        }
-//    }
-
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event)
     {
@@ -131,7 +115,6 @@ public class RotationManager extends GenericFeature
         {
             serverRotation.setYaw(packet.getYaw(0.0f));
             serverRotation.setPitch(packet.getPitch(0.0f));
-            handler.onRotationOutbound(packet);
         }
     }
 
@@ -190,7 +173,9 @@ public class RotationManager extends GenericFeature
             {
                 event.cancel();
                 event.setPacket(new PlayerMoveC2SPacket.Full(
-                        mc.player.getX(), mc.player.getY(), mc.player.getZ(),
+                        mc.player.getX(),
+                        mc.player.getY(),
+                        mc.player.getZ(),
                         lookGround.getYaw(0.0f),
                         lookGround.getPitch(0.0f),
                         mc.player.isOnGround(),
@@ -229,9 +214,13 @@ public class RotationManager extends GenericFeature
     {
         setClientRotation(rotation);
         Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
-                mc.player.getX(), mc.player.getY(), mc.player.getZ(),
-                rotation.getYaw(), rotation.getPitch(),
-                mc.player.isOnGround(), mc.player.horizontalCollision));
+                mc.player.getX(),
+                mc.player.getY(),
+                mc.player.getZ(),
+                rotation.getYaw(),
+                rotation.getPitch(),
+                mc.player.isOnGround(),
+                mc.player.horizontalCollision));
     }
 
     public void clearClientRotation()

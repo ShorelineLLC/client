@@ -23,7 +23,7 @@ import java.util.List;
 public class ScaffoldModule extends PlacerModule
 {
     Config<Boolean> keepYConfig = new BooleanConfig.Builder("KeepY")
-            .setDescription("Maintains the y height")
+            .setDescription("Maintains the player's y height")
             .setDefaultValue(false).build();
 
     private int groundPosY = Integer.MIN_VALUE;
@@ -79,7 +79,7 @@ public class ScaffoldModule extends PlacerModule
 
         for (BlockPos blockPos : placements)
         {
-            placeBlock(blockPos, currentScaffoldBlock);
+            placeBlock(blockPos, currentScaffoldBlock, false);
             lastPlacement = blockPos;
         }
 
@@ -111,7 +111,7 @@ public class ScaffoldModule extends PlacerModule
         List<BlockPos> placements = new ArrayList<>();
         placements.add(playerPos);
 
-        if (lastPlacement == null)
+        if (lastPlacement == null || AirPlaceModule.INSTANCE.isEnabled())
         {
             return placements;
         }

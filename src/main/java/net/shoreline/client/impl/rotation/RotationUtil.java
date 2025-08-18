@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.rotation;
 
 import lombok.experimental.UtilityClass;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -10,10 +11,17 @@ public class RotationUtil
     public float[] getRotationsTo(Vec3d src, Vec3d dest)
     {
         float yaw = (float) (Math.toDegrees(Math.atan2(dest.subtract(src).z,
-                dest.subtract(src).x)) - 90);
+                dest.subtract(src).x)) - 90.0f);
         float pitch = (float) Math.toDegrees(-Math.atan2(dest.subtract(src).y,
                 Math.hypot(dest.subtract(src).x, dest.subtract(src).z)));
-        return new float[] { MathHelper.wrapDegrees(yaw), MathHelper.wrapDegrees(pitch) };
+
+        float playerYaw = MinecraftClient.getInstance().player.getYaw();
+        float playerPitch = MinecraftClient.getInstance().player.getPitch();
+
+        float yaw1 = playerYaw + MathHelper.wrapDegrees(yaw - playerYaw);
+        float pitch1 = playerPitch + MathHelper.wrapDegrees(pitch - playerPitch);
+
+        return new float[] { yaw1, MathHelper.clamp(pitch1, -90.0f, 90.0f) };
     }
 
     public Vec3d getRotationVector(float yaw, float pitch)

@@ -40,11 +40,17 @@ public class PlacerModule extends ListeningToggleable
 
     protected void placeBlock(BlockPos placePos, Block block)
     {
+        placeBlock(placePos, block, true);
+    }
+
+    protected void placeBlock(BlockPos placePos, Block block, boolean packetPlace)
+    {
         final Interaction interaction = Interaction.builder()
                 .pos(placePos)
                 .direction(InteractDirection.getInteractDirection(placePos))
                 .hand(Hand.MAIN_HAND)
                 .block(block)
+                .packetPlace(packetPlace)
                 .build();
 
         Managers.INTERACT.placeBlock(interaction);

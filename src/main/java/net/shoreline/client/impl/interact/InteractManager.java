@@ -9,7 +9,6 @@ import net.minecraft.item.Item;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.PlayerInput;
@@ -22,15 +21,13 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
-import net.shoreline.eventbus.EventBus;
-import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,22 +47,23 @@ public class InteractManager extends GenericFeature
     public InteractManager()
     {
         super("Interactions");
-        EventBus.INSTANCE.subscribe(this);
-    }
-
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && !packet.getState().isAir())
-        {
-            placedBlocks.remove(packet.getPos());
-        }
     }
 
     public void placeBlock(Interaction interaction)
     {
         final BlockPos blockPos = interaction.getPos();
         if (!mc.world.isInBuildLimit(blockPos))
+        {
+            return;
+        }
+
+        placedBlocks.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
+        if (placedBlocks.size() >= anticheat.getBlocksPerTick() * 20)
+        {
+            return;
+        }
+
+        if (System.currentTimeMillis() - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay())
         {
             return;
         }
@@ -85,18 +83,6 @@ public class InteractManager extends GenericFeature
     public boolean canPlaceBlock(BlockPos blockPos, Block block)
     {
         return getCrystalsBlocking(blockPos, block).isEmpty();
-    }
-
-    private boolean checkBlockDelay(BlockPos blockPos)
-    {
-        int bps = anticheat.getBlocksPerTick() * 20;
-        long currTime = System.currentTimeMillis();
-        if (placedBlocks.values().stream().filter(x -> currTime - x <= 1000L).count() >= bps)
-        {
-            return true;
-        }
-
-        return currTime - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay();
     }
 
     public List<EndCrystalEntity> getCrystalsBlocking(BlockPos blockPos, Block block)
@@ -197,11 +183,6 @@ public class InteractManager extends GenericFeature
         }
     }
 
-    public boolean startPlacement(Item blockItem)
-    {
-        return startPlacement(InventoryUtil.getItemSlot(blockItem));
-    }
-
     public boolean startPlacement(int slot)
     {
         if (placementLock || slot == -1)
@@ -214,7 +195,7 @@ public class InteractManager extends GenericFeature
             return false;
         }
 
-        if (!Managers.INVENTORY.startSwap(slot))
+        if (!Managers.INVENTORY.startSwap(slot, SilentSwapType.HOTBAR))
         {
             return false;
         }

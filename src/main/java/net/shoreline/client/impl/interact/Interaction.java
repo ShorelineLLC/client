@@ -20,8 +20,10 @@ public class Interaction
     private final BlockPos pos;
     private final Hand hand;
 
-    private Direction direction;
+    @Builder.Default
     private final boolean packetPlace = true;
+
+    private Direction direction;
 
     public BlockState getState()
     {

@@ -11,28 +11,6 @@ public class ServerRotationHandler
     @Getter
     private Rotation cachedRotation;
 
-    public void onRotationOutbound(PlayerMoveC2SPacket packet)
-    {
-        if (Managers.ROTATION.hasClientRotation())
-        {
-            Rotation rotation = Managers.ROTATION.getClientRotation();
-            ((IPlayerMoveC2SPacket) packet).setYaw(rotation.getYaw());
-            ((IPlayerMoveC2SPacket) packet).setPitch(rotation.getPitch());
-        }
-    }
-
-    public void onRotationInbound(ClientPlayerEntity player)
-    {
-        if (!Managers.ROTATION.hasClientRotation())
-        {
-            return;
-        }
-
-        Rotation rotation = Managers.ROTATION.getClientRotation();
-        rotation.apply(player);
-        Managers.ROTATION.clearClientRotation();
-    }
-
     public void onPacketUpdatePre(ClientPlayerEntity player)
     {
         if (player == null || !Managers.ROTATION.hasClientRotation())

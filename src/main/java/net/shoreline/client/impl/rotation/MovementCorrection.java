@@ -17,6 +17,7 @@ public class MovementCorrection
             f = Math.round(f);
             g = Math.round(g);
         }
-        return new Vec2f(g, f).normalize();
+
+        return new Vec2f(g, f);
     }
 }
