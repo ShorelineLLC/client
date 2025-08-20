@@ -324,7 +324,7 @@ public class AutoCrystalModule extends ListeningToggleable
 
         for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
         {
-            if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getCenter()) < 144.0)
+            if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getCenter()) <= 144.0)
             {
                 mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
                 attackPackets.remove(entity.getId());

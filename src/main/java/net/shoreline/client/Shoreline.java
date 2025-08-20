@@ -1,5 +1,6 @@
 package net.shoreline.client;
 
+import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.impl.file.ModConfiguration;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.loader.Loader;
@@ -34,6 +35,12 @@ public class Shoreline
 
         SHUTDOWN = new ShutdownHook();
         Runtime.getRuntime().addShutdownHook(SHUTDOWN);
+    }
+
+    public static void postInit()
+    {
+        FontManager.init();
+        Managers.postInit();
     }
 
     public static void info(String message)

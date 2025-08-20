@@ -11,6 +11,7 @@ import net.shoreline.client.impl.command.CommandManager;
 import net.shoreline.client.impl.mining.MiningManager;
 import net.shoreline.client.impl.movement.MovementManager;
 import net.shoreline.client.impl.interact.InteractManager;
+import net.shoreline.client.impl.render.ShaderManager;
 import net.shoreline.client.impl.rotation.RotationManager;
 import net.shoreline.client.impl.module.ModuleManager;
 import net.shoreline.client.impl.inventory.InventoryManager;
@@ -33,6 +34,7 @@ public class Managers
     public static TotemManager TOTEM;
     public static KitManager KIT;
     public static CrystalCalcManager CRYSTAL;
+    public static ShaderManager SHADER;
 
     public static void init()
     {
@@ -51,5 +53,10 @@ public class Managers
         TOTEM = new TotemManager();
         KIT = new KitManager();
         CRYSTAL = new CrystalCalcManager();
+    }
+
+    public static void postInit()
+    {
+        SHADER = new ShaderManager();
     }
 }

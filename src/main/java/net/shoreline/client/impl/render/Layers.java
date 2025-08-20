@@ -14,7 +14,7 @@ public class Layers
 {
     public static Identifier GLINT = Identifier.of("shoreline", "textures/shine.png");
 
-    public static RenderLayer.MultiPhase QUADS_GLINT = RenderLayer.of(
+    public static final RenderLayer.MultiPhase QUADS_GLINT = RenderLayer.of(
             "shoreline_quads_glint", VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 1536, false, true,
             RenderLayer.MultiPhaseParameters.builder()
                     .program(Programs.GLINT)

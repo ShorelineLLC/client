@@ -86,6 +86,7 @@ public class ModuleManager
                 new NoBobModule(),
                 new NoRenderModule(),
                 new NoWeatherModule(),
+                new ShadersModule(),
                 new SwingModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),

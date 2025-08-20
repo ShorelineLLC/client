@@ -15,6 +15,7 @@ import net.minecraft.util.PlayerInput;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -139,6 +140,8 @@ public class InteractManager extends GenericFeature
             return;
         }
 
+        Vec3d eyePos = mc.player.getEyePos();
+        Box box = new Box(interaction.getPos());
         BlockPos blockPos = interaction.getPos().offset(direction.getOpposite());
 
         PlayerInput playerInput = mc.player.input.playerInput;
@@ -152,11 +155,11 @@ public class InteractManager extends GenericFeature
         Vec3d interactionVec = blockPos.toCenterPos().add(interaction.getHitVec());
         if (anticheat.getInteractRotate().getValue())
         {
-            float[] rots = RotationUtil.getRotationsTo(mc.player.getEyePos(), interactionVec);
+            float[] rots = RotationUtil.getRotationsTo(eyePos, interactionVec);
             Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
         }
 
-        BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, false);
+        BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
         if (interaction.isPacketPlace())
         {
             Hand finalHand = hand;
@@ -167,7 +170,7 @@ public class InteractManager extends GenericFeature
             actionResult = mc.interactionManager.interactBlock(mc.player, hand, result);
         }
 
-        if (actionResult instanceof ActionResult.Success r && r.swingSource() == ActionResult.SwingSource.CLIENT)
+        if (actionResult instanceof ActionResult.Success)
         {
             Managers.NETWORK.sendPacket(new HandSwingC2SPacket(interaction.getHand()));
         }

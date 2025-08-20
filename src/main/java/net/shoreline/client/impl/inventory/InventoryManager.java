@@ -40,7 +40,6 @@ public class InventoryManager extends GenericFeature
     private int serverSlot;
 
     private final Lock swapLock = new ReentrantLock();
-    private final Lock clickLock = new ReentrantLock();
 
     public InventoryManager()
     {
@@ -255,28 +254,20 @@ public class InventoryManager extends GenericFeature
 
         int slot1 = InventoryUtil.getPacketSlotIndex(fromSlot);
 
-        clickLock.lock();
-        try
+        if (!handler.getCursorStack().getItem().equals(item))
         {
-            if (!handler.getCursorStack().getItem().equals(item))
-            {
-                mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
-            }
-
-            if (handler.getCursorStack().getItem().equals(item))
-            {
-                int slot = InventoryUtil.getPacketSlotIndex(toSlot);
-                mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
-            }
-
-            if (!handler.getCursorStack().isEmpty())
-            {
-                mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
-            }
+            mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
         }
-        finally
+
+        if (handler.getCursorStack().getItem().equals(item))
         {
-            clickLock.unlock();
+            int slot = InventoryUtil.getPacketSlotIndex(toSlot);
+            mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
+        }
+
+        if (!handler.getCursorStack().isEmpty())
+        {
+            mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
         }
     }
 

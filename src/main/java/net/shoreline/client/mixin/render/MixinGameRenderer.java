@@ -1,15 +1,17 @@
 package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.util.ObjectAllocator;
+import net.minecraft.client.util.Pool;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
-import net.shoreline.client.impl.event.render.RenderBlockOutlineEvent;
-import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
-import net.shoreline.client.impl.event.render.RenderNauseaEvent;
-import net.shoreline.client.impl.event.render.TiltViewEvent;
+import net.shoreline.client.impl.event.render.*;
+import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,8 +19,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
-public class MixinGameRenderer
+public abstract class MixinGameRenderer implements IGameRenderer
 {
+    @Override
+    @Accessor("pool")
+    public abstract Pool getPool();
+
     @Inject(method = "tiltViewWhenHurt", at = @At(value = "HEAD"), cancellable = true)
     private void hookTiltViewWhenHurt(MatrixStack matrices,
                                       float tickDelta,
@@ -30,6 +36,18 @@ public class MixinGameRenderer
         {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V",
+            shift = At.Shift.AFTER))
+    private void hookRenderWorldSwap(RenderTickCounter tickCounter,
+                                     CallbackInfo info)
+    {
+        RenderShaderEvent.Post shaderEvent = new RenderShaderEvent.Post();
+        RenderEntityWorldEvent.Post renderEntityEvent = new RenderEntityWorldEvent.Post();
+        EventBus.INSTANCE.dispatch(shaderEvent);
+        EventBus.INSTANCE.dispatch(renderEntityEvent);
     }
 
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE",

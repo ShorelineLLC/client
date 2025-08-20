@@ -57,14 +57,12 @@ public class MovementModule extends Toggleable
         if (forward == 0.0f && strafe == 0.0f)
         {
             return Vec2f.ZERO;
-        }
-        else if (forward != 0.0f)
+        } else if (forward != 0.0f)
         {
             if (strafe > 0.0)
             {
                 yaw += forward > 0.0 ? -45 : 45;
-            }
-            else if (strafe < 0.0)
+            } else if (strafe < 0.0)
             {
                 yaw += forward > 0.0 ? 45 : -45;
             }
@@ -73,12 +71,12 @@ public class MovementModule extends Toggleable
             if (forward > 0.0)
             {
                 forward = 1.0f;
-            }
-            else if (forward < 0.0)
+            } else if (forward < 0.0)
             {
                 forward = -1.0f;
             }
         }
+
         float cos = (float) Math.cos(Math.toRadians(yaw));
         float sin = (float) -Math.sin(Math.toRadians(yaw));
         return new Vec2f((forward * speed * sin) + (strafe * speed * cos),

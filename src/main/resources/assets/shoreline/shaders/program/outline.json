@@ -5,8 +5,8 @@
     "srcrgb": "srcalpha",
     "dstrgb": "1-srcalpha"
   },
-  "vertex": "sobel",
-  "fragment": "shoreline:outline",
+  "vertex": "minecraft:post/sobel",
+  "fragment": "shoreline:program/outline",
   "attributes": [
     "Position"
   ],

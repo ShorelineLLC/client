@@ -1,16 +1,11 @@
 package net.shoreline.client.impl.module.impl;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.Window;
-import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.hud.Anchor;
-import net.shoreline.client.impl.Managers;
 
 public abstract class HudModule extends RenderModule
 {

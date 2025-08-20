@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.impl.event.OpenScreenEvent;
 import net.shoreline.client.impl.event.TickEvent;
@@ -42,7 +43,7 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
     private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext,
                                     CallbackInfoReturnable<Runnable> cir)
     {
-        FontManager.init();
+        Shoreline.postInit();
     }
 
     @Inject(method = "joinWorld", at = @At(value = "TAIL"))
