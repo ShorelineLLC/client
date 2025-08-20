@@ -25,12 +25,12 @@ public class RenderModule extends Toggleable
         super(name, nameAliases, description, category);
     }
 
-    protected void drawText(MatrixStack matrices, Text text, int x, int y)
+    public void drawText(MatrixStack matrices, Text text, float x, float y)
     {
         drawText(matrices, text, x, y, -1);
     }
 
-    protected void drawText(MatrixStack matrices, Text text, int x, int y, int color)
+    public void drawText(MatrixStack matrices, Text text, float x, float y, int color)
     {
         if (text.getString().isEmpty())
         {
@@ -47,7 +47,7 @@ public class RenderModule extends Toggleable
         mc.getBufferBuilders().getEntityVertexConsumers().draw();
     }
 
-    protected int getTextWidth(Text text)
+    public int getTextWidth(Text text)
     {
         if (text.getString().isEmpty())
         {

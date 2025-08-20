@@ -7,7 +7,7 @@ import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;

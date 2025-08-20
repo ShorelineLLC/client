@@ -159,7 +159,7 @@ public enum Easing
                 @Override
                 public double ease(double factor)
                 {
-                    return Math.min(0, Math.pow(2, 10 * factor - 10));
+                    return factor == 0 ? 0 : Math.pow(2, 10 * factor - 10);
                 }
             },
     EXPO_OUT
@@ -167,7 +167,7 @@ public enum Easing
                 @Override
                 public double ease(double factor)
                 {
-                    return Math.max(1 - Math.pow(2, -10 * factor), 1);
+                    return factor == 1 ? 1 : 1 - Math.pow(2, -10 * factor);
                 }
             },
     EXPO_IN_OUT

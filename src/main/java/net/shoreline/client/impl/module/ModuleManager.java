@@ -7,11 +7,8 @@ import net.shoreline.client.impl.module.combat.*;
 import net.shoreline.client.impl.module.exploit.AntiHungerModule;
 import net.shoreline.client.impl.module.exploit.FastLatencyModule;
 import net.shoreline.client.impl.module.exploit.PhaseModule;
-import net.shoreline.client.impl.module.hud.CrosshairHudModule;
-import net.shoreline.client.impl.module.hud.FPSHudModule;
-import net.shoreline.client.impl.module.hud.SpeedHudModule;
-import net.shoreline.client.impl.module.hud.WatermarkHudModule;
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.hud.*;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.impl.module.misc.*;
 import net.shoreline.client.impl.module.movement.*;
 import net.shoreline.client.impl.module.render.*;
@@ -103,7 +100,8 @@ public class ModuleManager
                 // HUD
                 new FPSHudModule(),
                 new SpeedHudModule(),
-                new WatermarkHudModule()
+                new WatermarkHudModule(),
+                new ArrayListHudModule()
         );
 
         for (Module module : getAllModules())

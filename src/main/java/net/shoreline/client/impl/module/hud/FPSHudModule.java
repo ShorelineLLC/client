@@ -2,7 +2,7 @@ package net.shoreline.client.impl.module.hud;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.util.math.PerSecond;
 
 public class FPSHudModule extends HudModule

@@ -5,8 +5,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.client.HudGuiModule;
@@ -15,7 +16,6 @@ import net.shoreline.client.impl.render.ColorUtil;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -215,17 +215,17 @@ public class HudGuiScreen extends Screen
                     continue;
                 }
 
-                hudModule.setX((int) anchor.getX(MinecraftClient.getInstance().getWindow().getScaledWidth(), hudModule.getWidth()));
+                hudModule.setX((int) anchor.getX(MinecraftClient.getInstance().getWindow().getScaledWidth(), hudModule.getHudModule().getWidth()));
                 switch (anchor)
                 {
                     case Top_Left:
                     case Top_Right:
                         hudModule.setY(currentY);
-                        currentY += hudModule.getHeight();
+                        currentY += hudModule.getHudModule().getHeight();
                         break;
                     case Bottom_Left:
                     case Bottom_Right:
-                        hudModule.setY(currentY -= hudModule.getHeight());
+                        hudModule.setY(currentY -= hudModule.getHudModule().getHeight());
                         break;
                 }
             }

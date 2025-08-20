@@ -1,0 +1,97 @@
+package net.shoreline.client.impl.module.impl.hud;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.UnboundAnimation;
+
+import java.util.function.Supplier;
+
+@Getter
+@Setter
+public class DynamicEntry
+{
+    private final DynamicHudModule module;
+    private final Supplier<String> text;
+    private final Supplier<Boolean> drawing;
+    private final UnboundAnimation animation;
+    private final Animation yAnimation; // y animation should never go out of bounds.
+
+    private int lastWidth;
+    private boolean modify;
+
+    public DynamicEntry(DynamicHudModule mod, Supplier<String> text, Supplier<Boolean> drawing)
+    {
+        this.module = mod;
+        this.text = text;
+        this.drawing = drawing;
+        this.animation = new UnboundAnimation(300, Easing.EXPO_OUT);
+        this.yAnimation = new Animation(false, 150);
+    }
+
+    public void draw(DrawContext context, float x, float y, float currentOffset)
+    {
+        boolean left = getModule().isLeft();
+        getModule().setOffset((int) (currentOffset + (10 * yAnimation.getFactor())));
+
+        Text current = Text.of(text.get());
+        int width = getModule().getTextWidth(current);
+        float renderX = (int) (x + animation.get() - (left ? width : 0));
+        float renderY = (int) (y + currentOffset);
+        getModule().drawText(context.getMatrices(), current, renderX, renderY);
+
+        if (drawing.get())
+        {
+            width = left ? width : -width;
+            if (width > lastWidth)
+            {
+                animation.setEasing(Easing.EXPO_IN);
+            }
+            else
+            {
+                animation.setEasing(Easing.EXPO_OUT);
+            }
+
+            lastWidth = width;
+            animation.get(width);
+            yAnimation.setState(true);
+            modify = true;
+        }
+        else
+        {
+            if (!isDone())
+            {
+                if (modify)
+                {
+                    animation.setPrev(animation.get());
+                    modify = false;
+                }
+
+                animation.setEasing(Easing.EXPO_IN);
+                animation.get(left ? -width + width - 2.0f : 2.0f);
+                if (animation.getFactor() > 0.1)
+                {
+                    yAnimation.setState(false);
+                }
+            }
+        }
+    }
+
+    public boolean isDrawing()
+    {
+        return drawing.get();
+    }
+
+    public boolean isDone()
+    {
+        Text current = Text.of(text.get());
+        int width = getModule().getTextWidth(current);
+        return yAnimation.getFactor() < 0.01 && (getModule().isLeft())
+                ? animation.get() == -width + width - 2.0f // i know this looks chinese
+                : animation.get() == 2.0f;
+    }
+}

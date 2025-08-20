@@ -4,7 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.shoreline.client.BuildConfig;
 import net.shoreline.client.ShorelineMod;
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 
 public class WatermarkHudModule extends HudModule
 {

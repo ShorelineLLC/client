@@ -6,8 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.gui.Interactable;
-import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.impl.render.Animation;
@@ -98,53 +97,47 @@ public class HudComponent extends DrawableComponent implements Interactable
     @Override
     public void charTyped(char chr, int modifiers) {}
 
-    private void updateAnchor()
-    {
+    private void updateAnchor() {
         Window resolution = mc.getWindow();
-        float offset = 7;
-        boolean nearLeft = x <= offset + 1;
-        boolean nearRight = y >= resolution.getScaledWidth() - getWidth() - offset - 1;
-        boolean nearTop = x <= offset + 1;
-        boolean nearBottom = y >= resolution.getScaledHeight() - getHeight() - offset - 1;
+        float offset = 10;
 
-        float centerX = resolution.getScaledWidth() / 2.0f;
+        float x = getX();
+        float y = getY();
+        float width = getWidth();
+        float height = getHeight();
+
+        float screenWidth = resolution.getScaledWidth();
+        float screenHeight = resolution.getScaledHeight();
+
+        boolean nearLeft = x <= offset;
+        boolean nearRight = x >= screenWidth - width - offset;
+        boolean nearTop = y <= offset;
+        boolean nearBottom = y >= screenHeight - height - offset;
+
+        float centerX = screenWidth / 2.0f;
         boolean nearTopMiddle = nearTop
                 && !nearLeft
                 && !nearRight
-                && Math.abs((getX() + getWidth() / 2.0f) - centerX) <= offset + 1;
+                && Math.abs((x + width / 2.0f) - centerX) <= offset;
 
         Anchor found;
-        if (nearLeft && nearTop)
-        {
+        if (nearLeft && nearTop) {
             found = Anchor.Top_Left;
-        }
-        else if (nearRight && nearTop)
-        {
+        } else if (nearRight && nearTop) {
             found = Anchor.Top_Right;
-        }
-        else if (nearLeft && nearBottom)
-        {
+        } else if (nearLeft && nearBottom) {
             found = Anchor.Bottom_Left;
-        }
-        else if (nearRight && nearBottom)
-        {
+        } else if (nearRight && nearBottom) {
             found = Anchor.Bottom_Right;
-        }
-        else if (nearTopMiddle)
-        {
+        } else if (nearTopMiddle) {
             found = Anchor.Middle;
-        }
-        else
-        {
+        } else {
             index = 0;
             anchor = Anchor.None;
             return;
         }
 
-        if (getAnchor() != null)
-        {
-            index = Integer.MAX_VALUE;
-            anchor = found;
-        }
+        index = Integer.MAX_VALUE;
+        anchor = found;
     }
 }

@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.impl;
+package net.shoreline.client.impl.module.impl.hud;
 
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.config.Config;
@@ -6,6 +6,7 @@ import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.hud.Anchor;
+import net.shoreline.client.impl.module.impl.RenderModule;
 
 public abstract class HudModule extends RenderModule
 {
@@ -16,11 +17,9 @@ public abstract class HudModule extends RenderModule
             .setDefaultValue(0)
             .setVisible(() -> false).build();
     Config<Integer> index = new NumberConfig.Builder<Integer>("Index")
-            .setDefaultValue(0)
-            .setVisible(() -> false).build();
+            .setMin(0).setMax(100).setDefaultValue(0).build();
     Config<Anchor> anchor = new EnumConfig.Builder<Anchor>("Anchor")
             .setValues(Anchor.values())
-            .setVisible(() -> false)
             .setDefaultValue(Anchor.None).build();
 
     public HudModule(String name, String description, int x, int y)

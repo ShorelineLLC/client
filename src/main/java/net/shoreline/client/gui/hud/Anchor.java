@@ -37,7 +37,7 @@ public enum Anchor
                     @Override
                     public float getX(float screenWidth, float elementWidth)
                     {
-                        return screenWidth;
+                        return screenWidth - elementWidth;
                     }
 
                     @Override
@@ -75,7 +75,7 @@ public enum Anchor
                     @Override
                     public float getX(float screenWidth, float elementWidth)
                     {
-                        return screenWidth;
+                        return screenWidth - elementWidth;
                     }
 
                     @Override

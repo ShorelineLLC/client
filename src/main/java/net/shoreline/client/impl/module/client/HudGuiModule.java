@@ -2,16 +2,12 @@ package net.shoreline.client.impl.module.client;
 
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.gui.hud.HudGuiScreen;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 
 public class HudGuiModule extends ListeningToggleable
 {

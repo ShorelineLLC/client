@@ -1,6 +1,6 @@
 package net.shoreline.client.gui.hud;
 
-import net.shoreline.client.impl.module.impl.HudModule;
+import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.gui.clickgui.ComponentFactory;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
