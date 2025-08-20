@@ -57,7 +57,7 @@ public class HudGuiModule extends ListeningToggleable
             return;
         }
 
-        HudGuiScreen.INSTANCE.runAnchorTick();
+        HudGuiScreen.INSTANCE.runAnchorTick(true);
         for (HudModule hudModule : Managers.MODULES.getHudModules())
         {
             if (hudModule.isEnabled())

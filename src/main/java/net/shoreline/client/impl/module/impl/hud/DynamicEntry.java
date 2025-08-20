@@ -36,12 +36,15 @@ public class DynamicEntry
     public void draw(DrawContext context, float x, float y, float currentOffset)
     {
         boolean left = getModule().isLeft();
+        boolean top = getModule().isTop();
+        float paddingX = left ? 2 : -2;
+        float paddingY = top ? 2 : -2;
         getModule().setOffset((int) (currentOffset + (10 * yAnimation.getFactor())));
 
         Text current = Text.of(text.get());
         int width = getModule().getTextWidth(current);
-        float renderX = (int) (x + animation.get() - (left ? width : 0));
-        float renderY = (int) (y + currentOffset);
+        float renderX = (int) (x + animation.get() - (left ? width : 0)) + paddingX;
+        float renderY = (int) (y + currentOffset) + paddingY;
         getModule().drawText(context.getMatrices(), current, renderX, renderY);
 
         if (drawing.get())

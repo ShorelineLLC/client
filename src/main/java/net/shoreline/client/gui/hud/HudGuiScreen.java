@@ -86,7 +86,7 @@ public class HudGuiScreen extends Screen
 
         hudFrame.drawComponent(context, mouseX, mouseY, deltaTicks);
 
-        runAnchorTick();
+        runAnchorTick(false);
         for (HudComponent component : hudComponents)
         {
             if (!draggingMouse && mouse.isHovering(component.getX(), component.getY(), component.getWidth(), component.getHeight()) && mouse.isLeftHeld())
@@ -178,7 +178,7 @@ public class HudGuiScreen extends Screen
         super.close();
     }
 
-    public void runAnchorTick()
+    public void runAnchorTick(boolean modifyComponent)
     {
         for (Anchor anchor : Anchor.values())
         {
@@ -208,6 +208,7 @@ public class HudGuiScreen extends Screen
                 }
 
                 hudModule.setIndex(i);
+                hudModule.getHudModule().setIndex(i);
                 i++;
 
                 if (!hudModule.getHudModule().isEnabled())
@@ -215,17 +216,17 @@ public class HudGuiScreen extends Screen
                     continue;
                 }
 
-                hudModule.setX((int) anchor.getX(MinecraftClient.getInstance().getWindow().getScaledWidth(), hudModule.getHudModule().getWidth()));
+                hudModule.setX(modifyComponent, (int) anchor.getX(MinecraftClient.getInstance().getWindow().getScaledWidth(), hudModule.getHudModule().getWidth()));
                 switch (anchor)
                 {
                     case Top_Left:
                     case Top_Right:
-                        hudModule.setY(currentY);
+                        hudModule.setY(modifyComponent, currentY);
                         currentY += hudModule.getHudModule().getHeight();
                         break;
                     case Bottom_Left:
                     case Bottom_Right:
-                        hudModule.setY(currentY -= hudModule.getHudModule().getHeight());
+                        hudModule.setY(modifyComponent, currentY -= hudModule.getHudModule().getHeight());
                         break;
                 }
             }

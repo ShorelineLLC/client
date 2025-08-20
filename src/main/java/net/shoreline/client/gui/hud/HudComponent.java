@@ -97,7 +97,8 @@ public class HudComponent extends DrawableComponent implements Interactable
     @Override
     public void charTyped(char chr, int modifiers) {}
 
-    private void updateAnchor() {
+    private void updateAnchor()
+    {
         Window resolution = mc.getWindow();
         float offset = 10;
 
@@ -121,17 +122,28 @@ public class HudComponent extends DrawableComponent implements Interactable
                 && Math.abs((x + width / 2.0f) - centerX) <= offset;
 
         Anchor found;
-        if (nearLeft && nearTop) {
+        if (nearLeft && nearTop)
+        {
             found = Anchor.Top_Left;
-        } else if (nearRight && nearTop) {
+        }
+        else if (nearRight && nearTop)
+        {
             found = Anchor.Top_Right;
-        } else if (nearLeft && nearBottom) {
+        }
+        else if (nearLeft && nearBottom)
+        {
             found = Anchor.Bottom_Left;
-        } else if (nearRight && nearBottom) {
+        }
+        else if (nearRight && nearBottom)
+        {
             found = Anchor.Bottom_Right;
-        } else if (nearTopMiddle) {
+        }
+        else if (nearTopMiddle)
+        {
             found = Anchor.Middle;
-        } else {
+        }
+        else
+        {
             index = 0;
             anchor = Anchor.None;
             return;
@@ -139,5 +151,29 @@ public class HudComponent extends DrawableComponent implements Interactable
 
         index = Integer.MAX_VALUE;
         anchor = found;
+    }
+
+    public void setX(boolean module, int x)
+    {
+        if (module)
+        {
+            getHudModule().setX(x);
+        }
+        else
+        {
+            this.x = x;
+        }
+    }
+
+    public void setY(boolean module, int y)
+    {
+        if (module)
+        {
+            getHudModule().setY(y);
+        }
+        else
+        {
+            this.y = y;
+        }
     }
 }
