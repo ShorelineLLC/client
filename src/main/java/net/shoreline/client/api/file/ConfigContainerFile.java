@@ -52,6 +52,7 @@ public class ConfigContainerFile extends JsonConfigFile
             {
                 continue;
             }
+
             final JsonElement id = configObj.get("id");
             Config<?> config = container.getConfig(id.getAsString());
             if (config == null || config instanceof ConfigGroup)

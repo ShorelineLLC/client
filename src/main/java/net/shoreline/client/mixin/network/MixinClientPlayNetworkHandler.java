@@ -3,8 +3,11 @@ package net.shoreline.client.mixin.network;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.event.network.EntitySpawnEvent;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.RotationUpdateEvent;
 import net.shoreline.client.impl.imixin.IClientConnection;
@@ -64,6 +67,16 @@ public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNet
             ci.cancel();
             client.player.addVelocityInternal(event.getPlayerVelocity());
         }
+    }
+
+    @Inject(method = "onEntitySpawn", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V",
+            shift = At.Shift.AFTER))
+    private void hookEntitySpawn(EntitySpawnS2CPacket packet, CallbackInfo ci)
+    {
+        EntitySpawnEvent event = new EntitySpawnEvent(new Vec3d(packet.getX(), packet.getY(), packet.getZ()),
+                packet.getEntityId(), packet.getEntityType());
+        EventBus.INSTANCE.dispatch(event);
     }
 
     @Override

@@ -5,7 +5,6 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.combat.HoleBlockType;
 import net.shoreline.client.impl.combat.HoleData;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Animation;
@@ -67,12 +66,6 @@ public class HoleESPModule extends RenderModule
     {
         super("HoleESP", "Highlights safe holes around you", GuiCategory.RENDER);
         INSTANCE = this;
-    }
-
-    @EventListener
-    public void onTick(TickEvent.Pre event)
-    {
-
     }
 
     @EventListener

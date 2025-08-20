@@ -57,7 +57,10 @@ public class ModuleManager
                 new PhaseModule(),
                 // Misc
                 new AntiAimModule(),
+                new AutoFishModule(),
                 new AutoRespawnModule(),
+                new BetterChatModule(),
+                new BetterInvModule(),
                 new ChestSwapModule(),
                 new FakePlayerModule(),
                 new MiddleClickModule(),

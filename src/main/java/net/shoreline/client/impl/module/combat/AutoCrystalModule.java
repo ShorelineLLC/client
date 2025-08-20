@@ -1,7 +1,9 @@
 package net.shoreline.client.impl.module.combat;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -16,9 +18,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
@@ -27,6 +27,8 @@ import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.network.EntitySpawnEvent;
+import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
@@ -44,6 +46,7 @@ import net.shoreline.client.impl.world.explosion.ExplosionUtil;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,21 +76,6 @@ public class AutoCrystalModule extends ListeningToggleable
     Config<Void> targetConfig = new ConfigGroup.Builder("Target")
             .addAll(targetRange, targetPlayers, targetHostiles, targetPassives).build();
 
-    Config<Float> placeRange = new NumberConfig.Builder<Float>("PlaceRange")
-            .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
-            .setDescription("The range to place crystals").build();
-    Config<Integer> placeDelay = new NumberConfig.Builder<Integer>("PlaceDelay")
-            .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
-            .setDescription("The delay between placing crystals").build();
-    Config<Boolean> strictDirection = new BooleanConfig.Builder("StrictDirection")
-            .setDescription("Only places crystals on visible faces")
-            .setDefaultValue(false).build();
-    Config<Boolean> protocolPlace = new BooleanConfig.Builder("Protocol")
-            .setDescription("Prevents placements in 1x1 areas")
-            .setDefaultValue(false).build();
-    Config<Void> placeConfig = new ConfigGroup.Builder("Place")
-            .addAll(placeRange, placeDelay, strictDirection, protocolPlace).build();
-
     Config<Float> breakRange = new NumberConfig.Builder<Float>("BreakRange")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("The range to break crystals").build();
@@ -97,8 +85,26 @@ public class AutoCrystalModule extends ListeningToggleable
     Config<Integer> ticksExisted = new NumberConfig.Builder<Integer>("TicksExisted")
             .setMin(0).setMax(10).setDefaultValue(0)
             .setDescription("The minimum ticks existed before breaking crystals").build();
+    Config<Boolean> sequentialBreak = new BooleanConfig.Builder("SequentialBreak")
+            .setDescription("Breaks immediately after a placement")
+            .setDefaultValue(false).build();
     Config<Void> breakConfig = new ConfigGroup.Builder("Break")
-            .addAll(breakRange, breakDelay, ticksExisted).build();
+            .addAll(breakRange, breakDelay, ticksExisted, sequentialBreak).build();
+
+    Config<Float> placeRange = new NumberConfig.Builder<Float>("PlaceRange")
+            .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
+            .setDescription("The range to place crystals").build();
+    Config<Integer> placeDelay = new NumberConfig.Builder<Integer>("PlaceDelay")
+            .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
+            .setDescription("The delay between placing crystals").build();
+    Config<Boolean> protocolPlace = new BooleanConfig.Builder("Protocol")
+            .setDescription("Prevents placements in 1x1 areas")
+            .setDefaultValue(false).build();
+    Config<Boolean> sequentialPlace = new BooleanConfig.Builder("SequentialPlace")
+            .setDescription("Places immediately after breaking a crystal")
+            .setDefaultValue(false).build();
+    Config<Void> placeConfig = new ConfigGroup.Builder("Place")
+            .addAll(placeRange, placeDelay, protocolPlace, sequentialPlace).build();
 
     Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
             .setDescription("Targets dropped items blocking placements")
@@ -170,6 +176,9 @@ public class AutoCrystalModule extends ListeningToggleable
 
     private final Timer attackTimer = new NanoTimer();
     private final Timer placeTimer = new NanoTimer();
+
+    private final Map<Integer, Long> attackPackets = new HashMap<>();
+    private final Map<BlockPos, Long> placePackets = new HashMap<>();
 
     private final ConcurrentMap<BlockPos, Animation> fadeAnimations = new ConcurrentHashMap<>();
 
@@ -279,6 +288,51 @@ public class AutoCrystalModule extends ListeningToggleable
     }
 
     @EventListener
+    public void onEntitySpawn(EntitySpawnEvent event)
+    {
+        if (checkNull() || event.getType() != EntityType.END_CRYSTAL)
+        {
+            return;
+        }
+
+        Vec3d crystalPos = event.getPos();
+        BlockPos crystalBase = BlockPos.ofFloored(crystalPos.offset(Direction.DOWN, 1.0));
+
+        if (placePackets.remove(crystalBase) == null || !sequentialBreak.getValue())
+        {
+            return;
+        }
+
+        Hand hand = getCrystalHand();
+
+        attackCrystal(event.getEntityId(), hand);
+        attackTimer.reset();
+
+        if (currentPlace != null && sequentialPlace.getValue())
+        {
+            placeCrystal(currentPlace.getCrystalData(), hand);
+        }
+    }
+
+    @EventListener
+    public void onExplosion(ExplosionEvent event)
+    {
+        if (checkNull())
+        {
+            return;
+        }
+
+        for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
+        {
+            if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getCenter()) < 144.0)
+            {
+                mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
+                attackPackets.remove(entity.getId());
+            }
+        }
+    }
+
+    @EventListener
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
         if (currentPlace != null)
@@ -325,6 +379,8 @@ public class AutoCrystalModule extends ListeningToggleable
         {
             Managers.INVENTORY.endSwap(silentType.getValue());
         }
+
+        attackPackets.put(crystalId, System.currentTimeMillis());
     }
 
     private void attackInternal(int crystalId, Hand hand)
@@ -344,9 +400,25 @@ public class AutoCrystalModule extends ListeningToggleable
 
     private void placeCrystal(BlockPos blockPos, Hand hand)
     {
-        Direction direction = Direction.UP;
-        BlockHitResult result = new BlockHitResult(blockPos.toCenterPos(), direction, blockPos, false);
+        Box box = new Box(blockPos);
+        Vec3d eyePos = mc.player.getEyePos();
+        Vec3d cut = new Vec3d(MathHelper.clamp(eyePos.getX(), box.minX, box.maxX),
+                MathHelper.clamp(eyePos.getY(), box.minY, box.maxY),
+                MathHelper.clamp(eyePos.getZ(), box.minZ, box.maxZ));
 
+        Direction placeDir;
+        if (eyePos.y >= box.maxY)
+        {
+            placeDir = Direction.UP;
+        } else if (blockPos.getY() >= mc.world.getTopYInclusive())
+        {
+            placeDir = Direction.DOWN;
+        } else
+        {
+            placeDir = Direction.getFacing(eyePos.x - cut.x, eyePos.y - cut.y, eyePos.z - cut.z);
+        }
+
+        BlockHitResult result = new BlockHitResult(cut, placeDir, blockPos, box.contains(eyePos));
         if (autoSwap.getValue() && silentSwap.getValue())
         {
             int slot = InventoryUtil.getInventorySlot(Items.END_CRYSTAL);
@@ -369,6 +441,8 @@ public class AutoCrystalModule extends ListeningToggleable
         {
             Managers.INVENTORY.endSwap(silentType.getValue());
         }
+
+        placePackets.put(blockPos, System.currentTimeMillis());
     }
 
     public boolean shouldRunCalcs()

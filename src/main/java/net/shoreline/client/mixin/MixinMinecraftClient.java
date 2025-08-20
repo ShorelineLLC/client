@@ -11,8 +11,10 @@ import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.imixin.IMinecraftClient;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -31,6 +33,10 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
     @Override
     @Accessor("itemUseCooldown")
     public abstract void setItemUseCooldown(int itemUseCooldown);
+
+    @Override
+    @Invoker("doItemUse")
+    public abstract void hookDoItemUse();
 
     @Inject(method = "onInitFinished", at = @At(value = "RETURN"))
     private void hookOnInitFinished(MinecraftClient.LoadingContext loadingContext,

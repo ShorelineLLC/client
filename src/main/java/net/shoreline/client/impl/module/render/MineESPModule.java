@@ -35,6 +35,11 @@ public class MineESPModule extends RenderModule
     @EventListener
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         for (MiningData data : Managers.MINING.getMiningBlocks())
         {
             float rangeSq = rangeConfig.getValue() * rangeConfig.getValue();

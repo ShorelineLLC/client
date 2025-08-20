@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.impl;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
@@ -12,11 +14,18 @@ import net.shoreline.client.impl.Managers;
 
 public abstract class HudModule extends RenderModule
 {
-    Config<Integer> x = new NumberConfig.Builder<Integer>("X-Position").setDefaultValue(0).build();
-    Config<Integer> y = new NumberConfig.Builder<Integer>("Y-Position").setDefaultValue(0).build();
-    Config<Integer> index = new NumberConfig.Builder<Integer>("Index").setDefaultValue(0).build();
+    Config<Integer> x = new NumberConfig.Builder<Integer>("X-Position")
+            .setDefaultValue(0)
+            .setVisible(() -> false).build();
+    Config<Integer> y = new NumberConfig.Builder<Integer>("Y-Position")
+            .setDefaultValue(0)
+            .setVisible(() -> false).build();
+    Config<Integer> index = new NumberConfig.Builder<Integer>("Index")
+            .setDefaultValue(0)
+            .setVisible(() -> false).build();
     Config<Anchor> anchor = new EnumConfig.Builder<Anchor>("Anchor")
             .setValues(Anchor.values())
+            .setVisible(() -> false)
             .setDefaultValue(Anchor.None).build();
 
     public HudModule(String name, String description, int x, int y)
@@ -25,6 +34,7 @@ public abstract class HudModule extends RenderModule
         this.x.setValue(x);
         this.y.setValue(y);
         unregisterConfig(getKeybind());
+        registerConfigs(this.x, this.y, index, anchor);
     }
 
     public abstract void drawHudComponent(DrawContext context, float tickDelta);
