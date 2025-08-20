@@ -1,11 +1,14 @@
 package net.shoreline.client.impl.module.impl.hud;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.hud.Anchor;
+import net.shoreline.client.impl.module.client.HudGuiModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 
 public abstract class HudModule extends RenderModule
@@ -17,10 +20,12 @@ public abstract class HudModule extends RenderModule
             .setDefaultValue(0)
             .setVisible(() -> false).build();
     Config<Integer> index = new NumberConfig.Builder<Integer>("Index")
-            .setMin(0).setMax(100).setDefaultValue(0).build();
+            .setMin(0).setMax(100).setDefaultValue(0)
+            .setVisible(() -> false).build();
     Config<Anchor> anchor = new EnumConfig.Builder<Anchor>("Anchor")
             .setValues(Anchor.values())
-            .setDefaultValue(Anchor.None).build();
+            .setDefaultValue(Anchor.None)
+            .setVisible(() -> false).build();
 
     public HudModule(String name, String description, int x, int y)
     {
@@ -87,4 +92,11 @@ public abstract class HudModule extends RenderModule
     public abstract int getWidth();
 
     public abstract int getHeight();
+
+    @Override
+    public void drawText(MatrixStack matrices, Text text, float x, float y)
+    {
+        int color = HudGuiModule.INSTANCE.getColor((int) y);
+        drawText(matrices, text, x, y, color);
+    }
 }

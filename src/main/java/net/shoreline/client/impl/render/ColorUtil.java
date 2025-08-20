@@ -116,4 +116,24 @@ public class ColorUtil
 
         return f;
     }
+
+    public static float getRainbowHue(float speedFactor, int offset)
+    {
+        float speed = 2500.0f / speedFactor;
+        return ((System.currentTimeMillis() + offset) % (int) speed) / speed;
+    }
+
+    public static float getPulse(float speedFactor, float depthFactor, float value, int offset)
+    {
+        float time = (float) Math.sin(getRainbowHue(speedFactor / 36, (int) (offset / speedFactor)) * 360);
+        float variation = time * (depthFactor / 8);
+        return Math.max(0f, Math.min(1f, value - (depthFactor / 8) + variation));
+    }
+
+    public static int getPulse(float speedFactor, float depthFactor, int offset, int color)
+    {
+        int[] rgba = getRGBColorValues(color);
+        float[] hsb = Color.RGBtoHSB(rgba[0], rgba[1], rgba[2], null);
+        return Color.HSBtoRGB(hsb[0], hsb[1], getPulse(speedFactor, depthFactor, hsb[2], -offset));
+    }
 }
