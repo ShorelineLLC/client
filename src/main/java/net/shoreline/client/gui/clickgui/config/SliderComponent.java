@@ -11,6 +11,7 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.*;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Smoother;
 import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
@@ -20,6 +21,7 @@ import java.math.RoundingMode;
 public class SliderComponent<T extends Number> extends ConfigComponent<T>
 {
     private final TextComponent textComponent;
+    private final Smoother smoother = new Smoother();
 
     public SliderComponent(Config<T> config,
                            ModuleComponent moduleComponent,
@@ -89,7 +91,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                 / (max.floatValue() - min.floatValue());
         int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
         int color1 = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());
-        int sliderWidth = (int) (fill * width);
+        float sliderWidth = (float) smoother.smooth(fill * width, 1.0f, delta);
         drawRect(context, getTx(), getTy(), sliderWidth, height, color);
         drawRect(context, getTx() + sliderWidth, getTy(), width - sliderWidth, height, color1);
 

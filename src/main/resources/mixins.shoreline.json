@@ -10,6 +10,7 @@
     "entity.MixinLivingEntity",
     "entity.decoration.MixinEndCrystalEntity",
     "gl.MixinPostEffectProcessor",
+    "gui.MixinDrawContext",
     "gui.hud.MixinBossBarHud",
     "gui.hud.MixinInGameHud",
     "gui.hud.MixinInGameOverlayRenderer",

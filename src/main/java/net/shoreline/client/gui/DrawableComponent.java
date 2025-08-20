@@ -2,11 +2,13 @@ package net.shoreline.client.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.FontModule;
+import org.joml.Matrix4f;
 
 public abstract class DrawableComponent
 {
@@ -18,13 +20,20 @@ public abstract class DrawableComponent
                                        float delta);
 
     protected void drawRect(DrawContext context,
-                            int x,
-                            int y,
-                            int width,
-                            int height,
+                            float x,
+                            float y,
+                            float width,
+                            float height,
                             int color)
     {
-        context.fill(x, y, x + width, y + height, color);
+        width += x;
+        height += y;
+        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
+        VertexConsumer vertexConsumer = ((IDrawContext) context).getVertexConsumerProvider().getBuffer(RenderLayer.getGui());
+        vertexConsumer.vertex(matrix4f, x, y, 0).color(color);
+        vertexConsumer.vertex(matrix4f, x, height, 0).color(color);
+        vertexConsumer.vertex(matrix4f, width, height, 0).color(color);
+        vertexConsumer.vertex(matrix4f, width, y, 0).color(color);
     }
 
     protected void drawTexturedRect(DrawContext context,
@@ -38,14 +47,14 @@ public abstract class DrawableComponent
     }
 
     protected void drawOutline(DrawContext context,
-                               int x,
-                               int y,
-                               int width,
-                               int height,
-                               int thickness,
+                               float x,
+                               float y,
+                               float width,
+                               float height,
+                               float thickness,
                                int color)
     {
-        int t2 = thickness * 2;
+        float t2 = thickness * 2;
         drawRect(context, x - thickness, y - thickness, width + t2, thickness, color);
         drawRect(context, x - thickness, y, thickness, height, color);
         drawRect(context, x + width, y, thickness, height, color);
