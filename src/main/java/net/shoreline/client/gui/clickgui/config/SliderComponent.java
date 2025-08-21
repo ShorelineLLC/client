@@ -97,15 +97,13 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
 
         boolean isInt = getConfig().getValue() instanceof Integer || numberConfig.getRoundingPlaces() == 0;
         String numberText = isInt ? String.valueOf(getConfig().getValue().intValue()) : String.valueOf(getConfig().getValue());
-        MutableText formattedText = Text.empty()
-                .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
-                .append(" " + numberText).formatted(Formatting.GRAY);
+        String formattedText = getConfig().getName() + " " + Formatting.GRAY + numberText;
         if (numberConfig.getFormat() != null)
         {
-            formattedText.append(Text.literal(numberConfig.getFormat()).formatted(Formatting.GRAY));
+            formattedText += numberConfig.getFormat();
         }
 
-        drawText(context, formattedText, getTx() + 3, getTy() + 4);
+        drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
     }
 
     @Override

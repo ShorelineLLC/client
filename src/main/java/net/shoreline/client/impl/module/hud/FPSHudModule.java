@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.hud;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.util.math.PerSecond;
 
@@ -33,8 +34,8 @@ public class FPSHudModule extends HudModule
         return 12;
     }
 
-    public Text getFPSText()
+    public String getFPSText()
     {
-        return Text.literal("FPS ").append(String.valueOf(fps.getPerSecond()));
+        return "FPS " + Formatting.WHITE + fps.getPerSecond();
     }
 }

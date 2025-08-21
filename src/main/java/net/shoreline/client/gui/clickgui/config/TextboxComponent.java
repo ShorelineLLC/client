@@ -52,10 +52,8 @@ public class TextboxComponent extends ConfigComponent<String>
             int color = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());
             drawRect(context, getTx(), getTy(), width, height, color);
 
-            Text formattedText = Text.empty()
-                    .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
-                    .append(Text.literal(" " + getConfig().getValue()).formatted(Formatting.GRAY));
-            drawText(context, formattedText, getTx() + 3, getTy() + 4);
+            String formattedText = getConfig().getName() + " " + Formatting.GRAY + getConfig().getValue();
+            drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
         }
     }
 

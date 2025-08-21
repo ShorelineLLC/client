@@ -43,10 +43,8 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
         drawRect(context, getTx(), getTy(), width, height, color);
 
         String selectorText = Formatter.formatEnum(getConfig().getValue());
-        Text formattedText = Text.empty()
-                .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
-                .append(Text.literal(" " + selectorText).formatted(Formatting.GRAY));
-        drawText(context, formattedText, getTx() + 3, getTy() + 4);
+        String formattedText = getConfig().getName() + " " + Formatting.GRAY + selectorText;
+        drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
     }
 
     @Override

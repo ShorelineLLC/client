@@ -65,7 +65,7 @@ public abstract class DynamicHudModule extends HudModule
     {
         boolean top = isTop();
         getHudEntries().sort(Comparator.comparingDouble(
-                entry -> getTextWidth(Text.of(entry.getText().get())) * (top ? -1 : 1)));
+                entry -> getTextWidth(entry.getText().get()) * (top ? -1 : 1)));
     }
 
     public boolean isLeft()
@@ -84,7 +84,7 @@ public abstract class DynamicHudModule extends HudModule
         int result = 0;
         for (DynamicEntry entry : getHudEntries())
         {
-            result = Math.max(result, getTextWidth(Text.of(entry.getText().get())));
+            result = Math.max(result, getTextWidth(entry.getText().get()));
         }
 
         width = result;

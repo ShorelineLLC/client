@@ -41,12 +41,12 @@ public class ToggleModuleComponent extends ModuleComponent
         toggleComponent.drawComponent(context, mouseX, mouseY, delta);
 
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, Text.literal(module.getName()).withColor(textColor), getTx() + 3, getTy() + 4);
+        drawText(context, module.getName(), getTx() + 3, getTy() + 4, textColor);
 
         if (components.size() > 1)
         {
-            Text dotsText = Text.literal("...").withColor(textColor);
-            drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4);
+            String dotsText = "...";
+            drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4, textColor);
         }
 
         if (getCollapseAnim().getFactor() > 0.0)

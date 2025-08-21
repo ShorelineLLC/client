@@ -7,9 +7,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.render.ColorUtil;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
@@ -66,37 +68,47 @@ public final class FontRenderer implements Closeable
 
     public void drawStringWithShadow(MatrixStack stack, String text, double x, double y, int color)
     {
-        drawString(stack, text, x + 0.5f, y + 0.5f, color, true);
-        drawString(stack, text, x, y, color, false);
+        drawString(stack, null, text, x + 0.5f, y + 0.5f, color, true);
+        drawString(stack, null, text, x, y, color, false);
     }
 
     public void drawString(MatrixStack stack, String text, double x, double y, int color)
     {
-        drawString(stack, text, x, y, color, false);
+        drawString(stack, null, text, x, y, color, false);
     }
 
-    private void drawString(MatrixStack stack, String text, double x, double y, int color, boolean shadow)
+    public void drawStringWithShadow(DrawContext context, String text, double x, double y, int color)
+    {
+        drawString(context.getMatrices(), ((IDrawContext) context).getVertexConsumerProvider(), text, x + 0.5f, y + 0.5f, color, true);
+        drawString(context.getMatrices(), ((IDrawContext) context).getVertexConsumerProvider(), text, x, y, color, false);
+    }
+
+    public void drawString(DrawContext context, String text, double x, double y, int color)
+    {
+        drawString(context.getMatrices(), ((IDrawContext) context).getVertexConsumerProvider(), text, x, y, color, false);
+    }
+
+    private void drawString(MatrixStack stack,
+                            VertexConsumerProvider vertexConsumerProvider, String text, double x, double y, int color, boolean shadow)
     {
         float brightnessMultiplier = shadow ? 0.25f : 1.0f;
         float r = ((color >> 16) & 0xff) / 255.0f * brightnessMultiplier;
         float g = ((color >> 8) & 0xff) / 255.0f * brightnessMultiplier;
         float b = ((color) & 0xff) / 255.0f * brightnessMultiplier;
         float a = ((color >> 24) & 0xff) / 255.0f;
-        drawString(stack, text, (float) x, (float) y, r, g, b, a, brightnessMultiplier);
+        drawString(stack, vertexConsumerProvider, text, (float) x, (float) y, r, g, b, a, brightnessMultiplier);
     }
 
-    public void drawString(MatrixStack stack, String text, double x, double y, Color color)
-    {
-        drawString(stack, text, x, y, color, false);
-    }
-
-    public void drawString(MatrixStack stack, String text, double x, double y, Color color, boolean shadow)
-    {
-        float brightnessMultiplier = shadow ? 0.25f : 1.0f;
-        drawString(stack, text, (float) x, (float) y, color.getRed() / 255.0f * brightnessMultiplier, color.getGreen() / 255.0f * brightnessMultiplier, color.getBlue() / 255.0f * brightnessMultiplier, color.getAlpha(), brightnessMultiplier);
-    }
-
-    public void drawString(MatrixStack stack, String text, float x, float y, float r, float g, float b, float a, float brightnessMultiplier)
+    public void drawString(MatrixStack stack,
+                           VertexConsumerProvider vertexConsumerProvider,
+                           String text,
+                           float x,
+                           float y,
+                           float r,
+                           float g,
+                           float b,
+                           float a,
+                           float brightnessMultiplier)
     {
         int currentScale = (int) MinecraftClient.getInstance().getWindow().getScaleFactor();
         if (currentScale != lastScale)
@@ -114,8 +126,6 @@ public final class FontRenderer implements Closeable
         stack.scale(1.0f / scale, 1.0f / scale, 0.0f);
 
         RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
-        Tessellator tessellator = Tessellator.getInstance();
-        Matrix4f matrix4f = stack.peek().getPositionMatrix();
         char[] chars = text.toCharArray();
         float xOffset = 0;
         float yOffset = 0;
@@ -175,35 +185,13 @@ public final class FontRenderer implements Closeable
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableCull();
+
             for (Identifier identifier : cache.keySet())
             {
                 RenderSystem.setShaderTexture(0, identifier);
 
                 List<CharLocation> objects = cache.get(identifier);
-
-                BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-                for (CharLocation object : objects)
-                {
-                    float xo = object.x;
-                    float yo = object.y;
-                    float cr = object.r;
-                    float cg = object.g;
-                    float cb = object.b;
-                    Glyph glyph = object.glyph;
-                    GlyphCache owner = glyph.owner();
-                    float w = glyph.width();
-                    float h = glyph.height();
-                    float u1 = (float) glyph.textureWidth() / owner.getWidth();
-                    float v1 = (float) glyph.textureHeight() / owner.getHeight();
-                    float u2 = (float) (glyph.textureWidth() + glyph.width()) / owner.getWidth();
-                    float v2 = (float) (glyph.textureHeight() + glyph.height()) / owner.getHeight();
-                    bufferBuilder.vertex(matrix4f, xo + 0, yo + h, 0).color(cr, cg, cb, a).texture(u1, v2);
-                    bufferBuilder.vertex(matrix4f, xo + w, yo + h, 0).color(cr, cg, cb, a).texture(u2, v2);
-                    bufferBuilder.vertex(matrix4f, xo + w, yo + 0, 0).color(cr, cg, cb, a).texture(u2, v1);
-                    bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).color(cr, cg, cb, a).texture(u1, v1);
-                }
-
-                BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+                drawGlyphs(stack, vertexConsumerProvider, objects, identifier, vertexConsumerProvider == null, a);
             }
 
             RenderSystem.enableCull();
@@ -214,30 +202,43 @@ public final class FontRenderer implements Closeable
         stack.pop();
     }
 
-    public void drawCenteredString(MatrixStack stack, String text, double x, double y, int color)
+    private void drawGlyphs(MatrixStack matrixStack,
+                            VertexConsumerProvider vertexConsumerProvider,
+                            List<CharLocation> locations,
+                            Identifier identifier,
+                            boolean immediate,
+                            float opacity)
     {
-        drawString(stack, text, x, y, color, false);
-    }
+        Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexConsumer bufferBuilder = immediate ? tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR) :
+                vertexConsumerProvider.getBuffer(RenderLayer.getGuiTextured(identifier));
 
-    public void drawCenteredString(MatrixStack stack, String text, double x, double y, int color, boolean shadow)
-    {
-        float brightnessMultiplier = shadow ? 0.25f : 1.0f;
-        float r = ((color >> 16) & 0xff) / 255.0f * brightnessMultiplier;
-        float g = ((color >> 8) & 0xff) / 255.0f * brightnessMultiplier;
-        float b = ((color) & 0xff) / 255.0f * brightnessMultiplier;
-        float a = (color & 0xff000000) != 0xff000000 ? 1.0f : ((color >> 24) & 0xff) / 255.0f * brightnessMultiplier;
-        drawString(stack, text, (float) (x - getStringWidth(text) / 2f), (float) y, r, g, b, a, brightnessMultiplier);
-    }
+        for (CharLocation charLocation : locations)
+        {
+            float xo = charLocation.x;
+            float yo = charLocation.y;
+            float cr = charLocation.r;
+            float cg = charLocation.g;
+            float cb = charLocation.b;
+            Glyph glyph = charLocation.glyph;
+            GlyphCache owner = glyph.owner();
+            float w = glyph.width();
+            float h = glyph.height();
+            float u1 = (float) glyph.textureWidth() / owner.getWidth();
+            float v1 = (float) glyph.textureHeight() / owner.getHeight();
+            float u2 = (float) (glyph.textureWidth() + glyph.width()) / owner.getWidth();
+            float v2 = (float) (glyph.textureHeight() + glyph.height()) / owner.getHeight();
+            bufferBuilder.vertex(matrix4f, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, opacity);
+            bufferBuilder.vertex(matrix4f, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, opacity);
+            bufferBuilder.vertex(matrix4f, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, opacity);
+            bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, opacity);
+        }
 
-    public void drawCenteredString(MatrixStack stack, String text, double x, double y, Color color)
-    {
-        drawString(stack, text, x, y, color, false);
-    }
-
-    public void drawCenteredString(MatrixStack stack, String text, double x, double y, Color color, boolean shadow)
-    {
-        float brightnessMultiplier = shadow ? 0.25f : 1.0f;
-        drawString(stack, text, (float) (x - getStringWidth(text) / 2.0f), (float) y, color.getRed() / 255.0f * brightnessMultiplier, color.getGreen() / 255.0f * brightnessMultiplier, color.getBlue() / 255.0f * brightnessMultiplier, color.getAlpha() / 255.0f, brightnessMultiplier);
+        if (immediate)
+        {
+            BufferRenderer.drawWithGlobalProgram(((BufferBuilder) bufferBuilder).end());
+        }
     }
 
     public float getStringWidth(String text)

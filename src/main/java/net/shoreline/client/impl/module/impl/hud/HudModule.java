@@ -40,7 +40,9 @@ public abstract class HudModule extends RenderModule
 
     public void drawGuiComponent(DrawContext context, float tickDelta)
     {
+        // context.enableScissor(getX() - 3, getY(), getX() + getWidth() + 3, getY() + getHeight());
         drawHudComponent(context, tickDelta);
+        // context.disableScissor();
     }
 
     @Override
@@ -94,7 +96,7 @@ public abstract class HudModule extends RenderModule
     public abstract int getHeight();
 
     @Override
-    public void drawText(MatrixStack matrices, Text text, float x, float y)
+    public void drawText(MatrixStack matrices, String text, float x, float y)
     {
         int color = HudGuiModule.INSTANCE.getColor((int) y);
         drawText(matrices, text, x, y, color);

@@ -22,10 +22,7 @@ public class ArrayListHudModule extends DynamicHudModule
             if (module instanceof Toggleable toggleable)
             {
                 getHudEntries().add(new DynamicEntry(this, () -> getFullName(module), toggleable::isEnabled));
-                continue;
             }
-
-            getHudEntries().add(new DynamicEntry(this, () -> getFullName(module), () -> true));
         }
     }
 

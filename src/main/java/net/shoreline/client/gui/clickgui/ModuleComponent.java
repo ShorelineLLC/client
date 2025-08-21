@@ -70,12 +70,12 @@ public class ModuleComponent extends FrameComponent
 
         int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
         drawRect(context, getTx(), getTy(), width, height, color);
-        drawText(context, Text.literal(module.getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
+        drawText(context, module.getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
 
         if (components.size() > 1)
         {
-            Text dotsText = Text.literal("...").withColor(theme.getTextColor());
-            drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4);
+            String dotsText = "...";
+            drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4, theme.getTextColor());
         }
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());

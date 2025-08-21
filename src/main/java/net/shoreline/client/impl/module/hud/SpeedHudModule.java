@@ -26,13 +26,13 @@ public class SpeedHudModule extends HudModule
     @Override
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
-        drawText(context.getMatrices(), Text.of(getSpeedometerText()), getX() + 2, getY() + 2);
+        drawText(context.getMatrices(), getSpeedometerText(), getX() + 2, getY() + 2);
     }
 
     @Override
     public int getWidth()
     {
-        return getTextWidth(Text.of(getSpeedometerText()));
+        return getTextWidth(getSpeedometerText());
     }
 
     @Override

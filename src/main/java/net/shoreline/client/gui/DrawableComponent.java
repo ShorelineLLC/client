@@ -3,6 +3,7 @@ package net.shoreline.client.gui;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.font.FontManager;
@@ -63,22 +64,23 @@ public abstract class DrawableComponent
 
 
     protected void drawText(DrawContext context,
-                            Text text,
+                            String text,
                             int x,
-                            int y)
+                            int y,
+                            int color)
     {
-        if (text.getString().isEmpty())
+        if (text.isEmpty())
         {
             return;
         }
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            FontManager.FONT.drawString(context.getMatrices(), text.getString(), x, y, -1);
+            FontManager.FONT.drawStringWithShadow(context, text, x, y, color);
             return;
         }
 
-        context.drawText(mc.textRenderer, text, x, y, -1, true);
+        context.drawTextWithShadow(mc.textRenderer, text, x, y, color);
     }
 
     protected void enableScissor(DrawContext context, int x1, int y1, int x2, int y2)
@@ -91,16 +93,16 @@ public abstract class DrawableComponent
         context.disableScissor();
     }
 
-    protected int getTextWidth(Text text)
+    protected int getTextWidth(String text)
     {
-        if (text.getString().isEmpty())
+        if (text.isEmpty())
         {
             return 0;
         }
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            return (int) FontManager.FONT.getStringWidth(text.getString());
+            return (int) FontManager.FONT.getStringWidth(text);
         }
 
         return mc.textRenderer.getWidth(text);

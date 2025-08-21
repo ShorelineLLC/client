@@ -75,7 +75,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         int color = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());
         drawRect(context, getTx(), getTy(), width, height, color);
 
-        drawText(context, Text.literal(getConfig().getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
+        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
 
         drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 1, 0x33000000);
         drawRect(context, getTx() + getWidth() - 14, getTy() + 2, 12, 12, getConfig().getValue().getRGB());

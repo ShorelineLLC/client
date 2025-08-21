@@ -51,9 +51,9 @@ public class GroupComponent extends ConfigComponent<Void>
         int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
         drawRect(context, getTx(), getTy(), width, height, color);
 
-        drawText(context, Text.literal(getConfig().getName()).withColor(theme.getTextColor()), getTx() + 3, getTy() + 4);
-        Text dotsText = Text.literal("...").withColor(theme.getTextColor());
-        drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4);
+        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
+        String dotsText = "...";
+        drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4, theme.getTextColor());
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 

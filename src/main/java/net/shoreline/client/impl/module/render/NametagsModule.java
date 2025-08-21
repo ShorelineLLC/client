@@ -125,7 +125,7 @@ public class NametagsModule extends RenderModule
             matrices.scale(scaling, -scaling, scaling);
 
             float hwidth = mc.textRenderer.getWidth(info) / 2f;
-            drawText(matrices, Text.of(info), (int) -hwidth, 0);
+            drawText(matrices, info, (int) -hwidth, 0);
             renderItems(matrices, player, armorConfig.getValue());
             matrices.pop();
         }
@@ -279,7 +279,7 @@ public class NametagsModule extends RenderModule
                 enchantString.append(lvl);
             }
 
-            drawText(matrixStack, Text.of(enchantString.toString()), (int) (x * 2), (int) ((y + n2) * 2), -1);
+            drawText(matrixStack, enchantString.toString(), (int) (x * 2), (int) ((y + n2) * 2), -1);
             n2 += 4.5f;
         }
     }
@@ -288,7 +288,7 @@ public class NametagsModule extends RenderModule
     {
         if (stack.getCount() != 1)
         {
-            Text count = Text.of(String.valueOf(stack.getCount()));
+            String count = String.valueOf(stack.getCount());
             drawText(matrixStack, count, x + 17 - getTextWidth(count), y + 9);
         }
     }
@@ -304,7 +304,7 @@ public class NametagsModule extends RenderModule
         int n2 = itemStack.getDamage();
         int durability = (int) ((n - n2) / ((float) n) * 100.0f);
         int color = ColorUtil.hslToColor((float) (n - n2) / (float) n * 120.0f, 100.0f, 50.0f, 1.0f).getRGB();
-        drawText(matrixStack, Text.of(durability + "%"), (int) (x * 2), (int) (y * 2), color);
+        drawText(matrixStack, durability + "%", (int) (x * 2), (int) (y * 2), color);
     }
 
     private void renderItem(ItemStack stack, MatrixStack matrices)
@@ -324,7 +324,7 @@ public class NametagsModule extends RenderModule
 
     private void renderItemName(MatrixStack matrixStack, ItemStack itemStack, float x, float y)
     {
-        Text itemName = itemStack.getName();
+        String itemName = itemStack.getName().getString();
         float width = getTextWidth(itemName) / 4.0f;
         drawText(matrixStack, itemName, (int) ((x - width) * 2), (int) (y * 2), -1);
     }

@@ -25,21 +25,21 @@ public class RenderModule extends Toggleable
         super(name, nameAliases, description, category);
     }
 
-    public void drawText(MatrixStack matrices, Text text, float x, float y)
+    public void drawText(MatrixStack matrices, String text, float x, float y)
     {
         drawText(matrices, text, x, y, -1);
     }
 
-    public void drawText(MatrixStack matrices, Text text, float x, float y, int color)
+    public void drawText(MatrixStack matrices, String text, float x, float y, int color)
     {
-        if (text.getString().isEmpty())
+        if (text.isEmpty())
         {
             return;
         }
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            FontManager.FONT.drawString(matrices, text.getString(), x, y, color);
+            FontManager.FONT.drawStringWithShadow(matrices, text, x, y, color);
             return;
         }
 
@@ -47,16 +47,16 @@ public class RenderModule extends Toggleable
         mc.getBufferBuilders().getEntityVertexConsumers().draw();
     }
 
-    public int getTextWidth(Text text)
+    public int getTextWidth(String text)
     {
-        if (text.getString().isEmpty())
+        if (text.isEmpty())
         {
             return 0;
         }
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            return (int) FontManager.FONT.getStringWidth(text.getString());
+            return (int) FontManager.FONT.getStringWidth(text);
         }
 
         return mc.textRenderer.getWidth(text);

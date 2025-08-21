@@ -41,7 +41,7 @@ public class DynamicEntry
         float paddingY = top ? 2 : -2;
         getModule().setOffset((int) (currentOffset + (10 * yAnimation.getFactor())));
 
-        Text current = Text.of(text.get());
+        String current = text.get();
         int width = getModule().getTextWidth(current);
         float renderX = (int) (x + animation.get() - (left ? width : 0)) + paddingX;
         float renderY = (int) (y + currentOffset) + paddingY;
@@ -91,7 +91,7 @@ public class DynamicEntry
 
     public boolean isDone()
     {
-        Text current = Text.of(text.get());
+        String current = text.get();
         int width = getModule().getTextWidth(current);
         return yAnimation.getFactor() < 0.01 && (getModule().isLeft())
                 ? animation.get() == -width + width - 2.0f // i know this looks chinese

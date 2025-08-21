@@ -45,7 +45,7 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
         toggleComponent.drawComponent(context, mouseX, mouseY, delta);
 
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, Text.literal(getConfig().getName()).withColor(textColor), getTx() + 3, getTy() + 4);
+        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, textColor);
     }
 
     @Override

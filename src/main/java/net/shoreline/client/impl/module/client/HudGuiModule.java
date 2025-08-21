@@ -23,9 +23,11 @@ public class HudGuiModule extends ListeningToggleable
             .setDefaultValue(ColorEffect.NONE)
             .setDescription("Applies effects to colors in hud.").build();
     Config<Float> rainbowSpeed = new NumberConfig.Builder<Float>("Speed")
-            .setMin(0.0f).setMax(2.0f).setDefaultValue(1.0f).build();
+            .setMin(0.0f).setMax(2.0f).setDefaultValue(1.0f)
+            .setVisible(() -> effectConfig.getValue() != ColorEffect.NONE).build();
     Config<Float> pulseDepth = new NumberConfig.Builder<Float>("Depth")
-            .setMin(0.0f).setMax(2.0f).setDefaultValue(1.0f).build();
+            .setMin(0.0f).setMax(2.0f).setDefaultValue(1.0f)
+            .setVisible(() -> effectConfig.getValue() != ColorEffect.NONE).build();
 
     public HudGuiModule()
     {
@@ -42,6 +44,7 @@ public class HudGuiModule extends ListeningToggleable
             return;
         }
 
+        ClickGuiModule.INSTANCE.disable();
         ClickGuiModule.INSTANCE.setFadeState(true);
         mc.setScreen(HudGuiScreen.INSTANCE);
     }

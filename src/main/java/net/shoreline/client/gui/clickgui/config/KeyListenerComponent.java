@@ -47,10 +47,8 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
         drawRect(context, getTx(), getTy(), width, height, color);
 
         String keyText = listening ? "..." : Keyboard.getKeyName(getConfig().getValue().getKeycode()).toUpperCase();
-        Text formattedText = Text.empty()
-                .append(Text.literal(getConfig().getName()).withColor(theme.getTextColor()))
-                .append(Text.literal(" " + keyText).formatted(Formatting.GRAY));
-        drawText(context, formattedText, getTx() + 3, getTy() + 4);
+        String formattedText = getConfig().getName() + " " + Formatting.GRAY + keyText;
+        drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
     }
 
     @Override

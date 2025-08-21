@@ -74,13 +74,12 @@ public class TextComponent extends FrameComponent
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         String buffer = bufferToString();
-        Text formattedText1 = Text.literal(buffer.isEmpty() ? getInsertionPoint(true) : buffer + getInsertionPoint(false))
-                .withColor(theme.getTextColor());
+        String formattedText1 = buffer.isEmpty() ? getInsertionPoint(true) : buffer + getInsertionPoint(false);
         enableScissor(context, getX() + 3, getY(), getX() + width, getY() + height);
 
         context.getMatrices().push();
         context.getMatrices().translate(-typedX, 0.0f, 0.0f);
-        drawText(context, formattedText1, getX() + 3, getY() + 4);
+        drawText(context, formattedText1, getX() + 3, getY() + 4, theme.getTextColor());
         context.getMatrices().pop();
 
         disableScissor(context);
@@ -159,7 +158,7 @@ public class TextComponent extends FrameComponent
 
     private void updateScrolling()
     {
-        int textW = getTextWidth(Text.literal(bufferToString()));
+        int textW = getTextWidth(bufferToString());
         int componentWidth = width - 6;
 
         if (textW - typedX > componentWidth)
