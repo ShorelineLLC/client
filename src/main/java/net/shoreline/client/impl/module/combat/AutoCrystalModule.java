@@ -484,6 +484,13 @@ public class AutoCrystalModule extends ListeningToggleable
             }
         }
 
+        ItemStack stack = Managers.INVENTORY.getServerStack();
+        if (mc.player.getStackInHand(hand).getItem() != Items.END_CRYSTAL
+                && stack.getItem() != Items.END_CRYSTAL)
+        {
+            return;
+        }
+
         Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
         if (swingConfig.getValue())
         {

@@ -26,7 +26,7 @@ public class TPSHudModule extends DynamicHudModule
     {
         double curr = Managers.TICK.getLatestTPS();
         double avg = Managers.TICK.getAverageTPS();
-        return String.format("TPS" + Formatting.WHITE + "%s " + Formatting.GRAY + "[" + Formatting.WHITE + "%s" + Formatting.GRAY + "]",
+        return String.format("TPS " + Formatting.WHITE + "%s " + Formatting.GRAY + "[" + Formatting.WHITE + "%s" + Formatting.GRAY + "]",
             decimal2.format(curr) + (Managers.TICK.getSize() == 20 ? "" : "*"),
             decimal2.format(avg));
     }

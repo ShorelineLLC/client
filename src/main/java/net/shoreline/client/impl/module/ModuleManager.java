@@ -99,8 +99,12 @@ public class ModuleManager
 
                 // HUD
                 new ArrayListHudModule(),
+                new BrandHudModule(),
+                new CoordsHudModule(),
                 new FPSHudModule(),
+                new PacketsHudModule(),
                 new PingHudModule(),
+                new ServerStatusHudModule(),
                 new SpeedHudModule(),
                 new TPSHudModule(),
                 new WatermarkHudModule()

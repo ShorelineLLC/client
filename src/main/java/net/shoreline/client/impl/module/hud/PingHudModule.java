@@ -23,7 +23,7 @@ public class PingHudModule extends DynamicHudModule
     public String getLatencyText()
     {
         Formatting connectionColor = HeadlessAPI.isConnected() ? Formatting.GREEN : Formatting.RED;
-        String headless = HeadlessMCModule.INSTANCE.isEnabled() ? connectionColor + "Headless " + Formatting.WHITE + "0ms" : "";
-        return String.format("Ping " + Formatting.WHITE + "%dms " + headless, Managers.NETWORK.getClientLatency());
+        String headless = HeadlessMCModule.INSTANCE.isEnabled() ? connectionColor + " Headless " + Formatting.WHITE + "0ms" : "";
+        return String.format("Ping " + Formatting.WHITE + "%dms" + headless, Managers.NETWORK.getClientLatency());
     }
 }

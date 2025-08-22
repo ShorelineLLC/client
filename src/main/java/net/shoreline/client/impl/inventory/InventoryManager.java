@@ -124,7 +124,7 @@ public class InventoryManager extends GenericFeature
         if (mc.player != null && current.isSwapped())
         {
             event.cancel();
-            event.setItemStack(mc.player.getInventory().getStack(serverSlot));
+            event.setItemStack(getServerStack());
         }
     }
 
@@ -290,5 +290,10 @@ public class InventoryManager extends GenericFeature
                 SlotActionType.SWAP,
                 screenHandler.getCursorStack().copy(),
                 int2ObjectMap));
+    }
+
+    public ItemStack getServerStack()
+    {
+        return mc.player.getInventory().getStack(serverSlot);
     }
 }
