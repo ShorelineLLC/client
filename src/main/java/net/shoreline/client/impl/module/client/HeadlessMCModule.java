@@ -7,6 +7,8 @@ import net.shoreline.client.api.module.Toggleable;
 
 public class HeadlessMCModule extends Toggleable
 {
+    public static HeadlessMCModule INSTANCE;
+
     Config<String> ipConfig = new StringConfig.Builder("IP")
             .setDefaultValue("127.0.0.1").build();
     Config<String> portConfig = new StringConfig.Builder("Port")
@@ -16,7 +18,6 @@ public class HeadlessMCModule extends Toggleable
     {
         super("HeadlessMC", "Allows you to connect to a HeadlessMC instance", GuiCategory.CLIENT);
         unregisterConfig(keybind);
+        INSTANCE = this;
     }
-    
-
 }

@@ -14,7 +14,6 @@ import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.render.ColorUtil;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.Closeable;
@@ -191,7 +190,7 @@ public final class FontRenderer implements Closeable
                 RenderSystem.setShaderTexture(0, identifier);
 
                 List<CharLocation> objects = cache.get(identifier);
-                drawGlyphs(stack, vertexConsumerProvider, objects, identifier, vertexConsumerProvider == null, a);
+                drawGlyphs(stack, vertexConsumerProvider, objects, identifier, a);
             }
 
             RenderSystem.enableCull();
@@ -206,13 +205,13 @@ public final class FontRenderer implements Closeable
                             VertexConsumerProvider vertexConsumerProvider,
                             List<CharLocation> locations,
                             Identifier identifier,
-                            boolean immediate,
                             float opacity)
     {
         Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
         Tessellator tessellator = Tessellator.getInstance();
-        VertexConsumer bufferBuilder = immediate ? tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR) :
-                vertexConsumerProvider.getBuffer(RenderLayer.getGuiTextured(identifier));
+        BufferBuilder bufferBuilder = vertexConsumerProvider == null ?
+                tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR) :
+                (BufferBuilder) vertexConsumerProvider.getBuffer(RenderLayer.getGuiTextured(identifier));
 
         for (CharLocation charLocation : locations)
         {
@@ -235,9 +234,9 @@ public final class FontRenderer implements Closeable
             bufferBuilder.vertex(matrix4f, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, opacity);
         }
 
-        if (immediate)
+        if (vertexConsumerProvider == null)
         {
-            BufferRenderer.drawWithGlobalProgram(((BufferBuilder) bufferBuilder).end());
+            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         }
     }
 

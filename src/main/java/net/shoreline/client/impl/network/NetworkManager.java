@@ -2,6 +2,7 @@ package net.shoreline.client.impl.network;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PendingUpdateManager;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.network.SequencedPacketCreator;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.listener.ClientPlayPacketListener;
@@ -99,6 +100,21 @@ public class NetworkManager extends GenericFeature
         {
             mc.executeSync(() -> packet.apply(handler));
         }
+    }
+
+    public int getClientLatency()
+    {
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (handler != null)
+        {
+            final PlayerListEntry playerEntry = handler.getPlayerListEntry(mc.player.getGameProfile().getId());
+            if (playerEntry != null)
+            {
+                return playerEntry.getLatency();
+            }
+        }
+
+        return 0;
     }
 
     public boolean wasSentFromClient(Packet<?> packet)

@@ -11,6 +11,7 @@ import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.client.impl.module.combat.util.TickPriorities;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
@@ -44,6 +45,12 @@ public class AutoTotemModule extends InventorySwapModule
     {
         super("AutoTotem", "Automatically replaces totems when you pop", GuiCategory.COMBAT);
         INSTANCE = this;
+    }
+
+    @Override
+    public String getModuleData()
+    {
+        return String.valueOf(InventoryUtil.getItemCount(Items.TOTEM_OF_UNDYING));
     }
 
     @EventListener(priority = TickPriorities.AUTO_TOTEM)

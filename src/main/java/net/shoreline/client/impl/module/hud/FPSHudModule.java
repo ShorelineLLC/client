@@ -1,12 +1,12 @@
 package net.shoreline.client.impl.module.hud;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.shoreline.client.impl.module.impl.hud.HudModule;
+import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
+import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
 import net.shoreline.client.util.math.PerSecond;
 
-public class FPSHudModule extends HudModule
+public class FPSHudModule extends DynamicHudModule
 {
     private final PerSecond fps = new PerSecond();
 
@@ -16,22 +16,16 @@ public class FPSHudModule extends HudModule
     }
 
     @Override
+    public void onEnable()
+    {
+        getHudEntries().add(new DynamicEntry(this, this::getFPSText, () -> true));
+    }
+
+    @Override
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
+        super.drawHudComponent(context, tickDelta);
         fps.count();
-        drawText(context.getMatrices(), getFPSText(), getX() + 2, getY() + 2);
-    }
-
-    @Override
-    public int getWidth()
-    {
-        return getTextWidth(getFPSText());
-    }
-
-    @Override
-    public int getHeight()
-    {
-        return 12;
     }
 
     public String getFPSText()

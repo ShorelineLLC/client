@@ -61,7 +61,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
                 continue;
             }
 
-            double blockDist = pos.getSquaredDistance(entity.getPos());
+            double blockDist = explosionCenter.squaredDistanceTo(entity.getPos());
             if (blockDist > 144.0f)
             {
                 continue;

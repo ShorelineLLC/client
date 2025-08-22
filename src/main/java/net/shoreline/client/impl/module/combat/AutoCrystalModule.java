@@ -16,6 +16,7 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
@@ -29,14 +30,17 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.EntitySpawnEvent;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.combat.util.TickPriorities;
+import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
+import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.Rotation;
@@ -44,8 +48,11 @@ import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionUtil;
 import net.shoreline.client.util.entity.EntityUtil;
+import net.shoreline.client.util.math.PerSecond;
+import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -180,7 +187,12 @@ public class AutoCrystalModule extends ListeningToggleable
     private final Map<Integer, Long> attackPackets = new HashMap<>();
     private final Map<BlockPos, Long> placePackets = new HashMap<>();
 
-    private final ConcurrentMap<BlockPos, Animation> fadeAnimations = new ConcurrentHashMap<>();
+    private final QueueAverage breakTime = new QueueAverage(20);
+    private final PerSecond cps = new PerSecond();
+
+    private final DecimalFormat numFormat = new DecimalFormat("0.0");
+
+    private final ConcurrentMap<CrystalData<BlockPos>, Animation> fadeAnimations = new ConcurrentHashMap<>();
 
     public AutoCrystalModule()
     {
@@ -193,6 +205,14 @@ public class AutoCrystalModule extends ListeningToggleable
     {
         currentAttack = null;
         currentPlace = null;
+        attackPackets.clear();
+        placePackets.clear();
+    }
+
+    @Override
+    public String getModuleData()
+    {
+        return String.format("%sms, %s", numFormat.format(breakTime.average()), cps.getPerSecond());
     }
 
     @EventListener
@@ -295,22 +315,32 @@ public class AutoCrystalModule extends ListeningToggleable
             return;
         }
 
-        Vec3d crystalPos = event.getPos();
-        BlockPos crystalBase = BlockPos.ofFloored(crystalPos.offset(Direction.DOWN, 1.0));
-
-        if (placePackets.remove(crystalBase) == null || !sequentialBreak.getValue())
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
         {
             return;
         }
 
-        Hand hand = getCrystalHand();
+        Vec3d crystalPos = event.getPos();
+        BlockPos crystalBase = BlockPos.ofFloored(crystalPos.offset(Direction.DOWN, 1.0));
 
-        attackCrystal(event.getEntityId(), hand);
-        attackTimer.reset();
-
-        if (currentPlace != null && sequentialPlace.getValue())
+        if (placePackets.remove(crystalBase) == null)
         {
-            placeCrystal(currentPlace.getCrystalData(), hand);
+            return;
+        }
+
+        cps.count();
+
+        if (sequentialBreak.getValue())
+        {
+            Hand hand = getCrystalHand();
+
+            attackCrystal(event.getEntityId(), hand);
+            attackTimer.reset();
+
+            if (currentPlace != null && sequentialPlace.getValue())
+            {
+                placeCrystal(currentPlace.getCrystalData(), hand);
+            }
         }
     }
 
@@ -327,7 +357,27 @@ public class AutoCrystalModule extends ListeningToggleable
             if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getCenter()) <= 144.0)
             {
                 mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
-                attackPackets.remove(entity.getId());
+            }
+        }
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (checkNull())
+        {
+            return;
+        }
+
+        if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                Long time = attackPackets.remove(id);
+                if (time != null)
+                {
+                    breakTime.add(System.currentTimeMillis() - time);
+                }
             }
         }
     }
@@ -337,12 +387,13 @@ public class AutoCrystalModule extends ListeningToggleable
     {
         if (currentPlace != null)
         {
-            fadeAnimations.put(currentPlace.getCrystalData(), new Animation(true, 250));
+            fadeAnimations.put(currentPlace, new Animation(true, 250));
         }
 
-        for (Map.Entry<BlockPos, Animation> entry : fadeAnimations.entrySet())
+        for (Map.Entry<CrystalData<BlockPos>, Animation> entry : fadeAnimations.entrySet())
         {
-            BlockPos placeData = entry.getKey();
+            CrystalData<BlockPos> placeData = entry.getKey();
+            BlockPos placePos = placeData.getCrystalData();
             Animation anim = entry.getValue();
 
             if (anim.getFactor() <= 0.01)
@@ -351,10 +402,15 @@ public class AutoCrystalModule extends ListeningToggleable
                 continue;
             }
 
+            float animFactor = (float) Easing.SMOOTH_STEP.ease(anim.getFactor());
             anim.setState(false);
             BoxRender.FILL.render(event.getMatrixStack(),
-                    placeData, ThemeModule.INSTANCE.getPrimaryColor().getRGB(),
-                    (float) Easing.SMOOTH_STEP.ease(anim.getFactor()));
+                    placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), animFactor);
+
+            double damage = ExplosionUtil.getAppliedDamageToEntity(placeData.getTarget().getEntity(), (float) placeData.getDamageToTarget());
+            NametagsModule.INSTANCE.renderNametag(event.getMatrixStack(), placePos.toCenterPos(),
+                    numFormat.format(damage),
+                    ColorUtil.withTransparency(-1, animFactor));
         }
     }
 

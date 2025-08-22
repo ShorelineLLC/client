@@ -98,10 +98,12 @@ public class ModuleManager
                 new TimerModule(),
 
                 // HUD
+                new ArrayListHudModule(),
                 new FPSHudModule(),
+                new PingHudModule(),
                 new SpeedHudModule(),
-                new WatermarkHudModule(),
-                new ArrayListHudModule()
+                new TPSHudModule(),
+                new WatermarkHudModule()
         );
 
         for (Module module : getAllModules())

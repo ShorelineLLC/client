@@ -7,7 +7,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.shoreline.client.util.world.RaytraceContext;
 
@@ -116,15 +115,7 @@ public class ExplosionTrace
                 return null;
             }
 
-            VoxelShape voxelShape = VoxelShapes.fullCube();
-            try
-            {
-                voxelShape = blockState.getCollisionShape(blockView, blockPos);
-            } catch (Throwable ignored)
-            {
-
-            }
-
+            VoxelShape voxelShape = blockState.getCollisionShape(blockView, blockPos);
             return voxelShape.raycast(context.start(), context.end(), blockPos);
         };
     }

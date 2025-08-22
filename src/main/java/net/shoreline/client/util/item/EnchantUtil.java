@@ -38,6 +38,7 @@ public class EnchantUtil
         {
             return false;
         }
+
         for (Object2IntMap.Entry<RegistryEntry<Enchantment>> e : enchants)
         {
             RegistryEntry<Enchantment> enchantment = e.getKey();

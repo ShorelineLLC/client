@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.block.AsyncBlockScanner;
+import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,9 +21,11 @@ public abstract class AsyncWorldScanner extends AsyncBlockScanner implements Asy
         @Override
         protected float getRadius()
         {
-            return AsyncWorldScanner.this.getRadius();
+            return getEntityRadius();
         }
     };
+
+    public abstract float getEntityRadius();
 
     @Override
     public void createCube(ClientWorld world, BlockPos center)
@@ -34,7 +37,7 @@ public abstract class AsyncWorldScanner extends AsyncBlockScanner implements Asy
     @Override
     public void createSphere(ClientWorld world, BlockPos center)
     {
-        super.createCube(world, center);
+        super.createSphere(world, center);
         createEntityLookup(world, center.toCenterPos());
     }
 

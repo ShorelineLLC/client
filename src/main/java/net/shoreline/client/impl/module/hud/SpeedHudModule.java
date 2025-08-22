@@ -1,15 +1,15 @@
 package net.shoreline.client.impl.module.hud;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
-import net.shoreline.client.impl.module.impl.hud.HudModule;
+import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
+import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
 import net.shoreline.client.impl.module.world.TimerModule;
 
 import java.text.DecimalFormat;
 
-public class SpeedHudModule extends HudModule
+public class SpeedHudModule extends DynamicHudModule
 {
     Config<Format> formatMode = new EnumConfig.Builder<Format>("Format")
             .setValues(Format.values())
@@ -24,21 +24,9 @@ public class SpeedHudModule extends HudModule
     }
 
     @Override
-    public void drawHudComponent(DrawContext context, float tickDelta)
+    public void onEnable()
     {
-        drawText(context.getMatrices(), getSpeedometerText(), getX() + 2, getY() + 2);
-    }
-
-    @Override
-    public int getWidth()
-    {
-        return getTextWidth(getSpeedometerText());
-    }
-
-    @Override
-    public int getHeight()
-    {
-        return 12;
+        getHudEntries().add(new DynamicEntry(this, this::getSpeedometerText, () -> true));
     }
 
     private String getSpeedometerText()
@@ -62,7 +50,7 @@ public class SpeedHudModule extends HudModule
         }
 
         String format = formatMode.getValue() == Format.K_M_H ? "km/h" : "b/s";
-        return String.format("Speed §f%s%s", decimalFormatter.format(speed), format);
+        return String.format("Speed " + Formatting.WHITE + "%s%s", decimalFormatter.format(speed), format);
     }
 
     public enum Format

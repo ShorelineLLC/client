@@ -23,6 +23,12 @@ import java.text.DecimalFormat;
 
 public class VelocityModule extends Toggleable
 {
+    Config<Boolean> cancelKnockback = new BooleanConfig.Builder("Knockback")
+            .setDescription("Cancels player knockback")
+            .setDefaultValue(true).build();
+    Config<Boolean> cancelExplosion = new BooleanConfig.Builder("Explosion")
+            .setDescription("Cancels explosion knockback")
+            .setDefaultValue(true).build();
     Config<VelocityMode> modeConfig = new EnumConfig.Builder<VelocityMode>("Mode")
             .setValues(VelocityMode.values())
             .setDescription("The bypass mode for anti knockback")
@@ -103,6 +109,11 @@ public class VelocityModule extends Toggleable
                 return;
             }
 
+            if (!cancelKnockback.getValue())
+            {
+                return;
+            }
+
             if (shouldCancelKnockback())
             {
                 event.cancel();
@@ -136,6 +147,11 @@ public class VelocityModule extends Toggleable
     @EventListener
     public void onExplosion(ExplosionEvent event)
     {
+        if (event.getPlayerVelocity() == null || !cancelExplosion.getValue())
+        {
+            return;
+        }
+
         if (shouldCancelExplosions())
         {
             event.cancel();

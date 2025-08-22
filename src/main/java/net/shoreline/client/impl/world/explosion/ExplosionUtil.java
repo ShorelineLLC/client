@@ -2,6 +2,12 @@ package net.shoreline.client.impl.world.explosion;
 
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifierSlot;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -11,6 +17,10 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
@@ -48,13 +58,20 @@ public class ExplosionUtil
                                  final boolean ignoreTerrain,
                                  final Set<BlockPos> ignoreBlocks)
     {
-        float dmg = ExplosionTrace.getDamageToPos(blockView, explosion, entity.getPos(), entity.getBoundingBox(), power, ignoreTerrain, ignoreBlocks);
+        float dmg = ExplosionTrace.getDamageToPos(blockView,
+                explosion,
+                entity.getPos(),
+                entity.getBoundingBox(),
+                power,
+                ignoreTerrain,
+                ignoreBlocks);
+
         return getAppliedDamageToEntity(entity, dmg);
     }
 
-    public float getAppliedDamageToEntity(LivingEntity livingEntity, float damage)
+    public float getAppliedDamageToEntity(Entity entity, float damage)
     {
-        return Math.max(0.0f, getReduction(livingEntity, MinecraftClient.getInstance().world.getDamageSources().explosion(null), damage));
+        return Math.max(0.0f, getReduction(entity, MinecraftClient.getInstance().world.getDamageSources().explosion(null), damage));
     }
 
     private float getReduction(Entity entity, DamageSource damageSource, float damage)
@@ -88,29 +105,41 @@ public class ExplosionUtil
     {
         if (player instanceof LivingEntity livingEntity)
         {
-            float protLevel = getProtectionAmount(livingEntity);
+            float protLevel = getProtectionAmount(livingEntity.getArmorItems());
             return DamageUtil.getInflictedDamage(damage, protLevel);
         }
 
         return 0.0f;
     }
 
-    private float getProtectionAmount(LivingEntity livingEntity)
+    private float getProtectionAmount(Iterable<ItemStack> equipment)
     {
         MutableInt mutableInt = new MutableInt();
-        livingEntity.getArmorItems().forEach(stack ->
+        equipment.forEach(i ->
         {
-            if (AnticheatModule.INSTANCE.getAssumeEnchanted().getValue() && EnchantUtil.isEnchantsObfuscated(stack))
+            if (AnticheatModule.INSTANCE.getAssumeEnchanted().getValue() && EnchantUtil.isEnchantsObfuscated(i))
             {
-                mutableInt.add(livingEntity.getPreferredEquipmentSlot(stack) == EquipmentSlot.LEGS ? 8 : 4);
-            }
-            else
+                ComponentMap item = i.getItem().getComponents();
+                if (item.contains(DataComponentTypes.EQUIPPABLE))
+                {
+                    mutableInt.add(item.get(DataComponentTypes.EQUIPPABLE).slot().getIndex() == 2 ? 8 : 4);
+                }
+            } else
             {
-                int modifierBlast = EnchantUtil.getLevel(Enchantments.BLAST_PROTECTION, stack);
-                int modifier = EnchantUtil.getLevel(Enchantments.PROTECTION, stack);
-                mutableInt.add(modifierBlast * 2 + modifier);
-            }
+                ItemEnchantmentsComponent enchantments = EnchantmentHelper.getEnchantments(i);
+                for (RegistryEntry<Enchantment> enchantment : enchantments.getEnchantments())
+                {
+                    if (enchantment.getIdAsString().contains("protection"))
+                    {
+                        mutableInt.add(enchantments.getLevel(enchantment));
+                    }
 
+                    if (enchantment.getIdAsString().contains("blast_protection"))
+                    {
+                        mutableInt.add(enchantments.getLevel(enchantment) * 2);
+                    }
+                }
+            }
         });
 
         return mutableInt.intValue();

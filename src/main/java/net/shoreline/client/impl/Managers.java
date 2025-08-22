@@ -16,6 +16,7 @@ import net.shoreline.client.impl.rotation.RotationManager;
 import net.shoreline.client.impl.module.ModuleManager;
 import net.shoreline.client.impl.inventory.InventoryManager;
 import net.shoreline.client.impl.render.RenderManager;
+import net.shoreline.client.impl.world.TickManager;
 
 public class Managers
 {
@@ -28,12 +29,13 @@ public class Managers
     public static InventoryManager INVENTORY;
     public static MovementManager MOVEMENT;
     public static InteractManager INTERACT;
+    public static TickManager TICK;
     public static MiningManager MINING;
-    public static RenderManager RENDER;
     public static SafeHoleManager HOLE;
     public static TotemManager TOTEM;
     public static KitManager KIT;
     public static CrystalCalcManager CRYSTAL;
+    public static RenderManager RENDER;
     public static ShaderManager SHADER;
 
     public static void init()
@@ -47,12 +49,13 @@ public class Managers
         INVENTORY = new InventoryManager();
         MOVEMENT = new MovementManager();
         INTERACT = new InteractManager();
+        TICK = new TickManager();
         MINING = new MiningManager();
-        RENDER = new RenderManager();
         HOLE = new SafeHoleManager();
         TOTEM = new TotemManager();
         KIT = new KitManager();
         CRYSTAL = new CrystalCalcManager();
+        RENDER = new RenderManager();
     }
 
     public static void postInit()
