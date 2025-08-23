@@ -38,12 +38,12 @@ public class PlacerModule extends ListeningToggleable
         super(name, nameAliases, description, category);
     }
 
-    protected void placeBlock(BlockPos placePos, Block block)
+    protected boolean placeBlock(BlockPos placePos, Block block)
     {
-        placeBlock(placePos, block, true);
+        return placeBlock(placePos, block, true);
     }
 
-    protected void placeBlock(BlockPos placePos, Block block, boolean packetPlace)
+    protected boolean placeBlock(BlockPos placePos, Block block, boolean packetPlace)
     {
         final Interaction interaction = Interaction.builder()
                 .pos(placePos)
@@ -53,8 +53,8 @@ public class PlacerModule extends ListeningToggleable
                 .packetPlace(packetPlace)
                 .build();
 
-        Managers.INTERACT.placeBlock(interaction);
         fadeOutAnimations.put(placePos, new Animation(true, 250));
+        return Managers.INTERACT.placeBlock(interaction);
     }
 
     protected boolean runSingleBlockPlacement(BlockPos placePos, Block block, int slot)
@@ -64,9 +64,9 @@ public class PlacerModule extends ListeningToggleable
             return false;
         }
 
-        placeBlock(placePos, block);
+        boolean result = placeBlock(placePos, block);
         Managers.INTERACT.endPlacement();
-        return true;
+        return result;
     }
 
     protected List<BlockPos> getPlacements(Block block, List<BlockPos> posList, double range)

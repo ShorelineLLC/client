@@ -5,6 +5,7 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
@@ -29,6 +30,8 @@ public class SprintModule extends MovementModule
             .setDescription("Fixes jumping slowdown in Rage sprint")
             .setVisible(() -> modeConfig.getValue().equals(SprintMode.RAGE))
             .setDefaultValue(false).build();
+
+    private boolean stopRotating;
 
     public SprintModule()
     {
@@ -59,7 +62,23 @@ public class SprintModule extends MovementModule
                 }
             }
 
-            case RAGE -> mc.player.setSprinting(true);
+            case RAGE ->
+            {
+                if (!InputUtil.isInputtingMovement())
+                {
+                    mc.player.setSprinting(false);
+                    return;
+                }
+
+                float sprintYaw = InputUtil.getYawFromInput(mc.player.getYaw());
+                if (!Managers.ROTATION.isFacingYaw(sprintYaw))
+                {
+                    mc.player.setSprinting(false);
+                    return;
+                }
+
+                mc.player.setSprinting(true);
+            }
         }
     }
 
@@ -71,8 +90,13 @@ public class SprintModule extends MovementModule
             return;
         }
 
+        if (event.isCanceled())
+        {
+            return;
+        }
+
         float sprintYaw = InputUtil.getYawFromInput(mc.player.getYaw());
-        event.receiveCanceled();
+        event.cancel();
         event.setYaw(sprintYaw);
     }
 

@@ -3,6 +3,7 @@ package net.shoreline.client.impl.rotation;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
@@ -127,13 +128,13 @@ public class RotationManager extends GenericFeature
         handler.onPacketUpdatePost(mc.player);
     }
 
-    @EventListener
+    @EventListener(priority = Integer.MIN_VALUE)
     public void onUpdatePre(PlayerUpdateEvent.Pre event)
     {
         Rotation playerRotation = new Rotation(mc.player);
         ClientRotationEvent rotationEvent = new ClientRotationEvent(playerRotation);
         EventBus.INSTANCE.dispatch(rotationEvent);
-        if (rotationEvent.isReceiveCanceled())
+        if (rotationEvent.isCanceled())
         {
             setClientRotation(rotationEvent.getRotation());
         } else if (hasClientRotation())
@@ -209,7 +210,6 @@ public class RotationManager extends GenericFeature
      */
     public void setSilentRotation(Rotation rotation)
     {
-        setClientRotation(rotation);
         Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
                 mc.player.getX(),
                 mc.player.getY(),
@@ -218,6 +218,29 @@ public class RotationManager extends GenericFeature
                 rotation.getPitch(),
                 mc.player.isOnGround(),
                 mc.player.horizontalCollision));
+    }
+
+    public void resetSilentRotation()
+    {
+        Rotation playerRotation = hasClientRotation() ? clientRotation : serverRotation;
+        setSilentRotation(playerRotation);
+    }
+
+    public boolean isFacingYaw(float yaw)
+    {
+        float dyaw = MathHelper.wrapDegrees(serverRotation.getYaw() - yaw);
+        return Math.abs(dyaw) <= 0.1f;
+    }
+
+    public boolean isFacingPitch(float pitch)
+    {
+        float p2 = MathHelper.clamp(pitch, -90.0f, 90.0f);
+        return Math.abs(serverRotation.getPitch() - p2) <= 0.1f;
+    }
+
+    public boolean isFacing(float yaw, float pitch)
+    {
+        return isFacingYaw(yaw) && isFacingPitch(pitch);
     }
 
     public void clearClientRotation()

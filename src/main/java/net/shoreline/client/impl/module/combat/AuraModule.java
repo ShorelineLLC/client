@@ -100,7 +100,7 @@ public class AuraModule extends CombatModule
            return;
         }
 
-        if (AutoCrystalModule.INSTANCE.isEnabled())
+        if (event.isCanceled() || AutoCrystalModule.INSTANCE.isEnabled())
         {
             return;
         }
@@ -127,7 +127,7 @@ public class AuraModule extends CombatModule
 
         if (rotateConfig.getValue() == RotateMode.SILENT)
         {
-            Managers.ROTATION.setSilentRotation(new Rotation(mc.player));
+            Managers.ROTATION.resetSilentRotation();
         }
     }
 

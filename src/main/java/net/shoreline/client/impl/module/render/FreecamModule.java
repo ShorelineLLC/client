@@ -141,6 +141,11 @@ public class FreecamModule extends Toggleable
     @EventListener
     public void onClientRotation(ClientRotationEvent event)
     {
+        if (event.isCanceled())
+        {
+            return;
+        }
+
         if (rotateConfig.getValue())
         {
             float[] currentAngles = { yaw, pitch };
@@ -149,7 +154,7 @@ public class FreecamModule extends Toggleable
             if (result instanceof BlockHitResult blockResult)
             {
                 float[] newAngles = RotationUtil.getRotationsTo(mc.player.getEyePos(), blockResult.getBlockPos().toCenterPos());
-                event.receiveCanceled();
+                event.cancel();
                 event.setYaw(newAngles[0]);
                 event.setPitch(newAngles[1]);
             }

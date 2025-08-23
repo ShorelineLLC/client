@@ -55,7 +55,7 @@ public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNet
             shift = At.Shift.AFTER), cancellable = true)
     private void hookExplosion(ExplosionS2CPacket packet, CallbackInfo ci)
     {
-        final ExplosionEvent event = new ExplosionEvent(packet.center(), packet.playerKnockback().get());
+        final ExplosionEvent event = new ExplosionEvent(packet.center(), packet.playerKnockback().isPresent() ? packet.playerKnockback().get() : Vec3d.ZERO);
         EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {

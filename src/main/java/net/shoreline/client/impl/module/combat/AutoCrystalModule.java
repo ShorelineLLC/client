@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -20,6 +22,7 @@ import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.world.BlockView;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
@@ -43,6 +46,7 @@ import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.impl.world.EntityState;
@@ -149,18 +153,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .addAll(minDamage, maxSelfDamage, overrideConfig, minArmorDamage,
                     damageMultiplier, ignoreTerrain).build();
 
-    Config<Boolean> shouldRotate = new BooleanConfig.Builder("AutoRotate")
-            .setDescription("Rotates before placing crystals")
-            .setDefaultValue(false).build();
-    Config<Boolean> rotatePacket = new BooleanConfig.Builder("SilentRotate")
-            .setDescription("Rotates without looking at the crystal")
-            .setVisible(() -> shouldRotate.getValue())
-            .setDefaultValue(false).build();
-    Config<Float> yawLimit = new NumberConfig.Builder<Float>("FOV")
-            .setMin(1.0f).setMax(180.0f).setDefaultValue(180.0f).setFormat("deg")
-            .setDescription("The field of view for attacking").build();
-    Config<Void> rotateConfig = new ConfigGroup.Builder("Rotate")
-            .addAll(shouldRotate, rotatePacket, yawLimit).build();
+    Config<RotateMode> rotateConfig = new EnumConfig.Builder<RotateMode>("Rotate")
+            .setValues(RotateMode.values())
+            .setDescription("Rotates to before interacting")
+            .setDefaultValue(RotateMode.OFF).build();
 
     Config<Boolean> autoSwap = new BooleanConfig.Builder("AutoSwap")
             .setDescription("Automatically swaps to crystals before placing")
@@ -246,7 +242,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (checkNull())
+        if (checkNull() || event.isCanceled())
         {
             return;
         }
@@ -267,7 +263,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             EntityState crystalState = currentAttack.getCrystalData();
             crystalVec = crystalState.getPos();
             rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
-            if (rotatePacket.getValue())
+            if (rotateConfig.getValue() == RotateMode.SILENT)
             {
                 Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
                 silentRotated = true;
@@ -287,13 +283,14 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             {
                 if (!runSingleObbyPlacement(crystalPos))
                 {
+                    currentPlace = null;
                     return;
                 }
             }
 
             crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.0, 0.0);
             rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
-            if (rotatePacket.getValue() && !silentRotated)
+            if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
             {
                 Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
                 silentRotated = true;
@@ -308,11 +305,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (silentRotated)
         {
-            Managers.ROTATION.setSilentRotation(new Rotation(mc.player));
+            Managers.ROTATION.resetSilentRotation();
             return;
         }
 
-        if (rotations != null && shouldRotate.getValue())
+        if (rotations != null && rotateConfig.getValue() == RotateMode.NORMAL)
         {
             event.cancel();
             event.setYaw(rotations[0]);
@@ -568,7 +565,24 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private boolean hasCrystalBaseBlock(BlockPos pos)
     {
         BlockState state = mc.world.getBlockState(pos);
-        return state.isOf(Blocks.OBSIDIAN) || state.isOf(Blocks.BEDROCK);
+        if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
+        {
+            return false;
+        }
+
+        return hasSpaceToPlaceCrystal(mc.world, pos);
+    }
+
+    public boolean hasSpaceToPlaceCrystal(BlockView blockView, BlockPos blockPos)
+    {
+        BlockPos p2 = blockPos.up();
+        BlockState state2 = blockView.getBlockState(p2);
+        if (protocolPlace.getValue() && !blockView.getBlockState(p2.up()).isAir())
+        {
+            return false;
+        }
+
+        return state2.isAir() || state2.isOf(Blocks.FIRE);
     }
 
     private Hand getCrystalHand()

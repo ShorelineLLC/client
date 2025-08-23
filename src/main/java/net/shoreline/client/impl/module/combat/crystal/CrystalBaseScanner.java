@@ -103,14 +103,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
             return false;
         }
 
-        BlockPos p2 = pos.up();
-        BlockState state2 = getBlockState(p2);
-        if (autoCrystal.getProtocolPlace().getValue() && !getBlockState(p2.up()).isAir())
-        {
-            return false;
-        }
-
-        if (!state2.isAir() && !state2.isOf(Blocks.FIRE))
+        if (!autoCrystal.hasSpaceToPlaceCrystal(this, pos))
         {
             return false;
         }

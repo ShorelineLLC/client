@@ -54,16 +54,21 @@ public class AntiAimModule extends Toggleable
         }
     }
 
-    @EventListener(priority = Integer.MAX_VALUE)
+    @EventListener(priority = Integer.MIN_VALUE)
     public void onRotation(ClientRotationEvent event)
     {
+        if (event.isCanceled())
+        {
+            return;
+        }
+
         if (mc.options.attackKey.isPressed() || mc.options.useKey.isPressed())
         {
             return;
         }
 
         current = new Rotation(getYaw(), getPitch());
-        event.receiveCanceled();
+        event.cancel();
         event.setRotation(current);
     }
 

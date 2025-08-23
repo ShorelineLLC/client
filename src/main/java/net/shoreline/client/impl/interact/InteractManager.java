@@ -50,35 +50,36 @@ public class InteractManager extends GenericFeature
         super("Interactions");
     }
 
-    public void placeBlock(Interaction interaction)
+    public boolean placeBlock(Interaction interaction)
     {
         final BlockPos blockPos = interaction.getPos();
         if (!mc.world.isInBuildLimit(blockPos))
         {
-            return;
+            return false;
         }
 
         placedBlocks.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
         if (placedBlocks.size() >= anticheat.getBptConfig().getValue() * 20)
         {
-            return;
+            return false;
         }
 
         if (System.currentTimeMillis() - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay().getValue())
         {
-            return;
+            return false;
         }
 
         List<EndCrystalEntity> crystalsBlocking = getCrystalsBlocking(blockPos, interaction.getBlock());
         if (!crystalsBlocking.isEmpty())
         {
-            return;
+            return false;
         }
 
-        placeBlockInternal(interaction);
+        boolean result = placeBlockInternal(interaction);
 
         placedBlocks.put(blockPos, System.currentTimeMillis());
         crystalsBlocking.forEach(e -> placedEntityIds.merge(e, 1, Integer::sum));
+        return result;
     }
 
     public boolean canPlaceBlock(BlockPos blockPos, Block block)
@@ -114,7 +115,7 @@ public class InteractManager extends GenericFeature
         return crystalEntities;
     }
 
-    private void placeBlockInternal(Interaction interaction)
+    private boolean placeBlockInternal(Interaction interaction)
     {
         Direction direction = interaction.getDirection();
         Hand hand = interaction.getHand();
@@ -137,7 +138,7 @@ public class InteractManager extends GenericFeature
 
         if (direction == null)
         {
-            return;
+            return false;
         }
 
         Vec3d eyePos = mc.player.getEyePos();
@@ -184,6 +185,8 @@ public class InteractManager extends GenericFeature
         {
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
         }
+
+        return true;
     }
 
     public boolean startPlacement(int slot)
@@ -215,7 +218,7 @@ public class InteractManager extends GenericFeature
 
         if (anticheat.getInteractRotate().getValue())
         {
-            Managers.ROTATION.setSilentRotation(new Rotation(mc.player));
+            Managers.ROTATION.resetSilentRotation();
         }
 
         Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
