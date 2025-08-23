@@ -29,10 +29,10 @@ public class ObsidianPlacerModule extends PlacerModule
         placeBlock(placePos, currentObbyBlock);
     }
 
-    protected void runSingleObbyPlacement(BlockPos placePos)
+    protected boolean runSingleObbyPlacement(BlockPos placePos)
     {
         int obbySlot = findBestObbySlot();
-        runSingleBlockPlacement(placePos, currentObbyBlock, obbySlot);
+        return runSingleBlockPlacement(placePos, currentObbyBlock, obbySlot);
     }
 
     protected int findBestObbySlot()

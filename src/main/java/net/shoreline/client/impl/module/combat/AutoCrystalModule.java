@@ -2,9 +2,9 @@ package net.shoreline.client.impl.module.combat;
 
 import com.google.common.collect.Lists;
 import lombok.Getter;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -24,7 +24,6 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
@@ -37,6 +36,7 @@ import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.combat.util.TickPriorities;
+import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
@@ -60,7 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 @Getter
-public class AutoCrystalModule extends ListeningToggleable
+public class AutoCrystalModule extends ObsidianPlacerModule
 {
     public static AutoCrystalModule INSTANCE;
 
@@ -107,11 +107,14 @@ public class AutoCrystalModule extends ListeningToggleable
     Config<Boolean> protocolPlace = new BooleanConfig.Builder("Protocol")
             .setDescription("Prevents placements in 1x1 areas")
             .setDefaultValue(false).build();
+    Config<Boolean> basePlace = new BooleanConfig.Builder("Support")
+            .setDescription("Places an obsidian block if there is none")
+            .setDefaultValue(false).build();
     Config<Boolean> sequentialPlace = new BooleanConfig.Builder("SequentialPlace")
             .setDescription("Places immediately after breaking a crystal")
             .setDefaultValue(false).build();
     Config<Void> placeConfig = new ConfigGroup.Builder("Place")
-            .addAll(placeRange, placeDelay, protocolPlace, sequentialPlace).build();
+            .addAll(placeRange, placeDelay, protocolPlace, basePlace, sequentialPlace).build();
 
     Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
             .setDescription("Targets dropped items blocking placements")
@@ -235,7 +238,9 @@ public class AutoCrystalModule extends ListeningToggleable
         List<CrystalData<EntityState>> latestCrystalEntities = Managers.CRYSTAL.getEntityResults();
 
         currentAttack = getBestData(latestCrystalEntities);
-        currentPlace = getBestData(latestCrystalBases);
+
+        List<CrystalData<BlockPos>> placements = getPlacements(latestCrystalBases);
+        currentPlace = getBestData(basePlace.getValue() && placements.isEmpty() ? latestCrystalBases : placements);
     }
 
     @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
@@ -278,6 +283,14 @@ public class AutoCrystalModule extends ListeningToggleable
         if (currentPlace != null)
         {
             BlockPos crystalPos = currentPlace.getCrystalData();
+            if (basePlace.getValue() && !hasCrystalBaseBlock(crystalPos))
+            {
+                if (!runSingleObbyPlacement(crystalPos))
+                {
+                    return;
+                }
+            }
+
             crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.0, 0.0);
             rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
             if (rotatePacket.getValue() && !silentRotated)
@@ -301,7 +314,7 @@ public class AutoCrystalModule extends ListeningToggleable
 
         if (rotations != null && shouldRotate.getValue())
         {
-            event.receiveCanceled();
+            event.cancel();
             event.setYaw(rotations[0]);
             event.setPitch(rotations[1]);
         }
@@ -423,9 +436,9 @@ public class AutoCrystalModule extends ListeningToggleable
         if (!canBreakCrystal)
         {
             int slot = getAntiWeaknessSlot(mc.player.getInventory());
-            if (slot != -1)
+            if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))
             {
-                Managers.INVENTORY.startSwap(slot, silentType.getValue());
+                return;
             }
         }
 
@@ -477,16 +490,14 @@ public class AutoCrystalModule extends ListeningToggleable
         BlockHitResult result = new BlockHitResult(cut, placeDir, blockPos, box.contains(eyePos));
         if (autoSwap.getValue() && silentSwap.getValue())
         {
-            int slot = InventoryUtil.getInventorySlot(Items.END_CRYSTAL);
-            if (slot != -1)
+            int slot = InventoryUtil.getItemSlot(Items.END_CRYSTAL, silentType.getValue());
+            if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))
             {
-                Managers.INVENTORY.startSwap(slot, silentType.getValue());
+                return;
             }
         }
 
-        ItemStack stack = Managers.INVENTORY.getServerStack();
-        if (mc.player.getStackInHand(hand).getItem() != Items.END_CRYSTAL
-                && stack.getItem() != Items.END_CRYSTAL)
+        if (!Managers.INVENTORY.isHolding(Items.END_CRYSTAL, hand))
         {
             return;
         }
@@ -511,6 +522,11 @@ public class AutoCrystalModule extends ListeningToggleable
     public boolean shouldRunCalcs()
     {
         return isEnabled() && !mc.player.isSpectator();
+    }
+
+    private List<CrystalData<BlockPos>> getPlacements(List<CrystalData<BlockPos>> crystalData)
+    {
+        return crystalData.stream().filter(d -> hasCrystalBaseBlock(d.getCrystalData())).toList();
     }
 
     private <T> CrystalData<T> getBestData(List<CrystalData<T>> crystals)
@@ -549,6 +565,12 @@ public class AutoCrystalModule extends ListeningToggleable
         return bestCrystal;
     }
 
+    private boolean hasCrystalBaseBlock(BlockPos pos)
+    {
+        BlockState state = mc.world.getBlockState(pos);
+        return state.isOf(Blocks.OBSIDIAN) || state.isOf(Blocks.BEDROCK);
+    }
+
     private Hand getCrystalHand()
     {
         final ItemStack offhand = mc.player.getOffHandStack();
@@ -568,7 +590,13 @@ public class AutoCrystalModule extends ListeningToggleable
             if (stack.getItem().getTranslationKey().contains("pickaxe")
                     || stack.getItem().getTranslationKey().contains("sword"))
             {
-                return i;
+                if (silentType.getValue() == SilentSwapType.INVENTORY)
+                {
+                    return InventoryUtil.getPacketSlotIndex(i);
+                } else if (i < PlayerInventory.getHotbarSize())
+                {
+                    return i;
+                }
             }
         }
 

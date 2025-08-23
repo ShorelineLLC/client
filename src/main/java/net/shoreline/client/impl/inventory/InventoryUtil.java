@@ -22,7 +22,12 @@ public class InventoryUtil
 
     public int getItemSlot(Item item)
     {
-        return AnticheatModule.INSTANCE.getSilentSwapType() == SilentSwapType.INVENTORY ? getInventorySlot(item) : getHotbarSlot(item);
+        return getItemSlot(item, AnticheatModule.INSTANCE.getSilentSwapType());
+    }
+
+    public int getItemSlot(Item item, SilentSwapType type)
+    {
+        return type == SilentSwapType.INVENTORY ? getInventorySlot(item) : getHotbarSlot(item);
     }
 
     public int getInventorySlot(Item item)

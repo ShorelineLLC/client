@@ -57,15 +57,16 @@ public class PlacerModule extends ListeningToggleable
         fadeOutAnimations.put(placePos, new Animation(true, 250));
     }
 
-    protected void runSingleBlockPlacement(BlockPos placePos, Block block, int slot)
+    protected boolean runSingleBlockPlacement(BlockPos placePos, Block block, int slot)
     {
         if (!canPlaceBlock(placePos, block) || !Managers.INTERACT.startPlacement(slot))
         {
-            return;
+            return false;
         }
 
         placeBlock(placePos, block);
         Managers.INTERACT.endPlacement();
+        return true;
     }
 
     protected List<BlockPos> getPlacements(Block block, List<BlockPos> posList, double range)

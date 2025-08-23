@@ -78,7 +78,7 @@ public abstract class AsyncBlockScanner extends AsyncBlockView
     {
         for (Map.Entry<BlockPos, AsyncBlockState> entry : blockStates.entrySet())
         {
-            visit(entry.getKey(), entry.getValue().getBlockState());
+            visit(entry.getKey(), entry.getValue());
         }
     }
 
@@ -94,7 +94,7 @@ public abstract class AsyncBlockScanner extends AsyncBlockView
         return bottomY;
     }
 
-    protected abstract void visit(BlockPos pos, BlockState state);
+    protected abstract void visit(BlockPos pos, AsyncBlockState state);
 
     protected abstract int getRadius();
 }

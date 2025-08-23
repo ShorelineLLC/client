@@ -6,12 +6,14 @@ import lombok.Getter;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.Hand;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
@@ -252,22 +254,19 @@ public class InventoryManager extends GenericFeature
     {
         ScreenHandler handler = mc.player.currentScreenHandler;
 
-        int slot1 = InventoryUtil.getPacketSlotIndex(fromSlot);
-
         if (!handler.getCursorStack().getItem().equals(item))
         {
-            mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(handler.syncId, fromSlot, 0, SlotActionType.PICKUP, mc.player);
         }
 
         if (handler.getCursorStack().getItem().equals(item))
         {
-            int slot = InventoryUtil.getPacketSlotIndex(toSlot);
-            mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(handler.syncId, toSlot, 0, SlotActionType.PICKUP, mc.player);
         }
 
         if (!handler.getCursorStack().isEmpty())
         {
-            mc.interactionManager.clickSlot(handler.syncId, slot1, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(handler.syncId, fromSlot, 0, SlotActionType.PICKUP, mc.player);
         }
     }
 
@@ -290,6 +289,11 @@ public class InventoryManager extends GenericFeature
                 SlotActionType.SWAP,
                 screenHandler.getCursorStack().copy(),
                 int2ObjectMap));
+    }
+
+    public boolean isHolding(Item item, Hand hand)
+    {
+        return getServerStack().getItem().equals(item) || mc.player.getStackInHand(hand).getItem().equals(item);
     }
 
     public ItemStack getServerStack()

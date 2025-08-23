@@ -11,6 +11,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.block.AsyncBlockState;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.network.NetworkUtil;
 import net.shoreline.client.impl.world.EntityState;
@@ -21,17 +22,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CrystalBaseScanner extends CrystalEntityScanner
 {
-    private static final Box FULL_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 2.0, 1.0);
-    private static final Box HALF_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+    private static final Box FULL_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 2.0, 0.5);
+    private static final Box HALF_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 1.0, 0.5);
 
     private final AutoCrystalModule autoCrystal = AutoCrystalModule.INSTANCE;
 
     private final List<CrystalData<?>> crystalBases = new CopyOnWriteArrayList<>();
 
     @Override
-    protected void visit(BlockPos pos, BlockState state)
+    protected void visit(BlockPos pos, AsyncBlockState asyncState)
     {
-        if (!canUseOnBlock(pos, state))
+        if (!canUseOnBlock(pos, asyncState.getBlockState()))
         {
             return;
         }
@@ -97,7 +98,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
 
     private boolean canUseOnBlock(BlockPos pos, BlockState state)
     {
-        if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
+        if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK) && !state.isReplaceable())
         {
             return false;
         }
@@ -112,29 +113,28 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         if (!state2.isAir() && !state2.isOf(Blocks.FIRE))
         {
             return false;
-        } else
-        {
-            final Box bb = NetworkUtil.getServerIp().contains("crystalpvp.cc") ? HALF_CRYSTAL_BB : FULL_CRYSTAL_BB;
-            return getEntitiesBlockingCrystal(bb.offset(p2.getX(), p2.getY(), p2.getZ())).isEmpty();
         }
+
+        final Box bb = NetworkUtil.getServerIp().contains("crystalpvp.cc") ? HALF_CRYSTAL_BB : FULL_CRYSTAL_BB;
+        return !hasEntityBlockingCrystal(bb.offset(pos.up().toBottomCenterPos()));
     }
 
-    private List<EntityState> getEntitiesBlockingCrystal(Box box)
+    private boolean hasEntityBlockingCrystal(Box box)
     {
-        List<EntityState> entities = getOtherEntities(null, box);
-        for (EntityState entity : entities)
+        for (EntityState entity1 : getOtherEntities(null, box))
         {
-            final Entity entity1 = entity.getEntity();
-            if (entity1 instanceof ExperienceOrbEntity
-                    || autoCrystal.getForcePlace().getValue() && entity1 instanceof ItemEntity && entity.getAge() <= 10)
+            Entity entity = entity1.getEntity();
+            if (entity instanceof ExperienceOrbEntity || autoCrystal.getForcePlace().getValue() && entity instanceof ItemEntity && entity1.getAge() <= 10)
             {
-                entities.remove(entity);
-            } else if (entity1 instanceof EndCrystalEntity crystal)
+                continue;
+            } else if (entity instanceof EndCrystalEntity crystal)
             {
-                entities.remove(entity);
+                continue;
             }
+
+            return true;
         }
 
-        return entities;
+        return false;
     }
 }

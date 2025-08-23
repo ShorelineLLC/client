@@ -100,6 +100,11 @@ public class AuraModule extends CombatModule
            return;
         }
 
+        if (AutoCrystalModule.INSTANCE.isEnabled())
+        {
+            return;
+        }
+
         auraTarget = getAuraTarget();
         if (auraTarget == null)
         {
@@ -110,7 +115,7 @@ public class AuraModule extends CombatModule
         Rotation rotation = new Rotation(rotations[0], rotations[1]);
         if (rotateConfig.getValue() == RotateMode.NORMAL)
         {
-            event.receiveCanceled();
+            event.cancel();
             event.setYaw(rotation.getYaw());
             event.setPitch(rotation.getPitch());
         } else if (rotateConfig.getValue() == RotateMode.SILENT)
