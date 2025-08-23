@@ -18,8 +18,6 @@ import net.shoreline.client.impl.render.Easing;
 public class HudComponent extends DrawableComponent implements Interactable
 {
     private final HudModule hudModule;
-    private Anchor anchor;
-    private int index;
 
     private int x, y;
     private int px, py;
@@ -37,8 +35,6 @@ public class HudComponent extends DrawableComponent implements Interactable
         this.x = x;
         this.y = y;
         this.hoverAnim = new Animation(false, 150L, Easing.LINEAR);
-        this.anchor = hudModule.getAnchor();
-        this.index = hudModule.getIndex();
     }
 
     @Override
@@ -68,8 +64,6 @@ public class HudComponent extends DrawableComponent implements Interactable
 
         hudModule.setX(x);
         hudModule.setY(y);
-        hudModule.setAnchor(anchor);
-        hudModule.setIndex(index);
         hudModule.drawGuiComponent(context, delta);
 
         width = hudModule.getWidth();
@@ -144,13 +138,13 @@ public class HudComponent extends DrawableComponent implements Interactable
         }
         else
         {
-            index = 0;
-            anchor = Anchor.None;
+            getHudModule().setIndex(0);
+            getHudModule().setAnchor(Anchor.None);
             return;
         }
 
-        index = Integer.MAX_VALUE;
-        anchor = found;
+        getHudModule().setIndex(Integer.MAX_VALUE);
+        getHudModule().setAnchor(found);
     }
 
     public void setX(boolean module, int x)

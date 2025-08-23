@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
@@ -21,6 +22,7 @@ public class DynamicEntry
     private final UnboundAnimation animation;
     private final Animation yAnimation; // y animation should never go out of bounds.
 
+    private String lastValid;
     private int lastWidth;
     private boolean modify;
 
@@ -45,7 +47,7 @@ public class DynamicEntry
         int width = getModule().getTextWidth(current);
         float renderX = (int) (x + animation.get() - (left ? width : 0)) + paddingX;
         float renderY = (int) (y + currentOffset) + paddingY;
-        getModule().drawText(context.getMatrices(), current, renderX, renderY);
+        drawText(context.getMatrices(), current, renderX, renderY);
 
         if (drawing.get())
         {
@@ -63,6 +65,7 @@ public class DynamicEntry
             animation.get(width);
             yAnimation.setState(true);
             modify = true;
+            lastValid = current;
         }
         else
         {
@@ -82,6 +85,15 @@ public class DynamicEntry
                 }
             }
         }
+    }
+
+    /**
+     * We make this a separate method so if any hud entries need custom
+     * colors (like potion hud). they can just override this.
+     */
+    public void drawText(MatrixStack matrices, String string, float x, float y)
+    {
+        getModule().drawText(matrices, string, x, y);
     }
 
     public boolean isDrawing()

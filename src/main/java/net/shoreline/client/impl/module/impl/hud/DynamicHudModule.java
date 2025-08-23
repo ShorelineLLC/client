@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.impl.hud;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.Comparator;

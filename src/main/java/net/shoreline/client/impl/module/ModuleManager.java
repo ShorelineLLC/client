@@ -104,6 +104,7 @@ public class ModuleManager
                 new FPSHudModule(),
                 new PacketsHudModule(),
                 new PingHudModule(),
+                new PotionsHudModule(),
                 new ServerStatusHudModule(),
                 new SpeedHudModule(),
                 new TPSHudModule(),

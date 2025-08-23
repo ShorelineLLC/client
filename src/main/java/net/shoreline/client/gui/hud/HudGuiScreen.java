@@ -189,8 +189,8 @@ public class HudGuiScreen extends Screen
 
             float offset = 2f;
             List<HudComponent> anchoredElements = hudComponents.stream()
-                    .filter(e -> e.getAnchor() == anchor)
-                    .sorted(Comparator.comparingInt(HudComponent::getIndex))
+                    .filter(e -> e.getHudModule().getAnchor() == anchor)
+                    .sorted(Comparator.comparingInt(e -> e.getHudModule().getIndex()))
                     .toList();
 
             if (anchoredElements.isEmpty())
@@ -207,7 +207,6 @@ public class HudGuiScreen extends Screen
                     continue;
                 }
 
-                hudModule.setIndex(i);
                 hudModule.getHudModule().setIndex(i);
                 i++;
 
