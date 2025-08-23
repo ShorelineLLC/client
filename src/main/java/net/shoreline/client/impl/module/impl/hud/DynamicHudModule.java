@@ -3,6 +3,9 @@ package net.shoreline.client.impl.module.impl.hud;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
+import net.shoreline.client.impl.module.client.HudGuiModule;
+import net.shoreline.client.impl.render.ColorUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -89,5 +92,11 @@ public abstract class DynamicHudModule extends HudModule
         }
 
         width = result;
+    }
+
+    public void drawTextTransparency(MatrixStack matrices, String text, float x, float y, float transparency)
+    {
+        int color = ColorUtil.withTransparency(HudGuiModule.INSTANCE.getColor((int) y), transparency);
+        drawText(matrices, text, x, y, color);
     }
 }

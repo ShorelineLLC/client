@@ -77,8 +77,8 @@ public class ColorPickerComponent extends ConfigComponent<Color>
 
         drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
 
-        drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 1, 0x33000000);
-        drawRect(context, getTx() + getWidth() - 14, getTy() + 2, 12, 12, getConfig().getValue().getRGB());
+        drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 0.5f, 0x33000000);
+        drawRect(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, getConfig().getValue().getRGB());
 
         if (collapseAnim.getFactor() > 0.001)
         {

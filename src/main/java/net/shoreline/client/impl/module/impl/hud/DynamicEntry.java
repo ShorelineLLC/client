@@ -93,7 +93,7 @@ public class DynamicEntry
      */
     public void drawText(MatrixStack matrices, String string, float x, float y)
     {
-        getModule().drawText(matrices, string, x, y);
+        getModule().drawTextTransparency(matrices, string, x, y, (float) yAnimation.getFactor());
     }
 
     public boolean isDrawing()
