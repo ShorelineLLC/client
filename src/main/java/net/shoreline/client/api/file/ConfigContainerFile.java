@@ -2,6 +2,7 @@ package net.shoreline.client.api.file;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigContainer;
 import net.shoreline.client.api.config.ConfigGroup;
@@ -77,10 +78,10 @@ public class ConfigContainerFile extends JsonConfigFile
         {
             try
             {
-                ((Config<Enum<?>>) config).setValue((Enum<?>) Enum.valueOf((Class<Enum>) config.getValue().getClass(), value.getAsString()));
+                ((Config<Enum<?>>) config).setValue(Enum.valueOf(((Enum<?>) config.getValue()).getDeclaringClass(), value.getAsString()));
             } catch (IllegalArgumentException ignored)
             {
-
+                ignored.printStackTrace();
             }
         } else if (config.getValue() instanceof Float)
         {
