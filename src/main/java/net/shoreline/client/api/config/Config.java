@@ -25,8 +25,8 @@ public abstract class Config<T> implements Identifiable, Observable<T>, Serializ
 
     private String[] nameAliases;
 
-    private T value;
-    private final T defaultValue;
+    protected T value;
+    private T defaultValue;
 
     private Supplier<Boolean> visible;
 
@@ -36,7 +36,6 @@ public abstract class Config<T> implements Identifiable, Observable<T>, Serializ
     {
         this.name = name;
         this.description = description;
-        this.defaultValue = value;
     }
 
     @Override

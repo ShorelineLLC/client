@@ -1,9 +1,13 @@
 package net.shoreline.client.impl.module.client;
 
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Concurrent;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Module;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Theme;
 
 import java.awt.*;
@@ -34,8 +38,24 @@ public class ThemeModule extends Concurrent
         INSTANCE = this;
 
         Theme primaryTheme = ClickGuiModule.INSTANCE.getTheme();
+        primaryColor.addListener(value ->
+        {
+            primaryTheme.setComponentColor(value);
+            for (Module module : Managers.MODULES.getModules())
+            {
+                for (Config<?> config : module.getConfigs())
+                {
+                    if (!(config instanceof ColorConfig colorConfig)
+                            || colorConfig.equals(primaryColor)
+                            || !colorConfig.isGlobal())
+                    {
+                        continue;
+                    }
 
-        primaryColor.addListener(primaryTheme::setComponentColor);
+                    colorConfig.setValue(new Color(ColorUtil.withTransparency(value, colorConfig.getAlpha() / 255f)));
+                }
+            }
+        });
         titleColor.addListener(primaryTheme::setTitleColor);
         backgroundColor.addListener(primaryTheme::setBackgroundColor);
         outlineColor.addListener(primaryTheme::setOutlineColor);
@@ -65,5 +85,10 @@ public class ThemeModule extends Concurrent
     public Color getTextColor()
     {
         return textColor.getValue();
+    }
+
+    public Config<Color> getSetting()
+    {
+        return primaryColor;
     }
 }

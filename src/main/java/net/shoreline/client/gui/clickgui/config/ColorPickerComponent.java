@@ -112,7 +112,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             Identifier syncSprite = Identifier.of("shoreline", "icon/sync_clickgui.png");
             int syncX = getTx() + pickerLength;
             int syncY = getTy() + height + pickerLength + 5;
-            drawRect(context, syncX, syncY, 15, 15, theme.getComponentColor());
+            drawRect(context, syncX, syncY, 15, 15, ((ColorConfig) getConfig()).isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
 
             drawSelectors(context, mouseX, mouseY, delta);
@@ -145,6 +145,14 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength + 4, getTy() + height + 3, 10, pickerLength - 2))
         {
             draggingHue = true;
+        }
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength, getTy() + height + pickerLength + 5, 15, 15))
+        {
+            ((ColorConfig) getConfig()).setGlobal(!((ColorConfig) getConfig()).isGlobal());
+        }
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength - 18, getTy() + height + pickerLength + 5, 15, 15))
+        {
+            getConfig().setValue(getConfig().getDefaultValue());
         }
     }
 

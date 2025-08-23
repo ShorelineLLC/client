@@ -60,6 +60,7 @@ public abstract class ConfigBuilder<T>
         if (defaultValue != null)
         {
             build.setValue(defaultValue);
+            build.setDefaultValue(defaultValue);
         }
 
         build.setVisible(visible);

@@ -3,6 +3,8 @@ package net.shoreline.client.api.config;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
+import net.shoreline.client.Shoreline;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.ColorUtil;
 
 import java.awt.*;
