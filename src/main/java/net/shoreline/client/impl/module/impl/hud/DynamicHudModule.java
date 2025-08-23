@@ -50,12 +50,11 @@ public abstract class DynamicHudModule extends HudModule
     {
         offset = 0;
         sortEntries();
-        boolean left = isLeft();
         for (DynamicEntry entry : getHudEntries())
         {
             if (entry.isDrawing() || !entry.isDone())
             {
-                entry.draw(context, getX() + (left ? 0 : getWidth()), getY(), offset);
+                entry.draw(context, getX() + (isLeft() ? 0 : getWidth()), getY(), offset);
             }
         }
     }
@@ -83,7 +82,10 @@ public abstract class DynamicHudModule extends HudModule
         int result = 0;
         for (DynamicEntry entry : getHudEntries())
         {
-            result = Math.max(result, getTextWidth(entry.getText().get()));
+            if (entry.isDrawing() || !entry.isDone())
+            {
+                result = Math.max(result, getTextWidth(entry.getText().get()));
+            }
         }
 
         width = result;

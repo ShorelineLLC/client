@@ -103,10 +103,6 @@ public class DynamicEntry
 
     public boolean isDone()
     {
-        String current = text.get();
-        int width = getModule().getTextWidth(current);
-        return yAnimation.getFactor() < 0.01 && (getModule().isLeft())
-                ? animation.get() == -width + width - 2.0f // i know this looks chinese
-                : animation.get() == 2.0f;
+        return yAnimation.getFactor() < 0.01;
     }
 }

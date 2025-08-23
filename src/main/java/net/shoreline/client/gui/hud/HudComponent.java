@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.gui.Interactable;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Mouse;
@@ -55,6 +56,7 @@ public class HudComponent extends DrawableComponent implements Interactable
             x = MathHelper.clamp(x, 0, screenWidth - width);
             y = MathHelper.clamp(y, 0, screenHeight - height);
             updateAnchor();
+            checkHovered();
         }
 
         hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, x, y, width, height));
@@ -90,6 +92,35 @@ public class HudComponent extends DrawableComponent implements Interactable
 
     @Override
     public void charTyped(char chr, int modifiers) {}
+
+    private boolean checkHovered()
+    {
+        for (HudModule element : Managers.MODULES.getHudModules())
+        {
+            if (element.getAnchor() == Anchor.None)
+            {
+                continue;
+            }
+
+            float ex = element.getX();
+            float ey = element.getY();
+            float ew = element.getWidth();
+            float eh = element.getHeight();
+            boolean overlaps = getX() + getWidth() >= ex &&
+                    getX() <= ex + ew &&
+                    getY() + getHeight() >= ey &&
+                    getY() <= ey + eh;
+
+            if (overlaps)
+            {
+                getHudModule().setIndex(Integer.MAX_VALUE);
+                getHudModule().setAnchor(element.getAnchor());
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private void updateAnchor()
     {
