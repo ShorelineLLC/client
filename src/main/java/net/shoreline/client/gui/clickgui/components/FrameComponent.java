@@ -23,6 +23,7 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
     protected int yOffset;
 
     protected final Animation hoverAnim;
+    protected final Animation drawAnim;
 
     public FrameComponent(Frame frame,
                           int x,
@@ -36,6 +37,7 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
         this.width = width;
         this.height = height;
         this.hoverAnim = new Animation(false, 150L, Easing.LINEAR);
+        this.drawAnim = new Animation(true, 100L, Easing.LINEAR);
     }
 
     public int getTx()
@@ -46,5 +48,10 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
     public int getTy()
     {
         return frame.getY() + this.y + this.yOffset;
+    }
+
+    public int getDrawHeight()
+    {
+        return (int) (height * drawAnim.getFactor());
     }
 }

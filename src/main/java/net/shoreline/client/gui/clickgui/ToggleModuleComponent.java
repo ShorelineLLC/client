@@ -56,18 +56,25 @@ public class ToggleModuleComponent extends ModuleComponent
             int configY = 2;
             for (ConfigComponent<?> component : components)
             {
-                if (component.getConfig().isVisible())
+                if (component.getConfig().isVisible() || component.getDrawAnim().getFactor() > 0.01)
                 {
-                    component.setYOffset(configY);
-                    component.drawComponent(context, mouseX, mouseY, delta);
-                    configY += component.getHeight() + 1;
+                    int extra = 0;
                     if (component instanceof GroupComponent c)
                     {
-                        configY += c.getScaledHeight();
-                    } else if (component instanceof ColorPickerComponent c1)
-                    {
-                        configY += c1.getComponentHeight();
+                        extra += c.getScaledHeight();
                     }
+                    else if (component instanceof ColorPickerComponent c1)
+                    {
+                        extra += c1.getComponentHeight();
+                    }
+
+                    context.enableScissor(component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
+                    component.getDrawAnim().setState(component.getConfig().isVisible());
+                    component.setYOffset(configY);
+                    component.drawComponent(context, mouseX, mouseY, delta);
+                    configY += component.getDrawHeight() + extra + 1;
+
+                    context.disableScissor();
                 }
             }
 

@@ -163,7 +163,7 @@ public class GroupComponent extends ConfigComponent<Void>
         {
             if (component.getConfig().isVisible())
             {
-                frameHeight += component.getHeight() + 1;
+                frameHeight += component.getDrawHeight() + 1;
                 if (component instanceof GroupComponent c)
                 {
                     frameHeight += c.getScaledHeight();

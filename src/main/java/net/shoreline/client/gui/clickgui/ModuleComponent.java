@@ -83,20 +83,26 @@ public class ModuleComponent extends FrameComponent
         int configY = 2;
         for (ConfigComponent<?> component : components)
         {
-            if (component.getConfig().isVisible())
+            if (component.getDrawAnim().getFactor() > 0.01)
             {
-                component.drawComponent(context, mouseX, mouseY, delta);
-                component.setYOffset(configY);
-                configY += component.getHeight() + 1;
+                int extra = 0;
                 if (component instanceof GroupComponent c)
                 {
-                    configY += c.getScaledHeight();
-                } else if (component instanceof ColorPickerComponent c1)
+                    extra += c.getScaledHeight();
+                }
+                else if (component instanceof ColorPickerComponent c1)
                 {
-                    configY += c1.getComponentHeight();
+                    extra += c1.getComponentHeight();
                 }
 
+                context.enableScissor(component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
+                component.getDrawAnim().setState(component.getConfig().isVisible());
+                component.drawComponent(context, mouseX, mouseY, delta);
+                component.setYOffset(configY);
+                configY += component.getDrawHeight() + extra + 1;
+
                 component.setModuleOffset(configY);
+                context.disableScissor();
             }
         }
 
@@ -183,7 +189,7 @@ public class ModuleComponent extends FrameComponent
         int frameHeight = 2;
         for (ConfigComponent<?> component : components)
         {
-            if (component.getConfig().isVisible())
+            if (component.getDrawAnim().getFactor() > 0.01)
             {
                 if (component instanceof GroupComponent c)
                 {
@@ -193,7 +199,7 @@ public class ModuleComponent extends FrameComponent
                     frameHeight += c1.getComponentHeight();
                 }
 
-                frameHeight += component.getHeight() + 1;
+                frameHeight += component.getDrawHeight() + 1;
             }
         }
         return frameHeight;

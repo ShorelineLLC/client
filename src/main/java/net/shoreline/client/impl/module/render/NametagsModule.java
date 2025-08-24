@@ -34,6 +34,7 @@ import net.shoreline.client.impl.imixin.ILayerRenderState;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Interpolation;
+import net.shoreline.client.impl.render.RenderManager;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;

@@ -37,6 +37,19 @@ public class Animation
         this.state = state;
     }
 
+    public void setStateHard(boolean state)
+    {
+        this.state = state;
+        if (state)
+        {
+            this.last = System.currentTimeMillis() - (long) (getLinearFactor() * length);
+        }
+        else
+        {
+            this.last = (long) (System.currentTimeMillis() - ((1 - getLinearFactor()) * length));
+        }
+    }
+
     public boolean getState()
     {
         return state;

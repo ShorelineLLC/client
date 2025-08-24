@@ -27,7 +27,7 @@ public abstract class ConfigComponent<T> extends FrameComponent
         super(frame, x, y, frameWidth, frameHeight);
         this.config = config;
         this.moduleComponent = moduleComponent;
-
+        getDrawAnim().setStateHard(config.isVisible());
         config.addListener(this::onConfigUpdate);
     }
 
