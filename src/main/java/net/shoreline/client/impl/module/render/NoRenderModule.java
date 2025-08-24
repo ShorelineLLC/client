@@ -11,6 +11,7 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
+import net.shoreline.client.impl.event.render.GlyphShadowEvent;
 import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
 import net.shoreline.client.impl.event.render.RenderNauseaEvent;
 import net.shoreline.client.impl.event.render.TiltViewEvent;
@@ -88,8 +89,11 @@ public class NoRenderModule extends Toggleable
     Config<Boolean> toastConfig = new BooleanConfig.Builder("Toast")
             .setDescription("Cancels the toast hud element")
             .setDefaultValue(true).build();
+    Config<Boolean> textShadow = new BooleanConfig.Builder("TextShadow")
+            .setDescription("Reduces the vanilla text shadow")
+            .setDefaultValue(false).build();
     Config<Void> hudConfig = new ConfigGroup.Builder("HUD")
-            .addAll(potionsHud, itemName, toastConfig).build();
+            .addAll(potionsHud, itemName, toastConfig, textShadow).build();
 
     Config<FogRender> fogConfig = new EnumConfig.Builder<FogRender>("Fog")
             .setValues(FogRender.values())
@@ -252,6 +256,16 @@ public class NoRenderModule extends Toggleable
         if (totemConfig.getValue() && event.getStack().getItem() == Items.TOTEM_OF_UNDYING)
         {
             event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onGlyphShadow(GlyphShadowEvent event)
+    {
+        if (textShadow.getValue())
+        {
+            event.cancel();
+            event.setShadowOffset(0.5f);
         }
     }
 

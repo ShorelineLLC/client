@@ -48,6 +48,7 @@
     "render.item.MixinHeldItemRenderer",
     "render.item.MixinItemRenderer",
     "render.item.MixinItemRenderState",
+    "text.MixinGlyph",
     "text.MixinTextColor",
     "texture.MixinNativeImage",
     "toast.MixinToastManager",

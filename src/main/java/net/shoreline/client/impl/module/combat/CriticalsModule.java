@@ -16,6 +16,8 @@ public class CriticalsModule extends Toggleable
         super("Criticals", "Always land critical hits", GuiCategory.COMBAT);
     }
 
+
+
     public enum CritMode
     {
         PACKET,

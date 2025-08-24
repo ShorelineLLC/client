@@ -98,6 +98,7 @@ public class ModuleManager
                 new TimerModule(),
 
                 // HUD
+                new ArmorHudModule(),
                 new ArrayListHudModule(),
                 new BrandHudModule(),
                 new CoordsHudModule(),
