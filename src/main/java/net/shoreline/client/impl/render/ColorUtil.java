@@ -53,7 +53,7 @@ public class ColorUtil
 
     public float[] getRGBValues(int color)
     {
-        Color c = new Color(color);
+        Color c = new Color(color, true);
         float r = c.getRed() / 255.0f;
         float g = c.getGreen() / 255.0f;
         float b = c.getBlue() / 255.0f;

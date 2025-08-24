@@ -32,12 +32,12 @@ public class Theme
 
     public void setBackgroundColor(Color color)
     {
-        this.backgroundColor = ColorUtil.withTransparency(color, 0.2f);
+        this.backgroundColor = ColorUtil.withTransparency(color, 0.33f);
     }
 
     public void setOutlineColor(Color color)
     {
-        this.outlineColor = ColorUtil.withTransparency(color, 0.4f);
+        this.outlineColor = ColorUtil.withTransparency(color, 1.0f);
     }
 
     public int getTitleColor()

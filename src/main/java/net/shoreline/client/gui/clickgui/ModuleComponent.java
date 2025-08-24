@@ -17,6 +17,7 @@ import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

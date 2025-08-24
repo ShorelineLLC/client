@@ -40,7 +40,7 @@ public class ToggleModuleComponent extends ModuleComponent
         toggleComponent.setY(getTy());
         toggleComponent.drawComponent(context, mouseX, mouseY, delta);
 
-        int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), 0xffaaaaaa, theme.getTextColor());
+        int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), theme.getColor(0xFFAAAAAA, 1.0f), theme.getTextColor());
         drawText(context, module.getName(), getTx() + 3, getTy() + 4, textColor);
 
         if (components.size() > 1)
