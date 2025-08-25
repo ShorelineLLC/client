@@ -29,6 +29,7 @@ import java.util.List;
 public class ModuleComponent extends FrameComponent
 {
     protected final Module module;
+    private ConfigComponent<?> currentAnimation;
 
     protected final List<ConfigComponent<?>> components = new ArrayList<>();
 
@@ -88,7 +89,19 @@ public class ModuleComponent extends FrameComponent
         int configY = 2;
         for (ConfigComponent<?> component : components)
         {
-            component.getDrawAnim().setState(component.getConfig().isVisible());
+            if (currentAnimation == null)
+            {
+                component.getDrawAnim().setState(component.getConfig().isVisible());
+                if (!component.getDrawAnim().isFinished())
+                {
+                    currentAnimation = component;
+                }
+            }
+            else if (currentAnimation.getDrawAnim().isFinished())
+            {
+                currentAnimation = null;
+            }
+
             if (component.getDrawAnim().getFactor() > 0.01)
             {
                 int extra = 0;
