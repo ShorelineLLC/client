@@ -22,13 +22,13 @@ public class PvpKit implements Serializable
     public PvpKit(String name, Inventory inventory)
     {
         this.name = name;
-        this.items = DefaultedList.ofSize(PlayerInventory.MAIN_SIZE, Items.AIR);
+        this.items = DefaultedList.ofSize(PlayerInventory.MAIN_SIZE + PlayerInventory.HOTBAR_SIZE, Items.AIR);
         setKitFromInventory(inventory);
     }
 
     public void setKitFromInventory(final Inventory inventory)
     {
-        for (int j = 0; j < PlayerInventory.MAIN_SIZE; ++j)
+        for (int j = 0; j < PlayerInventory.MAIN_SIZE + PlayerInventory.HOTBAR_SIZE; ++j)
         {
             ItemStack itemStack = inventory.getStack(j);
             items.set(j, itemStack.getItem());

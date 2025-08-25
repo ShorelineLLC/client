@@ -62,6 +62,7 @@ public class ModuleManager
                 new FakePlayerModule(),
                 new MiddleClickModule(),
                 new PacketSnifferModule(),
+                new RekitModule(),
                 new ShulkerceptionModule(),
                 // Movement
                 new FastFallModule(),
