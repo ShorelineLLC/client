@@ -92,6 +92,6 @@ public abstract class CrystalEntityScanner extends AsyncWorldScanner
     @Override
     protected int getRadius()
     {
-        return (int) Math.ceil(autoCrystal.getBreakRange().getValue());
+        return (int) Math.ceil(autoCrystal.getBreakRange().getValue() + 1.0f);
     }
 }

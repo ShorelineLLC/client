@@ -8,6 +8,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
@@ -211,7 +212,13 @@ public class AuraModule extends CombatModule
             return swordSlot;
         }
 
-        return InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("axe"));
+        int axeSlot = InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("axe"));
+        if (axeSlot != InventoryUtil.INVALID_SLOT)
+        {
+            return axeSlot;
+        }
+
+        return InventoryUtil.getItemSlot(Items.TRIDENT);
     }
 
     private Entity getAuraTarget()

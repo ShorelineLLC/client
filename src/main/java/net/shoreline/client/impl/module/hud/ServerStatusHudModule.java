@@ -29,7 +29,7 @@ public class ServerStatusHudModule extends HudModule
     @Override
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
-        statusAnimation.setState(serverStatus.hasPassed(1000));
+        statusAnimation.setState(serverStatus.hasPassed(1100));
         int color = ColorUtil.interpolateColor(MathHelper.clamp((serverStatus.getElapsedTime() - 1000.0f) / 5000.0f, 0.0f, 1.0f), Colors.RED, Colors.GREEN);
         if (statusAnimation.getFactor() >= 0.01f)
         {

@@ -303,11 +303,12 @@ public class InventoryManager extends GenericFeature
 
     public void clickSwap(int fromSlot, int toSlot, Item item)
     {
+        int slot = InventoryUtil.getPacketSlotIndex(fromSlot);
         ScreenHandler handler = mc.player.currentScreenHandler;
 
         if (!handler.getCursorStack().getItem().equals(item))
         {
-            mc.interactionManager.clickSlot(handler.syncId, fromSlot, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
         }
 
         if (handler.getCursorStack().getItem().equals(item))
@@ -317,7 +318,7 @@ public class InventoryManager extends GenericFeature
 
         if (!handler.getCursorStack().isEmpty())
         {
-            mc.interactionManager.clickSlot(handler.syncId, fromSlot, 0, SlotActionType.PICKUP, mc.player);
+            mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
         }
     }
 

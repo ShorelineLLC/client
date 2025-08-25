@@ -93,7 +93,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
     @Override
     protected int getRadius()
     {
-        return (int) Math.ceil(autoCrystal.getPlaceRange().getValue());
+        return (int) Math.ceil(autoCrystal.getTargetRange().getValue());
     }
 
     private boolean canUseOnBlock(BlockPos pos, BlockState state)

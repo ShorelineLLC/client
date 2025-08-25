@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.async.AsyncFeature;
 import net.shoreline.client.impl.event.TickEvent;

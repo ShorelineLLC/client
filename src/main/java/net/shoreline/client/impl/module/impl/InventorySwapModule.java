@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 
 public class InventorySwapModule extends Toggleable
 {
@@ -30,7 +31,8 @@ public class InventorySwapModule extends Toggleable
                 continue;
             }
 
-            Managers.INVENTORY.clickSwap(i, slot, item);
+            int slot1 = InventoryUtil.getPacketSlotIndex(slot);
+            Managers.INVENTORY.clickSwap(i, slot1, item);
             return;
         }
     }

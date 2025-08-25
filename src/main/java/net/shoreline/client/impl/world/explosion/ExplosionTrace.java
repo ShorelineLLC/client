@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.world.explosion;
 
 import lombok.experimental.UtilityClass;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -110,12 +111,15 @@ public class ExplosionTrace
             }
 
             BlockState blockState = blockView.getBlockState(blockPos);
-            if (ignoreTerrain && blockState.getBlock().getBlastResistance() < 600)
+            Block block = blockState.getBlock();
+
+            if (ignoreTerrain && block.getBlastResistance() < 600)
             {
                 return null;
             }
 
             VoxelShape voxelShape = blockState.getCollisionShape(blockView, blockPos);
+
             return voxelShape.raycast(context.start(), context.end(), blockPos);
         };
     }
