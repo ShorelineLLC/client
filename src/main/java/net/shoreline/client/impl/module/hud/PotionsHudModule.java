@@ -10,6 +10,7 @@ import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
 import net.shoreline.client.impl.render.ColorUtil;
 
 import java.awt.*;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -34,6 +35,12 @@ public class PotionsHudModule extends DynamicHudModule
                     () -> mc.player != null && mc.player.hasStatusEffect(Registries.STATUS_EFFECT.getEntry(effect)),
                     effect.getColor()));
         }
+    }
+
+    @Override
+    public void sortEntries()
+    {
+        getHudEntries().sort(Comparator.comparing(entry -> entry.getText().get()));
     }
 
     public String decorate(StatusEffect effect)

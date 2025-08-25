@@ -1,8 +1,11 @@
 package net.shoreline.client.gui.clickgui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.*;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
@@ -15,6 +18,7 @@ import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Theme;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -84,6 +88,7 @@ public class ModuleComponent extends FrameComponent
         int configY = 2;
         for (ConfigComponent<?> component : components)
         {
+            component.getDrawAnim().setState(component.getConfig().isVisible());
             if (component.getDrawAnim().getFactor() > 0.01)
             {
                 int extra = 0;
@@ -97,7 +102,6 @@ public class ModuleComponent extends FrameComponent
                 }
 
                 context.enableScissor(component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
-                component.getDrawAnim().setState(component.getConfig().isVisible());
                 component.drawComponent(context, mouseX, mouseY, delta);
                 component.setYOffset(configY);
                 configY += component.getDrawHeight() + extra + 1;
@@ -107,6 +111,7 @@ public class ModuleComponent extends FrameComponent
             }
         }
 
+        drawRect(context, getTx() + getWidth() - 1, getTy() + getHeight(), getTx() + getWidth(), getTy() + getHeight() + configY, color);
         disableScissor(context);
     }
 

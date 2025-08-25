@@ -2,7 +2,9 @@ package net.shoreline.client.gui.clickgui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.ToggleComponent;
 import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
@@ -51,12 +53,13 @@ public class ToggleModuleComponent extends ModuleComponent
 
         if (getCollapseAnim().getFactor() > 0.0)
         {
-            enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
+            enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight() + 1);
 
             int configY = 2;
             for (ConfigComponent<?> component : components)
             {
-                if (component.getConfig().isVisible() || component.getDrawAnim().getFactor() > 0.01)
+                component.getDrawAnim().setState(component.getConfig().isVisible());
+                if (component.getDrawAnim().getFactor() > 0.01)
                 {
                     int extra = 0;
                     if (component instanceof GroupComponent c)
@@ -69,7 +72,6 @@ public class ToggleModuleComponent extends ModuleComponent
                     }
 
                     context.enableScissor(component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
-                    component.getDrawAnim().setState(component.getConfig().isVisible());
                     component.setYOffset(configY);
                     component.drawComponent(context, mouseX, mouseY, delta);
                     configY += component.getDrawHeight() + extra + 1;
@@ -78,6 +80,8 @@ public class ToggleModuleComponent extends ModuleComponent
                 }
             }
 
+            int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) toggleComponent.getHoverAnim().getFactor());
+            drawRect(context, getTx() + getWidth() - 1, getTy() + getHeight(), getTx() + getWidth(), getTy() + getHeight() + configY, color);
             disableScissor(context);
         }
     }
@@ -88,6 +92,12 @@ public class ToggleModuleComponent extends ModuleComponent
                              int mouseButton)
     {
         toggleComponent.mouseClicked(mouseX, mouseY, mouseButton);
+        if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height) && mouseButton == 2)
+        {
+            Toggleable toggleable = (Toggleable) module;
+            toggleable.setHidden(!toggleable.isHidden());
+        }
+
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 

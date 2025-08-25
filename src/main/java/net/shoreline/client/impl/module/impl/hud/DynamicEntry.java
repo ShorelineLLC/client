@@ -54,7 +54,7 @@ public class DynamicEntry
             width = left ? width : -width;
             if (width > lastWidth)
             {
-                animation.setEasing(Easing.EXPO_IN);
+                animation.setEasing(Easing.SMOOTH_STEP);
             }
             else
             {

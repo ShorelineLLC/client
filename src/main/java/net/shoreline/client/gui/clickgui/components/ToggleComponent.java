@@ -1,5 +1,6 @@
 package net.shoreline.client.gui.clickgui.components;
 
+import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
@@ -14,6 +15,7 @@ import java.util.function.Supplier;
 
 public class ToggleComponent extends FrameComponent
 {
+    @Getter
     private final Animation toggleAnim;
 
     private final Supplier<Boolean> setter;

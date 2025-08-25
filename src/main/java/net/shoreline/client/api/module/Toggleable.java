@@ -21,6 +21,11 @@ public class Toggleable extends Module
             .setDescription("The module keybind")
             .setNameAliases("Bind")
             .setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
+    protected final Config<Boolean> hidden = new BooleanConfig.Builder("Hidden")
+            .setDescription("Module hidden state")
+            .setNameAliases("Hidden")
+            .setVisible(() -> false)
+            .setDefaultValue(false).build();
 
     public Toggleable(final String name,
                       final String description,
@@ -28,6 +33,7 @@ public class Toggleable extends Module
     {
         super(name, description, category);
         registerConfig(keybind);
+        registerConfig(hidden);
     }
 
     public Toggleable(final String name,
@@ -37,6 +43,7 @@ public class Toggleable extends Module
     {
         super(name, nameAliases, description, category);
         registerConfig(keybind);
+        registerConfig(hidden);
     }
 
     public void enable()
@@ -90,5 +97,15 @@ public class Toggleable extends Module
     public Macro getKeybindMacro()
     {
         return keybind.getValue();
+    }
+
+    public void setHidden(boolean hidden)
+    {
+        this.hidden.setValue(hidden);
+    }
+
+    public boolean isHidden()
+    {
+        return hidden.getValue();
     }
 }
