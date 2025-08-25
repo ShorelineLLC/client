@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.combat;
 
 import net.shoreline.client.api.async.AsyncFeature;
+import net.shoreline.client.impl.combat.hole.HoleData;
+import net.shoreline.client.impl.combat.hole.HoleScanner;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.combat.FillerModule;
 import net.shoreline.client.impl.module.render.HoleESPModule;

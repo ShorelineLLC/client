@@ -11,7 +11,6 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.EndCrystalItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -29,6 +28,7 @@ import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.EntitySpawnEvent;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
@@ -38,9 +38,7 @@ import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
-import net.shoreline.client.impl.module.combat.util.TickPriorities;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
-import net.shoreline.client.impl.module.render.NametagsModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -108,17 +106,17 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Integer> placeDelay = new NumberConfig.Builder<Integer>("PlaceDelay")
             .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
             .setDescription("The delay between placing crystals").build();
+    Config<Boolean> sequentialPlace = new BooleanConfig.Builder("SequentialPlace")
+            .setDescription("Places immediately after breaking a crystal")
+            .setDefaultValue(false).build();
     Config<Boolean> protocolPlace = new BooleanConfig.Builder("Protocol")
             .setDescription("Prevents placements in 1x1 areas")
             .setDefaultValue(false).build();
     Config<Boolean> basePlace = new BooleanConfig.Builder("Support")
             .setDescription("Places an obsidian block if there is none")
             .setDefaultValue(false).build();
-    Config<Boolean> sequentialPlace = new BooleanConfig.Builder("SequentialPlace")
-            .setDescription("Places immediately after breaking a crystal")
-            .setDefaultValue(false).build();
     Config<Void> placeConfig = new ConfigGroup.Builder("Place")
-            .addAll(placeRange, placeDelay, protocolPlace, basePlace, sequentialPlace).build();
+            .addAll(placeRange, placeDelay, sequentialPlace, protocolPlace, basePlace).build();
 
     Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
             .setDescription("Targets dropped items blocking placements")
@@ -418,7 +416,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                     placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), animFactor);
 
             double damage = ExplosionUtil.getAppliedDamageToEntity(placeData.getTarget().getEntity(), (float) placeData.getDamageToTarget());
-            NametagsModule.INSTANCE.renderNametag(event.getMatrixStack(), placePos.toCenterPos(),
+            Managers.RENDER.renderNametag(event.getMatrixStack(),
+                    placePos.toCenterPos(),
+                    0.003f,
                     numFormat.format(damage),
                     ColorUtil.withTransparency(-1, animFactor));
         }
@@ -432,7 +432,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         boolean canBreakCrystal = weakness == null || (strength != null && strength.getAmplifier() >= weakness.getAmplifier());
         if (!canBreakCrystal)
         {
-            int slot = getAntiWeaknessSlot(mc.player.getInventory());
+            int slot = getAntiWeaknessSlot();
             if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))
             {
                 return;
@@ -472,18 +472,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 MathHelper.clamp(eyePos.getY(), box.minY, box.maxY),
                 MathHelper.clamp(eyePos.getZ(), box.minZ, box.maxZ));
 
-        Direction placeDir;
-        if (eyePos.y >= box.maxY)
-        {
-            placeDir = Direction.UP;
-        } else if (blockPos.getY() >= mc.world.getTopYInclusive())
-        {
-            placeDir = Direction.DOWN;
-        } else
-        {
-            placeDir = Direction.getFacing(eyePos.x - cut.x, eyePos.y - cut.y, eyePos.z - cut.z);
-        }
-
+        Direction placeDir = getPlaceDirection(blockPos, box, eyePos, cut);
         BlockHitResult result = new BlockHitResult(cut, placeDir, blockPos, box.contains(eyePos));
         if (autoSwap.getValue() && silentSwap.getValue())
         {
@@ -514,6 +503,19 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         placePackets.put(blockPos, System.currentTimeMillis());
+    }
+
+    private Direction getPlaceDirection(BlockPos blockPos, Box box, Vec3d eyePos, Vec3d cut)
+    {
+        if (eyePos.y >= box.maxY)
+        {
+            return Direction.UP;
+        } else if (blockPos.getY() >= mc.world.getTopYInclusive())
+        {
+            return Direction.DOWN;
+        }
+
+        return Direction.getFacing(eyePos.x - cut.x, eyePos.y - cut.y, eyePos.z - cut.z);
     }
 
     public boolean shouldRunCalcs()
@@ -596,25 +598,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return Hand.MAIN_HAND;
     }
 
-    private int getAntiWeaknessSlot(PlayerInventory playerInventory)
+    private int getAntiWeaknessSlot()
     {
-        for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++)
-        {
-            ItemStack stack = playerInventory.getStack(i);
-            if (stack.getItem().getTranslationKey().contains("pickaxe")
-                    || stack.getItem().getTranslationKey().contains("sword"))
-            {
-                if (silentType.getValue() == SilentSwapType.INVENTORY)
-                {
-                    return InventoryUtil.getPacketSlotIndex(i);
-                } else if (i < PlayerInventory.getHotbarSize())
-                {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
+        return InventoryUtil.getItemSlot((ItemStack itemStack) ->
+                itemStack.getItem().getTranslationKey().contains("sword")
+                || itemStack.getItem().getTranslationKey().contains("axe"));
     }
 
     public boolean canTargetEntity(Entity entity)

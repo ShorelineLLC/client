@@ -37,6 +37,8 @@ public class InventoryManager extends GenericFeature
     private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
 
     private final SwapData.Mutable current = new SwapData.Mutable();
+    private final SwapData.Mutable multitick = new SwapData.Mutable();
+
     private final List<SwapData> trackedSwaps = new CopyOnWriteArrayList<>();
 
     private int serverSlot;
@@ -232,7 +234,8 @@ public class InventoryManager extends GenericFeature
                 {
                     if (isSilentSwapping())
                     {
-                        Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(playerInventory.selectedSlot));
+                        int returnSlot = multitick.isSwapped() ? multitick.getSlotTo() : playerInventory.selectedSlot;
+                        Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(returnSlot));
                     }
                 }
                 case INVENTORY ->
@@ -245,6 +248,54 @@ public class InventoryManager extends GenericFeature
             current.reset();
         }
         finally
+        {
+            swapLock.unlock();
+        }
+    }
+
+    public boolean startMultitickSwap(int itemSlot)
+    {
+        if (!PlayerInventory.isValidHotbarIndex(itemSlot))
+        {
+            return false;
+        }
+
+        PlayerInventory playerInventory = mc.player.getInventory();
+
+        swapLock.lock();
+        try
+        {
+            if (!multitick.isSwapped())
+            {
+                multitick.setSlotFrom(playerInventory.selectedSlot);
+                multitick.setSwapped(true);
+            }
+
+            multitick.setSlotTo(itemSlot);
+            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
+            return true;
+
+        } finally
+        {
+            swapLock.unlock();
+        }
+    }
+
+    public void endMultitickSwap()
+    {
+        swapLock.lock();
+        try
+        {
+            if (!multitick.isSwapped())
+            {
+                return;
+            }
+
+            int target = (multitick.getSlotFrom() >= 0) ? multitick.getSlotFrom() : mc.player.getInventory().selectedSlot;
+            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(target));
+            multitick.reset();
+
+        } finally
         {
             swapLock.unlock();
         }

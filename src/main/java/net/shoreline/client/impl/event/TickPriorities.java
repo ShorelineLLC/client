@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.combat.util;
+package net.shoreline.client.impl.event;
 
 public class TickPriorities
 {
@@ -6,4 +6,6 @@ public class TickPriorities
     public static final int OFFHAND = 2147483645;
     public static final int AUTO_CRYSTAL = 2147483644;
     public static final int KILL_AURA = 2147483643;
+    public static final int SPEED_MINE = 2147483642;
+    public static final int AUTO_MINE = 2147483641;
 }

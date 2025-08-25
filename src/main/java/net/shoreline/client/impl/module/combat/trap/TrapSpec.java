@@ -10,7 +10,11 @@ import java.util.EnumSet;
 public class TrapSpec
 {
     private final EnumSet<TrapLayer> layers;
-    private boolean extendFeet;
-    private boolean extendBody;
+
+    @Builder.Default
+    private boolean extendFeet = false;
+
+    @Builder.Default
+    private boolean extendBody = false;
 }
 

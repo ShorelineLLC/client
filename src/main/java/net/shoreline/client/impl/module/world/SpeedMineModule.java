@@ -1,11 +1,16 @@
 package net.shoreline.client.impl.module.world;
 
+import lombok.Getter;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.ItemSlot;
@@ -13,20 +18,27 @@ import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningPackets;
 import net.shoreline.client.impl.mining.MiningUtil;
+import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
 
+@Getter
 public class SpeedMineModule extends Toggleable
 {
+    public static SpeedMineModule INSTANCE;
+
     Config<MiningPackets> miningPackets = new EnumConfig.Builder<MiningPackets>("Mode")
             .setValues(MiningPackets.values()).setDefaultValue(MiningPackets.NORMAL)
             .setDescription("The mode for block click packets").build();
     Config<Boolean> doubleMine = new BooleanConfig.Builder("DoubleMine")
             .setDescription("Rotates before mining block")
-            .setVisible(() -> miningPackets.getValue() == MiningPackets.GRIM)
             .setDefaultValue(false).build();
+    Config<RemineMode> remineMode = new EnumConfig.Builder<RemineMode>("Remine")
+            .setValues(RemineMode.values())
+            .setDescription("The mode for remining mined blocks")
+            .setDefaultValue(RemineMode.OFF).build();
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("The max range to mine").build();
@@ -50,10 +62,20 @@ public class SpeedMineModule extends Toggleable
             .addAll(miningColor, breakingColor).build();
 
     private MiningData mainMiningBlock, packetMiningBlock;
+    private MiningRenderState mainState, packetState;
+
+    private MiningData pendingClear;
 
     public SpeedMineModule()
     {
         super("SpeedMine", new String[] {"SpeedyGonzales"}, "Mine faster", GuiCategory.WORLD);
+        INSTANCE = this;
+    }
+
+    @Override
+    public String getModuleData()
+    {
+        return mainMiningBlock != null ? String.format("%.1f", Math.min(mainMiningBlock.getBlockDamage(), 1.0f)) : super.getModuleData();
     }
 
     @Override
@@ -61,9 +83,12 @@ public class SpeedMineModule extends Toggleable
     {
         mainMiningBlock = null;
         packetMiningBlock = null;
+        pendingClear = null;
+        mainState = null;
+        packetState = null;
     }
 
-    @EventListener
+    @EventListener(priority = TickPriorities.SPEED_MINE)
     public void onTickEvent(TickEvent.Pre event)
     {
         if (checkNull())
@@ -71,7 +96,13 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        {
+            return;
+        }
+
         tickMain();
+        tickPacket();
     }
 
     @EventListener
@@ -84,27 +115,88 @@ public class SpeedMineModule extends Toggleable
 
         event.cancel();
 
-        ItemSlot slot = AutoToolModule.INSTANCE.getBestTool(event.getState());
-        mainMiningBlock = MiningData.builder()
-                .blockPos(event.getPos())
-                .direction(event.getDirection())
-                .maxProgress(speedConfig.getValue())
-                .player(mc.player)
-                .miningStack(slot.getItemStack())
-                .build();
+        if (isMining(event.getPos()))
+        {
+            return;
+        }
 
-        miningPackets.getValue().sendStartPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
+        startMining(event.getPos(), event.getDirection());
         mc.player.swingHand(Hand.MAIN_HAND, false);
     }
 
     @EventListener
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
-        if (mainMiningBlock != null)
+        if (mainState != null)
         {
-            mainMiningBlock.render(event.getMatrixStack(), event.getTickDelta(),
-                    miningColor.getValue().getRGB(), breakingColor.getValue().getRGB());
+            if (mainState.getFactor() < 0.01f)
+            {
+                mainState = null;
+                return;
+            }
+
+            mainState.data.render(event.getMatrixStack(),
+                    event.getTickDelta(),
+                    miningColor.getValue().getRGB(),
+                    breakingColor.getValue().getRGB(),
+                    mainState.getFactor(),
+                    speedConfig.getValue());
         }
+
+        if (packetState != null)
+        {
+            if (packetState.getFactor() < 0.01f)
+            {
+                packetState = null;
+                return;
+            }
+
+            packetState.data.render(event.getMatrixStack(),
+                    event.getTickDelta(),
+                    miningColor.getValue().getRGB(),
+                    breakingColor.getValue().getRGB(),
+                    packetState.getFactor(), 1.0f);
+        }
+    }
+
+    public void startMining(BlockPos blockPos, Direction direction)
+    {
+        if (doubleMine.getValue())
+        {
+            if (pendingClear != null)
+            {
+                if (pendingClear.equals(mainMiningBlock) && mainMiningBlock.getBlockDamage() < speedConfig.getValue())
+                {
+                    clearMain();
+                }
+
+                pendingClear = null;
+            }
+
+            if (mainMiningBlock != null && !mainMiningBlock.isBlockMined())
+            {
+                if (packetMiningBlock == null || packetMiningBlock.isBlockMined())
+                {
+                    packetMiningBlock = mainMiningBlock.copy(1.0f);
+                    packetState = new MiningRenderState(packetMiningBlock, new Animation(true, 300L));
+                }
+            }
+        }
+
+        BlockState state = mc.world.getBlockState(blockPos);
+        ItemSlot slot = AutoToolModule.INSTANCE.getBestTool(state);
+
+        mainMiningBlock = MiningData.builder()
+                .blockPos(blockPos)
+                .direction(direction)
+                .maxProgress(speedConfig.getValue())
+                .player(mc.player)
+                .miningStack(slot == null ? mc.player.getMainHandStack() : slot.getItemStack())
+                .build();
+
+        mainState = new MiningRenderState(mainMiningBlock, new Animation(true, 300L));
+
+        miningPackets.getValue().sendStartPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
     }
 
     private void tickMain()
@@ -114,14 +206,20 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
+        if (mainMiningBlock.getSquaredDistanceTo() > rangeConfig.getValue() * rangeConfig.getValue())
+        {
+            clearMain();
+            return;
+        }
+
         float blockDamage = mainMiningBlock.tickDelta();
         if (blockDamage < speedConfig.getValue())
         {
             return;
         }
 
-        int slot = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState()).getSlot();
-        if (slot == -1 || !Managers.INVENTORY.startSwap(slot, SilentSwapType.HOTBAR))
+        ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
+        if (bestTool != null && !Managers.INVENTORY.startSwap(bestTool.getSlot(), SilentSwapType.HOTBAR))
         {
             return;
         }
@@ -129,5 +227,87 @@ public class SpeedMineModule extends Toggleable
         miningPackets.getValue().sendStopPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
 
         Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
+    }
+
+    private void tickPacket()
+    {
+        if (packetMiningBlock == null)
+        {
+            return;
+        }
+
+        if (packetMiningBlock.getSquaredDistanceTo() > rangeConfig.getValue() * rangeConfig.getValue())
+        {
+            clearPacket();
+            return;
+        }
+
+        float blockDamage = packetMiningBlock.tickDelta();
+        if (blockDamage < speedConfig.getValue())
+        {
+            return;
+        }
+
+        if (packetMiningBlock.isBlockMined() || packetMiningBlock.hasMinedFor(30))
+        {
+            if (mainMiningBlock != null && mainMiningBlock.getBlockDamage() < speedConfig.getValue())
+            {
+                pendingClear = mainMiningBlock;
+            }
+
+            clearPacket();
+        } else
+        {
+            ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(packetMiningBlock.getBlockState());
+            if (bestTool == null)
+            {
+                return;
+            }
+
+            Managers.INVENTORY.startMultitickSwap(bestTool.getSlot());
+        }
+    }
+
+    private void clearMain()
+    {
+        mainMiningBlock = null;
+        if (mainState != null)
+        {
+            mainState.setState(false);
+        }
+    }
+
+    private void clearPacket()
+    {
+        Managers.INVENTORY.endMultitickSwap();
+        packetMiningBlock = null;
+        if (packetState != null)
+        {
+            packetState.setState(false);
+        }
+    }
+
+    public boolean isMining(BlockPos blockPos)
+    {
+        return mainMiningBlock != null && mainMiningBlock.getBlockPos().equals(blockPos)
+                || packetMiningBlock != null && packetMiningBlock.getBlockPos().equals(blockPos);
+    }
+
+    private record MiningRenderState(MiningData data, Animation animation)
+    {
+        public void setState(boolean state)
+        {
+            animation.setState(state);
+        }
+
+        public float getFactor()
+        {
+            return (float) animation.getFactor();
+        }
+    }
+
+    private enum RemineMode
+    {
+        INSTANT, OFF
     }
 }

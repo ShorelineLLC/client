@@ -2,6 +2,7 @@ package net.shoreline.client.impl;
 
 import net.shoreline.client.api.macro.MacroManager;
 import net.shoreline.client.impl.combat.KitManager;
+import net.shoreline.client.impl.combat.TargetManager;
 import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
 import net.shoreline.client.impl.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
@@ -34,6 +35,7 @@ public class Managers
     public static SafeHoleManager HOLE;
     public static TotemManager TOTEM;
     public static KitManager KIT;
+    public static TargetManager TARGETING;
     public static CrystalCalcManager CRYSTAL;
     public static RenderManager RENDER;
     public static ShaderManager SHADER;
@@ -54,6 +56,7 @@ public class Managers
         HOLE = new SafeHoleManager();
         TOTEM = new TotemManager();
         KIT = new KitManager();
+        TARGETING = new TargetManager();
         CRYSTAL = new CrystalCalcManager();
         RENDER = new RenderManager();
     }

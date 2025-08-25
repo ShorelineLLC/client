@@ -1,7 +1,6 @@
-package net.shoreline.client.impl.combat;
+package net.shoreline.client.impl.combat.hole;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.block.AsyncBlockScanner;

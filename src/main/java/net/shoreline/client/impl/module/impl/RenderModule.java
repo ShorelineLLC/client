@@ -1,14 +1,9 @@
 package net.shoreline.client.impl.module.impl;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.impl.module.client.FontModule;
+import net.shoreline.client.impl.Managers;
 
 public class RenderModule extends Toggleable
 {
@@ -32,33 +27,11 @@ public class RenderModule extends Toggleable
 
     public void drawText(MatrixStack matrices, String text, float x, float y, int color)
     {
-        if (text.isEmpty())
-        {
-            return;
-        }
-
-        if (FontModule.INSTANCE.isEnabled())
-        {
-            FontManager.FONT.drawStringWithShadow(matrices, text, x, y, color);
-            return;
-        }
-
-        mc.textRenderer.draw(text, x, y, color, true, matrices.peek().getPositionMatrix(), mc.getBufferBuilders().getEntityVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-        mc.getBufferBuilders().getEntityVertexConsumers().draw();
+        Managers.RENDER.drawText(matrices, text, x, y, color);
     }
 
     public int getTextWidth(String text)
     {
-        if (text.isEmpty())
-        {
-            return 0;
-        }
-
-        if (FontModule.INSTANCE.isEnabled())
-        {
-            return (int) FontManager.FONT.getStringWidth(text);
-        }
-
-        return mc.textRenderer.getWidth(text);
+        return (int) Managers.RENDER.getTextWidth(text);
     }
 }

@@ -8,8 +8,6 @@ import lombok.Setter;
 @Getter
 public class SwapData
 {
-    private static final int INVALID_SLOT = -1;
-
     private final HotbarCache preHotbar;
     private final int slotFrom, slotTo;
 
@@ -30,13 +28,13 @@ public class SwapData
     public static class Mutable
     {
         private boolean swapped;
-        private int slotFrom, slotTo = INVALID_SLOT;
+        private int slotFrom, slotTo = InventoryUtil.INVALID_SLOT;
 
         public void reset()
         {
             swapped = false;
-            slotFrom = INVALID_SLOT;
-            slotTo = INVALID_SLOT;
+            slotFrom = InventoryUtil.INVALID_SLOT;
+            slotTo = InventoryUtil.INVALID_SLOT;
         }
     }
 }

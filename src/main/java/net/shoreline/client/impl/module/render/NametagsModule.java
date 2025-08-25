@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Getter;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderState;
@@ -16,13 +15,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
-import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
@@ -347,40 +344,6 @@ public class NametagsModule extends RenderModule
         id = id.replace("minecraft:", "");
         id = level > 1 ? id.substring(0, 2) : id.substring(0, 3);
         return id.substring(0, 1).toUpperCase() + id.substring(1) + (level > 1 ? level : "");
-    }
-
-    public void renderNametag(MatrixStack matrixStack, Vec3d pos, String text, int color)
-    {
-        Camera camera = mc.getEntityRenderDispatcher().camera;
-
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
-        RenderSystem.enablePolygonOffset();
-        RenderSystem.polygonOffset(1.0f, -32500000);
-
-        float distance = (float) Math.sqrt(camera.getPos().squaredDistanceTo(pos));
-        float scaling = 0.0018f + scalingConfig.getValue() * distance;
-        if (distance <= 8.0)
-        {
-            scaling = 0.0245f;
-        }
-
-        pos = pos.subtract(camera.getPos());
-        matrixStack.push();
-        matrixStack.translate(pos);
-        matrixStack.multiply(mc.getEntityRenderDispatcher().getRotation());
-        matrixStack.scale(scaling, -scaling, scaling);
-
-        float hwidth = getTextWidth(text) / 2.0f;
-        drawText(matrixStack, text, (int) -hwidth, 0, color);
-
-        matrixStack.pop();
-
-        RenderSystem.disablePolygonOffset();
-        RenderSystem.polygonOffset(1.0f, 32500000);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
-        RenderSystem.disableBlend();
     }
 
     @Getter

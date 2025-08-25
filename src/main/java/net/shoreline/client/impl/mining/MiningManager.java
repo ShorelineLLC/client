@@ -61,7 +61,7 @@ public class MiningManager extends GenericFeature
 
         for (MiningData data : miningBlocks.values())
         {
-            if (data.getSquaredDistanceTo() > 36.0f || data.getFadeOutAnim().getFactor() < 0.01)
+            if (data.getSquaredDistanceTo() > 36.0f || data.isBlockMined())
             {
                 miningBlocks.remove(data.getBlockPos());
                 continue;
@@ -95,7 +95,7 @@ public class MiningManager extends GenericFeature
             MiningData data = MiningData.builder()
                     .blockPos(packet.getPos())
                     .direction(Direction.UP)
-                    .maxProgress(0.7f)
+                    .maxProgress(1.0f)
                     .player(playerEntity)
                     .miningStack(maxPickaxeStack)
                     .build();

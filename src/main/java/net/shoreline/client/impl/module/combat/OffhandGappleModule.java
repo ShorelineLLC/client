@@ -10,7 +10,7 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.module.combat.util.TickPriorities;
+import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;

@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.combat;
+package net.shoreline.client.impl.combat.hole;
 
 import lombok.Data;
 import net.minecraft.entity.Entity;

@@ -13,7 +13,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
-import net.shoreline.client.impl.module.combat.util.TickPriorities;
+import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.eventbus.annotation.EventListener;
 

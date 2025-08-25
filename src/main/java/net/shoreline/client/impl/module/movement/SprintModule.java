@@ -31,8 +31,6 @@ public class SprintModule extends MovementModule
             .setVisible(() -> modeConfig.getValue().equals(SprintMode.RAGE))
             .setDefaultValue(false).build();
 
-    private boolean stopRotating;
-
     public SprintModule()
     {
         super("Sprint", "Automatically sprints", GuiCategory.MOVEMENT);
@@ -47,8 +45,14 @@ public class SprintModule extends MovementModule
     @EventListener
     public void onTickPre(TickEvent.Post event)
     {
-        if (checkNull() || !canSprint() || !checkCollisions())
+        if (checkNull())
         {
+            return;
+        }
+
+        if (!canSprint() || !checkCollisions())
+        {
+            mc.player.setSprinting(false);
             return;
         }
 
@@ -64,14 +68,8 @@ public class SprintModule extends MovementModule
 
             case RAGE ->
             {
-                if (!InputUtil.isInputtingMovement())
-                {
-                    mc.player.setSprinting(false);
-                    return;
-                }
-
                 float sprintYaw = InputUtil.getYawFromInput(mc.player.getYaw());
-                if (!Managers.ROTATION.isFacingYaw(sprintYaw))
+                if (rotateConfig.getValue() && !Managers.ROTATION.isFacingYaw(sprintYaw))
                 {
                     mc.player.setSprinting(false);
                     return;

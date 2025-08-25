@@ -21,6 +21,8 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class NoRenderModule extends Toggleable
 {
+    public static NoRenderModule INSTANCE;
+
     Config<Boolean> hurtCamConfig = new BooleanConfig.Builder("HurtCam")
             .setDescription("Cancels the camera shake when taking damage")
             .setDefaultValue(true).build();
@@ -112,6 +114,7 @@ public class NoRenderModule extends Toggleable
     public NoRenderModule()
     {
         super("NoRender", "Prevents certain game elements from rendering", GuiCategory.RENDER);
+        INSTANCE = this;
     }
 
     @EventListener
@@ -267,6 +270,11 @@ public class NoRenderModule extends Toggleable
             event.cancel();
             event.setShadowOffset(0.5f);
         }
+    }
+
+    public boolean hidePotionHud()
+    {
+        return potionsHud.getValue();
     }
 
     public enum FogRender

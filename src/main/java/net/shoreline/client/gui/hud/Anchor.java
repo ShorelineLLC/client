@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.client.impl.module.render.NoRenderModule;
 
 public enum Anchor
     {
@@ -43,7 +44,7 @@ public enum Anchor
                     @Override
                     public float getY(float screenHeight, float elementHeight, float offset)
                     {
-                        if (!MinecraftClient.getInstance().player.getStatusEffects().isEmpty())
+                        if (!MinecraftClient.getInstance().player.getStatusEffects().isEmpty() && !NoRenderModule.INSTANCE.hidePotionHud())
                         {
                             return offset + 25;
                         }

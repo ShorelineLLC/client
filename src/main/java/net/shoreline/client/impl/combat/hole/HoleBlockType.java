@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.combat;
+package net.shoreline.client.impl.combat.hole;
 
 public enum HoleBlockType
 {

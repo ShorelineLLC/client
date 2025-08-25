@@ -222,7 +222,7 @@ public class RotationManager extends GenericFeature
 
     public void resetSilentRotation()
     {
-        Rotation playerRotation = hasClientRotation() ? clientRotation : serverRotation;
+        Rotation playerRotation = hasClientRotation() ? clientRotation : new Rotation(mc.player);
         setSilentRotation(playerRotation);
     }
 

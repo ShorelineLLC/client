@@ -5,12 +5,9 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
@@ -20,14 +17,15 @@ import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
-import net.shoreline.client.impl.module.combat.util.TickPriorities;
 import net.shoreline.client.impl.module.impl.CombatModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.apache.commons.lang3.mutable.MutableDouble;
 
@@ -207,12 +205,13 @@ public class AuraModule extends CombatModule
 
     private int getAuraWeaponSlot()
     {
-        int slot = InventoryUtil.getItemSlot(Items.NETHERITE_SWORD);
-        if (slot == -1)
+        int swordSlot = InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("sword"));
+        if (swordSlot != InventoryUtil.INVALID_SLOT)
         {
-            return InventoryUtil.getItemSlot(Items.DIAMOND_SWORD);
+            return swordSlot;
         }
-        return slot;
+
+        return InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("axe"));
     }
 
     private Entity getAuraTarget()
@@ -240,6 +239,7 @@ public class AuraModule extends CombatModule
     private boolean canTargetToAttack(Entity entity)
     {
         return entity instanceof PlayerEntity && targetPlayers.getValue()
-                || entity instanceof Monster || entity instanceof SheepEntity;
+                || EntityUtil.isHostile(entity) && targetHostiles.getValue()
+                || EntityUtil.isPassive(entity) && targetPassives.getValue();
     }
 }
