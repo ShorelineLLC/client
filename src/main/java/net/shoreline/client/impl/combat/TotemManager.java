@@ -44,7 +44,8 @@ public class TotemManager extends GenericFeature
             {
                 case 3 ->
                 {
-                    EventBus.INSTANCE.dispatch(new EntityDeathEvent(entity));
+                    EventBus.INSTANCE.dispatch(new EntityDeathEvent(entity,
+                            totems.getOrDefault(entity.getUuid(), TotemData.EMPTY).getPops()));
                     totems.remove(entity.getUuid());
                 }
                 case 35 ->
@@ -52,7 +53,13 @@ public class TotemManager extends GenericFeature
                     if (entity.isAlive())
                     {
                         totems.compute(entity.getUuid(), (uuid, data) ->
-                                new TotemData(System.currentTimeMillis(), data == null ? 1 : data.getPops() + 1));
+                        {
+                            int pops = data == null ? 1 : data.getPops() + 1;
+                            TotemPopEvent popEvent = new TotemPopEvent(entity, pops);
+                            EventBus.INSTANCE.dispatch(popEvent);
+
+                            return new TotemData(System.currentTimeMillis(), pops);
+                        });
                     }
                 }
             }

@@ -3,7 +3,7 @@ package net.shoreline.client.impl.module.hud;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.client.HeadlessMCModule;
-import net.shoreline.client.impl.module.exploit.FastLatencyModule;
+import net.shoreline.client.impl.module.client.LatencyModule;
 import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
 import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
 import net.shoreline.headless.HeadlessAPI;
@@ -25,7 +25,7 @@ public class PingHudModule extends DynamicHudModule
     {
         Formatting connectionColor = HeadlessAPI.isConnected() ? Formatting.GREEN : Formatting.RED;
         String headless = HeadlessMCModule.INSTANCE.isEnabled() ? connectionColor + " Headless " + Formatting.WHITE + "0ms" : "";
-        int latency = FastLatencyModule.INSTANCE.isEnabled() ? FastLatencyModule.INSTANCE.getCurrentLatency() : Managers.NETWORK.getClientLatency();
+        int latency = LatencyModule.INSTANCE.isEnabled() ? LatencyModule.INSTANCE.getCurrentLatency() : Managers.NETWORK.getClientLatency();
         return String.format("Ping " + Formatting.WHITE + "%dms" + headless, latency);
     }
 }

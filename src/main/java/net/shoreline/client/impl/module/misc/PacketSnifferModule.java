@@ -8,6 +8,13 @@ import net.shoreline.client.api.module.Toggleable;
 
 public class PacketSnifferModule extends Toggleable
 {
+    Config<Boolean> logPacket = new BooleanConfig.Builder("Log")
+            .setDescription("Logs the packets in chat")
+            .setDefaultValue(true).build();
+    Config<Boolean> cancelPacket = new BooleanConfig.Builder("Cancel")
+            .setDescription("Cancels the packets from sending/recieving")
+            .setDefaultValue(false).build();
+
     Config<Boolean> moveFullConfig = new BooleanConfig.Builder("PlayerMoveFull")
             .setDescription("Logs PlayerMoveC2SPacket").setDefaultValue(false).build();
     Config<Boolean> moveLookConfig = new BooleanConfig.Builder("PlayerMoveLook")

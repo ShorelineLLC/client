@@ -52,7 +52,7 @@ public class HoleScanner extends AsyncBlockScanner
     @Override
     protected int getRadius()
     {
-        return Math.max(10, (int) Math.ceil(HoleESPModule.INSTANCE.getRange()));
+        return Math.max(10, (int) Math.ceil(HoleESPModule.INSTANCE.getRange() + 1.0f));
     }
 
     public List<HoleData> scanHoles()

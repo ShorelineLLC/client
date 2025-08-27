@@ -96,11 +96,6 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
-        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
-        {
-            return;
-        }
-
         tickMain();
         tickPacket();
     }
@@ -218,6 +213,20 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
+        if (mainMiningBlock.isBlockMined())
+        {
+            mainMiningBlock.resetTicksMining();
+        } else if (mainMiningBlock.hasMinedFor(30))
+        {
+            clearMain();
+            return;
+        }
+
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        {
+            return;
+        }
+
         ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
         if (bestTool != null && !Managers.INVENTORY.startSwap(bestTool.getSlot(), SilentSwapType.HOTBAR))
         {
@@ -244,6 +253,11 @@ public class SpeedMineModule extends Toggleable
 
         float blockDamage = packetMiningBlock.tickDelta();
         if (blockDamage < speedConfig.getValue())
+        {
+            return;
+        }
+
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
         {
             return;
         }

@@ -4982,14 +4982,14 @@ net.shoreline.client.impl.module.exploit.FastEatModule$Mode -> net.shoreline.cli
     110:110:void <init>(java.lang.String,int) -> <init>
     110:110:net.shoreline.client.impl.module.exploit.FastEatModule$Mode[] $values() -> kr
     110:114:void <clinit>() -> <clinit>
-net.shoreline.client.impl.module.exploit.FastLatencyModule -> net.shoreline.client.jZ:
-    net.shoreline.client.impl.module.exploit.FastLatencyModule INSTANCE -> wu
+net.shoreline.client.impl.module.client.LatencyModule -> net.shoreline.client.jZ:
+    net.shoreline.client.impl.module.client.LatencyModule INSTANCE -> wu
     long requestTime -> wv
     long latency -> ww
     net.shoreline.client.util.math.timer.Timer lastRequest -> wx
     net.shoreline.client.util.math.timer.Timer requestTimer -> wy
     21:28:void <init>() -> <init>
-    32:32:net.shoreline.client.impl.module.exploit.FastLatencyModule getInstance() -> ks
+    32:32:net.shoreline.client.impl.module.client.LatencyModule getInstance() -> ks
     38:38:java.lang.String getModuleData() -> aW
     44:46:void onDisconnect(net.shoreline.client.impl.event.network.DisconnectEvent) -> a
     51:58:void onTick(net.shoreline.client.impl.event.TickEvent) -> b

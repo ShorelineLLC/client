@@ -1,6 +1,7 @@
 package net.shoreline.client.api.module;
 
 import lombok.Getter;
+import net.shoreline.client.api.Observable;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
@@ -49,6 +50,7 @@ public class Toggleable extends Module
     public void enable()
     {
         EventBus.INSTANCE.subscribe(this);
+        EventBus.INSTANCE.dispatch(new ModuleToggleEvent(this, true));
         enabled.setValue(true);
         onEnable();
     }
@@ -57,6 +59,7 @@ public class Toggleable extends Module
     {
         onDisable();
         enabled.setValue(false);
+        EventBus.INSTANCE.dispatch(new ModuleToggleEvent(this, false));
         EventBus.INSTANCE.unsubscribe(this);
     }
 

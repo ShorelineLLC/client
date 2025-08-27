@@ -1,23 +1,31 @@
-package net.shoreline.client.impl.module.exploit;
+package net.shoreline.client.impl.module.client;
 
 import lombok.Getter;
 import net.minecraft.client.gui.screen.advancement.AdvancementsScreen;
 import net.minecraft.network.packet.c2s.play.AdvancementTabC2SPacket;
 import net.minecraft.network.packet.s2c.play.SelectAdvancementTabS2CPacket;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.render.ClientFormatting;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class FastLatencyModule extends Toggleable
+public class LatencyModule extends Toggleable
 {
-    public static FastLatencyModule INSTANCE;
+    public static LatencyModule INSTANCE;
+
+    Config<Latency> modeConfig = new EnumConfig.Builder<Latency>("Mode")
+            .setValues(Latency.values())
+            .setDescription("The mode to get server latency")
+            .setDefaultValue(Latency.PING).build();
 
     @Getter
     private int currentLatency;
@@ -33,9 +41,9 @@ public class FastLatencyModule extends Toggleable
             Identifier.of("minecraft:husbandry/root")
     };
 
-    public FastLatencyModule()
+    public LatencyModule()
     {
-        super("FastLatency", "Attempts to resolve client latency", GuiCategory.EXPLOIT);
+        super("Latency", "Attempts to resolve client latency", GuiCategory.CLIENT);
         INSTANCE = this;
     }
 
@@ -86,5 +94,10 @@ public class FastLatencyModule extends Toggleable
                 break;
             }
         }
+    }
+
+    private enum Latency
+    {
+        TAB, PING
     }
 }

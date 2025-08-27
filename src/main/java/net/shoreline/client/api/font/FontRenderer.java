@@ -12,6 +12,8 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.imixin.IDrawContext;
+import net.shoreline.client.impl.module.client.SocialsModule;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.ColorUtil;
 import org.joml.Matrix4f;
 
@@ -369,6 +371,8 @@ public final class FontRenderer implements Closeable
             case 'd' -> 0xffFF55FF;
             case 'e' -> 0xffFFFF55;
             case 'f' -> 0xffffffff;
+            case 'g' -> ThemeModule.INSTANCE.getPrimaryColor().getRGB();
+            case 'h' -> SocialsModule.INSTANCE.getFriendsColor().getRGB();
             default -> -1;
         };
     }

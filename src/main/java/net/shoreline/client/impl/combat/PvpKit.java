@@ -49,7 +49,7 @@ public class PvpKit implements Serializable
         }
 
         jsonObject.add("items", jsonArray);
-        return null;
+        return jsonObject;
     }
 
     public Item getStack(int slot)

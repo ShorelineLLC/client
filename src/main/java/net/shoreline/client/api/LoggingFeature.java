@@ -2,11 +2,13 @@ package net.shoreline.client.api;
 
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.shoreline.client.impl.render.ClientFormatting;
 
 public class LoggingFeature extends GenericFeature
 {
-    private static final String PREFIX = "[Shoreline] ";
+    private static final String PREFIX = ClientFormatting.CLIENT + "[Shoreline] ";
     private static final String ERROR_PREFIX = "[\u274C] ";
+    private static final String SUCCESS_PREFIX = "[\u2713] ";
 
     public LoggingFeature(String name)
     {
@@ -21,6 +23,11 @@ public class LoggingFeature extends GenericFeature
     protected void sendClientChatMessage(String message)
     {
         sendChatMessage(PREFIX + Formatting.RESET + message);
+    }
+
+    protected void sendSuccessChatMessage(String message)
+    {
+        sendChatMessage(Formatting.GREEN + SUCCESS_PREFIX + message);
     }
 
     protected void sendErrorChatMessage(String message)
