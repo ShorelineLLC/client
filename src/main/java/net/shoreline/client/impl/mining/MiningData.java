@@ -6,9 +6,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -32,6 +34,11 @@ public class MiningData
     private float blockDamage, lastDamage;
 
     private int ticksMining;
+
+    public void abort()
+    {
+        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
+    }
 
     public float tickDelta()
     {

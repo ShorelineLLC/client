@@ -36,7 +36,7 @@ public class ClickGuiScreen extends Screen
     {
         super(Text.of("Shoreline-ClickGui"));
 
-        int frameOffset = 15;
+        float frameOffset = 15.0f;
         for (GuiCategory category : GuiCategory.values())
         {
             if (category.equals(GuiCategory.HUD))
@@ -45,7 +45,7 @@ public class ClickGuiScreen extends Screen
             }
             Frame frame = new GuiCategoryFrame(category, frameOffset, 15, 120, 17);
             guiFrames.add(frame);
-            frameOffset += frame.getWidth() + 4;
+            frameOffset += frame.getWidth() + 4.0f;
         }
     }
 
@@ -81,7 +81,7 @@ public class ClickGuiScreen extends Screen
             );
         }
 
-        if (ClickGuiModule.INSTANCE.shouldBlur())
+        if (client.world != null && ClickGuiModule.INSTANCE.shouldBlur())
         {
             applyBlur();
         }

@@ -7,7 +7,6 @@ import net.fabricmc.loader.api.FabricLoader;
  * @author linus
  * @since 2.0
  */
-
 public class ShorelineMod implements ClientModInitializer
 {
     public static final String MOD_NAME = "Shoreline";
@@ -23,6 +22,11 @@ public class ShorelineMod implements ClientModInitializer
     public void onInitializeClient()
     {
         Shoreline.init();
+    }
+
+    public static String getFormattedVersion()
+    {
+        return String.format("%s %s (%s-%s)", ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER, BuildConfig.HASH);
     }
 
     public static boolean isBaritonePresent()

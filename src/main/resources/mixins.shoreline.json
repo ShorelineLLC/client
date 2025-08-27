@@ -16,6 +16,8 @@
     "gui.hud.MixinInGameOverlayRenderer",
     "gui.screen.MixinChatInputSuggestor",
     "gui.screen.MixinChatScreen",
+    "gui.screen.MixinScreen",
+    "gui.screen.MixinTitleScreen",
     "gui.screen.slot.MixinShulkerBoxSlot",
     "input.MixinInput",
     "input.MixinKeyboardInput",

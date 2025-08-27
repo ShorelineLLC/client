@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.world;
 
 import lombok.Getter;
 import net.minecraft.block.BlockState;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -82,7 +83,12 @@ public class SpeedMineModule extends Toggleable
     public void onDisable()
     {
         mainMiningBlock = null;
-        packetMiningBlock = null;
+        if (packetMiningBlock != null)
+        {
+            packetMiningBlock.abort();
+            packetMiningBlock = null;
+        }
+
         pendingClear = null;
         mainState = null;
         packetState = null;

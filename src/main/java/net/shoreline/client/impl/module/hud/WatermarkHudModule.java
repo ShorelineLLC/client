@@ -8,6 +8,7 @@ import net.shoreline.client.impl.module.impl.hud.HudModule;
 
 public class WatermarkHudModule extends HudModule
 {
+
     public WatermarkHudModule()
     {
         super("Watermark", "Displays the client name and version", 2, 2);
@@ -16,26 +17,18 @@ public class WatermarkHudModule extends HudModule
     @Override
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
-        drawText(context.getMatrices(), getWatermarkText(), getX() + 2, getY() + 2);
+        drawText(context.getMatrices(), ShorelineMod.getFormattedVersion(), getX() + 2, getY() + 2);
     }
 
     @Override
     public int getWidth()
     {
-        return getTextWidth(getWatermarkText());
+        return getTextWidth(ShorelineMod.getFormattedVersion());
     }
 
     @Override
     public int getHeight()
     {
         return 12;
-    }
-
-    private String getWatermarkText()
-    {
-        return String.format("%s %s (%s%s%s)",
-                ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER,
-                !BuildConfig.BUILD_IDENTIFIER.equals("dev") ? "-" + BuildConfig.BUILD_NUMBER : "",
-                !BuildConfig.HASH.equals("null") ? "-" + BuildConfig.HASH : "");
     }
 }

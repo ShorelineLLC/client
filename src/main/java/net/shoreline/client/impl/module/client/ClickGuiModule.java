@@ -7,9 +7,11 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
+import net.shoreline.client.impl.event.LoadingEvent;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Theme;
+import net.shoreline.eventbus.annotation.EventListener;
 import org.lwjgl.glfw.GLFW;
 
 public class ClickGuiModule extends Toggleable
@@ -48,38 +50,41 @@ public class ClickGuiModule extends Toggleable
     @Override
     public void onEnable()
     {
-        if (checkNull())
+        if (mc.isFinishedLoading())
         {
-            disable();
-            return;
+            if (scale != scaleConfig.getValue())
+            {
+                scale = scaleConfig.getValue();
+            }
+
+            ThemeModule primaryTheme = ThemeModule.INSTANCE;
+            theme.setComponentColor(primaryTheme.getPrimaryColor());
+            theme.setTitleColor(primaryTheme.getTitleColor());
+            theme.setBackgroundColor(primaryTheme.getBackgroundColor());
+            theme.setOutlineColor(primaryTheme.getOutlineColor());
+            theme.setTextColor(primaryTheme.getTextColor());
+
+            setFadeState(true);
+            mc.setScreen(ClickGuiScreen.INSTANCE);
         }
-
-        ThemeModule primaryTheme = ThemeModule.INSTANCE;
-        theme.setComponentColor(primaryTheme.getPrimaryColor());
-        theme.setTitleColor(primaryTheme.getTitleColor());
-        theme.setBackgroundColor(primaryTheme.getBackgroundColor());
-        theme.setOutlineColor(primaryTheme.getOutlineColor());
-        theme.setTextColor(primaryTheme.getTextColor());
-
-        if (scale != scaleConfig.getValue())
-        {
-            scale = scaleConfig.getValue();
-        }
-
-        setFadeState(true);
-        mc.setScreen(ClickGuiScreen.INSTANCE);
     }
 
     @Override
     public void onDisable()
     {
+        setFadeState(false);
         if (checkNull())
         {
             return;
         }
 
         mc.player.closeScreen();
-        setFadeState(false);
+    }
+
+    @EventListener
+    public void onFinishedLoading(LoadingEvent.Finished event)
+    {
+        scale = scaleConfig.getValue();
     }
 
     public void setFadeState(boolean fadeState)

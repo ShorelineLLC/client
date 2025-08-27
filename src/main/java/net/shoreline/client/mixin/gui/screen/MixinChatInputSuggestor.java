@@ -40,9 +40,8 @@ public abstract class MixinChatInputSuggestor
     @Shadow
     protected abstract void showCommandSuggestions();
 
-    @Inject(method = "refresh", at = @At(value = "INVOKE",
-            target = "Lcom/mojang/brigadier/StringReader;canRead()Z",
-            remap = false), cancellable = true)
+    @Inject(method = "refresh",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false), cancellable = true)
     private void hookRefresh(CallbackInfo ci, @Local StringReader stringReader)
     {
         CommandManager commandManager = Managers.COMMANDS;
@@ -65,6 +64,7 @@ public abstract class MixinChatInputSuggestor
                     }
                 });
             }
+
             ci.cancel();
         }
     }

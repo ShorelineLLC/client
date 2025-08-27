@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.impl.event.LoadingEvent;
 import net.shoreline.client.impl.event.OpenScreenEvent;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
@@ -44,6 +45,9 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
                                     CallbackInfoReturnable<Runnable> cir)
     {
         Shoreline.postInit();
+
+        LoadingEvent.Finished finished = new LoadingEvent.Finished();
+        EventBus.INSTANCE.dispatch(finished);
     }
 
     @Inject(method = "joinWorld", at = @At(value = "TAIL"))
