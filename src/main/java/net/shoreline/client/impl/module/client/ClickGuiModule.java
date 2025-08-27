@@ -16,6 +16,9 @@ public class ClickGuiModule extends Toggleable
 {
     public static ClickGuiModule INSTANCE;
 
+    Config<Float> scaleConfig = new NumberConfig.Builder<Float>("Scale")
+            .setMin(0.5f).setMax(1.5f).setDefaultValue(1.0f)
+            .setDescription("The global gui scale").build();
     Config<Boolean> blurConfig = new BooleanConfig.Builder("Blur")
             .setDescription("Blurs the screen background")
             .setDefaultValue(true).build();
@@ -86,6 +89,11 @@ public class ClickGuiModule extends Toggleable
     public Animation getFadeAnimation()
     {
         return fadeInAnimation;
+    }
+
+    public float getScale()
+    {
+        return scaleConfig.getValue();
     }
 
     public boolean shouldBlur()

@@ -64,6 +64,11 @@ public class NotifierModule extends Toggleable
     @EventListener
     public void onModuleToggle(ModuleToggleEvent event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         if (event.isEnabled())
         {
             sendClientChatMessage(Formatting.GRAY + event.getModule().getName() + Formatting.GREEN + " enabled");

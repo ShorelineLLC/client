@@ -79,11 +79,12 @@ public class InventoryManager extends GenericFeature
             serverSlot = slot;
         }
 
+        ScreenHandler handler = mc.player.playerScreenHandler;
         if (event.getPacket() instanceof ScreenHandlerSlotUpdateS2CPacket packet
-                && packet.getSyncId() == mc.player.currentScreenHandler.syncId
+                && packet.getSyncId() == handler.syncId
                 && !InventoryUtil.isInInventoryScreen())
         {
-            int slot = InventoryUtil.getPacketSlotIndex(packet.getSlot());
+            int slot = InventoryUtil.getPacketSlotIndex(handler, packet.getSlot());
             if (packet.getStack().isEmpty() || !PlayerInventory.isValidHotbarIndex(slot))
             {
                 return;
@@ -303,8 +304,8 @@ public class InventoryManager extends GenericFeature
 
     public void clickSwap(int fromSlot, int toSlot, Item item)
     {
-        int slot = InventoryUtil.getPacketSlotIndex(fromSlot);
         ScreenHandler handler = mc.player.currentScreenHandler;
+        int slot = InventoryUtil.getPacketSlotIndex(handler, fromSlot);
 
         if (!handler.getCursorStack().getItem().equals(item))
         {
@@ -324,7 +325,7 @@ public class InventoryManager extends GenericFeature
 
     private void internalSwapSlot(int slot1, int slot2)
     {
-        ScreenHandler screenHandler = mc.player.currentScreenHandler;
+        ScreenHandler screenHandler = mc.player.playerScreenHandler;
 
         ItemStack stack1 = screenHandler.slots.get(slot1).getStack();
         ItemStack stack2 = screenHandler.slots.get(slot2).getStack();
@@ -333,7 +334,7 @@ public class InventoryManager extends GenericFeature
         int2ObjectMap.put(slot1, stack2.copy());
         int2ObjectMap.put(slot2, stack1.copy());
 
-        int slot = InventoryUtil.getPacketSlotIndex(slot1);
+        int slot = InventoryUtil.getPacketSlotIndex(screenHandler, slot1);
         Managers.NETWORK.sendPacket(new ClickSlotC2SPacket(screenHandler.syncId,
                 screenHandler.getRevision(),
                 slot,

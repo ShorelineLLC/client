@@ -8,8 +8,12 @@ import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.PlayerScreenHandler;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 
+import java.util.List;
 import java.util.function.Function;
 
 @UtilityClass
@@ -119,19 +123,24 @@ public class InventoryUtil
         return count;
     }
 
-    public int getPacketSlotIndex(int slot)
+    public int getPacketSlotIndex(ScreenHandler handler, int slot)
     {
-        if (slot == PlayerInventory.OFF_HAND_SLOT)
+        final List<Slot> slots = handler.slots;
+        for (int id = 0; id < slots.size(); id++)
+        {
+            Slot s = slots.get(id);
+            if (s.getIndex() == slot)
+            {
+                return id;
+            }
+        }
+
+        if (handler instanceof PlayerScreenHandler && slot == PlayerInventory.OFF_HAND_SLOT)
         {
             return 45;
         }
 
-        if (slot > PlayerInventory.MAIN_SIZE)
-        {
-            return slot - PlayerInventory.MAIN_SIZE + 1;
-        }
-
-        return slot < PlayerInventory.getHotbarSize() ? slot + PlayerInventory.MAIN_SIZE : slot;
+        return slot;
     }
 
     private int getMaterialRank(ItemStack stack)
