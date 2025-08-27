@@ -14,15 +14,15 @@ public abstract class ConfigComponent<T> extends FrameComponent
     private final ModuleComponent moduleComponent;
 
     @Setter
-    private int moduleOffset;
+    private float moduleOffset;
 
     public ConfigComponent(Config<T> config,
                            ModuleComponent moduleComponent,
                            Frame frame,
-                           int x,
-                           int y,
-                           int frameWidth,
-                           int frameHeight)
+                           float x,
+                           float y,
+                           float frameWidth,
+                           float frameHeight)
     {
         super(frame, x, y, frameWidth, frameHeight);
         this.config = config;
@@ -34,13 +34,13 @@ public abstract class ConfigComponent<T> extends FrameComponent
     protected void onConfigUpdate(T value) {}
 
     @Override
-    public int getTx()
+    public float getTx()
     {
         return getModuleComponent().getTx();
     }
 
     @Override
-    public int getTy()
+    public float getTy()
     {
         ModuleComponent parent = getModuleComponent();
         return parent.getTy() + parent.getHeight() + this.y + this.yOffset;

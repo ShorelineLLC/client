@@ -15,21 +15,21 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
     protected final Frame frame;
 
     // Positions inside the frame
-    protected int x, y;
+    protected float x, y;
 
-    protected int width;
-    protected int height;
+    protected float width;
+    protected float height;
 
-    protected int yOffset;
+    protected float yOffset;
 
     protected final Animation hoverAnim;
     protected final Animation drawAnim;
 
     public FrameComponent(Frame frame,
-                          int x,
-                          int y,
-                          int width,
-                          int height)
+                          float x,
+                          float y,
+                          float width,
+                          float height)
     {
         this.frame = frame;
         this.x = x;
@@ -40,18 +40,18 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
         this.drawAnim = new Animation(true, 100L, Easing.LINEAR);
     }
 
-    public int getTx()
+    public float getTx()
     {
         return frame.getX() + this.x;
     }
 
-    public int getTy()
+    public float getTy()
     {
         return frame.getY() + this.y + this.yOffset;
     }
 
-    public int getDrawHeight()
+    public float getDrawHeight()
     {
-        return (int) (height * drawAnim.getFactor());
+        return (float) (height * drawAnim.getFactor());
     }
 }

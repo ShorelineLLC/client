@@ -1,12 +1,8 @@
 package net.shoreline.client.gui.clickgui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
-import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.gui.Mouse;
@@ -14,14 +10,13 @@ import net.shoreline.client.gui.clickgui.components.FrameComponent;
 import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.gui.clickgui.config.GroupComponent;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Theme;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +34,15 @@ public class ModuleComponent extends FrameComponent
 
     public ModuleComponent(Module module,
                            Frame frame,
-                           int x,
-                           int y,
-                           int frameWidth,
-                           int frameHeight)
+                           float x,
+                           float y,
+                           float frameWidth,
+                           float frameHeight)
     {
         super(frame, x, y, frameWidth, frameHeight);
         this.module = module;
 
+        float scale = ClickGuiModule.INSTANCE.getScale();
         for (Config<?> config : module.getConfigs())
         {
             if (config.getConfigGroup() != null)
@@ -55,8 +51,11 @@ public class ModuleComponent extends FrameComponent
             }
 
             final ComponentFactory factory = frame.getComponentFactory();
-            ConfigComponent<?> component = factory.createConfigComponent(
-                    config, this, frame, 2, 0, frameWidth - 2, frameHeight);
+            ConfigComponent<?> component = factory.createConfigComponent(config, this, frame,
+                    2.0f * scale,
+                    0,
+                    (frameWidth - 2.0f) * scale,
+                    frameHeight * scale);
 
             components.add(component);
             frame.getAllComponents().add(component);
@@ -73,20 +72,21 @@ public class ModuleComponent extends FrameComponent
     {
         hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
+        float scale = ClickGuiModule.INSTANCE.getScale();
 
         int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
         drawRect(context, getTx(), getTy(), width, height, color);
-        drawText(context, module.getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, module.getName(), getTx() + 3.0f, getTy() + 4.0f, theme.getTextColor());
 
         if (components.size() > 1)
         {
             String dotsText = "...";
-            drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4, theme.getTextColor());
+            drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1.0f, getTy() + 4.0f, theme.getTextColor());
         }
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 
-        int configY = 2;
+        float configY = scale * 2.0f;
         for (ConfigComponent<?> component : components)
         {
             if (currentAnimation == null)
@@ -104,7 +104,7 @@ public class ModuleComponent extends FrameComponent
 
             if (component.getDrawAnim().getFactor() > 0.01)
             {
-                int extra = 0;
+                float extra = 0.0f;
                 if (component instanceof GroupComponent c)
                 {
                     extra += c.getScaledHeight();
@@ -114,17 +114,17 @@ public class ModuleComponent extends FrameComponent
                     extra += c1.getComponentHeight();
                 }
 
-                context.enableScissor(component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
+                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
                 component.drawComponent(context, mouseX, mouseY, delta);
                 component.setYOffset(configY);
-                configY += component.getDrawHeight() + extra + 1;
+                configY += component.getDrawHeight() + extra + (float) Math.floor(scale);
 
                 component.setModuleOffset(configY);
-                context.disableScissor();
+                disableScissor(context);
             }
         }
 
-        drawRect(context, getTx() + getWidth() - 1, getTy() + getHeight(), getTx() + getWidth(), getTy() + getHeight() + configY, color);
+        drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight(), 1.0f, configY, color);
         disableScissor(context);
     }
 
@@ -203,9 +203,10 @@ public class ModuleComponent extends FrameComponent
         }
     }
 
-    public int getComponentHeight()
+    public float getComponentHeight()
     {
-        int frameHeight = 2;
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        float frameHeight = 2.0f * scale;
         for (ConfigComponent<?> component : components)
         {
             if (component.getDrawAnim().getFactor() > 0.01)
@@ -218,14 +219,15 @@ public class ModuleComponent extends FrameComponent
                     frameHeight += c1.getComponentHeight();
                 }
 
-                frameHeight += component.getDrawHeight() + 1;
+                frameHeight += component.getDrawHeight() + (float) Math.floor(scale);
             }
         }
+
         return frameHeight;
     }
 
-    public int getScaledHeight()
+    public float getScaledHeight()
     {
-        return (int) (getComponentHeight() * collapseAnim.getFactor());
+        return (float) (getComponentHeight() * collapseAnim.getFactor());
     }
 }

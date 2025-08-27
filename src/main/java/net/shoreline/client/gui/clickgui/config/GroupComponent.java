@@ -9,6 +9,7 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -30,10 +31,10 @@ public class GroupComponent extends ConfigComponent<Void>
     public GroupComponent(Config<Void> config,
                           ModuleComponent moduleComponent,
                           Frame frame,
-                          int x,
-                          int y,
-                          int frameWidth,
-                          int frameHeight)
+                          float x,
+                          float y,
+                          float frameWidth,
+                          float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
@@ -47,23 +48,24 @@ public class GroupComponent extends ConfigComponent<Void>
     {
         hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
+        float scale = ClickGuiModule.INSTANCE.getScale();
 
         int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) hoverAnim.getFactor());
         drawRect(context, getTx(), getTy(), width, height, color);
 
-        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, getConfig().getName(), getTx() + 3.0f, getTy() + 4.0f, theme.getTextColor());
         String dotsText = "...";
-        drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1, getTy() + 4, theme.getTextColor());
+        drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1.0f, getTy() + 4.0f, theme.getTextColor());
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 
-        int configY = height + 3;
+        float configY = height + (3.0f * scale);
         for (ConfigComponent<?> component : components)
         {
             component.getDrawAnim().setState(component.getConfig().isVisible());
             if (component.getDrawAnim().getFactor() > 0.01)
             {
-                int extra = 0;
+                float extra = 0.0f;
                 if (component instanceof GroupComponent c)
                 {
                     extra += c.getScaledHeight();
@@ -73,18 +75,18 @@ public class GroupComponent extends ConfigComponent<Void>
                     extra += c1.getComponentHeight();
                 }
 
-                context.enableScissor(component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
+                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
                 component.setY(getYOffset());
                 component.drawComponent(context, mouseX, mouseY, delta);
                 component.setYOffset(configY);
-                configY += component.getDrawHeight() + extra + 1;
+                configY += component.getDrawHeight() + extra + (float) Math.floor(scale);
 
                 component.setModuleOffset(configY);
-                context.disableScissor();
+                disableScissor(context);
             }
         }
 
-        drawRect(context, getTx() + getWidth() - 1, getTy() + getHeight(), getTx() + getWidth(), getTy() + getHeight() + configY, color);
+        drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight(), 1.0f, configY, color);
         disableScissor(context);
     }
 
@@ -163,14 +165,14 @@ public class GroupComponent extends ConfigComponent<Void>
         }
     }
 
-    public int getComponentHeight()
+    public float getComponentHeight()
     {
-        int frameHeight = 0;
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        float frameHeight = 2.0f * scale;
         for (ConfigComponent<?> component : components)
         {
             if (component.getConfig().isVisible())
             {
-                frameHeight += component.getDrawHeight() + 1;
                 if (component instanceof GroupComponent c)
                 {
                     frameHeight += c.getScaledHeight();
@@ -178,13 +180,17 @@ public class GroupComponent extends ConfigComponent<Void>
                 {
                     frameHeight += c1.getComponentHeight();
                 }
+
+                frameHeight += component.getDrawHeight() + (float) Math.floor(scale);
             }
         }
+
         return frameHeight;
     }
 
-    public int getScaledHeight()
+    public float getScaledHeight()
     {
-        return (int) ((getComponentHeight() + 2) * collapseAnim.getFactor());
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        return (float) ((getComponentHeight() + (2.0f * scale)) * collapseAnim.getFactor());
     }
 }

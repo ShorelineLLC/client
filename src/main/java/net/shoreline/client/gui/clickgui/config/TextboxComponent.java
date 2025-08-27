@@ -18,10 +18,10 @@ public class TextboxComponent extends ConfigComponent<String>
     public TextboxComponent(Config<String> config,
                             ModuleComponent moduleComponent,
                             Frame frame,
-                            int x,
-                            int y,
-                            int frameWidth,
-                            int frameHeight)
+                            float x,
+                            float y,
+                            float frameWidth,
+                            float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         textComponent = new TextComponent(frame, x, y, frameWidth, frameHeight,
@@ -53,7 +53,7 @@ public class TextboxComponent extends ConfigComponent<String>
             drawRect(context, getTx(), getTy(), width, height, color);
 
             String formattedText = getConfig().getName() + " " + Formatting.GRAY + getConfig().getValue();
-            drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
+            drawText(context, formattedText, getTx() + 3.0f, getTy() + 4.0f, theme.getTextColor());
         }
     }
 

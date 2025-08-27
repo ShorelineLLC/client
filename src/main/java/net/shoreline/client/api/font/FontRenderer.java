@@ -242,7 +242,7 @@ public final class FontRenderer implements Closeable
         }
     }
 
-    public float getStringWidth(String text)
+    public int getStringWidth(String text)
     {
         char[] c = stripControlCodes(text).toCharArray();
         float currentLine = 0;
@@ -259,7 +259,8 @@ public final class FontRenderer implements Closeable
             float w = glyph == null ? 0 : glyph.width();
             currentLine += w / (float) this.scale;
         }
-        return Math.max(currentLine, maxPreviousLines);
+
+        return Math.round(Math.max(currentLine, maxPreviousLines));
     }
 
     public float getStringHeight(String text)

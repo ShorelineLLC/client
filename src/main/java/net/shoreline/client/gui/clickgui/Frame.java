@@ -3,11 +3,11 @@ package net.shoreline.client.gui.clickgui;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.FrameComponent;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Theme;
@@ -21,12 +21,12 @@ import java.util.List;
 public class Frame extends DrawableComponent implements Interactable
 {
     private final String title;
-    private int x, y;
+    private float x, y;
 
-    private int px, py;
+    private float px, py;
 
-    private int width;
-    private int titleHeight;
+    private float width;
+    private float titleHeight;
 
     private boolean frameOpen;
     private boolean dragging;
@@ -38,7 +38,7 @@ public class Frame extends DrawableComponent implements Interactable
     protected final List<FrameComponent> components = new ArrayList<>();
     protected final List<FrameComponent> allComponents = new ArrayList<>();
 
-    public Frame(String title, int x, int y, int width, int titleHeight)
+    public Frame(String title, float x, float y, float width, float titleHeight)
     {
         this.title = title;
         this.x = x;
@@ -64,19 +64,20 @@ public class Frame extends DrawableComponent implements Interactable
         }
 
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
+        float scale = ClickGuiModule.INSTANCE.getScale();
 
-        float frameHeight = getComponentHeight() + 1.0f;
+        float frameHeight = getComponentHeight() + scale;
         drawOutline(context, x, y, width, titleHeight + (int) (frameHeight * collapseAnim.getFactor()), 0.5f, theme.getOutlineColor());
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
-        drawText(context, title, x + 3, y + 5, theme.getTextColor());
+        drawText(context, title, x + 3.0f, y + 5.0f, theme.getTextColor());
 
         if (collapseAnim.getFactor() > 0.0)
         {
             enableScissor(context, x, y + titleHeight, x + width, y + titleHeight + (int) (frameHeight * collapseAnim.getFactor()));
             drawRect(context, x, y + titleHeight, width, frameHeight, theme.getBackgroundColor());
 
-            int yOffset = 0;
+            float yOffset = 0.0f;
             for (FrameComponent component : components)
             {
                 component.setYOffset(yOffset);
@@ -160,12 +161,13 @@ public class Frame extends DrawableComponent implements Interactable
         }
     }
 
-    public int getComponentHeight()
+    public float getComponentHeight()
     {
-        int frameHeight = 2;
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        float frameHeight = scale * 2.0f;
         for (FrameComponent component : components)
         {
-            int height = component.getHeight() + 1;
+            float height = component.getHeight() + scale;
             if (component instanceof ModuleComponent c1)
             {
                 height += c1.getScaledHeight();

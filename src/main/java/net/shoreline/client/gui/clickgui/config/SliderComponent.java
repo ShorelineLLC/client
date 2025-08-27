@@ -26,10 +26,10 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
     public SliderComponent(Config<T> config,
                            ModuleComponent moduleComponent,
                            Frame frame,
-                           int x,
-                           int y,
-                           int frameWidth,
-                           int frameHeight)
+                           float x,
+                           float y,
+                           float frameWidth,
+                           float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         textComponent = new TextComponent(frame, x, y, frameWidth, frameHeight,
@@ -103,7 +103,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
             formattedText += numberConfig.getFormat();
         }
 
-        drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, formattedText, getTx() + 3.0f, getTy() + 4.0f, theme.getTextColor());
     }
 
     @Override

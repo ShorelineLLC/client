@@ -33,6 +33,9 @@ public class ClickGuiModule extends Toggleable
     private final Theme theme;
     private final Animation fadeInAnimation;
 
+    @Getter
+    private float scale = 1.0f;
+
     public ClickGuiModule()
     {
         super("ClickGui", "The client mod menu", GuiCategory.CLIENT);
@@ -57,6 +60,11 @@ public class ClickGuiModule extends Toggleable
         theme.setBackgroundColor(primaryTheme.getBackgroundColor());
         theme.setOutlineColor(primaryTheme.getOutlineColor());
         theme.setTextColor(primaryTheme.getTextColor());
+
+        if (scale != scaleConfig.getValue())
+        {
+            scale = scaleConfig.getValue();
+        }
 
         setFadeState(true);
         mc.setScreen(ClickGuiScreen.INSTANCE);
@@ -89,11 +97,6 @@ public class ClickGuiModule extends Toggleable
     public Animation getFadeAnimation()
     {
         return fadeInAnimation;
-    }
-
-    public float getScale()
-    {
-        return scaleConfig.getValue();
     }
 
     public boolean shouldBlur()

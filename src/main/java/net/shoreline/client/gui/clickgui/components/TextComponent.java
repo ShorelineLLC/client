@@ -8,6 +8,7 @@ import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
@@ -19,7 +20,7 @@ import java.util.function.Supplier;
 
 public class TextComponent extends FrameComponent
 {
-    private int typedX;
+    private float typedX;
     private final Deque<Character> buffer = new ArrayDeque<>();
 
     @Getter
@@ -36,10 +37,10 @@ public class TextComponent extends FrameComponent
     private final IntPredicate charFilter;
 
     public TextComponent(Frame frame,
-                         int x,
-                         int y,
-                         int frameWidth,
-                         int frameHeight,
+                         float x,
+                         float y,
+                         float frameWidth,
+                         float frameHeight,
                          int mouseButton,
                          IntPredicate charFilter,
                          Supplier<String> value,
@@ -54,10 +55,10 @@ public class TextComponent extends FrameComponent
     }
 
     public TextComponent(Frame frame,
-                         int x,
-                         int y,
-                         int frameWidth,
-                         int frameHeight,
+                         float x,
+                         float y,
+                         float frameWidth,
+                         float frameHeight,
                          int mouseButton,
                          Supplier<String> value,
                          Consumer<String> setter)
@@ -75,11 +76,11 @@ public class TextComponent extends FrameComponent
 
         String buffer = bufferToString();
         String formattedText1 = buffer.isEmpty() ? getInsertionPoint(true) : buffer + getInsertionPoint(false);
-        enableScissor(context, getX() + 3, getY(), getX() + width, getY() + height);
+        enableScissor(context, getX() + 3.0f, getY(), getX() + width, getY() + height);
 
         context.getMatrices().push();
         context.getMatrices().translate(-typedX, 0.0f, 0.0f);
-        drawText(context, formattedText1, getX() + 3, getY() + 4, theme.getTextColor());
+        drawText(context, formattedText1, getX() + 3.0f, getY() + 4.0f, theme.getTextColor());
         context.getMatrices().pop();
 
         disableScissor(context);
@@ -158,8 +159,9 @@ public class TextComponent extends FrameComponent
 
     private void updateScrolling()
     {
+        float scale = ClickGuiModule.INSTANCE.getScale();
         int textW = getTextWidth(bufferToString());
-        int componentWidth = width - 6;
+        float componentWidth = width - (6.0f * scale);
 
         if (textW - typedX > componentWidth)
         {

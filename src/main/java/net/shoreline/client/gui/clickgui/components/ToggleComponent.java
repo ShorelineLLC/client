@@ -20,7 +20,13 @@ public class ToggleComponent extends FrameComponent
 
     private final Supplier<Boolean> setter;
 
-    public ToggleComponent(Frame frame, int x, int y, int width, int height, boolean state, Supplier<Boolean> setter)
+    public ToggleComponent(Frame frame,
+                           float x,
+                           float y,
+                           float width,
+                           float height,
+                           boolean state,
+                           Supplier<Boolean> setter)
     {
         super(frame, x, y, width, height);
         this.toggleAnim = new Animation(state, 200L, Easing.CUBIC_IN_OUT);

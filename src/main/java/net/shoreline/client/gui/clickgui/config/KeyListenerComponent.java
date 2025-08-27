@@ -2,7 +2,6 @@ package net.shoreline.client.gui.clickgui.config;
 
 import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
@@ -13,8 +12,8 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
-import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.util.Keyboard;
 import org.lwjgl.glfw.GLFW;
 
@@ -26,10 +25,10 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
     public KeyListenerComponent(Config<Macro> config,
                                 ModuleComponent moduleComponent,
                                 Frame frame,
-                                int x,
-                                int y,
-                                int frameWidth,
-                                int frameHeight)
+                                float x,
+                                float y,
+                                float frameWidth,
+                                float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
     }
@@ -48,7 +47,7 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
 
         String keyText = listening ? "..." : Keyboard.getKeyName(getConfig().getValue().getKeycode()).toUpperCase();
         String formattedText = getConfig().getName() + " " + Formatting.GRAY + keyText;
-        drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, formattedText, getTx() + 3.0f, getTy() + 4.0f, theme.getTextColor());
     }
 
     @Override

@@ -13,10 +13,10 @@ public class ComponentFactory
 {
     public ModuleComponent createModuleComponent(Module module,
                                                  Frame frame,
-                                                 int x,
-                                                 int y,
-                                                 int width,
-                                                 int height)
+                                                 float x,
+                                                 float y,
+                                                 float width,
+                                                 float height)
     {
         if (module instanceof Toggleable toggleable)
         {
@@ -29,10 +29,10 @@ public class ComponentFactory
     public ConfigComponent<?> createConfigComponent(Config<?> config,
                                                     ModuleComponent moduleComponent,
                                                     Frame frame,
-                                                    int x,
-                                                    int y,
-                                                    int width,
-                                                    int height)
+                                                    float x,
+                                                    float y,
+                                                    float width,
+                                                    float height)
     {
         if (!config.getChildren().isEmpty())
         {

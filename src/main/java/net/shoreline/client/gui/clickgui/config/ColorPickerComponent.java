@@ -12,6 +12,7 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.*;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.*;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -29,7 +30,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     private boolean draggingHue;
     private boolean draggingPicker;
 
-    private final int pickerLength;
+    private final float pickerLength;
 
     private boolean pickerOpen;
     private final Animation collapseAnim;
@@ -39,10 +40,10 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     public ColorPickerComponent(Config<Color> config,
                                 ModuleComponent moduleComponent,
                                 Frame frame,
-                                int x,
-                                int y,
-                                int frameWidth,
-                                int frameHeight)
+                                float x,
+                                float y,
+                                float frameWidth,
+                                float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         this.collapseAnim = new Animation(false, 200, Easing.CUBIC_OUT);
@@ -104,14 +105,14 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             hexComponent.drawComponent(context, mouseX, mouseY, delta);
 
             Identifier resetSprite = Identifier.of("shoreline", "icon/reset_clickgui.png");
-            int resetX = getTx() + pickerLength - 18;
-            int resetY = getTy() + height + pickerLength + 5;
+            float resetX = getTx() + pickerLength - 18;
+            float resetY = getTy() + height + pickerLength + 5;
             drawRect(context, resetX, resetY, 15, 15, theme.getComponentColor());
             drawTexturedRect(context, resetSprite, resetX + 2, resetY + 1, 12, 12);
 
             Identifier syncSprite = Identifier.of("shoreline", "icon/sync_clickgui.png");
-            int syncX = getTx() + pickerLength;
-            int syncY = getTy() + height + pickerLength + 5;
+            float syncX = getTx() + pickerLength;
+            float syncY = getTy() + height + pickerLength + 5;
             drawRect(context, syncX, syncY, 15, 15, ((ColorConfig) getConfig()).isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
 
@@ -193,10 +194,10 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     }
 
     private void drawGradientRect(DrawContext context,
-                                  int x1,
-                                  int y1,
-                                  int x2,
-                                  int y2,
+                                  float x1,
+                                  float y1,
+                                  float x2,
+                                  float y2,
                                   int startColor,
                                   int endColor,
                                   boolean sideways)
@@ -237,25 +238,25 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     public void drawSelectors(DrawContext context, float mouseX, float mouseY, float delta)
     {
         float[] hsb = colorConfig.getHsb();
-        int hueX = getTx() + pickerLength + 4;
-        int hueW = 10;
-        int hueY = getTy() + height + 3;
-        int hueH = pickerLength - 2;
+        float hueX = getTx() + pickerLength + 4;
+        float hueW = 10;
+        float hueY = getTy() + height + 3;
+        float hueH = pickerLength - 2;
 
-        int pickerX = getTx() + 2;
-        int pickerY = getTy() + height + 4;
-        int pickerW = pickerLength - 2;
-        int pickerH = pickerLength - 2;
+        float pickerX = getTx() + 2;
+        float pickerY = getTy() + height + 4;
+        float pickerW = pickerLength - 2;
+        float pickerH = pickerLength - 2;
 
-        int posX = (int) (pickerX + hsb[1] * pickerW);
-        int posY = (int) (pickerY + (1.0f - hsb[2]) * pickerH);
-        int smootherX = (int) colorSmootherX.smooth(posX, 0.5f, delta);
-        int smootherY = (int) colorSmootherY.smooth(posY, 0.5f, delta);
+        float posX = pickerX + hsb[1] * pickerW;
+        float posY = pickerY + (1.0f - hsb[2]) * pickerH;
+        float smootherX = (float) colorSmootherX.smooth(posX, 0.5f, delta);
+        float smootherY = (float) colorSmootherY.smooth(posY, 0.5f, delta);
         drawRect(context, smootherX - 2, smootherY - 2, 4, 4, 0xFF000000);
         drawRect(context, smootherX - 1, smootherY - 1, 2, 2, 0xFFFFFFFF);
 
-        int hueSelectorY = (int) (hueY + hsb[0] * hueH);
-        int hueSmoothY = (int) hueSmootherY.smooth(hueSelectorY - 2, 0.5f, delta);
+        float hueSelectorY = hueY + hsb[0] * hueH;
+        float hueSmoothY = (float) hueSmootherY.smooth(hueSelectorY - 2, 0.5f, delta);
         drawRect(context, hueX - 1, hueSmoothY, hueW + 2, 3, 0xFF000000);
         drawRect(context, hueX, hueSmoothY + 1, hueW + 1, 1, 0xFFFFFFFF);
 
@@ -277,14 +278,15 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         }
     }
 
-    public int getComponentHeight()
+    public float getComponentHeight()
     {
-        int pickerHeight = pickerLength + 20;
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        float pickerHeight = pickerLength + (20.0f * scale);
         if (colorConfig.isTransparency())
         {
-            pickerHeight += 14;
+            pickerHeight += 14.0f * scale;
         }
 
-        return (int) (pickerHeight * collapseAnim.getFactor());
+        return (float) (pickerHeight * collapseAnim.getFactor());
     }
 }

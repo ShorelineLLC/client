@@ -21,10 +21,10 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
     public SelectorComponent(Config<Enum<?>> config,
                              ModuleComponent moduleComponent,
                              Frame frame,
-                             int x,
-                             int y,
-                             int frameWidth,
-                             int frameHeight)
+                             float x,
+                             float y,
+                             float frameWidth,
+                             float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         index = ((EnumConfig<?>) config).getIndex();
@@ -44,7 +44,7 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
 
         String selectorText = Formatter.formatEnum(getConfig().getValue());
         String formattedText = getConfig().getName() + " " + Formatting.GRAY + selectorText;
-        drawText(context, formattedText, getTx() + 3, getTy() + 4, theme.getTextColor());
+        drawText(context, formattedText, getTx() + 3.0f, getTy() + 4.0f, theme.getTextColor());
     }
 
     @Override

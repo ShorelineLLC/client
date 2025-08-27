@@ -21,7 +21,7 @@ public class HudComponent extends DrawableComponent implements Interactable
     private final HudModule hudModule;
 
     private int x, y;
-    private int px, py;
+    private float px, py;
 
     private int width;
     private int height;
@@ -47,8 +47,8 @@ public class HudComponent extends DrawableComponent implements Interactable
         Mouse mouse = HudGuiScreen.INSTANCE.getMouse();
         if (isDragging())
         {
-            x += mouse.getMouseX() - px;
-            y += mouse.getMouseY() - py;
+            x += (int) (mouse.getMouseX() - px);
+            y += (int) (mouse.getMouseY() - py);
 
             int screenWidth = context.getScaledWindowWidth();
             int screenHeight = context.getScaledWindowHeight();

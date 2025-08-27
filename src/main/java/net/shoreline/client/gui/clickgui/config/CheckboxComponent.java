@@ -6,6 +6,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.gui.clickgui.components.ToggleComponent;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -17,10 +18,10 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
     public CheckboxComponent(Config<Boolean> config,
                              ModuleComponent moduleComponent,
                              Frame frame,
-                             int x,
-                             int y,
-                             int frameWidth,
-                             int frameHeight)
+                             float x,
+                             float y,
+                             float frameWidth,
+                             float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
         this.toggleComponent = new ToggleComponent(frame, x, y, frameWidth, frameHeight, config.getValue(), () ->
@@ -45,7 +46,7 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
         toggleComponent.drawComponent(context, mouseX, mouseY, delta);
 
         int textColor = ColorUtil.interpolateColor(1.0f - (float) toggleComponent.getFactor(), 0xffaaaaaa, theme.getTextColor());
-        drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, textColor);
+        drawText(context, getConfig().getName(), getTx() + 3.0f, getTy() + 4.0f, textColor);
     }
 
     @Override

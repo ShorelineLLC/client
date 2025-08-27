@@ -3,6 +3,7 @@ package net.shoreline.client.gui.clickgui;
 import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.module.GuiCategory;
@@ -63,6 +64,10 @@ public class ClickGuiScreen extends Screen
                        int mouseY,
                        float deltaTicks)
     {
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        final int scaledMx = (int) (mouseX / scale);
+        final int scaledMy = (int) (mouseY / scale);
+
         if (ClickGuiModule.INSTANCE.shouldDarken())
         {
             Animation animation = ClickGuiModule.INSTANCE.getFadeAnimation();
@@ -81,6 +86,9 @@ public class ClickGuiScreen extends Screen
             applyBlur();
         }
 
+        MatrixStack matrixStack = context.getMatrices();
+        matrixStack.push();
+        matrixStack.scale(scale, scale, 1.0f);
         for (Frame frame : guiFrames)
         {
             if (!draggingMouse && mouse.isHovering(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()) && mouse.isLeftHeld())
@@ -89,13 +97,15 @@ public class ClickGuiScreen extends Screen
                 draggingMouse = true;
             }
 
-            frame.drawComponent(context, mouseX, mouseY, deltaTicks);
+            frame.drawComponent(context, scaledMx, scaledMy, deltaTicks);
         }
+
+        matrixStack.pop();
 
         mouse.setLeftClicked(false);
         mouse.setRightClicked(false);
-        mouse.setMouseX(mouseX);
-        mouse.setMouseY(mouseY);
+        mouse.setMouseX(scaledMx);
+        mouse.setMouseY(scaledMy);
     }
 
     @Override
@@ -113,9 +123,13 @@ public class ClickGuiScreen extends Screen
             mouse.setRightHeld(true);
         }
 
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        final int scaledMx = (int) (mouseX / scale);
+        final int scaledMy = (int) (mouseY / scale);
+
         for (Frame frame : guiFrames)
         {
-            frame.mouseClicked(mouseX, mouseY, mouseButton);
+            frame.mouseClicked(scaledMx, scaledMy, mouseButton);
         }
 
         return super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -132,10 +146,14 @@ public class ClickGuiScreen extends Screen
             mouse.setRightHeld(false);
         }
 
+        float scale = ClickGuiModule.INSTANCE.getScale();
+        final int scaledMx = (int) (mouseX / scale);
+        final int scaledMy = (int) (mouseY / scale);
+
         for (Frame frame : guiFrames)
         {
             frame.setDragging(false);
-            frame.mouseReleased(mouseX, mouseY, button);
+            frame.mouseReleased(scaledMx, scaledMy, button);
         }
 
         draggingMouse = false;
@@ -150,10 +168,10 @@ public class ClickGuiScreen extends Screen
     {
         for (Frame frame : guiFrames)
         {
-            int scrolledY = (int) (verticalAmount * ClickGuiModule.INSTANCE.getScrollSpeed());
-            int y = frame.getY() + scrolledY;
-            int minY = -frame.getComponentHeight();
-            frame.setY(MathHelper.clamp(y, minY, scrolledY > 0 ? 15 : Integer.MAX_VALUE));
+            float scrolledY = (float) (verticalAmount * ClickGuiModule.INSTANCE.getScrollSpeed());
+            float y = frame.getY() + scrolledY;
+            float minY = -frame.getComponentHeight();
+            frame.setY(MathHelper.clamp(y, minY, scrolledY > 0.0f ? 15.0f : Integer.MAX_VALUE));
         }
 
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
