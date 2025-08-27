@@ -13,6 +13,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.shoreline.client.api.Serializable;
 
+import java.util.List;
+
 @Getter
 public class PvpKit implements Serializable
 {
@@ -24,6 +26,17 @@ public class PvpKit implements Serializable
         this.name = name;
         this.items = DefaultedList.ofSize(PlayerInventory.MAIN_SIZE + PlayerInventory.HOTBAR_SIZE, Items.AIR);
         setKitFromInventory(inventory);
+    }
+
+    public PvpKit(String name, List<Item> items)
+    {
+        this.name = name;
+        this.items = DefaultedList.ofSize(PlayerInventory.MAIN_SIZE + PlayerInventory.HOTBAR_SIZE, Items.AIR);
+        for (int j = 0; j < PlayerInventory.MAIN_SIZE + PlayerInventory.HOTBAR_SIZE; ++j)
+        {
+            Item item = items.get(j); // not sure if this maintains order all the time.
+            items.set(j, item);
+        }
     }
 
     public void setKitFromInventory(final Inventory inventory)

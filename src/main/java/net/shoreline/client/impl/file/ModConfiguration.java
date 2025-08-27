@@ -69,6 +69,7 @@ public class ModConfiguration
         {
             registerFiles(
                     new KeybindFile(saveDirectory),
+                    new PvpKitFile(saveDirectory),
                     new ToggleStateFile(saveDirectory)
             );
 

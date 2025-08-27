@@ -36,6 +36,11 @@ public class KitManager extends LoggingFeature
         pvpKits.put(name, new PvpKit(name, inventory));
     }
 
+    public void saveKit(String name, PvpKit kit)
+    {
+        pvpKits.put(name, kit);
+    }
+
     public void deleteKit(String name)
     {
         pvpKits.remove(name);

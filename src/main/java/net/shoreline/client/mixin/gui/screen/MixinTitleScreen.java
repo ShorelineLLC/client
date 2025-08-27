@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
-public class MixinTitleScreen extends MixinScreen
+public abstract class MixinTitleScreen extends MixinScreen
 {
     @Shadow
     private long backgroundFadeStart;

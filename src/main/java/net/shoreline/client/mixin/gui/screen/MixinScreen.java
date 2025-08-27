@@ -1,6 +1,9 @@
 package net.shoreline.client.mixin.gui.screen;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
@@ -13,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Screen.class)
-public class MixinScreen
+public abstract class MixinScreen
 {
     @Shadow
     protected MinecraftClient client;
@@ -23,6 +26,9 @@ public class MixinScreen
 
     @Shadow
     public int height;
+
+    @Shadow
+    protected abstract <T extends Element & Drawable & Selectable> T addDrawableChild(T drawableElement);
 
     @Inject(method = "keyPressed", at = @At(value = "HEAD"))
     private void hookKeyPressed(int keyCode,
