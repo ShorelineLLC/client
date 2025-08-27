@@ -32,26 +32,21 @@ public class RekitModule extends Toggleable
     Config<String> kit = new StringConfig.Builder("Kit")
             .setDescription("The kit to use")
             .setDefaultValue("").build();
-
     Config<RekitMode> mode = new EnumConfig.Builder<RekitMode>("Mode")
             .setValues(RekitMode.values())
             .setDefaultValue(RekitMode.BUTTON).build();
-
     Config<Integer> mismatchDelay = new NumberConfig.Builder<Integer>("MismatchDelay")
             .setMin(0).setDefaultValue(500).setMax(1000)
             .setDescription("The delay between updating mismatches")
             .setVisible(() -> mode.getValue() == RekitMode.AUTO)
             .build();
-
     Config<Integer> clickDelay = new NumberConfig.Builder<Integer>("ClickDelay")
             .setMin(0).setDefaultValue(100).setMax(1000)
             .setDescription("The click delay between 2 different clicks")
             .build();
-
     Config<Boolean> doubleClicks = new BooleanConfig.Builder("Double-Clicks")
             .setDescription("If we should double click.")
             .setDefaultValue(false).build();
-
     Config<Integer> sequenceDelay = new NumberConfig.Builder<Integer>("SequenceDelay")
             .setMin(0).setDefaultValue(50).setMax(1000)
             .setVisible(() -> !doubleClicks.getValue())
@@ -134,7 +129,6 @@ public class RekitModule extends Toggleable
 
                 ScreenHandler handler = mc.player.currentScreenHandler;
                 int slot = InventoryUtil.getPacketSlotIndex(handler, i);
-
                 if (handler.getCursorStack().getItem().equals(item))
                 {
                     addClick(mismatchedSlot + size, -1);

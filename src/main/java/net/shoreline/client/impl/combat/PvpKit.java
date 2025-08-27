@@ -35,7 +35,7 @@ public class PvpKit implements Serializable
         for (int j = 0; j < PlayerInventory.MAIN_SIZE + PlayerInventory.HOTBAR_SIZE; ++j)
         {
             Item item = items.get(j); // not sure if this maintains order all the time.
-            items.set(j, item);
+            this.items.set(j, item);
         }
     }
 

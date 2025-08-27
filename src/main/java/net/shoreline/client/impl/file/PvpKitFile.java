@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.file.IOUtils;
 import net.shoreline.client.api.file.JsonConfigFile;
 import net.shoreline.client.impl.Managers;
