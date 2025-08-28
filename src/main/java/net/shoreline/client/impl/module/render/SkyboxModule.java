@@ -52,9 +52,9 @@ public class SkyboxModule extends Toggleable
             return;
         }
 
-        event.cancel();
         if (!cancelFog.getValue() || cancelSky.getValue())
         {
+            event.cancel();
             event.setColor(fogColor.getValue());
         }
 

@@ -91,6 +91,11 @@ public class AuraModule extends CombatModule
     @EventListener(priority = TickPriorities.KILL_AURA)
     public void onClientRotation(ClientRotationEvent event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         if (mc.player.isUsingItem() && !multitaskConfig.getValue())
         {
            return;
