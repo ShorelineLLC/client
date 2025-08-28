@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.item.Item;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -22,7 +21,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
@@ -30,8 +28,6 @@ import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -69,50 +65,56 @@ public class InteractManager extends GenericFeature
             return false;
         }
 
-        List<EndCrystalEntity> crystalsBlocking = getCrystalsBlocking(blockPos, interaction.getBlock());
-        if (!crystalsBlocking.isEmpty())
+        if (isEntityBlocking(blockPos, interaction.getBlock(), true))
         {
             return false;
         }
 
         boolean result = placeBlockInternal(interaction);
-
         placedBlocks.put(blockPos, System.currentTimeMillis());
-        crystalsBlocking.forEach(e -> placedEntityIds.merge(e, 1, Integer::sum));
         return result;
     }
 
     public boolean canPlaceBlock(BlockPos blockPos, Block block)
     {
-        return getCrystalsBlocking(blockPos, block).isEmpty();
+        return !isEntityBlocking(blockPos, block, false);
     }
 
-    public List<EndCrystalEntity> getCrystalsBlocking(BlockPos blockPos, Block block)
+    public boolean isEntityBlocking(BlockPos blockPos, Block block, boolean merge)
     {
         final BlockState state = block.getDefaultState();
-        final List<EndCrystalEntity> crystalEntities = new ArrayList<>();
-        final VoxelShape shape = state.getCollisionShape(mc.world, blockPos, ShapeContext.absent()).offset(new Vec3d(blockPos));
-
+        final VoxelShape shape = state.getCollisionShape(mc.world, blockPos, ShapeContext.absent()).offset(Vec3d.of(blockPos));
         if (shape.isEmpty())
         {
-            return crystalEntities;
+            return false;
         }
 
         for (Entity entity : mc.world.getOtherEntities(null, shape.getBoundingBox()))
         {
-            if (!entity.isRemoved() && entity.intersectionChecked
-                    && VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND))
+            if (entity.isRemoved() || !entity.intersectionChecked)
             {
                 continue;
             }
 
-            if (entity instanceof EndCrystalEntity crystalEntity && placedEntityIds.getOrDefault(entity, 0) > anticheat.getInteractAttempts().getValue())
+            if (!VoxelShapes.matchesAnywhere(shape, VoxelShapes.cuboid(entity.getBoundingBox()), BooleanBiFunction.AND))
             {
-                crystalEntities.add(crystalEntity);
+                continue;
             }
+
+            if (entity instanceof EndCrystalEntity && placedEntityIds.getOrDefault(entity, 0) <= anticheat.getInteractAttempts().getValue())
+            {
+                if (merge)
+                {
+                    placedEntityIds.merge(entity, 1, Integer::sum);
+                }
+
+                continue;
+            }
+
+            return true;
         }
 
-        return crystalEntities;
+        return false;
     }
 
     private boolean placeBlockInternal(Interaction interaction)
@@ -163,8 +165,8 @@ public class InteractManager extends GenericFeature
         BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
         if (interaction.isPacketPlace())
         {
-            Hand finalHand = hand;
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(finalHand, result, id));
+            Hand hand1 = hand;
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand1, result, id));
             actionResult = ActionResult.SUCCESS;
         } else
         {

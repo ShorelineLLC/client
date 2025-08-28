@@ -44,7 +44,7 @@ public enum Anchor
                     @Override
                     public float getY(float screenHeight, float elementHeight, float offset)
                     {
-                        if (!MinecraftClient.getInstance().player.getStatusEffects().isEmpty() && !NoRenderModule.INSTANCE.hidePotionHud())
+                        if (!MinecraftClient.getInstance().player.getStatusEffects().isEmpty() && !NoRenderModule.INSTANCE.getPotionsHud().getValue())
                         {
                             return offset + 25;
                         }

@@ -1,11 +1,11 @@
 package net.shoreline.client.impl.module.render;
 
+import lombok.Getter;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
-import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
@@ -82,6 +82,7 @@ public class NoRenderModule extends Toggleable
             .addAll(explosionsConfig, effectsConfig, splashConfig, portalConfig,
                     drippingBlocksConfig, walkingConfig, eatingConfig, breakingConfig).build();
 
+    @Getter
     Config<Boolean> potionsHud = new BooleanConfig.Builder("Effects")
             .setDescription("Cancels the status effects hud element")
             .setDefaultValue(false).build();
@@ -97,10 +98,6 @@ public class NoRenderModule extends Toggleable
     Config<Void> hudConfig = new ConfigGroup.Builder("HUD")
             .addAll(potionsHud, itemName, toastConfig, textShadow).build();
 
-    Config<FogRender> fogConfig = new EnumConfig.Builder<FogRender>("Fog")
-            .setValues(FogRender.values())
-            .setDescription("Prevents fog from rendering in the world")
-            .setDefaultValue(FogRender.CLEAR).build();
     Config<Boolean> nauseaConfig = new BooleanConfig.Builder("Nausea")
             .setDescription("Cancels the nausea effect")
             .setDefaultValue(false).build();
@@ -270,17 +267,5 @@ public class NoRenderModule extends Toggleable
             event.cancel();
             event.setShadowOffset(0.5f);
         }
-    }
-
-    public boolean hidePotionHud()
-    {
-        return potionsHud.getValue();
-    }
-
-    public enum FogRender
-    {
-        CLEAR,
-        LIQUID_VISION,
-        OFF
     }
 }

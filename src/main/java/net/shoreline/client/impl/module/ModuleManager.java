@@ -91,6 +91,7 @@ public class ModuleManager
                 new NoRenderModule(),
                 new NoWeatherModule(),
                 new ShadersModule(),
+                new SkyboxModule(),
                 new SwingModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
