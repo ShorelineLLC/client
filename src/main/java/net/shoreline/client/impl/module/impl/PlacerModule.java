@@ -5,22 +5,22 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.interact.InteractDirection;
+import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class PlacerModule extends ListeningToggleable
+public class PlacerModule extends CombatModule
 {
     protected final AnticheatModule anticheat = AnticheatModule.INSTANCE;
 
@@ -69,7 +69,7 @@ public class PlacerModule extends ListeningToggleable
         return result;
     }
 
-    protected List<BlockPos> getPlacements(Block block, List<BlockPos> posList, double range)
+    protected List<BlockPos> getPlacements(Block block, Collection<BlockPos> posList, double range)
     {
         final List<BlockPos> placements = new ArrayList<>();
         if (posList.isEmpty())

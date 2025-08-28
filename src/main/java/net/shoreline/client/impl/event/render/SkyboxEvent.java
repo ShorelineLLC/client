@@ -18,6 +18,10 @@ public class SkyboxEvent extends Event
 
     public Vector4f getColorVec4()
     {
+        if (color == null)
+        {
+            return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        }
         return new Vector4f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
     }
 

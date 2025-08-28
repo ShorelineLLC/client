@@ -16,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -38,6 +37,7 @@ import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
+import net.shoreline.client.impl.module.impl.CombatModule;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
@@ -439,7 +439,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             }
         }
 
-        attackInternal(crystalId, hand);
+        sendAttackPacketsInternal(crystalId, swingConfig.getValue(), hand);
 
         if (!canBreakCrystal)
         {
@@ -447,21 +447,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         attackPackets.put(crystalId, System.currentTimeMillis());
-    }
-
-    private void attackInternal(int crystalId, Hand hand)
-    {
-        EndCrystalEntity entity2 = new EndCrystalEntity(mc.world, 0.0, 0.0, 0.0);
-        entity2.setId(crystalId);
-        PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity2, mc.player.isSneaking());
-        Managers.NETWORK.sendPacket(packet);
-        if (swingConfig.getValue())
-        {
-            mc.player.swingHand(hand);
-        } else
-        {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
-        }
     }
 
     private void placeCrystal(BlockPos blockPos, Hand hand)

@@ -1,9 +1,15 @@
 package net.shoreline.client.impl.module.impl;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.util.Hand;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.api.module.ListeningToggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.mixin.network.packet.c2s.AccessorPlayerInteractC2SPacket;
 
-public class CombatModule extends Toggleable
+public class CombatModule extends ListeningToggleable
 {
 
     public CombatModule(String name, String description, GuiCategory category) {
@@ -16,5 +22,28 @@ public class CombatModule extends Toggleable
                         final GuiCategory category)
     {
         super(name, nameAliases, description, category);
+    }
+
+    public void sendAttackPackets(final Entity entity,
+                                  final boolean swing)
+    {
+        sendAttackPacketsInternal(entity.getId(), swing, Hand.MAIN_HAND);
+    }
+
+    public void sendAttackPacketsInternal(final int entityId,
+                                          final boolean swing,
+                                          final Hand hand)
+    {
+        PlayerInteractEntityC2SPacket packet = AccessorPlayerInteractC2SPacket.invokeInit(
+                entityId, mc.player.isSneaking(), PlayerInteractEntityC2SPacket.ATTACK);
+
+        Managers.NETWORK.sendPacket(packet);
+        if (swing)
+        {
+            mc.player.swingHand(hand);
+        } else
+        {
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+        }
     }
 }

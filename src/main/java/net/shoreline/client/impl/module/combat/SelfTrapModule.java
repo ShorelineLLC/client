@@ -1,7 +1,10 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.shoreline.client.api.config.BooleanConfig;
@@ -40,8 +43,12 @@ public class SelfTrapModule extends TrapModule
     Config<Boolean> sequentialReplace = new BooleanConfig.Builder("Sequential")
             .setDescription("Replaces instantly after explosions")
             .setDefaultValue(false).build();
+    Config<Boolean> attackSequential = new BooleanConfig.Builder("Attack")
+            .setDescription("Attacks crystals when they spawn")
+            .setVisible(() -> sequentialReplace.getValue())
+            .setDefaultValue(false).build();
     Config<Void> replaceConfig = new ConfigGroup.Builder("Replace")
-            .addAll(instantReplace, sequentialReplace).build();
+            .addAll(instantReplace, sequentialReplace, attackSequential).build();
 
     Config<Boolean> autoDisable = new BooleanConfig.Builder("AutoDisable")
             .setDescription("Disables when player y-level changes")
@@ -94,7 +101,7 @@ public class SelfTrapModule extends TrapModule
         EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET, TrapLayer.BODY);
         if (headConfig.getValue())
         {
-            layers.add(TrapLayer.HEAD);
+            layers.add(TrapLayer.CEILING);
         }
 
         TrapSpec trapSpec = TrapSpec.builder()
@@ -136,11 +143,17 @@ public class SelfTrapModule extends TrapModule
             }
         }
 
-        else if (event.getPacket() instanceof ExplosionS2CPacket packet && sequentialReplace.getValue())
+        else if (event.getPacket() instanceof EntitySpawnS2CPacket packet
+                && packet.getEntityType() == EntityType.END_CRYSTAL && sequentialReplace.getValue())
         {
-            BlockPos blockPos = BlockPos.ofFloored(packet.center());
+            BlockPos blockPos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
             if (trapPos.getTrapPositions().contains(blockPos))
             {
+                if (attackSequential.getValue())
+                {
+                    sendAttackPacketsInternal(packet.getEntityId(), false, Hand.MAIN_HAND);
+                }
+
                 runSingleObbyPlacement(blockPos);
             }
         }

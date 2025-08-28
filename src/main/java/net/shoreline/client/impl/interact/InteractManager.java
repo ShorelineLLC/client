@@ -23,6 +23,7 @@ import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.combat.AuraModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
@@ -89,6 +90,7 @@ public class InteractManager extends GenericFeature
             return false;
         }
 
+        boolean attacked = false;
         for (Entity entity : mc.world.getOtherEntities(null, shape.getBoundingBox()))
         {
             if (entity.isRemoved() || !entity.intersectionChecked)
@@ -105,6 +107,12 @@ public class InteractManager extends GenericFeature
             {
                 if (merge)
                 {
+                    if (anticheat.getAttackCrystals().getValue() && !attacked)
+                    {
+                        AuraModule.INSTANCE.sendAttackPackets(entity, false);
+                        attacked = true;
+                    }
+
                     placedEntityIds.merge(entity, 1, Integer::sum);
                 }
 

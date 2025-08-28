@@ -30,6 +30,7 @@
     "network.MixinClientPlayerInteractionManager",
     "network.MixinClientPlayNetworkHandler",
     "network.packet.c2s.MixinEntityVelocityUpdateS2CPacket",
+    "network.packet.c2s.AccessorPlayerInteractC2SPacket",
     "network.packet.c2s.MixinPlayerInteractC2SPacket",
     "network.packet.c2s.MixinPlayerMoveC2SPacket",
     "option.MixinKeyBinding",

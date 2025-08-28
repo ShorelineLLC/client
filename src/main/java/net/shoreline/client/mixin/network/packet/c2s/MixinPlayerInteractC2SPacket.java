@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(PlayerInteractEntityC2SPacket.class)
-public class MixinPlayerInteractC2SPacket implements IPlayerInteractEntityC2S
+public abstract class MixinPlayerInteractC2SPacket implements IPlayerInteractEntityC2S
 {
     @Shadow
     @Final

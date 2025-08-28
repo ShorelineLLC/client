@@ -7,21 +7,29 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.impl.Managers;
 
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Getter
 public class TrapPositionCalc
 {
-    private final List<BlockPos> trapPositions = new CopyOnWriteArrayList<>();
+    private static final Comparator<Vec3i> TRAP_ORDER =
+            Comparator.comparingInt(Vec3i::getY)
+                    .thenComparingInt(Vec3i::getX)
+                    .thenComparingInt(Vec3i::getZ);
+
+    private final ConcurrentNavigableMap<BlockPos, TrapLayer> trapPositions
+            = new ConcurrentSkipListMap<>(TRAP_ORDER);
 
     public void calcTrap(Box boundingBox, TrapSpec trapSpec)
     {
         trapPositions.clear();
 
-        List<BlockPos> origin = BlockPos.stream(boundingBox).map(BlockPos::toImmutable).toList();
+        Set<BlockPos> origin = BlockPos.stream(boundingBox)
+                .map(BlockPos::toImmutable)
+                .collect(Collectors.toCollection(HashSet::new));
+
         int feetY = (int) boundingBox.minY;
         int bodyY = feetY + 1;
 
@@ -31,41 +39,60 @@ public class TrapPositionCalc
         }
 
         extendLayers(trapSpec, origin, feetY, bodyY);
-
-        trapPositions.sort(Comparator.comparingInt(Vec3i::getY));
     }
 
     private void addCoreLayers(EnumSet<TrapLayer> layers,
-                               List<BlockPos> origin,
+                               Set<BlockPos> origin,
                                BlockPos blockPos,
                                int feetY,
                                int bodyY)
     {
+        if (layers.contains(TrapLayer.FEET_INTERSECT) || layers.contains(TrapLayer.BODY_INTERSECT))
+        {
+            for (BlockPos pos : origin)
+            {
+                int inY = pos.getY();
+                if (feetY == inY)
+                {
+                    trapPositions.put(pos, TrapLayer.FEET_INTERSECT);
+                } else if (bodyY == inY)
+                {
+                    trapPositions.put(pos, TrapLayer.BODY_INTERSECT);
+                }
+            }
+        }
+
         int y = blockPos.getY();
         if (feetY == y)
         {
             if (layers.contains(TrapLayer.FEET))
             {
-                extendTrapAroundPos(blockPos, origin, false);
+                extendTrapAroundPos(blockPos, origin, TrapLayer.FEET, false);
             }
-            if (layers.contains(TrapLayer.HEAD))
+
+            if (layers.contains(TrapLayer.FLOOR))
             {
-                trapPositions.add(blockPos.up(2));
+                trapPositions.put(blockPos.down(), TrapLayer.FLOOR);
+            }
+
+            if (layers.contains(TrapLayer.CEILING))
+            {
+                trapPositions.put(blockPos.up(2), TrapLayer.CEILING);
             }
         }
 
         if (bodyY == y && layers.contains(TrapLayer.BODY))
         {
-            extendTrapAroundPos(blockPos, origin, false);
+            extendTrapAroundPos(blockPos, origin, TrapLayer.BODY, false);
         }
     }
 
     private void extendLayers(TrapSpec spec,
-                              List<BlockPos> origin,
+                              Set<BlockPos> origin,
                               int feetY,
                               int bodyY)
     {
-        for (BlockPos blockPos : trapPositions)
+        for (BlockPos blockPos : trapPositions.keySet())
         {
             if (Managers.MINING.getMiningProgress(blockPos) < 0.7f)
             {
@@ -73,15 +100,19 @@ public class TrapPositionCalc
             }
 
             int y = blockPos.getY();
-            if (feetY == y && spec.isExtendFeet() || bodyY == y && spec.isExtendBody())
+            if (feetY == y && spec.isExtendFeet())
             {
-                extendTrapAroundPos(blockPos, origin, true);
+                extendTrapAroundPos(blockPos, origin, TrapLayer.EXTEND_FEET, true);
+            } else if (bodyY == y && spec.isExtendBody())
+            {
+                extendTrapAroundPos(blockPos, origin, TrapLayer.EXTEND_BODY, true);
             }
         }
     }
 
     private void extendTrapAroundPos(BlockPos pos,
-                                     List<BlockPos> origin,
+                                     Set<BlockPos> origin,
+                                     TrapLayer trapLayer,
                                      boolean vertical)
     {
         for (Direction direction : Direction.values())
@@ -97,7 +128,22 @@ public class TrapPositionCalc
                 continue;
             }
 
-            trapPositions.add(extend);
+            trapPositions.put(extend, trapLayer);
         }
+    }
+
+    public TrapLayer getLayerType(BlockPos blockPos)
+    {
+        return trapPositions.get(blockPos);
+    }
+
+    public ConcurrentNavigableMap<BlockPos, TrapLayer> getTrapPositionLayers()
+    {
+        return trapPositions;
+    }
+
+    public NavigableSet<BlockPos> getTrapPositions()
+    {
+        return trapPositions.keySet();
     }
 }
