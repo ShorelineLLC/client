@@ -75,7 +75,7 @@ public class InventoryUtil
     public int getInventorySlot(Item item)
     {
         PlayerInventory inventory = MinecraftClient.getInstance().player.getInventory();
-        for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++)
+        for (int i = 9; i < PlayerInventory.MAIN_SIZE; i++)
         {
             ItemStack stack = inventory.getStack(i);
             if (stack.getItem().equals(item))
