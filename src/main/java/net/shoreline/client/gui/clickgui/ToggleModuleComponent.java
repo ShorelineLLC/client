@@ -58,6 +58,7 @@ public class ToggleModuleComponent extends ModuleComponent
         {
             enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight() + 1);
 
+            int pending = 0;
             float configY = 2.0f * scale;
             for (ConfigComponent<?> component : components)
             {
@@ -93,6 +94,18 @@ public class ToggleModuleComponent extends ModuleComponent
 
                     disableScissor(context);
                 }
+
+                if (!component.getDrawAnim().isFinished()
+                        || component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 1.0
+                        || !component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 0.0)
+                {
+                    pending++;
+                }
+            }
+
+            if (currentAnimation != null)
+            {
+                currentAnimation.getDrawAnim().setLength(100f / pending);
             }
 
             int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) toggleComponent.getHoverAnim().getFactor());

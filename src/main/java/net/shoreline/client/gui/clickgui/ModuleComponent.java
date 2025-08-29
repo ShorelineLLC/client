@@ -86,6 +86,7 @@ public class ModuleComponent extends FrameComponent
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
 
+        int pending = 0;
         float configY = scale * 2.0f;
         for (ConfigComponent<?> component : components)
         {
@@ -122,6 +123,18 @@ public class ModuleComponent extends FrameComponent
                 component.setModuleOffset(configY);
                 disableScissor(context);
             }
+
+            if (!component.getDrawAnim().isFinished()
+                    || component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 1.0
+                    || !component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 0.0)
+            {
+                pending++;
+            }
+        }
+
+        if (currentAnimation != null)
+        {
+            currentAnimation.getDrawAnim().setLength(100f / pending);
         }
 
         drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight(), 1.0f, configY, color);
