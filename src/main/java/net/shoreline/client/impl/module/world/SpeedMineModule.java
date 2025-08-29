@@ -109,14 +109,13 @@ public class SpeedMineModule extends Toggleable
     @EventListener
     public void onAttackBlock(AttackBlockEvent event)
     {
-        if (!PlayerUtil.isInSurvival(mc.player) || !MiningUtil.canMineBlock(event.getState()))
+        if (!PlayerUtil.isInSurvival(mc.player))
         {
             return;
         }
 
         event.cancel();
-
-        if (isMining(event.getPos()))
+        if (isMining(event.getPos()) || !MiningUtil.canMineBlock(event.getState()))
         {
             return;
         }

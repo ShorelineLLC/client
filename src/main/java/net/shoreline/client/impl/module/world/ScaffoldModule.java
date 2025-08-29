@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
@@ -22,6 +23,9 @@ import java.util.List;
 
 public class ScaffoldModule extends PlacerModule
 {
+    Config<Float> placeRange = new NumberConfig.Builder<Float>("Range")
+            .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
+            .setDescription("Range to place blocks").build();
     Config<Boolean> keepYConfig = new BooleanConfig.Builder("KeepY")
             .setDescription("Maintains the player's y height")
             .setDefaultValue(false).build();
@@ -79,7 +83,7 @@ public class ScaffoldModule extends PlacerModule
 
         for (BlockPos blockPos : placements)
         {
-            placeBlock(blockPos, currentScaffoldBlock, false);
+            placeBlock(blockPos, currentScaffoldBlock, false, false);
             lastPlacement = blockPos;
         }
 

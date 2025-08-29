@@ -1,34 +1,42 @@
 package net.shoreline.client.mixin.particle;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ParticleManager.class)
 public class MixinParticleManager
 {
-    @Inject(method = "createParticle", at = @At(value = "HEAD"), cancellable = true)
-    private void hookAddParticle(ParticleEffect parameters,
-                                 double x,
-                                 double y,
-                                 double z,
-                                 double velocityX,
-                                 double velocityY,
-                                 double velocityZ,
-                                 CallbackInfoReturnable<Particle> cir)
+    @Inject(method = "addBlockBreakParticles", at = @At(value = "HEAD"), cancellable = true)
+    private void hookAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci)
     {
-        ParticleEvent particleEvent = new ParticleEvent(parameters);
-        EventBus.INSTANCE.dispatch(particleEvent);
-        if (particleEvent.isCanceled())
+        BlockBreakParticleEvent event = new BlockBreakParticleEvent();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
         {
-            cir.setReturnValue(null);
-            cir.cancel();
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "addBlockBreakingParticles", at = @At(value = "HEAD"), cancellable = true)
+    private void hookAddBlockBreakingParticles(BlockPos pos, Direction direction, CallbackInfo ci)
+    {
+        BlockBreakParticleEvent event = new BlockBreakParticleEvent();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
         }
     }
 }

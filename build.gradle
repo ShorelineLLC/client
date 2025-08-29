@@ -45,6 +45,10 @@ repositories {
     mavenCentral()
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://impactdevelopment.github.io/maven/") }
+    maven {
+        name = "modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
 }
 
 dependencies {
@@ -57,6 +61,7 @@ dependencies {
         exclude group: "net.fabricmc.fabric-api", module: "fabric-loot-api-v2"
     }
     modImplementation "cabaletta:baritone-api:${project.baritone_api_version}"
+    modImplementation "maven.modrinth:sodium:${project.sodium_version}"
 
     implementation platform("org.lwjgl:lwjgl-bom:3.3.3")
     implementation "org.lwjgl:lwjgl-harfbuzz:3.3.3"

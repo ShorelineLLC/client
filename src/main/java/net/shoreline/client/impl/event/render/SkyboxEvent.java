@@ -29,12 +29,15 @@ public class SkyboxEvent extends Event
     @Cancelable
     @Getter
     @Setter
-    public static class Fog extends SkyboxEvent {
+    public static class Fog extends Event {
 
         private final BackgroundRenderer.FogType type;
         private float viewDist;
         private float fogStart, fogEnd;
     }
+
+    @Cancelable
+    public static class FogColor extends SkyboxEvent {}
 
     @Cancelable
     public static class SkyColor extends SkyboxEvent {}

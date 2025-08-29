@@ -40,21 +40,26 @@ public class PlacerModule extends CombatModule
 
     protected boolean placeBlock(BlockPos placePos, Block block)
     {
-        return placeBlock(placePos, block, true);
+        return placeBlock(placePos, block, true, anticheat.getStrictDirection().getValue());
     }
 
-    protected boolean placeBlock(BlockPos placePos, Block block, boolean packetPlace)
+    protected boolean placeBlock(BlockPos placePos, Block block, boolean packetPlace, boolean strictDir)
     {
         final Interaction interaction = Interaction.builder()
                 .pos(placePos)
-                .direction(InteractDirection.getInteractDirection(placePos))
+                .direction(InteractDirection.getInteractDirection(placePos, strictDir))
                 .hand(Hand.MAIN_HAND)
                 .block(block)
                 .packetPlace(packetPlace)
                 .build();
 
-        fadeOutAnimations.put(placePos, new Animation(true, 250));
-        return Managers.INTERACT.placeBlock(interaction);
+        boolean result = Managers.INTERACT.placeBlock(interaction);
+        if (result)
+        {
+            fadeOutAnimations.put(placePos, new Animation(true, 250));
+        }
+
+        return result;
     }
 
     protected boolean runSingleBlockPlacement(BlockPos placePos, Block block, int slot)

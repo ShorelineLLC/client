@@ -154,7 +154,7 @@ public class InteractManager extends GenericFeature
 
         Vec3d eyePos = mc.player.getEyePos();
         Box box = new Box(interaction.getPos());
-        BlockPos blockPos = interaction.getPos().offset(direction.getOpposite());
+        BlockPos blockPos = airPlacing ? interaction.getPos() : interaction.getPos().offset(direction.getOpposite());
 
         PlayerInput playerInput = mc.player.input.playerInput;
         boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(blockPos) && !playerInput.sneak();

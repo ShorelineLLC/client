@@ -1,16 +1,22 @@
 package net.shoreline.client.mixin.render;
 
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.Pool;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.impl.event.entity.player.ReachEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.eventbus.EventBus;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,6 +27,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer implements IGameRenderer
 {
+    @Shadow @Final private LightmapTextureManager lightmapTextureManager;
+
     @Override
     @Accessor("pool")
     public abstract Pool getPool();
@@ -44,10 +52,16 @@ public abstract class MixinGameRenderer implements IGameRenderer
     private void hookRenderWorldSwap(RenderTickCounter tickCounter,
                                      CallbackInfo info)
     {
-        RenderShaderEvent.Post shaderEvent = new RenderShaderEvent.Post();
+
         RenderEntityWorldEvent.Post renderEntityEvent = new RenderEntityWorldEvent.Post();
-        EventBus.INSTANCE.dispatch(shaderEvent);
         EventBus.INSTANCE.dispatch(renderEntityEvent);
+    }
+
+    @Inject(method = "renderWorld", at = @At("TAIL"))
+    private void renderWorld$TAIL(RenderTickCounter renderTickCounter, CallbackInfo info)
+    {
+        RenderShaderEvent.Post shaderEvent = new RenderShaderEvent.Post();
+        EventBus.INSTANCE.dispatch(shaderEvent);
     }
 
     @Redirect(method = "renderWorld", at = @At(value = "INVOKE",
@@ -83,5 +97,37 @@ public abstract class MixinGameRenderer implements IGameRenderer
             cir.setReturnValue(false);
             cir.cancel();
         }
+    }
+
+    @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/EntityHitResult;getEntity()Lnet/minecraft/entity/Entity;"))
+    private Entity hookCrosshairTarget(EntityHitResult instance)
+    {
+        Entity entity = instance.getEntity();
+        if (entity != null)
+        {
+            CrosshairTargetEvent targetEvent = new CrosshairTargetEvent(entity);
+            EventBus.INSTANCE.dispatch(targetEvent);
+            return targetEvent.isCanceled() ? null : entity;
+        }
+
+        return null;
+    }
+
+    @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getEntityInteractionRange()D"))
+    private double hookTargetedEntity(ClientPlayerEntity instance)
+    {
+        ReachEvent reachEvent = new ReachEvent();
+        EventBus.INSTANCE.dispatch(reachEvent);
+        double range = instance.getEntityInteractionRange();
+        return reachEvent.isCanceled() ? range + reachEvent.getReach() : range;
+    }
+
+    @Redirect(method = "updateCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getBlockInteractionRange()D"))
+    private double hookTargetedEntity$1(ClientPlayerEntity instance)
+    {
+        ReachEvent reachEvent = new ReachEvent();
+        EventBus.INSTANCE.dispatch(reachEvent);
+        double range = instance.getBlockInteractionRange();
+        return reachEvent.isCanceled() ? range + reachEvent.getReach() : range;
     }
 }

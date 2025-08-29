@@ -53,11 +53,13 @@ public class Toggleable extends Module
         EventBus.INSTANCE.dispatch(new ModuleToggleEvent(this, true));
         enabled.setValue(true);
         onEnable();
+        onToggle();
     }
 
     public void disable()
     {
         onDisable();
+        onToggle();
         enabled.setValue(false);
         EventBus.INSTANCE.dispatch(new ModuleToggleEvent(this, false));
         EventBus.INSTANCE.unsubscribe(this);
@@ -78,6 +80,8 @@ public class Toggleable extends Module
     protected void onEnable() {}
 
     protected void onDisable() {}
+
+    protected void onToggle() {}
 
     public boolean isEnabled()
     {

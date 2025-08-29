@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.render;
 
 import lombok.Getter;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
@@ -10,6 +11,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
+import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.render.GlyphShadowEvent;
 import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
@@ -18,6 +20,9 @@ import net.shoreline.client.impl.event.render.TiltViewEvent;
 import net.shoreline.client.impl.event.render.entity.feature.RenderArmorEvent;
 import net.shoreline.client.impl.event.toast.RenderGuiToastEvent;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class NoRenderModule extends Toggleable
 {
@@ -60,6 +65,9 @@ public class NoRenderModule extends Toggleable
     Config<Boolean> effectsConfig = new BooleanConfig.Builder("StatusEffect")
             .setDescription("Cancels the potion effect particles")
             .setDefaultValue(false).build();
+    Config<Boolean> fireworkConfig = new BooleanConfig.Builder("Firework")
+            .setDescription("Cancels the firework particles")
+            .setDefaultValue(false).build();
     Config<Boolean> splashConfig = new BooleanConfig.Builder("BottleSplash")
             .setDescription("Cancels the bottle splash particles")
             .setDefaultValue(false).build();
@@ -79,7 +87,7 @@ public class NoRenderModule extends Toggleable
             .setDescription("Cancels the block breaking particles")
             .setDefaultValue(false).build();
     Config<Void> particlesConfig = new ConfigGroup.Builder("Particles")
-            .addAll(explosionsConfig, effectsConfig, splashConfig, portalConfig,
+            .addAll(explosionsConfig, effectsConfig, fireworkConfig, splashConfig, portalConfig,
                     drippingBlocksConfig, walkingConfig, eatingConfig, breakingConfig).build();
 
     @Getter
@@ -107,6 +115,23 @@ public class NoRenderModule extends Toggleable
     Config<Boolean> totemConfig = new BooleanConfig.Builder("Totem")
             .setDescription("Cancels the totem pop animation")
             .setDefaultValue(false).build();
+
+    private final Set<ParticleType<?>> drippingParticles = new HashSet<>(Set.of(
+            ParticleTypes.FALLING_OBSIDIAN_TEAR,
+            ParticleTypes.DRIPPING_OBSIDIAN_TEAR,
+            ParticleTypes.LANDING_OBSIDIAN_TEAR,
+            ParticleTypes.FALLING_DRIPSTONE_WATER,
+            ParticleTypes.DRIPPING_DRIPSTONE_WATER,
+            ParticleTypes.FALLING_DRIPSTONE_LAVA,
+            ParticleTypes.DRIPPING_DRIPSTONE_LAVA,
+            ParticleTypes.FALLING_LAVA,
+            ParticleTypes.DRIPPING_LAVA,
+            ParticleTypes.FALLING_WATER,
+            ParticleTypes.DRIPPING_WATER,
+            ParticleTypes.FALLING_HONEY,
+            ParticleTypes.DRIPPING_HONEY,
+            ParticleTypes.FALLING_NECTAR
+    ));
 
     public NoRenderModule()
     {
@@ -198,17 +223,16 @@ public class NoRenderModule extends Toggleable
     @EventListener
     public void onParticle(ParticleEvent event)
     {
-        if (event.getParticleEffect() == ParticleTypes.ENTITY_EFFECT && effectsConfig.getValue()
-                || event.getParticleEffect() == ParticleTypes.EXPLOSION && explosionsConfig.getValue()
-                || (event.getParticleEffect() == ParticleTypes.EFFECT || event.getParticleEffect() == ParticleTypes.INSTANT_EFFECT) && splashConfig.getValue()
-                || event.getParticleEffect() == ParticleTypes.PORTAL && portalConfig.getValue()
-                || event.getParticleEffect() == ParticleTypes.BLOCK && walkingConfig.getValue()
-                || event.getParticleEffect() == ParticleTypes.ITEM && eatingConfig.getValue()
-                || (event.getParticleEffect() == ParticleTypes.FALLING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.DRIPPING_OBSIDIAN_TEAR || event.getParticleEffect() == ParticleTypes.LANDING_OBSIDIAN_TEAR
-                || event.getParticleEffect() == ParticleTypes.FALLING_DRIPSTONE_WATER || event.getParticleEffect() == ParticleTypes.DRIPPING_DRIPSTONE_WATER || event.getParticleEffect() == ParticleTypes.FALLING_DRIPSTONE_LAVA
-                || event.getParticleEffect() == ParticleTypes.DRIPPING_DRIPSTONE_LAVA || event.getParticleEffect() == ParticleTypes.FALLING_LAVA || event.getParticleEffect() == ParticleTypes.DRIPPING_LAVA
-                || event.getParticleEffect() == ParticleTypes.FALLING_WATER || event.getParticleEffect() == ParticleTypes.DRIPPING_WATER || event.getParticleEffect() == ParticleTypes.FALLING_HONEY
-                || event.getParticleEffect() == ParticleTypes.DRIPPING_HONEY || event.getParticleEffect() == ParticleTypes.FALLING_NECTAR) && drippingBlocksConfig.getValue())
+        if (shouldCancelParticle(event.getParticleType()))
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onBlockBreakParticle(BlockBreakParticleEvent event)
+    {
+        if (breakingConfig.getValue())
         {
             event.cancel();
         }
@@ -267,5 +291,17 @@ public class NoRenderModule extends Toggleable
             event.cancel();
             event.setShadowOffset(0.5f);
         }
+    }
+    
+    private boolean shouldCancelParticle(ParticleType<?> type)
+    {
+        return type == ParticleTypes.ENTITY_EFFECT && effectsConfig.getValue()
+                || (type == ParticleTypes.EXPLOSION || type == ParticleTypes.EXPLOSION_EMITTER) && explosionsConfig.getValue()
+                || type == ParticleTypes.FIREWORK && fireworkConfig.getValue()
+                || (type == ParticleTypes.EFFECT || type == ParticleTypes.INSTANT_EFFECT) && splashConfig.getValue()
+                || (type == ParticleTypes.PORTAL || type == ParticleTypes.REVERSE_PORTAL) && portalConfig.getValue()
+                || type == ParticleTypes.BLOCK && walkingConfig.getValue()
+                || type == ParticleTypes.ITEM && eatingConfig.getValue()
+                || drippingParticles.contains(type) && drippingBlocksConfig.getValue();
     }
 }

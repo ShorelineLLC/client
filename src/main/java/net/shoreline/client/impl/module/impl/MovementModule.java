@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.impl;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
 
 public class MovementModule extends Toggleable
 {
@@ -53,7 +54,8 @@ public class MovementModule extends Toggleable
     {
         float forward = mc.player.input.getMovementInput().y;
         float strafe = mc.player.input.getMovementInput().x;
-        float yaw = mc.player.prevYaw + (mc.player.getYaw() - mc.player.prevYaw) * mc.getRenderTickCounter().getTickDelta(true);
+        float currYaw = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getServerRotation().getYaw() : mc.player.prevYaw + (mc.player.getYaw() - mc.player.prevYaw);
+        float yaw = currYaw * mc.getRenderTickCounter().getTickDelta(true);
         if (forward == 0.0f && strafe == 0.0f)
         {
             return Vec2f.ZERO;

@@ -28,10 +28,12 @@ import net.shoreline.client.impl.event.render.entity.RenderEntityLabelEvent;
 import net.shoreline.client.impl.imixin.IItemRenderState;
 import net.shoreline.client.impl.imixin.IItemRenderer;
 import net.shoreline.client.impl.imixin.ILayerRenderState;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Interpolation;
 import net.shoreline.client.impl.render.RenderManager;
+import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
@@ -123,7 +125,8 @@ public class NametagsModule extends RenderModule
             matrices.scale(scaling, -scaling, scaling);
 
             float hwidth = getTextWidth(info) / 2.0f;
-            drawText(matrices, info, (int) -hwidth, 0);
+            int color = getNametagColor(player);
+            drawText(matrices, info, (int) -hwidth, 0, color);
             renderItems(matrices, player, armorConfig.getValue());
             matrices.pop();
         }
@@ -344,6 +347,31 @@ public class NametagsModule extends RenderModule
         id = id.replace("minecraft:", "");
         id = level > 1 ? id.substring(0, 2) : id.substring(0, 3);
         return id.substring(0, 1).toUpperCase() + id.substring(1) + (level > 1 ? level : "");
+    }
+
+    private int getNametagColor(PlayerEntity player)
+    {
+        if (player == mc.player)
+        {
+            return ThemeModule.INSTANCE.getPrimaryColor().getRGB();
+        }
+
+        if (player.isInvisible())
+        {
+            return 0xffff2500;
+        }
+
+        if (player instanceof FakePlayerEntity)
+        {
+            return 0xffef0147;
+        }
+
+        if (player.isSneaking())
+        {
+            return 0xffff9900;
+        }
+
+        return 0xffffffff;
     }
 
     @Getter

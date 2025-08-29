@@ -20,11 +20,16 @@ public class InteractDirection
 
     public Direction getInteractDirection(BlockPos blockPos)
     {
+        return getInteractDirection(blockPos, anticheat.getStrictDirection().getValue());
+    }
+
+    public Direction getInteractDirection(BlockPos blockPos, boolean strictDir)
+    {
         Direction interactDirection = null;
         for (final Direction direction : Direction.values())
         {
             Direction opposite = direction.getOpposite();
-            if (isDirectionHidden(blockPos, opposite))
+            if (strictDir && isDirectionHidden(blockPos, opposite))
             {
                 continue;
             }
@@ -51,11 +56,6 @@ public class InteractDirection
 
     public boolean isDirectionHidden(BlockPos blockPos, Direction direction)
     {
-        if (!anticheat.getStrictDirection().getValue())
-        {
-            return false;
-        }
-
         if (anticheat.getAcModeConfig().getValue() == Anticheat.GRIM)
         {
             PlayerEntity player = MinecraftClient.getInstance().player;

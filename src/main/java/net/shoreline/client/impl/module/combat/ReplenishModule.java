@@ -13,6 +13,7 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.inventory.HotbarCache;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class ReplenishModule extends Toggleable
@@ -55,7 +56,8 @@ public class ReplenishModule extends Toggleable
                             return;
                         }
 
-                        Managers.INVENTORY.clickSwap(slot, i + 36, result.getItem());
+                        int slot1 = InventoryUtil.getPacketSlotIndex(mc.player.playerScreenHandler, i);
+                        Managers.INVENTORY.clickSwap(slot, slot1, result.getItem());
                     }
                 }
             }

@@ -27,6 +27,15 @@ public class ShadersModule extends Toggleable
     }
 
     @EventListener
+    public void onRenderShader(RenderShaderEvent.Post event)
+    {
+        if (!checkNull())
+        {
+            // Managers.SHADER.render(new DefaultShaderEffect());
+        }
+    }
+
+    @EventListener
     public void onRenderEntity(RenderEntityWorldEvent event)
     {
         event.cancel();

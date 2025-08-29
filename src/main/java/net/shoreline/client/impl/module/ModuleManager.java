@@ -4,11 +4,8 @@ import lombok.Getter;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.*;
-import net.shoreline.client.impl.module.exploit.AntiHungerModule;
+import net.shoreline.client.impl.module.exploit.*;
 import net.shoreline.client.impl.module.client.LatencyModule;
-import net.shoreline.client.impl.module.exploit.ChorusControlModule;
-import net.shoreline.client.impl.module.exploit.NoFallModule;
-import net.shoreline.client.impl.module.exploit.PhaseModule;
 import net.shoreline.client.impl.module.hud.*;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.impl.module.misc.*;
@@ -49,6 +46,7 @@ public class ModuleManager
                 new CriticalsModule(),
                 new FeetTrapModule(),
                 new FillerModule(),
+                new KeepSprintModule(),
                 new OffhandGappleModule(),
                 new ReplenishModule(),
                 new SelfTrapModule(),
@@ -57,6 +55,7 @@ public class ModuleManager
                 new ChorusControlModule(),
                 new NoFallModule(),
                 new PhaseModule(),
+                new ReachModule(),
                 // Misc
                 new AntiAimModule(),
                 new AutoFishModule(),
@@ -93,6 +92,7 @@ public class ModuleManager
                 new ShadersModule(),
                 new SkyboxModule(),
                 new SwingModule(),
+                new TintModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
                 new ZoomModule(),
