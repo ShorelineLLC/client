@@ -72,8 +72,7 @@ public class AutoXPModule extends Toggleable
             return;
         }
 
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, xpThrow.getYaw(), xpThrow.getPitch()));
-        Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
 
         Managers.INVENTORY.endSwap();
         playerRotation.applyToPlayer();

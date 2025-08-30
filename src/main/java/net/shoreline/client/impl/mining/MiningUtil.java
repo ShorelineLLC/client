@@ -13,9 +13,19 @@ import net.shoreline.client.util.item.EnchantUtil;
 @UtilityClass
 public class MiningUtil
 {
+    public boolean isUnbreakable(BlockState state)
+    {
+        return state.getBlock().getHardness() == -1.0f;
+    }
+
+    public boolean isEmpty(BlockState state)
+    {
+        return state.isAir() || !state.getFluidState().isEmpty();
+    }
+
     public boolean canMineBlock(BlockState state)
     {
-        return state.getBlock().getHardness() != -1.0f && !state.isAir() && state.getFluidState().isEmpty();
+        return !isUnbreakable(state) && !isEmpty(state);
     }
 
     public boolean canHarvest(ItemStack miningStack, BlockState state)

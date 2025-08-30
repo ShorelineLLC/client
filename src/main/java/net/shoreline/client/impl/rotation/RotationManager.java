@@ -11,10 +11,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
 import net.shoreline.client.impl.event.input.PlayerInputEvent;
-import net.shoreline.client.impl.event.network.MovementPacketsEvent;
-import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
-import net.shoreline.client.impl.event.network.RotationUpdateEvent;
+import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.AnticheatModule.MoveFix;
@@ -30,7 +27,7 @@ public class RotationManager extends GenericFeature
 
     private Rotation clientRotation;
 
-    private final ServerRotationHandler handler;
+    private final RotationHandler handler;
     private final MovementCorrection moveFix;
     private final Rotation serverRotation;
 
@@ -39,7 +36,7 @@ public class RotationManager extends GenericFeature
     public RotationManager()
     {
         super("Rotations");
-        this.handler = new ServerRotationHandler();
+        this.handler = new RotationHandler();
         this.moveFix = new MovementCorrection();
         this.serverRotation = new Rotation(0.0f, 0.0f);
         EventBus.INSTANCE.subscribe(this);
@@ -48,10 +45,14 @@ public class RotationManager extends GenericFeature
     @EventListener
     public void onRotationUpdate(RotationUpdateEvent event)
     {
+        Rotation rotationUpdate = new Rotation(event.getYaw(), event.getPitch());
         if (!NoRotateModule.INSTANCE.isEnabled())
         {
-            setClientRotation(new Rotation(event.getYaw(), event.getPitch()));
+            setClientRotation(rotationUpdate);
         }
+
+        serverRotation.setYaw(rotationUpdate.getYaw());
+        serverRotation.setPitch(rotationUpdate.getPitch());
     }
 
     /** Standard vanilla rotation movement correction **/
@@ -119,13 +120,13 @@ public class RotationManager extends GenericFeature
     @EventListener(priority = Integer.MIN_VALUE)
     public void onUpdatePre(PlayerUpdateEvent.PrePacket event)
     {
-        handler.onPacketUpdatePre(mc.player);
+        handler.applyRotations(mc.player);
     }
 
     @EventListener(priority = Integer.MAX_VALUE)
     public void onUpdatePost(PlayerUpdateEvent.Post event)
     {
-        handler.onPacketUpdatePost(mc.player);
+        handler.revertRotations(mc.player);
     }
 
     @EventListener(priority = Integer.MIN_VALUE)
@@ -141,6 +142,18 @@ public class RotationManager extends GenericFeature
         {
             handler.resetRotations(playerRotation, 1.0f);
         }
+    }
+
+    @EventListener
+    public void onInteractItem(InteractItemEvent.Pre event)
+    {
+        handler.applyRotations(mc.player);
+    }
+
+    @EventListener
+    public void onInteractItem(InteractItemEvent.Post event)
+    {
+        handler.revertRotations(mc.player);
     }
 
     @EventListener

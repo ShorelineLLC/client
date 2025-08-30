@@ -12,6 +12,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.inventory.HotbarCache;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -19,7 +20,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 public class ReplenishModule extends Toggleable
 {
     Config<Integer> stackPercent = new NumberConfig.Builder<Integer>("Min")
-            .setMin(0).setMax(99).setDefaultValue(0).setFormat("%")
+            .setMin(0).setMax(20).setDefaultValue(0).setFormat("%")
             .setDescription("The minimum percent of stack before refill").build();
 
     private HotbarCache cache;
@@ -30,36 +31,40 @@ public class ReplenishModule extends Toggleable
     }
 
     @EventListener
-    public void onTick(TickEvent.Pre event)
+    public void onTick(TickEvent.Post event)
     {
         if (checkNull())
         {
             return;
         }
 
-        HotbarCache newCache = new HotbarCache(mc.player.getInventory());
-        if (shouldReplenish())
+        HotbarCache newCache = new HotbarCache(mc.player.getInventory(), true);
+        if (cache != null && shouldReplenish())
         {
             for (int i = 0; i < 9; i++)
             {
                 ItemStack stack = newCache.getStack(i);
-                double percentage = ((double) stack.getCount() / stack.getMaxCount()) * 100;
-                if (percentage < stackPercent.getValue() || stack.isEmpty())
+                double percentage = ((double) stack.getCount() / stack.getMaxCount()) * 100.0;
+                if (!stack.isEmpty() && percentage >= stackPercent.getValue())
                 {
-                    ItemStack cached = cache.getStack(i);
-                    if (cached != null && !cached.isEmpty() && (cached.getItem() == stack.getItem() || stack.isEmpty()))
-                    {
-                        ItemStack result = stack.isEmpty() ? cached : stack;
-                        int slot = getSlot(result);
-                        if (slot == -1)
-                        {
-                            return;
-                        }
-
-                        int slot1 = InventoryUtil.getPacketSlotIndex(mc.player.playerScreenHandler, i);
-                        Managers.INVENTORY.clickSwap(slot, slot1, result.getItem());
-                    }
+                    continue;
                 }
+
+                ItemStack cached = cache.getStack(i);
+                if (cached == null || cached.isEmpty() || (!stack.isEmpty() && cached.getItem() != stack.getItem()))
+                {
+                    continue;
+                }
+
+                ItemStack result = stack.isEmpty() ? cached : stack;
+                int slot = getSlot(result);
+                if (slot == -1)
+                {
+                    return;
+                }
+
+                int slot1 = InventoryUtil.getPacketSlotIndex(mc.player.playerScreenHandler, i);
+                Managers.INVENTORY.clickSwap(slot, slot1, result.getItem());
             }
         }
         else
@@ -69,14 +74,6 @@ public class ReplenishModule extends Toggleable
         }
 
         cache = newCache;
-    }
-
-    private boolean shouldReplenish()
-    {
-        return cache != null
-                && !(mc.currentScreen instanceof GenericContainerScreen)
-                && !(mc.currentScreen instanceof ShulkerBoxScreen)
-                && !(mc.currentScreen instanceof InventoryScreen);
     }
 
     private void updateCache(HotbarCache newCache)
@@ -89,6 +86,13 @@ public class ReplenishModule extends Toggleable
         {
             cache = null;
         }
+    }
+
+    private boolean shouldReplenish()
+    {
+        return !(mc.currentScreen instanceof GenericContainerScreen)
+                && !(mc.currentScreen instanceof ShulkerBoxScreen)
+                && !(mc.currentScreen instanceof InventoryScreen);
     }
 
     /**

@@ -75,10 +75,10 @@ public class NoSlowModule extends Toggleable
         {
             if (mc.player.getActiveHand() == Hand.OFF_HAND && !canUseItem(mc.player.getMainHandStack()))
             {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+                Managers.INTERACT.interactItem(Hand.MAIN_HAND, false);
             } else if (!canUseItem(mc.player.getOffHandStack()))
             {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
+                Managers.INTERACT.interactItem(Hand.OFF_HAND, false);
             }
         }
     }

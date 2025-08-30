@@ -1,10 +1,8 @@
 package net.shoreline.client.impl.module.world;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.item.ExperienceBottleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
@@ -33,14 +31,14 @@ public class FastPlaceModule extends Toggleable
     @EventListener
     public void onTick(TickEvent.Pre event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         if (mc.options.useKey.isPressed() && checkItem(mc.player.getMainHandStack())
                 && ((IMinecraftClient) mc).getItemUseCooldown() > delayConfig.getValue())
         {
-            if (ghostFixConfig.getValue())
-            {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(mc.player.getActiveHand(), id, mc.player.getYaw(), mc.player.getPitch()));
-            }
-
             ((IMinecraftClient) mc).setItemUseCooldown(delayConfig.getValue());
         }
     }

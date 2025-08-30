@@ -5,9 +5,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.PlayerInput;
@@ -234,5 +236,20 @@ public class InteractManager extends GenericFeature
 
         Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
         placementLock = false;
+    }
+
+    public void interactItem(Hand hand, boolean swing)
+    {
+        Rotation playerRotation = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getClientRotation() : new Rotation(mc.player);
+        interactItem(hand, playerRotation.getYaw(), playerRotation.getPitch(), swing);
+    }
+
+    public void interactItem(Hand hand, float yaw, float pitch, boolean swing)
+    {
+        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(hand, id, yaw, pitch));
+        if (swing)
+        {
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+        }
     }
 }

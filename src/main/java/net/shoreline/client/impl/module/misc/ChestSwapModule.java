@@ -57,9 +57,7 @@ public class ChestSwapModule extends Toggleable
                 int fireworkSlot = InventoryUtil.getItemSlot(Items.FIREWORK_ROCKET);
                 if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot))
                 {
-                    Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id,
-                            mc.player.getYaw(), mc.player.getPitch()));
-                    Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                    Managers.INTERACT.interactItem(Hand.MAIN_HAND, true);
                     Managers.INVENTORY.endSwap();
                 }
             }

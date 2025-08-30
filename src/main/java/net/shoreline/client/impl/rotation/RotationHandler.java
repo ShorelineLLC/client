@@ -2,16 +2,14 @@ package net.shoreline.client.impl.rotation;
 
 import lombok.Getter;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.imixin.IPlayerMoveC2SPacket;
 
-public class ServerRotationHandler
+public class RotationHandler
 {
     @Getter
     private Rotation cachedRotation;
 
-    public void onPacketUpdatePre(ClientPlayerEntity player)
+    public void applyRotations(ClientPlayerEntity player)
     {
         if (player == null || !Managers.ROTATION.hasClientRotation())
         {
@@ -24,7 +22,7 @@ public class ServerRotationHandler
         curr.apply(player);
     }
 
-    public void onPacketUpdatePost(ClientPlayerEntity player)
+    public void revertRotations(ClientPlayerEntity player)
     {
         if (player == null || cachedRotation == null)
         {
