@@ -78,12 +78,14 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDescription("The range to target entities").build();
     Config<Boolean> targetPlayers = new BooleanConfig.Builder("Players")
             .setDescription("Targets players").setDefaultValue(true).build();
+    Config<Boolean> targetNakeds = new BooleanConfig.Builder("Nakeds")
+            .setDescription("Targets nakeds").setVisible(targetPlayers::getValue).setDefaultValue(true).build();
     Config<Boolean> targetHostiles = new BooleanConfig.Builder("Hostiles")
             .setDescription("Targets hostiles").setDefaultValue(false).build();
     Config<Boolean> targetPassives = new BooleanConfig.Builder("Passives")
             .setDescription("Targets passives").setDefaultValue(false).build();
     Config<Void> targetConfig = new ConfigGroup.Builder("Target")
-            .addAll(targetRange, targetPlayers, targetHostiles, targetPassives).build();
+            .addAll(targetRange, targetPlayers, targetNakeds, targetHostiles, targetPassives).build();
 
     Config<Float> breakRange = new NumberConfig.Builder<Float>("BreakRange")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
@@ -592,7 +594,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     public boolean canTargetEntity(Entity entity)
     {
-        return entity instanceof PlayerEntity && targetPlayers.getValue()
+        return entity instanceof PlayerEntity player
+                && targetPlayers.getValue()
+                && (targetNakeds.getValue() || player.getArmor() > 0)
                 || EntityUtil.isHostile(entity) && targetHostiles.getValue()
                 || EntityUtil.isPassive(entity) && targetPassives.getValue();
     }
