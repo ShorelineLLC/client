@@ -12,7 +12,7 @@ public class PhaseUtil
 {
     public List<BlockPos> intersectingBlocks(Entity entity)
     {
-        return BlockPos.stream(entity.getBoundingBox())
+        return BlockPos.stream(entity.getBoundingBox().shrink(0.01, 0.1, 0.01))
                 .filter(pos -> !MinecraftClient.getInstance().world.getBlockState(pos).isReplaceable())
                 .toList();
     }

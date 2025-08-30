@@ -1,39 +1,75 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.mining.MiningUtil;
+import net.shoreline.client.impl.module.combat.trap.TrapLayer;
+import net.shoreline.client.impl.module.combat.trap.TrapModule;
+import net.shoreline.client.impl.module.combat.trap.TrapSpec;
+import net.shoreline.client.impl.module.world.SpeedMineModule;
+import net.shoreline.client.util.entity.EntityUtil;
+import net.shoreline.client.util.entity.PlayerUtil;
+import net.shoreline.eventbus.annotation.EventListener;
 
-public class AutoMineModule extends Toggleable
+import java.util.EnumSet;
+import java.util.Map;
+
+public class AutoMineModule extends TrapModule
 {
     public static AutoMineModule INSTANCE;
+    private static SpeedMineModule speedMine;
 
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("TargetRange")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(6.0f).setFormat("m")
             .setDescription("The max range to target players").build();
-    Config<Boolean> strictDirection = new BooleanConfig.Builder("StrictDirection")
-            .setDescription("Only attempts to mine visible faces")
-            .setDefaultValue(true).build();
+    Config<Integer> delayConfig = new NumberConfig.Builder<Integer>("Delay")
+            .setMin(50).setMax(500).setDefaultValue(100).setFormat("ms")
+            .setDescription("The delay between mines").build();
     Config<Boolean> antiCrawl = new BooleanConfig.Builder("AntiCrawl")
             .setDescription("Attempts to mine blocks to prevent player crawl")
             .setDefaultValue(true).build();
     Config<Boolean> feetConfig = new BooleanConfig.Builder("Feet")
             .setDescription("Mines out target feet blocks")
             .setDefaultValue(true).build();
-    Config<Boolean> headConfig = new BooleanConfig.Builder("Head")
-            .setDescription("Mines out target head blocks")
+    Config<Boolean> bodyConfig = new BooleanConfig.Builder("Head")
+            .setDescription("Mines out target body blocks")
             .setDefaultValue(false).build();
-    Config<Boolean> aboveHead = new BooleanConfig.Builder("AboveHead")
+    Config<Boolean> headConfig = new BooleanConfig.Builder("Ceiling")
             .setDescription("Mines out above target head blocks")
+            .setDefaultValue(false).build();
+    Config<Boolean> floorConfig = new BooleanConfig.Builder("Floor")
+            .setDescription("Mines out target floor blocks")
             .setDefaultValue(false).build();
     Config<Boolean> avoidSelf = new BooleanConfig.Builder("AvoidSelf")
             .setDescription("Avoids mining out blocks we are near")
             .setDefaultValue(false).build();
     Config<Void> targetingConfig = new ConfigGroup.Builder("Targeting")
-            .addAll(feetConfig, headConfig, aboveHead, avoidSelf).build();
+            .addAll(feetConfig, bodyConfig, headConfig, avoidSelf).build();
+
+    private final Timer mineTimer = new NanoTimer();
+
+    private final TrapSpec trapSpec = TrapSpec.builder()
+            .layers(EnumSet.of(TrapLayer.FEET,
+                    TrapLayer.BODY,
+                    TrapLayer.CEILING,
+                    TrapLayer.FLOOR,
+                    TrapLayer.FEET_INTERSECT,
+                    TrapLayer.BODY_INTERSECT)).build();
 
     public AutoMineModule()
     {
@@ -41,5 +77,131 @@ public class AutoMineModule extends Toggleable
         INSTANCE = this;
     }
 
+    @Override
+    public void onEnable()
+    {
+        speedMine = SpeedMineModule.INSTANCE;
+    }
 
+    @EventListener(priority = TickPriorities.AUTO_MINE)
+    public void onTick(TickEvent.Pre event)
+    {
+        if (checkNull() || !PlayerUtil.isInSurvival(mc.player))
+        {
+            return;
+        }
+
+        PlayerEntity target = Managers.TARGETING.setClosestTarget(rangeConfig.getValue());
+
+        if (target != null)
+        {
+            BlockPos targetPos = EntityUtil.getRoundedBlockPos(target);
+
+            Box boundingBox = target.getBoundingBox();
+            long roundedY = Math.round(boundingBox.minY);
+            Box bb = boundingBox.withMinY(roundedY).shrink(0.01, 0.1, 0.01);
+
+            BlockPos autoMine = getNextAutoMine(targetPos, bb);
+
+            if (autoMine != null && canStartMining(autoMine) && mineTimer.hasPassed(delayConfig.getValue()))
+            {
+                startAutoMine(autoMine);
+                mineTimer.reset();
+            }
+        }
+    }
+
+    private void startAutoMine(BlockPos blockPos)
+    {
+        BlockState state = mc.world.getBlockState(blockPos);
+        if (MiningUtil.canMineBlock(state) && !speedMine.isMining(blockPos))
+        {
+            speedMine.startMining(blockPos, Direction.UP);
+        }
+    }
+
+    public BlockPos getNextAutoMine(BlockPos targetPos, Box boundingBox)
+    {
+        boolean shouldTargetHead = mc.world.getBlockState(targetPos).isOf(Blocks.BEDROCK);
+        float crystalRange = AutoCrystalModule.INSTANCE.getPlaceRange().getValue();
+
+        BlockPos bestMine = null;
+        boolean inRange = false;
+
+        trapPos.calcTrap(boundingBox, trapSpec);
+        for (Map.Entry<BlockPos, TrapLayer> trapLayer : trapPos.getTrapPositionLayers().entrySet())
+        {
+            BlockPos blockPos = trapLayer.getKey();
+            TrapLayer layer = trapLayer.getValue();
+
+            BlockState state = mc.world.getBlockState(blockPos);
+            if (MiningUtil.isUnbreakable(state))
+            {
+                continue;
+            }
+
+            double dist = mc.player.squaredDistanceTo(blockPos.toCenterPos());
+            if (dist > speedMine.getRangeConfig().getValue() * speedMine.getRangeConfig().getValue())
+            {
+                continue;
+            }
+
+            if (shouldTargetHead)
+            {
+                if (!speedMine.isMining(blockPos) && !MiningUtil.isEmpty(state))
+                {
+                    if (layer == TrapLayer.FLOOR && floorConfig.getValue()
+                            || layer == TrapLayer.BODY_INTERSECT && bodyConfig.getValue())
+                    {
+                        return blockPos;
+                    }
+                }
+
+                if (layer == TrapLayer.BODY && bodyConfig.getValue())
+                {
+                    if (!inRange)
+                    {
+                        bestMine = blockPos;
+                    }
+
+                    Vec3d crystalVec = blockPos.toBottomCenterPos().add(0.0, 1.0, 0.0);
+                    if (mc.player.getEyePos().squaredDistanceTo(crystalVec) <= crystalRange * crystalRange)
+                    {
+                        inRange = true;
+                    }
+                }
+            } else if (feetConfig.getValue())
+            {
+                if (layer == TrapLayer.FEET_INTERSECT && !MiningUtil.isEmpty(state)
+                        && !speedMine.isMining(blockPos))
+                {
+                    return blockPos;
+                }
+
+                if (layer == TrapLayer.FEET)
+                {
+                    if (!inRange)
+                    {
+                        bestMine = blockPos;
+                    }
+
+                    Vec3d crystalVec = blockPos.toBottomCenterPos().add(0.0, 1.0, 0.0);
+                    if (mc.player.getEyePos().squaredDistanceTo(crystalVec) <= crystalRange * crystalRange)
+                    {
+                        inRange = true;
+                    }
+                }
+            }
+        }
+
+        return bestMine;
+    }
+
+    private boolean canStartMining(BlockPos currentMine)
+    {
+        return speedMine.getMainMiningBlock() == null
+                || speedMine.getMainMiningBlock().isDoneMining()
+                || currentMine.getY() != speedMine.getMainMiningBlock().getBlockPos().getY()
+                || speedMine.getDoubleMine().getValue() && speedMine.getPacketMiningBlock() == null;
+    }
 }
