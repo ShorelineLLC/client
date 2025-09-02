@@ -37,7 +37,6 @@ import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
-import net.shoreline.client.impl.module.impl.CombatModule;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
@@ -261,7 +260,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         if (currentAttack != null)
         {
             EntityState crystalState = currentAttack.getCrystalData();
-            crystalVec = crystalState.getPos();
+            crystalVec = crystalState.getPos().add(0.0, 0.5, 0.0);
             rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
             if (rotateConfig.getValue() == RotateMode.SILENT)
             {
@@ -288,7 +287,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 }
             }
 
-            crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.0, 0.0);
+            crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.5, 0.0);
             rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
             if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
             {
@@ -432,7 +431,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         StatusEffectInstance strength = mc.player.getStatusEffect(StatusEffects.STRENGTH);
 
         boolean canBreakCrystal = weakness == null || (strength != null && strength.getAmplifier() >= weakness.getAmplifier());
-        if (!canBreakCrystal)
+        if (!canBreakCrystal && antiWeakness.getValue())
         {
             int slot = getAntiWeaknessSlot();
             if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))
@@ -530,7 +529,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             LivingEntity entity = (LivingEntity) data.getTarget().getEntity();
             float baseDamage = (float) data.getDamageToTarget();
 
-            if (entity.isDead() || baseDamage < bestDamage)
+            if (entity.isDead())
+            {
+                continue;
+            }
+
+            if (baseDamage < bestDamage)
             {
                 continue;
             }
@@ -599,5 +603,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 && (targetNakeds.getValue() || player.getArmor() > 0)
                 || EntityUtil.isHostile(entity) && targetHostiles.getValue()
                 || EntityUtil.isPassive(entity) && targetPassives.getValue();
+    }
+
+    public boolean isRunning()
+    {
+        return isEnabled() && (currentAttack != null || currentPlace != null);
     }
 }

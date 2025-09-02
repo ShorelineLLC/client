@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -75,7 +74,11 @@ public class InteractManager extends GenericFeature
         }
 
         boolean result = placeBlockInternal(interaction);
-        placedBlocks.put(blockPos, System.currentTimeMillis());
+        if (result)
+        {
+            placedBlocks.put(blockPos, System.currentTimeMillis());
+        }
+
         return result;
     }
 
@@ -224,11 +227,6 @@ public class InteractManager extends GenericFeature
 
     public void endPlacement()
     {
-        if (!placementLock)
-        {
-            return;
-        }
-
         if (anticheat.getInteractRotate().getValue())
         {
             Managers.ROTATION.resetSilentRotation();

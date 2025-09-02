@@ -12,6 +12,7 @@
     "entity.MixinLivingEntity",
     "entity.decoration.MixinEndCrystalEntity",
     "entity.player.MixinPlayerEntity",
+    "entity.player.MixinPlayerInventory",
     "gl.MixinPostEffectProcessor",
     "gui.MixinDrawContext",
     "gui.hud.MixinBossBarHud",

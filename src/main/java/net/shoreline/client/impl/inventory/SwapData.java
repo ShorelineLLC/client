@@ -3,6 +3,8 @@ package net.shoreline.client.impl.inventory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 
 @RequiredArgsConstructor
 @Getter
@@ -35,6 +37,11 @@ public class SwapData
             swapped = false;
             slotFrom = InventoryUtil.INVALID_SLOT;
             slotTo = InventoryUtil.INVALID_SLOT;
+        }
+
+        public ItemStack getItemStack(PlayerInventory playerInventory)
+        {
+            return playerInventory.getStack(slotTo);
         }
     }
 }

@@ -21,11 +21,9 @@ public abstract class AsyncWorldScanner extends AsyncBlockScanner implements Asy
         @Override
         protected float getRadius()
         {
-            return getEntityRadius();
+            return AsyncWorldScanner.this.getRadius();
         }
     };
-
-    public abstract float getEntityRadius();
 
     @Override
     public void createCube(ClientWorld world, BlockPos center)

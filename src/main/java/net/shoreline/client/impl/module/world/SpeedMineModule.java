@@ -1,13 +1,14 @@
 package net.shoreline.client.impl.module.world;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.block.BlockState;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
@@ -26,7 +27,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import java.awt.*;
 
 @Getter
-public class SpeedMineModule extends Toggleable
+public class SpeedMineModule extends ListeningToggleable
 {
     public static SpeedMineModule INSTANCE;
 
@@ -62,6 +63,9 @@ public class SpeedMineModule extends Toggleable
     Config<Void> renderConfig = new ConfigGroup.Builder("Render")
             .addAll(miningColor, breakingColor).build();
 
+    @Setter
+    private boolean isManualMining;
+
     private MiningData mainMiningBlock, packetMiningBlock;
     private MiningRenderState mainState, packetState;
 
@@ -82,16 +86,9 @@ public class SpeedMineModule extends Toggleable
     @Override
     public void onDisable()
     {
-        mainMiningBlock = null;
-        if (packetMiningBlock != null)
-        {
-            packetMiningBlock.abort();
-            packetMiningBlock = null;
-        }
-
+        clearMain();
+        clearPacket();
         pendingClear = null;
-        mainState = null;
-        packetState = null;
     }
 
     @EventListener(priority = TickPriorities.SPEED_MINE)
@@ -104,12 +101,17 @@ public class SpeedMineModule extends Toggleable
 
         tickMain();
         tickPacket();
+
+        if (isManualMining && mainMiningBlock == null)
+        {
+            isManualMining = false;
+        }
     }
 
     @EventListener
     public void onAttackBlock(AttackBlockEvent event)
     {
-        if (!PlayerUtil.isInSurvival(mc.player))
+        if (checkNull() || !PlayerUtil.isInSurvival(mc.player))
         {
             return;
         }
@@ -120,6 +122,7 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
+        isManualMining = true;
         startMining(event.getPos(), event.getDirection());
         mc.player.swingHand(Hand.MAIN_HAND, false);
     }
@@ -212,7 +215,8 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
-        float blockDamage = mainMiningBlock.tickDelta();
+        boolean multiTasking = mc.player.isUsingItem() && !multitaskConfig.getValue();
+        float blockDamage = mainMiningBlock.tickDelta(multiTasking);
         if (blockDamage < speedConfig.getValue())
         {
             return;
@@ -221,13 +225,19 @@ public class SpeedMineModule extends Toggleable
         if (mainMiningBlock.isBlockMined())
         {
             mainMiningBlock.resetTicksMining();
+
+            if (isManualMining)
+            {
+                isManualMining = false;
+            }
+
         } else if (mainMiningBlock.hasMinedFor(30))
         {
             clearMain();
             return;
         }
 
-        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        if (multiTasking)
         {
             return;
         }
@@ -256,13 +266,14 @@ public class SpeedMineModule extends Toggleable
             return;
         }
 
-        float blockDamage = packetMiningBlock.tickDelta();
+        boolean multiTasking = mc.player.isUsingItem() && !multitaskConfig.getValue();
+        float blockDamage = packetMiningBlock.tickDelta(multiTasking);
         if (blockDamage < speedConfig.getValue())
         {
             return;
         }
 
-        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        if (multiTasking)
         {
             return;
         }

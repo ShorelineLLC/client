@@ -1,11 +1,11 @@
 package net.shoreline.client.impl.world;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.EntityView;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +18,7 @@ public abstract class AsyncEntityScanner implements AsyncEntityView
     protected EntityState localEntity;
     protected final ConcurrentMap<Integer, EntityState> entities = new ConcurrentHashMap<>();
 
-    public void createEntityLookup(ClientWorld world, Vec3d c)
+    public void createEntityLookup(EntityView world, Vec3d c)
     {
         clearEntityLookup();
         float r2 = getRadius() * getRadius();
@@ -38,9 +38,9 @@ public abstract class AsyncEntityScanner implements AsyncEntityView
         localEntity = new EntityState(localPlayer);
     }
 
-    public EntityState addEntityLookup(Entity entity)
+    public void addEntityLookup(Entity entity)
     {
-        return entities.put(entity.getId(), new EntityState(entity));
+        entities.put(entity.getId(), new EntityState(entity));
     }
 
     public void clearEntityLookup()

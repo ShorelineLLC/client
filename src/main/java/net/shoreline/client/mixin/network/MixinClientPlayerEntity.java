@@ -181,6 +181,13 @@ public abstract class MixinClientPlayerEntity
         EventBus.INSTANCE.dispatch(swingEvent);
     }
 
+    @Inject(method = "setCurrentHand", at = @At(value = "HEAD"))
+    private void hookSetCurrentHand(Hand hand, CallbackInfo ci)
+    {
+        SetHandEvent setHandEvent = new SetHandEvent();
+        EventBus.INSTANCE.dispatch(setHandEvent);
+    }
+
     /** Allows you to open screens in portals **/
     @Redirect(method = "tickNausea", at = @At(value = "FIELD",
             target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;"))

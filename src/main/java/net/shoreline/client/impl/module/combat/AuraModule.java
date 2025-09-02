@@ -101,7 +101,7 @@ public class AuraModule extends CombatModule
            return;
         }
 
-        if (event.isCanceled() || AutoCrystalModule.INSTANCE.isEnabled())
+        if (event.isCanceled() || AutoCrystalModule.INSTANCE.isRunning())
         {
             return;
         }

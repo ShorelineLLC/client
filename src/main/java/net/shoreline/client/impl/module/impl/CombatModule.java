@@ -34,10 +34,14 @@ public class CombatModule extends ListeningToggleable
                                           final boolean swing,
                                           final Hand hand)
     {
-        PlayerInteractEntityC2SPacket packet = AccessorPlayerInteractC2SPacket.invokeInit(
-                entityId, mc.player.isSneaking(), PlayerInteractEntityC2SPacket.ATTACK);
+        boolean sneaking = mc.player.isSneaking();
+        Managers.NETWORK.sendPacket(
+                AccessorPlayerInteractC2SPacket.invokeInit(
+                        entityId,
+                        sneaking,
+                        PlayerInteractEntityC2SPacket.ATTACK)
+        );
 
-        Managers.NETWORK.sendPacket(packet);
         if (swing)
         {
             mc.player.swingHand(hand);

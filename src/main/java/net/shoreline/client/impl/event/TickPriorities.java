@@ -8,4 +8,5 @@ public class TickPriorities
     public static final int KILL_AURA = 2147483643;
     public static final int SPEED_MINE = 2147483642;
     public static final int AUTO_MINE = 2147483641;
+    public static final int AUTO_XP = 2147483640;
 }

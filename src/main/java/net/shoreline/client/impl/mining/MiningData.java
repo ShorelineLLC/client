@@ -42,10 +42,19 @@ public class MiningData
 
     public float tickDelta()
     {
+        return tickDelta(false);
+    }
+
+    public float tickDelta(boolean isMultitasking)
+    {
         this.lastDamage = blockDamage;
         if (blockDamage >= maxProgress)
         {
-            ticksMining++;
+            if (!isMultitasking)
+            {
+                ticksMining++;
+            }
+
             return blockDamage;
         }
 

@@ -51,7 +51,7 @@ public class ReplenishModule extends Toggleable
                 }
 
                 ItemStack cached = cache.getStack(i);
-                if (cached == null || cached.isEmpty() || (!stack.isEmpty() && cached.getItem() != stack.getItem()))
+                if (cached == null || cached.isEmpty() || (!stack.isEmpty() && !ItemStack.areItemsAndComponentsEqual(cached, stack)))
                 {
                     continue;
                 }
@@ -109,7 +109,7 @@ public class ReplenishModule extends Toggleable
         for (int i = 9; i < PlayerInventory.MAIN_SIZE; i++)
         {
             ItemStack iStack = inventory.getStack(i);
-            if (iStack.getItem().equals(stack.getItem()))
+            if (ItemStack.areItemsAndComponentsEqual(iStack, stack))
             {
                 int count = iStack.getCount();
                 if (count > delta)

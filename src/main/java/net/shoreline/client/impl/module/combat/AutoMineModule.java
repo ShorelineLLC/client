@@ -86,14 +86,14 @@ public class AutoMineModule extends TrapModule
     @EventListener(priority = TickPriorities.AUTO_MINE)
     public void onTick(TickEvent.Pre event)
     {
-        if (checkNull() || !PlayerUtil.isInSurvival(mc.player))
+        if (checkNull() || !speedMine.isEnabled() || !PlayerUtil.isInSurvival(mc.player))
         {
             return;
         }
 
         PlayerEntity target = Managers.TARGETING.setClosestTarget(rangeConfig.getValue());
 
-        if (target != null)
+        if (target != null && !speedMine.isManualMining())
         {
             BlockPos targetPos = EntityUtil.getRoundedBlockPos(target);
 

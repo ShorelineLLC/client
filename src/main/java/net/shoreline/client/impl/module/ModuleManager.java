@@ -77,10 +77,12 @@ public class ModuleManager
                 new NoSlowModule(),
                 new SpeedModule(),
                 new SprintModule(),
+                new StepModule(),
                 new VelocityModule(),
                 // Render
                 new BlockHighlightModule(),
                 new ChamsModule(),
+                new CrystalModelModule(),
                 new FreecamModule(),
                 new FullbrightModule(),
                 new HoleESPModule(),

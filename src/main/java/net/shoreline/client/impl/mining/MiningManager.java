@@ -61,7 +61,7 @@ public class MiningManager extends GenericFeature
 
         for (MiningData data : miningBlocks.values())
         {
-            if (data.getSquaredDistanceTo() > 36.0f || data.isBlockMined())
+            if (data.getSquaredDistanceTo() > 36.0f || data.isBlockMined() || data.hasMinedFor(40))
             {
                 miningBlocks.remove(data.getBlockPos());
                 continue;

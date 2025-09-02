@@ -12,6 +12,9 @@ import net.minecraft.entity.passive.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @UtilityClass
 public class EntityUtil
 {
@@ -39,16 +42,10 @@ public class EntityUtil
         return BlockPos.ofFloored(entity.getBlockX(), Math.round(entity.getY()), entity.getBlockZ());
     }
 
-    public ItemStack[] getEquippedItems(LivingEntity entity)
+    public List<ItemStack> getEquippedItems(LivingEntity entity)
     {
-        return new ItemStack[]
-                {
-                        entity.getEquippedStack(EquipmentSlot.MAINHAND),
-                        entity.getEquippedStack(EquipmentSlot.OFFHAND),
-                        entity.getEquippedStack(EquipmentSlot.HEAD),
-                        entity.getEquippedStack(EquipmentSlot.BODY),
-                        entity.getEquippedStack(EquipmentSlot.LEGS),
-                        entity.getEquippedStack(EquipmentSlot.FEET)
-                };
+        final List<ItemStack> stacks = new ArrayList<>();
+        EquipmentSlot.VALUES.forEach(equipmentSlot -> stacks.add(entity.getEquippedStack(equipmentSlot)));
+        return stacks;
     }
 }

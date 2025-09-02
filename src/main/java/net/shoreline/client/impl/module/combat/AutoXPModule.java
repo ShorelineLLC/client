@@ -2,18 +2,16 @@ package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
-import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.util.entity.EntityUtil;
@@ -40,10 +38,15 @@ public class AutoXPModule extends Toggleable
         return String.valueOf(InventoryUtil.getItemCount(Items.EXPERIENCE_BOTTLE));
     }
 
-    @EventListener
-    public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
+    @EventListener(priority = TickPriorities.AUTO_XP)
+    public void onClientRotation(ClientRotationEvent event)
     {
         if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        {
+            return;
+        }
+
+        if (rotateConfig.getValue() == RotateMode.NORMAL && event.isCanceled())
         {
             return;
         }
@@ -61,21 +64,35 @@ public class AutoXPModule extends Toggleable
             return;
         }
 
-        Rotation playerRotation = new Rotation(mc.player);
-        Rotation xpThrow = new Rotation(mc.player.getYaw(), 90.0f);
-
-        Managers.ROTATION.setSilentRotation(xpThrow);
-        xpThrow.applyToPlayer();
-
         if (!Managers.INVENTORY.startSwap(itemSlot))
         {
             return;
         }
 
+        Rotation playerRotation = new Rotation(mc.player);
+        Rotation xpThrow = new Rotation(mc.player.getYaw(), 90.0f);
+
+        switch (rotateConfig.getValue())
+        {
+            case SILENT -> Managers.ROTATION.setSilentRotation(xpThrow);
+            case NORMAL ->
+            {
+                event.cancel();
+                event.setYaw(xpThrow.getYaw());
+                event.setPitch(xpThrow.getPitch());
+            }
+        }
+
+        xpThrow.applyToPlayer();
         Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
+        playerRotation.applyToPlayer();
+
+        if (rotateConfig.getValue() == RotateMode.SILENT)
+        {
+            Managers.ROTATION.resetSilentRotation();
+        }
 
         Managers.INVENTORY.endSwap();
-        playerRotation.applyToPlayer();
     }
 
     private boolean isPlayerFullDurability()
@@ -87,6 +104,7 @@ public class AutoXPModule extends Toggleable
                 return false;
             }
         }
+
         return true;
     }
 }

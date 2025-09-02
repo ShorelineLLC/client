@@ -11,6 +11,7 @@ import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.network.StopSprintingEvent;
 import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.module.impl.MovementModule;
+import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.client.util.input.InputUtil;
@@ -88,7 +89,7 @@ public class SprintModule extends MovementModule
             return;
         }
 
-        if (event.isCanceled())
+        if (event.isCanceled() || FreecamModule.INSTANCE.isEnabled())
         {
             return;
         }

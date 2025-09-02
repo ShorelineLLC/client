@@ -17,19 +17,13 @@ public abstract class CrystalEntityScanner extends AsyncWorldScanner
 
     private final List<CrystalData<?>> crystalEntities = new CopyOnWriteArrayList<>();
 
-    @Override
-    public float getEntityRadius()
-    {
-        return autoCrystal.getTargetRange().getValue();
-    }
-
     public List<CrystalData<?>> scanCrystalEntities()
     {
         crystalEntities.clear();
 
         for (EntityState state : getEntities())
         {
-            if (!state.getEntity().isAlive() || !(state.getEntity() instanceof EndCrystalEntity))
+            if (!state.isAlive() || !(state.getEntity() instanceof EndCrystalEntity))
             {
                 continue;
             }

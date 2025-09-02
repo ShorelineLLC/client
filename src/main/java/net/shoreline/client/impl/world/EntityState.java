@@ -18,6 +18,7 @@ public class EntityState
     private final Vec3d eyePos;
     private final Box boundingBox;
 
+    private final boolean alive;
     private final float totalHealth;
     private final int age;
 
@@ -28,6 +29,7 @@ public class EntityState
         this.pos = entity.getPos();
         this.eyePos = entity.getEyePos();
         this.boundingBox = entity.getBoundingBox();
+        this.alive = entity.isAlive();
         this.totalHealth = entity instanceof LivingEntity e ? e.getHealth() + e.getAbsorptionAmount() : 0.0f;
         this.age = entity.age;
     }
