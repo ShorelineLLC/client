@@ -2,6 +2,7 @@ package net.shoreline.client.impl.render;
 
 import lombok.experimental.UtilityClass;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -28,5 +29,22 @@ public class Interpolation
         return new Vec3d(pos.x - MathHelper.lerp(tickDelta, lastPos.x, pos.x),
                 pos.y - MathHelper.lerp(tickDelta, lastPos.y, pos.y),
                 pos.z - MathHelper.lerp(tickDelta, lastPos.z, pos.z));
+    }
+
+    public Box getEntityRenderBox(Entity entity, float tickDelta)
+    {
+        Box box = entity.getBoundingBox();
+        Box lastBox = box.offset(entity.prevX - entity.getX(), entity.prevY - entity.getY(), entity.prevZ - entity.getZ());
+        return getRenderBox(box, lastBox, tickDelta);
+    }
+
+    public Box getRenderBox(Box box, Box lastBox, float tickDelta)
+    {
+        return new Box(MathHelper.lerp(tickDelta, lastBox.minX, box.minX),
+                MathHelper.lerp(tickDelta, lastBox.minY, box.minY),
+                MathHelper.lerp(tickDelta, lastBox.minZ, box.minZ),
+                MathHelper.lerp(tickDelta, lastBox.maxX, box.maxX),
+                MathHelper.lerp(tickDelta, lastBox.maxY, box.maxY),
+                MathHelper.lerp(tickDelta, lastBox.maxZ, box.maxZ));
     }
 }

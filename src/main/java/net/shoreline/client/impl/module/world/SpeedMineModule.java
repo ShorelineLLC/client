@@ -9,10 +9,10 @@ import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
-import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.ItemSlot;
@@ -89,6 +89,12 @@ public class SpeedMineModule extends ListeningToggleable
         clearMain();
         clearPacket();
         pendingClear = null;
+    }
+
+    @EventListener
+    public void onWorldDisconnect(WorldEvent.Disconnect event)
+    {
+        disable();
     }
 
     @EventListener(priority = TickPriorities.SPEED_MINE)

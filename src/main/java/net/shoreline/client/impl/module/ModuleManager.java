@@ -53,6 +53,7 @@ public class ModuleManager
                 // Exploit
                 new AntiHungerModule(),
                 new ChorusControlModule(),
+                new FakeLagModule(),
                 new NoFallModule(),
                 new PhaseModule(),
                 new ReachModule(),
@@ -69,9 +70,12 @@ public class ModuleManager
                 new PacketSnifferModule(),
                 new RekitModule(),
                 new ShulkerceptionModule(),
+                new SpammerModule(),
                 // Movement
+                new AvoidModule(),
                 new FastFallModule(),
                 new FlightModule(),
+                new LongJumpModule(),
                 new NoAccelModule(),
                 new NoJumpDelayModule(),
                 new NoSlowModule(),

@@ -20,6 +20,7 @@ import java.util.function.Function;
 public class InventoryUtil
 {
     public static final int INVALID_SLOT = -1;
+    public static final int OFFHAND_SLOT = 45;
 
     public boolean isInInventoryScreen()
     {
@@ -28,15 +29,16 @@ public class InventoryUtil
                 || MinecraftClient.getInstance().currentScreen instanceof InventoryScreen;
     }
 
-    public int getItemSlot(Function<ItemStack, Boolean> stackFilter)
+    public ItemSlot getItemSlot(Function<ItemStack, Boolean> stackFilter)
     {
         return getItemSlot(stackFilter, AnticheatModule.INSTANCE.getSilentSwapType());
     }
 
-    public int getItemSlot(Function<ItemStack, Boolean> stackFilter, SilentSwapType type)
+    public ItemSlot getItemSlot(Function<ItemStack, Boolean> stackFilter, SilentSwapType type)
     {
         PlayerInventory inv = MinecraftClient.getInstance().player.getInventory();
 
+        ItemStack itemStack = null;
         int bestSlot = INVALID_SLOT;
         int bestScore = -1;
 
@@ -55,11 +57,12 @@ public class InventoryUtil
                 if (type == SilentSwapType.INVENTORY || i < PlayerInventory.getHotbarSize())
                 {
                     bestSlot = i;
+                    itemStack = stack;
                 }
             }
         }
 
-        return bestSlot;
+        return new ItemSlot(bestSlot, itemStack);
     }
 
     public int getItemSlot(Item item)
@@ -110,14 +113,14 @@ public class InventoryUtil
             ItemStack stack = inventory.getStack(i);
             if (stack.getItem().equals(item))
             {
-                count++;
+                count += stack.getCount();
             }
         }
 
         ItemStack offhand = inventory.getStack(PlayerInventory.OFF_HAND_SLOT);
         if (offhand.getItem().equals(item))
         {
-            count++;
+            count += offhand.getCount();
         }
 
         return count;
@@ -129,7 +132,7 @@ public class InventoryUtil
         {
             if (slot == PlayerInventory.OFF_HAND_SLOT)
             {
-                return 45;
+                return OFFHAND_SLOT;
             }
 
             return slot < PlayerInventory.getHotbarSize() ? slot + PlayerInventory.MAIN_SIZE : slot;

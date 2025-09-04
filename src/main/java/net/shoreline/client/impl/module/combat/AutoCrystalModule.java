@@ -35,6 +35,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
+import net.shoreline.client.impl.inventory.SwapHandler;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
@@ -125,6 +126,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Boolean> forcePlace = new BooleanConfig.Builder("ForcePlace")
             .setDescription("Attempts to force crystal placements in blocked positions")
             .setDefaultValue(false).build();
+    Config<Boolean> predictPlace = new BooleanConfig.Builder("PrePlace")
+            .setDescription("Attempts to place while mining")
+            .setDefaultValue(false).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
             .addAll(targetItems, forcePlace).build();
 
@@ -161,10 +165,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDescription("Automatically swaps to crystals before placing")
             .setDefaultValue(false).build();
     Config<Boolean> silentSwap = new BooleanConfig.Builder("SilentSwap")
+            .setVisibilityDependant(true)
             .setDescription("Silently swaps to crystals before placing")
             .setVisible(() -> autoSwap.getValue())
             .setDefaultValue(false).build();
     Config<Boolean> antiWeakness = new BooleanConfig.Builder("AntiWeakness")
+            .setVisibilityDependant(true)
             .setDescription("Swaps to sword before attacking crystals")
             .setVisible(() -> autoSwap.getValue() && silentSwap.getValue())
             .setDefaultValue(false).build();
@@ -179,6 +185,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private CrystalData<EntityState> currentAttack;
     private CrystalData<BlockPos> currentPlace;
 
+    private final SwapHandler autoSwapHandler = new SwapHandler();
     private final Timer attackTimer = new NanoTimer();
     private final Timer placeTimer = new NanoTimer();
 
@@ -241,7 +248,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (checkNull() || event.isCanceled())
+        if (checkNull() || event.isCanceled() || mc.player.isSpectator())
         {
             return;
         }
@@ -460,30 +467,41 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         Direction placeDir = getPlaceDirection(blockPos, box, eyePos, cut);
         BlockHitResult result = new BlockHitResult(cut, placeDir, blockPos, box.contains(eyePos));
-        if (autoSwap.getValue() && silentSwap.getValue())
-        {
-            int slot = InventoryUtil.getItemSlot(Items.END_CRYSTAL, silentType.getValue());
-            if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))
-            {
-                return;
-            }
-        }
-
-        if (!Managers.INVENTORY.isHolding(Items.END_CRYSTAL, hand))
+        int slot = InventoryUtil.getItemSlot(Items.END_CRYSTAL, silentType.getValue());
+        if (slot == -1)
         {
             return;
         }
 
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
-        if (swingConfig.getValue())
+        if (silentSwap.getValue())
         {
-            mc.player.swingHand(hand);
-        } else
+            if (!Managers.INVENTORY.startSwap(slot, silentType.getValue()))
+            {
+                return;
+            }
+
+        } else if (autoSwap.getValue())
         {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+            autoSwapHandler.handleSwaps();
+            if (autoSwapHandler.canAutoSwap())
+            {
+                Managers.INVENTORY.setSelectedSlot(slot);
+            }
         }
 
-        if (autoSwap.getValue() && silentSwap.getValue())
+        if (Managers.INVENTORY.isHolding(Items.END_CRYSTAL, hand))
+        {
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
+            if (swingConfig.getValue())
+            {
+                mc.player.swingHand(hand);
+            } else
+            {
+                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+            }
+        }
+
+        if (silentSwap.getValue())
         {
             Managers.INVENTORY.endSwap(silentType.getValue());
         }
@@ -593,7 +611,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         return InventoryUtil.getItemSlot((ItemStack itemStack) ->
                 itemStack.getItem().getTranslationKey().contains("sword")
-                || itemStack.getItem().getTranslationKey().contains("axe"));
+                || itemStack.getItem().getTranslationKey().contains("axe")).getSlot();
     }
 
     public boolean canTargetEntity(Entity entity)

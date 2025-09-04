@@ -21,10 +21,10 @@ public class InventorySwapModule extends Toggleable
         super(name, nameAliases, description, category);
     }
 
-    protected void swapItemWithSlot(Item item, int slot)
+    protected int swapItemWithSlot(Item item, int slot)
     {
         PlayerInventory playerInventory = mc.player.getInventory();
-        ScreenHandler handler = mc.player.currentScreenHandler;
+        ScreenHandler handler = mc.player.playerScreenHandler;
         for (int i = 0; i < PlayerInventory.MAIN_SIZE; ++i)
         {
             ItemStack stack = playerInventory.getStack(i);
@@ -35,7 +35,9 @@ public class InventorySwapModule extends Toggleable
 
             int slot1 = InventoryUtil.getPacketSlotIndex(handler, slot);
             Managers.INVENTORY.clickSwap(i, slot1, item);
-            return;
+            return i;
         }
+
+        return -1;
     }
 }

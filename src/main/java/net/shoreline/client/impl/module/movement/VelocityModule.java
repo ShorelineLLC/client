@@ -100,8 +100,7 @@ public class VelocityModule extends Toggleable
             return;
         }
 
-        if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet
-                && packet.getEntityId() == mc.player.getId())
+        if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet && packet.getEntityId() == mc.player.getId())
         {
             if (concealVelocity && packet.getVelocityX() == 0 && packet.getVelocityZ() == 0 && packet.getVelocityZ() == 0)
             {
@@ -147,7 +146,7 @@ public class VelocityModule extends Toggleable
     @EventListener
     public void onExplosion(ExplosionEvent event)
     {
-        if (event.getPlayerVelocity() == null || !cancelExplosion.getValue())
+        if (!cancelExplosion.getValue())
         {
             return;
         }
@@ -155,7 +154,6 @@ public class VelocityModule extends Toggleable
         if (shouldCancelExplosions())
         {
             event.cancel();
-            event.setPlayerVelocity(Vec3d.ZERO);
         } else if (modeConfig.getValue() == VelocityMode.NORMAL)
         {
             Vec3d knockback = event.getPlayerVelocity();
@@ -201,13 +199,13 @@ public class VelocityModule extends Toggleable
             return PhaseUtil.isInsideBlock(mc.player) && (!groundOnlyConfig.getValue() || mc.player.isOnGround());
         } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
         {
-
+            return true;
         } else if (modeConfig.getValue() == VelocityMode.NORMAL)
         {
             return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
         }
 
-        return true;
+        return false;
     }
 
     private boolean shouldCancelExplosions()
@@ -217,13 +215,13 @@ public class VelocityModule extends Toggleable
             return PhaseUtil.isInsideBlock(mc.player);
         } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
         {
-
+            return true;
         } else if (modeConfig.getValue() == VelocityMode.NORMAL)
         {
             return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
         }
 
-        return true;
+        return false;
     }
 
     private enum VelocityMode

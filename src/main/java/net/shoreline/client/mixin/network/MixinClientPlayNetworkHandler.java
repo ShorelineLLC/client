@@ -52,7 +52,8 @@ public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNet
 
     @Inject(method = "onExplosion", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/world/ClientWorld;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
-            shift = At.Shift.AFTER), cancellable = true)
+            shift = At.Shift.AFTER),
+            cancellable = true)
     private void hookExplosion(ExplosionS2CPacket packet, CallbackInfo ci)
     {
         final ExplosionEvent event = new ExplosionEvent(packet.center(), packet.playerKnockback().isPresent() ? packet.playerKnockback().get() : Vec3d.ZERO);
@@ -60,7 +61,11 @@ public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNet
         if (event.isCanceled())
         {
             ci.cancel();
-            client.player.addVelocityInternal(event.getPlayerVelocity());
+            Vec3d newVelo = event.getPlayerVelocity();
+            if (newVelo != null)
+            {
+                client.player.addVelocityInternal(newVelo);
+            }
         }
     }
 

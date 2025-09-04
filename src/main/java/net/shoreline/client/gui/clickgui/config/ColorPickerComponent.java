@@ -83,7 +83,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
 
         if (collapseAnim.getFactor() > 0.001)
         {
-            enableScissor(context, getTx() + 2, getTy() + height + 4, getTx() + width, getTy() + height + getComponentHeight() + 2);
+            enableScissor(context, getTx() + 3, getTy() + height + 4, getTx() + width - 1, getTy() + height + getComponentHeight() + 2);
 
             for (int i = 0; i < pickerLength - 2; i++)
             {

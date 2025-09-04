@@ -81,7 +81,7 @@ public class MiningManager extends GenericFeature
 
         if (event.getPacket() instanceof BlockBreakingProgressS2CPacket packet)
         {
-            if (packet.getProgress() > 3 || miningBlocks.containsKey(packet.getPos()))
+            if (miningBlocks.containsKey(packet.getPos()))
             {
                 return;
             }

@@ -12,13 +12,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Getter
 public class FakePlayerEntity extends OtherClientPlayerEntity
 {
+    public static final UUID FAKE_UUID = UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7");
+
     public static final AtomicInteger CURRENT_ID = new AtomicInteger(1000000);
 
     private final PlayerEntity player;
 
     public FakePlayerEntity(PlayerEntity player, String name)
     {
-        super(MinecraftClient.getInstance().world, new GameProfile(UUID.fromString("8667ba71-b85a-4004-af54-457a9734eed7"), name));
+        super(MinecraftClient.getInstance().world, new GameProfile(FAKE_UUID, name));
         this.player = player;
         this.age = 100;
 

@@ -47,7 +47,7 @@ public class DynamicEntry
         int width = getModule().getTextWidth(current);
         float renderX = (int) (x + animation.get() - (left ? width : 0)) + paddingX;
         float renderY = (int) (y + currentOffset) + paddingY;
-        drawText(context.getMatrices(), current, renderX, renderY);
+        drawText(context, current, renderX, renderY);
 
         if (drawing.get())
         {
@@ -91,9 +91,9 @@ public class DynamicEntry
      * We make this a separate method so if any hud entries need custom
      * colors (like potion hud). they can just override this.
      */
-    public void drawText(MatrixStack matrices, String string, float x, float y)
+    public void drawText(DrawContext context, String string, float x, float y)
     {
-        getModule().drawTextTransparency(matrices, string, x, y, (float) yAnimation.getFactor());
+        getModule().drawTextTransparency(context.getMatrices(), string, x, y, (float) yAnimation.getFactor());
     }
 
     public boolean isDrawing()

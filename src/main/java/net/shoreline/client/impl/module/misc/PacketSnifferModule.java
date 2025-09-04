@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.misc;
 
+import net.minecraft.network.packet.Packet;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
@@ -90,5 +91,10 @@ public class PacketSnifferModule extends Toggleable
     {
         super("PacketSniffer", new String[] {"PacketLogger"},
                 "Logs client packets", GuiCategory.MISCELLANEOUS);
+    }
+
+    public String formatPacket(Packet<?> packet)
+    {
+        return null;
     }
 }

@@ -41,6 +41,19 @@ public class InputUtil
                 sprinting);
     }
 
+    public boolean isInputtingHotbar()
+    {
+        for (KeyBinding binding : options.hotbarKeys)
+        {
+            if (binding.isPressed())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public KeyBinding[] getMovementKeys()
     {
         return new KeyBinding[] {

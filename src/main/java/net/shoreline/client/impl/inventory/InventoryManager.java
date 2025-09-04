@@ -181,6 +181,15 @@ public class InventoryManager extends GenericFeature
         return mc.player.getInventory().selectedSlot != serverSlot;
     }
 
+    public void setSelectedSlot(int slot)
+    {
+        mc.player.getInventory().setSelectedSlot(slot);
+        if (slot != serverSlot)
+        {
+            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+        }
+    }
+
     public boolean startSwap(int itemSlot)
     {
         return startSwap(itemSlot, anticheat.getSilentSwapType());
@@ -264,7 +273,11 @@ public class InventoryManager extends GenericFeature
 
         multitick.setSwapped(true);
         multitick.setSlotTo(itemSlot);
-        Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
+        if (serverSlot != itemSlot)
+        {
+            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
+        }
+
         return true;
     }
 
@@ -288,21 +301,25 @@ public class InventoryManager extends GenericFeature
     {
         ScreenHandler handler = mc.player.currentScreenHandler;
         int slot = InventoryUtil.getPacketSlotIndex(handler, fromSlot);
-
         if (!handler.getCursorStack().getItem().equals(item))
         {
-            mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
+            pickupSlot(handler, slot);
         }
 
         if (handler.getCursorStack().getItem().equals(item))
         {
-            mc.interactionManager.clickSlot(handler.syncId, toSlot, 0, SlotActionType.PICKUP, mc.player);
+            pickupSlot(handler, toSlot);
         }
 
         if (!handler.getCursorStack().isEmpty())
         {
-            mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
+            pickupSlot(handler, slot);
         }
+    }
+
+    public void pickupSlot(ScreenHandler handler, int slot)
+    {
+        mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
     }
 
     private void internalSwapSlot(int slot1, int slot2)
@@ -328,7 +345,8 @@ public class InventoryManager extends GenericFeature
 
     public boolean isHolding(Item item, Hand hand)
     {
-        return getServerStack().getItem().equals(item) || mc.player.getStackInHand(hand).getItem().equals(item);
+        ItemStack holdingStack = isSilentSwapping() && hand == Hand.MAIN_HAND ? getServerStack() : mc.player.getStackInHand(hand);
+        return holdingStack.getItem().equals(item);
     }
 
     public ItemStack getServerStack()

@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
+import lombok.Getter;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.Entity;
@@ -10,6 +11,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
@@ -17,8 +21,16 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.impl.inventory.ItemSlot;
+import net.shoreline.client.impl.inventory.SwapHandler;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.CombatModule;
+import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.BoxRender;
+import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.Interpolation;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
@@ -40,6 +52,9 @@ public class AuraModule extends CombatModule
     Config<Boolean> multitaskConfig = new BooleanConfig.Builder("Multitask")
             .setDescription("Allows you to use items while attacking")
             .setDefaultValue(true).build();
+    Config<Boolean> requireWeapon = new BooleanConfig.Builder("RequireWeapon")
+            .setDescription("Must be holding a weapon to attack")
+            .setDefaultValue(false).build();
     Config<Boolean> swingConfig = new BooleanConfig.Builder("Swing")
             .setDescription("Swings the hand when attacking")
             .setDefaultValue(true).build();
@@ -61,14 +76,22 @@ public class AuraModule extends CombatModule
             .setDescription("Automatically swaps to a weapon before attacking")
             .setDefaultValue(false).build();
     Config<Boolean> silentSwap = new BooleanConfig.Builder("SilentSwap")
+            .setVisibilityDependant(true)
             .setDescription("Swaps to a weapon silently")
             .setVisible(() -> autoSwap.getValue())
             .setDefaultValue(false).build();
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
             .addAll(autoSwap, silentSwap).build();
 
+    private final SwapHandler autoSwapHandler = new SwapHandler();
     private final Timer attackDelayTimer = new NanoTimer();
+
+    @Getter
+    private boolean running;
     private Entity auraTarget;
+    private Box targetBox;
+
+    private final Animation fadeAnim = new Animation(true, 300L);
 
     public AuraModule()
     {
@@ -80,6 +103,7 @@ public class AuraModule extends CombatModule
     public void onDisable()
     {
         auraTarget = null;
+        running = false;
     }
 
     @EventListener
@@ -91,7 +115,8 @@ public class AuraModule extends CombatModule
     @EventListener(priority = TickPriorities.KILL_AURA)
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (checkNull())
+        running = false;
+        if (checkNull() || event.isCanceled() || mc.player.isSpectator())
         {
             return;
         }
@@ -101,7 +126,7 @@ public class AuraModule extends CombatModule
            return;
         }
 
-        if (event.isCanceled() || AutoCrystalModule.INSTANCE.isRunning())
+        if (AutoCrystalModule.INSTANCE.isRunning())
         {
             return;
         }
@@ -132,26 +157,71 @@ public class AuraModule extends CombatModule
         }
     }
 
-    private void runAttack(final Entity entity)
+    @EventListener
+    public void onRenderWorld(RenderWorldEvent.Post event)
     {
-        PlayerInventory playerInventory = mc.player.getInventory();
+        if (auraTarget != null)
+        {
+            targetBox = Interpolation.getEntityRenderBox(auraTarget, event.getTickDelta());
+        } else
+        {
+            fadeAnim.setState(false);
+        }
 
-        int weaponSlot = getAuraWeaponSlot();
-        if (weaponSlot == -1 || !Managers.INVENTORY.startSwap(weaponSlot))
+        if (targetBox == null)
         {
             return;
         }
 
-        ItemStack stack = playerInventory.getStack(weaponSlot);
-        double attackDelay = 1.0 / getAttackSpeed(stack) * 20.0;
+        fadeAnim.setState(running);
+        double scaledFactor = Easing.SMOOTH_STEP.ease(attackDelayTimer.getFactor());
+        double animFactor = (MathHelper.clamp(0.5f + scaledFactor, 0.0f, 1.0f)) * fadeAnim.getFactor();
 
-        if (attackDelayTimer.hasPassed(attackDelay * 50.0))
+        int color = ThemeModule.INSTANCE.getPrimaryColor().getRGB();
+        BoxRender.FILL.render(event.getMatrixStack(), targetBox, color, (float) animFactor);
+    }
+
+    private void runAttack(final Entity entity)
+    {
+        PlayerInventory playerInventory = mc.player.getInventory();
+
+        ItemSlot weaponSlot = getAuraWeaponSlot();
+        if (weaponSlot.getSlot() != -1)
         {
-            attackEntity(entity);
-            attackDelayTimer.reset();
+            if (silentSwap.getValue())
+            {
+                if (!Managers.INVENTORY.startSwap(weaponSlot.getSlot()))
+                {
+                    return;
+                }
+
+            } else if (autoSwap.getValue())
+            {
+                autoSwapHandler.handleSwaps();
+                if (autoSwapHandler.canAutoSwap())
+                {
+                    Managers.INVENTORY.setSelectedSlot(weaponSlot.getSlot());
+                }
+            }
         }
 
-        Managers.INVENTORY.endSwap();
+        if (!requireWeapon.getValue() || Managers.INVENTORY.isHolding(weaponSlot.getItem(), Hand.MAIN_HAND))
+        {
+            running = true;
+            ItemStack stack = weaponSlot.getItemStack() == null ? playerInventory.getMainHandStack() : weaponSlot.getItemStack();
+            double attackDelay = 1.0 / getAttackSpeed(stack) * 20.0;
+
+            if (attackDelayTimer.hasPassed(attackDelay * 50.0))
+            {
+                attackEntity(entity);
+                attackDelayTimer.reset();
+            }
+        }
+
+        if (silentSwap.getValue())
+        {
+            Managers.INVENTORY.endSwap();
+        }
     }
 
     public void attackEntity(final Entity entity)
@@ -192,21 +262,21 @@ public class AuraModule extends CombatModule
         return attackSpeed.getValue();
     }
 
-    private int getAuraWeaponSlot()
+    private ItemSlot getAuraWeaponSlot()
     {
-        int swordSlot = InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("sword"));
-        if (swordSlot != InventoryUtil.INVALID_SLOT)
+        ItemSlot swordSlot = InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("sword"));
+        if (swordSlot.getSlot() != InventoryUtil.INVALID_SLOT)
         {
             return swordSlot;
         }
 
-        int axeSlot = InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("axe"));
-        if (axeSlot != InventoryUtil.INVALID_SLOT)
+        ItemSlot axeSlot = InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("axe"));
+        if (axeSlot.getSlot() != InventoryUtil.INVALID_SLOT)
         {
             return axeSlot;
         }
 
-        return InventoryUtil.getItemSlot(Items.TRIDENT);
+        return new ItemSlot(mc.player.getInventory(), InventoryUtil.getItemSlot(Items.TRIDENT));
     }
 
     private Entity getAuraTarget()

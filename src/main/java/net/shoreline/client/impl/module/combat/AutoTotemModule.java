@@ -4,12 +4,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.ScreenHandler;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
@@ -61,19 +64,20 @@ public class AutoTotemModule extends InventorySwapModule
             return;
         }
 
+        ScreenHandler handler = mc.player.currentScreenHandler;
         float playerHealth = DamageUtil.getHealth(mc.player);
 
         isTotemInMainHand = mainhandTotem.getValue() && playerHealth - DamageUtil.getCrystalDamage(mc.player) <= 0.5;
-//      if (isTotemInMainHand)
-//      {
-//          ItemStack stack = playerInventory.getStack(hotbarTotemSlot.getValue());
-//          if (stack.isEmpty() || stack.getItem() != Items.TOTEM_OF_UNDYING)
-//          {
-//              swapItemWithSlot(Items.TOTEM_OF_UNDYING, hotbarTotemSlot.getValue());
-//          }
-//
-//          mc.player.getInventory().setSelectedSlot(hotbarTotemSlot.getValue());
-//      }
+        if (isTotemInMainHand)
+        {
+            ItemStack stack = mc.player.getInventory().getStack(hotbarTotemSlot.getValue());
+            if (stack.isEmpty() || stack.getItem() != Items.TOTEM_OF_UNDYING)
+            {
+                swapItemWithSlot(Items.TOTEM_OF_UNDYING, hotbarTotemSlot.getValue());
+            }
+
+            Managers.INVENTORY.setSelectedSlot(hotbarTotemSlot.getValue());
+        }
 
         double potentialDamage = 0.5;
         potentialDamage += DamageUtil.getFallDamage(mc.player, mc.player.fallDistance, 1.0f);
@@ -89,13 +93,30 @@ public class AutoTotemModule extends InventorySwapModule
             return;
         }
 
-        Item offhandItem = isTotemInOffHand ? Items.TOTEM_OF_UNDYING : modeConfig.getValue().getItem();
-        if (mc.player.getOffHandStack().getItem().equals(offhandItem))
+        Item offhandItem = mc.player.getOffHandStack().getItem();
+        Item requiredItem = isTotemInOffHand ? Items.TOTEM_OF_UNDYING : modeConfig.getValue().getItem();
+        if (offhandItem.equals(requiredItem))
         {
             return;
         }
 
-        swapItemWithSlot(offhandItem, PlayerInventory.OFF_HAND_SLOT);
+        int returnSlot = OffhandGappleModule.INSTANCE.getReturnSlot();
+        if (offhandItem == Items.ENCHANTED_GOLDEN_APPLE && returnSlot != -1)
+        {
+            Managers.INVENTORY.pickupSlot(handler, InventoryUtil.OFFHAND_SLOT);
+            Managers.INVENTORY.pickupSlot(handler, InventoryUtil.getPacketSlotIndex(handler, returnSlot));
+            if (handler.getCursorStack().getItem().equals(requiredItem))
+            {
+                Managers.INVENTORY.pickupSlot(handler, InventoryUtil.OFFHAND_SLOT);
+            } else
+            {
+                swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT);
+            }
+
+            return;
+        }
+
+        swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT);
     }
 
     @RequiredArgsConstructor

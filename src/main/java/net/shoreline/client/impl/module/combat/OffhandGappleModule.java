@@ -1,7 +1,7 @@
 package net.shoreline.client.impl.module.combat;
 
-
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,10 +11,12 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
+@Getter
 public class OffhandGappleModule extends InventorySwapModule
 {
     public static OffhandGappleModule INSTANCE;
@@ -29,13 +31,21 @@ public class OffhandGappleModule extends InventorySwapModule
             .setDescription("Allows gapples in offhand when holding a totem")
             .setDefaultValue(true).build();
 
-    @Getter
     private boolean isGappleInOffHand;
+
+    @Setter
+    private int returnSlot = InventoryUtil.INVALID_SLOT;
 
     public OffhandGappleModule()
     {
         super("OffhandGapple", "Swaps golden apples into your offhand", GuiCategory.COMBAT);
         INSTANCE = this;
+    }
+
+    @Override
+    public String getModuleData()
+    {
+        return String.valueOf(InventoryUtil.getItemCount(Items.ENCHANTED_GOLDEN_APPLE));
     }
 
     @EventListener(priority = TickPriorities.OFFHAND)
@@ -54,7 +64,7 @@ public class OffhandGappleModule extends InventorySwapModule
             return;
         }
 
-        swapItemWithSlot(Items.ENCHANTED_GOLDEN_APPLE, PlayerInventory.OFF_HAND_SLOT);
+        returnSlot = swapItemWithSlot(Items.ENCHANTED_GOLDEN_APPLE, PlayerInventory.OFF_HAND_SLOT);
     }
 
     private boolean canEatWhileHolding(Item item)

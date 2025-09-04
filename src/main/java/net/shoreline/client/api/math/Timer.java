@@ -7,4 +7,6 @@ public interface Timer
     void reset();
 
     long getElapsedTime();
+
+    float getFactor();
 }
