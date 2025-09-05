@@ -1,9 +1,11 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.shoreline.client.impl.world.EntityState;
 
+@AllArgsConstructor
 @Data
 public class CrystalData<T>
 {
@@ -15,11 +17,5 @@ public class CrystalData<T>
     @EqualsAndHashCode.Exclude
     private double damageToTarget, damageToPlayer;
 
-    public CrystalData(T crystalData, EntityState target, double damageToTarget, double damageToPlayer)
-    {
-        this.crystalData = crystalData;
-        this.target = target;
-        this.damageToTarget = damageToTarget;
-        this.damageToPlayer = damageToPlayer;
-    }
+    private boolean antiSurround;
 }

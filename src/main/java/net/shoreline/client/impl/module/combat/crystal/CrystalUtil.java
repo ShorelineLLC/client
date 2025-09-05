@@ -8,6 +8,8 @@ import net.minecraft.world.BlockView;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 
+import java.util.Set;
+
 @UtilityClass
 public class CrystalUtil
 {
@@ -16,7 +18,26 @@ public class CrystalUtil
                                   final EntityState entity,
                                   final boolean ignoreTerrain)
     {
-        return ExplosionTrace.getDamageToPos(blockView, pos, entity.getPos(),
-                entity.getBoundingBox(), 12.0f, ignoreTerrain);
+        return ExplosionTrace.getDamageToPos(blockView,
+                pos,
+                entity.getPos(),
+                entity.getBoundingBox(),
+                12.0f,
+                ignoreTerrain);
+    }
+
+    public float getCrystalDamage(final BlockView blockView,
+                                  final Vec3d pos,
+                                  final EntityState entity,
+                                  final boolean ignoreTerrain,
+                                  final Set<BlockPos> ignoredBlocks)
+    {
+        return ExplosionTrace.getDamageToPos(blockView,
+                pos,
+                entity.getPos(),
+                entity.getBoundingBox(),
+                12.0f,
+                ignoreTerrain,
+                ignoredBlocks);
     }
 }

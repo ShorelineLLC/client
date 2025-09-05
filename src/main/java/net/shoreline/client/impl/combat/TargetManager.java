@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.eventbus.EventBus;
 
 public class TargetManager extends GenericFeature
@@ -29,7 +30,7 @@ public class TargetManager extends GenericFeature
         double bestDist = Double.MAX_VALUE;
         for (PlayerEntity entity : mc.world.getPlayers())
         {
-            if (entity == mc.player || !entity.isAlive() || entity.isRemoved())
+            if (entity == mc.player || !entity.isAlive() || entity.isRemoved() || Managers.SOCIAL.isFriend(entity))
             {
                 continue;
             }

@@ -17,6 +17,7 @@ import net.shoreline.client.impl.rotation.RotationManager;
 import net.shoreline.client.impl.module.ModuleManager;
 import net.shoreline.client.impl.inventory.InventoryManager;
 import net.shoreline.client.impl.render.RenderManager;
+import net.shoreline.client.impl.social.SocialManager;
 import net.shoreline.client.impl.world.TickManager;
 
 public class Managers
@@ -39,6 +40,7 @@ public class Managers
     public static CrystalCalcManager CRYSTAL;
     public static RenderManager RENDER;
     public static ShaderManager SHADER;
+    public static SocialManager SOCIAL;
 
     public static void init()
     {
@@ -59,6 +61,7 @@ public class Managers
         TARGETING = new TargetManager();
         CRYSTAL = new CrystalCalcManager();
         RENDER = new RenderManager();
+        SOCIAL = new SocialManager();
     }
 
     public static void postInit()

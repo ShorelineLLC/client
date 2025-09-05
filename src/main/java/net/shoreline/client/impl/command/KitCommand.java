@@ -59,7 +59,7 @@ public class KitCommand extends Command
 
                 .executes(context ->
                 {
-                    sendErrorChatMessage("Invalid command usage! Usage: kit <save/delete/list> <kit_name>");
+                    sendErrorChatMessage("Invalid command usage! Usage: kit <save/delete/list> *<kit_name>");
                     return 1;
                 });
     }

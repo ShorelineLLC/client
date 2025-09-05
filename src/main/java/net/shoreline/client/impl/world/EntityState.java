@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -32,6 +33,11 @@ public class EntityState
         this.alive = entity.isAlive();
         this.totalHealth = entity instanceof LivingEntity e ? e.getHealth() + e.getAbsorptionAmount() : 0.0f;
         this.age = entity.age;
+    }
+
+    public BlockPos getBlockPos()
+    {
+        return BlockPos.ofFloored(pos);
     }
 
     public double squaredDistanceTo(Vec3d pos)

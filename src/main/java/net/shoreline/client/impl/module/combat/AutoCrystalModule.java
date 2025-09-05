@@ -1,12 +1,9 @@
 package net.shoreline.client.impl.module.combat;
 
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -36,9 +33,13 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.inventory.SwapHandler;
+import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
+import net.shoreline.client.impl.module.combat.crystal.CrystalUtil;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
+import net.shoreline.client.impl.module.world.SpeedMineModule;
+import net.shoreline.client.impl.network.NetworkUtil;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -58,6 +59,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -130,7 +132,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDescription("Attempts to place while mining")
             .setDefaultValue(false).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
-            .addAll(targetItems, forcePlace).build();
+            .addAll(targetItems, forcePlace, predictPlace).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(4.0f)
@@ -182,6 +184,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
             .addAll(autoSwap, silentSwap, antiWeakness, silentType).build();
 
+    private static final Box FULL_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 2.0, 0.5);
+    private static final Box HALF_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 1.0, 0.5);
+
     private CrystalData<EntityState> currentAttack;
     private CrystalData<BlockPos> currentPlace;
 
@@ -191,6 +196,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private final Map<Integer, Long> attackPackets = new HashMap<>();
     private final Map<BlockPos, Long> placePackets = new HashMap<>();
+
+    private boolean silentRotated;
 
     private final QueueAverage breakTime = new QueueAverage(20);
     private final PerSecond cps = new PerSecond();
@@ -212,6 +219,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         currentPlace = null;
         attackPackets.clear();
         placePackets.clear();
+        silentRotated = false;
     }
 
     @Override
@@ -258,55 +266,22 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
-        Hand hand = getCrystalHand();
+        final Hand hand = getCrystalHand();
 
-        boolean silentRotated = false;
         float[] rotations = null;
+        silentRotated = false;
 
-        Vec3d crystalVec;
         if (currentAttack != null)
         {
-            EntityState crystalState = currentAttack.getCrystalData();
-            crystalVec = crystalState.getPos().add(0.0, 0.5, 0.0);
-            rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
-            if (rotateConfig.getValue() == RotateMode.SILENT)
-            {
-                Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
-                silentRotated = true;
-            }
-
-            if (attackTimer.hasPassed(breakDelay.getValue()))
-            {
-                attackCrystal(crystalState.getId(), hand);
-                attackTimer.reset();
-            }
+            rotations = runAttack(currentAttack, hand);
         }
 
         if (currentPlace != null)
         {
-            BlockPos crystalPos = currentPlace.getCrystalData();
-            if (basePlace.getValue() && !hasCrystalBaseBlock(crystalPos))
-            {
-                if (!runSingleObbyPlacement(crystalPos))
-                {
-                    currentPlace = null;
-                    return;
-                }
-            }
-
-            crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.5, 0.0);
-            rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
-            if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
-            {
-                Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
-                silentRotated = true;
-            }
-
-            if (placeTimer.hasPassed(placeDelay.getValue()))
-            {
-                placeCrystal(crystalPos, hand);
-                placeTimer.reset();
-            }
+            rotations = runPlace(currentPlace, hand);
+        } else if (predictPlace.getValue())
+        {
+            rotations = runPrePlace(hand);
         }
 
         if (silentRotated)
@@ -356,6 +331,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             if (currentPlace != null && sequentialPlace.getValue())
             {
                 placeCrystal(currentPlace.getCrystalData(), hand);
+                placeTimer.reset();
             }
         }
     }
@@ -368,13 +344,16 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
-        for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
+        mc.executeSync(() ->
         {
-            if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getCenter()) <= 144.0)
+            for (Entity entity : mc.world.getEntities())
             {
-                mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
+                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getCenter()) <= 144.0)
+                {
+                    mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
+                }
             }
-        }
+        });
     }
 
     @EventListener
@@ -423,13 +402,120 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             BoxRender.FILL.render(event.getMatrixStack(),
                     placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), animFactor);
 
-            double damage = ExplosionUtil.getAppliedDamageToEntity(placeData.getTarget().getEntity(), (float) placeData.getDamageToTarget());
+            String dataNametag;
+            if (placeData.isAntiSurround())
+            {
+                dataNametag = "AS";
+            } else
+            {
+                double damage = ExplosionUtil.getAppliedDamageToEntity(placeData.getTarget().getEntity(), (float) placeData.getDamageToTarget());
+                dataNametag = numFormat.format(damage);
+            }
+
             Managers.RENDER.renderNametag(event.getMatrixStack(),
                     placePos.toCenterPos(),
                     0.003f,
-                    numFormat.format(damage),
+                    dataNametag,
                     ColorUtil.withTransparency(-1, animFactor));
         }
+    }
+
+    private float[] runAttack(CrystalData<EntityState> attack, Hand hand)
+    {
+        EntityState crystalState = attack.getCrystalData();
+        Vec3d crystalVec = crystalState.getPos().add(0.0, 0.5, 0.0);
+        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
+        if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
+        {
+            Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
+            silentRotated = true;
+        }
+
+        if (breakDelay.getValue() == 0 || attackTimer.hasPassed(breakDelay.getValue()))
+        {
+            attackCrystal(crystalState.getId(), hand);
+            attackTimer.reset();
+        }
+
+        return rotations;
+    }
+
+    private float[] runPlace(CrystalData<BlockPos> placement, Hand hand)
+    {
+        BlockPos crystalPos = placement.getCrystalData();
+        if (basePlace.getValue() && !canUseOnBlock(mc.world, crystalPos, hasEntityBlockingCrystal(getCrystalBox(crystalPos))))
+        {
+            if (!runSingleObbyPlacement(crystalPos))
+            {
+                currentPlace = null;
+                return null;
+            }
+        }
+
+        Vec3d crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.5, 0.0);
+        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
+        if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
+        {
+            Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
+            silentRotated = true;
+        }
+
+        if (placeDelay.getValue() == 0 || placeTimer.hasPassed(placeDelay.getValue()))
+        {
+            placeCrystal(crystalPos, hand);
+            placeTimer.reset();
+        }
+
+        return rotations;
+    }
+
+    private float[] runPrePlace(Hand hand)
+    {
+        if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
+        {
+            return null;
+        }
+
+        MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
+        if (currentMine == null || currentMine.getProgress() < 0.7f || SpeedMineModule.INSTANCE.isManualMining())
+        {
+            return null;
+        }
+
+        PlayerEntity target = Managers.TARGETING.getTarget();
+        if (target == null)
+        {
+            return null;
+        }
+
+        BlockPos minePos = currentMine.getBlockPos();
+        BlockPos placePos = minePos.down();
+        if (mc.player.squaredDistanceTo(placePos.toCenterPos()) > placeRange.getValue() * placeRange.getValue())
+        {
+            return null;
+        }
+
+        if (hasEntityBlockingCrystal(getCrystalBox(placePos)))
+        {
+            return null;
+        }
+
+        EntityState targetState = new EntityState(target);
+        double damage = CrystalUtil.getCrystalDamage(mc.world, minePos.toBottomCenterPos(), targetState, true, Set.of(minePos));
+
+        Vec3d crystalVec = minePos.toBottomCenterPos().add(0.0, 0.5, 0.0);
+        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
+        if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
+        {
+            Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
+            silentRotated = true;
+        }
+
+        currentPlace = new CrystalData<>(placePos, targetState, damage, 0.0f, false);
+        placeCrystal(placePos, hand);
+        placeTimer.reset();
+
+        return rotations;
     }
 
     private void attackCrystal(int crystalId, Hand hand)
@@ -459,14 +545,14 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private void placeCrystal(BlockPos blockPos, Hand hand)
     {
-        Box box = new Box(blockPos);
+        Box baseBox = new Box(blockPos);
         Vec3d eyePos = mc.player.getEyePos();
-        Vec3d cut = new Vec3d(MathHelper.clamp(eyePos.getX(), box.minX, box.maxX),
-                MathHelper.clamp(eyePos.getY(), box.minY, box.maxY),
-                MathHelper.clamp(eyePos.getZ(), box.minZ, box.maxZ));
+        Vec3d cut = new Vec3d(MathHelper.clamp(eyePos.getX(), baseBox.minX, baseBox.maxX),
+                MathHelper.clamp(eyePos.getY(), baseBox.minY, baseBox.maxY),
+                MathHelper.clamp(eyePos.getZ(), baseBox.minZ, baseBox.maxZ));
 
-        Direction placeDir = getPlaceDirection(blockPos, box, eyePos, cut);
-        BlockHitResult result = new BlockHitResult(cut, placeDir, blockPos, box.contains(eyePos));
+        Direction placeDir = getPlaceDirection(blockPos, baseBox, eyePos, cut);
+        BlockHitResult result = new BlockHitResult(cut, placeDir, blockPos, baseBox.contains(eyePos));
         int slot = InventoryUtil.getItemSlot(Items.END_CRYSTAL, silentType.getValue());
         if (slot == -1)
         {
@@ -529,7 +615,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private List<CrystalData<BlockPos>> getPlacements(List<CrystalData<BlockPos>> crystalData)
     {
-        return crystalData.stream().filter(d -> hasCrystalBaseBlock(d.getCrystalData())).toList();
+        return crystalData.stream().filter(d ->
+        {
+            BlockPos blockPos = d.getCrystalData();
+            return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos)));
+
+        }).toList();
     }
 
     private <T> CrystalData<T> getBestData(List<CrystalData<T>> crystals)
@@ -567,33 +658,79 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (bestDamage < minDamage.getValue())
         {
+            if (targetItems.getValue())
+            {
+                for (CrystalData<T> data : crystals)
+                {
+                    LivingEntity entity = (LivingEntity) data.getTarget().getEntity();
+                    if (entity.isDead() || !data.isAntiSurround())
+                    {
+                        continue;
+                    }
+
+                    return data;
+                }
+            }
+
             return null;
         }
 
         return bestCrystal;
     }
 
-    private boolean hasCrystalBaseBlock(BlockPos pos)
+    public boolean canUseOnBlock(BlockView blockView, BlockPos pos, boolean hasEntityBlockingCrystal)
     {
-        BlockState state = mc.world.getBlockState(pos);
+        BlockState state = blockView.getBlockState(pos);
         if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
         {
             return false;
         }
 
-        return hasSpaceToPlaceCrystal(mc.world, pos);
-    }
-
-    public boolean hasSpaceToPlaceCrystal(BlockView blockView, BlockPos blockPos)
-    {
-        BlockPos p2 = blockPos.up();
+        BlockPos p2 = pos.up();
         BlockState state2 = blockView.getBlockState(p2);
         if (protocolPlace.getValue() && !blockView.getBlockState(p2.up()).isAir())
         {
             return false;
         }
 
-        return state2.isAir() || state2.isOf(Blocks.FIRE);
+        if (!state2.isAir() && !state2.isOf(Blocks.FIRE))
+        {
+            return false;
+        }
+
+        return !hasEntityBlockingCrystal;
+    }
+
+    private boolean hasEntityBlockingCrystal(Box box)
+    {
+        for (Entity entity : mc.world.getOtherEntities(null, box))
+        {
+            if (!canIgnoreEntity(entity, entity.age))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean canIgnoreEntity(Entity entity, int age)
+    {
+        if (entity instanceof ExperienceOrbEntity || forcePlace.getValue() && entity instanceof ItemEntity && age <= 10)
+        {
+            return true;
+        } else if (entity instanceof EndCrystalEntity crystal)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public Box getCrystalBox(BlockPos blockPos)
+    {
+        Box crystalBB = NetworkUtil.getServerIp().contains("crystalpvp.cc") ? HALF_CRYSTAL_BB : FULL_CRYSTAL_BB;
+        return crystalBB.offset(blockPos.up().toBottomCenterPos());
     }
 
     private Hand getCrystalHand()
@@ -616,6 +753,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     public boolean canTargetEntity(Entity entity)
     {
+        if (Managers.SOCIAL.isFriend(entity))
+        {
+            return false;
+        }
+
         return entity instanceof PlayerEntity player
                 && targetPlayers.getValue()
                 && (targetNakeds.getValue() || player.getArmor() > 0)

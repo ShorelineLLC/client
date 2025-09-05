@@ -303,6 +303,11 @@ public class AuraModule extends CombatModule
 
     private boolean canTargetToAttack(Entity entity)
     {
+        if (Managers.SOCIAL.isFriend(entity))
+        {
+            return false;
+        }
+
         return entity instanceof PlayerEntity && targetPlayers.getValue()
                 || EntityUtil.isHostile(entity) && targetHostiles.getValue()
                 || EntityUtil.isPassive(entity) && targetPassives.getValue();

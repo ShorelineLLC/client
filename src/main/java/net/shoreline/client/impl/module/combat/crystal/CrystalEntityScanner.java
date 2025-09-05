@@ -34,22 +34,22 @@ public abstract class CrystalEntityScanner extends AsyncWorldScanner
         return crystalEntities;
     }
 
-    private void visitEndCrystal(EntityState entityState)
+    private void visitEndCrystal(EntityState crystal)
     {
-        if (entityState.getAge() < autoCrystal.getTicksExisted().getValue())
+        if (crystal.getAge() < autoCrystal.getTicksExisted().getValue())
         {
             return;
         }
 
         float breakRange = autoCrystal.getBreakRange().getValue();
-        double breakDist = getLocalEntity().getEyePos().squaredDistanceTo(entityState.getPos());
+        double breakDist = getLocalEntity().getEyePos().squaredDistanceTo(crystal.getPos());
         if (breakDist > breakRange * breakRange)
         {
             return;
         }
 
         float local = !PlayerUtil.isInSurvival(MinecraftClient.getInstance().player) ? 0.0f :
-                CrystalUtil.getCrystalDamage(this, entityState.getPos(), getLocalEntity(), autoCrystal.getIgnoreTerrain().getValue());
+                CrystalUtil.getCrystalDamage(this, crystal.getPos(), getLocalEntity(), autoCrystal.getIgnoreTerrain().getValue());
 
         boolean willKillPlayer = getLocalEntity().getTotalHealth() - local < 0.5f;
         if (local > autoCrystal.getMaxSelfDamage().getValue() || willKillPlayer)
@@ -64,7 +64,7 @@ public abstract class CrystalEntityScanner extends AsyncWorldScanner
                 continue;
             }
 
-            double entityDist = entityState.squaredDistanceTo(entity.getPos());
+            double entityDist = crystal.squaredDistanceTo(entity.getPos());
             if (entityDist > 144.0f)
             {
                 continue;
@@ -77,9 +77,10 @@ public abstract class CrystalEntityScanner extends AsyncWorldScanner
                 continue;
             }
 
-            float damage = CrystalUtil.getCrystalDamage(this, entityState.getPos(), entity, autoCrystal.getIgnoreTerrain().getValue());
+            float damage = CrystalUtil.getCrystalDamage(this, crystal.getPos(), entity, autoCrystal.getIgnoreTerrain().getValue());
+            boolean antiSurround = AntiSurround.checkAntiSurroundQualifiers(crystal.getBlockPos().down());
 
-            crystalEntities.add(new CrystalData<>(entityState, entity, damage, local));
+            crystalEntities.add(new CrystalData<>(crystal, entity, damage, local, antiSurround));
         }
     }
 

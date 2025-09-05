@@ -28,6 +28,7 @@ import net.shoreline.client.impl.event.render.entity.RenderEntityLabelEvent;
 import net.shoreline.client.impl.imixin.IItemRenderState;
 import net.shoreline.client.impl.imixin.IItemRenderer;
 import net.shoreline.client.impl.imixin.ILayerRenderState;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -153,7 +154,7 @@ public class NametagsModule extends RenderModule
                 continue;
             }
 
-            if (entity == mc.player)
+            if (entity == mc.player && !FreecamModule.INSTANCE.isEnabled())
             {
                 continue;
             }
@@ -354,6 +355,11 @@ public class NametagsModule extends RenderModule
         if (player == mc.player)
         {
             return ThemeModule.INSTANCE.getPrimaryColor().getRGB();
+        }
+
+        if (Managers.SOCIAL.isFriend(player))
+        {
+            return SocialsModule.INSTANCE.getFriendsColor().getRGB();
         }
 
         if (player.isInvisible())

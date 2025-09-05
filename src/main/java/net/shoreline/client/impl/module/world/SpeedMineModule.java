@@ -13,6 +13,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.ItemSlot;
@@ -95,6 +96,15 @@ public class SpeedMineModule extends ListeningToggleable
     public void onWorldDisconnect(WorldEvent.Disconnect event)
     {
         disable();
+    }
+
+    @EventListener
+    public void onEntityDeath(EntityDeathEvent event)
+    {
+        if (event.getEntity() == mc.player)
+        {
+            disable();
+        }
     }
 
     @EventListener(priority = TickPriorities.SPEED_MINE)

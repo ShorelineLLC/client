@@ -88,6 +88,7 @@ public class AutoMineModule extends TrapModule
     {
         if (checkNull() || !speedMine.isEnabled() || !PlayerUtil.isInSurvival(mc.player))
         {
+            Managers.TARGETING.clearTarget();
             return;
         }
 
@@ -140,6 +141,12 @@ public class AutoMineModule extends TrapModule
                 continue;
             }
 
+            BlockState state2 = mc.world.getBlockState(blockPos.down());
+            if (!state2.isOf(Blocks.OBSIDIAN) && !state2.isOf(Blocks.BEDROCK))
+            {
+                continue;
+            }
+
             double dist = mc.player.squaredDistanceTo(blockPos.toCenterPos());
             if (dist > speedMine.getRangeConfig().getValue() * speedMine.getRangeConfig().getValue())
             {
@@ -172,8 +179,7 @@ public class AutoMineModule extends TrapModule
                 }
             } else if (feetConfig.getValue())
             {
-                if (layer == TrapLayer.FEET_INTERSECT && !MiningUtil.isEmpty(state)
-                        && !speedMine.isMining(blockPos))
+                if (layer == TrapLayer.FEET_INTERSECT && !MiningUtil.isEmpty(state) && !speedMine.isMining(blockPos))
                 {
                     return blockPos;
                 }

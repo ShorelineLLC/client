@@ -105,6 +105,11 @@ public class MiningData
         return MathHelper.clamp((blockDamage + (blockDamage - lastDamage) * tickDelta) / (float) Math.max(0.001, maxProgress), 0.0f, 1.0f);
     }
 
+    public float getProgress()
+    {
+        return MathHelper.clamp(blockDamage / (float) Math.max(0.001, maxProgress), 0.0f, 1.0f);
+    }
+
     public double getSquaredDistanceTo()
     {
         return player.squaredDistanceTo(blockPos.toCenterPos());

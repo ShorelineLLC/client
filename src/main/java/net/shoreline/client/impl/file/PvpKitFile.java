@@ -21,7 +21,6 @@ import java.util.List;
 
 public class PvpKitFile extends JsonConfigFile
 {
-
     public PvpKitFile(Path directory) throws IOException
     {
         super(directory, "pvp_kits");
