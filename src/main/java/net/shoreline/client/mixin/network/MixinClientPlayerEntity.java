@@ -34,16 +34,21 @@ public abstract class MixinClientPlayerEntity
     private boolean ticking;
 
     @Inject(method = "tick", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V"),
-            cancellable = true)
+            target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
+            shift = At.Shift.BEFORE))
     private void hookTickPre(CallbackInfo ci)
     {
         final PlayerUpdateEvent.Pre event = new PlayerUpdateEvent.Pre();
         EventBus.INSTANCE.dispatch(event);
-        if (event.isCanceled())
-        {
-            ci.cancel();
-        }
+    }
+
+    @Inject(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/network/AbstractClientPlayerEntity;tick()V",
+            shift = At.Shift.AFTER))
+    private void hookTickPeri(CallbackInfo ci)
+    {
+        final PlayerUpdateEvent.Peri event = new PlayerUpdateEvent.Peri();
+        EventBus.INSTANCE.dispatch(event);
     }
 
     @Inject(method = "sendMovementPackets", at = @At(value = "HEAD"))

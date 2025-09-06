@@ -54,8 +54,10 @@ public class ModuleManager
                 new AntiHungerModule(),
                 new ChorusControlModule(),
                 new FakeLagModule(),
+                new MountControlModule(),
                 new NoFallModule(),
                 new PhaseModule(),
+                new ProjectileBoostModule(),
                 new ReachModule(),
                 // Misc
                 new AntiAimModule(),
@@ -79,6 +81,7 @@ public class ModuleManager
                 new NoAccelModule(),
                 new NoJumpDelayModule(),
                 new NoSlowModule(),
+                new ParkourModule(),
                 new SpeedModule(),
                 new SprintModule(),
                 new StepModule(),

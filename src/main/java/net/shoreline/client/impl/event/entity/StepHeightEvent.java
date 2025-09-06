@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.event.render.entity;
+package net.shoreline.client.impl.event.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import net.shoreline.eventbus.annotation.Cancelable;
 @Cancelable
 @Getter
 @Setter
-public class PlayerTransformsEvent extends Event
+public class StepHeightEvent extends Event
 {
-    private float yaw, pitch;
+    private float stepHeight;
 }

@@ -27,7 +27,6 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.EntitySpawnEvent;
-import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
@@ -334,26 +333,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 placeTimer.reset();
             }
         }
-    }
-
-    @EventListener
-    public void onExplosion(ExplosionEvent event)
-    {
-        if (checkNull())
-        {
-            return;
-        }
-
-        mc.executeSync(() ->
-        {
-            for (Entity entity : mc.world.getEntities())
-            {
-                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(event.getCenter()) <= 144.0)
-                {
-                    mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
-                }
-            }
-        });
     }
 
     @EventListener

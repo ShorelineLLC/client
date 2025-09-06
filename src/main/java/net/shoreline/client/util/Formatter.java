@@ -8,6 +8,17 @@ public class Formatter
     public String formatEnum(final Enum<?> in)
     {
         String name = in.name();
+        if (name.equalsIgnoreCase("KMH"))
+        {
+            return "KMH";
+        } else if (name.equalsIgnoreCase("BPS"))
+        {
+            return "BPS";
+        } else if (name.equalsIgnoreCase("NCP"))
+        {
+            return "NCP";
+        }
+
         // no capitalization
         if (!name.contains("_"))
         {

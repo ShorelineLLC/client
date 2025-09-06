@@ -64,11 +64,6 @@ public class AutoXPModule extends Toggleable
             return;
         }
 
-        if (!Managers.INVENTORY.startSwap(itemSlot))
-        {
-            return;
-        }
-
         Rotation playerRotation = new Rotation(mc.player);
         Rotation xpThrow = new Rotation(mc.player.getYaw(), 90.0f);
 
@@ -83,16 +78,19 @@ public class AutoXPModule extends Toggleable
             }
         }
 
-        xpThrow.applyToPlayer();
-        Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
-        playerRotation.applyToPlayer();
+        if (Managers.INVENTORY.startSwap(itemSlot))
+        {
+            xpThrow.applyToPlayer();
+            Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
+            playerRotation.applyToPlayer();
+
+            Managers.INVENTORY.endSwap();
+        }
 
         if (rotateConfig.getValue() == RotateMode.SILENT)
         {
             Managers.ROTATION.resetSilentRotation();
         }
-
-        Managers.INVENTORY.endSwap();
     }
 
     private boolean isPlayerFullDurability()

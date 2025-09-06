@@ -89,7 +89,7 @@ public class MiningData
         Box boundingBox = outlineShape != null && !outlineShape.isEmpty() ? outlineShape.getBoundingBox() : VoxelShapes.fullCube().getBoundingBox();
         double scale = Easing.SMOOTH_STEP.ease(getLinearScale(miningSpeed, tickDelta));
 
-        int color = ColorUtil.interpolateColor(Math.min(blockDamage, 1.0f), endColor, startColor);
+        int color = ColorUtil.interpolateColor(Math.min(blockDamage / miningSpeed, 1.0f), endColor, startColor);
         Vec3d center = boundingBox.offset(blockPos).getCenter();
 
         double dx = (boundingBox.maxX - boundingBox.minX) * scale;

@@ -11,7 +11,6 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.PlayerInput;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -161,11 +160,10 @@ public class InteractManager extends GenericFeature
         Box box = new Box(interaction.getPos());
         BlockPos blockPos = airPlacing ? interaction.getPos() : interaction.getPos().offset(direction.getOpposite());
 
-        PlayerInput playerInput = mc.player.input.playerInput;
-        boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(blockPos) && !playerInput.sneak();
+        boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(blockPos) && !mc.player.isSneaking();
         if (shouldSneak)
         {
-            Managers.MOVEMENT.setSilentSneaking(playerInput, true);
+            Managers.MOVEMENT.setSilentSneaking(true);
         }
 
         ActionResult actionResult;
@@ -194,7 +192,7 @@ public class InteractManager extends GenericFeature
 
         if (shouldSneak)
         {
-            Managers.MOVEMENT.setSilentSneaking(playerInput, false);
+            Managers.MOVEMENT.setSilentSneaking(false);
         }
 
         if (airPlacing && airPlace.isGrim())

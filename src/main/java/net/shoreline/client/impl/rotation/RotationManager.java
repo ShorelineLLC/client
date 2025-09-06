@@ -10,6 +10,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
+import net.shoreline.client.impl.event.entity.player.TravelEvent;
 import net.shoreline.client.impl.event.input.PlayerInputEvent;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
@@ -196,15 +197,21 @@ public class RotationManager extends GenericFeature
     }
 
     @EventListener
-    public void onTickPost(TickEvent.Post event)
+    public void onTravelPre(TravelEvent.Pre event)
     {
-        if (checkNull() || !rotationsConfig.getRenderRotationsConfig().getValue())
+        if (rotationsConfig.getFixTravel().getValue())
         {
-            return;
+            handler.applyRotations(mc.player);
         }
+    }
 
-        mc.player.setBodyYaw(serverRotation.getYaw());
-        mc.player.setHeadYaw(serverRotation.getYaw());
+    @EventListener
+    public void onTravelPost(TravelEvent.Post event)
+    {
+        if (rotationsConfig.getFixTravel().getValue())
+        {
+            handler.revertRotations(mc.player);
+        }
     }
 
     @EventListener
@@ -213,6 +220,7 @@ public class RotationManager extends GenericFeature
         if (rotationsConfig.getRenderRotationsConfig().getValue())
         {
             event.cancel();
+            event.setYaw(serverRotation.getYaw());
             event.setPitch(serverRotation.getPitch());
         }
     }

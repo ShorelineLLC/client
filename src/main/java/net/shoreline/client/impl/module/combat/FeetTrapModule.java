@@ -33,6 +33,9 @@ public class FeetTrapModule extends TrapModule
     Config<Boolean> extendFeet = new BooleanConfig.Builder("Extend")
             .setDescription("Extends feet trap when being mined")
             .setDefaultValue(false).build();
+    Config<Boolean> headConfig = new BooleanConfig.Builder("CoverHead")
+            .setDescription("Traps player head")
+            .setDefaultValue(false).build();
 
     Config<Boolean> instantReplace = new BooleanConfig.Builder("Instant")
             .setDescription("Replaces instantly after mined")

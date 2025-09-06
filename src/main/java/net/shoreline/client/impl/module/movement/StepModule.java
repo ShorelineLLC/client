@@ -1,25 +1,124 @@
 package net.shoreline.client.impl.module.movement;
 
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.entity.StepHeightEvent;
+import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.module.world.TimerModule;
+import net.shoreline.client.util.Formatter;
+import net.shoreline.eventbus.annotation.EventListener;
 
 public class StepModule extends Toggleable
 {
+    Config<Float> heightConfig = new NumberConfig.Builder<Float>("Height")
+            .setMin(1.0f).setMax(2.5f).setDefaultValue(2.0f)
+            .setDescription("The maximum step height").build();
+    Config<StepMode> stepMode = new EnumConfig.Builder<StepMode>("Mode")
+            .setValues(StepMode.values())
+            .setDescription("The spoofing mode when attempting to step")
+            .setDefaultValue(StepMode.VANILLA).build();
+    Config<Boolean> timerConfig = new BooleanConfig.Builder("UseTimer")
+            .setDescription("Uses timer to prevent packet spam")
+            .setVisible(() -> stepMode.getValue() == StepMode.NCP)
+            .setDefaultValue(false).build();
     Config<Boolean> strictConfig = new BooleanConfig.Builder("Strict")
             .setDescription("Works on updated NCP servers")
+            .setVisible(() -> stepMode.getValue() == StepMode.NCP)
             .setDefaultValue(false).build();
+
+    private final Timer stepTimer = new NanoTimer();
+    private float stepHeight;
+    private boolean cancelTimer;
 
     public StepModule()
     {
         super("Step", "Step up blocks", GuiCategory.MOVEMENT);
     }
 
+    @Override
+    public String getModuleData()
+    {
+        return Formatter.formatEnum(stepMode.getValue());
+    }
+
+    @Override
+    public void onDisable()
+    {
+        TimerModule.INSTANCE.setTimerTicks(1.0f);
+        cancelTimer = false;
+        stepHeight = 0.6f;
+    }
+
+    @EventListener
+    public void onStepHeight(StepHeightEvent event)
+    {
+        if (mc.player.isOnGround() && stepTimer.hasPassed(200))
+        {
+            event.cancel();
+            event.setStepHeight(heightConfig.getValue());
+        }
+    }
+
+    @EventListener
+    public void onPlayerUpdatePre(PlayerUpdateEvent.Pre event)
+    {
+        if (cancelTimer)
+        {
+            TimerModule.INSTANCE.setTimerTicks(1.0f);
+            cancelTimer = false;
+        }
+    }
+
+    @EventListener
+    public void onPlayerUpdatePeri(PlayerUpdateEvent.Peri event)
+    {
+        if (stepMode.getValue() == StepMode.NCP)
+        {
+            double stepHeight = mc.player.getY() - mc.player.prevY;
+            if (stepHeight <= 0.5 || stepHeight > heightConfig.getValue())
+            {
+                return;
+            }
+
+            double[] offs = getStepOffsets(stepHeight);
+            if (offs == null)
+            {
+                return;
+            }
+
+            if (timerConfig.getValue())
+            {
+
+                TimerModule.INSTANCE.setTimerTicks(stepHeight > 1.0 ? 0.15f : 0.35f);
+                cancelTimer = true;
+            }
+
+            for (double off : offs)
+            {
+                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                        mc.player.prevX,
+                        mc.player.prevY + off,
+                        mc.player.prevZ,
+                        false,
+                        mc.player.horizontalCollision));
+            }
+
+            stepTimer.reset();
+        }
+    }
+
     // Credit: doogie
     private double[] getStepOffsets(double stepHeight)
     {
-        double[] offsets = new double[0];
+        double[] offsets = null;
         if (strictConfig.getValue())
         {
             if (stepHeight > 1.1661)
@@ -51,5 +150,10 @@ public class StepModule extends Toggleable
         }
 
         return offsets;
+    }
+
+    private enum StepMode
+    {
+        NCP, VANILLA
     }
 }

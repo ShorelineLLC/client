@@ -50,8 +50,13 @@ public class AnticheatModule extends Concurrent
             .setValues(MoveFix.values())
             .setDescription("Applies movement corrections when rotating")
             .setDefaultValue(MoveFix.OFF).build();
+    Config<Boolean> fixTravel = new BooleanConfig.Builder("FixInAir")
+            .setDescription("Fixes the movement while in the air")
+            .setVisible(() -> moveFixConfig.getValue() != MoveFix.OFF)
+            .setDefaultValue(false).build();
     Config<Boolean> normalizeMovement = new BooleanConfig.Builder("Normalize")
             .setDescription("Normalizes the movement vector")
+            .setVisible(() -> moveFixConfig.getValue() != MoveFix.OFF)
             .setDefaultValue(false).build();
     Config<Boolean> gcdFixConfig = new BooleanConfig.Builder("MouseSensFix")
             .setDescription("Corrects rotations based on mouse sensitivity")
@@ -63,7 +68,7 @@ public class AnticheatModule extends Concurrent
             .setDescription("Sends rotation packets when player look changes")
             .setDefaultValue(false).build();
     Config<Void> rotateConfig = new ConfigGroup.Builder("Rotations")
-            .addAll(renderRotationsConfig, moveFixConfig, normalizeMovement, gcdFixConfig, tickSyncConfig, lookSyncConfig)
+            .addAll(renderRotationsConfig, moveFixConfig, fixTravel, normalizeMovement, gcdFixConfig, tickSyncConfig, lookSyncConfig)
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
     
     Config<SilentSwapType> silentSwap = new EnumConfig.Builder<SilentSwapType>("SilentSwap")

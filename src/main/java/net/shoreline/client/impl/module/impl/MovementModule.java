@@ -54,8 +54,12 @@ public class MovementModule extends Toggleable
     {
         float forward = mc.player.input.getMovementInput().y;
         float strafe = mc.player.input.getMovementInput().x;
-        float currYaw = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getServerRotation().getYaw() : mc.player.prevYaw + (mc.player.getYaw() - mc.player.prevYaw);
-        float yaw = currYaw * mc.getRenderTickCounter().getTickDelta(true);
+
+        float tickDelta = mc.getRenderTickCounter().getTickDelta(true);
+        float yaw = Managers.ROTATION.hasClientRotation() ?
+                Managers.ROTATION.getClientRotation().getYaw() :
+                mc.player.prevYaw + (mc.player.getYaw() - mc.player.prevYaw) * tickDelta;
+
         if (forward == 0.0f && strafe == 0.0f)
         {
             return Vec2f.ZERO;

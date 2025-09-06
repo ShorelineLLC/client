@@ -154,6 +154,11 @@ public class VelocityModule extends Toggleable
         if (shouldCancelExplosions())
         {
             event.cancel();
+            if (mc.isInSingleplayer())
+            {
+                event.setPlayerVelocity(Vec3d.ZERO);
+            }
+
         } else if (modeConfig.getValue() == VelocityMode.NORMAL)
         {
             Vec3d knockback = event.getPlayerVelocity();

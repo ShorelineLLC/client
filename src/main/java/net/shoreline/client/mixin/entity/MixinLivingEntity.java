@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.shoreline.client.impl.event.entity.HandSwingDurationEvent;
 import net.shoreline.client.impl.event.entity.JumpDelayEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
+import net.shoreline.client.impl.event.entity.StepHeightEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -70,6 +71,21 @@ public class MixinLivingEntity
             if (jumpDelayEvent.isCanceled())
             {
                 jumpingCooldown = 0;
+            }
+        }
+    }
+
+    @Inject(method = "getStepHeight", at = @At(value = "HEAD"), cancellable = true)
+    private void hookGetStepHeight(CallbackInfoReturnable<Float> cir)
+    {
+        if ((Object) this == MinecraftClient.getInstance().player)
+        {
+            StepHeightEvent stepHeightEvent = new StepHeightEvent();
+            EventBus.INSTANCE.dispatch(stepHeightEvent);
+            if (stepHeightEvent.isCancelable())
+            {
+                cir.cancel();
+                cir.setReturnValue(stepHeightEvent.getStepHeight());
             }
         }
     }

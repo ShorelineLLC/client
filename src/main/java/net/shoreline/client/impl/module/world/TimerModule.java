@@ -60,7 +60,7 @@ public class TimerModule extends ListeningToggleable
     @EventListener
     public void onTickPre(TickEvent.Pre event)
     {
-        if (isEnabled())
+        if (!checkNull())
         {
             timerTicks = ticksConfig.getValue();
         }

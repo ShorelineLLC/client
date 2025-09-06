@@ -9,4 +9,6 @@ public class AutoTrapModule extends TrapModule
     {
         super("AutoTrap", "Traps enemies with obsidian", GuiCategory.COMBAT);
     }
+
+
 }

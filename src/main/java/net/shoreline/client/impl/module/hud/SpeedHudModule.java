@@ -14,7 +14,7 @@ public class SpeedHudModule extends DynamicHudModule
     Config<Format> formatMode = new EnumConfig.Builder<Format>("Format")
             .setValues(Format.values())
             .setDescription("The speed value format")
-            .setDefaultValue(Format.K_M_H).build();
+            .setDefaultValue(Format.KMH).build();
 
     private final DecimalFormat decimalFormatter = new DecimalFormat("0.0#");
 
@@ -35,8 +35,8 @@ public class SpeedHudModule extends DynamicHudModule
         double x = mc.player.getX() - mc.player.prevX;
         // double y = mc.player.getY() - mc.player.prevY;
         double z = mc.player.getZ() - mc.player.prevZ;
-        float timer = TimerModule.INSTANCE.isEnabled() ? TimerModule.INSTANCE.getTimerTicks() : 1.0f;
-        if (formatMode.getValue() == Format.K_M_H)
+        float timer = TimerModule.INSTANCE.getTimerTicks();
+        if (formatMode.getValue() == Format.KMH)
         {
             double dist = Math.sqrt(x * x + z * z) / 1000.0;
             double div = 0.05 / 3600.0;
@@ -49,13 +49,13 @@ public class SpeedHudModule extends DynamicHudModule
             speed = Math.abs(dist) * timer;
         }
 
-        String format = formatMode.getValue() == Format.K_M_H ? "km/h" : "b/s";
+        String format = formatMode.getValue() == Format.KMH ? "km/h" : "b/s";
         return String.format("Speed " + Formatting.WHITE + "%s%s", decimalFormatter.format(speed), format);
     }
 
     public enum Format
     {
-        K_M_H,
-        B_P_S
+        KMH,
+        BPS
     }
 }
