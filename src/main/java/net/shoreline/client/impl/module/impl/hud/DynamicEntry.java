@@ -8,7 +8,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
-import net.shoreline.client.impl.render.Smoother;
 import net.shoreline.client.impl.render.UnboundAnimation;
 
 import java.util.function.Supplier;
@@ -20,15 +19,18 @@ public class DynamicEntry
     private final DynamicHudModule module;
     private final Supplier<String> text;
     private final Supplier<Boolean> drawing;
-    private final Smoother smootherX;
+    private final UnboundAnimation animation;
     private final Animation yAnimation; // y animation should never go out of bounds.
+
+    private float lastWidth;
+    private boolean modify;
 
     public DynamicEntry(DynamicHudModule mod, Supplier<String> text, Supplier<Boolean> drawing)
     {
         this.module = mod;
         this.text = text;
         this.drawing = drawing;
-        this.smootherX = new Smoother();
+        this.animation = new UnboundAnimation(300, Easing.EXPO_OUT);
         this.yAnimation = new Animation(false, 150);
     }
 
@@ -41,23 +43,43 @@ public class DynamicEntry
         getModule().setOffset((int) (currentOffset + (10 * yAnimation.getFactor())));
 
         String current = text.get();
-        int width = getModule().getTextWidth(current);
-        float renderX = (x - (left ? width : 0)) + paddingX;
+        float width = getModule().getTextWidth(current);
+        float renderX = (int) (x - (left ? width : 0)) + paddingX;
         float renderY = (int) (y + currentOffset) + paddingY;
 
         if (drawing.get())
         {
             width = left ? width : -width;
-            renderX += (float) smootherX.smooth(width, 0.075f, tickDelta);
+            if (width > lastWidth)
+            {
+                animation.setEasing(Easing.SMOOTH_STEP);
+            }
+            else
+            {
+                animation.setEasing(Easing.EXPO_OUT);
+            }
+
+            renderX += animation.get(width);
+            lastWidth = width;
             yAnimation.setState(true);
+            modify = true;
         }
         else
         {
             if (!isDone())
             {
-                width = left ? -width + width - 2 : 2;
-                renderX += (float) smootherX.smooth(width, 0.03f, tickDelta);
-                yAnimation.setState(false);
+                if (modify)
+                {
+                    animation.setPrev(animation.get());
+                    modify = false;
+                }
+
+                animation.setEasing(Easing.EXPO_IN);
+                renderX += animation.get(left ? -width + width - 2.0f : 2.0f);
+                if (animation.getFactor() > 0.1)
+                {
+                    yAnimation.setState(false);
+                }
             }
         }
 
