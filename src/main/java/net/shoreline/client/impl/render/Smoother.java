@@ -1,5 +1,8 @@
 package net.shoreline.client.impl.render;
 
+import lombok.Getter;
+
+@Getter
 public class Smoother
 {
     private double smoothedValue;

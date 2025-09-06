@@ -33,7 +33,7 @@ public abstract class DynamicHudModule extends HudModule
     @Override
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
-        drawEntries(context);
+        drawEntries(context, tickDelta);
         cacheWidth();
     }
 
@@ -49,7 +49,7 @@ public abstract class DynamicHudModule extends HudModule
         return offset;
     }
 
-    public void drawEntries(DrawContext context)
+    public void drawEntries(DrawContext context, float tickDelta)
     {
         offset = 0;
         sortEntries();
@@ -57,7 +57,7 @@ public abstract class DynamicHudModule extends HudModule
         {
             if (entry.isDrawing() || !entry.isDone())
             {
-                entry.draw(context, getX() + (isLeft() ? 0 : getWidth()), getY(), offset);
+                entry.draw(context, getX() + (isLeft() ? 0 : getWidth()), getY(), offset, tickDelta);
             }
         }
     }

@@ -8,6 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.Smoother;
 import net.shoreline.client.impl.render.UnboundAnimation;
 
 import java.util.function.Supplier;
@@ -19,23 +20,19 @@ public class DynamicEntry
     private final DynamicHudModule module;
     private final Supplier<String> text;
     private final Supplier<Boolean> drawing;
-    private final UnboundAnimation animation;
+    private final Smoother smootherX;
     private final Animation yAnimation; // y animation should never go out of bounds.
-
-    private String lastValid;
-    private int lastWidth;
-    private boolean modify;
 
     public DynamicEntry(DynamicHudModule mod, Supplier<String> text, Supplier<Boolean> drawing)
     {
         this.module = mod;
         this.text = text;
         this.drawing = drawing;
-        this.animation = new UnboundAnimation(300, Easing.EXPO_OUT);
+        this.smootherX = new Smoother();
         this.yAnimation = new Animation(false, 150);
     }
 
-    public void draw(DrawContext context, float x, float y, float currentOffset)
+    public void draw(DrawContext context, float x, float y, float currentOffset, float tickDelta)
     {
         boolean left = getModule().isLeft();
         boolean top = getModule().isTop();
@@ -45,46 +42,26 @@ public class DynamicEntry
 
         String current = text.get();
         int width = getModule().getTextWidth(current);
-        float renderX = (int) (x + animation.get() - (left ? width : 0)) + paddingX;
+        float renderX = (x - (left ? width : 0)) + paddingX;
         float renderY = (int) (y + currentOffset) + paddingY;
-        drawText(context, current, renderX, renderY);
 
         if (drawing.get())
         {
             width = left ? width : -width;
-            if (width > lastWidth)
-            {
-                animation.setEasing(Easing.SMOOTH_STEP);
-            }
-            else
-            {
-                animation.setEasing(Easing.EXPO_OUT);
-            }
-
-            lastWidth = width;
-            animation.get(width);
+            renderX += (float) smootherX.smooth(width, 0.075f, tickDelta);
             yAnimation.setState(true);
-            modify = true;
-            lastValid = current;
         }
         else
         {
             if (!isDone())
             {
-                if (modify)
-                {
-                    animation.setPrev(animation.get());
-                    modify = false;
-                }
-
-                animation.setEasing(Easing.EXPO_IN);
-                animation.get(left ? -width + width - 2.0f : 2.0f);
-                if (animation.getFactor() > 0.1)
-                {
-                    yAnimation.setState(false);
-                }
+                width = left ? -width + width - 2 : 2;
+                renderX += (float) smootherX.smooth(width, 0.03f, tickDelta);
+                yAnimation.setState(false);
             }
         }
+
+        drawText(context, current, renderX, renderY);
     }
 
     /**
