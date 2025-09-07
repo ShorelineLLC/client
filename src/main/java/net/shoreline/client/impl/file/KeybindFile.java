@@ -50,6 +50,7 @@ public class KeybindFile extends JsonConfigFile
             return;
         }
 
+
         for (JsonElement element : object.getAsJsonArray())
         {
             JsonObject jsonObject = element.getAsJsonObject();

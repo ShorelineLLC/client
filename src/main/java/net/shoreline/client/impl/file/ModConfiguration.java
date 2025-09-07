@@ -20,6 +20,7 @@ import java.util.List;
 public class ModConfiguration
 {
     private Path saveDirectory;
+    private Path configsDirectory;
     private Path modulesDirectory;
 
     private final List<JsonConfigFile> saveFiles = new LinkedList<>();
@@ -48,6 +49,7 @@ public class ModConfiguration
             }
 
             modulesDirectory = saveDirectory.resolve("Modules");
+            configsDirectory = saveDirectory.resolve("Configs");
             try
             {
                 if (!Files.exists(saveDirectory))
@@ -57,6 +59,10 @@ public class ModConfiguration
                 if (!Files.exists(modulesDirectory))
                 {
                     Files.createDirectory(modulesDirectory);
+                }
+                if (!Files.exists(configsDirectory))
+                {
+                    Files.createDirectories(configsDirectory);
                 }
             } catch (IOException e)
             {

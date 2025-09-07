@@ -7,6 +7,7 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.util.math.MathUtil;
 
 public class ArmorHudModule extends HudModule
 {
@@ -42,14 +43,15 @@ public class ArmorHudModule extends HudModule
             if (percent.getValue())
             {
                 context.getMatrices().push();
-                context.getMatrices().translate(getX() + getWidth() - offset + 17, getY(), 1.0f);
+                context.getMatrices().translate(getX() + getWidth() - offset + 17, getY(), 0.0f);
                 context.getMatrices().scale(0.66f, 0.66f, 0.66f);
+
                 int damage = stack.getMaxDamage() - stack.getDamage();
-                int percent = (damage / stack.getMaxDamage()) * 100;
-                String text = percent + "%";
-                float width = getTextWidth(text);
+                float percent = (float) damage / stack.getMaxDamage();
+                String text = (int) (percent * 100) + "%";
+                float width = getTextWidth(text) / 2f;
                 int color = ColorUtil.hslToColor(percent * 120, 100f, 50f, 1f).getRGB();
-                drawText(context.getMatrices(), text, -width + 1, 0, color);
+                drawText(context.getMatrices(), text, -width - 13, 0, color);
                 context.getMatrices().pop();
             }
 

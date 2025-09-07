@@ -37,7 +37,8 @@ public class CommandManager extends GenericFeature
         registerCommands(
                 new FriendCommand(),
                 new KitCommand(),
-                new PrefixCommand()
+                new PrefixCommand(),
+                new PresetCommand()
         );
 
         for (Command command : commands)
