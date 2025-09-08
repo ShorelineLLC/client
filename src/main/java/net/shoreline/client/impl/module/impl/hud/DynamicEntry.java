@@ -37,6 +37,11 @@ public class DynamicEntry
 
     public void draw(DrawContext context, float x, float y, float currentOffset, float tickDelta)
     {
+        if (!drawing.get() && isDone())
+        {
+            return;
+        }
+
         boolean left = getModule().isLeft();
         boolean top = getModule().isTop();
         float paddingX = left ? 2 : -2;
@@ -58,17 +63,10 @@ public class DynamicEntry
         if (drawing)
         {
             width = left ? width : -width;
-            if (width > lastWidth)
-            {
-                animation.setEasing(Easing.SMOOTH_STEP);
-            }
-            else
-            {
-                animation.setEasing(Easing.EXPO_OUT);
-            }
+            animation.setEasing(width > lastWidth ? Easing.SMOOTH_STEP : Easing.EXPO_OUT);
+            lastWidth = width;
 
             renderX += animation.get(width);
-            lastWidth = width;
             yAnimation.setState(true);
         }
         else
