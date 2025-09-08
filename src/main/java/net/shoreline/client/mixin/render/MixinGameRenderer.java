@@ -1,5 +1,7 @@
 package net.shoreline.client.mixin.render;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -14,6 +16,7 @@ import net.shoreline.client.impl.event.entity.player.ReachEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.eventbus.EventBus;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,15 +49,21 @@ public abstract class MixinGameRenderer implements IGameRenderer
         }
     }
 
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V",
-            shift = At.Shift.AFTER))
-    private void hookRenderWorldSwap(RenderTickCounter tickCounter,
-                                     CallbackInfo info)
+    @Inject(
+            method = "renderWorld",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/mojang/blaze3d/systems/RenderSystem;clear(I)V"))
+    private void renderWorldHook(RenderTickCounter tickCounter, CallbackInfo info,
+                                 @Local(ordinal = 2) Matrix4f matrix4f)
     {
-
+        MatrixStack matrices = new MatrixStack();
+        RenderSystem.getModelViewStack().pushMatrix();
+        RenderSystem.getModelViewStack().mul(matrix4f);
+        RenderSystem.getModelViewStack().mul(matrices.peek().getPositionMatrix().invert());
         RenderEntityWorldEvent.Post renderEntityEvent = new RenderEntityWorldEvent.Post();
         EventBus.INSTANCE.dispatch(renderEntityEvent);
+        RenderSystem.getModelViewStack().popMatrix();
     }
 
     @Inject(method = "renderWorld", at = @At("TAIL"))

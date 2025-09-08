@@ -46,14 +46,22 @@ public abstract class MixinWorldRenderer
                                  CallbackInfo ci)
     {
         MatrixStack matrixStack = new MatrixStack();
+        matrixStack.push();
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(client.gameRenderer.getCamera().getPitch()));
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(client.gameRenderer.getCamera().getYaw() + 180f));
 
         RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickCounter.getTickDelta(true));
         EventBus.INSTANCE.dispatch(renderWorldEvent);
+        matrixStack.pop();
     }
 
-    @Inject(method = "render", at = @At(value = "HEAD"))
+    @Inject(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+                    ordinal = 0,
+                    shift = At.Shift.BEFORE))
     private void hookRenderSwap(ObjectAllocator allocator,
                                 RenderTickCounter tickCounter,
                                 boolean renderBlockOutline,

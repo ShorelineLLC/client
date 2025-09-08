@@ -4496,18 +4496,26 @@ net.shoreline.client.mixin.network.packet.c2s.MixinPlayerMoveC2SPacket -> net.sh
     void setZ(double) -> e
     void setYaw(float) -> m
     void setPitch(float) -> r
-net.shoreline.client.mixin.option.MixinKeyBinding -> net.shoreline.client.jG:
+net.shoreline.client.mixin.option.MixinGameOptions -> net.shoreline.client.jG:
+    net.minecraft.class_7172 field_1826 -> field_1826
+    19:19:void <init>() -> <init>
+    29:35:void hookInit(net.minecraft.class_310,java.io.File,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
+    34:34:void lambda$hookInit$3(java.lang.Integer) -> a
+    34:34:java.lang.Double lambda$hookInit$2(java.lang.Integer) -> b
+    34:34:java.lang.Integer lambda$hookInit$1(java.lang.Double) -> a
+    29:33:net.minecraft.class_2561 lambda$hookInit$0(net.minecraft.class_2561,java.lang.Integer) -> a
+net.shoreline.client.mixin.option.MixinKeyBinding -> net.shoreline.client.jH:
     10:10:void <init>() -> <init>
     net.minecraft.class_3675$class_306 getBoundKey() -> dN
-net.shoreline.client.mixin.particle.MixinParticleManager -> net.shoreline.client.jH:
+net.shoreline.client.mixin.particle.MixinParticleManager -> net.shoreline.client.jI:
     19:19:void <init>() -> <init>
     24:30:void hookAddBlockBreakParticles(net.minecraft.class_2338,net.minecraft.class_2680,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
     35:41:void hookAddBlockBreakingParticles(net.minecraft.class_2338,net.minecraft.class_2350,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.mixin.render.MixinBackgroundRenderer -> net.shoreline.client.jI:
+net.shoreline.client.mixin.render.MixinBackgroundRenderer -> net.shoreline.client.jJ:
     16:16:void <init>() -> <init>
     26:33:void hookGetFogColor(net.minecraft.class_4184,float,net.minecraft.class_638,int,float,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> a
     44:52:void hookApplyFog(net.minecraft.class_4184,net.minecraft.class_758$class_4596,org.joml.Vector4f,float,boolean,float,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> a
-net.shoreline.client.mixin.render.MixinCamera -> net.shoreline.client.jJ:
+net.shoreline.client.mixin.render.MixinCamera -> net.shoreline.client.jK:
     float field_47549 -> field_47549
     15:15:void <init>() -> <init>
     void method_19327(double,double,double) -> method_19327
@@ -4515,7 +4523,7 @@ net.shoreline.client.mixin.render.MixinCamera -> net.shoreline.client.jJ:
     30:39:void hookUpdatePosition(net.minecraft.class_4184,double,double,double) -> a
     45:54:void hookUpdateRotation(net.minecraft.class_4184,float,float) -> a
     59:66:void hookClipToSpace(float,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> c
-net.shoreline.client.mixin.render.MixinGameRenderer -> net.shoreline.client.jK:
+net.shoreline.client.mixin.render.MixinGameRenderer -> net.shoreline.client.jL:
     net.minecraft.class_765 field_4028 -> field_4028
     28:28:void <init>() -> <init>
     net.minecraft.class_9920 getPool() -> dJ
@@ -4528,23 +4536,23 @@ net.shoreline.client.mixin.render.MixinGameRenderer -> net.shoreline.client.jK:
     105:113:net.minecraft.class_1297 hookCrosshairTarget(net.minecraft.class_3966) -> a
     119:122:double hookTargetedEntity(net.minecraft.class_746) -> f
     128:131:double hookTargetedEntity$1(net.minecraft.class_746) -> g
-net.shoreline.client.mixin.render.MixinLayerRenderState -> net.shoreline.client.jL:
+net.shoreline.client.mixin.render.MixinLayerRenderState -> net.shoreline.client.jM:
     11:11:void <init>() -> <init>
     void setRenderLayer(net.minecraft.class_1921) -> a
-net.shoreline.client.mixin.render.MixinLightmapTextureManager -> net.shoreline.client.jM:
+net.shoreline.client.mixin.render.MixinLightmapTextureManager -> net.shoreline.client.jN:
     net.minecraft.class_6367 field_53101 -> field_53101
     21:21:void <init>() -> <init>
     34:40:void hookEndWrite(float,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
     46:48:boolean hookUpdate(net.minecraft.class_746,net.minecraft.class_6880) -> a
     55:57:float hookUpdate$2(net.minecraft.class_1309,float) -> b
-net.shoreline.client.mixin.render.MixinMultiPhase -> net.shoreline.client.jN:
+net.shoreline.client.mixin.render.MixinMultiPhase -> net.shoreline.client.jO:
     9:9:void <init>() -> <init>
     net.minecraft.class_1921$class_4688 hookGetPhases() -> dQ
-net.shoreline.client.mixin.render.MixinMultiPhaseParameters -> net.shoreline.client.jO:
+net.shoreline.client.mixin.render.MixinMultiPhaseParameters -> net.shoreline.client.jP:
     10:10:void <init>() -> <init>
     net.minecraft.class_1921$class_4750 getOutlineMode() -> dR
     net.minecraft.class_4668$class_5939 getTexture() -> dS
-net.shoreline.client.mixin.render.MixinRenderTickCounter -> net.shoreline.client.jP:
+net.shoreline.client.mixin.render.MixinRenderTickCounter -> net.shoreline.client.jQ:
     it.unimi.dsi.fastutil.floats.FloatUnaryOperator field_51965 -> field_51965
     float field_51964 -> field_51964
     float field_51958 -> field_51958
@@ -4552,10 +4560,10 @@ net.shoreline.client.mixin.render.MixinRenderTickCounter -> net.shoreline.client
     float field_51959 -> field_51959
     15:15:void <init>() -> <init>
     34:45:void hookBeginRenderTick(long,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> a
-net.shoreline.client.mixin.render.MixinTextureBase -> net.shoreline.client.jQ:
+net.shoreline.client.mixin.render.MixinTextureBase -> net.shoreline.client.jR:
     12:12:void <init>() -> <init>
     java.util.Optional hookGetId() -> dW
-net.shoreline.client.mixin.render.MixinWorldRenderer -> net.shoreline.client.jR:
+net.shoreline.client.mixin.render.MixinWorldRenderer -> net.shoreline.client.jS:
     net.minecraft.class_310 field_4088 -> field_4088
     32:32:void <init>() -> <init>
     48:54:void hookRenderWorld(net.minecraft.class_9922,net.minecraft.class_9779,boolean,net.minecraft.class_4184,net.minecraft.class_757,org.joml.Matrix4f,org.joml.Matrix4f,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
@@ -4564,7 +4572,7 @@ net.shoreline.client.mixin.render.MixinWorldRenderer -> net.shoreline.client.jR:
     92:94:boolean hookGetEntitiesToRender(net.minecraft.class_4184) -> a
     109:116:void hookAddParticle(net.minecraft.class_2394,boolean,boolean,double,double,double,double,double,double,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> a
     121:125:void hookResized(int,int,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.mixin.render.entity.MixinEndCrystalEntityRenderer -> net.shoreline.client.jS:
+net.shoreline.client.mixin.render.entity.MixinEndCrystalEntityRenderer -> net.shoreline.client.jT:
     net.minecraft.class_1921 field_21736 -> field_21736
     net.minecraft.class_2960 field_4663 -> field_4663
     net.minecraft.class_9946 field_53187 -> field_53187
@@ -4575,11 +4583,11 @@ net.shoreline.client.mixin.render.entity.MixinEndCrystalEntityRenderer -> net.sh
     72:79:void preModelRenderHook(net.minecraft.class_10014,net.minecraft.class_4587,net.minecraft.class_4597,int,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
     92:104:void setAnglesHook(net.minecraft.class_10014,net.minecraft.class_4587,net.minecraft.class_4597,int,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> b
     44:44:void <clinit>() -> <clinit>
-net.shoreline.client.mixin.render.entity.MixinEntityRenderer -> net.shoreline.client.jT:
+net.shoreline.client.mixin.render.entity.MixinEntityRenderer -> net.shoreline.client.jU:
     net.minecraft.class_898 field_4676 -> field_4676
     20:20:void <init>() -> <init>
     34:40:void hookRenderLabelIfPresent(net.minecraft.class_10017,net.minecraft.class_2561,net.minecraft.class_4587,net.minecraft.class_4597,int,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.mixin.render.entity.MixinLivingEntityRenderer -> net.shoreline.client.jU:
+net.shoreline.client.mixin.render.entity.MixinLivingEntityRenderer -> net.shoreline.client.jV:
     net.minecraft.class_583 field_4737 -> field_4737
     net.minecraft.class_1309 last -> ua
     33:33:void <init>() -> <init>
@@ -4588,21 +4596,21 @@ net.shoreline.client.mixin.render.entity.MixinLivingEntityRenderer -> net.shorel
     58:64:net.minecraft.class_1921 getRenderLayerHook(net.minecraft.class_1921,net.minecraft.class_10042,boolean) -> a
     77:83:void renderHook(org.spongepowered.asm.mixin.injection.invoke.arg.Args,net.minecraft.class_10042,net.minecraft.class_4587,net.minecraft.class_4597,int) -> a
     94:106:void setAnglesHook(net.minecraft.class_10042,net.minecraft.class_4587,net.minecraft.class_4597,int,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.mixin.render.entity.MixinModel -> net.shoreline.client.jV:
+net.shoreline.client.mixin.render.entity.MixinModel -> net.shoreline.client.jW:
     boolean cancelModel -> ub
     20:22:void <init>() -> <init>
     28:29:void cancelModel(boolean) -> r
     34:39:net.minecraft.class_1921 getLayerHook(net.minecraft.class_1921,net.minecraft.class_2960) -> a
     50:56:void render$render(org.spongepowered.asm.mixin.injection.invoke.arg.Args) -> c
-net.shoreline.client.mixin.render.entity.MixinPlayerEntityRenderer -> net.shoreline.client.jW:
+net.shoreline.client.mixin.render.entity.MixinPlayerEntityRenderer -> net.shoreline.client.jX:
     float lastRenderYaw -> uc
     float lastRenderPitch -> ud
     17:17:void <init>() -> <init>
     28:43:void hookUpdateRenderState(net.minecraft.class_742,net.minecraft.class_10055,float,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.mixin.render.entity.feature.MixinArmorFeatureRenderer -> net.shoreline.client.jX:
+net.shoreline.client.mixin.render.entity.feature.MixinArmorFeatureRenderer -> net.shoreline.client.jY:
     16:16:void <init>() -> <init>
     29:38:void hookRenderArmor(net.minecraft.class_4587,net.minecraft.class_4597,int,net.minecraft.class_10034,float,float,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.mixin.render.item.MixinHeldItemRenderer -> net.shoreline.client.jY:
+net.shoreline.client.mixin.render.item.MixinHeldItemRenderer -> net.shoreline.client.jZ:
     net.minecraft.class_310 field_4050 -> field_4050
     net.minecraft.class_1799 field_4047 -> field_4047
     float field_4043 -> field_4043
@@ -4611,63 +4619,63 @@ net.shoreline.client.mixin.render.item.MixinHeldItemRenderer -> net.shoreline.cl
     72:74:void hookRenderItem(net.minecraft.class_742,float,float,net.minecraft.class_1268,float,net.minecraft.class_1799,float,net.minecraft.class_4587,net.minecraft.class_4597,int,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> b
     80:88:void hookApplyEatOrDrinkTransformation(net.minecraft.class_4587,float,float,float) -> a
     94:103:float hookUpdateHeldItems(float) -> T
-net.shoreline.client.mixin.render.item.MixinItemRenderState -> net.shoreline.client.jZ:
+net.shoreline.client.mixin.render.item.MixinItemRenderState -> net.shoreline.client.ka:
     9:9:void <init>() -> <init>
     int getLayerCount() -> dK
     net.minecraft.class_10444$class_10446[] getLayers() -> dL
-net.shoreline.client.mixin.render.item.MixinItemRenderer -> net.shoreline.client.ka:
+net.shoreline.client.mixin.render.item.MixinItemRenderer -> net.shoreline.client.kb:
     10:10:void <init>() -> <init>
     net.minecraft.class_10442 getItemModelManager() -> dM
-net.shoreline.client.mixin.sodium.MixinFluidRendererImplDefaultRenderContext -> net.shoreline.client.kb:
+net.shoreline.client.mixin.sodium.MixinFluidRendererImplDefaultRenderContext -> net.shoreline.client.kc:
     23:23:void <init>() -> <init>
     28:34:void hookGetColorProvider(net.minecraft.class_3611,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> a
     45:46:void getColors(net.caffeinemc.mods.sodium.client.world.LevelSlice,net.minecraft.class_2338,net.minecraft.class_2338$class_2339,net.minecraft.class_3610,net.caffeinemc.mods.sodium.client.model.quad.ModelQuadView,int[],java.awt.Color) -> a
     32:32:void lambda$hookGetColorProvider$0(net.shoreline.client.impl.event.render.WorldTintEvent$Lava,net.caffeinemc.mods.sodium.client.world.LevelSlice,net.minecraft.class_2338,net.minecraft.class_2338$class_2339,net.minecraft.class_3610,net.caffeinemc.mods.sodium.client.model.quad.ModelQuadView,int[]) -> a
-net.shoreline.client.mixin.text.MixinGlyph -> net.shoreline.client.kc:
+net.shoreline.client.mixin.text.MixinGlyph -> net.shoreline.client.kd:
     19:26:void hookGetShadowOffset(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> n
-net.shoreline.client.mixin.text.MixinTextColor -> net.shoreline.client.kd:
+net.shoreline.client.mixin.text.MixinTextColor -> net.shoreline.client.ke:
     int field_24364 -> field_24364
     13:13:void <init>() -> <init>
     23:24:void init(int,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
     29:30:void init(int,java.lang.String,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.mixin.text.MixinTextVisitFactory -> net.shoreline.client.ke:
+net.shoreline.client.mixin.text.MixinTextVisitFactory -> net.shoreline.client.kf:
     16:16:void <init>() -> <init>
     29:37:net.minecraft.class_2583 hookVisitFormatted(net.minecraft.class_2583,net.minecraft.class_124,char) -> a
-net.shoreline.client.mixin.texture.MixinLightmapTextureManager -> net.shoreline.client.kf:
+net.shoreline.client.mixin.texture.MixinLightmapTextureManager -> net.shoreline.client.kg:
     13:13:void <init>() -> <init>
     18:27:void updateHook(net.minecraft.class_278,org.joml.Vector3f) -> a
     32:41:void updateHook$3(net.minecraft.class_278,float) -> a
-net.shoreline.client.mixin.texture.MixinNativeImage -> net.shoreline.client.kg:
+net.shoreline.client.mixin.texture.MixinNativeImage -> net.shoreline.client.kh:
     9:9:void <init>() -> <init>
     long getPointer() -> dT
-net.shoreline.client.mixin.toast.MixinToastManager -> net.shoreline.client.kh:
+net.shoreline.client.mixin.toast.MixinToastManager -> net.shoreline.client.ki:
     13:13:void <init>() -> <init>
     19:25:void hookDraw(net.minecraft.class_332,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> c
-net.shoreline.client.mixin.world.MixinClientWorld -> net.shoreline.client.ki:
+net.shoreline.client.mixin.world.MixinClientWorld -> net.shoreline.client.kj:
     16:16:void <init>() -> <init>
     net.minecraft.class_7202 getUpdateManager() -> dH
     27:34:void hookGetSkyColor(net.minecraft.class_243,float,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> a
     40:47:void hookGetCloudsColor(float,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> d
-net.shoreline.client.mixin.world.MixinProperties -> net.shoreline.client.kj:
+net.shoreline.client.mixin.world.MixinProperties -> net.shoreline.client.kk:
     12:12:void <init>() -> <init>
     17:24:void hookGetHorizonShadingRatio(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable) -> o
-net.shoreline.client.mixin.world.MixinServerWorld -> net.shoreline.client.kk:
+net.shoreline.client.mixin.world.MixinServerWorld -> net.shoreline.client.kl:
     22:22:void <init>() -> <init>
     39:44:void hookCreateExplosion(net.minecraft.class_1297,net.minecraft.class_1282,net.minecraft.class_5362,double,double,double,float,boolean,net.minecraft.class_1937$class_7867,net.minecraft.class_2394,net.minecraft.class_2394,net.minecraft.class_6880,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.util.Formatter -> net.shoreline.client.kl:
+net.shoreline.client.util.Formatter -> net.shoreline.client.km:
     10:38:java.lang.String formatEnum(java.lang.Enum) -> c
     6:6:void <init>() -> <init>
-net.shoreline.client.util.Keyboard -> net.shoreline.client.km:
+net.shoreline.client.util.Keyboard -> net.shoreline.client.kn:
     11:45:java.lang.String getKeyName(int,int) -> d
     51:51:java.lang.String getKeyName(int) -> L
     60:87:int getKeyCode(java.lang.String) -> C
     7:7:void <init>() -> <init>
-net.shoreline.client.util.RegistryUtil -> net.shoreline.client.kn:
+net.shoreline.client.util.RegistryUtil -> net.shoreline.client.ko:
     net.minecraft.class_7225$class_7874 lookup -> ue
     14:14:net.minecraft.class_6880 getEntry(net.minecraft.class_5321,net.minecraft.class_5321) -> a
     8:8:void <init>() -> <init>
     10:10:void <clinit>() -> <clinit>
-net.shoreline.client.util.entity.DamageableFakePlayer -> net.shoreline.client.ko:
+net.shoreline.client.util.entity.DamageableFakePlayer -> net.shoreline.client.kp:
     31:33:void <init>(net.minecraft.class_1657,java.lang.String) -> <init>
     38:49:void method_5670() -> method_5670
     53:105:void simulateAttackFrom(net.minecraft.class_638,net.minecraft.class_1657) -> a
@@ -4680,7 +4688,7 @@ net.shoreline.client.util.entity.DamageableFakePlayer -> net.shoreline.client.ko
     183:204:void applyDamage(net.minecraft.class_1282,float) -> a
     208:214:void simulateGappleEat() -> kN
     218:226:void simulateTotemPop() -> kO
-net.shoreline.client.util.entity.EntityUtil -> net.shoreline.client.kp:
+net.shoreline.client.util.entity.EntityUtil -> net.shoreline.client.kq:
     23:23:boolean isHostile(net.minecraft.class_1297) -> q
     28:28:boolean isPassive(net.minecraft.class_1297) -> r
     33:37:boolean isNeutral(net.minecraft.class_1297) -> s
@@ -4688,7 +4696,7 @@ net.shoreline.client.util.entity.EntityUtil -> net.shoreline.client.kp:
     47:49:java.util.List getEquippedItems(net.minecraft.class_1309) -> d
     19:19:void <init>() -> <init>
     48:48:void lambda$getEquippedItems$0(java.util.List,net.minecraft.class_1309,net.minecraft.class_1304) -> a
-net.shoreline.client.util.entity.FakePlayerEntity -> net.shoreline.client.kq:
+net.shoreline.client.util.entity.FakePlayerEntity -> net.shoreline.client.kr:
     java.util.UUID FAKE_UUID -> uf
     java.util.concurrent.atomic.AtomicInteger CURRENT_ID -> ug
     net.minecraft.class_1657 player -> uh
@@ -4700,10 +4708,10 @@ net.shoreline.client.util.entity.FakePlayerEntity -> net.shoreline.client.kq:
     69:71:void despawnPlayer() -> kQ
     19:19:net.minecraft.class_1657 getPlayer() -> eL
     15:17:void <clinit>() -> <clinit>
-net.shoreline.client.util.entity.PlayerUtil -> net.shoreline.client.kr:
+net.shoreline.client.util.entity.PlayerUtil -> net.shoreline.client.ks:
     11:11:boolean isInSurvival(net.minecraft.class_1657) -> d
     7:7:void <init>() -> <init>
-net.shoreline.client.util.input.InputUtil -> net.shoreline.client.ks:
+net.shoreline.client.util.input.InputUtil -> net.shoreline.client.kt:
     net.minecraft.class_315 options -> ui
     20:20:net.minecraft.class_10185 inputJumping(net.minecraft.class_10185,boolean) -> a
     25:25:net.minecraft.class_10185 inputSneaking(net.minecraft.class_10185,boolean) -> b
@@ -4716,33 +4724,33 @@ net.shoreline.client.util.input.InputUtil -> net.shoreline.client.ks:
     100:132:float getYawFromInput(float) -> V
     14:14:void <init>() -> <init>
     16:16:void <clinit>() -> <clinit>
-net.shoreline.client.util.item.ArmorUtil -> net.shoreline.client.kt:
+net.shoreline.client.util.item.ArmorUtil -> net.shoreline.client.ku:
     15:37:double getArmorValue(net.minecraft.class_1799) -> l
     11:11:void <init>() -> <init>
-net.shoreline.client.util.item.ArmorUtil$1 -> net.shoreline.client.ku:
+net.shoreline.client.util.item.ArmorUtil$1 -> net.shoreline.client.kv:
     int[] $SwitchMap$net$minecraft$entity$attribute$EntityAttributeModifier$Operation -> uj
     28:28:void <clinit>() -> <clinit>
-net.shoreline.client.util.item.EnchantUtil -> net.shoreline.client.kv:
+net.shoreline.client.util.item.EnchantUtil -> net.shoreline.client.kw:
     22:23:net.minecraft.class_6880 getEntry(net.minecraft.class_5321) -> a
     28:29:int getLevel(net.minecraft.class_5321,net.minecraft.class_1799) -> a
     34:51:boolean isEnchantsObfuscated(net.minecraft.class_1799) -> m
     18:18:void <init>() -> <init>
-net.shoreline.client.util.item.ItemUtil -> net.shoreline.client.kw:
+net.shoreline.client.util.item.ItemUtil -> net.shoreline.client.kx:
     12:12:boolean isSameItem(net.minecraft.class_1799,net.minecraft.class_1799) -> a
     17:18:boolean isTool(net.minecraft.class_1792) -> g
     23:23:boolean isSword(net.minecraft.class_1792) -> h
     8:8:void <init>() -> <init>
-net.shoreline.client.util.math.Extrapolation -> net.shoreline.client.kx:
+net.shoreline.client.util.math.Extrapolation -> net.shoreline.client.ky:
     3:3:void <init>() -> <init>
-net.shoreline.client.util.math.MathUtil -> net.shoreline.client.ky:
+net.shoreline.client.util.math.MathUtil -> net.shoreline.client.kz:
     13:15:double round(double,int) -> a
     9:9:void <init>() -> <init>
-net.shoreline.client.util.math.PerSecond -> net.shoreline.client.kz:
+net.shoreline.client.util.math.PerSecond -> net.shoreline.client.kA:
     java.util.concurrent.CopyOnWriteArrayList counter -> uk
     5:7:void <init>() -> <init>
     11:12:void count() -> kU
     16:22:int getPerSecond() -> kV
-net.shoreline.client.util.math.QueueAverage -> net.shoreline.client.kA:
+net.shoreline.client.util.math.QueueAverage -> net.shoreline.client.kB:
     double[] buf -> ul
     int idx -> um
     int count -> un
@@ -4753,7 +4761,7 @@ net.shoreline.client.util.math.QueueAverage -> net.shoreline.client.kA:
     44:50:double latest() -> kX
     55:55:int size() -> kY
     60:64:void clear() -> an
-net.shoreline.client.util.world.BlockUtil -> net.shoreline.client.kB:
+net.shoreline.client.util.world.BlockUtil -> net.shoreline.client.kC:
     java.util.Set INTERACTABLE_BLOCKS -> up
     java.util.Set EXPLOSION_RESISTANT -> uq
     java.util.Set UNBREAKABLE -> ur
@@ -4766,9 +4774,9 @@ net.shoreline.client.util.world.BlockUtil -> net.shoreline.client.kB:
     115:115:boolean isUnbreakable(net.minecraft.class_2680) -> a
     14:14:void <init>() -> <init>
     16:78:void <clinit>() -> <clinit>
-net.shoreline.client.util.world.PositionUtil -> net.shoreline.client.kC:
+net.shoreline.client.util.world.PositionUtil -> net.shoreline.client.kD:
     6:6:void <init>() -> <init>
-net.shoreline.client.util.world.RaytraceContext -> net.shoreline.client.kD:
+net.shoreline.client.util.world.RaytraceContext -> net.shoreline.client.kE:
     net.minecraft.class_243 start -> us
     net.minecraft.class_243 end -> ut
     7:7:void <init>(net.minecraft.class_243,net.minecraft.class_243) -> <init>
@@ -4778,7 +4786,7 @@ net.shoreline.client.util.world.RaytraceContext -> net.shoreline.client.kD:
     7:7:boolean equals(java.lang.Object) -> equals
     7:7:net.minecraft.class_243 start() -> kZ
     7:7:net.minecraft.class_243 end() -> la
-net.shoreline.client.util.world.RaytraceUtil -> net.shoreline.client.kE:
+net.shoreline.client.util.world.RaytraceUtil -> net.shoreline.client.kF:
     20:26:net.minecraft.class_239 raycast(double,net.minecraft.class_243,float[]) -> a
     31:37:net.minecraft.class_239 raycastFromCamera(double) -> p
     45:48:net.minecraft.class_239 raycastFromEntity(net.minecraft.class_1297,double,net.minecraft.class_243,float[]) -> a
@@ -4814,9 +4822,9 @@ net.shoreline.eventbus.EventBus$InvokerNode -> net.shoreline.client.n:
     java.lang.Object subscriber -> c
     java.lang.Integer priority -> d
     147:151:void <init>(net.shoreline.eventbus.EventBus$Invoker,java.lang.Object,java.lang.Integer) -> <init>
-net.shoreline.eventbus.annotation.Cancelable -> net.shoreline.client.kF:
+net.shoreline.eventbus.annotation.Cancelable -> net.shoreline.client.kG:
 net.shoreline.eventbus.annotation.EventListener -> net.shoreline.client.el:
     int priority() -> a
     boolean receiveCanceled() -> b
-net.shoreline.eventbus.dev.DevEventBusLoader -> net.shoreline.client.kG:
+net.shoreline.eventbus.dev.DevEventBusLoader -> net.shoreline.client.kH:
     8:8:void <init>() -> <init>

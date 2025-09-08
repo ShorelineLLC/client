@@ -158,7 +158,7 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                if (component.getConfig().isVisible())
+                if (component.getConfig().isVisible() && component.getDrawAnim().getFactor() == 1.0f)
                 {
                     component.mouseClicked(mouseX, mouseY, mouseButton);
                 }
@@ -175,7 +175,7 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                if (component.getConfig().isVisible())
+                if (component.getConfig().isVisible() && component.getDrawAnim().getFactor() == 1.0f)
                 {
                     component.mouseReleased(mouseX, mouseY, button);
                 }
@@ -192,7 +192,7 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                if (component.getConfig().isVisible())
+                if (component.getConfig().isVisible() && component.getDrawAnim().getFactor() == 1.0f)
                 {
                     component.keyPressed(keyCode, scanCode, modifiers);
                 }
@@ -208,7 +208,7 @@ public class ModuleComponent extends FrameComponent
         {
             for (ConfigComponent<?> component : components)
             {
-                if (component.getConfig().isVisible())
+                if (component.getConfig().isVisible() && component.getDrawAnim().getFactor() == 1.0f)
                 {
                     component.charTyped(chr, modifiers);
                 }
