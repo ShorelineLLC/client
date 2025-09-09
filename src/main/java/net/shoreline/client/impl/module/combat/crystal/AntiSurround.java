@@ -6,6 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.mining.MiningData;
+import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.AutoMineModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 
@@ -26,15 +27,25 @@ public class AntiSurround
         }
 
         MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-        if (currentMine == null || currentMine.getProgress() < 0.7f || SpeedMineModule.INSTANCE.isManualMining())
+        if (currentMine == null || !currentMine.isDoneMining() || SpeedMineModule.INSTANCE.isManualMining())
         {
             return false;
         }
 
         for (Direction direction : Direction.values())
         {
-            BlockPos pos1 = currentMine.getBlockPos().offset(direction);
-            if (blockPos.equals(pos1))
+            BlockPos pos = currentMine.getBlockPos().offset(direction);
+            if (target.squaredDistanceTo(pos.toCenterPos()) > 1.75f)
+            {
+                continue;
+            }
+
+            if (!AutoCrystalModule.INSTANCE.canUseOnBlock(pos.down()))
+            {
+                continue;
+            }
+            
+            if (blockPos.equals(pos))
             {
                 return true;
             }

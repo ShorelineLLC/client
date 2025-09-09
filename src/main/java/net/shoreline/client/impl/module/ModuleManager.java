@@ -86,6 +86,7 @@ public class ModuleManager
                 new SprintModule(),
                 new StepModule(),
                 new VelocityModule(),
+                new YawModule(),
                 // Render
                 new BlockHighlightModule(),
                 new ChamsModule(),

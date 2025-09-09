@@ -74,6 +74,11 @@ public class ShaderManager extends GenericFeature
         RenderSystem.enableCull();
     }
 
+    public void draw()
+    {
+        vertexConsumerProvider.draw();
+    }
+
     public void resize(int width, int height)
     {
         if (framebuffer != null)

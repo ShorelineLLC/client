@@ -132,22 +132,19 @@ public class InteractManager extends GenericFeature
 
     private boolean placeBlockInternal(Interaction interaction)
     {
+        BlockPos placePos = interaction.getPos();
         Direction direction = interaction.getDirection();
-        Hand hand = interaction.getHand();
-
-        boolean airPlacing = false;
 
         boolean noValidDir = airPlace.isForceAirPlace() || direction == null;
-        if (hand == Hand.MAIN_HAND && noValidDir && airPlace.isEnabled())
+        boolean airPlacing = interaction.getHand() == Hand.MAIN_HAND && noValidDir && airPlace.isEnabled();
+        if (airPlacing)
         {
-            airPlacing = true;
             direction = Direction.DOWN;
             interaction.setDirection(direction);
 
             if (airPlace.isGrim())
             {
                 Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
-                hand = Hand.OFF_HAND;
             }
         }
 
@@ -157,8 +154,8 @@ public class InteractManager extends GenericFeature
         }
 
         Vec3d eyePos = mc.player.getEyePos();
-        Box box = new Box(interaction.getPos());
-        BlockPos blockPos = airPlacing ? interaction.getPos() : interaction.getPos().offset(direction.getOpposite());
+        Box box = new Box(placePos);
+        BlockPos blockPos = airPlacing ? placePos : placePos.offset(direction.getOpposite());
 
         boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(blockPos) && !mc.player.isSneaking();
         if (shouldSneak)
@@ -174,20 +171,20 @@ public class InteractManager extends GenericFeature
             Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
         }
 
+        Hand hand = airPlacing && airPlace.isGrim() ? Hand.OFF_HAND : interaction.getHand();
         BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
         if (interaction.isPacketPlace())
         {
-            Hand hand1 = hand;
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand1, result, id));
+            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
             actionResult = ActionResult.SUCCESS;
         } else
         {
             actionResult = mc.interactionManager.interactBlock(mc.player, hand, result);
         }
 
-        if (actionResult instanceof ActionResult.Success)
+        if (actionResult.isAccepted())
         {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(interaction.getHand()));
+            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
         }
 
         if (shouldSneak)
@@ -200,7 +197,7 @@ public class InteractManager extends GenericFeature
             Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
         }
 
-        return true;
+        return actionResult.isAccepted();
     }
 
     public boolean startPlacement(int slot)

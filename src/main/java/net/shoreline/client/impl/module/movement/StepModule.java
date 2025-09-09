@@ -8,7 +8,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.entity.StepHeightEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
@@ -16,7 +16,7 @@ import net.shoreline.client.impl.module.world.TimerModule;
 import net.shoreline.client.util.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
-public class StepModule extends Toggleable
+public class StepModule extends ListeningToggleable
 {
     Config<Float> heightConfig = new NumberConfig.Builder<Float>("Height")
             .setMin(1.0f).setMax(2.5f).setDefaultValue(2.0f)
@@ -35,7 +35,6 @@ public class StepModule extends Toggleable
             .setDefaultValue(false).build();
 
     private final Timer stepTimer = new NanoTimer();
-    private float stepHeight;
     private boolean cancelTimer;
 
     public StepModule()
@@ -54,15 +53,21 @@ public class StepModule extends Toggleable
     {
         TimerModule.INSTANCE.setTimerTicks(1.0f);
         cancelTimer = false;
-        stepHeight = 0.6f;
     }
 
     @EventListener
     public void onStepHeight(StepHeightEvent event)
     {
-        if (mc.player.isOnGround() && stepTimer.hasPassed(200))
+        event.cancel();
+
+        if (checkNull() || !mc.player.isOnGround())
         {
-            event.cancel();
+            event.setStepHeight(0.6f);
+            return;
+        }
+
+        if (stepTimer.hasPassed(200))
+        {
             event.setStepHeight(heightConfig.getValue());
         }
     }
@@ -80,6 +85,11 @@ public class StepModule extends Toggleable
     @EventListener
     public void onPlayerUpdatePeri(PlayerUpdateEvent.Peri event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         if (stepMode.getValue() == StepMode.NCP)
         {
             double stepHeight = mc.player.getY() - mc.player.prevY;

@@ -422,7 +422,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private float[] runPlace(CrystalData<BlockPos> placement, Hand hand)
     {
         BlockPos crystalPos = placement.getCrystalData();
-        if (basePlace.getValue() && !canUseOnBlock(mc.world, crystalPos, hasEntityBlockingCrystal(getCrystalBox(crystalPos))))
+        if (basePlace.getValue() && !canUseOnBlock(crystalPos))
         {
             if (!runSingleObbyPlacement(crystalPos))
             {
@@ -597,7 +597,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return crystalData.stream().filter(d ->
         {
             BlockPos blockPos = d.getCrystalData();
-            return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos)));
+            return canUseOnBlock(blockPos);
 
         }).toList();
     }
@@ -655,6 +655,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         return bestCrystal;
+    }
+
+    public boolean canUseOnBlock(BlockPos blockPos)
+    {
+        return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos)));
     }
 
     public boolean canUseOnBlock(BlockView blockView, BlockPos pos, boolean hasEntityBlockingCrystal)

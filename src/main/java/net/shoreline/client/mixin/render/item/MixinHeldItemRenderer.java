@@ -1,7 +1,10 @@
 package net.shoreline.client.mixin.render.item;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -9,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
+import net.shoreline.client.impl.event.render.item.RenderHandEvent;
 import net.shoreline.client.impl.event.render.item.RenderHeldItemEvent;
 import net.shoreline.client.impl.event.render.item.SwingAnimFactorEvent;
 import net.shoreline.eventbus.EventBus;
@@ -71,6 +75,40 @@ public class MixinHeldItemRenderer
     {
         RenderHeldItemEvent.FirstPerson renderHeldItemEvent = new RenderHeldItemEvent.FirstPerson(matrices, hand);
         EventBus.INSTANCE.dispatch(renderHeldItemEvent);
+    }
+
+    @WrapOperation(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;FLnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
+    private void hookRenderItem(HeldItemRenderer instance,
+                                AbstractClientPlayerEntity player,
+                                float tickDelta,
+                                float pitch,
+                                Hand hand,
+                                float swingProgress,
+                                ItemStack item,
+                                float equipProgress,
+                                MatrixStack matrices,
+                                VertexConsumerProvider vertexConsumers,
+                                int light,
+                                Operation<Void> original)
+    {
+        RenderHandEvent event = new RenderHandEvent(vertexConsumers);
+        EventBus.INSTANCE.dispatch(event);
+
+        original.call(instance, player, tickDelta, pitch, hand, swingProgress, item, equipProgress, matrices, event.getVertexConsumerProvider(), light);
+    }
+
+    @Inject(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At("TAIL"))
+    private void hookRenderItemPost(float tickDelta,
+                                    MatrixStack matrices,
+                                    VertexConsumerProvider.Immediate vertexConsumers,
+                                    ClientPlayerEntity player,
+                                    int light,
+                                    CallbackInfo ci)
+    {
+        RenderHandEvent.Post event = new RenderHandEvent.Post();
+        EventBus.INSTANCE.dispatch(event);
     }
 
     @Redirect(method = "applyEatOrDrinkTransformation", at = @At(value = "INVOKE",

@@ -8,6 +8,8 @@ import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
+import net.shoreline.client.impl.event.render.item.RenderHandEvent;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.impl.render.shader.ShaderEffect;
@@ -20,6 +22,9 @@ public class ShadersModule extends Toggleable
     Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
             .setMin(0.0f).setDefaultValue(0.5f).setMax(1.0f)
             .setDescription("Opacity for the shader fill").build();
+    Config<Boolean> handsConfig = new BooleanConfig.Builder("Hands")
+            .setDescription("Render shaders over hands")
+            .setDefaultValue(true).build();
     Config<Boolean> fastOutline = new BooleanConfig.Builder("FastOutline")
             .setDefaultValue(false).build();
 
@@ -49,14 +54,36 @@ public class ShadersModule extends Toggleable
     @EventListener
     public void onRenderEntity(RenderEntityWorldEvent event)
     {
+        boolean isFriend = Managers.SOCIAL.isFriend(event.getEntity());
         event.cancel();
-        event.setVertexConsumerProvider(Managers.SHADER.createVertexConsumer(event.getVertexConsumerProvider(), ThemeModule.INSTANCE.getPrimaryColor()));
+        event.setVertexConsumerProvider(Managers.SHADER.createVertexConsumer(
+                event.getVertexConsumerProvider(),
+                isFriend ? SocialsModule.INSTANCE.getFriendsColor() : ThemeModule.INSTANCE.getPrimaryColor()));
     }
 
     @EventListener
     public void onRenderEntityPost(RenderEntityWorldEvent.Post event)
     {
-        Managers.SHADER.getVertexConsumerProvider().draw();
+        Managers.SHADER.draw();
+    }
+
+    @EventListener
+    public void onRenderHand(RenderHandEvent event)
+    {
+        if (handsConfig.getValue())
+        {
+            event.setVertexConsumerProvider(Managers.SHADER.createVertexConsumer(
+                    event.getVertexConsumerProvider(), ThemeModule.INSTANCE.getPrimaryColor()));
+        }
+    }
+
+    @EventListener
+    public void onRenderHandPost(RenderHandEvent.Post event)
+    {
+        if (handsConfig.getValue())
+        {
+            Managers.SHADER.draw();
+        }
     }
 
     public class DefaultShaderEffect extends ShaderEffect
