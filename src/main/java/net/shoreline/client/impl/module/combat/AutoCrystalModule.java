@@ -198,7 +198,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private boolean silentRotated;
 
-    private final QueueAverage breakTime = new QueueAverage(20);
+    private final QueueAverage breakTime = new QueueAverage(20, 1000L);
     private final PerSecond cps = new PerSecond();
 
     private final DecimalFormat numFormat = new DecimalFormat("0.0");

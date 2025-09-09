@@ -12,6 +12,7 @@ import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.imixin.*;
+import net.shoreline.client.impl.module.render.ShadersModule;
 import net.shoreline.client.impl.render.shader.ShaderEffect;
 import net.shoreline.client.impl.render.shader.Uniform;
 
@@ -29,6 +30,8 @@ public class ShaderManager extends GenericFeature
 
     private final Map<Identifier, RenderLayer> layerCache = new HashMap<>();
 
+    private final ShadersModule shaderConfig = ShadersModule.INSTANCE;
+
     public ShaderManager()
     {
         super("Shaders");
@@ -36,8 +39,10 @@ public class ShaderManager extends GenericFeature
         this.framebuffer = new SimpleFramebuffer(mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), true);
         this.framebuffer.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         this.target = new RenderPhase.Target("shader_target",
-                () -> framebuffer.beginWrite(false),
-                () -> mc.getFramebuffer().beginWrite(false));
+                () -> {
+                    framebuffer.copyDepthFrom(mc.getFramebuffer());
+                    framebuffer.beginWrite(false);
+                }, () -> mc.getFramebuffer().beginWrite(false));
     }
 
     public void begin()
@@ -79,6 +84,11 @@ public class ShaderManager extends GenericFeature
         vertexConsumerProvider.draw();
     }
 
+    public void clearCache()
+    {
+        layerCache.clear();
+    }
+
     public void resize(int width, int height)
     {
         if (framebuffer != null)
@@ -118,7 +128,7 @@ public class ShaderManager extends GenericFeature
                                 .program(RenderPhase.OUTLINE_PROGRAM)
                                 .texture(texture)
                                 .cull(RenderPhase.DISABLE_CULLING)
-                                .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
+                                .depthTest(shaderConfig.getDepth() ? RenderPhase.LEQUAL_DEPTH_TEST : RenderPhase.ALWAYS_DEPTH_TEST)
                                 .target(target)
                                 .build(RenderLayer.OutlineMode.IS_OUTLINE)
                 )

@@ -1,5 +1,8 @@
 package net.shoreline.client.util.math;
 
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
+
 import java.util.Arrays;
 
 public class QueueAverage
@@ -9,13 +12,24 @@ public class QueueAverage
     private int count = 0;
     private double sum = 0.0;
 
+    private final long clearTime;
+    private final Timer lastAddTime = new NanoTimer();
+
     public QueueAverage(int capacity)
     {
         this.buf = new double[capacity];
+        this.clearTime = -1;
+    }
+
+    public QueueAverage(int capacity, long clearTime)
+    {
+        this.buf = new double[capacity];
+        this.clearTime = clearTime;
     }
 
     public void add(double v)
     {
+        lastAddTime.reset();
         if (count < buf.length)
         {
             buf[idx] = v;
@@ -36,6 +50,11 @@ public class QueueAverage
 
     public double average()
     {
+        if (clearTime != -1 && lastAddTime.hasPassed(clearTime))
+        {
+            clear();
+        }
+
         return count == 0 ? 0.0 : sum / count;
     }
 
@@ -44,6 +63,11 @@ public class QueueAverage
         if (count == 0)
         {
             return 0.0;
+        }
+
+        if (clearTime != -1 && lastAddTime.hasPassed(clearTime))
+        {
+            clear();
         }
 
         int last = idx == 0 ? buf.length - 1 : idx - 1;
