@@ -33,11 +33,9 @@ import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Interpolation;
-import net.shoreline.client.impl.render.RenderManager;
 import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

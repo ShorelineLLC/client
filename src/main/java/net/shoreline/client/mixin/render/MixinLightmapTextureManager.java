@@ -1,5 +1,8 @@
 package net.shoreline.client.mixin.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
@@ -8,10 +11,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.shoreline.client.impl.event.render.NightVisionEvent;
 import net.shoreline.client.impl.event.render.WorldGammaEvent;
+import net.shoreline.client.impl.event.render.WorldTintEvent;
+import net.shoreline.client.impl.render.Shaders;
 import net.shoreline.eventbus.EventBus;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -23,6 +30,43 @@ public class MixinLightmapTextureManager
     @Shadow
     @Final
     private SimpleFramebuffer lightmapFramebuffer;
+
+    @Unique
+    private ShaderProgram lightmapProgram;
+
+    @Redirect(
+            method = "update",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShader(Lnet/minecraft/client/gl/ShaderProgramKey;)Lnet/minecraft/client/gl/ShaderProgram;"
+            )
+    )
+    private ShaderProgram hookUpdateLightmap(ShaderProgramKey shaderProgramKey)
+    {
+        lightmapProgram = RenderSystem.setShader(Shaders.LIGHTMAP);
+        return lightmapProgram;
+    }
+
+    @Inject(
+            method = "update",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShader(Lnet/minecraft/client/gl/ShaderProgramKey;)Lnet/minecraft/client/gl/ShaderProgram;",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void hookSetUniforms(float delta, CallbackInfo ci)
+    {
+        if (lightmapProgram != null)
+        {
+            WorldTintEvent.Light worldTintEvent = new WorldTintEvent.Light();
+            EventBus.INSTANCE.dispatch(worldTintEvent);
+            Vector3f color = worldTintEvent.getColorVec3();
+
+            lightmapProgram.getUniformOrDefault("CustomLightColor").set(color.x, color.y, color.z);
+            lightmapProgram.getUniformOrDefault("CustomLightStrength").set(worldTintEvent.isCanceled() ? 1.0f : 0.0f);
+        }
+    }
 
     @Inject(
             method = "update",

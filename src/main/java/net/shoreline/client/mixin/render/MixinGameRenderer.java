@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.Pool;
 import net.minecraft.client.util.math.MatrixStack;
@@ -17,9 +16,7 @@ import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.eventbus.EventBus;
 import org.joml.Matrix4f;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,8 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer implements IGameRenderer
 {
-    @Shadow @Final private LightmapTextureManager lightmapTextureManager;
-
     @Override
     @Accessor("pool")
     public abstract Pool getPool();

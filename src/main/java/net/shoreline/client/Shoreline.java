@@ -1,8 +1,8 @@
 package net.shoreline.client;
 
 import net.shoreline.client.api.font.FontManager;
-import net.shoreline.client.impl.file.ModConfiguration;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.file.ModConfiguration;
 import net.shoreline.loader.Loader;
 
 /**
