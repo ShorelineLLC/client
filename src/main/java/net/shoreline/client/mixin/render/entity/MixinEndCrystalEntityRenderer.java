@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.render.entity;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -11,9 +12,11 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.imixin.IEndCrystalEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.render.ChamsModule;
+import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Layers;
 import org.spongepowered.asm.mixin.*;
@@ -22,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EndCrystalEntityRenderer.class)
-public class MixinEndCrystalEntityRenderer
+public class MixinEndCrystalEntityRenderer implements IEndCrystalEntityRenderer
 {
     @Mutable
     @Shadow
@@ -42,6 +45,15 @@ public class MixinEndCrystalEntityRenderer
 
     @Unique
     private static final Identifier BLANK = Identifier.of("shoreline", "textures/blank.png");
+
+    @Unique
+    private boolean skip = false;
+
+    @Override
+    public void skipShineRendering(boolean skip)
+    {
+        this.skip = skip;
+    }
 
     @Inject(
             method = "updateRenderState(Lnet/minecraft/entity/decoration/EndCrystalEntity;" +
@@ -89,17 +101,27 @@ public class MixinEndCrystalEntityRenderer
                     shift = At.Shift.AFTER))
     private void setAnglesHook(EndCrystalEntityRenderState endCrystalEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo info)
     {
+        if (skip)
+        {
+            return;
+        }
+
         boolean valid = ChamsModule.getInstance().isValid(last);
         ((IModel) model).cancelModel(valid);
         if (ChamsModule.getInstance().isEnabled() && valid)
         {
+            int color = ChamsModule.getInstance().color.getValue().getRGB();
             if (ChamsModule.getInstance().shine.getValue())
             {
                 Layers.QUADS_GLINT.startDrawing();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, Layers.QUADS_GLINT, true);
-                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(ThemeModule.INSTANCE.getPrimaryColor(), 1.0f));
+                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, 1.0f));
                 Layers.QUADS_GLINT.endDrawing();
             }
+
+            ChamsRenderer mode = ChamsModule.getInstance().mode.getValue();
+            float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+            ChamsRenderer.render(mode, last, tickDelta, color);
         }
     }
 }

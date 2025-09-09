@@ -29,6 +29,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     private float[] selectedColor;
     private boolean draggingHue;
     private boolean draggingPicker;
+    private boolean draggingTransparency;
 
     private final float pickerLength;
 

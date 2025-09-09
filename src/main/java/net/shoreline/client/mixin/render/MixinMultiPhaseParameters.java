@@ -16,4 +16,8 @@ public abstract class MixinMultiPhaseParameters implements IMultiPhaseParameters
     @Override
     @Accessor("texture")
     public abstract RenderPhase.TextureBase getTexture();
+
+    @Override
+    @Accessor("target")
+    public abstract RenderPhase.Target getTarget();
 }

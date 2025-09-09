@@ -6,18 +6,21 @@ import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.shoreline.client.api.config.BooleanConfig;
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.ConfigGroup;
-import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.loader.Loader;
 import net.shoreline.loader.session.UserSession;
+
+import java.awt.*;
 
 public class ChamsModule extends Toggleable
 {
     private static ChamsModule INSTANCE;
+    public Config<ChamsRenderer> mode = new EnumConfig.Builder<ChamsRenderer>("Mode")
+            .setValues(ChamsRenderer.values())
+            .setDefaultValue(ChamsRenderer.CHAMS).build();
     public Config<Boolean> renderPlayers = new BooleanConfig.Builder("Players")
             .setDescription("Render players").setDefaultValue(true).build();
     public Config<Boolean> renderHostiles = new BooleanConfig.Builder("Hostiles")
@@ -36,11 +39,13 @@ public class ChamsModule extends Toggleable
     public Config<Float> speed = new NumberConfig.Builder<Float>("Speed")
             .setMin(0.0f).setMax(1.0f).setDefaultValue(0.5f)
             .setVisible(shine::getValue).build();
-    public final Config<Boolean> xqz = new BooleanConfig.Builder("XQZ")
+    public Config<Boolean> xqz = new BooleanConfig.Builder("XQZ")
             .setDefaultValue(false).build();
     public Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
             .setMin(0.0f).setMax(1.0f).setDefaultValue(1.0f)
             .setVisible(xqz::getValue).build();
+    public Config<Color> color = new ColorConfig.Builder("Color")
+            .setRgb(0xFFFFFFFF).setTransparency(true).build();
 
     public ChamsModule()
     {

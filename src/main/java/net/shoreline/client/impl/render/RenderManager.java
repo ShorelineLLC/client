@@ -134,6 +134,26 @@ public class RenderManager
         endRender();
     }
 
+    public void renderBox(Consumer<BufferBuilder> consumer)
+    {
+        startRender();
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        consumer.accept(buffer);
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
+    public void renderBoundingBox(Consumer<BufferBuilder> consumer)
+    {
+        startRender();
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        consumer.accept(buffer);
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
     public void renderNametag(MatrixStack matrixStack, Vec3d pos, float scale, String text, int color)
     {
         EntityRenderDispatcher entityRenderer =MinecraftClient.getInstance().getEntityRenderDispatcher();
