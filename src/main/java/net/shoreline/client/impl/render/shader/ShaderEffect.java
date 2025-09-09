@@ -3,17 +3,22 @@ package net.shoreline.client.impl.render.shader;
 import lombok.Getter;
 import net.shoreline.client.api.GenericFeature;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 public class ShaderEffect extends GenericFeature
 {
-    private final List<Uniform<?>> uniforms = new ArrayList<>();
+    private final Set<Uniform<?>> uniforms = new HashSet<>();
 
     public ShaderEffect(String name)
     {
         super(name);
+    }
+
+    public void setUniform()
+    {
+
     }
 
     public void addIntUniform(String name, int value)

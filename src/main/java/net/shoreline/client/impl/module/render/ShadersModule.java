@@ -50,9 +50,7 @@ public class ShadersModule extends Toggleable
             .setDescription("Render shaders over items")
             .setDefaultValue(true).build();
     Config<Boolean> thrownConfig = new BooleanConfig.Builder("Thrown")
-            .setVisibilityDependant(true)
             .setDescription("Render shaders over thrown items")
-            .setVisible(() -> itemsConfig.getValue())
             .setDefaultValue(true).build();
     Config<Boolean> passiveConfig = new BooleanConfig.Builder("Passive")
             .setDescription("Render shaders over hands")

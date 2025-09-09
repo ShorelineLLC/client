@@ -99,9 +99,10 @@ public class NametagsModule extends RenderModule
         MatrixStack matrices = event.getMatrixStack();
         Camera camera = mc.getEntityRenderDispatcher().camera;
 
+        RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
+
         RenderSystem.enablePolygonOffset();
         RenderSystem.polygonOffset(1.0f, -32500000);
         for (PlayerEntry playerEntry : players)
@@ -134,7 +135,7 @@ public class NametagsModule extends RenderModule
 
         RenderSystem.disablePolygonOffset();
         RenderSystem.polygonOffset(1.0f, 32500000);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
+        RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
 

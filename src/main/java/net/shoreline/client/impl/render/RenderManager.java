@@ -139,9 +139,9 @@ public class RenderManager
         EntityRenderDispatcher entityRenderer =MinecraftClient.getInstance().getEntityRenderDispatcher();
         Camera camera = entityRenderer.camera;
 
+        RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        GL11.glDepthFunc(GL11.GL_ALWAYS);
         RenderSystem.enablePolygonOffset();
         RenderSystem.polygonOffset(1.0f, -32500000);
 
@@ -165,8 +165,8 @@ public class RenderManager
 
         RenderSystem.disablePolygonOffset();
         RenderSystem.polygonOffset(1.0f, 32500000);
-        GL11.glDepthFunc(GL11.GL_LEQUAL);
         RenderSystem.disableBlend();
+        RenderSystem.enableDepthTest();
     }
 
     public void drawText(MatrixStack matrices, String text, float x, float y, int color)
