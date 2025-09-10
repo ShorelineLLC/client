@@ -66,7 +66,7 @@ public class KeybindFile extends JsonConfigFile
                 }
 
                 int key = keycode.getAsInt();
-                ModuleKeybind keybind =  module.getKeybindMacro() instanceof HoldKeybind ?
+                ModuleKeybind keybind =  jsonObject.has("hold") && jsonObject.get("hold").getAsBoolean() ?
                         new HoldKeybind(key, module) : new ModuleKeybind(key, module);
 
                 module.setKeybind(keybind);

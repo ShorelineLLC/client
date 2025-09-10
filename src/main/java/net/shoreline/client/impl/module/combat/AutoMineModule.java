@@ -92,23 +92,30 @@ public class AutoMineModule extends TrapModule
             return;
         }
 
-        PlayerEntity target = Managers.TARGETING.setClosestTarget(rangeConfig.getValue());
-
-        if (target != null && !speedMine.isManualMining())
+        if (speedMine.isManualMining())
         {
-            BlockPos targetPos = EntityUtil.getRoundedBlockPos(target);
+            mineTimer.reset();
+            return;
+        }
 
-            Box boundingBox = target.getBoundingBox();
-            long roundedY = Math.round(boundingBox.minY);
-            Box bb = boundingBox.withMinY(roundedY).shrink(0.01, 0.1, 0.01);
+        PlayerEntity target = Managers.TARGETING.setClosestTarget(rangeConfig.getValue());
+        if (target == null)
+        {
+            return;
+        }
 
-            BlockPos autoMine = getNextAutoMine(targetPos, bb);
+        BlockPos targetPos = EntityUtil.getRoundedBlockPos(target);
 
-            if (autoMine != null && canStartMining(autoMine) && mineTimer.hasPassed(delayConfig.getValue()))
-            {
-                startAutoMine(autoMine);
-                mineTimer.reset();
-            }
+        Box boundingBox = target.getBoundingBox();
+        long roundedY = Math.round(boundingBox.minY);
+        Box bb = boundingBox.withMinY(roundedY).shrink(0.01, 0.1, 0.01);
+
+        BlockPos autoMine = getNextAutoMine(targetPos, bb);
+
+        if (autoMine != null && canStartMining(autoMine) && mineTimer.hasPassed(delayConfig.getValue()))
+        {
+            startAutoMine(autoMine);
+            mineTimer.reset();
         }
     }
 

@@ -22,7 +22,7 @@ public class HoldKeybind extends ModuleKeybind
         };
     }
 
-    public void onKeyEndPress()
+    public void onKeyRelease()
     {
         if (module.isEnabled())
         {

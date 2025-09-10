@@ -43,12 +43,12 @@ public class ArmorHudModule extends HudModule
             if (percent.getValue())
             {
                 context.getMatrices().push();
-                context.getMatrices().translate(getX() + getWidth() - offset + 17, getY(), 0.0f);
+                context.getMatrices().translate(getX() + getWidth() - offset + 17, getY() + 1, 0.0f);
                 context.getMatrices().scale(0.66f, 0.66f, 0.66f);
 
                 int damage = stack.getMaxDamage() - stack.getDamage();
                 float percent = (float) damage / stack.getMaxDamage();
-                String text = (int) (percent * 100) + "%";
+                String text = String.valueOf((int) (percent * 100));
                 float width = getTextWidth(text) / 2f;
                 int color = ColorUtil.hslToColor(percent * 120, 100f, 50f, 1f).getRGB();
                 drawText(context.getMatrices(), text, -width - 13, 0, color);

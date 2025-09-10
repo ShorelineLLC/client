@@ -92,6 +92,7 @@ public class FastFallModule extends MovementModule
             {
                 return;
             }
+
             double fallHeight = traceDown();
             if (fallHeight > 0.01 && fallHeight <= heightConfig.getValue() + 0.01)
             {

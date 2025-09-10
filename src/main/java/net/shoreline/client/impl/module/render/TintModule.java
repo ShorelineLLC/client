@@ -13,6 +13,9 @@ import java.awt.*;
 
 public class TintModule extends Toggleable
 {
+    Config<Color> tintColor = new ColorConfig.Builder("Tint")
+            .setDescription("The color of the world tint")
+            .setDefaultValue(Color.RED).build();
     Config<Boolean> lightConfig = new BooleanConfig.Builder("Light")
             .setDescription("Change the color of world light")
             .setDefaultValue(false).build();
@@ -25,9 +28,6 @@ public class TintModule extends Toggleable
     Config<Boolean> lavaConfig = new BooleanConfig.Builder("Lava")
             .setDescription("Change the color of lava")
             .setDefaultValue(false).build();
-    Config<Color> tintColor = new ColorConfig.Builder("TintColor")
-            .setDescription("The color of the world tint")
-            .setDefaultValue(Color.RED).build();
 
     public TintModule()
     {

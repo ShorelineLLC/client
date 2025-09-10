@@ -3,46 +3,46 @@ package net.shoreline.client.impl.module.render;
 import net.shoreline.client.api.macro.HoldKeybind;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
-import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.option.FovEvent;
-import net.shoreline.eventbus.annotation.EventListener;
 import org.lwjgl.glfw.GLFW;
 
 public class ZoomModule extends ListeningToggleable
 {
+    private int prevFov = 100;
+
     public ZoomModule()
     {
         super("Zoom", "Zooms in the camera", GuiCategory.RENDER);
-        setKeybind(new HoldKeybind(GLFW.GLFW_KEY_UNKNOWN, this));
+        setKeybind(new HoldKeybind(GLFW.GLFW_KEY_C, this));
     }
 
-    @EventListener
-    public void onTick(TickEvent.Pre event)
+    @Override
+    public void onEnable()
     {
-        if (mc.currentScreen != null || mc.options == null)
+        if (mc.options == null)
         {
             return;
         }
 
-        if (isEnabled())
+        prevFov = mc.options.getFov().getValue();
+
+        if (mc.currentScreen != null)
         {
-            mc.options.smoothCameraEnabled = true;
-            // mc.options.hudHidden = true;
+            return;
         }
-        else
-        {
-            mc.options.smoothCameraEnabled = false;
-            // mc.options.hudHidden = false;
-        }
+
+        mc.options.smoothCameraEnabled = true;
+        mc.options.getFov().setValue(30);
     }
 
-    @EventListener
-    public void onFov(FovEvent event)
+    @Override
+    public void onDisable()
     {
-        if (isEnabled())
+        if (mc.options == null)
         {
-            event.cancel();
-            event.setFov(30);
+            return;
         }
+
+        mc.options.smoothCameraEnabled = false;
+        mc.options.getFov().setValue(prevFov);
     }
 }
