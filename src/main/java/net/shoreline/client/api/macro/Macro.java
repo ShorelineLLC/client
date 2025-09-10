@@ -1,6 +1,7 @@
 package net.shoreline.client.api.macro;
 
 import com.google.gson.JsonObject;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -8,11 +9,12 @@ import net.shoreline.client.api.Serializable;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
-public class Macro implements Serializable
+public abstract class Macro implements Serializable
 {
     private int keycode;
     private final Runnable command;
+
+    private boolean hold;
 
     public Macro(int keycode, Runnable command)
     {
@@ -26,11 +28,5 @@ public class Macro implements Serializable
         {
             getCommand().run();
         }
-    }
-
-    @Override
-    public JsonObject toJson()
-    {
-        return null;
     }
 }

@@ -45,11 +45,13 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
         this.searchBar = new SearchComponent(frame, x, y, frameWidth, frameHeight);
         for (int i = 0; i < cells.length; i++)
         {
+            RegistryConfig<T> reg = (RegistryConfig<T>) config;
+            Object entry = cellEntries[i];
+
             final int idx = i;
-            Object e = cellEntries[idx];
-            RegistryConfig<T> reg = (RegistryConfig<T>) getConfig();
-            ToggleComponent toggleComponent = new ToggleComponent(frame, 0, 0, 0, 0, false, () ->
+            cells[i] = new ToggleComponent(frame, 0, 0, 0, 0, reg.contains((T) entry), () ->
             {
+                Object e = cellEntries[idx];
                 if (e == null)
                 {
                     return cells[idx].getState();
@@ -66,9 +68,6 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
                     return true;
                 }
             });
-
-            toggleComponent.setState(reg.contains((T) e));
-            cells[i] = toggleComponent;
         }
     }
 
@@ -196,6 +195,8 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
         }
 
         float scale = ClickGuiModule.INSTANCE.getScale();
+        final int cols = 4;
+        final int maxRows = 3;
         final float pad = 4.0f * scale;
         final float searchH = 14.0f * scale;
         final float cell = 22.0f * scale;
@@ -218,17 +219,17 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
         if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
         {
             List<T> results = findResults(searchBar.getQuery());
-            int slots = Math.min(results.size(), 12);
-            int rows = Math.max(1, (int) Math.ceil(slots / 4.0f));
+            int slots = Math.min(results.size(), cols * maxRows);
+            int rows = Math.max(1, (int) Math.ceil(slots / (float) cols));
 
-            float gridWCells = 4.0f * cell + 3.0f * gap;
+            float gridWCells = cols * cell + (cols - 1) * gap;
             float gridX = panelX + (panelW - gridWCells) / 2.0f;
             float gridY = searchY + searchH + pad;
             float gridH = rows * cell + (rows - 1) * gap;
 
             if (Mouse.isHovering(mouseX, mouseY, gridX, gridY, gridWCells, gridH))
             {
-                for (int i = 0; i < rows * 4; i++)
+                for (int i = 0; i < rows * cols; i++)
                 {
                     cells[i].mouseClicked(mouseX, mouseY, mouseButton);
                 }
@@ -308,6 +309,6 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
     @Override
     public float getComponentHeight()
     {
-        return (float) (pickerHeight * collapseAnim.getFactor());
+        return pickerHeight * (float) collapseAnim.getFactor();
     }
 }

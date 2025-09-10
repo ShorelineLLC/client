@@ -23,17 +23,41 @@ public class MacroManager extends GenericFeature
     @EventListener
     public void onKeyboardInput(InputEvent.Keyboard event)
     {
-        if (checkNull() || mc.currentScreen != null
-                || event.getAction() != GLFW.GLFW_PRESS || event.getKey() == GLFW.GLFW_KEY_UNKNOWN)
+        if (checkNull() || mc.currentScreen != null)
         {
             return;
         }
 
         for (Macro macro : macros)
         {
-            if (macro.getKeycode() <= GLFW.GLFW_KEY_LAST && event.getKey() == macro.getKeycode())
+            if (macro.getKeycode() > GLFW.GLFW_KEY_LAST)
             {
-                macro.onKeyPress();
+                continue;
+            }
+
+            if (macro instanceof HoldKeybind hold)
+            {
+                if (event.getKey() == macro.getKeycode()
+                        && (event.getAction() == GLFW.GLFW_PRESS
+                        || event.getAction() == GLFW.GLFW_REPEAT))
+                {
+                    hold.onKeyPress();
+                } else if (event.getAction() == GLFW.GLFW_RELEASE)
+                {
+                    hold.onKeyEndPress();
+                }
+            }
+            else
+            {
+                if (event.getKey() == GLFW.GLFW_KEY_UNKNOWN || event.getAction() != GLFW.GLFW_PRESS)
+                {
+                    continue;
+                }
+
+                if (event.getKey() == macro.getKeycode())
+                {
+                    macro.onKeyPress();
+                }
             }
         }
     }

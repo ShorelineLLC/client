@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.macro.ModuleKeybind;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
@@ -41,7 +42,9 @@ public class ClickGuiModule extends Toggleable
     public ClickGuiModule()
     {
         super("ClickGui", "The client mod menu", GuiCategory.CLIENT);
-        setKeybind(GLFW.GLFW_KEY_RIGHT_SHIFT);
+
+        setKeybind(new ModuleKeybind(GLFW.GLFW_KEY_RIGHT_SHIFT, this));
+
         this.fadeInAnimation = new Animation(false, 400, Easing.SINE_OUT);
         this.theme = new Theme(fadeInAnimation);
         INSTANCE = this;

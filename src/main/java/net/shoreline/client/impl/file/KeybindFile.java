@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.shoreline.client.api.file.IOUtils;
 import net.shoreline.client.api.file.JsonConfigFile;
+import net.shoreline.client.api.macro.HoldKeybind;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.macro.ModuleKeybind;
 import net.shoreline.client.api.module.Toggleable;
@@ -64,7 +65,11 @@ public class KeybindFile extends JsonConfigFile
                     continue;
                 }
 
-                module.setKeybind(keycode.getAsInt());
+                int key = keycode.getAsInt();
+                ModuleKeybind keybind =  module.getKeybindMacro() instanceof HoldKeybind ?
+                        new HoldKeybind(key, module) : new ModuleKeybind(key, module);
+
+                module.setKeybind(keybind);
             }
         }
     }

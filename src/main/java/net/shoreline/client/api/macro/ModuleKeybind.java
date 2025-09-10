@@ -7,7 +7,7 @@ import net.shoreline.client.api.module.Toggleable;
 public class ModuleKeybind extends Macro
 {
     @Getter
-    private final Toggleable module;
+    protected final Toggleable module;
 
     public ModuleKeybind(int keycode, Toggleable module)
     {
