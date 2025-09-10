@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -31,9 +32,10 @@ public enum ChamsRenderer
     private static Matrix4f matrix;
     private static Vec3d position;
     private static int color;
+    private static boolean throughWalls;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static void render(ChamsRenderer chams, Entity entity, float tickDelta, int color)
+    public static void render(ChamsRenderer chams, Entity entity, float tickDelta, boolean throughWalls, int color)
     {
         if (chams == NONE)
         {
@@ -46,11 +48,12 @@ public enum ChamsRenderer
         ChamsRenderer.chams = chams;
         ChamsRenderer.color = color;
         ChamsRenderer.matrix = matrix4f;
+        ChamsRenderer.throughWalls = throughWalls;
         ChamsRenderer.position = Interpolation.getRenderPosition(entity, tickDelta);
 
         EntityRenderer<?, ?> renderer = MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity);
         EntityRenderState renderState = ((EntityRenderer<Entity, EntityRenderState>) renderer).getAndUpdateRenderState(entity, tickDelta);
-
+        renderState.
         matrices.push();
         if (renderer instanceof LivingEntityRenderer livingEntityRenderer && renderState instanceof LivingEntityRenderState state)
         {
@@ -92,6 +95,7 @@ public enum ChamsRenderer
         private final float[] ys = new float[4];
         private final float[] zs = new float[4];
         private int i = 0;
+        private int j = 0;
 
         @Override
         public VertexConsumer vertex(float x, float y, float z)
@@ -100,11 +104,12 @@ public enum ChamsRenderer
             ys[i] = y;
             zs[i] = z;
             i++;
+            j++;
 
             if (i == 4)
             {
                 Vec3d camera = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
-                if (chams == CHAMS || chams == BOTH)
+                if ((chams == CHAMS || chams == BOTH))
                 {
                     Managers.RENDER.renderBox(buffer ->
                     {
@@ -112,10 +117,10 @@ public enum ChamsRenderer
                         buffer.vertex(matrix, (float) (position.getX() + xs[1] - camera.getX()), (float) (position.getY() + ys[1] - camera.getY()), (float) (position.getZ() + zs[1] - camera.getZ())).color(color);
                         buffer.vertex(matrix, (float) (position.getX() + xs[2] - camera.getX()), (float) (position.getY() + ys[2] - camera.getY()), (float) (position.getZ() + zs[2] - camera.getZ())).color(color);
                         buffer.vertex(matrix, (float) (position.getX() + xs[3] - camera.getX()), (float) (position.getY() + ys[3] - camera.getY()), (float) (position.getZ() + zs[3] - camera.getZ())).color(color);
-                    });
+                    }, !throughWalls);
                 }
 
-                if (chams == WIREFRAME || chams == BOTH)
+                if ((chams == WIREFRAME || chams == BOTH))
                 {
                     Managers.RENDER.renderBoundingBox(buffer ->
                     {
@@ -126,7 +131,7 @@ public enum ChamsRenderer
                         buffer.vertex(matrix, (float) (position.x + xs[2] - camera.getX()), (float) (position.y + ys[2] - camera.getY()), (float) (position.z + zs[2] - camera.getZ())).color(lineColor);
                         buffer.vertex(matrix, (float) (position.x + xs[2] - camera.getX()), (float) (position.y + ys[2] - camera.getY()), (float) (position.z + zs[2] - camera.getZ())).color(lineColor);
                         buffer.vertex(matrix, (float) (position.x + xs[3] - camera.getX()), (float) (position.y + ys[3] - camera.getY()), (float) (position.z + zs[3] - camera.getZ())).color(lineColor);
-                    });
+                    }, !throughWalls);
                 }
 
                 i = 0;

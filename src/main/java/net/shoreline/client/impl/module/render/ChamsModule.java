@@ -10,8 +10,6 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.render.ChamsRenderer;
-import net.shoreline.loader.Loader;
-import net.shoreline.loader.session.UserSession;
 
 import java.awt.*;
 
@@ -31,6 +29,8 @@ public class ChamsModule extends Toggleable
             .setDescription("Render crystals").setDefaultValue(false).build();
     public Config<Void> renderConfig = new ConfigGroup.Builder("Target")
             .addAll(renderPlayers, renderHostiles, renderPassives, renderCrystals).build();
+    public Config<Boolean> throughWalls = new BooleanConfig.Builder("ThroughWalls")
+            .setDefaultValue(true).build();
     public Config<Boolean> shine = new BooleanConfig.Builder("Shine")
             .setDefaultValue(false).build();
     public Config<Float> scale = new NumberConfig.Builder<Float>("Scale")

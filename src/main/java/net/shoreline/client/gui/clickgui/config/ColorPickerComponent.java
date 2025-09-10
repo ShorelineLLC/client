@@ -274,7 +274,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
 
         float alphaY = getTy() + height + pickerLength + 22;
         float alphaW = pickerLength + 10;
-        float alphaSelectorX = pickerX + (alphaW * alpha);
+        float alphaSelectorX = pickerX + (alphaW * (1.0f - alpha));
         drawRect(context, alphaSelectorX - 1, alphaY - 1, 4, 17, 0xFF000000);
         drawRect(context, alphaSelectorX, alphaY, 2, 15, 0xFFFFFFFF);
 
@@ -297,7 +297,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
 
         if (draggingTransparency)
         {
-            float transparency = Math.max(0, Math.min(1, (mouseX - pickerX) / alphaW));
+            float transparency = Math.max(0, Math.min(1, 1.0f - (mouseX - pickerX) / alphaW));
             colorConfig.setValue(new Color(ColorUtil.withTransparency(colorConfig.getValue(), transparency), true));
         }
     }

@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.awt.*;
@@ -131,7 +132,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
 
             ChamsRenderer mode = ChamsModule.getInstance().mode.getValue();
             float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
-            ChamsRenderer.render(mode, last, tickDelta, color);
+            ChamsRenderer.render(mode, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
         }
     }
 }
