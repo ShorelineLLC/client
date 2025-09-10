@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
@@ -86,14 +87,15 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         {
             enableScissor(context, getTx() + 3, getTy() + height + 4, getTx() + width - 1, getTy() + height + getComponentHeight() + 2);
 
-            for (int i = 0; i < pickerLength - 2; i++)
+            for (int i = 0; i < pickerLength - 1; i++)
             {
                 float hue = i / (float) pickerLength;
-                drawRect(context, getTx() + pickerLength + 4, getTy() + i + height + 3, 10, 1, Color.getHSBColor(hue, 1.0f, 1.0f).getRGB());
+                drawRect(context, getTx() + pickerLength + 3, getTy() + i + height + 3, 11, 1, Color.getHSBColor(hue, 1.0f, 1.0f).getRGB());
             }
             // drawOutline(context, getTx() + pickerLength + 3, getTy() + height + 5, 10, pickerLength - 2, 1, Colors.BLACK);
 
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, getConfig().getValue().getRGB(), true);
+            int configColor = new Color(colorConfig.getRGB(), false).getRGB();
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, configColor, true);
             drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0x00000000, 0xff000000, false);
 
             drawOutline(context, getTx() + 3, getTy() + height + pickerLength + 6, pickerLength - 24, 13, 1, theme.getComponentColor());
@@ -116,6 +118,9 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             float syncY = getTy() + height + pickerLength + 5;
             drawRect(context, syncX, syncY, 15, 15, ((ColorConfig) getConfig()).isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
+
+            float alphaY = syncY + 17;
+            drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, 0xFFFFFFFF, true);
 
             drawSelectors(context, mouseX, mouseY, delta);
             disableScissor(context);
@@ -148,6 +153,10 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         {
             draggingHue = true;
         }
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + height + pickerLength + 22, 14 + pickerLength, 15))
+        {
+            draggingTransparency = true;
+        }
         else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength, getTy() + height + pickerLength + 5, 15, 15))
         {
             ((ColorConfig) getConfig()).setGlobal(!((ColorConfig) getConfig()).isGlobal());
@@ -165,6 +174,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     {
         draggingHue = false;
         draggingPicker = false;
+        draggingTransparency = false;
     }
 
     @Override
@@ -239,10 +249,11 @@ public class ColorPickerComponent extends ConfigComponent<Color>
     public void drawSelectors(DrawContext context, float mouseX, float mouseY, float delta)
     {
         float[] hsb = colorConfig.getHsb();
-        float hueX = getTx() + pickerLength + 4;
-        float hueW = 10;
+        float alpha = colorConfig.getAlpha() / 255f;
+        float hueX = getTx() + pickerLength + 3;
+        float hueW = 11;
         float hueY = getTy() + height + 3;
-        float hueH = pickerLength - 2;
+        float hueH = pickerLength - 1;
 
         float pickerX = getTx() + 2;
         float pickerY = getTy() + height + 4;
@@ -261,6 +272,12 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         drawRect(context, hueX - 1, hueSmoothY, hueW + 2, 3, 0xFF000000);
         drawRect(context, hueX, hueSmoothY + 1, hueW + 1, 1, 0xFFFFFFFF);
 
+        float alphaY = getTy() + height + pickerLength + 22;
+        float alphaW = pickerLength + 10;
+        float alphaSelectorX = pickerX + (alphaW * alpha);
+        drawRect(context, alphaSelectorX - 1, alphaY - 1, 4, 17, 0xFF000000);
+        drawRect(context, alphaSelectorX, alphaY, 2, 15, 0xFFFFFFFF);
+
         if (draggingPicker)
         {
             float sat = Math.max(0, Math.min(1, (mouseX - pickerX) / pickerW));
@@ -276,6 +293,12 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             float hue = Math.max(0, Math.min(1, (mouseY - hueY) / hueH));
             selectedColor[0] = hue;
             colorConfig.setValue(new Color(Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2])));
+        }
+
+        if (draggingTransparency)
+        {
+            float transparency = Math.max(0, Math.min(1, (mouseX - pickerX) / alphaW));
+            colorConfig.setValue(new Color(ColorUtil.withTransparency(colorConfig.getValue(), transparency), true));
         }
     }
 
