@@ -87,6 +87,11 @@ public class SpeedMineModule extends ListeningToggleable
     @Override
     public void onDisable()
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         clearMain();
         clearPacket();
         pendingClear = null;

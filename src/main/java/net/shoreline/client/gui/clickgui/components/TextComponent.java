@@ -91,8 +91,7 @@ public class TextComponent extends FrameComponent
                              double mouseY,
                              int button)
     {
-        if (Mouse.isHovering(mouseX, mouseY, getX(), getY(), width, height)
-                && button == mouseButton)
+        if (Mouse.isHovering(mouseX, mouseY, getX(), getY(), width, height) && button == mouseButton)
         {
             if (typing)
             {
@@ -199,10 +198,12 @@ public class TextComponent extends FrameComponent
             showInsertionPoint = !showInsertionPoint;
             timer.reset();
         }
+
         if (showInsertionPoint && typing)
         {
             return style ? "|" : "_";
         }
+
         return "";
     }
 }

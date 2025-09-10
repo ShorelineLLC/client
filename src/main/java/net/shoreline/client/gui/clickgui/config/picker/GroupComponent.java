@@ -1,14 +1,14 @@
-package net.shoreline.client.gui.clickgui.config;
+package net.shoreline.client.gui.clickgui.config.picker;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
+import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.impl.render.Animation;
@@ -19,12 +19,8 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupComponent extends ConfigComponent<Void>
+public class GroupComponent extends ExpandableComponent<Void>
 {
-    @Setter
-    private boolean groupOpen;
-    private final Animation collapseAnim;
-
     @Getter
     private final List<ConfigComponent<?>> components = new ArrayList<>();
 
@@ -37,7 +33,6 @@ public class GroupComponent extends ConfigComponent<Void>
                           float frameHeight)
     {
         super(config, moduleComponent, frame, x, y, frameWidth, frameHeight);
-        this.collapseAnim = new Animation(false, 150L, Easing.CUBIC_IN_OUT);
     }
 
     @Override
@@ -57,7 +52,7 @@ public class GroupComponent extends ConfigComponent<Void>
         String dotsText = "...";
         drawText(context, dotsText, getTx() + width - getTextWidth(dotsText) - 1.0f, getTy() + 4.0f, theme.getTextColor());
 
-        enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getScaledHeight());
+        enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
 
         float configY = height + (3.0f * scale);
         for (ConfigComponent<?> component : components)
@@ -65,21 +60,19 @@ public class GroupComponent extends ConfigComponent<Void>
             component.getDrawAnim().setState(component.getConfig().isVisible());
             if (component.getDrawAnim().getFactor() > 0.01)
             {
-                float extra = 0.0f;
-                if (component instanceof GroupComponent c)
+                float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                if (component instanceof ExpandableComponent<?> c)
                 {
-                    extra += c.getScaledHeight();
-                }
-                else if (component instanceof ColorPickerComponent c1)
-                {
-                    extra += c1.getComponentHeight();
+                    totalHeight += c.getComponentHeight();
                 }
 
-                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
+                totalHeight *= (float) component.getDrawAnim().getFactor();
+
+                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
                 component.setY(getYOffset());
                 component.drawComponent(context, mouseX, mouseY, delta);
                 component.setYOffset(configY);
-                configY += component.getDrawHeight() + extra + (float) Math.floor(scale);
+                configY += totalHeight;
 
                 component.setModuleOffset(configY);
                 disableScissor(context);
@@ -98,9 +91,9 @@ public class GroupComponent extends ConfigComponent<Void>
         if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
                 && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
         {
-            this.groupOpen = !groupOpen;
-            collapseAnim.setState(groupOpen);
-            collapseAnim.setEasing(groupOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
+            this.pickerOpen = !pickerOpen;
+            collapseAnim.setState(pickerOpen);
+            collapseAnim.setEasing(pickerOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
         if (collapseAnim.getFactor() > 0.0)
@@ -165,32 +158,25 @@ public class GroupComponent extends ConfigComponent<Void>
         }
     }
 
+    @Override
     public float getComponentHeight()
     {
         float scale = ClickGuiModule.INSTANCE.getScale();
-        float frameHeight = 2.0f * scale;
+        float frameHeight = 4.0f * scale;
         for (ConfigComponent<?> component : components)
         {
             if (component.getConfig().isVisible())
             {
-                if (component instanceof GroupComponent c)
+                float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                if (component instanceof ExpandableComponent<?> c)
                 {
-                    frameHeight += c.getScaledHeight();
-                } else if (component instanceof ColorPickerComponent c1)
-                {
-                    frameHeight += c1.getComponentHeight();
+                    totalHeight += c.getComponentHeight();
                 }
 
-                frameHeight += component.getDrawHeight() + (float) Math.floor(scale);
+                frameHeight += (float) (totalHeight * component.getDrawAnim().getFactor());
             }
         }
 
-        return frameHeight;
-    }
-
-    public float getScaledHeight()
-    {
-        float scale = ClickGuiModule.INSTANCE.getScale();
-        return (float) ((getComponentHeight() + (2.0f * scale)) * collapseAnim.getFactor());
+        return (float) (frameHeight * collapseAnim.getFactor());
     }
 }

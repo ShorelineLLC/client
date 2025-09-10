@@ -70,9 +70,6 @@ void main() {
     if (max_component < 1.0) {
         vec3 tint = mix(vec3(1.0), CustomLightColor, clamp(CustomLightStrength, 0.0, 1.0));
         color *= tint;
-
-        fragColor = vec4(color, 1.0);
-        return;
     }
 
     fragColor = vec4(color, 1.0);

@@ -1,14 +1,14 @@
 package net.shoreline.client.gui.clickgui;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.ToggleComponent;
-import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
+import net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
-import net.shoreline.client.gui.clickgui.config.GroupComponent;
+import net.shoreline.client.gui.clickgui.config.picker.ExpandableComponent;
+import net.shoreline.client.gui.clickgui.config.picker.GroupComponent;
+import net.shoreline.client.gui.clickgui.config.picker.RegistryPickerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Theme;
@@ -77,20 +77,18 @@ public class ToggleModuleComponent extends ModuleComponent
 
                 if (component.getDrawAnim().getFactor() > 0.01)
                 {
-                    float extra = 0.0f;
-                    if (component instanceof GroupComponent c)
+                    float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                    if (component instanceof ExpandableComponent<?> c)
                     {
-                        extra += c.getScaledHeight();
-                    }
-                    else if (component instanceof ColorPickerComponent c1)
-                    {
-                        extra += c1.getComponentHeight();
+                        totalHeight += c.getComponentHeight();
                     }
 
-                    enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
+                    totalHeight *= (float) component.getDrawAnim().getFactor();
+
+                    enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
                     component.setYOffset(configY);
                     component.drawComponent(context, mouseX, mouseY, delta);
-                    configY += component.getDrawHeight() + extra + (float) Math.floor(scale);
+                    configY += totalHeight;
 
                     disableScissor(context);
                 }

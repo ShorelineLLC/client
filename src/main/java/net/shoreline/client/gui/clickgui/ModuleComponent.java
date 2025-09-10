@@ -7,9 +7,11 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.FrameComponent;
-import net.shoreline.client.gui.clickgui.config.ColorPickerComponent;
+import net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
-import net.shoreline.client.gui.clickgui.config.GroupComponent;
+import net.shoreline.client.gui.clickgui.config.picker.ExpandableComponent;
+import net.shoreline.client.gui.clickgui.config.picker.GroupComponent;
+import net.shoreline.client.gui.clickgui.config.picker.RegistryPickerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -105,20 +107,18 @@ public class ModuleComponent extends FrameComponent
 
             if (component.getDrawAnim().getFactor() > 0.01)
             {
-                float extra = 0.0f;
-                if (component instanceof GroupComponent c)
+                float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                if (component instanceof ExpandableComponent<?> c)
                 {
-                    extra += c.getScaledHeight();
-                }
-                else if (component instanceof ColorPickerComponent c1)
-                {
-                    extra += c1.getComponentHeight();
+                    totalHeight += c.getComponentHeight();
                 }
 
-                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + component.getDrawHeight() + extra);
+                totalHeight *= (float) component.getDrawAnim().getFactor();
+
+                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
                 component.drawComponent(context, mouseX, mouseY, delta);
                 component.setYOffset(configY);
-                configY += component.getDrawHeight() + extra + (float) Math.floor(scale);
+                configY += totalHeight;
 
                 component.setModuleOffset(configY);
                 disableScissor(context);
@@ -224,15 +224,13 @@ public class ModuleComponent extends FrameComponent
         {
             if (component.getDrawAnim().getFactor() > 0.01)
             {
-                if (component instanceof GroupComponent c)
+                float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                if (component instanceof ExpandableComponent<?> c)
                 {
-                    frameHeight += c.getScaledHeight();
-                } else if (component instanceof ColorPickerComponent c1)
-                {
-                    frameHeight += c1.getComponentHeight();
+                    totalHeight += c.getComponentHeight();
                 }
 
-                frameHeight += component.getDrawHeight() + (float) Math.floor(scale);
+                frameHeight += (float) (totalHeight * component.getDrawAnim().getFactor());
             }
         }
 

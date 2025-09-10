@@ -202,15 +202,13 @@ public class VelocityModule extends Toggleable
         if (modeConfig.getValue() == VelocityMode.WALLS)
         {
             return PhaseUtil.isInsideBlock(mc.player) && (!groundOnlyConfig.getValue() || mc.player.isOnGround());
-        } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
-        {
-            return true;
         } else if (modeConfig.getValue() == VelocityMode.NORMAL)
         {
             return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
+        } else
+        {
+            return modeConfig.getValue() == VelocityMode.GRIM_V2;
         }
-
-        return false;
     }
 
     private boolean shouldCancelExplosions()
@@ -218,15 +216,13 @@ public class VelocityModule extends Toggleable
         if (modeConfig.getValue() == VelocityMode.WALLS)
         {
             return PhaseUtil.isInsideBlock(mc.player);
-        } else if (modeConfig.getValue() == VelocityMode.GRIM_V2)
-        {
-            return true;
         } else if (modeConfig.getValue() == VelocityMode.NORMAL)
         {
             return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
+        } else
+        {
+            return modeConfig.getValue() == VelocityMode.GRIM_V2;
         }
-
-        return false;
     }
 
     private enum VelocityMode

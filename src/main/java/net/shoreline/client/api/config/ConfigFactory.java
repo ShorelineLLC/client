@@ -3,6 +3,7 @@ package net.shoreline.client.api.config;
 import net.shoreline.client.api.macro.Macro;
 
 import java.awt.*;
+import java.util.Collection;
 
 public class ConfigFactory<T>
 {
@@ -44,6 +45,9 @@ public class ConfigFactory<T>
         } else if (defaultValue instanceof Macro)
         {
             return (Config<T>) new MacroConfig(name, description);
+        } else if (defaultValue instanceof Collection<?>)
+        {
+            return (Config<T>) new RegistryConfig<>(name, description);
         }
 
         throw new IllegalArgumentException("Unsupported config type: " + defaultValue.getClass().getName());

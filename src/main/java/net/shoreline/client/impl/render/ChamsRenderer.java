@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -53,7 +52,6 @@ public enum ChamsRenderer
 
         EntityRenderer<?, ?> renderer = MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity);
         EntityRenderState renderState = ((EntityRenderer<Entity, EntityRenderState>) renderer).getAndUpdateRenderState(entity, tickDelta);
-        renderState.
         matrices.push();
         if (renderer instanceof LivingEntityRenderer livingEntityRenderer && renderState instanceof LivingEntityRenderState state)
         {

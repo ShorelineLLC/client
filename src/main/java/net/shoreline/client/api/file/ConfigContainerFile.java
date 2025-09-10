@@ -2,16 +2,18 @@ package net.shoreline.client.api.file;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.shoreline.client.Shoreline;
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.ConfigContainer;
-import net.shoreline.client.api.config.ConfigGroup;
-import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.config.*;
 
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ConfigContainerFile extends JsonConfigFile
 {
@@ -71,34 +73,47 @@ public class ConfigContainerFile extends JsonConfigFile
 
     private void updateConfigFromJson(Config<?> config, JsonElement value)
     {
-        if (config.getValue() instanceof Boolean)
+        try
         {
-            ((Config<Boolean>) config).setValue(value.getAsBoolean());
-        } else if (config.getValue() instanceof Enum<?>)
-        {
-            try
+            if (config.getValue() instanceof Boolean)
+            {
+                ((Config<Boolean>) config).setValue(value.getAsBoolean());
+            } else if (config.getValue() instanceof Enum<?>)
             {
                 ((Config<Enum<?>>) config).setValue(Enum.valueOf(((Enum<?>) config.getValue()).getDeclaringClass(), value.getAsString()));
-            } catch (IllegalArgumentException ignored)
+            } else if (config.getValue() instanceof Float)
             {
-                ignored.printStackTrace();
+                ((NumberConfig) config).setValue(value.getAsFloat());
+            } else if (config.getValue() instanceof Double)
+            {
+                ((NumberConfig) config).setValue(value.getAsDouble());
+            } else if (config.getValue() instanceof Integer)
+            {
+                ((NumberConfig) config).setValue(value.getAsInt());
+            } else if (config.getValue() instanceof String)
+            {
+                ((Config<String>) config).setValue(value.getAsString());
             }
-        } else if (config.getValue() instanceof Float)
+            else if (config.getValue() instanceof Color)
+            {
+                ((Config<Color>) config).setValue(new Color((int) Long.parseLong(value.getAsString(), 16), true));
+            } else if (config.getValue() instanceof Collection<?>)
+            {
+                Set<Object> entries = new HashSet<>();
+                for (JsonElement element : value.getAsJsonArray())
+                {
+                    Identifier id = Identifier.of(element.getAsString());
+                    Object entry = ((RegistryConfig<?>) config).getRegistry().get(id);
+                    entries.add(entry);
+                }
+
+                ((Config<Collection<?>>) config).setValue(entries);
+            }
+
+        } catch (IllegalArgumentException | InvalidIdentifierException e)
         {
-            ((NumberConfig) config).setValue(value.getAsFloat());
-        } else if (config.getValue() instanceof Double)
-        {
-            ((NumberConfig) config).setValue(value.getAsDouble());
-        } else if (config.getValue() instanceof Integer)
-        {
-            ((NumberConfig) config).setValue(value.getAsInt());
-        } else if (config.getValue() instanceof String)
-        {
-            ((Config<String>) config).setValue(value.getAsString());
-        }
-        else if (config.getValue() instanceof Color)
-        {
-            ((Config<Color>) config).setValue(new Color((int) Long.parseLong(value.getAsString(), 16), true));
+            Shoreline.info("Failed to load config: " + config.getName());
+            e.printStackTrace();
         }
     }
 }

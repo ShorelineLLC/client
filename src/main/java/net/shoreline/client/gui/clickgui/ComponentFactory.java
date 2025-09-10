@@ -6,8 +6,12 @@ import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.config.*;
+import net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent;
+import net.shoreline.client.gui.clickgui.config.picker.GroupComponent;
+import net.shoreline.client.gui.clickgui.config.picker.RegistryPickerComponent;
 
 import java.awt.*;
+import java.util.Collection;
 
 public class ComponentFactory
 {
@@ -26,6 +30,7 @@ public class ComponentFactory
         return new ModuleComponent(module, frame, x, y, width, height);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public ConfigComponent<?> createConfigComponent(Config<?> config,
                                                     ModuleComponent moduleComponent,
                                                     Frame frame,
@@ -85,6 +90,12 @@ public class ComponentFactory
             if (config.getValue() instanceof String)
             {
                 return new TextboxComponent((Config<String>) config, moduleComponent, frame, x, y, width, height);
+            }
+
+            if (config.getValue() instanceof Collection<?>)
+            {
+                Config<Collection<Object>> colCfg = (Config) config;
+                return new RegistryPickerComponent<>(colCfg, moduleComponent, frame, x, y, width, height);
             }
         }
 
