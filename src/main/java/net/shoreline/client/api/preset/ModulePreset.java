@@ -31,11 +31,17 @@ public class ModulePreset<T extends Module> extends AbstractPreset<T>
             boolean enabled = object.get("toggled").getAsBoolean();
             if (enabled)
             {
-                toggleable.enable();
+                if (!toggleable.isEnabled())
+                {
+                    toggleable.enable();
+                }
             }
             else
             {
-                toggleable.disable();
+                if (toggleable.isEnabled())
+                {
+                    toggleable.disable();
+                }
             }
         }
     }
