@@ -119,8 +119,11 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             drawRect(context, syncX, syncY, 15, 15, ((ColorConfig) getConfig()).isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
 
-            float alphaY = syncY + 17;
-            drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, 0xFFFFFFFF, true);
+            if (colorConfig.isTransparency())
+            {
+                float alphaY = syncY + 17;
+                drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, 0xFFFFFFFF, true);
+            }
 
             drawSelectors(context, mouseX, mouseY, delta);
             disableScissor(context);
@@ -153,7 +156,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
         {
             draggingHue = true;
         }
-        else if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + height + pickerLength + 22, 14 + pickerLength, 15))
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + height + pickerLength + 22, 14 + pickerLength, 15) && colorConfig.isTransparency())
         {
             draggingTransparency = true;
         }
@@ -274,9 +277,12 @@ public class ColorPickerComponent extends ConfigComponent<Color>
 
         float alphaY = getTy() + height + pickerLength + 22;
         float alphaW = pickerLength + 10;
-        float alphaSelectorX = pickerX + (alphaW * (1.0f - alpha));
-        drawRect(context, alphaSelectorX - 1, alphaY - 1, 4, 17, 0xFF000000);
-        drawRect(context, alphaSelectorX, alphaY, 2, 15, 0xFFFFFFFF);
+        if (colorConfig.isTransparency())
+        {
+            float alphaSelectorX = pickerX + (alphaW * (1.0f - alpha));
+            drawRect(context, alphaSelectorX - 1, alphaY - 1, 4, 17, 0xFF000000);
+            drawRect(context, alphaSelectorX, alphaY, 2, 15, 0xFFFFFFFF);
+        }
 
         if (draggingPicker)
         {
@@ -295,7 +301,7 @@ public class ColorPickerComponent extends ConfigComponent<Color>
             colorConfig.setValue(new Color(Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2])));
         }
 
-        if (draggingTransparency)
+        if (draggingTransparency && colorConfig.isTransparency())
         {
             float transparency = Math.max(0, Math.min(1, 1.0f - (mouseX - pickerX) / alphaW));
             colorConfig.setValue(new Color(ColorUtil.withTransparency(colorConfig.getValue(), transparency), true));

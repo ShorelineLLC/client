@@ -90,7 +90,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             // drawOutline(context, getTx() + pickerLength + 3, getTy() + height + 5, 10, pickerLength - 2, 1, Colors.BLACK);
 
             int configColor = new Color(colorConfig.getRGB(), false).getRGB();
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength - 4, getTy() + height + pickerLength - 2, 0xffffffff, getConfig().getValue().getRGB(), true);
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength - 4, getTy() + height + pickerLength - 2, 0xffffffff, configColor, true);
             drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength - 4, getTy() + height + pickerLength - 2, 0x00000000, 0xff000000, false);
 
             drawOutline(context, getTx() + 3, getTy() + height + pickerLength + 3, pickerLength - 24, 13, 1, theme.getComponentColor());
@@ -114,8 +114,11 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             drawRect(context, syncX, syncY, 13, 15, ((ColorConfig) getConfig()).isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
 
-            float alphaY = syncY + 17;
-            drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, 0xFFFFFFFF, true);
+            if (colorConfig.isTransparency())
+            {
+                float alphaY = syncY + 17;
+                drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, 0xFFFFFFFF, true);
+            }
 
             drawSelectors(context, mouseX, mouseY, delta);
             disableScissor(context);
@@ -148,13 +151,13 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         {
             draggingHue = true;
         }
-        else if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + height + pickerLength + 22, 14 + pickerLength, 15))
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + height + pickerLength + 22, 14 + pickerLength, 15) && colorConfig.isTransparency())
         {
             draggingTransparency = true;
         }
         else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength, getTy() + height + pickerLength + 5, 15, 15))
         {
-            ((ColorConfig) getConfig()).setGlobal(!((ColorConfig) getConfig()).isGlobal());
+            colorConfig.setGlobal(!colorConfig.isGlobal());
         }
         else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength - 18, getTy() + height + pickerLength + 5, 15, 15))
         {
@@ -169,6 +172,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
     {
         draggingHue = false;
         draggingPicker = false;
+        draggingTransparency = false;
     }
 
     @Override
@@ -268,9 +272,12 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
 
         float alphaY = getTy() + height + pickerLength + 22;
         float alphaW = pickerLength + 10;
-        float alphaSelectorX = pickerX + (alphaW * (1.0f - alpha));
-        drawRect(context, alphaSelectorX - 1, alphaY - 1, 4, 17, 0xFF000000);
-        drawRect(context, alphaSelectorX, alphaY, 2, 15, 0xFFFFFFFF);
+        if (colorConfig.isTransparency())
+        {
+            float alphaSelectorX = pickerX + (alphaW * (1.0f - alpha));
+            drawRect(context, alphaSelectorX - 1, alphaY - 1, 4, 17, 0xFF000000);
+            drawRect(context, alphaSelectorX, alphaY, 2, 15, 0xFFFFFFFF);
+        }
 
         if (draggingPicker)
         {
@@ -289,7 +296,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             colorConfig.setValue(new Color(Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2])));
         }
 
-        if (draggingTransparency)
+        if (draggingTransparency && colorConfig.isTransparency())
         {
             float transparency = Math.max(0, Math.min(1, 1.0f - (mouseX - pickerX) / alphaW));
             colorConfig.setValue(new Color(ColorUtil.withTransparency(colorConfig.getValue(), transparency), true));

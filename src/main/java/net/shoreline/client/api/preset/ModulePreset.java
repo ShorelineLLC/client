@@ -29,19 +29,9 @@ public class ModulePreset<T extends Module> extends AbstractPreset<T>
         if (module instanceof Toggleable toggleable && object.has("toggled"))
         {
             boolean enabled = object.get("toggled").getAsBoolean();
-            if (enabled)
+            if (enabled != toggleable.isEnabled())
             {
-                if (!toggleable.isEnabled())
-                {
-                    toggleable.enable();
-                }
-            }
-            else
-            {
-                if (toggleable.isEnabled())
-                {
-                    toggleable.disable();
-                }
+                toggleable.toggle();
             }
         }
     }
