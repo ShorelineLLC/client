@@ -2109,8 +2109,8 @@ net.shoreline.client.impl.module.client.ThemeModule -> net.shoreline.client.eP:
     87:87:java.awt.Color getTextColor() -> fN
     92:92:net.shoreline.client.api.config.Config getSetting() -> fO
     43:58:void lambda$new$0(net.shoreline.client.impl.render.Theme,java.awt.Color) -> a
-net.shoreline.client.impl.module.combat.AuraModule -> net.shoreline.client.eQ:
-    net.shoreline.client.impl.module.combat.AuraModule INSTANCE -> hK
+net.shoreline.client.impl.module.combat.KillAuraModule -> net.shoreline.client.eQ:
+    net.shoreline.client.impl.module.combat.KillAuraModule INSTANCE -> hK
     net.shoreline.client.api.config.Config rangeConfig -> hL
     net.shoreline.client.api.config.Config hitDelay -> hM
     net.shoreline.client.api.config.Config multitaskConfig -> hN
@@ -4662,7 +4662,7 @@ net.shoreline.client.mixin.world.MixinProperties -> net.shoreline.client.kk:
 net.shoreline.client.mixin.world.MixinServerWorld -> net.shoreline.client.kl:
     22:22:void <init>() -> <init>
     39:44:void hookCreateExplosion(net.minecraft.class_1297,net.minecraft.class_1282,net.minecraft.class_5362,double,double,double,float,boolean,net.minecraft.class_1937$class_7867,net.minecraft.class_2394,net.minecraft.class_2394,net.minecraft.class_6880,org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> a
-net.shoreline.client.util.Formatter -> net.shoreline.client.km:
+net.shoreline.client.util.text.Formatter -> net.shoreline.client.km:
     10:38:java.lang.String formatEnum(java.lang.Enum) -> c
     6:6:void <init>() -> <init>
 net.shoreline.client.util.Keyboard -> net.shoreline.client.kn:

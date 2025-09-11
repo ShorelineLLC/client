@@ -69,7 +69,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
             }
 
             float damage = CrystalUtil.getCrystalDamage(this, explosionCenter, entity, autoCrystal.getIgnoreTerrain().getValue());
-            boolean antiSurround = AntiSurround.checkAntiSurroundQualifiers(pos.up());
+            boolean antiSurround = AntiSurround.checkAntiSurroundQualifiers(this, pos.up());
 
             crystalBases.add(new CrystalData<>(pos, entity, damage, local, antiSurround));
         }

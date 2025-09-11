@@ -14,7 +14,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerMoveEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.impl.module.world.TimerModule;
-import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.text.Formatter;
 import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.client.util.math.MathUtil;
 import net.shoreline.eventbus.annotation.EventListener;

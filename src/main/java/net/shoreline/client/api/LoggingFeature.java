@@ -6,9 +6,10 @@ import net.shoreline.client.impl.render.ClientFormatting;
 
 public class LoggingFeature extends GenericFeature
 {
-    private static final String PREFIX = ClientFormatting.CLIENT + "[Shoreline] ";
-    private static final String ERROR_PREFIX = "[\u274C] ";
-    private static final String SUCCESS_PREFIX = "[\u2713] ";
+    protected static final String RAW_PREFIX = "[Shoreline]";
+    protected static final String PREFIX = ClientFormatting.CLIENT + RAW_PREFIX + " ";
+    protected static final String ERROR_PREFIX = "[\u274C] ";
+    protected static final String SUCCESS_PREFIX = "[\u2713] ";
 
     public LoggingFeature(String name)
     {

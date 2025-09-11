@@ -39,9 +39,9 @@ import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.apache.commons.lang3.mutable.MutableDouble;
 
-public class AuraModule extends CombatModule
+public class KillAuraModule extends CombatModule
 {
-    public static AuraModule INSTANCE;
+    public static KillAuraModule INSTANCE;
 
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setDefaultValue(4.0f).setMin(0.5f).setMax(6.0f).setFormat("m")
@@ -93,9 +93,9 @@ public class AuraModule extends CombatModule
 
     private final Animation fadeAnim = new Animation(true, 300L);
 
-    public AuraModule()
+    public KillAuraModule()
     {
-        super("Aura", "Attacks nearby entities", GuiCategory.COMBAT);
+        super("KillAura", "Attacks nearby entities", GuiCategory.COMBAT);
         INSTANCE = this;
     }
 

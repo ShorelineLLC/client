@@ -20,6 +20,7 @@ public class ModuleManager
 {
     private final LinkedHashMap<String, Module> allModules = new LinkedHashMap<>();
 
+    private final List<String> moduleNames = new ArrayList<>();
     private final List<Module> modules = new ArrayList<>();
     private final List<HudModule> hudModules = new ArrayList<>();
 
@@ -35,7 +36,7 @@ public class ModuleManager
                 new SocialsModule(),
                 new ThemeModule(),
                 // Combat
-                new AuraModule(),
+                new AutoArmorModule(),
                 new AutoBowReleaseModule(),
                 new AutoCrystalModule(),
                 new AutoDisconnectModule(),
@@ -47,6 +48,7 @@ public class ModuleManager
                 new FeetTrapModule(),
                 new FillerModule(),
                 new KeepSprintModule(),
+                new KillAuraModule(),
                 new OffhandGappleModule(),
                 new ReplenishModule(),
                 new SelfTrapModule(),
@@ -144,6 +146,7 @@ public class ModuleManager
         } else
         {
             modules.add(module);
+            moduleNames.add(module.getName());
         }
 
         allModules.put(module.getId(), module);

@@ -1,4 +1,4 @@
-package net.shoreline.client.util;
+package net.shoreline.client.util.text;
 
 import lombok.experimental.UtilityClass;
 

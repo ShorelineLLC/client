@@ -13,7 +13,7 @@ import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.impl.module.render.FreecamModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
-import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.text.Formatter;
 import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 

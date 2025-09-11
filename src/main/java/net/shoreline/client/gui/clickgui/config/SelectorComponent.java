@@ -1,7 +1,6 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
@@ -11,7 +10,7 @@ import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.impl.render.ColorUtil;
-import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.text.Formatter;
 import org.lwjgl.glfw.GLFW;
 
 public class SelectorComponent extends ConfigComponent<Enum<?>>

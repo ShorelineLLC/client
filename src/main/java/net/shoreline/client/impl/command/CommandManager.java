@@ -35,6 +35,7 @@ public class CommandManager extends GenericFeature
         EventBus.INSTANCE.subscribe(this);
 
         registerCommands(
+                new DrawnCommand(),
                 new FriendCommand(),
                 new KitCommand(),
                 new PrefixCommand(),

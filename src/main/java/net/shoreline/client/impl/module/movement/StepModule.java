@@ -13,7 +13,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.entity.StepHeightEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.module.world.TimerModule;
-import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.text.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class StepModule extends ListeningToggleable

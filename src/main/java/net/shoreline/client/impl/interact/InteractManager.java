@@ -23,7 +23,7 @@ import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.client.AnticheatModule;
-import net.shoreline.client.impl.module.combat.AuraModule;
+import net.shoreline.client.impl.module.combat.KillAuraModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
@@ -114,7 +114,7 @@ public class InteractManager extends GenericFeature
                 {
                     if (anticheat.getAttackCrystals().getValue() && !attacked)
                     {
-                        AuraModule.INSTANCE.sendAttackPackets(entity, false);
+                        KillAuraModule.INSTANCE.sendAttackPackets(entity, false);
                         attacked = true;
                     }
 

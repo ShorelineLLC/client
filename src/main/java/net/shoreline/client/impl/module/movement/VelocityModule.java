@@ -16,7 +16,7 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
 import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.imixin.IEntityVelocityUpdateS2CPacket;
-import net.shoreline.client.util.Formatter;
+import net.shoreline.client.util.text.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;

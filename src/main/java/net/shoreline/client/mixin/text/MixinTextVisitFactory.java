@@ -1,7 +1,5 @@
 package net.shoreline.client.mixin.text;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.text.Style;
 import net.minecraft.text.TextVisitFactory;
@@ -19,12 +17,24 @@ public class MixinTextVisitFactory
             method = "visitFormatted(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/text/Style;Lnet/minecraft/text/CharacterVisitor;)Z",
             at = @At(
                     value = "INVOKE",
+                    target = "Lnet/minecraft/util/Formatting;byCode(C)Lnet/minecraft/util/Formatting;"
+            )
+    )
+    private static Formatting hookVisitFormatted$2(char code)
+    {
+        return code == 'g' || code == 'h' ? Formatting.WHITE : Formatting.byCode(code);
+    }
+
+    @Redirect(
+            method = "visitFormatted(Ljava/lang/String;ILnet/minecraft/text/Style;Lnet/minecraft/text/Style;Lnet/minecraft/text/CharacterVisitor;)Z",
+            at = @At(
+                    value = "INVOKE",
                     target = "Lnet/minecraft/text/Style;withExclusiveFormatting(Lnet/minecraft/util/Formatting;)Lnet/minecraft/text/Style;"
             )
     )
     private static Style hookVisitFormatted(Style instance,
                                             Formatting formatting,
-                                            @Local(index = 8) char d)
+                                            @Local(name = "d") char d)
     {
         if (d == 'g')
         {

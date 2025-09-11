@@ -4,16 +4,21 @@ import lombok.experimental.UtilityClass;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.AutoMineModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
+import net.shoreline.client.impl.world.explosion.ExplosionUtil;
+
+import java.util.Set;
 
 @UtilityClass
 public class AntiSurround
 {
-    public boolean checkAntiSurroundQualifiers(BlockPos blockPos)
+
+    public boolean checkAntiSurroundQualifiers(BlockView blockView, BlockPos blockPos)
     {
         if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
@@ -32,14 +37,21 @@ public class AntiSurround
             return false;
         }
 
+        BlockPos minePos = currentMine.getBlockPos();
+        double damage = ExplosionUtil.crystalDamageToEntity(blockView,
+                target,
+                minePos.toBottomCenterPos(),
+                AutoCrystalModule.INSTANCE.getIgnoreTerrain().getValue(),
+                Set.of(minePos));
+
+        if (damage < AutoCrystalModule.INSTANCE.getMinDamage().getValue())
+        {
+            return false;
+        }
+
         for (Direction direction : Direction.values())
         {
-            BlockPos pos = currentMine.getBlockPos().offset(direction);
-            if (target.squaredDistanceTo(pos.toCenterPos()) > 1.75f)
-            {
-                continue;
-            }
-
+            BlockPos pos = minePos.offset(direction);
             if (!AutoCrystalModule.INSTANCE.canUseOnBlock(pos.down()))
             {
                 continue;

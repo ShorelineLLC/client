@@ -6,6 +6,8 @@ import net.shoreline.client.api.config.ConfigContainer;
 @Getter
 public abstract class Module extends ConfigContainer
 {
+    public static final String ID_FORMAT = "%s_module";
+
     private final String description;
     private final GuiCategory category;
 
@@ -31,7 +33,7 @@ public abstract class Module extends ConfigContainer
     @Override
     public String getId()
     {
-        return String.format("%s_module", getName().toLowerCase());
+        return String.format(ID_FORMAT, getName().toLowerCase());
     }
 
     public String getModuleData()
