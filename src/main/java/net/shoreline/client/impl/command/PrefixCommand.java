@@ -25,7 +25,7 @@ public class PrefixCommand extends Command
                     }
 
                     Managers.COMMANDS.setChatPrefix(prefix);
-                    sendClientChatMessage("Command prefix changed to " + prefix);
+                    sendClientMessageWithOptionalDeletion("Command prefix changed to " + prefix, hashCode());
                     return 1;
                 }))
 

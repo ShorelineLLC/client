@@ -1,7 +1,6 @@
 package net.shoreline.client.mixin.gui.hud;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +12,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.MessageIndicatorEvent;
-import net.shoreline.client.impl.event.gui.hud.RenderChatTextEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderChatEvent;
 import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.impl.imixin.IChatHudLine;
 import net.shoreline.client.impl.imixin.IChatHudLineVisible;
@@ -87,7 +86,7 @@ public abstract class MixinChatHud implements IChatHud
                              int y,
                              int color)
     {
-        RenderChatTextEvent renderChatTextEvent = new RenderChatTextEvent(currentLine, instance, text, x, y, color);
+        RenderChatEvent.Text renderChatTextEvent = new RenderChatEvent.Text(currentLine, instance, text, x, y, color);
         EventBus.INSTANCE.dispatch(renderChatTextEvent);
         return renderChatTextEvent.isCanceled() ? 0 : instance.drawTextWithShadow(textRenderer, text, x, y, color);
     }

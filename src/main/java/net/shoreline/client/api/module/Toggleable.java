@@ -1,7 +1,6 @@
 package net.shoreline.client.api.module;
 
 import lombok.Getter;
-import net.shoreline.client.api.Observable;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
@@ -24,7 +23,11 @@ public class Toggleable extends Module
             .setDefaultValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN, this)).build();
     protected final Config<Boolean> hidden = new BooleanConfig.Builder("Hidden")
             .setDescription("Module hidden state")
-            .setNameAliases("Hidden")
+            .setNameAliases("Drawn")
+            .setVisible(() -> false)
+            .setDefaultValue(false).build();
+    protected final Config<Boolean> notify = new BooleanConfig.Builder("Notify")
+            .setDescription("Notifies in chat on toggle")
             .setVisible(() -> false)
             .setDefaultValue(false).build();
 
@@ -33,8 +36,7 @@ public class Toggleable extends Module
                       final GuiCategory category)
     {
         super(name, description, category);
-        registerConfig(keybind);
-        registerConfig(hidden);
+        registerConfigs(keybind, hidden, notify);
     }
 
     public Toggleable(final String name,
@@ -43,8 +45,7 @@ public class Toggleable extends Module
                       final GuiCategory category)
     {
         super(name, nameAliases, description, category);
-        registerConfig(keybind);
-        registerConfig(hidden);
+        registerConfigs(keybind, hidden, notify);
     }
 
     public void enable()
@@ -113,5 +114,15 @@ public class Toggleable extends Module
     public boolean isHidden()
     {
         return hidden.getValue();
+    }
+
+    public void setNotify(boolean notify)
+    {
+        this.notify.setValue(notify);
+    }
+
+    public boolean shouldNotify()
+    {
+        return notify.getValue();
     }
 }

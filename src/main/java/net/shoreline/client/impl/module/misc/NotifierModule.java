@@ -7,6 +7,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ModuleToggleEvent;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.combat.TotemPopEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.render.ClientFormatting;
@@ -26,7 +27,7 @@ public class NotifierModule extends Toggleable
     @EventListener
     public void onTotemPop(TotemPopEvent event)
     {
-        if (!totemPops.getValue() || event.getEntity() == mc.player
+        if (!totemPops.getValue() || event.getEntity() == mc.player || event.getPops() <= 0
                 || !(event.getEntity() instanceof LivingEntity e))
         {
             return;
@@ -35,17 +36,17 @@ public class NotifierModule extends Toggleable
         String playerName = formatPlayerName(e.getName().getString());
         String popNotification = String.format("%s "
                         + Formatting.WHITE + "popped "
-                        + ClientFormatting.CLIENT + "%d "
+                        + ClientFormatting.THEME + "%d "
                         + Formatting.WHITE + "totem%s",
                 playerName, event.getPops(), event.getPops() > 1 ? "s" : "");
 
-        sendClientChatMessage(popNotification);
+        sendClientMessageWithOptionalDeletion(popNotification, e.hashCode());
     }
 
     @EventListener
     public void onEntityDeath(EntityDeathEvent event)
     {
-        if (!totemPops.getValue() || event.getEntity() == mc.player
+        if (!totemPops.getValue() || event.getEntity() == mc.player || event.getPops() <= 0
                 || !(event.getEntity() instanceof LivingEntity e))
         {
             return;
@@ -54,32 +55,32 @@ public class NotifierModule extends Toggleable
         String playerName = formatPlayerName(e.getName().getString());
         String deathNotification = String.format("%s "
                         + Formatting.WHITE + "died after popping "
-                        + ClientFormatting.CLIENT + "%d "
+                        + ClientFormatting.THEME + "%d "
                         + Formatting.WHITE + "totem%s",
                 playerName, event.getPops(), event.getPops() > 1 ? "s" : "");
 
-        sendClientChatMessage(deathNotification);
+        sendClientMessageWithOptionalDeletion(deathNotification, e.hashCode());
     }
 
     @EventListener
     public void onModuleToggle(ModuleToggleEvent event)
     {
-        if (checkNull())
+        if (checkNull() || !event.getModule().shouldNotify())
         {
             return;
         }
 
         if (event.isEnabled())
         {
-            sendClientChatMessage(Formatting.GRAY + event.getModule().getName() + Formatting.GREEN + " enabled");
+            sendClientMessageWithOptionalDeletion(Formatting.GRAY + event.getModule().getName() + Formatting.GREEN + " enabled", hashCode());
         } else
         {
-            sendClientChatMessage(Formatting.GRAY + event.getModule().getName() + Formatting.RED + " disabled");
+            sendClientMessageWithOptionalDeletion(Formatting.GRAY + event.getModule().getName() + Formatting.RED + " disabled", hashCode());
         }
     }
 
     private String formatPlayerName(String name)
     {
-        return Formatting.GRAY + name;
+        return (Managers.SOCIAL.isFriend(name) ? ClientFormatting.FRIEND : Formatting.GRAY) + name;
     }
 }

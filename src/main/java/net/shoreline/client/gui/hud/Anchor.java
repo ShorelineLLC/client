@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.hud;
 
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.client.impl.module.misc.BetterChatModule;
 import net.shoreline.client.impl.module.render.NoRenderModule;
 
 public enum Anchor
@@ -65,7 +66,7 @@ public enum Anchor
                     {
                         if (MinecraftClient.getInstance().inGameHud.getChatHud().isChatFocused())
                         {
-                            return screenHeight - elementHeight - offset - 15;
+                            return screenHeight - elementHeight - offset - (15.0f * (float) BetterChatModule.INSTANCE.getChatFactor());
                         }
 
                         return screenHeight - elementHeight - offset;
@@ -84,7 +85,7 @@ public enum Anchor
                     {
                         if (MinecraftClient.getInstance().inGameHud.getChatHud().isChatFocused())
                         {
-                            return screenHeight - elementHeight - offset - 15;
+                            return screenHeight - elementHeight - offset - (15.0f * (float) BetterChatModule.INSTANCE.getChatFactor());
                         }
 
                         return screenHeight - elementHeight - offset;

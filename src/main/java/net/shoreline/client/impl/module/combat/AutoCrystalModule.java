@@ -456,7 +456,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-        if (currentMine == null || currentMine.getProgress() < 0.7f || SpeedMineModule.INSTANCE.isManualMining())
+        if (currentMine == null || !currentMine.isDoneMining() || SpeedMineModule.INSTANCE.isManualMining())
         {
             return null;
         }
@@ -480,7 +480,13 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         EntityState targetState = new EntityState(target);
-        double damage = CrystalUtil.getCrystalDamage(mc.world, minePos.toBottomCenterPos(), targetState, true, Set.of(minePos));
+        double damage = ExplosionUtil.crystalDamageToEntity(mc.world, target,
+                minePos.toBottomCenterPos(), ignoreTerrain.getValue(), Set.of(minePos));
+
+        if (damage < minDamage.getValue())
+        {
+            return null;
+        }
 
         Vec3d crystalVec = minePos.toBottomCenterPos().add(0.0, 0.5, 0.0);
         float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);

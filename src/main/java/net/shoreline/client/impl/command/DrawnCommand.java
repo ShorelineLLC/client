@@ -24,7 +24,8 @@ public class DrawnCommand extends Command
                     {
                         boolean hide = !toggle.isHidden();
                         toggle.setHidden(hide);
-                        sendClientChatMessage(module.getName() + " is now " + (hide ? Formatting.RED + "hidden" : Formatting.GREEN + "visible"));
+                        sendClientChatMessage(Formatting.GRAY + module.getName() + Formatting.RESET + " is now " +
+                                (hide ? Formatting.RED + "hidden" : Formatting.GREEN + "visible"));
                     }
 
                     return 1;

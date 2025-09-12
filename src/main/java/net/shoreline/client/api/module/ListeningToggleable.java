@@ -25,6 +25,7 @@ public class ListeningToggleable extends Toggleable
     public void enable()
     {
         enabled.setValue(true);
+        EventBus.INSTANCE.dispatch(new ModuleToggleEvent(this, true));
         onEnable();
     }
 
@@ -33,6 +34,7 @@ public class ListeningToggleable extends Toggleable
     {
         onDisable();
         enabled.setValue(false);
+        EventBus.INSTANCE.dispatch(new ModuleToggleEvent(this, false));
     }
 
     @Override

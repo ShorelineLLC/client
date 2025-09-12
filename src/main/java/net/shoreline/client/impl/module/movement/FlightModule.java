@@ -4,6 +4,7 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
@@ -60,6 +61,7 @@ public class FlightModule extends MovementModule
         {
             enableVanillaFly();
         }
+
         speed = 0.0;
     }
 
@@ -70,6 +72,7 @@ public class FlightModule extends MovementModule
         {
             disableVanillaFly();
         }
+
         modifyY = false;
     }
 
@@ -124,19 +127,9 @@ public class FlightModule extends MovementModule
             {
                 setMotionY(-vSpeedConfig.getValue());
             }
-            speed = Math.max(speed, 0.2873f);
-            float forward = mc.player.input.getMovementInput().y;
-            float strafe = mc.player.input.getMovementInput().x;
-            float yaw = mc.player.getYaw();
-            if (forward == 0.0f && strafe == 0.0f)
-            {
-                setMotionXZ(0.0f, 0.0f);
-                return;
-            }
-            double cos = Math.cos(Math.toRadians(yaw + 90.0f));
-            double sin = Math.sin(Math.toRadians(yaw + 90.0f));
-            setMotionXZ((forward * speed * cos) + (strafe * speed * sin),
-                    (forward * speed * sin) - (strafe * speed * cos));
+
+            Vec2f strafeVec = strafe(speedConfig.getValue());
+            setMotionXZ(strafeVec.x, strafeVec.y);
         }
     }
 
@@ -159,6 +152,7 @@ public class FlightModule extends MovementModule
                     modifyY = false;
                     return;
                 }
+
                 floating = floatingCheck(packet);
                 lastY = packetY;
                 return;
@@ -167,8 +161,20 @@ public class FlightModule extends MovementModule
             if (modifyY)
             {
                 PlayerMoveC2SPacket packet1 = packet.changesLook() ?
-                        new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), packet.isOnGround(), mc.player.horizontalCollision) :
-                        new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(), mc.player.getY() - 0.04, mc.player.getZ(), packet.isOnGround(), mc.player.horizontalCollision);
+                        new PlayerMoveC2SPacket.Full(
+                                mc.player.getX(),
+                                mc.player.getY() - 0.04,
+                                mc.player.getZ(),
+                                mc.player.getYaw(),
+                                mc.player.getPitch(),
+                                packet.isOnGround(),
+                                mc.player.horizontalCollision) :
+                        new PlayerMoveC2SPacket.PositionAndOnGround(
+                                mc.player.getX(),
+                                mc.player.getY() - 0.04,
+                                mc.player.getZ(),
+                                packet.isOnGround(),
+                                mc.player.horizontalCollision);
 
                 event.cancel();
                 Managers.NETWORK.sendQuietPacket(packet1);
@@ -201,6 +207,7 @@ public class FlightModule extends MovementModule
         {
             mc.player.getAbilities().allowFlying = false;
         }
+
         mc.player.getAbilities().flying = false;
         mc.player.getAbilities().setFlySpeed(0.05f);
     }

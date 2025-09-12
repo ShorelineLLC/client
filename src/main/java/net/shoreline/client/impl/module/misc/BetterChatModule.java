@@ -1,16 +1,19 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.OpenScreenEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.MessageIndicatorEvent;
-import net.shoreline.client.impl.event.gui.hud.RenderChatTextEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderChatEvent;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ClientFormatting;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -24,25 +27,35 @@ import java.util.concurrent.ConcurrentMap;
 
 public class BetterChatModule extends Toggleable
 {
+    public static BetterChatModule INSTANCE;
+
     Config<Boolean> animateConfig = new BooleanConfig.Builder("Animate")
             .setDescription("Animates the chat hud")
             .setDefaultValue(true).build();
     Config<Boolean> timestampConfig = new BooleanConfig.Builder("Timestamp")
             .setDescription("Adds a timestamp to all messages in chat")
             .setDefaultValue(false).build();
+    Config<Integer> chatLength = new NumberConfig.Builder<Integer>("MaxLength")
+            .setMin(100).setMax(1000).setDefaultValue(500)
+            .setDescription("The max number of rows in the chat").build();
     Config<Boolean> noIndicator = new BooleanConfig.Builder("NoIndicator")
             .setDescription("Removes the message indicator")
             .setDefaultValue(false).build();
+    Config<Boolean> saveHistory = new BooleanConfig.Builder("SaveHistory")
+            .setDescription("Saves chat history when switching between worlds")
+            .setDefaultValue(false).build();
 
+    private final Animation chatAnim = new Animation(200L);
     private final ConcurrentMap<ChatHudLine.Visible, Animation> chatLineAnims = new ConcurrentHashMap<>();
 
     public BetterChatModule()
     {
         super("BetterChat", "Improves in-game chat", GuiCategory.MISCELLANEOUS);
+        INSTANCE = this;
     }
 
     @EventListener
-    public void onRenderChatText(RenderChatTextEvent event)
+    public void onRenderChatText(RenderChatEvent.Text event)
     {
         if (event.getChatLine() == null)
         {
@@ -70,6 +83,21 @@ public class BetterChatModule extends Toggleable
     }
 
     @EventListener
+    public void onRenderChatBackground(RenderChatEvent.Background event)
+    {
+        if (animateConfig.getValue())
+        {
+            double factor = Easing.SMOOTH_STEP.ease(chatAnim.getFactor());
+            event.cancel();
+            event.getContext().fill(event.getX(),
+                    event.getY(),
+                    event.getWidth(),
+                    (int) (event.getY() - (12.0f * factor)),
+                    mc.options.getTextBackgroundColor(Integer.MIN_VALUE));
+        }
+    }
+
+    @EventListener
     public void onChatMessage(ChatMessageEvent event)
     {
         String string = event.getText().getString();
@@ -82,7 +110,7 @@ public class BetterChatModule extends Toggleable
         if (timestampConfig.getValue())
         {
             String time = new SimpleDateFormat("k:mm").format(new Date());
-            chatPrefix = Text.literal(ClientFormatting.CLIENT + "<" + time + "> ");
+            chatPrefix = Text.literal(ClientFormatting.THEME + "<" + time + "> ");
         }
 
         event.cancel();
@@ -102,5 +130,22 @@ public class BetterChatModule extends Toggleable
         {
             event.cancel();
         }
+    }
+
+    @EventListener
+    public void onChatOpen(OpenScreenEvent event)
+    {
+        if (event.getScreen() == null && chatAnim.getState())
+        {
+            chatAnim.setState(false);
+        } else if (event.getScreen() instanceof ChatScreen)
+        {
+            chatAnim.setState(true);
+        }
+    }
+
+    public double getChatFactor()
+    {
+        return isEnabled() && animateConfig.getValue() ? Easing.SMOOTH_STEP.ease(chatAnim.getFactor()) : 1.0f;
     }
 }

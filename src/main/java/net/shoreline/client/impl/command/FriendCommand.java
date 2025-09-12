@@ -34,7 +34,7 @@ public class FriendCommand extends Command
                                             return 0;
                                         }
 
-                                        sendClientChatMessage("Added friend with name " + ClientFormatting.CLIENT + friendName);
+                                        sendClientChatMessage("Added friend with name " + ClientFormatting.THEME + friendName);
                                         Managers.SOCIAL.addFriend(friendName);
 
                                     } else if (action.equalsIgnoreCase("del") || action.equalsIgnoreCase("delete") || action.equalsIgnoreCase("remove"))

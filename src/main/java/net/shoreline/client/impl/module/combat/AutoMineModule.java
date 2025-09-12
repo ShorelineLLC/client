@@ -59,7 +59,7 @@ public class AutoMineModule extends TrapModule
             .setDescription("Avoids mining out blocks we are near")
             .setDefaultValue(false).build();
     Config<Void> targetingConfig = new ConfigGroup.Builder("Targeting")
-            .addAll(feetConfig, bodyConfig, headConfig, avoidSelf).build();
+            .addAll(feetConfig, bodyConfig, headConfig, floorConfig, avoidSelf).build();
 
     private final Timer mineTimer = new NanoTimer();
 

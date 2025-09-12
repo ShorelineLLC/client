@@ -7,7 +7,6 @@ import net.shoreline.client.impl.module.client.LatencyModule;
 import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
 import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
 import net.shoreline.client.impl.render.ClientFormatting;
-import net.shoreline.headless.HeadlessAPI;
 
 public class PingHudModule extends DynamicHudModule
 {
@@ -24,7 +23,7 @@ public class PingHudModule extends DynamicHudModule
 
     public String getLatencyText()
     {
-        String headless = HeadlessMCModule.INSTANCE.isEnabled() ? ClientFormatting.CLIENT + " Headless " + Formatting.WHITE + "0ms" : "";
+        String headless = HeadlessMCModule.INSTANCE.isEnabled() ? ClientFormatting.THEME + " Headless " + Formatting.WHITE + "0ms" : "";
         int latency = LatencyModule.INSTANCE.isEnabled() ? LatencyModule.INSTANCE.getCurrentLatency() : Managers.NETWORK.getClientLatency();
         return String.format("Ping " + Formatting.WHITE + "%dms" + headless, latency);
     }

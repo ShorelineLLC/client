@@ -38,6 +38,7 @@ public class CommandManager extends GenericFeature
                 new DrawnCommand(),
                 new FriendCommand(),
                 new KitCommand(),
+                new NotifyCommand(),
                 new PrefixCommand(),
                 new PresetCommand()
         );
