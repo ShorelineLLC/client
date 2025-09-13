@@ -6,8 +6,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.BooleanConfig;
@@ -47,18 +45,18 @@ public class ChestSwapModule extends Toggleable
             if (slot != -1)
             {
                 Managers.INVENTORY.clickSwap(slot, 6, Items.ELYTRA);
-            }
 
-            if (fireworkConfig.getValue() && !mc.player.isOnGround())
-            {
-                Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-                mc.player.startGliding();
-
-                int fireworkSlot = InventoryUtil.getItemSlot(Items.FIREWORK_ROCKET);
-                if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot))
+                if (fireworkConfig.getValue() && !mc.player.isOnGround())
                 {
-                    Managers.INTERACT.interactItem(Hand.MAIN_HAND, true);
-                    Managers.INVENTORY.endSwap();
+                    Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                    mc.player.startGliding();
+
+                    int fireworkSlot = InventoryUtil.getItemSlot(Items.FIREWORK_ROCKET);
+                    if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot))
+                    {
+                        Managers.INTERACT.interactItem(Hand.MAIN_HAND, true);
+                        Managers.INVENTORY.endSwap();
+                    }
                 }
             }
         }

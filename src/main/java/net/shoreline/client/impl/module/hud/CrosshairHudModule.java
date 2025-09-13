@@ -1,20 +1,20 @@
 package net.shoreline.client.impl.module.hud;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Colors;
 import net.minecraft.world.GameMode;
 import net.shoreline.client.api.config.BooleanConfig;
-import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-
-import java.awt.*;
 
 public class CrosshairHudModule extends HudModule
 {
@@ -40,9 +40,6 @@ public class CrosshairHudModule extends HudModule
     Config<Float> opacityConfig = new NumberConfig.Builder<Float>("Opacity")
             .setMin(0.10f).setMax(1.00f).setDefaultValue(1.00f)
             .setDescription("The crosshair opacity").build();
-    Config<Color> colorConfig = new ColorConfig.Builder("Color")
-            .setDescription("The crosshair color")
-            .setDefaultValue(Color.WHITE).build();
 
     private final Animation gapAnim = new Animation(false, 100L);
 
@@ -79,63 +76,65 @@ public class CrosshairHudModule extends HudModule
 
         float x = context.getScaledWindowWidth() / 2.0f;
         float y = context.getScaledWindowHeight() / 2.0f;
-        float halfLength = (lengthConfig.getValue() * 10) / 2.0f;
 
-        float o1 = outlineThicknessConfig.getValue();
-        float o2 = o1 * 2.0f;
-        float o3 = o1 * 3.0f;
+        float halfLength = (lengthConfig.getValue() * 10) / 2.0f;
+        float thick = thicknessConfig.getValue();
+        float gap = gapConfig.getValue();
 
         boolean moving = InputUtil.isInputtingMovement() || mc.player.isSneaking() || mc.player.isClimbing() || !mc.player.isOnGround();
-        float gap = gapConfig.getValue();
         if (dynamicConfig.getValue())
         {
             gapAnim.setState(moving);
             gap += 2.5f * (float) Easing.SMOOTH_STEP.ease(gapAnim.getFactor());
         }
 
-        float width = (halfLength + o3);
-        float height = thicknessConfig.getValue() * 2.0f + o2;
-        float x1 = x - halfLength - gap - o2;
-        float y1 = y - thicknessConfig.getValue() - o1;
-        if (outlineConfig.getValue())
-        {
-            context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(Color.BLACK.getRGB(), opacityConfig.getValue()));
+        int fill = ColorUtil.withTransparency(ThemeModule.INSTANCE.getPrimaryColor().getRGB(), opacityConfig.getValue());
+        int outline = ColorUtil.withTransparency(Colors.BLACK, opacityConfig.getValue());;
+        boolean drawOutline = outlineConfig.getValue();
+        float offset = outlineThicknessConfig.getValue();
 
-            x1 = x + gap - o2;
-            y1 = y - thicknessConfig.getValue() - o1;
-            context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(Color.BLACK.getRGB(), opacityConfig.getValue()));
+        float hWidth = halfLength;
+        float hHeight = thick * 2.0f;
+        float vWidth = thick * 2.0f;
+        float vHeight = halfLength;
+
+        float lx = x - gap - halfLength;
+        float ly = y - thick;
+        float rx = x + gap;
+        float ry = y - thick;
+
+        float tx = x - thick;
+        float ty = y - gap - halfLength;
+        float bx = x - thick;
+        float by = y + gap;
+
+        if (drawOutline)
+        {
+            Managers.RENDER.drawOutline(context, lx, ly, hWidth, hHeight, offset, outline);
         }
 
-        width = halfLength;
-        height = thicknessConfig.getValue() * 2.0f;
-        x1 = x - halfLength - gap;
-        y1 = y - thicknessConfig.getValue();
-        context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(colorConfig.getValue().getRGB(), opacityConfig.getValue()));
+        Managers.RENDER.drawRect(context, lx, ly, hWidth, hHeight, fill);
 
-        x1 = x + gap;
-        context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(colorConfig.getValue().getRGB(), opacityConfig.getValue()));
-
-        if (outlineConfig.getValue())
+        if (drawOutline)
         {
-            width = thicknessConfig.getValue() * 2.0f + o2;
-            height = halfLength + o3;
-            x1 = x - thicknessConfig.getValue() - o1;
-            y1 = y - halfLength - gap - o1;
-            context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(Color.BLACK.getRGB(), opacityConfig.getValue()));
-
-            x1 = x - thicknessConfig.getValue() - o1;
-            y1 = y + gap - o1;
-            context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(Color.BLACK.getRGB(), opacityConfig.getValue()));
+            Managers.RENDER.drawOutline(context, rx, ry, hWidth, hHeight, offset, outline);
         }
 
-        width = thicknessConfig.getValue() * 2.0f;
-        height = halfLength;
-        x1 = x - thicknessConfig.getValue();
-        y1 = y - halfLength - gap;
-        context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(colorConfig.getValue().getRGB(), opacityConfig.getValue()));
+        Managers.RENDER.drawRect(context, rx, ry, hWidth, hHeight, fill);
 
-        y1 = y + gap;
-        context.fill((int) x1, (int) y1, (int) (x1 + width), (int) (y1 + height), ColorUtil.withTransparency(colorConfig.getValue().getRGB(), opacityConfig.getValue()));
+        if (drawOutline)
+        {
+            Managers.RENDER.drawOutline(context, tx, ty, vWidth, vHeight, offset, outline);
+        }
+
+        Managers.RENDER.drawRect(context, tx, ty, vWidth, vHeight, fill);
+
+        if (drawOutline)
+        {
+            Managers.RENDER.drawOutline(context, bx, by, vWidth, vHeight, offset, outline);
+        }
+
+        Managers.RENDER.drawRect(context, bx, by, vWidth, vHeight, fill);
     }
 
     @Override

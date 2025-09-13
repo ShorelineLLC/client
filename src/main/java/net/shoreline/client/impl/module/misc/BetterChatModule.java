@@ -8,12 +8,14 @@ import net.minecraft.util.Colors;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.OpenScreenEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.MessageIndicatorEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderChatEvent;
+import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ClientFormatting;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -45,7 +47,7 @@ public class BetterChatModule extends Toggleable
             .setDescription("Saves chat history when switching between worlds")
             .setDefaultValue(false).build();
 
-    private final Animation chatAnim = new Animation(200L);
+    private final Animation chatAnim = new Animation(250L);
     private final ConcurrentMap<ChatHudLine.Visible, Animation> chatLineAnims = new ConcurrentHashMap<>();
 
     public BetterChatModule()
@@ -65,20 +67,22 @@ public class BetterChatModule extends Toggleable
         if (animateConfig.getValue() && chatLineAnims.containsKey(event.getChatLine()))
         {
             Animation anim = chatLineAnims.get(event.getChatLine());
-
             anim.setState(true);
-            if (anim.getFactor() == 1.0f)
-            {
-                return;
-            }
 
+            boolean overrideFont = FontModule.INSTANCE.getOverrideChat().getValue();
             double factor = Easing.EXPO_IN_OUT.ease(anim.getFactor());
-            int width = mc.textRenderer.getWidth(event.getText());
+            int width = overrideFont ? FontManager.FONT.getStringWidth(event.getString()) : mc.textRenderer.getWidth(event.getText());
             int renderX = (int) (event.getX() - (width * (1.0f - factor)));
+            int color = ColorUtil.withTransparency(Colors.WHITE, (float) factor);
 
             event.cancel();
-            event.getContext().drawTextWithShadow(mc.textRenderer, event.getText(),
-                    renderX, event.getY(), ColorUtil.withTransparency(Colors.WHITE, (float) factor));
+            if (overrideFont)
+            {
+                FontManager.FONT.drawStringWithShadow(event.getContext().getMatrices(), event.getString(), renderX, event.getY(), color);
+            } else
+            {
+                event.getContext().drawTextWithShadow(mc.textRenderer, event.getText(), renderX, event.getY(), color);
+            }
         }
     }
 
@@ -120,7 +124,7 @@ public class BetterChatModule extends Toggleable
     @EventListener
     public void onChatLineAdd(ChatMessageEvent.Visible event)
     {
-        chatLineAnims.put(event.getChatLine(), new Animation(300L));
+        chatLineAnims.put(event.getChatLine(), new Animation(400L));
     }
 
     @EventListener

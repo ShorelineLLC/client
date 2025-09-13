@@ -6,6 +6,7 @@ import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,12 +14,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.FontModule;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.function.Consumer;
 
+// TODO: Batch 3d rendering calls
 @Getter
 @Setter
 public class RenderManager
@@ -187,6 +190,27 @@ public class RenderManager
         RenderSystem.polygonOffset(1.0f, 32500000);
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
+    }
+
+    public void drawRect(DrawContext context, float x, float y, float width, float height, int color)
+    {
+        float x2 = x + width;
+        float y2 = y + height;
+        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
+        VertexConsumer vc = ((IDrawContext) context).getVertexConsumerProvider().getBuffer(RenderLayer.getGui());
+        vc.vertex(matrix4f, x, y, 0).color(color);
+        vc.vertex(matrix4f, x, y2, 0).color(color);
+        vc.vertex(matrix4f, x2, y2, 0).color(color);
+        vc.vertex(matrix4f, x2, y, 0).color(color);
+    }
+
+    public void drawOutline(DrawContext context, float x, float y, float width, float height, float thickness, int color)
+    {
+        float t2 = thickness * 2;
+        drawRect(context, x - thickness, y - thickness, width + t2, thickness, color);
+        drawRect(context, x - thickness, y, thickness, height, color);
+        drawRect(context, x + width, y, thickness, height, color);
+        drawRect(context, x - thickness, y + height, width + t2, thickness, color);
     }
 
     public void drawText(MatrixStack matrices, String text, float x, float y, int color)

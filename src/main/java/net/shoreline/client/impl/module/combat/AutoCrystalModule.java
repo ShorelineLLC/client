@@ -35,7 +35,6 @@ import net.shoreline.client.impl.inventory.SwapHandler;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
-import net.shoreline.client.impl.module.combat.crystal.CrystalUtil;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkUtil;

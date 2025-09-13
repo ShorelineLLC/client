@@ -23,9 +23,9 @@ public class TextUtil
         StringBuilder builder = new StringBuilder();
         text.accept((index, style, codePoint) ->
         {
-            builder.append(Formatting.FORMATTING_CODE_PREFIX);
             if (style.getColor() != null)
             {
+                builder.append(Formatting.FORMATTING_CODE_PREFIX);
                 int rgb = style.getColor().getRgb();
                 
                 int clientColor = ThemeModule.INSTANCE.getPrimaryColor().getRGB();
@@ -47,22 +47,22 @@ public class TextUtil
                 }
             } else if (style.isObfuscated())
             {
-                builder.append("k");
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("k");
             } else if (style.isBold())
             {
-                builder.append("l");
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("l");
             } else if (style.isStrikethrough())
             {
-                builder.append("m");
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("m");
             } else if (style.isUnderlined())
             {
-                builder.append("n");
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("n");
             } else if (style.isItalic())
             {
-                builder.append("o");
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("o");
             } else
             {
-                builder.append("r");
+                builder.append(Formatting.FORMATTING_CODE_PREFIX).append("r");
             }
 
             builder.appendCodePoint(codePoint);

@@ -6,6 +6,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.FontModule;
 import org.joml.Matrix4f;
@@ -26,14 +27,7 @@ public abstract class DrawableComponent
                             float height,
                             int color)
     {
-        float x2 = x + width;
-        float y2 = y + height;
-        Matrix4f m = context.getMatrices().peek().getPositionMatrix();
-        VertexConsumer vc = ((IDrawContext) context).getVertexConsumerProvider().getBuffer(RenderLayer.getGui());
-        vc.vertex(m, x, y, 0).color(color);
-        vc.vertex(m, x, y2, 0).color(color);
-        vc.vertex(m, x2, y2, 0).color(color);
-        vc.vertex(m, x2, y, 0).color(color);
+        Managers.RENDER.drawRect(context, x, y, width, height, color);
     }
 
     protected void drawTexturedRect(DrawContext context,
@@ -57,13 +51,8 @@ public abstract class DrawableComponent
                                float thickness,
                                int color)
     {
-        float t2 = thickness * 2;
-        drawRect(context, x - thickness, y - thickness, width + t2, thickness, color);
-        drawRect(context, x - thickness, y, thickness, height, color);
-        drawRect(context, x + width, y, thickness, height, color);
-        drawRect(context, x - thickness, y + height, width + t2, thickness, color);
+        Managers.RENDER.drawOutline(context, x, y, width, height, thickness, color);
     }
-
 
     protected void drawText(DrawContext context,
                             String text,

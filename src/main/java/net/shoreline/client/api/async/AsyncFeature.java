@@ -42,7 +42,8 @@ public class AsyncFeature<T> extends GenericFeature
             return currentResult.get();
         } catch (InterruptedException | ExecutionException e)
         {
-            return null;
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 }

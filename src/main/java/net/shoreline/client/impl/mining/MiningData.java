@@ -48,7 +48,7 @@ public class MiningData
     public float tickDelta(boolean isMultitasking)
     {
         this.lastDamage = blockDamage;
-        if (blockDamage >= maxProgress)
+        if (isDoneMining())
         {
             if (!isMultitasking)
             {

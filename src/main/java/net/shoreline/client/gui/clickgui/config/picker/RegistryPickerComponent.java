@@ -1,8 +1,16 @@
 package net.shoreline.client.gui.clickgui.config.picker;
 
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -160,13 +168,9 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
                     cellEntries[idx] = entry;
                     tg.drawComponent(context, mouseX, mouseY, delta);
 
-                    ItemStack stack = toStack(entry);
-                    if (!stack.isEmpty())
-                    {
-                        int ix = (int) (cellX + (cell - 16.0f) / 2.0f);
-                        int iy = (int) (cellY + (cell - 16.0f) / 2.0f);
-                        context.drawItem(stack, ix, iy);
-                    }
+                    int ix = (int) (cellX + (cell - 16.0f) / 2.0f);
+                    int iy = (int) (cellY + (cell - 16.0f) / 2.0f);
+                    renderEntry(context, entry, ix, iy);
                 } else
                 {
                     tg.drawComponent(context, mouseX, mouseY, delta);
@@ -294,6 +298,29 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
         return out;
     }
 
+    private void renderEntry(DrawContext context, T entry, int x, int y)
+    {
+        ItemStack stack = toStack(entry);
+        if (!stack.isEmpty())
+        {
+            context.drawItem(stack, x, y);
+            return;
+        }
+
+        if (entry instanceof Block b)
+        {
+            Sprite blockSprite = getBlockSprite(b);
+            if (blockSprite != null)
+            {
+                context.drawSpriteStretched(RenderLayer::getGuiTextured, blockSprite, x, y, 16, 16);
+                return;
+            }
+        }
+
+        Sprite missing = mc.getBakedModelManager().getMissingBlockModel().getParticleSprite();
+        context.drawSpriteStretched(RenderLayer::getGuiTextured, missing, x, y, 16, 16);
+    }
+
     private ItemStack toStack(T entry)
     {
         if (entry instanceof Item it)
@@ -304,6 +331,32 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
             return new ItemStack(b.asItem());
         }
         return ItemStack.EMPTY;
+    }
+
+    private Sprite getBlockSprite(Block block)
+    {
+        if (block instanceof FluidBlock)
+        {
+            FluidState fluidState = block.getDefaultState().getFluidState();
+            FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluidState.getFluid());
+            if (handler != null)
+            {
+                Sprite[] sprites = handler.getFluidSprites(null, null, fluidState);
+                if (sprites != null && sprites.length > 0 && sprites[0] != null)
+                {
+                    return sprites[0];
+                }
+            }
+        }
+
+        BlockState state = block.getDefaultState();
+        BakedModel model = mc.getBlockRenderManager().getModel(state);
+        if (model != null)
+        {
+            return model.getParticleSprite();
+        }
+
+        return null;
     }
 
     @Override

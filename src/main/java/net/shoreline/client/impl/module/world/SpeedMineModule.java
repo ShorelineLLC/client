@@ -321,7 +321,16 @@ public class SpeedMineModule extends ListeningToggleable
 
     private void clearMain()
     {
-        mainMiningBlock = null;
+        if (mainMiningBlock != null)
+        {
+            if (!mainMiningBlock.isDoneMining())
+            {
+                mainMiningBlock.abort();
+            }
+
+            mainMiningBlock = null;
+        }
+
         if (mainState != null)
         {
             mainState.setState(false);
@@ -330,8 +339,12 @@ public class SpeedMineModule extends ListeningToggleable
 
     private void clearPacket()
     {
-        Managers.INVENTORY.endMultitickSwap();
-        packetMiningBlock = null;
+        if (packetMiningBlock != null)
+        {
+            Managers.INVENTORY.endMultitickSwap();
+            packetMiningBlock = null;
+        }
+
         if (packetState != null)
         {
             packetState.setState(false);

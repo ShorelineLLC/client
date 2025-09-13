@@ -124,6 +124,7 @@ public class ModuleManager
                 new ArrayListHudModule(),
                 new BrandHudModule(),
                 new CoordsHudModule(),
+                new CrosshairHudModule(),
                 new FPSHudModule(),
                 new PacketsHudModule(),
                 new PingHudModule(),

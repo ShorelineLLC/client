@@ -22,9 +22,11 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.inventory.SilentSwapType;
+import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
+import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
@@ -54,6 +56,15 @@ public class InteractManager extends GenericFeature
         if (!mc.world.isInBuildLimit(blockPos))
         {
             return false;
+        }
+
+        if (SpeedMineModule.INSTANCE.isEnabled())
+        {
+            MiningData mining = SpeedMineModule.INSTANCE.getMainMiningBlock();
+            if (mining != null && mining.isDoneMining() && mining.getBlockPos().equals(blockPos))
+            {
+                return false;
+            }
         }
 
         placedBlocks.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
