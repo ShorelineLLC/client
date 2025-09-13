@@ -6,6 +6,7 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
 import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
+import net.shoreline.client.impl.render.ClientFormatting;
 
 import java.text.DecimalFormat;
 
@@ -34,7 +35,7 @@ public class CoordsHudModule extends DynamicHudModule
         double y = mc.player.getY();
         double z = mc.player.getZ();
         boolean nether = mc.world.getRegistryKey() == World.NETHER;
-        return String.format("XYZ " + Formatting.WHITE + "%s, %s, %s " + (netherConfig.getValue() ? Formatting.GRAY + "[" + Formatting.WHITE + "%s, %s" + Formatting.GRAY + "]" : ""),
+        return String.format("XYZ " + Formatting.WHITE + "%s, %s, %s " + (netherConfig.getValue() ? ClientFormatting.THEME + "(" + Formatting.WHITE + "%s, %s" + ClientFormatting.THEME + ")" : ""),
                 decimal.format(x),
                 decimal.format(y),
                 decimal.format(z),

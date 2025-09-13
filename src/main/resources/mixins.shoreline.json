@@ -56,6 +56,7 @@
     "render.MixinWorldRenderer",
     "render.entity.MixinEndCrystalEntityRenderer",
     "render.entity.MixinEntityRenderer",
+    "render.entity.MixinItemFrameEntityRenderer",
     "render.entity.MixinLivingEntityRenderer",
     "render.entity.MixinModel",
     "render.entity.MixinPlayerEntityRenderer",
@@ -69,6 +70,7 @@
     "text.MixinTextVisitFactory",
     "texture.MixinNativeImage",
     "toast.MixinToastManager",
+    "world.chunk.light.MixinChunkSkylightProvider",
     "world.MixinClientWorld",
     "world.MixinProperties",
     "world.MixinServerWorld"

@@ -223,6 +223,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     @Override
     public String getModuleData()
     {
+        if (!isRunning())
+        {
+            return super.getModuleData();
+        }
+
         return String.format("%sms, %s", numFormat.format(breakTime.average()), cps.getPerSecond());
     }
 

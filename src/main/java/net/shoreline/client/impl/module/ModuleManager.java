@@ -72,6 +72,7 @@ public class ModuleManager
                 new FakePlayerModule(),
                 new MiddleClickModule(),
                 new NameProtectModule(),
+                new NoLagModule(),
                 new NotifierModule(),
                 new PacketSnifferModule(),
                 new RekitModule(),

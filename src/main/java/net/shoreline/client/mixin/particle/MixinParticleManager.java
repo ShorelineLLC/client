@@ -18,6 +18,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ParticleManager.class)
 public class MixinParticleManager
 {
+    @Inject(method = "tickParticle", at = @At(value = "HEAD"), cancellable = true)
+    private void hookTickParticle(Particle particle, CallbackInfo ci)
+    {
+        ci.cancel();
+
+        try
+        {
+            particle.tick();
+        } catch (Throwable throwable)
+        {
+            particle.markDead();
+        }
+    }
+
     @Inject(method = "addBlockBreakParticles", at = @At(value = "HEAD"), cancellable = true)
     private void hookAddBlockBreakParticles(BlockPos pos, BlockState state, CallbackInfo ci)
     {

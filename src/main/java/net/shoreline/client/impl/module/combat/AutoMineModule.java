@@ -17,6 +17,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningUtil;
 import net.shoreline.client.impl.module.combat.trap.TrapLayer;
 import net.shoreline.client.impl.module.combat.trap.TrapModule;
@@ -38,7 +39,7 @@ public class AutoMineModule extends TrapModule
             .setMin(1.0f).setMax(10.0f).setDefaultValue(6.0f).setFormat("m")
             .setDescription("The max range to target players").build();
     Config<Integer> delayConfig = new NumberConfig.Builder<Integer>("Delay")
-            .setMin(50).setMax(500).setDefaultValue(100).setFormat("ms")
+            .setMin(100).setMax(500).setDefaultValue(200).setFormat("ms")
             .setDescription("The delay between mines").build();
     Config<Boolean> antiCrawl = new BooleanConfig.Builder("AntiCrawl")
             .setDescription("Attempts to mine blocks to prevent player crawl")
@@ -212,9 +213,30 @@ public class AutoMineModule extends TrapModule
 
     private boolean canStartMining(BlockPos currentMine)
     {
-        return speedMine.getMainMiningBlock() == null
-                || speedMine.getMainMiningBlock().isDoneMining()
-                || currentMine.getY() != speedMine.getMainMiningBlock().getBlockPos().getY()
-                || speedMine.getDoubleMine().getValue() && speedMine.getPacketMiningBlock() == null;
+        MiningData main = speedMine.getMainMiningBlock();
+        MiningData packet = speedMine.getPacketMiningBlock();
+
+        if (main != null && packet != null)
+        {
+            BlockPos mainPos = main.getBlockPos();
+            BlockPos packetPos = packet.getBlockPos();
+            if (mainPos.equals(currentMine) || packetPos.equals(currentMine))
+            {
+                return false;
+            }
+
+            return main.isDoneMining() && (packet.isBlockMined() || packet.hasMinedFor(30));
+        } else if (main != null)
+        {
+            BlockPos mainPos = main.getBlockPos();
+            if (!mainPos.equals(currentMine))
+            {
+                return true;
+            }
+
+            return main.isBlockMined();
+        }
+
+        return packet == null;
     }
 }
