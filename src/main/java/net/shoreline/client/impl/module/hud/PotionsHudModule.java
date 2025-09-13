@@ -64,7 +64,7 @@ public class PotionsHudModule extends DynamicHudModule
     }
 
     @Override
-    public int getWidth()
+    public float getWidth()
     {
         return super.getWidth() + (potionIcons.getValue() ? 13 : 0);
     }

@@ -127,6 +127,7 @@ public class ModuleManager
                 new CoordsHudModule(),
                 new CrosshairHudModule(),
                 new FPSHudModule(),
+                new NotificationsHudModule(),
                 new PacketsHudModule(),
                 new PingHudModule(),
                 new PotionsHudModule(),

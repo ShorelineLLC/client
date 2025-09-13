@@ -18,12 +18,13 @@ public class DynamicEntry
 {
     private final DynamicHudModule module;
     private final Supplier<String> text;
-    private final Supplier<Boolean> drawing;
     private final UnboundAnimation animation;
     private final Animation yAnimation; // y animation should never go out of bounds.
 
+    private Supplier<Boolean> drawing;
     private boolean lastState;
     private float lastWidth;
+    private float height;
 
     public DynamicEntry(DynamicHudModule mod, Supplier<String> text, Supplier<Boolean> drawing)
     {
@@ -33,6 +34,7 @@ public class DynamicEntry
         this.lastState = drawing.get();
         this.animation = new UnboundAnimation(300, Easing.EXPO_OUT);
         this.yAnimation = new Animation(false, 150);
+        this.height = 10;
     }
 
     public void draw(DrawContext context, float x, float y, float currentOffset, float tickDelta)
@@ -46,7 +48,7 @@ public class DynamicEntry
         boolean top = getModule().isTop();
         float paddingX = left ? 2 : -2;
         float paddingY = top ? 2 : -2;
-        getModule().setOffset((int) (currentOffset + (10 * yAnimation.getFactor())));
+        getModule().setOffset((float) (currentOffset + (height * yAnimation.getFactor())));
 
         String current = text.get();
         float width = getModule().getTextWidth(current);

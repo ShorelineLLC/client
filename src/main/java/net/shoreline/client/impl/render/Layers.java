@@ -32,10 +32,10 @@ public class Layers
                 .program(RenderLayer.ENTITY_CUTOUT_PROGRAM)
                 .texture(new RenderPhase.Texture(texture, TriState.DEFAULT, false))
                 .transparency(RenderLayer.TRANSLUCENT_TRANSPARENCY)
-                .cull(RenderLayer.DISABLE_CULLING)
                 .lightmap(RenderLayer.ENABLE_LIGHTMAP)
                 .overlay(RenderLayer.ENABLE_OVERLAY_COLOR)
                 .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
+                .cull(RenderPhase.Cull.DISABLE_CULLING)
                 .build(affectsOutline);
 
         return RenderLayer.of("shoreline_entity", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);

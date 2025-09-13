@@ -50,13 +50,13 @@ public class ServerStatusHudModule extends HudModule
     }
 
     @Override
-    public int getWidth()
+    public float getWidth()
     {
         return getTextWidth(getStatusText());
     }
 
     @Override
-    public int getHeight()
+    public float getHeight()
     {
         return 12;
     }

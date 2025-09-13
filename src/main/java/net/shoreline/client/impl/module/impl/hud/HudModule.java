@@ -13,11 +13,11 @@ import net.shoreline.client.impl.module.impl.RenderModule;
 
 public abstract class HudModule extends RenderModule
 {
-    Config<Integer> x = new NumberConfig.Builder<Integer>("X-Position")
-            .setDefaultValue(0)
+    Config<Float> x = new NumberConfig.Builder<Float>("X-Position")
+            .setDefaultValue(0f)
             .setVisible(() -> false).build();
-    Config<Integer> y = new NumberConfig.Builder<Integer>("Y-Position")
-            .setDefaultValue(0)
+    Config<Float> y = new NumberConfig.Builder<Float>("Y-Position")
+            .setDefaultValue(0f)
             .setVisible(() -> false).build();
     Config<Integer> index = new NumberConfig.Builder<Integer>("Index")
             .setMin(0).setMax(100).setDefaultValue(0)
@@ -27,7 +27,7 @@ public abstract class HudModule extends RenderModule
             .setDefaultValue(Anchor.None)
             .setVisible(() -> false).build();
 
-    public HudModule(String name, String description, int x, int y)
+    public HudModule(String name, String description, float x, float y)
     {
         super(name, description, GuiCategory.HUD);
         this.x.setValue(x);
@@ -51,22 +51,22 @@ public abstract class HudModule extends RenderModule
         return String.format("%s_hud_module", getName().toLowerCase());
     }
 
-    public int getX()
+    public float getX()
     {
         return x.getValue();
     }
 
-    public int getY()
+    public float getY()
     {
         return y.getValue();
     }
 
-    public void setX(int x)
+    public void setX(float x)
     {
         this.x.setValue(x);
     }
 
-    public void setY(int y)
+    public void setY(float y)
     {
         this.y.setValue(y);
     }
@@ -91,9 +91,9 @@ public abstract class HudModule extends RenderModule
         this.index.setValue(index);
     }
 
-    public abstract int getWidth();
+    public abstract float getWidth();
 
-    public abstract int getHeight();
+    public abstract float getHeight();
 
     @Override
     public void drawText(MatrixStack matrices, String text, float x, float y)

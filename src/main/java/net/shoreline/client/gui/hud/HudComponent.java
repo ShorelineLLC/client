@@ -20,11 +20,11 @@ public class HudComponent extends DrawableComponent implements Interactable
 {
     private final HudModule hudModule;
 
-    private int x, y;
+    private float x, y;
     private float px, py;
 
-    private int width;
-    private int height;
+    private float width;
+    private float height;
 
     private boolean dragging;
 
@@ -178,7 +178,7 @@ public class HudComponent extends DrawableComponent implements Interactable
         getHudModule().setAnchor(found);
     }
 
-    public void setX(boolean module, int x)
+    public void setX(boolean module, float x)
     {
         if (module)
         {
@@ -190,7 +190,7 @@ public class HudComponent extends DrawableComponent implements Interactable
         }
     }
 
-    public void setY(boolean module, int y)
+    public void setY(boolean module, float y)
     {
         if (module)
         {

@@ -38,8 +38,8 @@ public class ArmorHudModule extends HudModule
             }
 
             int extra = percent.getValue() ? 8 : 3;
-            context.drawItem(stack, getX() + getWidth() - offset, getY() + extra);
-            context.drawStackOverlay(mc.textRenderer, stack, getX() + getWidth() - offset, getY() + extra);
+            context.drawItem(stack, (int) (getX() + getWidth() - offset), (int) (getY() + extra));
+            context.drawStackOverlay(mc.textRenderer, stack, (int) (getX() + getWidth() - offset), (int) (getY() + extra));
             if (percent.getValue())
             {
                 context.getMatrices().push();
@@ -60,13 +60,13 @@ public class ArmorHudModule extends HudModule
     }
 
     @Override
-    public int getWidth()
+    public float getWidth()
     {
         return 75;
     }
 
     @Override
-    public int getHeight()
+    public float getHeight()
     {
         return percent.getValue() ? 25 : 20;
     }

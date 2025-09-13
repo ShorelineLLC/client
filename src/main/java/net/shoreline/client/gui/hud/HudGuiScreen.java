@@ -37,7 +37,7 @@ public class HudGuiScreen extends Screen
         hudFrame = new HudFrame("HUD", 100, 50, 120, 17);
         for (HudModule module : Managers.MODULES.getHudModules())
         {
-            HudComponent component = new HudComponent(module, module.getX(), module.getY());
+            HudComponent component = new HudComponent(module, (int) module.getX(), (int) module.getY());
             hudComponents.add(component);
         }
     }
@@ -199,7 +199,7 @@ public class HudGuiScreen extends Screen
             }
 
             int i = 0;
-            int currentY = (int) anchor.getY(MinecraftClient.getInstance().getWindow().getScaledHeight(), 0, offset);
+            float currentY = anchor.getY(MinecraftClient.getInstance().getWindow().getScaledHeight(), 0, offset);
             for (HudComponent hudModule : anchoredElements)
             {
                 if (hudModule.isDragging())
@@ -215,7 +215,7 @@ public class HudGuiScreen extends Screen
                     continue;
                 }
 
-                hudModule.setX(modifyComponent, (int) anchor.getX(MinecraftClient.getInstance().getWindow().getScaledWidth(), hudModule.getHudModule().getWidth()));
+                hudModule.setX(modifyComponent, anchor.getX(MinecraftClient.getInstance().getWindow().getScaledWidth(), hudModule.getHudModule().getWidth()));
                 switch (anchor)
                 {
                     case Top_Left:

@@ -7,17 +7,19 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.shoreline.client.impl.module.client.HudGuiModule;
 import net.shoreline.client.impl.render.ColorUtil;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 @Setter
 public abstract class DynamicHudModule extends HudModule
 {
-    protected final List<DynamicEntry> hudEntries = new ArrayList<>();
-    protected int offset = 0;
-    protected int width = 0;
+    protected final List<DynamicEntry> hudEntries = new CopyOnWriteArrayList<>();
+    protected float offset = 0;
+    protected float width = 0;
+    protected boolean left;
+    protected boolean top;
 
     public DynamicHudModule(String name, String description, int x, int y)
     {
@@ -35,16 +37,20 @@ public abstract class DynamicHudModule extends HudModule
     {
         drawEntries(context, tickDelta);
         cacheWidth();
+
+        float center = mc.getWindow().getScaledHeight() / 2f;
+        top  = !(getY() + (getHeight() / 2.0f) > center);
+        left = getX() + (getWidth() / 2f) < mc.getWindow().getScaledWidth() / 2f;
     }
 
     @Override
-    public int getWidth()
+    public float getWidth()
     {
         return width;
     }
 
     @Override
-    public int getHeight()
+    public float getHeight()
     {
         return offset;
     }
@@ -67,17 +73,6 @@ public abstract class DynamicHudModule extends HudModule
         boolean top = isTop();
         getHudEntries().sort(Comparator.comparingDouble(
                 entry -> getTextWidth(entry.getText().get()) * (top ? -1 : 1)));
-    }
-
-    public boolean isLeft()
-    {
-        return getX() + (getWidth() / 2f) < mc.getWindow().getScaledWidth() / 2f;
-    }
-
-    public boolean isTop()
-    {
-        float center = mc.getWindow().getScaledHeight() / 2f;
-        return !(getY() + (getHeight() / 2.0f) > center);
     }
 
     public void cacheWidth()
