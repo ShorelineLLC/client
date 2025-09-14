@@ -13,7 +13,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
+import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
@@ -76,6 +78,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Float> targetRange = new NumberConfig.Builder<Float>("TargetRange")
             .setMin(1.0f).setMax(15.0f).setDefaultValue(10.0f).setFormat("m")
             .setDescription("The range to target entities").build();
+    Config<Integer> extrapolateTicks = new NumberConfig.Builder<Integer>("Extrapolate")
+            .setMin(0).setDefaultValue(0).setMax(10).setFormat(" ticks")
+            .setDescription("The number of ticks ahead to predict movement").build();
     Config<Boolean> targetPlayers = new BooleanConfig.Builder("Players")
             .setDescription("Targets players").setDefaultValue(true).build();
     Config<Boolean> targetNakeds = new BooleanConfig.Builder("Nakeds")
@@ -85,7 +90,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Boolean> targetPassives = new BooleanConfig.Builder("Passives")
             .setDescription("Targets passives").setDefaultValue(false).build();
     Config<Void> targetConfig = new ConfigGroup.Builder("Target")
-            .addAll(targetRange, targetPlayers, targetNakeds, targetHostiles, targetPassives).build();
+            .addAll(targetRange, extrapolateTicks, targetPlayers, targetNakeds, targetHostiles, targetPassives).build();
 
     Config<Float> breakRange = new NumberConfig.Builder<Float>("BreakRange")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
@@ -93,8 +98,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Integer> breakDelay = new NumberConfig.Builder<Integer>("BreakDelay")
             .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
             .setDescription("The delay between breaking crystals").build();
-    Config<Integer> ticksExisted = new NumberConfig.Builder<Integer>("TicksExisted")
-            .setMin(0).setMax(10).setDefaultValue(0)
+    Config<Integer> ticksExisted = new NumberConfig.Builder<Integer>("MinExisted")
+            .setMin(0).setMax(10).setDefaultValue(0).setFormat(" ticks")
             .setDescription("The minimum ticks existed before breaking crystals").build();
     Config<Boolean> sequentialBreak = new BooleanConfig.Builder("SequentialBreak")
             .setDescription("Breaks immediately after a placement")
@@ -126,9 +131,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Boolean> forcePlace = new BooleanConfig.Builder("ForcePlace")
             .setDescription("Attempts to force crystal placements in blocked positions")
             .setDefaultValue(false).build();
-    Config<Boolean> predictPlace = new BooleanConfig.Builder("PrePlace")
-            .setDescription("Attempts to place while mining")
-            .setDefaultValue(false).build();
+    Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("PrePlace")
+            .setValues(Timing.values())
+            .setDescription("Attempts to predict the next place")
+            .setDefaultValue(Timing.OFF).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
             .addAll(targetItems, forcePlace, predictPlace).build();
 
@@ -282,9 +288,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         if (currentPlace != null)
         {
             rotations = runPlace(currentPlace, hand);
-        } else if (predictPlace.getValue())
+        } else if (predictPlace.getValue() == Timing.VANILLA)
         {
-            rotations = runPrePlace(hand);
+            MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
+            rotations = runPrePlace(currentMine, hand);
         }
 
         if (silentRotated)
@@ -356,6 +363,58 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 {
                     breakTime.add(System.currentTimeMillis() - time);
                 }
+            }
+        }
+
+        if (predictPlace.getValue() != Timing.SEQUENTIAL)
+        {
+            return;
+        }
+
+        MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
+        if (currentMine == null)
+        {
+            return;
+        }
+
+        Hand hand = getCrystalHand();
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet
+                && packet.getPos().equals(currentMine.getBlockPos()))
+        {
+            runPrePlace(currentMine, hand);
+        }
+
+        if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity == null)
+                {
+                    continue;
+                }
+
+                BlockPos pos = entity.getBlockPos();
+                if (entity instanceof ItemEntity && pos.equals(currentMine.getBlockPos()))
+                {
+                    runPrePlace(currentMine, hand);
+                    break;
+                }
+            }
+        }
+
+        if (event.getPacket() instanceof ItemPickupAnimationS2CPacket packet)
+        {
+            Entity entity = mc.world.getEntityById(packet.getEntityId());
+            if (entity == null)
+            {
+                return;
+            }
+
+            BlockPos pos = entity.getBlockPos();
+            if (pos.equals(currentMine.getBlockPos()))
+            {
+                runPrePlace(currentMine, hand);
             }
         }
     }
@@ -452,14 +511,13 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return rotations;
     }
 
-    private float[] runPrePlace(Hand hand)
+    private float[] runPrePlace(MiningData currentMine, Hand hand)
     {
         if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
             return null;
         }
 
-        MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
         if (currentMine == null || !currentMine.isDoneMining() || SpeedMineModule.INSTANCE.isManualMining())
         {
             return null;
@@ -762,5 +820,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     public boolean isRunning()
     {
         return isEnabled() && (currentAttack != null || currentPlace != null);
+    }
+
+    private enum Timing
+    {
+        VANILLA, SEQUENTIAL, OFF
     }
 }

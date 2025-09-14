@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public abstract class AsyncBlockScanner extends AsyncBlockView
+public abstract class AsyncBlockScanner extends AsyncCollisionView
 {
     private final BlockPos.Mutable mPos = new BlockPos.Mutable();
 

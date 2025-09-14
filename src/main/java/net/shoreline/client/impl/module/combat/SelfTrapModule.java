@@ -87,7 +87,8 @@ public class SelfTrapModule extends TrapModule
             return;
         }
 
-        if (autoDisable.getValue() && (mc.player.getY() - prevY > 0.5 || mc.player.fallDistance > 1.5f))
+        double dy = mc.player.getY() - prevY;
+        if (autoDisable.getValue() && (dy > 0.5 || dy < -1.5))
         {
             disable();
             return;
