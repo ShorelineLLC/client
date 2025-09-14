@@ -128,15 +128,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
             .setDescription("Targets dropped items blocking placements")
             .setDefaultValue(false).build();
-    Config<Boolean> forcePlace = new BooleanConfig.Builder("ForcePlace")
-            .setDescription("Attempts to force crystal placements in blocked positions")
-            .setDefaultValue(false).build();
     Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("PrePlace")
             .setValues(Timing.values())
             .setDescription("Attempts to predict the next place")
             .setDefaultValue(Timing.OFF).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
-            .addAll(targetItems, forcePlace, predictPlace).build();
+            .addAll(targetItems, predictPlace).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(4.0f)
@@ -757,7 +754,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         for (Entity entity : mc.world.getOtherEntities(null, box))
         {
-            if (!canIgnoreEntity(entity, entity.age))
+            if (!canIgnoreEntity(entity))
             {
                 return true;
             }
@@ -766,17 +763,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return false;
     }
 
-    public boolean canIgnoreEntity(Entity entity, int age)
+    public boolean canIgnoreEntity(Entity entity)
     {
-        if (entity instanceof ExperienceOrbEntity || forcePlace.getValue() && entity instanceof ItemEntity && age <= 10)
-        {
-            return true;
-        } else if (entity instanceof EndCrystalEntity crystal)
-        {
-            return true;
-        }
-
-        return false;
+        return entity instanceof ExperienceOrbEntity || entity instanceof EndCrystalEntity crystal;
     }
 
     public Box getCrystalBox(BlockPos blockPos)

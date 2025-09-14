@@ -1,24 +1,24 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
 import lombok.experimental.UtilityClass;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.util.math.Box;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.AutoMineModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
-import net.shoreline.client.impl.world.explosion.ExplosionUtil;
+import net.shoreline.client.impl.world.AsyncWorldScanner;
+import net.shoreline.client.impl.world.EntityState;
 
 import java.util.Set;
 
 @UtilityClass
 public class AntiSurround
 {
-
-    public boolean checkAntiSurroundQualifiers(BlockView blockView, BlockPos blockPos)
+    public boolean checkAntiSurroundQualifiers(AsyncWorldScanner view, BlockPos blockPos)
     {
         if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
@@ -38,28 +38,36 @@ public class AntiSurround
         }
 
         BlockPos minePos = currentMine.getBlockPos();
-        double damage = ExplosionUtil.crystalDamageToEntity(blockView,
-                target,
+        EntityState state = view.getEntityById(target.getId());
+
+        float baseDamage = CrystalUtil.getCrystalDamage(view,
                 minePos.toBottomCenterPos(),
+                state.getPos(),
+                state.getBoundingBox(),
                 AutoCrystalModule.INSTANCE.getIgnoreTerrain().getValue(),
                 Set.of(minePos));
 
-        if (damage < AutoCrystalModule.INSTANCE.getMinDamage().getValue())
+        baseDamage *= 0.9f; // We have to assume armor here...
+        if (baseDamage < AutoCrystalModule.INSTANCE.getMinDamage().getValue())
         {
             return false;
         }
 
-        for (Direction direction : Direction.values())
+        for (EntityState entityState : view.getOtherEntities(null, new Box(minePos)))
         {
-            BlockPos pos = minePos.offset(direction);
-            if (!AutoCrystalModule.INSTANCE.canUseOnBlock(pos.down()))
+            if (entityState.getEntity() instanceof ItemEntity)
             {
-                continue;
-            }
-            
-            if (blockPos.equals(pos))
-            {
-                return true;
+                float damage = CrystalUtil.getCrystalDamage(view,
+                        blockPos.toBottomCenterPos(),
+                        entityState.getPos(),
+                        entityState.getBoundingBox(),
+                        false,
+                        Set.of(minePos));
+
+                if (damage >= 5.0f)
+                {
+                    return true;
+                }
             }
         }
 

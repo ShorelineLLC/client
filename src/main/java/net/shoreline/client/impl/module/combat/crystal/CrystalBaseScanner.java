@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
-import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -110,7 +109,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         for (EntityState entity1 : getOtherEntities(null, box))
         {
             Entity entity = entity1.getEntity();
-            if (!autoCrystal.canIgnoreEntity(entity, entity1.getAge()))
+            if (!autoCrystal.canIgnoreEntity(entity))
             {
                 return true;
             }
