@@ -12,6 +12,7 @@ import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
+import net.shoreline.client.impl.render.Easing;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +57,7 @@ public class PlacerModule extends CombatModule
         boolean result = Managers.INTERACT.placeBlock(interaction);
         if (result)
         {
-            fadeOutAnimations.put(placePos, new Animation(true, 250));
+            fadeOutAnimations.put(placePos, new Animation(true, 500));
         }
 
         return result;
@@ -115,7 +116,7 @@ public class PlacerModule extends CombatModule
             BlockPos blockPos = animations.getKey();
             int color = ThemeModule.INSTANCE.getPrimaryColor().getRGB();
 
-            BoxRender.FILL.render(matrixStack, blockPos, color, (float) animations.getValue().getFactor());
+            BoxRender.FILL.render(matrixStack, blockPos, color, (float) Easing.SMOOTH_STEP.ease(animations.getValue().getFactor()));
         }
     }
 

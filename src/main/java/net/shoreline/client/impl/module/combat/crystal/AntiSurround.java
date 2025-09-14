@@ -47,7 +47,7 @@ public class AntiSurround
                 AutoCrystalModule.INSTANCE.getIgnoreTerrain().getValue(),
                 Set.of(minePos));
 
-        baseDamage *= 0.9f; // We have to assume armor here...
+        baseDamage *= 0.11f; // We have to assume armor here...
         if (baseDamage < AutoCrystalModule.INSTANCE.getMinDamage().getValue())
         {
             return false;
