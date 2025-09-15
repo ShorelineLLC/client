@@ -7,7 +7,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.render.ClientFormatting;
 import net.shoreline.client.impl.render.Shaders;
 
 /**
@@ -33,7 +35,11 @@ public class ShorelineMod implements ClientModInitializer
 
     public static String getFormattedVersion()
     {
-        return String.format("%s %s (%s-%s)", ShorelineMod.MOD_NAME, ShorelineMod.MOD_VER, BuildConfig.BUILD_IDENTIFIER, BuildConfig.HASH);
+        return String.format(ClientFormatting.THEME + "%s " + Formatting.WHITE + "%s %s-%s",
+                ShorelineMod.MOD_NAME,
+                ShorelineMod.MOD_VER,
+                BuildConfig.BUILD_IDENTIFIER,
+                BuildConfig.HASH);
     }
 
     public static boolean isBaritonePresent()

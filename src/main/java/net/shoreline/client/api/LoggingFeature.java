@@ -11,7 +11,7 @@ import net.shoreline.client.impl.render.ClientFormatting;
 public class LoggingFeature extends GenericFeature
 {
     protected static final String RAW_PREFIX = "[Shoreline]";
-    protected static final String PREFIX = Formatting.GRAY + "[" + ClientFormatting.THEME + "Shoreline" + Formatting.GRAY + "] ";
+    protected static final String PREFIX = Formatting.DARK_GRAY + "[" + ClientFormatting.THEME + "Shoreline" + Formatting.DARK_GRAY + "] ";
     protected static final String ERROR_PREFIX = "[\u274C] ";
     protected static final String SUCCESS_PREFIX = "[\u2713] ";
 

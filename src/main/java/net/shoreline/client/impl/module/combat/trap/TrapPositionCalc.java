@@ -8,7 +8,8 @@ import net.minecraft.util.math.Vec3i;
 import net.shoreline.client.impl.Managers;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Getter
@@ -130,6 +131,29 @@ public class TrapPositionCalc
 
             trapPositions.put(extend, trapLayer);
         }
+    }
+
+    public List<Map.Entry<BlockPos, TrapLayer>> entriesSortedByLayer(TrapLayer... layerOrder)
+    {
+        List<Map.Entry<BlockPos, TrapLayer>> list = new ArrayList<>(trapPositions.entrySet());
+        if (layerOrder == null || layerOrder.length == 0)
+        {
+            list.sort(Map.Entry.comparingByKey(TRAP_ORDER));
+            return list;
+        }
+
+        EnumMap<TrapLayer, Integer> rank = new EnumMap<>(TrapLayer.class);
+        for (int i = 0; i < layerOrder.length; i++)
+        {
+            rank.put(layerOrder[i], i);
+        }
+
+        list.sort(
+                Comparator.<Map.Entry<BlockPos, TrapLayer>>comparingInt(e -> rank.getOrDefault(e.getValue(), Integer.MAX_VALUE))
+                        .thenComparing(Map.Entry::getKey, TRAP_ORDER)
+        );
+
+        return list;
     }
 
     public TrapLayer getLayerType(BlockPos blockPos)

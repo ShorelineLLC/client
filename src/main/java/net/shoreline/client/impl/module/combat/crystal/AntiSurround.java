@@ -38,6 +38,11 @@ public class AntiSurround
         }
 
         BlockPos minePos = currentMine.getBlockPos();
+        if (minePos.equals(blockPos))
+        {
+            return false;
+        }
+
         EntityState state = view.getEntityById(target.getId());
 
         float baseDamage = CrystalUtil.getCrystalDamage(view,

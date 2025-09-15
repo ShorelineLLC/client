@@ -87,7 +87,7 @@ public class MiningData
 
         VoxelShape outlineShape = state.getOutlineShape(MinecraftClient.getInstance().world, blockPos);
         Box boundingBox = outlineShape != null && !outlineShape.isEmpty() ? outlineShape.getBoundingBox() : VoxelShapes.fullCube().getBoundingBox();
-        double scale = Easing.SMOOTH_STEP.ease(getLinearScale(miningSpeed, tickDelta));
+        double scale = isDoneMining() ? 1.0 : Easing.SMOOTH_STEP.ease(getLinearScale(miningSpeed, tickDelta));
 
         int color = ColorUtil.interpolateColor(Math.min(blockDamage / miningSpeed, 1.0f), endColor, startColor);
         Vec3d center = boundingBox.offset(blockPos).getCenter();

@@ -133,7 +133,6 @@ public class ModuleManager
                 new PotionsHudModule(),
                 new ServerStatusHudModule(),
                 new SpeedHudModule(),
-                new TextRadarHudModule(),
                 new TPSHudModule(),
                 new WatermarkHudModule()
         );

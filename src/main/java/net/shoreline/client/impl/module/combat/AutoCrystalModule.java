@@ -442,7 +442,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                     placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), animFactor);
 
             String dataNametag;
-            if (placeData.isAntiSurround())
+            if (placeData.isAntiSurround() || placeData.getDamageToPlayer() == -1.0f)
             {
                 dataNametag = "AS";
             } else
@@ -533,7 +533,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return null;
         }
 
-        if (hasEntityBlockingCrystal(getCrystalBox(placePos)))
+        if (hasEntityBlockingCrystal(getCrystalBox(placePos), true))
         {
             return null;
         }
@@ -555,7 +555,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             silentRotated = true;
         }
 
-        currentPlace = new CrystalData<>(placePos, targetState, damage, 0.0f, false);
+        currentPlace = new CrystalData<>(placePos, targetState, damage, -1.0f, false);
         placeCrystal(placePos, hand);
         placeTimer.reset();
 
@@ -724,7 +724,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     public boolean canUseOnBlock(BlockPos blockPos)
     {
-        return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos)));
+        return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos), false));
     }
 
     public boolean canUseOnBlock(BlockView blockView, BlockPos pos, boolean hasEntityBlockingCrystal)
@@ -750,11 +750,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return !hasEntityBlockingCrystal;
     }
 
-    private boolean hasEntityBlockingCrystal(Box box)
+    private boolean hasEntityBlockingCrystal(Box box, boolean ignoreItems)
     {
         for (Entity entity : mc.world.getOtherEntities(null, box))
         {
-            if (!canIgnoreEntity(entity))
+            if (!(canIgnoreEntity(entity) || ignoreItems && entity instanceof ItemEntity))
             {
                 return true;
             }

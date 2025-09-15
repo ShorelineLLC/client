@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.world;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -22,6 +23,7 @@ import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningPackets;
 import net.shoreline.client.impl.mining.MiningUtil;
 import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -163,7 +165,7 @@ public class SpeedMineModule extends ListeningToggleable
                     event.getTickDelta(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
-                    mainState.getFactor(),
+                    (float) Easing.SMOOTH_STEP.ease(mainState.getFactor()),
                     speedConfig.getValue());
         }
 
@@ -179,7 +181,7 @@ public class SpeedMineModule extends ListeningToggleable
                     event.getTickDelta(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
-                    packetState.getFactor(), 1.0f);
+                    (float) Easing.SMOOTH_STEP.ease(packetState.getFactor()), 1.0f);
         }
     }
 
@@ -342,6 +344,11 @@ public class SpeedMineModule extends ListeningToggleable
         if (packetMiningBlock != null)
         {
             Managers.INVENTORY.endMultitickSwap();
+            if (!packetMiningBlock.isDoneMining())
+            {
+                packetMiningBlock.abort();
+            }
+
             packetMiningBlock = null;
         }
 

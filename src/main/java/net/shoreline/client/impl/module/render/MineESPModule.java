@@ -9,6 +9,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
@@ -57,7 +58,7 @@ public class MineESPModule extends RenderModule
             data.render(event.getMatrixStack(), event.getTickDelta(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
-                    (float) animations.getValue().getFactor(), 1.0f);
+                    (float) Easing.SMOOTH_STEP.ease(animations.getValue().getFactor()), 1.0f);
         }
 
         for (MiningData data : Managers.MINING.getMiningBlocks())

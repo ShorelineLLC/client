@@ -28,6 +28,7 @@ import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 
 public class AutoMineModule extends TrapModule
@@ -111,12 +112,20 @@ public class AutoMineModule extends TrapModule
         long roundedY = Math.round(boundingBox.minY);
         Box bb = boundingBox.withMinY(roundedY).shrink(0.01, 0.1, 0.01);
 
-        BlockPos autoMine = getNextAutoMine(targetPos, bb);
-
-        if (autoMine != null && canStartMining(autoMine) && mineTimer.hasPassed(delayConfig.getValue()))
+        if (mineTimer.hasPassed(delayConfig.getValue()))
         {
-            startAutoMine(autoMine);
-            mineTimer.reset();
+            Map.Entry<BlockPos, TrapLayer> autoMine = getNextAutoMine(targetPos, bb);
+            if (autoMine == null)
+            {
+                return;
+            }
+
+            BlockPos minePos = autoMine.getKey();
+            if (canStartMining(minePos))
+            {
+                startAutoMine(minePos);
+                mineTimer.reset();
+            }
         }
     }
 
@@ -129,28 +138,31 @@ public class AutoMineModule extends TrapModule
         }
     }
 
-    public BlockPos getNextAutoMine(BlockPos targetPos, Box boundingBox)
+    public Map.Entry<BlockPos, TrapLayer> getNextAutoMine(BlockPos targetPos, Box boundingBox)
     {
+        trapPos.calcTrap(boundingBox, trapSpec);
+
         boolean shouldTargetHead = mc.world.getBlockState(targetPos).isOf(Blocks.BEDROCK);
         float crystalRange = AutoCrystalModule.INSTANCE.getPlaceRange().getValue();
 
-        BlockPos bestMine = null;
+        Map.Entry<BlockPos, TrapLayer> bestMine = null;
         boolean inRange = false;
 
-        trapPos.calcTrap(boundingBox, trapSpec);
-        for (Map.Entry<BlockPos, TrapLayer> trapLayer : trapPos.getTrapPositionLayers().entrySet())
+        List<Map.Entry<BlockPos, TrapLayer>> trapLayers = trapPos.entriesSortedByLayer(
+                TrapLayer.FEET_INTERSECT,
+                TrapLayer.BODY_INTERSECT,
+                TrapLayer.FEET,
+                TrapLayer.BODY,
+                TrapLayer.FLOOR,
+                TrapLayer.CEILING);
+
+        for (Map.Entry<BlockPos, TrapLayer> trapLayer : trapLayers)
         {
             BlockPos blockPos = trapLayer.getKey();
             TrapLayer layer = trapLayer.getValue();
 
             BlockState state = mc.world.getBlockState(blockPos);
             if (MiningUtil.isUnbreakable(state))
-            {
-                continue;
-            }
-
-            BlockState state2 = mc.world.getBlockState(blockPos.down());
-            if (!state2.isOf(Blocks.OBSIDIAN) && !state2.isOf(Blocks.BEDROCK))
             {
                 continue;
             }
@@ -168,7 +180,7 @@ public class AutoMineModule extends TrapModule
                     if (layer == TrapLayer.FLOOR && floorConfig.getValue()
                             || layer == TrapLayer.BODY_INTERSECT && bodyConfig.getValue())
                     {
-                        return blockPos;
+                        return trapLayer;
                     }
                 }
 
@@ -176,31 +188,41 @@ public class AutoMineModule extends TrapModule
                 {
                     if (!inRange)
                     {
-                        bestMine = blockPos;
+                        bestMine = trapLayer;
                     }
 
                     Vec3d crystalVec = blockPos.toBottomCenterPos().add(0.0, 1.0, 0.0);
-                    if (mc.player.getEyePos().squaredDistanceTo(crystalVec) <= crystalRange * crystalRange)
+                    double distance = mc.player.getEyePos().squaredDistanceTo(crystalVec);
+                    if (distance <= crystalRange * crystalRange)
                     {
                         inRange = true;
                     }
                 }
-            } else if (feetConfig.getValue())
+            }
+
+            else if (feetConfig.getValue())
             {
                 if (layer == TrapLayer.FEET_INTERSECT && !MiningUtil.isEmpty(state) && !speedMine.isMining(blockPos))
                 {
-                    return blockPos;
+                    return trapLayer;
                 }
 
                 if (layer == TrapLayer.FEET)
                 {
+                    BlockState state2 = mc.world.getBlockState(blockPos.down());
+                    if (!state2.isOf(Blocks.OBSIDIAN) && !state2.isOf(Blocks.BEDROCK))
+                    {
+                        continue;
+                    }
+
                     if (!inRange)
                     {
-                        bestMine = blockPos;
+                        bestMine = trapLayer;
                     }
 
                     Vec3d crystalVec = blockPos.toBottomCenterPos().add(0.0, 1.0, 0.0);
-                    if (mc.player.getEyePos().squaredDistanceTo(crystalVec) <= crystalRange * crystalRange)
+                    double distance = mc.player.getEyePos().squaredDistanceTo(crystalVec);
+                    if (distance <= crystalRange * crystalRange)
                     {
                         inRange = true;
                     }
@@ -215,6 +237,12 @@ public class AutoMineModule extends TrapModule
     {
         MiningData main = speedMine.getMainMiningBlock();
         MiningData packet = speedMine.getPacketMiningBlock();
+        MiningData pendingClear = speedMine.getPendingClear();
+
+        if (pendingClear != null && pendingClear.equals(main) && !main.isDoneMining())
+        {
+            return false;
+        }
 
         if (main != null && packet != null)
         {
