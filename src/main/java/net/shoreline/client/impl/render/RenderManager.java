@@ -194,8 +194,23 @@ public class RenderManager
 
     public void drawRect(DrawContext context, float x, float y, float width, float height, int color)
     {
+        float i;
         float x2 = x + width;
         float y2 = y + height;
+        if (x < x2)
+        {
+            i = x;
+            x = x2;
+            x2 = i;
+        }
+
+        if (y < y2)
+        {
+            i = y;
+            y = y2;
+            y2 = i;
+        }
+
         Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
         VertexConsumer vc = ((IDrawContext) context).getVertexConsumerProvider().getBuffer(RenderLayer.getGui());
         vc.vertex(matrix4f, x, y, 0).color(color);

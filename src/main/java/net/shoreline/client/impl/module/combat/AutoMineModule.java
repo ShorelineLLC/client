@@ -150,10 +150,10 @@ public class AutoMineModule extends TrapModule
 
         List<Map.Entry<BlockPos, TrapLayer>> trapLayers = trapPos.entriesSortedByLayer(
                 TrapLayer.FEET_INTERSECT,
+                TrapLayer.FLOOR,
                 TrapLayer.BODY_INTERSECT,
                 TrapLayer.FEET,
                 TrapLayer.BODY,
-                TrapLayer.FLOOR,
                 TrapLayer.CEILING);
 
         for (Map.Entry<BlockPos, TrapLayer> trapLayer : trapLayers)

@@ -11,7 +11,7 @@ import net.shoreline.client.impl.render.ClientFormatting;
 public class LoggingFeature extends GenericFeature
 {
     protected static final String RAW_PREFIX = "[Shoreline]";
-    protected static final String PREFIX = Formatting.DARK_GRAY + "[" + ClientFormatting.THEME + "Shoreline" + Formatting.DARK_GRAY + "] ";
+    protected static final String PREFIX = ClientFormatting.THEME + RAW_PREFIX + Formatting.RESET + " ";
     protected static final String ERROR_PREFIX = "[\u274C] ";
     protected static final String SUCCESS_PREFIX = "[\u2713] ";
 
@@ -27,12 +27,12 @@ public class LoggingFeature extends GenericFeature
 
     protected void sendClientMessageWithOptionalDeletion(String message, int id)
     {
-        sendChatMessageWithOptionalDeletion(PREFIX + Formatting.RESET + message, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), id);
+        sendChatMessageWithOptionalDeletion(PREFIX + message, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), id);
     }
 
     protected void sendClientChatMessage(String message)
     {
-        sendChatMessage(PREFIX + Formatting.RESET + message, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
+        sendChatMessage(PREFIX + message, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
     }
 
     protected void sendSuccessChatMessage(String message)

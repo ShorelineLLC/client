@@ -11,6 +11,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.OpenScreenEvent;
 import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
 import net.shoreline.client.impl.event.gui.hud.MessageIndicatorEvent;
@@ -73,7 +74,7 @@ public class BetterChatModule extends Toggleable
             double factor = Easing.EXPO_IN_OUT.ease(anim.getFactor());
             int width = overrideFont ? FontManager.FONT.getStringWidth(event.getString()) : mc.textRenderer.getWidth(event.getText());
             int renderX = (int) (event.getX() - (width * (1.0f - factor)));
-            int color = ColorUtil.withTransparency(Colors.WHITE, (float) factor);
+            int color = ColorUtil.withTransparency(Colors.WHITE, (event.getU() / 255.0f) * (float) factor);
 
             event.cancel();
             if (overrideFont)
@@ -91,13 +92,14 @@ public class BetterChatModule extends Toggleable
     {
         if (animateConfig.getValue())
         {
-            double factor = Easing.SMOOTH_STEP.ease(chatAnim.getFactor());
+            float factor = (float) Easing.SMOOTH_STEP.ease(chatAnim.getFactor());
             event.cancel();
-            event.getContext().fill(event.getX(),
+            Managers.RENDER.drawRect(event.getContext(),
+                    event.getX(),
                     event.getY(),
                     event.getWidth(),
-                    (int) (event.getY() - (12.0f * factor)),
-                    mc.options.getTextBackgroundColor(Integer.MIN_VALUE));
+                    -12.0f * factor,
+                    event.getColor());
         }
     }
 

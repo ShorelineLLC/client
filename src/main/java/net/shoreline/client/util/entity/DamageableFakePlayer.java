@@ -138,7 +138,7 @@ public class DamageableFakePlayer extends FakePlayerEntity
         } else
         {
             this.lastDamageTaken = amount;
-            this.timeUntilRegen = 20;
+            this.timeUntilRegen = 15;
             applyDamage(source, amount);
             this.hurtTime = 10;
             this.maxHurtTime = 10;

@@ -77,6 +77,7 @@ public class ModuleManager
                 new PacketSnifferModule(),
                 new RekitModule(),
                 new ShulkerceptionModule(),
+                new SkinBlinkModule(),
                 new SpammerModule(),
                 // Movement
                 new AvoidModule(),
@@ -96,6 +97,7 @@ public class ModuleManager
                 new BlockHighlightModule(),
                 new ChamsModule(),
                 new CrystalModelModule(),
+                new ESPModule(),
                 new FreecamModule(),
                 new FullbrightModule(),
                 new HoleESPModule(),

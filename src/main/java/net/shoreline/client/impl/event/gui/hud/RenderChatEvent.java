@@ -20,6 +20,7 @@ public class RenderChatEvent extends Event
     {
         private final DrawContext context;
         private final int x, y, width;
+        private final int color;
     }
 
     @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class RenderChatEvent extends Event
         private final OrderedText text;
         private final int x, y;
         private final int color;
+        private final int u;
 
         private int width;
 

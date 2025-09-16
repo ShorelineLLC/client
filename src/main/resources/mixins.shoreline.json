@@ -22,6 +22,7 @@
     "gui.hud.MixinChatHudLineVisible",
     "gui.hud.MixinInGameHud",
     "gui.hud.MixinInGameOverlayRenderer",
+    "gui.hud.MixinPlayerListHud",
     "gui.screen.MixinChatInputSuggestor",
     "gui.screen.MixinChatScreen",
     "gui.screen.MixinHandledScreen",

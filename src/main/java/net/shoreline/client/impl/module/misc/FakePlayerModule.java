@@ -58,6 +58,7 @@ public class FakePlayerModule extends Toggleable
             return;
         }
 
+        fakePlayer.baseTick();
         if (gappleTimer.hasPassed(1600))
         {
             fakePlayer.simulateGappleEat();

@@ -33,7 +33,7 @@ public abstract class MixinChatScreen extends MixinScreen
     private void hookRender(DrawContext instance, int x1, int y1, int x2, int y2, int color)
     {
         int y = (int) (this.height - 2.0f);
-        RenderChatEvent.Background event = new RenderChatEvent.Background(instance, 2, y, this.width - 2);
+        RenderChatEvent.Background event = new RenderChatEvent.Background(instance, 2, y, this.width - 2, color);
         EventBus.INSTANCE.dispatch(event);
     }
 }

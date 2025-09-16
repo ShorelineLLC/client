@@ -34,7 +34,7 @@ public class CrosshairHudModule extends HudModule
             .setDescription("Outlines the crosshair")
             .setDefaultValue(true).build();
     Config<Float> outlineThicknessConfig = new NumberConfig.Builder<Float>("OutlineThickness")
-            .setMin(0.1f).setMax(0.5f).setDefaultValue(0.3f)
+            .setMin(0.1f).setMax(1.0f).setDefaultValue(0.5f)
             .setDescription("The width of the outline")
             .setVisible(() -> outlineConfig.getValue()).build();
     Config<Float> opacityConfig = new NumberConfig.Builder<Float>("Opacity")
