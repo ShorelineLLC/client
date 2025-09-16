@@ -51,6 +51,8 @@ public class SkinBlinkModule extends Toggleable
         {
             mc.options.setPlayerModelPart(modelPart, enabledPlayerModelParts.contains(modelPart));
         }
+
+        mc.player.networkHandler.syncOptions(mc.options.getSyncedOptions());
     }
 
     @EventListener

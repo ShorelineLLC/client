@@ -132,10 +132,20 @@ public class AutoMineModule extends TrapModule
     private void startAutoMine(BlockPos blockPos)
     {
         BlockState state = mc.world.getBlockState(blockPos);
-        if (MiningUtil.canMineBlock(state) && !speedMine.isMining(blockPos))
+        if (!MiningUtil.canMineBlock(state) || speedMine.isMining(blockPos))
         {
-            speedMine.startMining(blockPos, Direction.UP);
+            return;
         }
+
+        MiningData main = speedMine.getMainMiningBlock();
+        MiningData pendingClear = speedMine.getPendingClear();
+
+        if (pendingClear != null && pendingClear.equals(main) && !main.isDoneMining())
+        {
+            speedMine.startMining(main.getBlockPos(), Direction.UP);
+        }
+
+        speedMine.startMining(blockPos, Direction.UP);
     }
 
     public Map.Entry<BlockPos, TrapLayer> getNextAutoMine(BlockPos targetPos, Box boundingBox)
@@ -237,12 +247,6 @@ public class AutoMineModule extends TrapModule
     {
         MiningData main = speedMine.getMainMiningBlock();
         MiningData packet = speedMine.getPacketMiningBlock();
-        MiningData pendingClear = speedMine.getPendingClear();
-
-        if (pendingClear != null && pendingClear.equals(main) && !main.isDoneMining())
-        {
-            return false;
-        }
 
         if (main != null && packet != null)
         {

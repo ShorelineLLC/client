@@ -43,7 +43,7 @@ public class BetterTabModule extends Toggleable
     {
         if (animateConfig.getValue())
         {
-            float animFactor = (float) Easing.SMOOTH_STEP.ease(tabListAnim.getFactor());
+            float animFactor = (float) Easing.QUART_IN_OUT.ease(tabListAnim.getFactor());
             int h = event.getY2() - event.getY1();
             int cb = event.getY1() + Math.round(h * animFactor);
             event.getContext().enableScissor(event.getX1(), event.getY1(), event.getX2(), Math.max(event.getY1(), Math.min(event.getY2(), cb)));
@@ -80,7 +80,7 @@ public class BetterTabModule extends Toggleable
     }
 
     @EventListener
-    public void onScreenOpen(OpenTabEvent event)
+    public void onOpenTab(OpenTabEvent event)
     {
         if (event.isVisible())
         {

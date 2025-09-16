@@ -95,7 +95,6 @@ public class SpeedMineModule extends ListeningToggleable
         }
 
         clearMain();
-        clearPacket();
         pendingClear = null;
     }
 
@@ -117,14 +116,17 @@ public class SpeedMineModule extends ListeningToggleable
     @EventListener(priority = TickPriorities.SPEED_MINE)
     public void onTickEvent(TickEvent.Pre event)
     {
-        if (checkNull())
+        if (mc.player == null || mc.world == null)
         {
             return;
         }
 
-        tickMain();
-        tickPacket();
+        if (isEnabled())
+        {
+            tickMain();
+        }
 
+        tickPacket();
         if (isManualMining && mainMiningBlock == null)
         {
             isManualMining = false;
@@ -283,12 +285,6 @@ public class SpeedMineModule extends ListeningToggleable
             return;
         }
 
-        if (packetMiningBlock.getSquaredDistanceTo() > rangeConfig.getValue() * rangeConfig.getValue())
-        {
-            clearPacket();
-            return;
-        }
-
         boolean multiTasking = mc.player.isUsingItem() && !multitaskConfig.getValue();
         float blockDamage = packetMiningBlock.tickDelta(multiTasking);
         if (blockDamage < speedConfig.getValue())
@@ -344,11 +340,6 @@ public class SpeedMineModule extends ListeningToggleable
         if (packetMiningBlock != null)
         {
             Managers.INVENTORY.endMultitickSwap();
-            if (!packetMiningBlock.isDoneMining())
-            {
-                packetMiningBlock.abort();
-            }
-
             packetMiningBlock = null;
         }
 

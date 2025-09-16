@@ -32,6 +32,7 @@ import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -107,7 +108,8 @@ public class InteractManager extends GenericFeature
         }
 
         boolean attacked = false;
-        for (Entity entity : new ArrayList<>(mc.world.getOtherEntities(null, shape.getBoundingBox())))
+        List<Entity> entities = mc.world.getEntitiesByClass(Entity.class, shape.getBoundingBox(), e -> true);
+        for (Entity entity : entities)
         {
             if (entity.isRemoved() || !entity.intersectionChecked)
             {
