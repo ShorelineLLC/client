@@ -15,7 +15,7 @@ public class FontManager
 
     public static void init()
     {
-        FONT = fromResource("/assets/shoreline/font/verdana.ttf", 9);
+        FONT = fromResource("/assets/shoreline/font/dejavu.ttf", 9.5f);
     }
 
     public void loadFont(Identifier identifier)
@@ -23,7 +23,7 @@ public class FontManager
 
     }
 
-    public static FontRenderer fromResource(String resPath, int pxHeight)
+    public static FontRenderer fromResource(String resPath, float pxHeight)
     {
         try (InputStream in = FontManager.class.getResourceAsStream(resPath))
         {

@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.imixin.IDrawContext;
@@ -124,7 +125,7 @@ public final class FontRenderer implements Closeable
         stack.push();
         y -= 3.0f;
         stack.translate(x, y, 0.0f);
-        stack.scale(1.0f / scale, 1.0f / scale, 0.0f);
+        stack.scale(1.0f / scale, 1.0f / scale, 1.0f);
 
         RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
         char[] chars = text.toCharArray();
@@ -170,6 +171,7 @@ public final class FontRenderer implements Closeable
                     lineStart = i + 1;
                     continue;
                 }
+
                 Glyph glyph = glyphs.computeIfAbsent(c, g1 -> getGlyphFromChar(g1));
                 if (glyph != null)
                 {
@@ -179,24 +181,29 @@ public final class FontRenderer implements Closeable
                         CharLocation entry = new CharLocation(xOffset, yOffset, r2, g2, b2, glyph);
                         cache.computeIfAbsent(i1, integer -> new ObjectArrayList<>()).add(entry);
                     }
+
                     xOffset += glyph.width();
                 }
             }
 
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.disableCull();
-
             for (Identifier identifier : cache.keySet())
             {
-                RenderSystem.setShaderTexture(0, identifier);
+                List<CharLocation> locations = cache.get(identifier);
 
-                List<CharLocation> objects = cache.get(identifier);
-                drawGlyphs(stack, vertexConsumerProvider, objects, identifier, a);
+                AbstractTexture texture = MinecraftClient.getInstance().getTextureManager().getTexture(identifier);
+                if (texture != null)
+                {
+                    texture.setFilter(true, true);
+                }
+
+                RenderSystem.setShaderTexture(0, identifier);
+                drawGlyphs(stack, vertexConsumerProvider, locations, identifier, a);
             }
 
-            RenderSystem.enableCull();
             RenderSystem.disableBlend();
+
             cache.clear();
         }
 
@@ -211,9 +218,14 @@ public final class FontRenderer implements Closeable
     {
         Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = vertexConsumerProvider == null ?
-                tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR) :
-                (BufferBuilder) vertexConsumerProvider.getBuffer(RenderLayer.getGuiTextured(identifier));
+        BufferBuilder bufferBuilder;
+        if (vertexConsumerProvider == null)
+        {
+            bufferBuilder = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        } else
+        {
+            bufferBuilder = (BufferBuilder) vertexConsumerProvider.getBuffer(RenderLayer.getGuiTextured(identifier));
+        }
 
         for (CharLocation charLocation : locations)
         {

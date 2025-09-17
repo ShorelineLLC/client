@@ -189,12 +189,18 @@ public class SpeedMineModule extends ListeningToggleable
 
     public void startMining(BlockPos blockPos, Direction direction)
     {
+        float oldDamage = -1.0f;
         if (doubleMine.getValue())
         {
             if (pendingClear != null)
             {
                 if (pendingClear.equals(mainMiningBlock) && mainMiningBlock.getBlockDamage() < speedConfig.getValue())
                 {
+                    if (pendingClear.getBlockPos().equals(blockPos))
+                    {
+                        oldDamage = pendingClear.getBlockDamage();
+                    }
+
                     clearMain();
                 }
 
@@ -221,6 +227,11 @@ public class SpeedMineModule extends ListeningToggleable
                 .player(mc.player)
                 .miningStack(slot == null ? mc.player.getMainHandStack() : slot.getItemStack())
                 .build();
+
+        if (oldDamage > 0.0f)
+        {
+            mainMiningBlock.setBlockDamage(oldDamage);
+        }
 
         mainState = new MiningRenderState(mainMiningBlock, new Animation(true, 300L));
 

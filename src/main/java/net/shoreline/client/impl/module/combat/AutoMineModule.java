@@ -137,9 +137,9 @@ public class AutoMineModule extends TrapModule
             return;
         }
 
+        // Some fuckery lets us double mine in correct sequence
         MiningData main = speedMine.getMainMiningBlock();
         MiningData pendingClear = speedMine.getPendingClear();
-
         if (pendingClear != null && pendingClear.equals(main) && !main.isDoneMining())
         {
             speedMine.startMining(main.getBlockPos(), Direction.UP);
