@@ -113,7 +113,7 @@ public class StepModule extends ListeningToggleable
 
             for (double off : offs)
             {
-                Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
                         mc.player.prevX,
                         mc.player.prevY + off,
                         mc.player.prevZ,

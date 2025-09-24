@@ -196,12 +196,11 @@ public class SpeedMineModule extends ListeningToggleable
             {
                 if (pendingClear.equals(mainMiningBlock) && mainMiningBlock.getBlockDamage() < speedConfig.getValue())
                 {
+                    clearMain();
                     if (pendingClear.getBlockPos().equals(blockPos))
                     {
                         oldDamage = pendingClear.getBlockDamage();
                     }
-
-                    clearMain();
                 }
 
                 pendingClear = null;
@@ -235,7 +234,7 @@ public class SpeedMineModule extends ListeningToggleable
 
         mainState = new MiningRenderState(mainMiningBlock, new Animation(true, 300L));
 
-        miningPackets.getValue().sendStartPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
+        miningPackets.getValue().sendStartPackets(this, mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
     }
 
     private void tickMain()
@@ -284,7 +283,7 @@ public class SpeedMineModule extends ListeningToggleable
             return;
         }
 
-        miningPackets.getValue().sendStopPackets(mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
+        miningPackets.getValue().sendStopPackets(this, mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
 
         Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
     }
@@ -334,7 +333,7 @@ public class SpeedMineModule extends ListeningToggleable
         {
             if (!mainMiningBlock.isDoneMining())
             {
-                mainMiningBlock.abort();
+                mainMiningBlock.abort(this);
             }
 
             mainMiningBlock = null;

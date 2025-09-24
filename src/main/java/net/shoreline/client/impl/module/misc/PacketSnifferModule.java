@@ -1,16 +1,26 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.network.packet.Packet;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.network.NetworkHandler;
+import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.List;
 
 public class PacketSnifferModule extends Toggleable
 {
     Config<Boolean> logPacket = new BooleanConfig.Builder("Log")
             .setDescription("Logs the packets in chat")
+            .setDefaultValue(true).build();
+    Config<Boolean> logPacketSpam = new BooleanConfig.Builder("PacketSpam")
+            .setDescription("Detects and logs potential packet spam")
             .setDefaultValue(true).build();
     Config<Boolean> cancelPacket = new BooleanConfig.Builder("Cancel")
             .setDescription("Cancels the packets from sending/recieving")
@@ -91,6 +101,30 @@ public class PacketSnifferModule extends Toggleable
     {
         super("PacketSniffer", new String[] {"PacketLogger"},
                 "Logs client packets", GuiCategory.MISCELLANEOUS);
+    }
+
+    @EventListener
+    public void onDisconnect(WorldEvent.Disconnect event)
+    {
+        if (!logPacketSpam.getValue())
+        {
+            return;
+        }
+
+        StringBuilder log = new StringBuilder();
+        for (NetworkHandler handler : Managers.NETWORK.getHandlers())
+        {
+            long packets = Managers.NETWORK.getPacketsSent(handler);
+            if (packets >= 100)
+            {
+                log.append(handler.getName())
+                        .append(": ")
+                        .append(packets)
+                        .append(", ");
+            }
+        }
+
+        Shoreline.info(log.toString());
     }
 
     public String formatPacket(Packet<?> packet)

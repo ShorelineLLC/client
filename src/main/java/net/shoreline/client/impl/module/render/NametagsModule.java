@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Getter;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderState;
@@ -201,7 +202,7 @@ public class NametagsModule extends RenderModule
             }
         }
 
-        float enchY = icons ? enchantOffset(yOffset) : -5.f;
+        float enchY = icons ? enchantOffset(yOffset) : -5.0f;
         for (ItemStack stack : displayItems)
         {
             if (icons)
@@ -290,7 +291,18 @@ public class NametagsModule extends RenderModule
         if (stack.getCount() != 1)
         {
             String count = String.valueOf(stack.getCount());
-            drawText(matrixStack, count, x + 17 - getTextWidth(count), y + 9);
+            mc.textRenderer.draw(count,
+                    x + 17 - getTextWidth(count),
+                    y + 8,
+                    -1,
+                    true,
+                    matrixStack.peek().getPositionMatrix(),
+                    mc.getBufferBuilders().getEntityVertexConsumers(),
+                    TextRenderer.TextLayerType.SEE_THROUGH,
+                    0,
+                    LightmapTextureManager.MAX_LIGHT_COORDINATE);
+
+            mc.getBufferBuilders().getEntityVertexConsumers().draw();
         }
     }
 

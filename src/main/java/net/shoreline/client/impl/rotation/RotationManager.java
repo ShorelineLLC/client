@@ -5,9 +5,6 @@ import lombok.Setter;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
-import net.shoreline.client.api.GenericFeature;
-import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
 import net.shoreline.client.impl.event.entity.player.TravelEvent;
@@ -17,12 +14,14 @@ import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.AnticheatModule.MoveFix;
 import net.shoreline.client.impl.module.world.NoRotateModule;
+import net.shoreline.client.impl.network.NetworkHandler;
+import net.shoreline.client.impl.render.Smoother;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 @Getter
 @Setter
-public class RotationManager extends GenericFeature
+public class RotationManager extends NetworkHandler
 {
     private final AnticheatModule rotationsConfig = AnticheatModule.INSTANCE;
 
@@ -33,6 +32,9 @@ public class RotationManager extends GenericFeature
     private final Rotation serverRotation;
 
     private Rotation preJumpRotation;
+
+    private final Smoother yawAnim = new Smoother();
+    private final Smoother pitchAnim = new Smoother();
 
     public RotationManager()
     {
@@ -219,9 +221,13 @@ public class RotationManager extends GenericFeature
     {
         if (rotationsConfig.getRenderRotationsConfig().getValue())
         {
+            float delta = event.getTickDelta() * 0.05f;
+            float renderYaw = (float) yawAnim.smooth(serverRotation.getYaw(), 5.0, delta);
+            float renderPitch = (float) pitchAnim.smooth(serverRotation.getPitch(), 5.0, delta);
+
             event.cancel();
-            event.setYaw(serverRotation.getYaw());
-            event.setPitch(serverRotation.getPitch());
+            event.setYaw(renderYaw);
+            event.setPitch(renderPitch);
         }
     }
 
@@ -231,7 +237,7 @@ public class RotationManager extends GenericFeature
      */
     public void setSilentRotation(Rotation rotation)
     {
-        Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.Full(
+        sendPacket(new PlayerMoveC2SPacket.Full(
                 mc.player.getX(),
                 mc.player.getY(),
                 mc.player.getZ(),

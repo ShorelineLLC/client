@@ -9,10 +9,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.render.ClientFormatting;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.IdentityHashMap;
@@ -63,7 +61,7 @@ public class LatencyModule extends Toggleable
 
         if (mc.player.age % 2 == 0 && !(mc.currentScreen instanceof AdvancementsScreen))
         {
-            Managers.NETWORK.sendPacket(new AdvancementTabC2SPacket(AdvancementTabC2SPacket.Action.OPENED_TAB, categories[categoryIndex]));
+            sendPacket(new AdvancementTabC2SPacket(AdvancementTabC2SPacket.Action.OPENED_TAB, categories[categoryIndex]));
             trackedLatency.put(categoryIndex, System.currentTimeMillis());
             categoryIndex++;
             if (categoryIndex >= 6)

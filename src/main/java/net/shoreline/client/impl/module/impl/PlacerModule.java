@@ -41,7 +41,7 @@ public class PlacerModule extends CombatModule
 
     protected boolean placeBlock(BlockPos placePos, Block block)
     {
-        return placeBlock(placePos, block, true, anticheat.getStrictDirection().getValue());
+        return placeBlock(placePos, block, anticheat.getNoGlitchBlocks().getValue(), anticheat.getStrictDirection().getValue());
     }
 
     protected boolean placeBlock(BlockPos placePos, Block block, boolean packetPlace, boolean strictDir)

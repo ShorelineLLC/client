@@ -621,13 +621,13 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (Managers.INVENTORY.isHolding(Items.END_CRYSTAL, hand))
         {
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
             if (swingConfig.getValue())
             {
                 mc.player.swingHand(hand);
             } else
             {
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+                sendPacket(new HandSwingC2SPacket(hand));
             }
         }
 

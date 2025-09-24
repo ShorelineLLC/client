@@ -48,7 +48,7 @@ public class ChestSwapModule extends Toggleable
 
                 if (fireworkConfig.getValue() && !mc.player.isOnGround())
                 {
-                    Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
                     mc.player.startGliding();
 
                     int fireworkSlot = InventoryUtil.getItemSlot(Items.FIREWORK_ROCKET);

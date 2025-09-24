@@ -15,6 +15,7 @@ import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
+import net.shoreline.client.impl.module.misc.NameProtectModule;
 import net.shoreline.client.impl.render.ColorUtil;
 import org.joml.Matrix4f;
 
@@ -112,6 +113,15 @@ public final class FontRenderer implements Closeable
                            float a,
                            float brightnessMultiplier)
     {
+        if (NameProtectModule.INSTANCE.isEnabled())
+        {
+            String username = MinecraftClient.getInstance().getSession().getUsername();
+            if (text.contains(username))
+            {
+                text = text.replace(username, NameProtectModule.INSTANCE.getAliasConfig().getValue());
+            }
+        }
+
         int currentScale = (int) MinecraftClient.getInstance().getWindow().getScaleFactor();
         if (currentScale != lastScale)
         {
@@ -137,9 +147,8 @@ public final class FontRenderer implements Closeable
         glyphs.clear();
         synchronized (cache)
         {
-            for (int i = 0; i < chars.length; i++)
+            for (char c : chars)
             {
-                char c = chars[i];
                 if (formatting)
                 {
                     formatting = false;
@@ -148,8 +157,7 @@ public final class FontRenderer implements Closeable
                         r2 = r;
                         g2 = g;
                         b2 = b;
-                    }
-                    else
+                    } else
                     {
                         int colorCode = getColorFromCode(c);
                         int[] col = ColorUtil.getRGBColorValues(colorCode);
@@ -157,18 +165,13 @@ public final class FontRenderer implements Closeable
                         g2 = col[1] / 255.0f * brightnessMultiplier;
                         b2 = col[2] / 255.0f * brightnessMultiplier;
                     }
+
                     continue;
                 }
+
                 if (c == '§')
                 {
                     formatting = true;
-                    continue;
-                }
-                else if (c == '\n')
-                {
-                    yOffset += getStringHeight(text.substring(lineStart, i)) * scale;
-                    xOffset = 0;
-                    lineStart = i + 1;
                     continue;
                 }
 
@@ -256,6 +259,15 @@ public final class FontRenderer implements Closeable
 
     public int getStringWidth(String text)
     {
+        if (NameProtectModule.INSTANCE.isEnabled())
+        {
+            String username = MinecraftClient.getInstance().getSession().getUsername();
+            if (text.contains(username))
+            {
+                text = text.replace(username, NameProtectModule.INSTANCE.getAliasConfig().getValue());
+            }
+        }
+
         char[] c = stripControlCodes(text).toCharArray();
         float currentLine = 0;
         float maxPreviousLines = 0;
@@ -273,37 +285,6 @@ public final class FontRenderer implements Closeable
         }
 
         return Math.round(Math.max(currentLine, maxPreviousLines));
-    }
-
-    public float getStringHeight(String text)
-    {
-        char[] c = stripControlCodes(text).toCharArray();
-        if (c.length == 0)
-        {
-            c = new char[] {' '};
-        }
-
-        float currentLine = 0;
-        float previous = 0;
-        for (char c1 : c)
-        {
-            if (c1 == '\n')
-            {
-                if (currentLine == 0)
-                {
-                    Glyph glyph = glyphs.computeIfAbsent(' ', g1 -> getGlyphFromChar(g1));
-                    currentLine = glyph.height() / (float) scale;
-                }
-                previous += currentLine;
-                currentLine = 0;
-                continue;
-            }
-            Glyph glyph = glyphs.computeIfAbsent(c1, g1 -> getGlyphFromChar(g1));
-            float h = glyph == null ? 0 : glyph.height();
-            currentLine = Math.max(h / (float) scale, currentLine);
-        }
-
-        return currentLine + previous;
     }
 
     public float getFontHeight()
@@ -390,7 +371,5 @@ public final class FontRenderer implements Closeable
         };
     }
 
-    public record CharLocation(float x, float y, float r, float g, float b, Glyph glyph)
-    {
-    }
+    public record CharLocation(float x, float y, float r, float g, float b, Glyph glyph) {}
 }

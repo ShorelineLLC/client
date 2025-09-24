@@ -23,6 +23,9 @@ public class AnticheatModule extends Concurrent
     Config<Boolean> interactRotate = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates to face before interacting")
             .setDefaultValue(false).build();
+    Config<Boolean> noGlitchBlocks = new BooleanConfig.Builder("NoGlitchBlocks")
+            .setDescription("Only spawns blocks when server confirms")
+            .setDefaultValue(true).build();
     Config<Boolean> attackCrystals = new BooleanConfig.Builder("Attack")
             .setDescription("Attacks crystals blocking placements")
             .setDefaultValue(false).build();
@@ -39,7 +42,7 @@ public class AnticheatModule extends Concurrent
             .setDescription("Only places on visible faces")
             .setDefaultValue(false).build();
     Config<Void> interactConfig = new ConfigGroup.Builder("Interactions")
-            .addAll(multiTask, interactRotate, attackCrystals, bptConfig,
+            .addAll(multiTask, interactRotate, noGlitchBlocks, attackCrystals, bptConfig,
                     interactDelay, interactAttempts, strictDirection)
             .setVisible(() -> acModeConfig.getValue() != Anticheat.VANILLA).build();
 

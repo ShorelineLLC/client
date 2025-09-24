@@ -2,22 +2,20 @@ package net.shoreline.client.impl.movement;
 
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
-import net.shoreline.client.api.GenericFeature;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.InteractSneakEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.AnticheatModule.MoveFix;
+import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
-public class MovementManager extends GenericFeature
+public class MovementManager extends NetworkHandler
 {
     private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
 
@@ -52,6 +50,6 @@ public class MovementManager extends GenericFeature
             mc.player.input.movementSideways = modified.y;
         }
 
-        Managers.NETWORK.sendPacket(new PlayerInputC2SPacket(playerInput));
+        sendPacket(new PlayerInputC2SPacket(playerInput));
     }
 }

@@ -35,8 +35,7 @@ public class CombatModule extends ListeningToggleable
                                           final Hand hand)
     {
         boolean sneaking = mc.player.isSneaking();
-        Managers.NETWORK.sendPacket(
-                AccessorPlayerInteractC2SPacket.invokeInit(
+        sendPacket(AccessorPlayerInteractC2SPacket.invokeInit(
                         entityId,
                         sneaking,
                         PlayerInteractEntityC2SPacket.ATTACK)
@@ -47,7 +46,7 @@ public class CombatModule extends ListeningToggleable
             mc.player.swingHand(hand);
         } else
         {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+            sendPacket(new HandSwingC2SPacket(hand));
         }
     }
 }

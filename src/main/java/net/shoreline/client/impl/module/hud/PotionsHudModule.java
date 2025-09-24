@@ -160,7 +160,7 @@ public class PotionsHudModule extends DynamicHudModule
             if (sprite != null && potionIcons.getValue())
             {
                 matrices.push();
-                matrices.translate(x - 13, y - 2, 0);
+                matrices.translate(x - 12.5f, y - 2.5f, 0.0f);
                 context.drawSpriteStretched(RenderLayer::getGuiTextured, sprite, 0, 0, 11, 11);
                 matrices.pop();
             }

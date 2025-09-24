@@ -1,32 +1,53 @@
 package net.shoreline.client.impl.network;
 
+import lombok.Getter;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.network.SequencedPacketCreator;
-import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.imixin.IClientWorld;
 import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
+import net.shoreline.client.impl.imixin.IClientWorld;
 import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.LongAdder;
 
 public class NetworkManager extends GenericFeature
 {
-    private final Set<Packet<?>> sentFromClient = Collections.synchronizedSet(
-            Collections.newSetFromMap(new IdentityHashMap<>()));
+    @Getter
+    private final List<NetworkHandler> handlers = new ArrayList<>();
+
+    private final ConcurrentMap<NetworkHandler, LongAdder> sentCount = new ConcurrentHashMap<>();
+    private final Map<Packet<?>, SentPacketData> sentFromClient =
+            Collections.synchronizedMap(new LinkedHashMap<>(16, 0.75f, false)
+            {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<Packet<?>, SentPacketData> eldest)
+                {
+                    return size() > 10000;
+                }
+            });
 
     public NetworkManager()
     {
         super("Network");
+        EventBus.INSTANCE.subscribe(this);
+    }
+
+    @EventListener
+    public void onWorldDisconnect(WorldEvent.Disconnect event)
+    {
+        sentFromClient.clear();
     }
 
     public void disconnect(String disconnectReason)
@@ -41,27 +62,27 @@ public class NetworkManager extends GenericFeature
         handler.getConnection().disconnect(Text.of(disconnectReason));
     }
 
-    public void sendPacket(Packet<?> packet)
+    public void sendPacket(NetworkHandler clientHandler, Packet<?> packet)
     {
         ClientPlayNetworkHandler handler = mc.getNetworkHandler();
         if (mc.world != null && handler != null)
         {
             handler.sendPacket(packet);
-            sentFromClient.add(packet);
+            logPacket(clientHandler, packet);
         }
     }
 
-    public void sendQuietPacket(Packet<?> packet)
+    public void sendQuietPacket(NetworkHandler clientHandler, Packet<?> packet)
     {
         ClientPlayNetworkHandler handler = mc.getNetworkHandler();
         if (mc.world != null && handler != null)
         {
             ((IClientPlayNetworkHandler) handler).sendQuietPacket(packet);
-            sentFromClient.add(packet);
+            logPacket(clientHandler, packet);
         }
     }
 
-    public void sendSequencedPacket(SequencedPacketCreator packetCreator)
+    public void sendSequencedPacket(NetworkHandler clientHandler, SequencedPacketCreator packetCreator)
     {
         ClientPlayNetworkHandler handler = mc.getNetworkHandler();
         if (mc.world == null || handler == null)
@@ -74,8 +95,14 @@ public class NetworkManager extends GenericFeature
             int i = pendingUpdateManager.getSequence();
             Packet<ServerPlayPacketListener> packet = packetCreator.predict(i);
             handler.sendPacket(packet);
-            sentFromClient.add(packet);
+            logPacket(clientHandler, packet);
         }
+    }
+
+    private void logPacket(NetworkHandler handler, Packet<?> packet)
+    {
+        sentFromClient.put(packet, new SentPacketData(handler, System.currentTimeMillis()));
+        sentCount.computeIfAbsent(handler, k -> new LongAdder()).increment();
     }
 
     public void receivePacket(Packet<ClientPlayPacketListener> packet)
@@ -117,8 +144,20 @@ public class NetworkManager extends GenericFeature
         return 0;
     }
 
+    public void registerHandler(NetworkHandler h)
+    {
+        handlers.add(h);
+    }
+
+    public long getPacketsSent(NetworkHandler handler)
+    {
+        return sentCount.getOrDefault(handler, new LongAdder()).longValue();
+    }
+
     public boolean wasSentFromClient(Packet<?> packet)
     {
-        return sentFromClient.contains(packet);
+        return sentFromClient.containsKey(packet);
     }
+
+    private record SentPacketData(NetworkHandler handler, Long timestamp) {}
 }

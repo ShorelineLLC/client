@@ -120,7 +120,7 @@ public class NoSlowModule extends Toggleable
 
     private boolean canBypassGrimUseTime()
     {
-        return mc.player.getItemUseTimeLeft() < 5 || ((mc.player.getItemUseTime() > 1) && mc.player.getItemUseTime() % 2 != 0);
+        return mc.player.getItemUseTimeLeft() < 5 || (mc.player.getItemUseTime() > 1 && mc.player.getItemUseTime() % 2 != 0);
     }
 
     private enum ItemMode

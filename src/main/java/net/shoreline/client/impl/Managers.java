@@ -22,10 +22,10 @@ import net.shoreline.client.impl.world.TickManager;
 
 public class Managers
 {
+    public static NetworkManager NETWORK;
     public static MacroManager MACROS;
     public static ModuleManager MODULES;
     public static CommandManager COMMANDS;
-    public static NetworkManager NETWORK;
     public static AnticheatManager ANTICHEAT;
     public static RotationManager ROTATION;
     public static InventoryManager INVENTORY;
@@ -44,10 +44,10 @@ public class Managers
 
     public static void init()
     {
+        NETWORK = new NetworkManager();
         MACROS = new MacroManager();
         MODULES = new ModuleManager();
         COMMANDS = new CommandManager();
-        NETWORK = new NetworkManager();
         ANTICHEAT = new AnticheatManager();
         ROTATION = new RotationManager();
         INVENTORY = new InventoryManager();

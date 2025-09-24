@@ -11,6 +11,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -35,9 +36,9 @@ public class MiningData
 
     private int ticksMining;
 
-    public void abort()
+    public void abort(NetworkHandler handler)
     {
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
+        handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
     }
 
     public float tickDelta()

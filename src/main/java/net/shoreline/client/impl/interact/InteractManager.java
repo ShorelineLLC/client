@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.interact;
 
+import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -19,7 +20,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
-import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
@@ -27,16 +27,16 @@ import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
+import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class InteractManager extends GenericFeature
+public class InteractManager extends NetworkHandler
 {
     private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
     private final AirPlaceModule airPlace = AirPlaceModule.INSTANCE;
@@ -108,8 +108,8 @@ public class InteractManager extends GenericFeature
         }
 
         boolean attacked = false;
-        List<Entity> entities = mc.world.getEntitiesByClass(Entity.class, shape.getBoundingBox(), e -> true);
-        for (Entity entity : entities)
+
+        for (Entity entity : collectEntitiesInBox(shape.getBoundingBox()))
         {
             if (entity.isRemoved() || !entity.intersectionChecked)
             {
@@ -157,7 +157,7 @@ public class InteractManager extends GenericFeature
 
             if (airPlace.isGrim())
             {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
+                sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
             }
         }
 
@@ -188,7 +188,7 @@ public class InteractManager extends GenericFeature
         BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
         if (interaction.isPacketPlace())
         {
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
             actionResult = ActionResult.SUCCESS;
         } else
         {
@@ -197,7 +197,7 @@ public class InteractManager extends GenericFeature
 
         if (actionResult.isAccepted())
         {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+            sendPacket(new HandSwingC2SPacket(hand));
         }
 
         if (shouldSneak)
@@ -207,7 +207,7 @@ public class InteractManager extends GenericFeature
 
         if (airPlacing && airPlace.isGrim())
         {
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
+            sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
         }
 
         return actionResult.isAccepted();
@@ -252,10 +252,24 @@ public class InteractManager extends GenericFeature
 
     public void interactItem(Hand hand, float yaw, float pitch, boolean swing)
     {
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(hand, id, yaw, pitch));
+        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(hand, id, yaw, pitch));
         if (swing)
         {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+            sendPacket(new HandSwingC2SPacket(hand));
         }
+    }
+
+    private List<Entity> collectEntitiesInBox(Box boundingBox)
+    {
+        List<Entity> entities = Lists.newArrayList();
+        for (Entity entity : mc.world.getEntities())
+        {
+            if (entity.getBoundingBox().intersects(boundingBox))
+            {
+                entities.add(entity);
+            }
+        }
+
+        return entities;
     }
 }

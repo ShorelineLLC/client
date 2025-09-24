@@ -46,7 +46,7 @@ public class FastPlaceModule extends Toggleable
     @EventListener
     public void onPacketOutbound(PacketEvent.Outbound event)
     {
-        if (checkNull() || Managers.NETWORK.wasSentFromClient(event.getPacket()))
+        if (checkNull() || wasSentFromClient(event.getPacket()))
         {
             return;
         }

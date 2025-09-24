@@ -177,7 +177,7 @@ public class FlightModule extends MovementModule
                                 mc.player.horizontalCollision);
 
                 event.cancel();
-                Managers.NETWORK.sendQuietPacket(packet1);
+                sendQuietPacket(packet1);
                 modifyY = false;
             }
         }

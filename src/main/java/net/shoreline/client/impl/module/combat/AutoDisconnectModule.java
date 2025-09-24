@@ -77,7 +77,7 @@ public class AutoDisconnectModule extends Toggleable
             return;
         }
 
-        Managers.NETWORK.sendPacket(new ChatMessageC2SPacket("§",
+        sendPacket(new ChatMessageC2SPacket("§",
                 Instant.now(),
                 NetworkEncryptionUtils.SecureRandomUtil.nextLong(),
                 null,

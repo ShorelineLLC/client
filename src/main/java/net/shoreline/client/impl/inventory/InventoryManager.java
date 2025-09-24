@@ -14,8 +14,6 @@ import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import net.shoreline.client.api.GenericFeature;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.entity.player.InsertStackEvent;
@@ -23,6 +21,7 @@ import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.SetHandEvent;
 import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -30,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
-public class InventoryManager extends GenericFeature
+public class InventoryManager extends NetworkHandler
 {
     private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
 
@@ -85,7 +84,7 @@ public class InventoryManager extends GenericFeature
             int slot = multitick.getSlotTo();
             if (serverSlot != slot)
             {
-                Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(slot));
             }
 
             usingItem = false;
@@ -137,7 +136,7 @@ public class InventoryManager extends GenericFeature
     {
         if (multitick.isSwapped() && isSilentSwapping())
         {
-            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
             usingItem = true;
         }
     }
@@ -186,7 +185,7 @@ public class InventoryManager extends GenericFeature
         mc.player.getInventory().setSelectedSlot(slot);
         if (slot != serverSlot)
         {
-            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(slot));
         }
     }
 
@@ -220,7 +219,7 @@ public class InventoryManager extends GenericFeature
         {
             case HOTBAR ->
             {
-                Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
+                sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
                 trackedHotbar.add(data);
             }
             case INVENTORY ->
@@ -254,7 +253,7 @@ public class InventoryManager extends GenericFeature
                 if (isSilentSwapping())
                 {
                     int returnSlot = multitick.isSwapped() && !mc.player.isUsingItem() ? multitick.getSlotTo() : playerInventory.selectedSlot;
-                    Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(returnSlot));
+                    sendPacket(new UpdateSelectedSlotC2SPacket(returnSlot));
                 }
             }
 
@@ -275,7 +274,7 @@ public class InventoryManager extends GenericFeature
         multitick.setSlotTo(itemSlot);
         if (serverSlot != itemSlot)
         {
-            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
         }
 
         return true;
@@ -291,7 +290,7 @@ public class InventoryManager extends GenericFeature
         usingItem = false;
         if (isSilentSwapping())
         {
-            Managers.NETWORK.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+            sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
         }
 
         multitick.reset();
@@ -334,7 +333,7 @@ public class InventoryManager extends GenericFeature
         int2ObjectMap.put(slot2, stack1.copy());
 
         int slot = InventoryUtil.getPacketSlotIndex(screenHandler, slot1);
-        Managers.NETWORK.sendPacket(new ClickSlotC2SPacket(screenHandler.syncId,
+        sendPacket(new ClickSlotC2SPacket(screenHandler.syncId,
                 screenHandler.getRevision(),
                 slot,
                 slot2,

@@ -8,6 +8,7 @@ import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
@@ -27,12 +28,6 @@ public class ShadersModule extends Toggleable
 {
     public static ShadersModule INSTANCE;
 
-    Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
-            .setMin(0.0f).setDefaultValue(0.5f).setMax(1.0f)
-            .setDescription("Opacity for the shader fill").build();
-    Config<Boolean> depthConfig = new BooleanConfig.Builder("ThroughWalls")
-            .setDescription("Renders shaders through walls")
-            .setDefaultValue(true).build();
     Config<Boolean> handsConfig = new BooleanConfig.Builder("Hands")
             .setDescription("Render shaders over hands")
             .setDefaultValue(true).build();
@@ -57,6 +52,16 @@ public class ShadersModule extends Toggleable
             .setDefaultValue(true).build();
     Config<Boolean> hostilesConfig = new BooleanConfig.Builder("Hostiles")
             .setDescription("Render shaders over hands")
+            .setDefaultValue(true).build();
+    public Config<Void> renderConfig = new ConfigGroup.Builder("Target")
+            .addAll(handsConfig, playersConfig, selfConfig, crystalsConfig, itemsConfig,
+                    thrownConfig, passiveConfig, hostilesConfig).build();
+
+    Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
+            .setMin(0.0f).setDefaultValue(0.5f).setMax(1.0f)
+            .setDescription("Opacity for the shader fill").build();
+    Config<Boolean> depthConfig = new BooleanConfig.Builder("ThroughWalls")
+            .setDescription("Renders shaders through walls")
             .setDefaultValue(true).build();
 
     public ShadersModule()

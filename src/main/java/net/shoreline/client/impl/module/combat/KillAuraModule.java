@@ -229,7 +229,7 @@ public class KillAuraModule extends CombatModule
         boolean sprinting = mc.player.isSprinting();
         if (sprinting)
         {
-            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
         }
 
         sendAttackPackets(entity, swingConfig.getValue());
@@ -237,7 +237,7 @@ public class KillAuraModule extends CombatModule
 
         if (sprinting)
         {
-            Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+            sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
         }
     }
 

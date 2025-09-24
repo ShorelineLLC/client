@@ -26,6 +26,11 @@ public class TargetManager extends GenericFeature
 
     public PlayerEntity setClosestTarget(float targetRange)
     {
+        return target = getClosestTarget(targetRange);
+    }
+
+    public PlayerEntity getClosestTarget(float targetRange)
+    {
         PlayerEntity best = null;
         double bestDist = Double.MAX_VALUE;
         for (PlayerEntity entity : mc.world.getPlayers())
@@ -48,7 +53,7 @@ public class TargetManager extends GenericFeature
             }
         }
 
-        return target = best;
+        return best;
     }
 
     public boolean hasTarget()
