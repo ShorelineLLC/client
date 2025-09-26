@@ -115,7 +115,7 @@ public class SelfTrapModule extends TrapModule
 
         trapPos.calcTrap(boundingBox, trapSpec);
 
-        List<BlockPos> placements = getPlacements(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
+        createPlacementsFromPositions(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
         if (placements.isEmpty() || !Managers.INTERACT.startPlacement(obbySlot))
         {
             return;

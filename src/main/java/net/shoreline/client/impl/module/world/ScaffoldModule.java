@@ -83,7 +83,7 @@ public class ScaffoldModule extends PlacerModule
 
         BlockPos pos = new BlockPos(mc.player.getBlockX(), posY, mc.player.getBlockZ());
 
-        List<BlockPos> placements = getPlacements(currentScaffoldBlock, getScaffoldPlacements(pos.down()), 4.0);
+        createPlacementsFromPositions(currentScaffoldBlock, getScaffoldPlacements(pos.down()), 4.0);
         if (placements.isEmpty() || !Managers.INTERACT.startPlacement(slot))
         {
             return;

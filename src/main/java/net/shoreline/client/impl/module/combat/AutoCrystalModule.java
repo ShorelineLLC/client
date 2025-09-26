@@ -607,7 +607,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 placeArea,
                 e -> ExplosionUtil.crystalDamageToEntity(mc.world, mc.player, crystalVec) <= maxSelfDamage.getValue());
 
-        if (blocking.isEmpty())
+        if (blocking.isEmpty() || currentAttack != null && blocking.stream().anyMatch(e -> e.getId() == currentAttack.getCrystalData().getId()))
         {
             return null;
         }

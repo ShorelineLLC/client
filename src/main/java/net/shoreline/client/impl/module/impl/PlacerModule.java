@@ -25,7 +25,8 @@ public class PlacerModule extends CombatModule
 {
     protected final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
 
-    private final ConcurrentMap<BlockPos, Animation> fadeOutAnimations = new ConcurrentHashMap<>();
+    protected final List<BlockPos> placements = new ArrayList<>();
+    protected final ConcurrentMap<BlockPos, Animation> fadeOutAnimations = new ConcurrentHashMap<>();
 
     public PlacerModule(String name, String description, GuiCategory category) {
         super(name, description, category);
@@ -75,12 +76,13 @@ public class PlacerModule extends CombatModule
         return result;
     }
 
-    protected List<BlockPos> getPlacements(Block block, Collection<BlockPos> posList, double range)
+    protected void createPlacementsFromPositions(Block block, Collection<BlockPos> posList, double range)
     {
-        final List<BlockPos> placements = new ArrayList<>();
+        placements.clear();
+
         if (posList.isEmpty())
         {
-            return placements;
+            return;
         }
 
         for (BlockPos blockPos : posList)
@@ -98,8 +100,6 @@ public class PlacerModule extends CombatModule
 
             placements.add(blockPos);
         }
-
-        return placements;
     }
 
     public void renderBlockPlacements(MatrixStack matrixStack)

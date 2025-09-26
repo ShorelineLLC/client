@@ -189,21 +189,14 @@ public class InteractManager extends NetworkHandler
 
         Hand hand = airPlacing && airPlace.isGrim() ? Hand.OFF_HAND : interaction.getHand();
         BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
-        if (interaction.isPacketPlace())
+
+        if (interaction.isPacketPlace() || !mc.isOnThread())
         {
             sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
             actionResult.setValue(ActionResult.SUCCESS);
         } else
         {
-            if (mc.isOnThread())
-            {
-                actionResult.setValue(mc.interactionManager.interactBlock(mc.player, hand, result));
-            } else
-            {
-                sendSequencedPacket(sequence -> new PlayerInteractBlockC2SPacket(hand, result, sequence));
-
-                mc.executeSync(() -> actionResult.setValue(((IClientPlayerInteractionManager) mc.interactionManager).invokeInteractInternal(mc.player, hand, result)));
-            }
+            actionResult.setValue(mc.interactionManager.interactBlock(mc.player, hand, result));
         }
 
         boolean success = actionResult.getValue() != null && actionResult.getValue().isAccepted();

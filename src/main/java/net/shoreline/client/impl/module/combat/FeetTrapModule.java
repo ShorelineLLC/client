@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.entity.EntityType;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -112,8 +111,7 @@ public class FeetTrapModule extends TrapModule
 
         trapPos.calcTrap(boundingBox, trapSpec);
 
-        List<BlockPos> placements = getPlacements(getCurrentObbyBlock(),
-                trapPos.getTrapPositions(), placeRange.getValue());
+        createPlacementsFromPositions(getCurrentObbyBlock(), trapPos.getTrapPositions(), placeRange.getValue());
         if (placements.isEmpty() || !Managers.INTERACT.startPlacement(obbySlot))
         {
             return;
