@@ -4,23 +4,21 @@ import lombok.experimental.UtilityClass;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.ac.Anticheat;
-import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.world.InteractionsModule;
 
 @UtilityClass
 public class InteractDirection
 {
-    private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
+    private final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
 
     public Direction getInteractDirection(BlockPos blockPos)
     {
-        return getInteractDirection(blockPos, anticheat.getStrictDirection().getValue());
+        return getInteractDirection(blockPos, interactConfig.getStrictDirection().getValue());
     }
 
     public Direction getInteractDirection(BlockPos blockPos, boolean strictDir)
@@ -56,30 +54,25 @@ public class InteractDirection
 
     public boolean isDirectionHidden(BlockPos blockPos, Direction direction)
     {
-        if (anticheat.getAcModeConfig().getValue() == Anticheat.GRIM)
+        PlayerEntity player = MinecraftClient.getInstance().player;
+        double x = player.getX();
+        double y = player.getEyeY();
+        double z = player.getZ();
+
+        Box blockBox = new Box(blockPos);
+        if (blockBox.contains(x, y, z))
         {
-            PlayerEntity player = MinecraftClient.getInstance().player;
-            double x = player.getX();
-            double y = player.getEyeY();
-            double z = player.getZ();
-
-            Box blockBox = new Box(blockPos);
-            if (blockBox.contains(x, y, z))
-            {
-                return false;
-            }
-
-            return switch (direction)
-            {
-                case NORTH -> z > blockBox.minZ; // Z- face
-                case SOUTH -> z < blockBox.maxZ; // Z+ face
-                case EAST  -> x < blockBox.maxX; // X+ face
-                case WEST  -> x > blockBox.minX; // X- face
-                case DOWN  -> y > blockBox.minY; // Y- face
-                case UP -> false;
-            };
+            return false;
         }
 
-        return false;
+        return switch (direction)
+        {
+            case NORTH -> z > blockBox.minZ; // Z- face
+            case SOUTH -> z < blockBox.maxZ; // Z+ face
+            case EAST  -> x < blockBox.maxX; // X+ face
+            case WEST  -> x > blockBox.minX; // X- face
+            case DOWN  -> y > blockBox.minY; // Y- face
+            case UP -> false;
+        };
     }
 }

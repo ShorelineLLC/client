@@ -8,8 +8,8 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.interact.Interaction;
-import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
+import net.shoreline.client.impl.module.world.InteractionsModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.Easing;
@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class PlacerModule extends CombatModule
 {
-    protected final AnticheatModule anticheat = AnticheatModule.INSTANCE;
+    protected final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
 
     private final ConcurrentMap<BlockPos, Animation> fadeOutAnimations = new ConcurrentHashMap<>();
 
@@ -41,7 +41,7 @@ public class PlacerModule extends CombatModule
 
     protected boolean placeBlock(BlockPos placePos, Block block)
     {
-        return placeBlock(placePos, block, anticheat.getNoGlitchBlocks().getValue(), anticheat.getStrictDirection().getValue());
+        return placeBlock(placePos, block, interactConfig.getNoGlitchBlocks().getValue(), interactConfig.getStrictDirection().getValue());
     }
 
     protected boolean placeBlock(BlockPos placePos, Block block, boolean packetPlace, boolean strictDir)

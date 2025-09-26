@@ -4,28 +4,22 @@ import lombok.experimental.UtilityClass;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
-import net.shoreline.client.impl.module.client.AnticheatModule;
-import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.module.world.InventoryModule;
 import net.shoreline.client.util.item.EnchantUtil;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -117,7 +111,7 @@ public class ExplosionUtil
         MutableInt mutableInt = new MutableInt();
         equipment.forEach(i ->
         {
-            if (AnticheatModule.INSTANCE.getAssumeEnchanted().getValue() && EnchantUtil.isEnchantsObfuscated(i))
+            if (InventoryModule.INSTANCE.getAssumeEnchanted().getValue() && EnchantUtil.isEnchantsObfuscated(i))
             {
                 ComponentMap item = i.getItem().getComponents();
                 if (item.contains(DataComponentTypes.EQUIPPABLE))

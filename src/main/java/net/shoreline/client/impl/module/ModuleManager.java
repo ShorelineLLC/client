@@ -27,7 +27,12 @@ public class ModuleManager
     public ModuleManager()
     {
         registerModules(
-                new AnticheatModule(),
+
+                // Managers
+                new InteractionsModule(),
+                new InventoryModule(),
+                new RotationsModule(),
+                // Client
                 new ClickGuiModule(),
                 new FontModule(),
                 new HeadlessMCModule(),
@@ -117,7 +122,6 @@ public class ModuleManager
                 new AirPlaceModule(),
                 new AutoToolModule(),
                 new FastPlaceModule(),
-                new NoRotateModule(),
                 new ScaffoldModule(),
                 new SpeedMineModule(),
                 new TimerModule(),

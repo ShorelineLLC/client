@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.world.InventoryModule;
 
 import java.util.List;
 import java.util.function.Function;
@@ -31,7 +31,7 @@ public class InventoryUtil
 
     public ItemSlot getItemSlot(Function<ItemStack, Boolean> stackFilter)
     {
-        return getItemSlot(stackFilter, AnticheatModule.INSTANCE.getSilentSwapType());
+        return getItemSlot(stackFilter, InventoryModule.INSTANCE.getSilentSwapType());
     }
 
     public ItemSlot getItemSlot(Function<ItemStack, Boolean> stackFilter, SilentSwapType type)
@@ -67,7 +67,7 @@ public class InventoryUtil
 
     public int getItemSlot(Item item)
     {
-        return getItemSlot(item, AnticheatModule.INSTANCE.getSilentSwapType());
+        return getItemSlot(item, InventoryModule.INSTANCE.getSilentSwapType());
     }
 
     public int getItemSlot(Item item, SilentSwapType type)

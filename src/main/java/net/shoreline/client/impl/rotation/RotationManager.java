@@ -11,9 +11,8 @@ import net.shoreline.client.impl.event.entity.player.TravelEvent;
 import net.shoreline.client.impl.event.input.PlayerInputEvent;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
-import net.shoreline.client.impl.module.client.AnticheatModule;
-import net.shoreline.client.impl.module.client.AnticheatModule.MoveFix;
-import net.shoreline.client.impl.module.world.NoRotateModule;
+import net.shoreline.client.impl.module.world.RotationsModule;
+import net.shoreline.client.impl.module.world.RotationsModule.MoveFix;
 import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.render.Smoother;
 import net.shoreline.eventbus.EventBus;
@@ -23,7 +22,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 @Setter
 public class RotationManager extends NetworkHandler
 {
-    private final AnticheatModule rotationsConfig = AnticheatModule.INSTANCE;
+    private final RotationsModule rotationsConfig = RotationsModule.INSTANCE;
 
     private Rotation clientRotation;
 
@@ -49,7 +48,7 @@ public class RotationManager extends NetworkHandler
     public void onRotationUpdate(RotationUpdateEvent event)
     {
         Rotation rotationUpdate = new Rotation(event.getYaw(), event.getPitch());
-        if (!NoRotateModule.INSTANCE.isEnabled())
+        if (!rotationsConfig.getNoServerRotate().getValue())
         {
             setClientRotation(rotationUpdate);
         }
@@ -221,8 +220,9 @@ public class RotationManager extends NetworkHandler
     {
         if (rotationsConfig.getRenderRotationsConfig().getValue())
         {
+            float yaw = MathHelper.wrapDegrees(serverRotation.getYaw());
             float delta = event.getTickDelta() * 0.05f;
-            float renderYaw = (float) yawAnim.smooth(serverRotation.getYaw(), 5.0, delta);
+            float renderYaw = (float) yawAnim.smooth(yaw, 5.0, delta);
             float renderPitch = (float) pitchAnim.smooth(serverRotation.getPitch(), 5.0, delta);
 
             event.cancel();

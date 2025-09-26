@@ -21,16 +21,18 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.imixin.IClientPlayerInteractionManager;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
-import net.shoreline.client.impl.module.client.AnticheatModule;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
+import net.shoreline.client.impl.module.world.InteractionsModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,7 +40,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class InteractManager extends NetworkHandler
 {
-    private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
+    private final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
     private final AirPlaceModule airPlace = AirPlaceModule.INSTANCE;
 
     private final ConcurrentMap<BlockPos, Long> placedBlocks = new ConcurrentHashMap<>();
@@ -69,12 +71,12 @@ public class InteractManager extends NetworkHandler
         }
 
         placedBlocks.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
-        if (placedBlocks.size() >= anticheat.getBptConfig().getValue() * 20)
+        if (placedBlocks.size() >= interactConfig.getBptConfig().getValue() * 20)
         {
             return false;
         }
 
-        if (System.currentTimeMillis() - placedBlocks.getOrDefault(blockPos, 0L) < anticheat.getInteractDelay().getValue())
+        if (System.currentTimeMillis() - placedBlocks.getOrDefault(blockPos, 0L) < interactConfig.getInteractDelay().getValue())
         {
             return false;
         }
@@ -121,11 +123,11 @@ public class InteractManager extends NetworkHandler
                 continue;
             }
 
-            if (entity instanceof EndCrystalEntity && placedEntityIds.getOrDefault(entity, 0) <= anticheat.getInteractAttempts().getValue())
+            if (entity instanceof EndCrystalEntity && placedEntityIds.getOrDefault(entity, 0) <= interactConfig.getInteractAttempts().getValue())
             {
                 if (merge)
                 {
-                    if (anticheat.getAttackCrystals().getValue() && !attacked)
+                    if (interactConfig.getAttackCrystals().getValue() && !attacked)
                     {
                         KillAuraModule.INSTANCE.sendAttackPackets(entity, false);
                         attacked = true;
@@ -176,9 +178,10 @@ public class InteractManager extends NetworkHandler
             Managers.MOVEMENT.setSilentSneaking(true);
         }
 
-        ActionResult actionResult;
+        MutableObject<ActionResult> actionResult = new MutableObject<>();
+
         Vec3d interactionVec = blockPos.toCenterPos().add(interaction.getHitVec());
-        if (anticheat.getInteractRotate().getValue())
+        if (interactConfig.getInteractRotate().getValue())
         {
             float[] rots = RotationUtil.getRotationsTo(eyePos, interactionVec);
             Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
@@ -189,13 +192,22 @@ public class InteractManager extends NetworkHandler
         if (interaction.isPacketPlace())
         {
             sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
-            actionResult = ActionResult.SUCCESS;
+            actionResult.setValue(ActionResult.SUCCESS);
         } else
         {
-            actionResult = mc.interactionManager.interactBlock(mc.player, hand, result);
+            if (mc.isOnThread())
+            {
+                actionResult.setValue(mc.interactionManager.interactBlock(mc.player, hand, result));
+            } else
+            {
+                sendSequencedPacket(sequence -> new PlayerInteractBlockC2SPacket(hand, result, sequence));
+
+                mc.executeSync(() -> actionResult.setValue(((IClientPlayerInteractionManager) mc.interactionManager).invokeInteractInternal(mc.player, hand, result)));
+            }
         }
 
-        if (actionResult.isAccepted())
+        boolean success = actionResult.getValue() != null && actionResult.getValue().isAccepted();
+        if (success)
         {
             sendPacket(new HandSwingC2SPacket(hand));
         }
@@ -210,7 +222,7 @@ public class InteractManager extends NetworkHandler
             sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
         }
 
-        return actionResult.isAccepted();
+        return success;
     }
 
     public boolean startPlacement(int slot)
@@ -220,7 +232,7 @@ public class InteractManager extends NetworkHandler
             return false;
         }
 
-        if (mc.player.isUsingItem() && !anticheat.getMultiTask().getValue())
+        if (mc.player.isUsingItem() && !interactConfig.getMultiTask().getValue())
         {
             return false;
         }
@@ -235,7 +247,7 @@ public class InteractManager extends NetworkHandler
 
     public void endPlacement()
     {
-        if (anticheat.getInteractRotate().getValue())
+        if (interactConfig.getInteractRotate().getValue())
         {
             Managers.ROTATION.resetSilentRotation();
         }

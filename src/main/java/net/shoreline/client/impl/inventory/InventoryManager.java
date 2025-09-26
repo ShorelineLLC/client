@@ -20,7 +20,7 @@ import net.shoreline.client.impl.event.entity.player.InsertStackEvent;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.SetHandEvent;
-import net.shoreline.client.impl.module.client.AnticheatModule;
+import net.shoreline.client.impl.module.world.InventoryModule;
 import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -31,7 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Getter
 public class InventoryManager extends NetworkHandler
 {
-    private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
+    private final InventoryModule inventoryConfig = InventoryModule.INSTANCE;
 
     private final SwapData.Mutable current = new SwapData.Mutable();
     private final SwapData.Mutable multitick = new SwapData.Mutable();
@@ -191,7 +191,7 @@ public class InventoryManager extends NetworkHandler
 
     public boolean startSwap(int itemSlot)
     {
-        return startSwap(itemSlot, anticheat.getSilentSwapType());
+        return startSwap(itemSlot, inventoryConfig.getSilentSwapType());
     }
 
     public boolean startSwap(int itemSlot, SilentSwapType swapType)
@@ -234,7 +234,7 @@ public class InventoryManager extends NetworkHandler
 
     public void endSwap()
     {
-        endSwap(anticheat.getSilentSwapType());
+        endSwap(inventoryConfig.getSilentSwapType());
     }
 
     public void endSwap(SilentSwapType swapType)

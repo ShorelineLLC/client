@@ -7,8 +7,8 @@ import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.impl.event.network.InteractSneakEvent;
-import net.shoreline.client.impl.module.client.AnticheatModule;
-import net.shoreline.client.impl.module.client.AnticheatModule.MoveFix;
+import net.shoreline.client.impl.module.world.RotationsModule;
+import net.shoreline.client.impl.module.world.RotationsModule.MoveFix;
 import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.client.util.item.EnchantUtil;
@@ -17,7 +17,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class MovementManager extends NetworkHandler
 {
-    private final AnticheatModule anticheat = AnticheatModule.INSTANCE;
+    private final RotationsModule rotationConfig = RotationsModule.INSTANCE;
 
     private boolean sneaking;
 
@@ -41,7 +41,7 @@ public class MovementManager extends NetworkHandler
         this.sneaking = sneaking;
 
         PlayerInput playerInput = InputUtil.inputSneaking(mc.player.input.playerInput, true);
-        if (sneaking && anticheat.getMoveFixConfig().getValue() != MoveFix.OFF)
+        if (sneaking && rotationConfig.getMoveFixConfig().getValue() != MoveFix.OFF)
         {
             int swiftSneak = EnchantUtil.getLevel(Enchantments.SWIFT_SNEAK, mc.player.getEquippedStack(EquipmentSlot.FEET));
             float modifier = MathHelper.clamp(0.3f + swiftSneak * 0.15f, 0.0f, 1.0f);

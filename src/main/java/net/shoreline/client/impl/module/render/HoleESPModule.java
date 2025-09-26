@@ -100,8 +100,8 @@ public class HoleESPModule extends RenderModule
                 anim.setState(latestHoleData.contains(holeData));
             }
 
-            if (holeData.getBlockType() == HoleBlockType.OBSIDIAN && !showObsidian.getValue() ||
-                    holeData.getBlockType() == HoleBlockType.MIXED && !showMixed.getValue())
+            if (holeData.getBlockType() == HoleBlockType.OBSIDIAN && !showObsidian.getValue()
+                    || holeData.getBlockType() == HoleBlockType.MIXED && !showMixed.getValue())
             {
                 return true;
             }

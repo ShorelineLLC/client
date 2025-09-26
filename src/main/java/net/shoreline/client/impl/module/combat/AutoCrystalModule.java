@@ -501,6 +501,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (placeDelay.getValue() == 0 || placeTimer.hasPassed(placeDelay.getValue()))
         {
+            EndCrystalEntity blocking = getBlockingCrystal(crystalVec);
+            if (blocking != null)
+            {
+                attackCrystal(blocking.getId(), hand);
+            }
+
             placeCrystal(crystalPos, hand);
             placeTimer.reset();
         }
@@ -555,6 +561,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             silentRotated = true;
         }
 
+        EndCrystalEntity blocking = getBlockingCrystal(crystalVec);
+        if (blocking != null)
+        {
+            attackCrystal(blocking.getId(), hand);
+        }
+
         currentPlace = new CrystalData<>(placePos, targetState, damage, -1.0f, false);
         placeCrystal(placePos, hand);
         placeTimer.reset();
@@ -585,6 +597,22 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         attackPackets.put(crystalId, System.currentTimeMillis());
+    }
+
+    private EndCrystalEntity getBlockingCrystal(Vec3d crystalVec)
+    {
+        Box placeArea = FULL_CRYSTAL_BB.offset(crystalVec);
+        List<EndCrystalEntity> blocking = mc.world.getEntitiesByClass(
+                EndCrystalEntity.class,
+                placeArea,
+                e -> ExplosionUtil.crystalDamageToEntity(mc.world, mc.player, crystalVec) <= maxSelfDamage.getValue());
+
+        if (blocking.isEmpty())
+        {
+            return null;
+        }
+
+        return blocking.getFirst();
     }
 
     private void placeCrystal(BlockPos blockPos, Hand hand)

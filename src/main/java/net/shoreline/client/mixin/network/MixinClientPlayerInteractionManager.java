@@ -6,22 +6,29 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
 import net.shoreline.client.impl.event.network.InteractItemEvent;
 import net.shoreline.client.impl.event.network.InteractSneakEvent;
+import net.shoreline.client.impl.imixin.IClientPlayerInteractionManager;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ClientPlayerInteractionManager.class)
-public class MixinClientPlayerInteractionManager
+@Mixin(value = ClientPlayerInteractionManager.class)
+public abstract class MixinClientPlayerInteractionManager implements IClientPlayerInteractionManager
 {
+    @Override
+    @Invoker(value = "interactBlockInternal", remap = false)
+    public abstract ActionResult invokeInteractInternal(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult);
+
     @Inject(method = "interactItem", at = @At(value = "HEAD"))
     private void hookInteractItemHead(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir)
     {

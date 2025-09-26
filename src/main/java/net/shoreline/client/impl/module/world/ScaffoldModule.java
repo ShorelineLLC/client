@@ -1,14 +1,17 @@
 package net.shoreline.client.impl.module.world;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.config.RegistryConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
@@ -19,6 +22,7 @@ import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ScaffoldModule extends PlacerModule
@@ -29,6 +33,10 @@ public class ScaffoldModule extends PlacerModule
     Config<Boolean> keepYConfig = new BooleanConfig.Builder("KeepY")
             .setDescription("Maintains the player's y height")
             .setDefaultValue(false).build();
+    Config<Collection<Block>> blockList = new RegistryConfig.Builder<Block>("Blocks")
+            .setRegistry(Registries.BLOCK)
+            .setValues(Blocks.OBSIDIAN, Blocks.DIRT)
+            .setDescription("The blocks to use for scaffolding").build();
 
     private int groundPosY = Integer.MIN_VALUE;
 
@@ -254,7 +262,8 @@ public class ScaffoldModule extends PlacerModule
                 BlockPos support = getSupportingBlock(pos);
                 if (support != null)
                 {
-                    if (!out.contains(support))
+                    double dist = mc.player.squaredDistanceTo(support.toCenterPos());
+                    if (!out.contains(support) && dist <= placeRange.getValue() * placeRange.getValue())
                     {
                         out.add(support);
                     }
@@ -264,7 +273,8 @@ public class ScaffoldModule extends PlacerModule
                     int depth = 0;
                     while (depth++ < 3 && mc.world.getBlockState(down).isReplaceable())
                     {
-                        if (!out.contains(down))
+                        double dist = mc.player.squaredDistanceTo(down.toCenterPos());
+                        if (!out.contains(down) && dist <= placeRange.getValue() * placeRange.getValue())
                         {
                             out.add(down);
                         }
@@ -274,7 +284,8 @@ public class ScaffoldModule extends PlacerModule
                 }
             }
 
-            if (!out.contains(pos))
+            double dist = mc.player.squaredDistanceTo(pos.toCenterPos());
+            if (!out.contains(pos) && dist <= placeRange.getValue() * placeRange.getValue())
             {
                 out.add(pos);
             }
