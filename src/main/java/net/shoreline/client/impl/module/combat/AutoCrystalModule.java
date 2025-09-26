@@ -337,7 +337,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
             if (currentPlace != null && sequentialPlace.getValue())
             {
-                placeCrystal(currentPlace.getCrystalData(), hand);
+                placeCrystal(currentPlace.getCrystalData(), null, hand);
                 placeTimer.reset();
             }
         }
@@ -473,6 +473,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         if (breakDelay.getValue() == 0 || attackTimer.hasPassed(breakDelay.getValue()))
         {
             attackCrystal(crystalState.getId(), hand);
+            crystalState.getEntity().remove(Entity.RemovalReason.KILLED);
             attackTimer.reset();
         }
 
@@ -501,13 +502,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (placeDelay.getValue() == 0 || placeTimer.hasPassed(placeDelay.getValue()))
         {
-            EndCrystalEntity blocking = getBlockingCrystal(crystalVec);
-            if (blocking != null)
-            {
-                attackCrystal(blocking.getId(), hand);
-            }
-
-            placeCrystal(crystalPos, hand);
+            placeCrystal(crystalPos, crystalVec, hand);
             placeTimer.reset();
         }
 
@@ -561,14 +556,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             silentRotated = true;
         }
 
-        EndCrystalEntity blocking = getBlockingCrystal(crystalVec);
-        if (blocking != null)
-        {
-            attackCrystal(blocking.getId(), hand);
-        }
-
         currentPlace = new CrystalData<>(placePos, targetState, damage, -1.0f, false);
-        placeCrystal(placePos, hand);
+        placeCrystal(placePos, crystalVec, hand);
         placeTimer.reset();
 
         return rotations;
@@ -599,24 +588,23 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         attackPackets.put(crystalId, System.currentTimeMillis());
     }
 
-    private EndCrystalEntity getBlockingCrystal(Vec3d crystalVec)
+    private void placeCrystal(BlockPos blockPos, Vec3d crystalVec, Hand hand)
     {
-        Box placeArea = FULL_CRYSTAL_BB.offset(crystalVec);
-        List<EndCrystalEntity> blocking = mc.world.getEntitiesByClass(
-                EndCrystalEntity.class,
-                placeArea,
-                e -> ExplosionUtil.crystalDamageToEntity(mc.world, mc.player, crystalVec) <= maxSelfDamage.getValue());
-
-        if (blocking.isEmpty() || currentAttack != null && blocking.stream().anyMatch(e -> e.getId() == currentAttack.getCrystalData().getId()))
+        if (currentAttack == null && crystalVec != null)
         {
-            return null;
+            Box placeArea = FULL_CRYSTAL_BB.offset(crystalVec);
+            List<EndCrystalEntity> blocking = mc.world.getEntitiesByClass(
+                    EndCrystalEntity.class,
+                    placeArea,
+                    e -> ExplosionUtil.crystalDamageToEntity(mc.world, mc.player, crystalVec) <= maxSelfDamage.getValue());
+
+            if (!blocking.isEmpty())
+            {
+                attackCrystal(blocking.getFirst().getId(), hand);
+                attackTimer.reset();
+            }
         }
 
-        return blocking.getFirst();
-    }
-
-    private void placeCrystal(BlockPos blockPos, Hand hand)
-    {
         Box baseBox = new Box(blockPos);
         Vec3d eyePos = mc.player.getEyePos();
         Vec3d cut = new Vec3d(MathHelper.clamp(eyePos.getX(), baseBox.minX, baseBox.maxX),
@@ -817,7 +805,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         return InventoryUtil.getItemSlot((ItemStack itemStack) ->
                 itemStack.getItem().getTranslationKey().contains("sword")
-                || itemStack.getItem().getTranslationKey().contains("axe")).getSlot();
+                        || itemStack.getItem().getTranslationKey().contains("axe")).getSlot();
     }
 
     public boolean canTargetEntity(Entity entity)
