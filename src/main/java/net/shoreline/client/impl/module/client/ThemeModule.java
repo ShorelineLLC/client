@@ -62,6 +62,11 @@ public class ThemeModule extends Concurrent
         textColor.addListener(primaryTheme::setTextColor);
     }
 
+    public Config<Color> getPrimaryConfig()
+    {
+        return primaryColor;
+    }
+
     public Color getPrimaryColor()
     {
         return primaryColor.getValue();

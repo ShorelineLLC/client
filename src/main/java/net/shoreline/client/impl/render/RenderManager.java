@@ -15,6 +15,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.impl.imixin.IDrawContext;
+import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.client.impl.module.client.FontModule;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
@@ -39,6 +40,11 @@ public class RenderManager
                           Box box,
                           int color)
     {
+        if (!isVisible(box))
+        {
+            return;
+        }
+
         startRender(false);
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
@@ -92,6 +98,11 @@ public class RenderManager
 
     public void renderBoundingBox(MatrixStack matrixStack, Box box, int color)
     {
+        if (!isVisible(box))
+        {
+            return;
+        }
+
         startRender(false);
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
@@ -289,5 +300,11 @@ public class RenderManager
     {
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
+    }
+
+    public boolean isVisible(Box box)
+    {
+        return ((IWorldRenderer) MinecraftClient.getInstance().worldRenderer)
+                .getFrustum().isVisible(box);
     }
 }

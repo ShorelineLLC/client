@@ -93,7 +93,6 @@ public enum ChamsRenderer
         private final float[] ys = new float[4];
         private final float[] zs = new float[4];
         private int i = 0;
-        private int j = 0;
 
         @Override
         public VertexConsumer vertex(float x, float y, float z)
@@ -102,7 +101,6 @@ public enum ChamsRenderer
             ys[i] = y;
             zs[i] = z;
             i++;
-            j++;
 
             if (i == 4)
             {

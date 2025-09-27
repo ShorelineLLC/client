@@ -10,6 +10,7 @@ import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.file.IOUtils;
 import net.shoreline.client.api.file.JsonConfigFile;
+import net.shoreline.client.impl.file.ModConfiguration;
 import net.shoreline.loader.Loader;
 
 import java.awt.*;
@@ -110,6 +111,8 @@ public abstract class AbstractPreset<T extends ConfigContainer> extends JsonConf
                 }
             }
         }
+
+        ModConfiguration.applySync();
     }
 
     protected abstract void apply(T container, JsonObject object);

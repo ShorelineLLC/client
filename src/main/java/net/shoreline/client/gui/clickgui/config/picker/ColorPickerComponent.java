@@ -96,8 +96,9 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             }
             // drawOutline(context, getTx() + pickerLength + 3, getTy() + height + 5, 10, pickerLength - 2, 1, Colors.BLACK);
 
+            int clr = Color.HSBtoRGB(colorConfig.getHsb()[0], 1.0f, 1.0f);
             int configColor = new Color(colorConfig.getRGB(), false).getRGB();
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, configColor, true);
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, clr, true);
             drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0x00000000, 0xff000000, false);
 
             drawOutline(context, getTx() + 3, getTy() + height + pickerLength + 6, pickerLength - 24, 13, 1, theme.getComponentColor());
@@ -118,7 +119,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             Identifier syncSprite = Identifier.of("shoreline", "icon/sync_clickgui.png");
             float syncX = getTx() + pickerLength;
             float syncY = getTy() + height + pickerLength + 5;
-            drawRect(context, syncX, syncY, 15, 15, theme.getComponentColor());
+            drawRect(context, syncX, syncY, 15, 15, colorConfig.isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
 
             if (colorConfig.isTransparency())
@@ -151,11 +152,11 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             hexComponent.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
-        if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + 2 + height + 4, pickerLength, pickerLength))
+        if (Mouse.isHovering(mouseX, mouseY, getTx() + 2, getTy() + 2 + height + 4, pickerLength, pickerLength) && !colorConfig.isGlobal())
         {
             draggingPicker = true;
         }
-        else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength + 4, getTy() + height + 3, 10, pickerLength - 2))
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength + 4, getTy() + height + 3, 10, pickerLength - 2) && !colorConfig.isGlobal())
         {
             draggingHue = true;
         }
@@ -165,9 +166,14 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         }
         else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength, getTy() + height + pickerLength + 5, 15, 15))
         {
-            colorConfig.setValue(new Color(ColorUtil.withTransparency(ThemeModule.INSTANCE.getPrimaryColor(), colorConfig.getAlpha() / 255f), true));
+            colorConfig.setGlobal(!colorConfig.isGlobal());
+            if (colorConfig.isGlobal())
+            {
+                colorConfig.setValue(new Color(ColorUtil.withTransparency(ThemeModule.INSTANCE.getPrimaryColor(), colorConfig.getAlpha() / 255f), true));
+                selectedColor = colorConfig.getHsb();
+            }
         }
-        else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength - 18, getTy() + height + pickerLength + 5, 15, 15))
+        else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength - 18, getTy() + height + pickerLength + 5, 15, 15) && !colorConfig.isGlobal())
         {
             getConfig().setValue(getConfig().getDefaultValue());
         }
@@ -310,7 +316,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             drawRect(context, smootherSelector, alphaY, 2, 15, 0xFFFFFFFF);
         }
 
-        if (draggingPicker)
+        if (draggingPicker && !colorConfig.isGlobal())
         {
             float sat = Math.max(0, Math.min(1, (mouseX - pickerX) / pickerW));
             float bri = 1.0f - Math.max(0, Math.min(1, (mouseY - pickerY) / pickerH));
@@ -322,7 +328,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             colorConfig.setValue(new Color(ColorUtil.withTransparency(color, colorConfig.getAlpha() / 255f), true));
         }
 
-        if (draggingHue)
+        if (draggingHue && !colorConfig.isGlobal())
         {
             float hue = Math.max(0, Math.min(1, (mouseY - hueY) / hueH));
             selectedColor[0] = hue;

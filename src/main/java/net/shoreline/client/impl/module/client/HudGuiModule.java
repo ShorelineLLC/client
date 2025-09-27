@@ -5,6 +5,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.gui.hud.HudGuiScreen;
@@ -27,6 +28,9 @@ public class HudGuiModule extends ListeningToggleable
             .setVisible(() -> effectConfig.getValue() != ColorEffect.NONE).build();
     Config<Float> pulseDepth = new NumberConfig.Builder<Float>("Depth")
             .setMin(0.0f).setMax(2.0f).setDefaultValue(1.0f)
+            .setVisible(() -> effectConfig.getValue() != ColorEffect.NONE).build();
+    Config<Float> factorConfig = new NumberConfig.Builder<Float>("Factor")
+            .setMin(0.0f).setMax(5.0f).setDefaultValue(1.0f)
             .setVisible(() -> effectConfig.getValue() != ColorEffect.NONE).build();
 
     public HudGuiModule()
@@ -64,7 +68,7 @@ public class HudGuiModule extends ListeningToggleable
     @EventListener
     public void onHudOverlay(HudOverlayEvent.Post event)
     {
-        if (mc.currentScreen != null && !(mc.currentScreen instanceof ChatScreen))
+        if (mc.currentScreen != null && !(mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof ClickGuiScreen))
         {
             return;
         }
@@ -86,6 +90,7 @@ public class HudGuiModule extends ListeningToggleable
 
     public int getColor(int y)
     {
+        y *= factorConfig.getValue();
         int primary = ThemeModule.INSTANCE.primaryColor.getValue().getRGB();
         return switch (effectConfig.getValue())
         {

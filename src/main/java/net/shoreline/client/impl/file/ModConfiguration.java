@@ -2,12 +2,17 @@ package net.shoreline.client.impl.file;
 
 import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.client.Shoreline;
+import net.shoreline.client.api.config.ColorConfig;
+import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.file.ConfigContainerFile;
 import net.shoreline.client.api.file.JsonConfigFile;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.loader.Loader;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -116,6 +121,31 @@ public class ModConfiguration
             {
                 Loader.info("Failed to load configuration for " + file.getFilepath().toString());
                 e.printStackTrace();
+            }
+        }
+
+        applySync();
+    }
+
+    /**
+     * Identifies all ColorConfigs that has a value matching theme color and syncs them.
+     * Should only need to be applied after loading a config or preset.
+     */
+    public static void applySync()
+    {
+        Config<Color> themeConfig = ThemeModule.INSTANCE.getPrimaryConfig();
+        Color theme = themeConfig.getValue();
+        for (Module module : Managers.MODULES.getModules())
+        {
+            for (Config<?> config : module.getConfigs())
+            {
+                if (!(config instanceof ColorConfig colorConfig) || config.equals(themeConfig))
+                {
+                    continue;
+                }
+
+                Color color = colorConfig.getValue();
+                colorConfig.setGlobal((theme.getRGB() & 0x00FFFFFF) == (color.getRGB() & 0x00FFFFFF));
             }
         }
     }

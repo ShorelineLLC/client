@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.render.ChamsRenderer;
 
 import java.awt.*;
@@ -55,25 +56,19 @@ public class ChamsModule extends Toggleable
 
     public boolean isValid(Entity entity)
     {
-        if (entity == mc.player)
+        if (entity == mc.player || !Managers.RENDER.isVisible(entity.getBoundingBox()))
         {
             return false;
         }
 
-        if (entity instanceof PlayerEntity && renderPlayers.getValue())
+        return switch (entity)
         {
-            return true;
-        }
-        else if (entity instanceof Monster && renderHostiles.getValue())
-        {
-            return true;
-        }
-        else if (entity instanceof AnimalEntity && renderPassives.getValue())
-        {
-            return true;
-        }
+            case PlayerEntity player when renderPlayers.getValue() -> true;
+            case Monster monster when renderHostiles.getValue() -> true;
+            case AnimalEntity animalEntity when renderPassives.getValue() -> true;
+            default -> entity instanceof EndCrystalEntity && renderCrystals.getValue();
+        };
 
-        return entity instanceof EndCrystalEntity && renderCrystals.getValue();
     }
 
     public static ChamsModule getInstance()

@@ -107,8 +107,12 @@ public class NametagsModule extends RenderModule
         for (PlayerEntry playerEntry : players)
         {
             PlayerEntity player = playerEntry.getPlayer();
-            String info = playerEntry.getInfo();
+            if (!Managers.RENDER.isVisible(player.getBoundingBox()))
+            {
+                continue;
+            }
 
+            String info = playerEntry.getInfo();
             Vec3d interp = Interpolation.getRenderPosition(player, event.getTickDelta());
             double x = interp.x - camera.getPos().x;
             double y = interp.y + (player.isSneaking() ? 2.0f : 2.2f) - camera.getPos().y;

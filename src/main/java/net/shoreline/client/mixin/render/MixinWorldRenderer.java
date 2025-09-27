@@ -17,11 +17,13 @@ import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
 import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.eventbus.EventBus;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -29,11 +31,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldRenderer.class)
-public abstract class MixinWorldRenderer
+public abstract class MixinWorldRenderer implements IWorldRenderer
 {
     @Shadow
     @Final
     private MinecraftClient client;
+
+    @Override
+    @Accessor(value = "frustum")
+    public abstract Frustum getFrustum();
 
     @Inject(method = "render", at = @At(value = "RETURN"))
     private void hookRenderWorld(ObjectAllocator allocator,
