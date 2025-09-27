@@ -11,7 +11,9 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.*;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
+import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
+import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.*;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -24,6 +26,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
     private final Smoother colorSmootherX;
     private final Smoother colorSmootherY;
     private final Smoother hueSmootherY;
+    private final Smoother alphaSmoother;
 
     private float[] selectedColor;
     private boolean draggingHue;
@@ -51,6 +54,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         this.colorSmootherX = new Smoother();
         this.colorSmootherY = new Smoother();
         this.hueSmootherY = new Smoother();
+        this.alphaSmoother = new Smoother();
         this.pickerLength = width - 14;
         float[] hsb = colorConfig.getHsb();
         selectedColor = new float[] { hsb[0], hsb[1], hsb[2], hsb[3] };
@@ -114,13 +118,14 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             Identifier syncSprite = Identifier.of("shoreline", "icon/sync_clickgui.png");
             float syncX = getTx() + pickerLength;
             float syncY = getTy() + height + pickerLength + 5;
-            drawRect(context, syncX, syncY, 15, 15, ((ColorConfig) getConfig()).isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
+            drawRect(context, syncX, syncY, 15, 15, theme.getComponentColor());
             drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
 
             if (colorConfig.isTransparency())
             {
                 float alphaY = syncY + 17;
-                drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, 0xFFFFFFFF, true);
+                drawBackground(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, 0.5f);
+                drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, ColorUtil.withTransparency(configColor, 0f), true);
             }
 
             drawSelectors(context, mouseX, mouseY, delta);
@@ -160,7 +165,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         }
         else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength, getTy() + height + pickerLength + 5, 15, 15))
         {
-            ((ColorConfig) getConfig()).setGlobal(!((ColorConfig) getConfig()).isGlobal());
+            colorConfig.setValue(new Color(ColorUtil.withTransparency(ThemeModule.INSTANCE.getPrimaryColor(), colorConfig.getAlpha() / 255f), true));
         }
         else if (Mouse.isHovering(mouseX, mouseY, getTx() + pickerLength - 18, getTy() + height + pickerLength + 5, 15, 15))
         {
@@ -224,27 +229,49 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         float f7 = (endColor & 255) / 255.0F;
         Matrix4f posMatrix = context.getMatrices().peek().getPositionMatrix();
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        VertexConsumer vc = ((IDrawContext) context).getVertexConsumerProvider().getBuffer(RenderLayer.getGui());
         if (sideways)
         {
-            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
-            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f);
-            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
-            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4);
+            vc.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            vc.vertex(posMatrix, x1, y2, 0.0F).color(f1, f2, f3, f);
+            vc.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
+            vc.vertex(posMatrix, x2, y1, 0.0F).color(f5, f6, f7, f4);
         }
         else
         {
-            bufferBuilder.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f);
-            bufferBuilder.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
-            bufferBuilder.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4);
-            bufferBuilder.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
+            vc.vertex(posMatrix, x2, y1, 0.0F).color(f1, f2, f3, f);
+            vc.vertex(posMatrix, x1, y1, 0.0F).color(f1, f2, f3, f);
+            vc.vertex(posMatrix, x1, y2, 0.0F).color(f5, f6, f7, f4);
+            vc.vertex(posMatrix, x2, y2, 0.0F).color(f5, f6, f7, f4);
         }
+    }
 
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        RenderSystem.disableBlend();
+    private void drawBackground(DrawContext context, float x, float y, float x2, float y2, float size)
+    {
+        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
+        VertexConsumer vc = ((IDrawContext) context)
+                .getVertexConsumerProvider()
+                .getBuffer(RenderLayer.getGui());
+
+        drawRect(context, x, y, x2, y2, 0xFFFFFFFF);
+        boolean skip = false;
+        for (float yPos = y; yPos < y2; yPos += size)
+        {
+            skip = !skip;
+            float startX = x + (skip ? size : 0);
+            for (float xPos = startX; xPos < x2; xPos += size * 2)
+            {
+                if (xPos + size > x2 || yPos + size > y2)
+                {
+                    continue;
+                }
+
+                vc.vertex(matrix4f, xPos+ 0f, yPos + size, 0f).color(0xFF808080);
+                vc.vertex(matrix4f, xPos + size, yPos + size, 0f).color(0xFF808080);
+                vc.vertex(matrix4f, xPos + size, yPos + 0f, 0f).color(0xFF808080);
+                vc.vertex(matrix4f, xPos + 0f, yPos + 0f, 0f).color(0xFF808080);
+            }
+        }
     }
 
     public void drawSelectors(DrawContext context, float mouseX, float mouseY, float delta)
@@ -278,8 +305,9 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         if (colorConfig.isTransparency())
         {
             float alphaSelectorX = pickerX + (alphaW * (1.0f - alpha));
-            drawRect(context, alphaSelectorX - 1, alphaY - 1, 4, 17, 0xFF000000);
-            drawRect(context, alphaSelectorX, alphaY, 2, 15, 0xFFFFFFFF);
+            float smootherSelector = (float) alphaSmoother.smooth(alphaSelectorX, 0.5f, delta);
+            drawRect(context, smootherSelector - 1, alphaY - 1, 4, 17, 0xFF000000);
+            drawRect(context, smootherSelector, alphaY, 2, 15, 0xFFFFFFFF);
         }
 
         if (draggingPicker)
@@ -289,14 +317,18 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
 
             selectedColor[1] = sat;
             selectedColor[2] = bri;
-            colorConfig.setValue(new Color(Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2])));
+
+            int color = Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2]);
+            colorConfig.setValue(new Color(ColorUtil.withTransparency(color, colorConfig.getAlpha() / 255f), true));
         }
 
         if (draggingHue)
         {
             float hue = Math.max(0, Math.min(1, (mouseY - hueY) / hueH));
             selectedColor[0] = hue;
-            colorConfig.setValue(new Color(Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2])));
+
+            int color = Color.HSBtoRGB(selectedColor[0], selectedColor[1], selectedColor[2]);
+            colorConfig.setValue(new Color(ColorUtil.withTransparency(color, colorConfig.getAlpha() / 255f), true));
         }
 
         if (draggingTransparency && colorConfig.isTransparency())
