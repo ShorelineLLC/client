@@ -25,7 +25,7 @@ public class InteractionsModule extends Concurrent
             .setDescription("Attacks crystals blocking placements")
             .setDefaultValue(false).build();
     Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("BlocksPerTick")
-            .setMin(1).setMax(20).setDefaultValue(2)
+            .setMin(1).setMax(10).setDefaultValue(2)
             .setDescription("The max interactions per tick").build();
     Config<Integer> interactDelay = new NumberConfig.Builder<Integer>("Delay")
             .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")

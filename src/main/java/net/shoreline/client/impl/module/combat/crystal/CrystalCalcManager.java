@@ -53,7 +53,7 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
     public List<CrystalData<BlockPos>> getBaseResults()
     {
         return getResults().stream()
-                .filter(d -> d.getCrystalData() instanceof BlockPos)
+                .filter(d -> d.getValue() instanceof BlockPos)
                 .map(d -> (CrystalData<BlockPos>) d)
                 .toList();
     }
@@ -62,7 +62,7 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
     public List<CrystalData<EntityState>> getEntityResults()
     {
         return getResults().stream()
-                .filter(d -> d.getCrystalData() instanceof EntityState)
+                .filter(d -> d.getValue() instanceof EntityState)
                 .map(d -> (CrystalData<EntityState>) d)
                 .toList();
     }

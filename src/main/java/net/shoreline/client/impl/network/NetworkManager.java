@@ -10,6 +10,7 @@ import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
 import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
@@ -29,14 +30,7 @@ public class NetworkManager extends GenericFeature
 
     private final ConcurrentMap<NetworkHandler, LongAdder> sentCount = new ConcurrentHashMap<>();
     private final Map<Packet<?>, SentPacketData> sentFromClient =
-            Collections.synchronizedMap(new LinkedHashMap<>(16, 0.75f, false)
-            {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<Packet<?>, SentPacketData> eldest)
-                {
-                    return size() > 10000;
-                }
-            });
+            Collections.synchronizedMap(new ConcurrentHashMap<>());
 
     public NetworkManager()
     {
@@ -48,6 +42,24 @@ public class NetworkManager extends GenericFeature
     public void onWorldDisconnect(WorldEvent.Disconnect event)
     {
         sentFromClient.clear();
+    }
+    
+    @EventListener
+    public void onTick(TickEvent.Post event)
+    {
+        for (Map.Entry<Packet<?>, SentPacketData> entry : sentFromClient.entrySet())
+        {
+            SentPacketData data = entry.getValue();
+            long timeSince = System.currentTimeMillis() - data.timestamp;
+            if (timeSince > 1000)
+            {
+                sentFromClient.remove(entry.getKey());
+                if (sentCount.containsKey(data.handler))
+                {
+                    sentCount.get(data.handler).decrement();
+                }
+            }
+        }
     }
 
     public void disconnect(String disconnectReason)

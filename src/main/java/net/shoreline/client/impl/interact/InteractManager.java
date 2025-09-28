@@ -21,7 +21,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.imixin.IClientPlayerInteractionManager;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
@@ -43,7 +42,7 @@ public class InteractManager extends NetworkHandler
     private final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
     private final AirPlaceModule airPlace = AirPlaceModule.INSTANCE;
 
-    private final ConcurrentMap<BlockPos, Long> placedBlocks = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Interaction, Long> interactions = new ConcurrentHashMap<>();
     private final ConcurrentMap<Entity, Integer> placedEntityIds = new ConcurrentHashMap<>();
 
     private boolean placementLock;
@@ -70,13 +69,13 @@ public class InteractManager extends NetworkHandler
             }
         }
 
-        placedBlocks.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
-        if (placedBlocks.size() >= interactConfig.getBptConfig().getValue() * 20)
+        interactions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
+        if (interactions.size() >= interactConfig.getBptConfig().getValue() * 20)
         {
             return false;
         }
 
-        if (System.currentTimeMillis() - placedBlocks.getOrDefault(blockPos, 0L) < interactConfig.getInteractDelay().getValue())
+        if (System.currentTimeMillis() - interactions.getOrDefault(blockPos, 0L) < interactConfig.getInteractDelay().getValue())
         {
             return false;
         }
@@ -89,7 +88,7 @@ public class InteractManager extends NetworkHandler
         boolean result = placeBlockInternal(interaction);
         if (result)
         {
-            placedBlocks.put(blockPos, System.currentTimeMillis());
+            interactions.put(interaction, System.currentTimeMillis());
         }
 
         return result;
