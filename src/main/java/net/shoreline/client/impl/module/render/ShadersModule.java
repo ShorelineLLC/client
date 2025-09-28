@@ -6,10 +6,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
-import net.shoreline.client.api.config.BooleanConfig;
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.ConfigGroup;
-import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
@@ -28,6 +25,9 @@ public class ShadersModule extends Toggleable
 {
     public static ShadersModule INSTANCE;
 
+    Config<Shaders> shaderConfig = new EnumConfig.Builder<Shaders>("Shader")
+            .setValues(Shaders.values())
+            .setDefaultValue(Shaders.DEFAULT).build();
     Config<Boolean> handsConfig = new BooleanConfig.Builder("Hands")
             .setDescription("Render shaders over hands")
             .setDefaultValue(true).build();
@@ -92,7 +92,7 @@ public class ShadersModule extends Toggleable
     {
         if (!checkNull())
         {
-            Managers.SHADER.render(new DefaultShaderEffect());
+            Managers.SHADER.render(shaderConfig.getValue().getShaderEffect());
         }
     }
 
@@ -173,5 +173,57 @@ public class ShadersModule extends Toggleable
             addIntUniform("glow", 0);
             addFltUniform("glowRadius", 1.0f);
         }
+    }
+
+    public enum Shaders
+    {
+        DEFAULT
+        {
+            @Override
+            public ShaderEffect getShaderEffect()
+            {
+                ShaderEffect effect = new ShaderEffect("outline");
+                Color color = ThemeModule.INSTANCE.getPrimaryColor();
+                effect.addIntUniform("sobel", 1);
+                effect.addVec2Uniform("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                effect.addVec4Uniform("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
+                effect.addIntUniform("samples", 8);
+                effect.addIntUniform("steps", 8);
+                effect.addIntUniform("dots", 0);
+                effect.addIntUniform("dotRadius", 8);
+                effect.addIntUniform("fastOutline", 0);
+                effect.addFltUniform("radius", 1.0f);
+                effect.addIntUniform("glow", 0);
+                effect.addFltUniform("glowRadius", 1.0f);
+                return effect;
+            }
+        },
+        GRADIENT
+        {
+            @Override
+            public ShaderEffect getShaderEffect()
+            {
+                ShaderEffect effect = new ShaderEffect("gradient");
+                Color color = ThemeModule.INSTANCE.getPrimaryColor();
+                Color darker = color.darker().darker();
+                effect.addIntUniform("sobel", 1);
+                effect.addVec2Uniform("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
+                effect.addVec4Uniform("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
+                effect.addVec4Uniform("color1", darker.getRed() / 255f, darker.getGreen() / 255f, darker.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
+                effect.addIntUniform("samples", 8);
+                effect.addIntUniform("steps", 8);
+                effect.addFltUniform("factor", 60f);
+                effect.addFltUniform("time", (float) (System.currentTimeMillis() - startTime) / 5f);
+                effect.addIntUniform("fastOutline", 0);
+                effect.addFltUniform("radius", 1.0f);
+                effect.addIntUniform("glow", 0);
+                effect.addFltUniform("glowRadius", 1.0f);
+                return effect;
+            }
+        };
+
+        public abstract ShaderEffect getShaderEffect();
+
+        private static final long startTime = System.currentTimeMillis();
     }
 }

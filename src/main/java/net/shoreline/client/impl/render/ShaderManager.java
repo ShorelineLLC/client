@@ -55,7 +55,7 @@ public class ShaderManager extends GenericFeature
 
     public void render(ShaderEffect shaderEffect)
     {
-        Identifier id = Identifier.of("shoreline", "outline");
+        Identifier id = Identifier.of("shoreline", shaderEffect.getName());
         PostEffectProcessor shader = mc.getShaderLoader().loadPostEffect(id, DefaultFramebufferSet.MAIN_ONLY);
 
         ShaderProgram program = ((IPostEffectProcessor) shader).getPasses().getFirst().getProgram();
