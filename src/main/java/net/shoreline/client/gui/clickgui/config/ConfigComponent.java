@@ -45,4 +45,9 @@ public abstract class ConfigComponent<T> extends FrameComponent
         ModuleComponent parent = getModuleComponent();
         return parent.getTy() + parent.getHeight() + this.y + this.yOffset;
     }
+
+    public void reset()
+    {
+        /* Implemented by the Component */
+    }
 }

@@ -32,7 +32,7 @@ public class ModuleComponent extends FrameComponent
 
     @Setter
     private boolean frameOpen;
-    private final Animation collapseAnim;
+    protected final Animation collapseAnim;
 
     public ModuleComponent(Module module,
                            Frame frame,
@@ -122,6 +122,15 @@ public class ModuleComponent extends FrameComponent
 
                 component.setModuleOffset(configY);
                 disableScissor(context);
+            }
+            else
+            {
+                component.reset();
+            }
+
+            if (collapseAnim.getFactor() < 0.01f)
+            {
+                component.reset();
             }
 
             if (!component.getDrawAnim().isFinished()

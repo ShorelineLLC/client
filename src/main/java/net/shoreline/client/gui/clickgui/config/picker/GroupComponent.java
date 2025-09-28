@@ -77,6 +77,15 @@ public class GroupComponent extends ExpandableComponent<Void>
                 component.setModuleOffset(configY);
                 disableScissor(context);
             }
+            else
+            {
+                component.reset();
+            }
+
+            if (collapseAnim.getFactor() < 0.01f)
+            {
+                component.reset();
+            }
         }
 
         drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight(), 1.0f, configY, color);
@@ -165,7 +174,7 @@ public class GroupComponent extends ExpandableComponent<Void>
         float frameHeight = 4.0f * scale;
         for (ConfigComponent<?> component : components)
         {
-            if (component.getConfig().isVisible())
+            if (component.getDrawAnim().getFactor() > 0.01)
             {
                 float totalHeight = component.getHeight() + (float) Math.floor(scale);
                 if (component instanceof ExpandableComponent<?> c)

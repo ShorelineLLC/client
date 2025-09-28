@@ -5,6 +5,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.gui.Mouse;
@@ -175,6 +176,12 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
 
             ((NumberConfig<Double>) getConfig()).setValue(round(rounding, val).doubleValue());
         }
+    }
+
+    @Override
+    public void reset()
+    {
+        smoother.clear();
     }
 
     private BigDecimal round(int places, double val)

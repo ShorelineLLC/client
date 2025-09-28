@@ -92,12 +92,21 @@ public class ToggleModuleComponent extends ModuleComponent
 
                     disableScissor(context);
                 }
+                else
+                {
+                    component.reset();
+                }
 
                 if (!component.getDrawAnim().isFinished()
                         || component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 1.0
                         || !component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 0.0)
                 {
                     pending++;
+                }
+
+                if (collapseAnim.getFactor() < 0.01f)
+                {
+                    component.reset();
                 }
             }
 
