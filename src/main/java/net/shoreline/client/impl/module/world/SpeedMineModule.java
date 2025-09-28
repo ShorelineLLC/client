@@ -102,6 +102,7 @@ public class SpeedMineModule extends ListeningToggleable
     public void onWorldDisconnect(WorldEvent.Disconnect event)
     {
         disable();
+        clearPacket();
     }
 
     @EventListener
@@ -110,6 +111,7 @@ public class SpeedMineModule extends ListeningToggleable
         if (event.getEntity() == mc.player)
         {
             disable();
+            clearPacket();
         }
     }
 

@@ -237,6 +237,12 @@ public class RotationManager extends NetworkHandler
      */
     public void setSilentRotation(Rotation rotation)
     {
+        if (serverRotation.getYaw() == rotation.getYaw()
+                && serverRotation.getPitch() == rotation.getPitch())
+        {
+            return;
+        }
+
         sendPacket(new PlayerMoveC2SPacket.Full(
                 mc.player.getX(),
                 mc.player.getY(),

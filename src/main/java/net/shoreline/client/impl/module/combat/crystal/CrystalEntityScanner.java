@@ -91,14 +91,14 @@ public abstract class CrystalEntityScanner extends AsyncWorldScanner
 
             Box boundingBox = entity.getDimensions().getBoxAt(entityPos);
             float damage = CrystalUtil.getCrystalDamage(this,
-                    crystal.getEyePos(),
+                    crystal.getPos(),
                     entityPos,
                     boundingBox,
                     autoCrystal.getIgnoreTerrain().getValue());
 
             boolean antiSurround = AntiSurround.checkAntiSurroundQualifiers(this, crystal.getBlockPos());
 
-            crystalEntities.add(new CrystalData<>(crystal, entity, damage, local, antiSurround));
+            crystalEntities.add(new CrystalData<>(crystal, crystal.getPos(), entity, damage, local, antiSurround));
         }
     }
 

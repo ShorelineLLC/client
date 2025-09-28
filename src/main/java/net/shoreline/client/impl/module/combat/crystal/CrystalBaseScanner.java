@@ -87,7 +87,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
 
             boolean antiSurround = AntiSurround.checkAntiSurroundQualifiers(this, pos.up());
 
-            crystalBases.add(new CrystalData<>(pos, entity, damage, local, antiSurround));
+            crystalBases.add(new CrystalData<>(pos, explosionCenter, entity, damage, local, antiSurround));
         }
     }
 
