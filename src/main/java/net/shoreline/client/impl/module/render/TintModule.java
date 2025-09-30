@@ -6,7 +6,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.LoadingEvent;
-import net.shoreline.client.impl.event.render.WorldTintEvent;
+import net.shoreline.client.impl.event.render.*;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
@@ -89,6 +89,56 @@ public class TintModule extends Toggleable
         {
             event.cancel();
             event.setColor(tintColor.getValue());
+        }
+    }
+
+    @EventListener
+    public void onBlockLight(BlockLightEvent event)
+    {
+        if (lightConfig.getValue())
+        {
+            event.cancel();
+            event.setBlockLight(0);
+        }
+    }
+
+    @EventListener
+    public void onEntityLightBlock(EntityLightEvent.Block event)
+    {
+        if (lightConfig.getValue())
+        {
+            event.cancel();
+            event.setLight(0);
+        }
+    }
+
+    @EventListener
+    public void onEntityLightSky(EntityLightEvent.Skylight event)
+    {
+        if (lightConfig.getValue())
+        {
+            event.cancel();
+            event.setLight(15);
+        }
+    }
+
+    @EventListener
+    public void onLightData(LightDataEvent event)
+    {
+        if (lightConfig.getValue())
+        {
+            event.cancel();
+            event.setSl(15);
+        }
+    }
+
+    @EventListener
+    public void onLuminance(LuminanceEvent event)
+    {
+        if (lightConfig.getValue())
+        {
+            event.cancel();
+            event.setLuminance(0);
         }
     }
 

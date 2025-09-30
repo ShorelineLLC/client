@@ -53,7 +53,10 @@ public class TextRadarHudModule extends DynamicHudModule
                 {
                     boolean draw = playerEntry.getPlayer().isDead()
                             || !mc.world.getPlayers().contains(playerEntry.getPlayer());
-                    entry.setDrawing(() -> !draw);
+                    if (draw)
+                    {
+                        entry.setDrawing(() -> false);
+                    }
                 }
                 else if (entry.isDone())
                 {
@@ -68,7 +71,7 @@ public class TextRadarHudModule extends DynamicHudModule
             {
                 continue;
             }
-            
+
             PlayerListEntry playerEntry = mc.getNetworkHandler().getPlayerListEntry(player.getGameProfile().getId());
             if (playerEntry == null)
             {

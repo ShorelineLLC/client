@@ -1,5 +1,7 @@
 package net.shoreline.client.mixin.render;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gl.ShaderProgramKey;
@@ -9,6 +11,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.shoreline.client.impl.event.render.BlockLightEvent;
 import net.shoreline.client.impl.event.render.NightVisionEvent;
 import net.shoreline.client.impl.event.render.WorldGammaEvent;
 import net.shoreline.client.impl.event.render.WorldTintEvent;
@@ -99,5 +102,18 @@ public class MixinLightmapTextureManager
         NightVisionEvent nightVisionEvent = new NightVisionEvent();
         EventBus.INSTANCE.dispatch(nightVisionEvent);
         return nightVisionEvent.isCanceled() ? 1.0f : GameRenderer.getNightVisionStrength(entity, tickDelta);
+    }
+
+    @WrapMethod(method = "getBlockLightCoordinates")
+    private static int getBlockLightCoordinatesHook(int light, Operation<Integer> original)
+    {
+        BlockLightEvent event = new BlockLightEvent();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            return event.getBlockLight();
+        }
+
+        return original.call(light);
     }
 }

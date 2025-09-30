@@ -71,12 +71,17 @@
     "text.MixinTextVisitFactory",
     "texture.MixinNativeImage",
     "toast.MixinToastManager",
-    "world.chunk.light.MixinChunkSkylightProvider",
     "world.MixinClientWorld",
     "world.MixinProperties",
-    "world.MixinServerWorld"
+    "world.MixinServerWorld",
+    "world.chunk.light.MixinChunkSkylightProvider"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "block.MixinAbstractBlockState",
+    "block.MixinChunkBlockLightProvider",
+    "render.MixinLightDataAccess"
+  ]
 }
