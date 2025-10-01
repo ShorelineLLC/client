@@ -51,7 +51,7 @@ public class AutoXPModule extends Toggleable
             return;
         }
 
-        if (!isPlayerFullDurability())
+        if (isPlayerFullDurability())
         {
             disable();
             return;

@@ -19,6 +19,22 @@ public class MovementExtrapolation
                                      Entity entity,
                                      int ticks)
     {
+        return extrapolatePosition(view, velocity, box, entity, ticks, true);
+    }
+
+
+    public Vec3d extrapolatePosition(CollisionView view,
+                                     Vec3d velocity,
+                                     Box box,
+                                     Entity entity,
+                                     int ticks,
+                                     boolean simulateY)
+    {
+        if (!simulateY)
+        {
+            velocity = velocity.multiply(1.0, 0.0, 1.0);
+        }
+
         for (int i = 0; i < ticks; i++)
         {
             velocity = velocity.add(0.0, -0.08, 0.0).multiply(0.98, 0.98, 0.98);

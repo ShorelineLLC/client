@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 public class AutoCrystalModule extends ObsidianPlacerModule
@@ -197,6 +198,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private final ConcurrentMap<Integer, Long> attackPackets = new ConcurrentHashMap<>();
     private final ConcurrentMap<Interaction, Long> placePackets = new ConcurrentHashMap<>();
+    private final AtomicInteger crystalsPlaced = new AtomicInteger();
 
     private boolean silentRotated;
 
@@ -257,6 +259,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         List<CrystalData<BlockPos>> placements = getPlacements(latestCrystalBases);
         currentPlace = getBestData(basePlace.getValue() && placements.isEmpty() ? latestCrystalBases : placements);
+    }
+
+    @EventListener
+    public void onTickPost(TickEvent.Post event)
+    {
+        crystalsPlaced.set(0);
     }
 
     @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
@@ -325,7 +333,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         Vec3d crystalPos = event.getPos();
         BlockPos crystalBase = BlockPos.ofFloored(crystalPos.offset(Direction.DOWN, 1.0));
 
-        if (placePackets.keySet().stream().noneMatch(d -> d.getPos().equals(crystalBase)))
+        if (!placePackets.keySet().removeIf(d -> d.getPos().equals(crystalBase)))
         {
             return;
         }
@@ -371,6 +379,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        {
+            return;
+        }
+
         MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
         if (currentMine == null)
         {
@@ -384,6 +397,24 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             if (currentPlace != null && packet.getPos().equals(currentPlace.getValue().up()))
             {
                 placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+            }
+        }
+
+        if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity instanceof ItemEntity)
+                {
+                    runPrePlace(currentMine);
+                    BlockPos pos = entity.getBlockPos();
+                    if (currentPlace != null && pos.equals(currentPlace.getValue().up()))
+                    {
+                        placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+                        return;
+                    }
+                }
             }
         }
 
@@ -575,8 +606,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
-        placePackets.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
-        if (placePackets.size() >= placeLimit.getValue() * 20)
+        if (crystalsPlaced.get() > placeLimit.getValue())
         {
             return;
         }
@@ -644,6 +674,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         placePackets.put(placeInteraction, System.currentTimeMillis());
+        crystalsPlaced.incrementAndGet();
     }
 
     private Direction getPlaceDirection(BlockPos blockPos, Box box, Vec3d eyePos, Vec3d cut)
@@ -761,7 +792,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         for (Entity entity : WorldUtil.collectEntitiesInBox(box))
         {
-            if (!canIgnoreEntity(entity) && !(ignoreItems && entity instanceof ItemEntity))
+            if (!canIgnoreEntity(entity) || (!ignoreItems && entity instanceof ItemEntity))
             {
                 return true;
             }

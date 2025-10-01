@@ -6,6 +6,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.LoadingEvent;
+import net.shoreline.client.impl.event.particle.TotemParticleEvent;
 import net.shoreline.client.impl.event.render.*;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -27,6 +28,9 @@ public class TintModule extends Toggleable
             .setDefaultValue(false).build();
     Config<Boolean> lavaConfig = new BooleanConfig.Builder("Lava")
             .setDescription("Change the color of lava")
+            .setDefaultValue(false).build();
+    Config<Boolean> totemsConfig = new BooleanConfig.Builder("TotemEffects")
+            .setDescription("Change the color of totem particles")
             .setDefaultValue(false).build();
 
     public TintModule()
@@ -139,6 +143,16 @@ public class TintModule extends Toggleable
         {
             event.cancel();
             event.setLuminance(0);
+        }
+    }
+
+    @EventListener
+    public void onTotemParticle(TotemParticleEvent event)
+    {
+        if (totemsConfig.getValue())
+        {
+            event.cancel();
+            event.setColor(tintColor.getValue());
         }
     }
 

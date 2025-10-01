@@ -39,7 +39,7 @@ vec4 computeEdgeDistance(vec2 coords)
             for (float y = -radius; y <= radius; y++)
             {
                 vec4 currentColor = texture(DiffuseSampler, texCoord + vec2(texelSize.x * x, texelSize.y * y));
-                if (currentColor.a > 0)
+                if (currentColor.a > 0.0)
                 {
                     float currentDist = sqrt(x * x + y * y);
                     if (currentDist < closest)
@@ -112,6 +112,7 @@ void main()
         {
             colorOutline = edgeDist.rgb;
         }
+
         if (radius > 0.0f && edgeDist.a <= radius)
         {
             if (glow != 0)

@@ -103,6 +103,8 @@ public class SpeedMineModule extends ListeningToggleable
     {
         disable();
         clearPacket();
+        clearMain();
+        pendingClear = null;
     }
 
     @EventListener
@@ -112,6 +114,8 @@ public class SpeedMineModule extends ListeningToggleable
         {
             disable();
             clearPacket();
+            clearMain();
+            pendingClear = null;
         }
     }
 

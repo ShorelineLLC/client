@@ -7,11 +7,13 @@ import net.minecraft.particle.ParticleTypes;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
+import net.shoreline.client.impl.event.particle.EmitParticleEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.render.GlyphShadowEvent;
 import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
@@ -59,10 +61,24 @@ public class NoRenderModule extends Toggleable
             .addAll(fireOverlay, waterOverlay, frostbiteOverlay, blockOverlay,
                     spyglassOverlay, bossBarOverlay, portalOverlay).build();
 
+    Config<Boolean> totemEffects = new BooleanConfig.Builder("TotemEffects")
+            .setDescription("Cancels the totem effects when a player pops")
+            .setDefaultValue(false).build();
+    Config<Integer> totemParticles = new NumberConfig.Builder<Integer>("TotemParticles")
+            .setMin(3).setDefaultValue(16).setMax(16)
+            .setVisible(() -> !totemEffects.getValue())
+            .setDescription("The number of particles for the totem effect").build();
+    Config<Integer> totemTicks = new NumberConfig.Builder<Integer>("TotemTicks")
+            .setMin(5).setDefaultValue(30).setMax(30)
+            .setVisible(() -> !totemEffects.getValue())
+            .setDescription("The time in ticks that the totem effect will last").build();
+    Config<Void> effectConfig = new ConfigGroup.Builder("Effects")
+            .addAll(totemEffects, totemParticles, totemTicks).build();
+
     Config<Boolean> explosionsConfig = new BooleanConfig.Builder("Explosion")
             .setDescription("Cancels the explosion particles")
             .setDefaultValue(false).build();
-    Config<Boolean> effectsConfig = new BooleanConfig.Builder("StatusEffect")
+    Config<Boolean> statusEffectsConfig = new BooleanConfig.Builder("StatusEffect")
             .setDescription("Cancels the potion effect particles")
             .setDefaultValue(false).build();
     Config<Boolean> fireworkConfig = new BooleanConfig.Builder("Firework")
@@ -87,11 +103,11 @@ public class NoRenderModule extends Toggleable
             .setDescription("Cancels the block breaking particles")
             .setDefaultValue(false).build();
     Config<Void> particlesConfig = new ConfigGroup.Builder("Particles")
-            .addAll(explosionsConfig, effectsConfig, fireworkConfig, splashConfig, portalConfig,
+            .addAll(explosionsConfig, statusEffectsConfig, fireworkConfig, splashConfig, portalConfig,
                     drippingBlocksConfig, walkingConfig, eatingConfig, breakingConfig).build();
 
     @Getter
-    Config<Boolean> potionsHud = new BooleanConfig.Builder("Effects")
+    Config<Boolean> potionsHud = new BooleanConfig.Builder("PotionEffects")
             .setDescription("Cancels the status effects hud element")
             .setDefaultValue(false).build();
     Config<Boolean> itemName = new BooleanConfig.Builder("ItemName")
@@ -292,10 +308,29 @@ public class NoRenderModule extends Toggleable
             event.setShadowOffset(0.5f);
         }
     }
+
+    @EventListener
+    public void onEmitParticle(EmitParticleEvent event)
+    {
+        if (event.getEffect() != ParticleTypes.TOTEM_OF_UNDYING)
+        {
+            return;
+        }
+
+        if (totemEffects.getValue())
+        {
+            event.cancel();
+            event.setMaxCount(0);
+            return;
+        }
+
+        event.setMaxCount(totemParticles.getValue());
+        event.setMaxTicks(totemTicks.getValue());
+    }
     
     private boolean shouldCancelParticle(ParticleType<?> type)
     {
-        return type == ParticleTypes.ENTITY_EFFECT && effectsConfig.getValue()
+        return type == ParticleTypes.ENTITY_EFFECT && statusEffectsConfig.getValue()
                 || (type == ParticleTypes.EXPLOSION || type == ParticleTypes.EXPLOSION_EMITTER) && explosionsConfig.getValue()
                 || type == ParticleTypes.FIREWORK && fireworkConfig.getValue()
                 || (type == ParticleTypes.EFFECT || type == ParticleTypes.INSTANT_EFFECT) && splashConfig.getValue()

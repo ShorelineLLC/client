@@ -10,6 +10,7 @@ import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
+import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.function.BooleanBiFunction;
@@ -21,6 +22,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
@@ -31,11 +34,16 @@ import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
+import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class InteractManager extends NetworkHandler
 {
@@ -45,11 +53,47 @@ public class InteractManager extends NetworkHandler
     private final ConcurrentMap<Interaction, Long> interactions = new ConcurrentHashMap<>();
     private final ConcurrentMap<Entity, Integer> placedEntityIds = new ConcurrentHashMap<>();
 
+    private final AtomicInteger blocksPlaced = new AtomicInteger();
+
     private boolean placementLock;
 
     public InteractManager()
     {
         super("Interactions");
+        EventBus.INSTANCE.subscribe(this);
+    }
+
+    @EventListener(priority = Integer.MIN_VALUE)
+    public void onTickPost(TickEvent.Post event)
+    {
+        blocksPlaced.set(0);
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (checkNull())
+        {
+            return;
+        }
+
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
+        {
+            for (Interaction interaction : interactions.keySet())
+            {
+                if (!interaction.getPos().equals(packet.getPos()))
+                {
+                    continue;
+                }
+
+                if (packet.getState().getBlock().equals(interaction.getBlock()))
+                {
+                    // Confirm that we succeeded placement serverside
+                }
+
+                break;
+            }
+        }
     }
 
     public boolean placeBlock(Interaction interaction)
@@ -70,12 +114,17 @@ public class InteractManager extends NetworkHandler
         }
 
         interactions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
-        if (interactions.size() >= interactConfig.getBptConfig().getValue() * 20)
+
+        if (blocksPlaced.get() > interactConfig.getBptConfig().getValue())
         {
             return false;
         }
 
-        if (System.currentTimeMillis() - interactions.getOrDefault(blockPos, 0L) < interactConfig.getInteractDelay().getValue())
+        Optional<Map.Entry<Interaction, Long>> interact = interactions.entrySet().stream()
+                .filter(d -> d.getKey().getPos().equals(blockPos))
+                .findFirst();
+
+        if (interact.isPresent() && System.currentTimeMillis() - interact.get().getValue() < interactConfig.getInteractDelay().getValue())
         {
             return false;
         }
@@ -89,6 +138,7 @@ public class InteractManager extends NetworkHandler
         if (result)
         {
             interactions.put(interaction, System.currentTimeMillis());
+            blocksPlaced.incrementAndGet();
         }
 
         return result;
