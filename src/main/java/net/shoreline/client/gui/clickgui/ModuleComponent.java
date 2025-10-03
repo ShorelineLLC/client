@@ -146,7 +146,7 @@ public class ModuleComponent extends FrameComponent
             currentAnimation.getDrawAnim().setLength(100f / pending);
         }
 
-        drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight(), 1.0f, configY, color);
+        drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight(), 1.0f, (float) (configY * collapseAnim.getFactor()), color);
         disableScissor(context);
     }
 

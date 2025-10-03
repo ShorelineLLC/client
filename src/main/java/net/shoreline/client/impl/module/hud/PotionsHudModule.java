@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.hud;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.texture.Sprite;
@@ -8,11 +9,10 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.stat.Stat;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.ListConfig;
+import net.shoreline.client.api.config.RegistryConfig;
 import net.shoreline.client.impl.event.LoadingEvent;
 import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
 import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
@@ -20,10 +20,8 @@ import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class PotionsHudModule extends DynamicHudModule
@@ -34,6 +32,10 @@ public class PotionsHudModule extends DynamicHudModule
     Config<Boolean> potionIcons = new BooleanConfig.Builder("Icons")
             .setDescription("Shows the potion icon")
             .setDefaultValue(false).build();
+    Config<Collection<StatusEffect>> blacklist = new RegistryConfig.Builder<StatusEffect>("Blacklist")
+            .setRegistry(Registries.STATUS_EFFECT)
+            .setDescription("What potions to blacklist")
+            .build();
 
     private final Map<StatusEffect, String> nameMap = new HashMap<>();
 
@@ -56,6 +58,9 @@ public class PotionsHudModule extends DynamicHudModule
                     () -> getPotionColor(entry, effect)));
         }
     }
+
+    @Override
+    public void onDisable() {}
 
     @Override
     public void sortEntries()

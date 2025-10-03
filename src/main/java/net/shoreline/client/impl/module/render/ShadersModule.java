@@ -15,6 +15,7 @@ import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.item.RenderHandEvent;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
+import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.shader.ShaderEffect;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -67,6 +68,10 @@ public class ShadersModule extends Toggleable
     Config<Float> outlineWidth = new NumberConfig.Builder<Float>("OutlineWidth")
             .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f)
             .setDescription("The width of the outline").build();
+    Config<Float> glowConfig = new NumberConfig.Builder<Float>("Glow")
+            .setMin(0.0f).setMax(5.0f).setDefaultValue(1.0f).build();
+    Config<Integer> qualityConfig = new NumberConfig.Builder<Integer>("Quality")
+            .setMin(1).setMax(5).setDefaultValue(2).build();
     Config<Float> outlineOpacity = new NumberConfig.Builder<Float>("OutlineOpacity")
             .setMin(0.01f).setDefaultValue(1.0f).setMax(1.0f)
             .setDescription("Opacity for the outline").build();
@@ -199,6 +204,21 @@ public class ShadersModule extends Toggleable
                 effect.addFltUniform("radius", 1.0f);
                 effect.addIntUniform("glow", 0);
                 effect.addFltUniform("glowRadius", 1.0f);
+                return effect;
+            }
+        },
+        BLOOM
+        {
+            @Override
+            public ShaderEffect getShaderEffect()
+            {
+                ShaderEffect effect = new ShaderEffect("bloom");
+                Color color = ThemeModule.INSTANCE.getPrimaryColor();
+                effect.addIntUniform("u_Width", (int) (ShadersModule.INSTANCE.outlineConfig.getValue() ? ShadersModule.INSTANCE.outlineWidth.getValue() : 0.0f));
+                effect.addIntUniform("u_GlowQuality", ShadersModule.INSTANCE.qualityConfig.getValue());
+                effect.addFltUniform("u_GlowMultiplier", ShadersModule.INSTANCE.glowConfig.getValue());
+                effect.addVec4Uniform("u_FillColor", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
+                effect.addVec4Uniform("u_OutlineColor", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.outlineOpacity.getValue());
                 return effect;
             }
         };
