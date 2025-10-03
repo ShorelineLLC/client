@@ -1,6 +1,5 @@
 {
-  "blend":
-  {
+  "blend": {
     "func": "add",
     "srcrgb": "srcalpha",
     "dstrgb": "1-srcalpha"
@@ -35,67 +34,19 @@
       "values": [ 1.0, 1.0 ]
     },
     {
-      "name": "sobel",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "texelSize",
-      "type": "float",
-      "count": 2,
-      "values": [ 1.0, 1.0 ]
-    },
-    {
-      "name": "color",
-      "type": "float",
-      "count": 4,
-      "values": [ 1.0, 1.0, 1.0, 1.0 ]
-    },
-    {
-      "name": "samples",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "steps",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "dots",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "dotRadius",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "fastOutline",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "radius",
+      "name": "u_Width",
       "type": "float",
       "count": 1,
-      "values": [ 1.0 ]
+      "values": [ 3.0 ]
     },
     {
-      "name": "glow",
-      "type": "int",
+      "name": "u_OutlineAlpha",
+      "type": "float",
       "count": 1,
-      "values": [ 1.0 ]
+      "values": [ 3.0 ]
     },
     {
-      "name": "glowRadius",
+      "name": "u_FillAlpha",
       "type": "float",
       "count": 1,
       "values": [ 1.0 ]

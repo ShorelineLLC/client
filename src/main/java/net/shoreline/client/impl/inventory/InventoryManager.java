@@ -20,7 +20,7 @@ import net.shoreline.client.impl.event.entity.player.InsertStackEvent;
 import net.shoreline.client.impl.event.item.ItemUseEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.SetHandEvent;
-import net.shoreline.client.impl.module.world.InventoryModule;
+import net.shoreline.client.impl.module.client.InventoryModule;
 import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;

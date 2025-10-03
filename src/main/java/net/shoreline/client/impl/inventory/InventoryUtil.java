@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.shoreline.client.impl.module.world.InventoryModule;
+import net.shoreline.client.impl.module.client.InventoryModule;
 
 import java.util.List;
 import java.util.function.Function;

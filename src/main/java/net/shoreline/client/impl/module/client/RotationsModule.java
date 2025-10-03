@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.world;
+package net.shoreline.client.impl.module.client;
 
 import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
@@ -18,6 +18,9 @@ public class RotationsModule extends Concurrent
     Config<Boolean> renderRotationsConfig = new BooleanConfig.Builder("ShowRotations")
             .setDescription("Renders the serverside rotations")
             .setDefaultValue(true).build();
+    Config<Boolean> noServerRotate = new BooleanConfig.Builder("NoRotate")
+            .setDescription("Prevents the server from forcing rotations")
+            .setDefaultValue(false).build();
     Config<Boolean> raycastFixConfig = new BooleanConfig.Builder("Raytrace")
             .setDescription("Uses server rotations when raytracing crosshair")
             .setDefaultValue(false).build();
@@ -42,15 +45,12 @@ public class RotationsModule extends Concurrent
     Config<Boolean> lookSyncConfig = new BooleanConfig.Builder("RotateSync")
             .setDescription("Sends rotation packets when player look changes")
             .setDefaultValue(false).build();
-    Config<Boolean> noServerRotate = new BooleanConfig.Builder("NoRotate")
-            .setDescription("Prevents the server from forcing rotations")
-            .setDefaultValue(false).build();
 
     private Rotation clientRotations;
 
     public RotationsModule() 
     {
-        super("Rotations", "Manages client rotations", GuiCategory.WORLD);
+        super("Rotations", "Manages client rotations", GuiCategory.CLIENT);
         INSTANCE = this;
     }
 

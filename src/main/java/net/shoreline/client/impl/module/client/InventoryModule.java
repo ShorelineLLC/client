@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.module.world;
+package net.shoreline.client.impl.module.client;
 
 import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
@@ -23,7 +23,7 @@ public class InventoryModule extends Concurrent
 
     public InventoryModule()
     {
-        super("Inventory", "Manages inventory interactions", GuiCategory.WORLD);
+        super("Inventory", "Manages inventory interactions", GuiCategory.CLIENT);
         INSTANCE = this;
     }
 

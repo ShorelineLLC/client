@@ -28,7 +28,7 @@ import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
-import net.shoreline.client.impl.module.world.InteractionsModule;
+import net.shoreline.client.impl.module.client.InteractionsModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.rotation.Rotation;

@@ -1,6 +1,5 @@
 package net.shoreline.client.mixin.render;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.caffeinemc.mods.sodium.client.model.light.data.LightDataAccess;
 import net.shoreline.client.impl.event.render.LightDataEvent;
 import net.shoreline.eventbus.EventBus;

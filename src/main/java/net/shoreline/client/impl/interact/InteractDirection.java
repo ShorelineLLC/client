@@ -8,8 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.shoreline.client.impl.ac.Anticheat;
-import net.shoreline.client.impl.module.world.InteractionsModule;
+import net.shoreline.client.impl.module.client.InteractionsModule;
 
 @UtilityClass
 public class InteractDirection

@@ -2,8 +2,8 @@ package net.shoreline.client.impl.rotation;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
-import net.shoreline.client.impl.module.world.RotationsModule;
-import net.shoreline.client.impl.module.world.RotationsModule.MoveFix;
+import net.shoreline.client.impl.module.client.RotationsModule;
+import net.shoreline.client.impl.module.client.RotationsModule.MoveFix;
 
 public class MovementCorrection
 {

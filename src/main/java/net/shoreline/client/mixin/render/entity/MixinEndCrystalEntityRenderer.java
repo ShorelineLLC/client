@@ -14,14 +14,15 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.imixin.IEndCrystalEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
-import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.render.ChamsModule;
+import net.shoreline.client.impl.module.render.CrystalModelModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Layers;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EndCrystalEntityRenderer.class)
@@ -123,5 +124,17 @@ public class MixinEndCrystalEntityRenderer implements IEndCrystalEntityRenderer
             float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
             ChamsRenderer.render(mode, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
         }
+    }
+
+    @Redirect(
+            method = "render(Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;" +
+                    "Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V"))
+    private void hookScale(MatrixStack instance, float x, float y, float z)
+    {
+        float scale = CrystalModelModule.INSTANCE.isEnabled() ? CrystalModelModule.INSTANCE.getCrystalScale().getValue() : 1.0f;
+        instance.scale(2.0f * scale, 2.0f * scale, 2.0f * scale);
     }
 }

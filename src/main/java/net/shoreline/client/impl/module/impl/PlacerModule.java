@@ -9,7 +9,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.module.client.ThemeModule;
-import net.shoreline.client.impl.module.world.InteractionsModule;
+import net.shoreline.client.impl.module.client.InteractionsModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.Easing;

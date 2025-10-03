@@ -60,6 +60,16 @@ public class ShadersModule extends Toggleable
     Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
             .setMin(0.0f).setDefaultValue(0.5f).setMax(1.0f)
             .setDescription("Opacity for the shader fill").build();
+
+    Config<Boolean> outlineConfig = new BooleanConfig.Builder("Outline")
+            .setDescription("Outlines the entity")
+            .setDefaultValue(true).build();
+    Config<Float> outlineWidth = new NumberConfig.Builder<Float>("OutlineWidth")
+            .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f)
+            .setDescription("The width of the outline").build();
+    Config<Float> outlineOpacity = new NumberConfig.Builder<Float>("OutlineOpacity")
+            .setMin(0.01f).setDefaultValue(1.0f).setMax(1.0f)
+            .setDescription("Opacity for the outline").build();
     Config<Boolean> depthConfig = new BooleanConfig.Builder("ThroughWalls")
             .setDescription("Renders shaders through walls")
             .setDefaultValue(true).build();
@@ -155,26 +165,6 @@ public class ShadersModule extends Toggleable
                 || (entity instanceof ExperienceBottleEntity || entity instanceof EnderPearlEntity) && thrownConfig.getValue();
     }
 
-    public class DefaultShaderEffect extends ShaderEffect
-    {
-        public DefaultShaderEffect()
-        {
-            super("DefaultOutlineFill");
-            Color color = ThemeModule.INSTANCE.getPrimaryColor();
-            addIntUniform("sobel", 1);
-            addVec2Uniform("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-            addVec4Uniform("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, opacity.getValue());
-            addIntUniform("samples", 8);
-            addIntUniform("steps", 8);
-            addIntUniform("dots", 0);
-            addIntUniform("dotRadius", 8);
-            addIntUniform("fastOutline", 0);
-            addFltUniform("radius", 1.0f);
-            addIntUniform("glow", 0);
-            addFltUniform("glowRadius", 1.0f);
-        }
-    }
-
     public enum Shaders
     {
         DEFAULT
@@ -183,18 +173,9 @@ public class ShadersModule extends Toggleable
             public ShaderEffect getShaderEffect()
             {
                 ShaderEffect effect = new ShaderEffect("outline");
-                Color color = ThemeModule.INSTANCE.getPrimaryColor();
-                effect.addIntUniform("sobel", 1);
-                effect.addVec2Uniform("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                effect.addVec4Uniform("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
-                effect.addIntUniform("samples", 8);
-                effect.addIntUniform("steps", 8);
-                effect.addIntUniform("dots", 0);
-                effect.addIntUniform("dotRadius", 8);
-                effect.addIntUniform("fastOutline", 0);
-                effect.addFltUniform("radius", 1.0f);
-                effect.addIntUniform("glow", 0);
-                effect.addFltUniform("glowRadius", 1.0f);
+                effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineConfig.getValue() ? ShadersModule.INSTANCE.outlineWidth.getValue() : 0.0f);
+                effect.addFltUniform("u_FillAlpha", ShadersModule.INSTANCE.opacity.getValue());
+                effect.addFltUniform("u_OutlineAlpha", ShadersModule.INSTANCE.outlineOpacity.getValue());
                 return effect;
             }
         },

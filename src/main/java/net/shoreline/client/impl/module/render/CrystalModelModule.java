@@ -1,13 +1,17 @@
 package net.shoreline.client.impl.module.render;
 
+import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 
+@Getter
 public class CrystalModelModule extends Toggleable
 {
+    public static CrystalModelModule INSTANCE;
+
     Config<Float> crystalScale = new NumberConfig.Builder<Float>("Scale")
             .setMin(0.1f).setMax(1.5f).setDefaultValue(1.0f)
             .setDescription("The scale of the crystal model").build();
@@ -21,5 +25,6 @@ public class CrystalModelModule extends Toggleable
     public CrystalModelModule()
     {
         super("CrystalModel", "Modify the crystal model", GuiCategory.RENDER);
+        INSTANCE = this;
     }
 }

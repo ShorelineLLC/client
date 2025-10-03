@@ -65,6 +65,7 @@
     "render.entity.MixinModel",
     "render.entity.MixinPlayerEntityRenderer",
     "render.entity.feature.MixinArmorFeatureRenderer",
+    "render.entity.model.MixinEndCrystalEntityModel",
     "render.item.MixinHeldItemRenderer",
     "render.item.MixinItemRenderer",
     "render.item.MixinItemRenderState",

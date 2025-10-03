@@ -19,7 +19,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
-import net.shoreline.client.impl.module.world.InventoryModule;
+import net.shoreline.client.impl.module.client.InventoryModule;
 import net.shoreline.client.util.item.EnchantUtil;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -92,7 +92,13 @@ public class ExplosionUtil
 
     private float getArmor(LivingEntity entity)
     {
-        return (float) Math.floor(entity.getAttributeValue(EntityAttributes.ARMOR));
+        try
+        {
+            return (float) Math.floor(entity.getAttributeValue(EntityAttributes.ARMOR));
+        } catch (Exception ignored)
+        {
+            return 0.0f;
+        }
     }
 
     private float getProtectionReduction(Entity player, float damage)

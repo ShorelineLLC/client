@@ -28,16 +28,15 @@ public class ModuleManager
     {
         registerModules(
 
-                // Managers
-                new InteractionsModule(),
-                new InventoryModule(),
-                new RotationsModule(),
                 // Client
                 new ClickGuiModule(),
                 new FontModule(),
                 new HeadlessMCModule(),
                 new HudGuiModule(),
+                new InteractionsModule(),
+                new InventoryModule(),
                 new LatencyModule(),
+                new RotationsModule(),
                 new SocialsModule(),
                 new ThemeModule(),
                 // Combat
@@ -72,7 +71,6 @@ public class ModuleManager
                 new AutoFishModule(),
                 new AutoRespawnModule(),
                 new BetterChatModule(),
-                new BetterInvModule(),
                 new BetterTabModule(),
                 new ChestSwapModule(),
                 new FakePlayerModule(),
@@ -100,7 +98,9 @@ public class ModuleManager
                 new VelocityModule(),
                 new YawModule(),
                 // Render
+                new BlockESPModule(),
                 new BlockHighlightModule(),
+                new BreadcrumbsModule(),
                 new ChamsModule(),
                 new CrystalModelModule(),
                 new ESPModule(),
@@ -123,6 +123,7 @@ public class ModuleManager
                 new AirPlaceModule(),
                 new AutoToolModule(),
                 new FastPlaceModule(),
+                new NukerModule(),
                 new ScaffoldModule(),
                 new SpeedMineModule(),
                 new TimerModule(),
