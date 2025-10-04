@@ -32,10 +32,10 @@ public class PotionsHudModule extends DynamicHudModule
     Config<Boolean> potionIcons = new BooleanConfig.Builder("Icons")
             .setDescription("Shows the potion icon")
             .setDefaultValue(false).build();
-    Config<Collection<StatusEffect>> blacklist = new RegistryConfig.Builder<StatusEffect>("Blacklist")
-            .setRegistry(Registries.STATUS_EFFECT)
-            .setDescription("What potions to blacklist")
-            .build();
+//    Config<Collection<StatusEffect>> blacklist = new RegistryConfig.Builder<StatusEffect>("Blacklist")
+//            .setRegistry(Registries.STATUS_EFFECT)
+//            .setDescription("What potions to blacklist")
+//            .build();
 
     private final Map<StatusEffect, String> nameMap = new HashMap<>();
 

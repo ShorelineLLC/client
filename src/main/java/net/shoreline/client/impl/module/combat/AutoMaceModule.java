@@ -11,5 +11,10 @@ public class AutoMaceModule extends Toggleable
         super("AutoMace", "Automatically damages entities with a mace", GuiCategory.COMBAT);
     }
 
+    @Override
+    public String getModuleData()
+    {
+        return String.valueOf(mc.player.fallDistance);
+    }
 
 }

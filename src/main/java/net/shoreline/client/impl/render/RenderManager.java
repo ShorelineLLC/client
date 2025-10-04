@@ -1,7 +1,9 @@
 package net.shoreline.client.impl.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -14,20 +16,38 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.client.impl.module.client.FontModule;
+import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
 
+import java.util.List;
 import java.util.function.Consumer;
 
-// TODO: Batch 3d rendering calls
 @Getter
 @Setter
 public class RenderManager
 {
+    private final List<BatchedBoxRender> quadQueue = new ObjectArrayList<>(512);
+    private final List<BatchedBoxRender> lineQuadQueue = new ObjectArrayList<>(512);
+    private final List<BatchedLineRender> lineQueue = new ObjectArrayList<>(1024);
+
     private double deltaTime;
+
+    public RenderManager()
+    {
+        EventBus.INSTANCE.subscribe(this);
+    }
+
+    @EventListener(priority = Integer.MIN_VALUE)
+    public void onRenderWorld(RenderWorldEvent.Post event)
+    {
+        flushBuffer();
+    }
 
     public void renderBox(MatrixStack matrixStack,
                           BlockPos blockPos,
@@ -40,55 +60,10 @@ public class RenderManager
                           Box box,
                           int color)
     {
-        if (!isVisible(box))
+        if (isVisible(box))
         {
-            return;
+            queueQuad(matrixStack, box, color, false);
         }
-
-        startRender(false);
-        Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
-        float minX = (float) (box.minX - camera.getX());
-        float minY = (float) (box.minY - camera.getY());
-        float minZ = (float) (box.minZ - camera.getZ());
-        float maxX = (float) (box.maxX - camera.getX());
-        float maxY = (float) (box.maxY - camera.getY());
-        float maxZ = (float) (box.maxZ - camera.getZ());
-
-        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        buffer.vertex(matrix, minX, minY, minZ).color(color);
-        buffer.vertex(matrix, maxX, minY, minZ).color(color);
-        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
-        buffer.vertex(matrix, minX, minY, maxZ).color(color);
-
-        buffer.vertex(matrix, minX, maxY, minZ).color(color);
-        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
-
-        buffer.vertex(matrix, minX, minY, minZ).color(color);
-        buffer.vertex(matrix, minX, maxY, minZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
-        buffer.vertex(matrix, maxX, minY, minZ).color(color);
-
-        buffer.vertex(matrix, maxX, minY, minZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
-
-        buffer.vertex(matrix, minX, minY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-
-        buffer.vertex(matrix, minX, minY, minZ).color(color);
-        buffer.vertex(matrix, minX, minY, maxZ).color(color);
-        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, minX, maxY, minZ).color(color);
-
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        endRender();
     }
 
     public void renderBoundingBox(MatrixStack matrixStack, BlockPos pos, int color)
@@ -98,54 +73,25 @@ public class RenderManager
 
     public void renderBoundingBox(MatrixStack matrixStack, Box box, int color)
     {
-        if (!isVisible(box))
+        if (isVisible(box))
         {
-            return;
+            queueLineQuad(matrixStack, box, color, false);
         }
+    }
 
-        startRender(false);
-        Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
-        float minX = (float) (box.minX - camera.getX());
-        float minY = (float) (box.minY - camera.getY());
-        float minZ = (float) (box.minZ - camera.getZ());
-        float maxX = (float) (box.maxX - camera.getX());
-        float maxY = (float) (box.maxY - camera.getY());
-        float maxZ = (float) (box.maxZ - camera.getZ());
-
-        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        buffer.vertex(matrix, minX, minY, minZ).color(color);
-        buffer.vertex(matrix, minX, minY, maxZ).color(color);
-        buffer.vertex(matrix, minX, minY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
-
-        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, minY, minZ).color(color);
-        buffer.vertex(matrix, maxX, minY, minZ).color(color);
-        buffer.vertex(matrix, minX, minY, minZ).color(color);
-
-        buffer.vertex(matrix, minX, maxY, minZ).color(color);
-        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
-
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
-        buffer.vertex(matrix, minX, maxY, minZ).color(color);
-
-        buffer.vertex(matrix, minX, minY, minZ).color(color);
-        buffer.vertex(matrix, minX, maxY, minZ).color(color);
-        buffer.vertex(matrix, maxX, minY, minZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, minZ).color(color);
-
-        buffer.vertex(matrix, maxX, minY, maxZ).color(color);
-        buffer.vertex(matrix, maxX, maxY, maxZ).color(color);
-        buffer.vertex(matrix, minX, minY, maxZ).color(color);
-        buffer.vertex(matrix, minX, maxY, maxZ).color(color);
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        endRender();
+    public void renderLine(MatrixStack matrices, Vec3d start, Vec3d end, int color)
+    {
+        double minX = Math.min(start.x, end.x);
+        double minY = Math.min(start.y, end.y);
+        double minZ = Math.min(start.z, end.z);
+        double maxX = Math.max(start.x, end.x);
+        double maxY = Math.max(start.y, end.y);
+        double maxZ = Math.max(start.z, end.z);
+        Box bounds = new Box(minX, minY, minZ, maxX, maxY, maxZ);
+        if (isVisible(bounds))
+        {
+            queueLine(matrices, start, end, color, false);
+        }
     }
 
     public void renderBox(Consumer<BufferBuilder> consumer, boolean depth)
@@ -164,6 +110,178 @@ public class RenderManager
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         consumer.accept(buffer);
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
+    private void queueQuad(MatrixStack matrices, Box box, int color, boolean depth)
+    {
+        Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
+        quadQueue.add(new BatchedBoxRender(m, color, depth, box));
+    }
+
+    private void queueLineQuad(MatrixStack matrices, Box box, int color, boolean depth)
+    {
+        Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
+        lineQuadQueue.add(new BatchedBoxRender(m, color, depth, box));
+    }
+
+    private void queueLine(MatrixStack matrices, Vec3d start, Vec3d end, int color, boolean depth)
+    {
+        Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
+        lineQueue.add(new BatchedLineRender(m, color, depth, start, end));
+    }
+
+    private void queueLinePoint(MatrixStack matrices, Vec3d point, int color, boolean depth)
+    {
+        Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
+        lineQueue.add(new BatchedLineRender(m, color, depth, point, null));
+    }
+
+    public void flushBuffer()
+    {
+        flushQuads();
+        flushLinesQuad();
+        flushLines();
+
+        quadQueue.clear();
+        lineQuadQueue.clear();
+        lineQueue.clear();
+    }
+
+    private void flushQuads()
+    {
+        if (quadQueue.isEmpty())
+        {
+            return;
+        }
+
+        startRender(false);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
+
+        for (BatchedBoxRender batchedRender : quadQueue)
+        {
+            float minX = (float) (batchedRender.box.minX - camera.x);
+            float minY = (float) (batchedRender.box.minY - camera.y);
+            float minZ = (float) (batchedRender.box.minZ - camera.z);
+            float maxX = (float) (batchedRender.box.maxX - camera.x);
+            float maxY = (float) (batchedRender.box.maxY - camera.y);
+            float maxZ = (float) (batchedRender.box.maxZ - camera.z);
+
+            buffer.vertex(batchedRender.matrix, minX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, minZ).color(batchedRender.color);
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
+    private void flushLinesQuad()
+    {
+        if (lineQuadQueue.isEmpty())
+        {
+            return;
+        }
+
+        startRender(false);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
+
+        for (BatchedBoxRender batchedRender : lineQuadQueue)
+        {
+            float minX = (float) (batchedRender.box.minX - camera.x);
+            float minY = (float) (batchedRender.box.minY - camera.y);
+            float minZ = (float) (batchedRender.box.minZ - camera.z);
+            float maxX = (float) (batchedRender.box.maxX - camera.x);
+            float maxY = (float) (batchedRender.box.maxY - camera.y);
+            float maxZ = (float) (batchedRender.box.maxZ - camera.z);
+
+            buffer.vertex(batchedRender.matrix, minX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, minZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, maxX, maxY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, minY, maxZ).color(batchedRender.color);
+            buffer.vertex(batchedRender.matrix, minX, maxY, maxZ).color(batchedRender.color);
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
+    private void flushLines()
+    {
+        if (lineQueue.isEmpty())
+        {
+            return;
+        }
+
+        startRender(false);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
+
+        for (BatchedLineRender batchedRender : lineQueue)
+        {
+            float x1 = (float) (batchedRender.start.x - camera.x);
+            float y1 = (float) (batchedRender.start.y - camera.y);
+            float z1 = (float) (batchedRender.start.z - camera.z);
+            buffer.vertex(batchedRender.matrix, x1, y1, z1).color(batchedRender.color);
+
+            if (batchedRender.end != null)
+            {
+                float x2 = (float) (batchedRender.end.x - camera.x);
+                float y2 = (float) (batchedRender.end.y - camera.y);
+                float z2 = (float) (batchedRender.end.z - camera.z);
+                buffer.vertex(batchedRender.matrix, x2, y2, z2).color(batchedRender.color);
+            }
+        }
+
         BufferRenderer.drawWithGlobalProgram(buffer.end());
         endRender();
     }
@@ -306,5 +424,37 @@ public class RenderManager
     {
         return ((IWorldRenderer) MinecraftClient.getInstance().worldRenderer)
                 .getFrustum().isVisible(box);
+    }
+
+    @RequiredArgsConstructor
+    private static class BatchedRender
+    {
+        public final Matrix4f matrix;
+        public final int color;
+        public final boolean depth;
+    }
+
+    private static class BatchedBoxRender extends BatchedRender
+    {
+        public final Box box;
+
+        public BatchedBoxRender(Matrix4f matrix, int color, boolean depth, Box box)
+        {
+            super(matrix, color, depth);
+            this.box = box;
+        }
+    }
+
+    private static class BatchedLineRender extends BatchedRender
+    {
+        public final Vec3d start;
+        public final Vec3d end;
+
+        public BatchedLineRender(Matrix4f matrix, int color, boolean depth, Vec3d start, @Nullable Vec3d end)
+        {
+            super(matrix, color, depth);
+            this.start = start;
+            this.end = end;
+        }
     }
 }

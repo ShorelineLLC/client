@@ -177,7 +177,7 @@ public class InventoryManager extends NetworkHandler
 
     public boolean isSilentSwapping()
     {
-        return mc.player.getInventory().selectedSlot != serverSlot;
+        return mc.player != null && mc.player.getInventory().selectedSlot != serverSlot;
     }
 
     public void setSelectedSlot(int slot)

@@ -37,7 +37,6 @@ public class ShadersModule extends Toggleable
             .setDefaultValue(true).build();
     Config<Boolean> selfConfig = new BooleanConfig.Builder("Self")
             .setDescription("Render shaders over the player")
-            .setVisible(() -> playersConfig.getValue())
             .setDefaultValue(true).build();
     Config<Boolean> crystalsConfig = new BooleanConfig.Builder("Crystals")
             .setDescription("Render shaders over crystals")
@@ -45,8 +44,11 @@ public class ShadersModule extends Toggleable
     Config<Boolean> itemsConfig = new BooleanConfig.Builder("Items")
             .setDescription("Render shaders over items")
             .setDefaultValue(true).build();
-    Config<Boolean> thrownConfig = new BooleanConfig.Builder("Thrown")
-            .setDescription("Render shaders over thrown items")
+    Config<Boolean> xpConfig = new BooleanConfig.Builder("XP")
+            .setDescription("Render shaders over xp bottles")
+            .setDefaultValue(true).build();
+    Config<Boolean> pearlsConfig = new BooleanConfig.Builder("Pearls")
+            .setDescription("Render shaders over pearls")
             .setDefaultValue(true).build();
     Config<Boolean> passiveConfig = new BooleanConfig.Builder("Passive")
             .setDescription("Render shaders over hands")
@@ -56,7 +58,7 @@ public class ShadersModule extends Toggleable
             .setDefaultValue(true).build();
     public Config<Void> renderConfig = new ConfigGroup.Builder("Target")
             .addAll(handsConfig, playersConfig, selfConfig, crystalsConfig, itemsConfig,
-                    thrownConfig, passiveConfig, hostilesConfig).build();
+                    xpConfig, pearlsConfig, passiveConfig, hostilesConfig).build();
 
     Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
             .setMin(0.0f).setDefaultValue(0.5f).setMax(1.0f)
@@ -167,7 +169,8 @@ public class ShadersModule extends Toggleable
                 || EntityUtil.isPassive(entity) && passiveConfig.getValue()
                 || entity instanceof ItemEntity && itemsConfig.getValue()
                 || entity instanceof EndCrystalEntity && crystalsConfig.getValue()
-                || (entity instanceof ExperienceBottleEntity || entity instanceof EnderPearlEntity) && thrownConfig.getValue();
+                || entity instanceof ExperienceBottleEntity && xpConfig.getValue()
+                || entity instanceof EnderPearlEntity && pearlsConfig.getValue();
     }
 
     public enum Shaders

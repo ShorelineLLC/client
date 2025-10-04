@@ -100,7 +100,6 @@ public class ModuleManager
                 // Render
                 new BlockESPModule(),
                 new BlockHighlightModule(),
-                new BreadcrumbsModule(),
                 new ChamsModule(),
                 new CrystalModelModule(),
                 new ESPModule(),
@@ -116,6 +115,7 @@ public class ModuleManager
                 new SkyboxModule(),
                 new SwingModule(),
                 new TintModule(),
+                new TrailsModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
                 new ZoomModule(),
@@ -142,6 +142,7 @@ public class ModuleManager
                 new ServerStatusHudModule(),
                 new SpeedHudModule(),
                 new TextRadarHudModule(),
+                new TotemsHudModule(),
                 new TPSHudModule(),
                 new WatermarkHudModule()
         );

@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.world;
 
-import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
