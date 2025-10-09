@@ -15,7 +15,7 @@ public class FontManager
 
     public static void init()
     {
-        FONT = fromResource("/assets/shoreline/font/dejavu.ttf", 9.5f);
+        FONT = fromResource("/assets/shoreline/font/verdana.ttf", 9.5f);
     }
 
     public void loadFont(Identifier identifier)

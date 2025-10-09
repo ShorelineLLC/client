@@ -135,10 +135,16 @@ public class MiningManager extends GenericFeature
         return count;
     }
 
-    public float getMiningProgress(BlockPos blockPos)
+    public float getMiningDamage(BlockPos blockPos)
     {
         MiningData data = miningBlocks.get(blockPos);
         return data != null ? data.getBlockDamage() : 0.0f;
+    }
+
+    public float getMiningProgress(BlockPos blockPos)
+    {
+        MiningData data = miningBlocks.get(blockPos);
+        return data != null ? data.getBlockDamage() / data.getMaxProgress() : 0.0f;
     }
 
     public Collection<MiningData> getMiningBlocks()

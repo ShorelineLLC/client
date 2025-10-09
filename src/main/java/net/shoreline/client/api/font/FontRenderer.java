@@ -43,16 +43,7 @@ public final class FontRenderer implements Closeable
 
     public FontRenderer(InputStream inputStream, float size)
     {
-        try
-        {
-            this.font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
-        }
-        catch (Throwable t)
-        {
-            t.printStackTrace();
-            this.font = new Font("Verdana", Font.PLAIN, Math.round(size));
-        }
-
+        this.font = new Font("Verdana", Font.PLAIN, Math.round(size));
         this.size = size;
         createFont(font, size);
     }

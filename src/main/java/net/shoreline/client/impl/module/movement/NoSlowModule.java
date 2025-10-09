@@ -104,7 +104,7 @@ public class NoSlowModule extends Toggleable
 
     private boolean canUseItem(ItemStack stack)
     {
-        return stack.getComponents().contains(DataComponentTypes.FOOD) || stack.getItem() == Items.BOW || stack.getItem() == Items.CROSSBOW || stack.getItem() == Items.SHIELD;
+        return stack.getComponents().contains(DataComponentTypes.FOOD) || stack.getItem() == Items.BOW || stack.getItem() == Items.CROSSBOW || stack.getItem() == Items.SHIELD || stack.getItem() == Items.ENDER_PEARL;
     }
 
     public boolean shouldCancelSlowedDown()

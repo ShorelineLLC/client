@@ -69,6 +69,7 @@ public class ModuleManager
                 // Misc
                 new AntiAimModule(),
                 new AutoFishModule(),
+                new AutoReconnectModule(),
                 new AutoRespawnModule(),
                 new BetterChatModule(),
                 new BetterTabModule(),
@@ -83,8 +84,10 @@ public class ModuleManager
                 new ShulkerceptionModule(),
                 new SkinBlinkModule(),
                 new SpammerModule(),
+                new XCarryModule(),
                 // Movement
                 new AvoidModule(),
+                new ElytraFlyModule(),
                 new FastFallModule(),
                 new FlightModule(),
                 new LongJumpModule(),
@@ -92,6 +95,8 @@ public class ModuleManager
                 new NoJumpDelayModule(),
                 new NoSlowModule(),
                 new ParkourModule(),
+                new PatherModule(),
+                new SafeWalkModule(),
                 new SpeedModule(),
                 new SprintModule(),
                 new StepModule(),
@@ -115,6 +120,7 @@ public class ModuleManager
                 new SkyboxModule(),
                 new SwingModule(),
                 new TintModule(),
+                new TracersModule(),
                 new TrailsModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
@@ -127,6 +133,7 @@ public class ModuleManager
                 new ScaffoldModule(),
                 new SpeedMineModule(),
                 new TimerModule(),
+                new XRayModule(),
 
                 // HUD
                 new ArmorHudModule(),

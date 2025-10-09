@@ -15,6 +15,8 @@ import net.shoreline.loader.Loader;
  */
 public class Shoreline
 {
+    public static final long UPTIME = System.currentTimeMillis();
+
     public static ModConfiguration CONFIG;
 
     // Client shutdown hooks which will run once when the MinecraftClient

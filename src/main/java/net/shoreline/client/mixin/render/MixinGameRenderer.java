@@ -3,6 +3,7 @@ package net.shoreline.client.mixin.render;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.Pool;
@@ -18,6 +19,7 @@ import net.shoreline.eventbus.EventBus;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -30,6 +32,10 @@ public abstract class MixinGameRenderer implements IGameRenderer
     @Override
     @Accessor("pool")
     public abstract Pool getPool();
+
+    @Override
+    @Invoker("getFov")
+    public abstract float invokeGetFov(Camera camera, float tickDelta, boolean changingFov);
 
     @Inject(method = "tiltViewWhenHurt", at = @At(value = "HEAD"), cancellable = true)
     private void hookTiltViewWhenHurt(MatrixStack matrices,

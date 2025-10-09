@@ -2,6 +2,8 @@ package net.shoreline.client.mixin.render;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.render.*;
@@ -17,6 +19,7 @@ import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
 import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.eventbus.EventBus;
 import org.joml.Matrix4f;
@@ -56,8 +59,18 @@ public abstract class MixinWorldRenderer implements IWorldRenderer
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(client.gameRenderer.getCamera().getPitch()));
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(client.gameRenderer.getCamera().getYaw() + 180f));
 
-        RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickCounter.getTickDelta(true));
+        float tickDelta = tickCounter.getTickDelta(true);
+//        MatrixStack matrixStack2 = new MatrixStack();
+//        float d = ((IGameRenderer) gameRenderer).invokeGetFov(camera, tickDelta, false);
+//        matrixStack2.multiplyPositionMatrix(gameRenderer.getBasicProjectionMatrix(d));
+//
+//        RenderSystem.backupProjectionMatrix();
+//        RenderSystem.setProjectionMatrix(matrixStack2.peek().getPositionMatrix(), ProjectionType.PERSPECTIVE);
+
+        RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickDelta);
         EventBus.INSTANCE.dispatch(renderWorldEvent);
+
+//        RenderSystem.restoreProjectionMatrix();
         matrixStack.pop();
     }
 

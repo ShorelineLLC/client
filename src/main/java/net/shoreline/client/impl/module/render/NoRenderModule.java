@@ -10,6 +10,7 @@ import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.entity.RenderOnFireEvent;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
@@ -72,8 +73,11 @@ public class NoRenderModule extends Toggleable
             .setMin(5).setDefaultValue(30).setMax(30)
             .setVisible(() -> !totemEffects.getValue())
             .setDescription("The time in ticks that the totem effect will last").build();
+    Config<Boolean> fireEffect = new BooleanConfig.Builder("EntityFire")
+            .setDescription("Cancels the fire effect on entities")
+            .setDefaultValue(false).build();
     Config<Void> effectConfig = new ConfigGroup.Builder("Effects")
-            .addAll(totemEffects, totemParticles, totemTicks).build();
+            .addAll(totemEffects, totemParticles, totemTicks, fireEffect).build();
 
     Config<Boolean> explosionsConfig = new BooleanConfig.Builder("Explosion")
             .setDescription("Cancels the explosion particles")
@@ -285,6 +289,15 @@ public class NoRenderModule extends Toggleable
     public void onRenderNausea(RenderNauseaEvent event)
     {
         if (nauseaConfig.getValue())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onRenderEntityFire(RenderOnFireEvent event)
+    {
+        if (fireEffect.getValue())
         {
             event.cancel();
         }

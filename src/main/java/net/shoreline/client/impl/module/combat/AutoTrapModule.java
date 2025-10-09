@@ -137,19 +137,19 @@ public class AutoTrapModule extends TrapModule
         for (Map.Entry<BlockPos, TrapLayer> entry : trapPos.getTrapPositionLayers().entrySet())
         {
             BlockPos blockPos = entry.getKey();
-            TrapLayer layer = entry.getValue();
-
             double dist = mc.player.squaredDistanceTo(blockPos.toCenterPos());
             if (dist > placeRange.getValue() * placeRange.getValue())
             {
                 continue;
             }
 
-            boolean crawlLayer = layer == TrapLayer.BODY_INTERSECT || layer == TrapLayer.FLOOR;
-            boolean consideredAir = mc.world.getBlockState(blockPos).isReplaceable()
-                    || crawlLayer && Managers.MINING.getMiningProgress(blockPos) > 0.7f;
+            if (!mc.world.getBlockState(blockPos).isReplaceable()
+                    && Managers.MINING.getMiningProgress(blockPos) < 0.7f)
+            {
+                continue;
+            }
 
-            if (!consideredAir || !Managers.INTERACT.canPlaceBlock(blockPos, getCurrentObbyBlock()))
+            if (!Managers.INTERACT.canPlaceBlock(blockPos, getCurrentObbyBlock()))
             {
                 continue;
             }

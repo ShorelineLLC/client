@@ -3,22 +3,32 @@ package net.shoreline.client.mixin.render;
 import net.minecraft.client.render.Camera;
 import net.shoreline.client.impl.event.render.CameraClipEvent;
 import net.shoreline.client.impl.event.render.CameraEvent;
+import net.shoreline.client.impl.imixin.ICamera;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Camera.class)
-public abstract class MixinCamera
+public abstract class MixinCamera implements ICamera
 {
     @Shadow
     protected abstract void setPos(double x, double y, double z);
 
     @Shadow
     protected abstract void setRotation(float yaw, float pitch);
+
+    @Override
+    @Accessor("cameraY")
+    public abstract float getCameraY();
+
+    @Override
+    @Accessor("lastCameraY")
+    public abstract float getLastCameraY();
 
     @Shadow
     private float lastTickDelta;

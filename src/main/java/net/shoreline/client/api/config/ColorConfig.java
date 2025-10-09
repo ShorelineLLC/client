@@ -3,9 +3,10 @@ package net.shoreline.client.api.config;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
-import net.shoreline.client.Shoreline;
+import net.shoreline.client.impl.event.LoadingEvent;
 import net.shoreline.client.impl.module.client.ThemeModule;
-import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.eventbus.EventBus;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
 
@@ -27,6 +28,15 @@ public class ColorConfig extends Config<Color>
         JsonObject jsonObject = super.toJson();
         jsonObject.addProperty("value", Integer.toHexString(getRGB()));
         return jsonObject;
+    }
+
+    @EventListener
+    public void onFinishedLoading(LoadingEvent.Finished event)
+    {
+        if (global)
+        {
+            setValue(ThemeModule.INSTANCE.getPrimaryColor());
+        }
     }
 
     public int getRed()
@@ -63,9 +73,17 @@ public class ColorConfig extends Config<Color>
     public static class Builder extends ConfigBuilder<Color>
     {
         private boolean transparency;
+        private boolean global;
 
         public Builder(String name) {
             super(name);
+        }
+
+        public Builder setGlobalColor()
+        {
+            setDefaultValue(Color.WHITE);
+            global = true;
+            return this;
         }
 
         public Builder setRgb(int rgb)
@@ -83,9 +101,15 @@ public class ColorConfig extends Config<Color>
         @Override
         public Config<Color> build()
         {
-            ColorConfig colorConfig = (ColorConfig) super.build();
-            colorConfig.setTransparency(transparency);
-            return colorConfig;
+            ColorConfig built = (ColorConfig) super.build();
+            built.setTransparency(transparency);
+            if (global)
+            {
+                built.setGlobal(true);
+                EventBus.INSTANCE.subscribe(built);
+            }
+
+            return built;
         }
     }
 }

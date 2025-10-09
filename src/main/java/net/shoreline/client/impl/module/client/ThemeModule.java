@@ -56,6 +56,7 @@ public class ThemeModule extends Concurrent
                 }
             }
         });
+
         titleColor.addListener(primaryTheme::setTitleColor);
         backgroundColor.addListener(primaryTheme::setBackgroundColor);
         outlineColor.addListener(primaryTheme::setOutlineColor);

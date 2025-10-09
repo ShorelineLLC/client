@@ -4,10 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.event.entity.EntityDamageEvent;
-import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
-import net.shoreline.client.impl.event.entity.PushEvent;
-import net.shoreline.client.impl.event.entity.PlayerVecEvent;
+import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -116,5 +113,17 @@ public abstract class MixinEntity
     {
         EntityDamageEvent event = new EntityDamageEvent((Entity) (Object) this, source, amount);
         EventBus.INSTANCE.dispatch(event);
+    }
+
+    @Inject(method = "doesRenderOnFire", at = @At(value = "HEAD"), cancellable = true)
+    private void hookDoesRenderOnFire(CallbackInfoReturnable<Boolean> cir)
+    {
+        RenderOnFireEvent renderFireEntityEvent = new RenderOnFireEvent();
+        EventBus.INSTANCE.dispatch(renderFireEntityEvent);
+        if (renderFireEntityEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(false);
+        }
     }
 }

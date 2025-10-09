@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.render;
 
+import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
@@ -15,9 +16,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.imixin.IDrawContext;
+import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.eventbus.EventBus;
@@ -30,23 +33,28 @@ import java.util.function.Consumer;
 
 @Getter
 @Setter
-public class RenderManager
+public class RenderManager extends GenericFeature
 {
-    private final List<BatchedBoxRender> quadQueue = new ObjectArrayList<>(512);
-    private final List<BatchedBoxRender> lineQuadQueue = new ObjectArrayList<>(512);
-    private final List<BatchedLineRender> lineQueue = new ObjectArrayList<>(1024);
+    private final List<CustomBuffer> quadBuffer = new ObjectArrayList<>(1024);
+    private final List<CustomBuffer> lineBuffer = new ObjectArrayList<>(1024);
+
+    private final List<BoxRender> quadQueue = new ObjectArrayList<>(512);
+    private final List<BoxRender> lineQuadQueue = new ObjectArrayList<>(512);
+    private final List<LineRender> lineQueue = new ObjectArrayList<>(1024);
+    private final List<TextRender> textQueue = new ObjectArrayList<>(512);
 
     private double deltaTime;
 
     public RenderManager()
     {
+        super("Custom Rendering");
         EventBus.INSTANCE.subscribe(this);
     }
 
     @EventListener(priority = Integer.MIN_VALUE)
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
-        flushBuffer();
+        flushBuffer(event.getTickDelta());
     }
 
     public void renderBox(MatrixStack matrixStack,
@@ -96,73 +104,135 @@ public class RenderManager
 
     public void renderBox(Consumer<BufferBuilder> consumer, boolean depth)
     {
-        startRender(depth);
-        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        consumer.accept(buffer);
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        endRender();
+        queueQuadBuffer(consumer, depth);
     }
 
     public void renderBoundingBox(Consumer<BufferBuilder> consumer, boolean depth)
     {
-        startRender(depth);
-        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        consumer.accept(buffer);
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        endRender();
+        queueLineBuffer(consumer, depth);
+    }
+
+    public void renderNametag(MatrixStack matrixStack, Vec3d pos, float scale, String text, int color)
+    {
+        if (isVisible(Box.from(pos)))
+        {
+            queueText(matrixStack, pos, text, scale, color, false);
+        }
+    }
+
+    private void queueQuadBuffer(Consumer<BufferBuilder> consumer, boolean depth)
+    {
+        quadBuffer.add(new CustomBuffer(depth, consumer));
+    }
+
+    private void queueLineBuffer(Consumer<BufferBuilder> consumer, boolean depth)
+    {
+        lineBuffer.add(new CustomBuffer(depth, consumer));
     }
 
     private void queueQuad(MatrixStack matrices, Box box, int color, boolean depth)
     {
         Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
-        quadQueue.add(new BatchedBoxRender(m, color, depth, box));
+        quadQueue.add(new BoxRender(m, color, depth, box));
     }
 
     private void queueLineQuad(MatrixStack matrices, Box box, int color, boolean depth)
     {
         Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
-        lineQuadQueue.add(new BatchedBoxRender(m, color, depth, box));
+        lineQuadQueue.add(new BoxRender(m, color, depth, box));
     }
 
     private void queueLine(MatrixStack matrices, Vec3d start, Vec3d end, int color, boolean depth)
     {
         Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
-        lineQueue.add(new BatchedLineRender(m, color, depth, start, end));
+        lineQueue.add(new LineRender(m, color, depth, start, end));
     }
 
     private void queueLinePoint(MatrixStack matrices, Vec3d point, int color, boolean depth)
     {
         Matrix4f m = new Matrix4f(matrices.peek().getPositionMatrix());
-        lineQueue.add(new BatchedLineRender(m, color, depth, point, null));
+        lineQueue.add(new LineRender(m, color, depth, point, null));
     }
 
-    public void flushBuffer()
+    private void queueText(MatrixStack matrices, Vec3d start, String text, float scale, int color, boolean depth)
     {
-        flushQuads();
-        flushLinesQuad();
-        flushLines();
+        textQueue.add(new TextRender(matrices, color, depth, start, scale, text));
+    }
+
+    public void flushBuffer(float tickDelta)
+    {
+        flushQuadsBuffer();
+        flushLinesQuadBuffer();
+        flushLinesBuffer(tickDelta);
+
+        flushTextBuffer();
+
+        flushCustomQuadBuffer();
+        flushCustomLineBuffer();
 
         quadQueue.clear();
         lineQuadQueue.clear();
         lineQueue.clear();
+
+        quadBuffer.clear();
+        lineBuffer.clear();
+        textQueue.clear();
     }
 
-    private void flushQuads()
+    private void flushCustomQuadBuffer()
+    {
+        if (quadBuffer.isEmpty())
+        {
+            return;
+        }
+
+        startRender();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        for (CustomBuffer customBuffer : quadBuffer)
+        {
+            customBuffer.consumer.accept(buffer);
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
+    private void flushCustomLineBuffer()
+    {
+        if (lineBuffer.isEmpty())
+        {
+            return;
+        }
+
+        startRender();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+
+        for (CustomBuffer customBuffer : lineBuffer)
+        {
+            customBuffer.consumer.accept(buffer);
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+        endRender();
+    }
+
+    private void flushQuadsBuffer()
     {
         if (quadQueue.isEmpty())
         {
             return;
         }
 
-        startRender(false);
+        startRender();
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
+        Vec3d camera = mc.getEntityRenderDispatcher().camera.getPos();
 
-        for (BatchedBoxRender batchedRender : quadQueue)
+        for (BoxRender batchedRender : quadQueue)
         {
             float minX = (float) (batchedRender.box.minX - camera.x);
             float minY = (float) (batchedRender.box.minY - camera.y);
@@ -201,20 +271,20 @@ public class RenderManager
         endRender();
     }
 
-    private void flushLinesQuad()
+    private void flushLinesQuadBuffer()
     {
         if (lineQuadQueue.isEmpty())
         {
             return;
         }
 
-        startRender(false);
+        startRender();
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
+        Vec3d camera = mc.getEntityRenderDispatcher().camera.getPos();
 
-        for (BatchedBoxRender batchedRender : lineQuadQueue)
+        for (BoxRender batchedRender : lineQuadQueue)
         {
             float minX = (float) (batchedRender.box.minX - camera.x);
             float minY = (float) (batchedRender.box.minY - camera.y);
@@ -253,31 +323,37 @@ public class RenderManager
         endRender();
     }
 
-    private void flushLines()
+    private void flushLinesBuffer(float tickDelta)
     {
         if (lineQueue.isEmpty())
         {
             return;
         }
 
-        startRender(false);
+        startRender();
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        Vec3d camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getPos();
 
-        for (BatchedLineRender batchedRender : lineQueue)
+        Camera camera = mc.getEntityRenderDispatcher().camera;
+
+//        MatrixStack matrixStack = new MatrixStack();
+//        float d = ((IGameRenderer) mc.gameRenderer).invokeGetFov(camera, tickDelta, false);
+//        matrixStack.multiplyPositionMatrix(mc.gameRenderer.getBasicProjectionMatrix(d));
+//
+//        RenderSystem.backupProjectionMatrix();
+
+        for (LineRender batchedRender : lineQueue)
         {
-            float x1 = (float) (batchedRender.start.x - camera.x);
-            float y1 = (float) (batchedRender.start.y - camera.y);
-            float z1 = (float) (batchedRender.start.z - camera.z);
+            float x1 = (float) (batchedRender.start.x - camera.getPos().x);
+            float y1 = (float) (batchedRender.start.y - camera.getPos().y);
+            float z1 = (float) (batchedRender.start.z - camera.getPos().z);
             buffer.vertex(batchedRender.matrix, x1, y1, z1).color(batchedRender.color);
 
             if (batchedRender.end != null)
             {
-                float x2 = (float) (batchedRender.end.x - camera.x);
-                float y2 = (float) (batchedRender.end.y - camera.y);
-                float z2 = (float) (batchedRender.end.z - camera.z);
+                float x2 = (float) (batchedRender.end.x - camera.getPos().x);
+                float y2 = (float) (batchedRender.end.y - camera.getPos().y);
+                float z2 = (float) (batchedRender.end.z - camera.getPos().z);
                 buffer.vertex(batchedRender.matrix, x2, y2, z2).color(batchedRender.color);
             }
         }
@@ -286,9 +362,14 @@ public class RenderManager
         endRender();
     }
 
-    public void renderNametag(MatrixStack matrixStack, Vec3d pos, float scale, String text, int color)
+    private void flushTextBuffer()
     {
-        EntityRenderDispatcher entityRenderer =MinecraftClient.getInstance().getEntityRenderDispatcher();
+        if (textQueue.isEmpty())
+        {
+            return;
+        }
+        
+        EntityRenderDispatcher entityRenderer = mc.getEntityRenderDispatcher();
         Camera camera = entityRenderer.camera;
 
         RenderSystem.disableDepthTest();
@@ -297,24 +378,28 @@ public class RenderManager
         RenderSystem.enablePolygonOffset();
         RenderSystem.polygonOffset(1.0f, -32500000);
 
-        float distance = (float) Math.sqrt(camera.getPos().squaredDistanceTo(pos));
-        float scaling = 0.0018f + scale * distance;
-        if (distance <= 8.0)
+        for (TextRender render : textQueue) 
         {
-            scaling = 0.0245f;
+            float distance = (float) Math.sqrt(camera.getPos().squaredDistanceTo(render.pos));
+            float scaling = 0.0018f + render.scale * distance;
+            if (distance <= 8.0)
+            {
+                scaling = 0.0245f;
+            }
+
+            Vec3d pos = render.pos.subtract(camera.getPos());
+            MatrixStack matrixStack = render.matrixStack;
+            matrixStack.push();
+            matrixStack.translate(pos);
+            matrixStack.multiply(entityRenderer.getRotation());
+            matrixStack.scale(scaling, -scaling, scaling);
+
+            float hwidth = getTextWidth(render.text) / 2.0f;
+            drawText(matrixStack, render.text, (int) -hwidth, 0, render.color);
+
+            matrixStack.pop();
         }
-
-        pos = pos.subtract(camera.getPos());
-        matrixStack.push();
-        matrixStack.translate(pos);
-        matrixStack.multiply(entityRenderer.getRotation());
-        matrixStack.scale(scaling, -scaling, scaling);
-
-        float hwidth = getTextWidth(text) / 2.0f;
-        drawText(matrixStack, text, (int) -hwidth, 0, color);
-
-        matrixStack.pop();
-
+        
         RenderSystem.disablePolygonOffset();
         RenderSystem.polygonOffset(1.0f, 32500000);
         RenderSystem.disableBlend();
@@ -370,19 +455,19 @@ public class RenderManager
             return;
         }
 
-        MinecraftClient.getInstance().textRenderer.draw(
+        mc.textRenderer.draw(
                 text,
                 x,
                 y,
                 color,
                 true,
                 matrices.peek().getPositionMatrix(),
-                MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers(),
+                mc.getBufferBuilders().getEntityVertexConsumers(),
                 TextRenderer.TextLayerType.SEE_THROUGH,
                 0,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE);
 
-        MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().draw();
+        mc.getBufferBuilders().getEntityVertexConsumers().draw();
     }
 
     public float getTextWidth(String text)
@@ -397,24 +482,17 @@ public class RenderManager
             return FontManager.FONT.getStringWidth(text);
         }
 
-        return MinecraftClient.getInstance().textRenderer.getWidth(text);
+        return mc.textRenderer.getWidth(text);
     }
 
-    private static void startRender(boolean depth)
+    private void startRender()
     {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        if (depth)
-        {
-            RenderSystem.enableDepthTest();
-        }
-        else
-        {
-            RenderSystem.disableDepthTest();
-        }
+        RenderSystem.disableDepthTest();
     }
 
-    private static void endRender()
+    private void endRender()
     {
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
@@ -422,39 +500,79 @@ public class RenderManager
 
     public boolean isVisible(Box box)
     {
-        return ((IWorldRenderer) MinecraftClient.getInstance().worldRenderer)
-                .getFrustum().isVisible(box);
+        return ((IWorldRenderer) mc.worldRenderer).getFrustum().isVisible(box);
     }
 
     @RequiredArgsConstructor
-    private static class BatchedRender
+    private class BatchedRender
     {
         public final Matrix4f matrix;
         public final int color;
         public final boolean depth;
     }
 
-    private static class BatchedBoxRender extends BatchedRender
+    private class BoxRender extends BatchedRender
     {
         public final Box box;
 
-        public BatchedBoxRender(Matrix4f matrix, int color, boolean depth, Box box)
+        public BoxRender(Matrix4f matrix,
+                         int color,
+                         boolean depth,
+                         Box box)
         {
             super(matrix, color, depth);
             this.box = box;
         }
     }
 
-    private static class BatchedLineRender extends BatchedRender
+    private class LineRender extends BatchedRender
     {
         public final Vec3d start;
         public final Vec3d end;
 
-        public BatchedLineRender(Matrix4f matrix, int color, boolean depth, Vec3d start, @Nullable Vec3d end)
+        public LineRender(Matrix4f matrix,
+                          int color,
+                          boolean depth,
+                          Vec3d start,
+                          @Nullable Vec3d end)
         {
             super(matrix, color, depth);
             this.start = start;
             this.end = end;
+        }
+    }
+
+    private class TextRender extends BatchedRender
+    {
+        private final MatrixStack matrixStack;
+        private final Vec3d pos;
+        private final float scale;
+        private final String text;
+
+        public TextRender(MatrixStack matrixStack,
+                          int color,
+                          boolean depth,
+                          Vec3d pos,
+                          float scale,
+                          String text)
+        {
+            super(new Matrix4f(matrixStack.peek().getPositionMatrix()), color, depth);
+            this.matrixStack = matrixStack;
+            this.pos = pos;
+            this.scale = scale;
+            this.text = text;
+        }
+    }
+
+    private class CustomBuffer extends BatchedRender
+    {
+        private final Consumer<BufferBuilder> consumer;
+
+        public CustomBuffer(boolean depth,
+                            Consumer<BufferBuilder> consumer)
+        {
+            super(new Matrix4f(), -1, depth);
+            this.consumer = consumer;
         }
     }
 }

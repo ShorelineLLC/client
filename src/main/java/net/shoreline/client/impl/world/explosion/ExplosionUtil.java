@@ -10,6 +10,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -82,7 +83,7 @@ public class ExplosionUtil
 
         if (entity instanceof LivingEntity livingEntity)
         {
-            damage = DamageUtil.getDamageLeft(livingEntity, damage, damageSource, getArmor(livingEntity), (float) livingEntity.getAttributeValue(EntityAttributes.ARMOR_TOUGHNESS));
+            damage = DamageUtil.getDamageLeft(livingEntity, damage, damageSource, getArmor(livingEntity), (float) getAttributeValue(livingEntity, EntityAttributes.ARMOR_TOUGHNESS));
             damage = getResistanceReduction(livingEntity, damage);
             damage = getProtectionReduction(livingEntity, damage);
         }
@@ -92,12 +93,18 @@ public class ExplosionUtil
 
     private float getArmor(LivingEntity entity)
     {
+        return (float) Math.floor(getAttributeValue(entity, EntityAttributes.ARMOR));
+    }
+
+    // TODO: Figure out why this is null
+    private double getAttributeValue(LivingEntity entity, RegistryEntry<EntityAttribute> attribute)
+    {
         try
         {
-            return (float) Math.floor(entity.getAttributeValue(EntityAttributes.ARMOR));
-        } catch (Exception ignored)
+            return entity.getAttributeValue(attribute);
+        } catch (NullPointerException ignored)
         {
-            return 0.0f;
+            return 0.0;
         }
     }
 

@@ -296,10 +296,15 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         } else if (predictPlace.getValue() != Timing.OFF)
         {
             MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-            rotations = runPrePlace(currentMine);
-            if (predictPlace.getValue() == Timing.VANILLA)
+            CrystalDataWithAngles<BlockPos> prePlaceData = runPrePlace(currentMine);
+            if (prePlaceData != null)
             {
-                placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+                currentPlace = prePlaceData.data();
+                rotations = prePlaceData.angles();
+                if (predictPlace.getValue() == Timing.VANILLA)
+                {
+                    placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+                }
             }
         }
 
@@ -391,10 +396,17 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         Hand hand = getCrystalHand();
+
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
         {
-            runPrePlace(currentMine);
-            if (currentPlace != null && packet.getPos().equals(currentPlace.getValue().up()))
+            CrystalDataWithAngles<BlockPos> prePlace = runPrePlace(currentMine);
+            if (prePlace == null)
+            {
+                return;
+            }
+
+            CrystalData<BlockPos> currentPlace = prePlace.data;
+            if (packet.getPos().equals(currentPlace.getValue().up()))
             {
                 placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
             }
@@ -407,9 +419,15 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 Entity entity = mc.world.getEntityById(id);
                 if (entity instanceof ItemEntity)
                 {
-                    runPrePlace(currentMine);
                     BlockPos pos = entity.getBlockPos();
-                    if (currentPlace != null && pos.equals(currentPlace.getValue().up()))
+                    CrystalDataWithAngles<BlockPos> prePlace = runPrePlace(currentMine);
+                    if (prePlace == null)
+                    {
+                        continue;
+                    }
+
+                    CrystalData<BlockPos> currentPlace = prePlace.data;
+                    if (pos.equals(currentPlace.getValue().up()))
                     {
                         placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
                         return;
@@ -423,9 +441,15 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             Entity entity = mc.world.getEntityById(packet.getEntityId());
             if (entity instanceof ItemEntity)
             {
-                runPrePlace(currentMine);
                 BlockPos pos = entity.getBlockPos();
-                if (currentPlace != null && pos.equals(currentPlace.getValue().up()))
+                CrystalDataWithAngles<BlockPos> prePlace = runPrePlace(currentMine);
+                if (prePlace == null)
+                {
+                    return;
+                }
+
+                CrystalData<BlockPos> currentPlace = prePlace.data;
+                if (pos.equals(currentPlace.getValue().up()))
                 {
                     placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
                 }
@@ -522,7 +546,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return rotations;
     }
 
-    private float[] runPrePlace(MiningData currentMine)
+    private CrystalDataWithAngles<BlockPos> runPrePlace(MiningData currentMine)
     {
         if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
@@ -547,7 +571,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return null;
         }
 
-        if (hasEntityBlockingCrystal(getCrystalBox(placePos), true))
+        if (hasEntityBlockingCrystal(getCrystalBox(minePos), true))
         {
             return null;
         }
@@ -569,8 +593,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             silentRotated = true;
         }
 
-        currentPlace = new CrystalData<>(placePos, crystalVec, targetState, damage, -1.0f, false);
-        return rotations;
+        CrystalData<BlockPos> currentPlace = new CrystalData<>(placePos,
+                crystalVec, targetState, damage, -1.0f, false);
+
+        return new CrystalDataWithAngles<>(currentPlace, rotations);
     }
 
     private void attackCrystal(int crystalId, Hand hand)
@@ -579,7 +605,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         StatusEffectInstance strength = mc.player.getStatusEffect(StatusEffects.STRENGTH);
 
         boolean canBreakCrystal = weakness == null || (strength != null && strength.getAmplifier() >= weakness.getAmplifier());
-        if (!canBreakCrystal && antiWeakness.getValue())
+       if (!canBreakCrystal && antiWeakness.getValue())
         {
             int slot = getAntiWeaknessSlot();
             if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))
@@ -762,7 +788,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     public boolean canUseOnBlock(BlockPos blockPos)
     {
-        return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos), false));
+        return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos.up()), false));
     }
 
     public boolean canUseOnBlock(BlockView blockView, BlockPos pos, boolean hasEntityBlockingCrystal)
@@ -809,7 +835,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     public Box getCrystalBox(BlockPos blockPos)
     {
         Box crystalBB = NetworkUtil.getServerIp().contains("crystalpvp.cc") ? HALF_CRYSTAL_BB : FULL_CRYSTAL_BB;
-        return crystalBB.offset(blockPos.up().toBottomCenterPos());
+        return crystalBB.offset(blockPos.toBottomCenterPos());
     }
 
     private Hand getCrystalHand()
@@ -853,4 +879,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         VANILLA, SEQUENTIAL, OFF
     }
+
+    private record CrystalDataWithAngles<T>(CrystalData<T> data, float[] angles) {}
 }

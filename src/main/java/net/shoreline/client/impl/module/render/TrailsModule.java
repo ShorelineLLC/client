@@ -93,7 +93,7 @@ public class TrailsModule extends ListeningToggleable
                 TimedPosition timedPosition = timedPositions.get(i);
 
                 long timeSince = System.currentTimeMillis() - timedPosition.time();
-                float factor = 1.0f - MathHelper.clamp(timeSince / (trailTime.getValue() * 100.0f), 0.0f, 1.0f);
+                float factor = 1.0f - MathHelper.clamp(timeSince / (trailTime.getValue() * 1000.0f), 0.0f, 1.0f);
                 int color = ColorUtil.withTransparency(ThemeModule.INSTANCE.getPrimaryColor(), factor);
 
                 if (i > 1)

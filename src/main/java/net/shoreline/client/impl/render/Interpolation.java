@@ -26,15 +26,18 @@ public class Interpolation
 
     public Vec3d getRenderPosition(Vec3d pos, Vec3d lastPos, float tickDelta)
     {
-        return new Vec3d(pos.x - MathHelper.lerp(tickDelta, lastPos.x, pos.x),
-                pos.y - MathHelper.lerp(tickDelta, lastPos.y, pos.y),
-                pos.z - MathHelper.lerp(tickDelta, lastPos.z, pos.z));
+        return pos.subtract(MathHelper.lerp(tickDelta, lastPos.x, pos.x),
+                MathHelper.lerp(tickDelta, lastPos.y, pos.y),
+                MathHelper.lerp(tickDelta, lastPos.z, pos.z));
     }
 
     public Box getEntityRenderBox(Entity entity, float tickDelta)
     {
         Box box = entity.getBoundingBox();
-        Box lastBox = box.offset(entity.prevX - entity.getX(), entity.prevY - entity.getY(), entity.prevZ - entity.getZ());
+        Box lastBox = box.offset(entity.prevX - entity.getX(),
+                entity.prevY - entity.getY(),
+                entity.prevZ - entity.getZ());
+
         return getRenderBox(box, lastBox, tickDelta);
     }
 
