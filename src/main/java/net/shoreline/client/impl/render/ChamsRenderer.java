@@ -107,27 +107,25 @@ public enum ChamsRenderer
                 Vec3d camera = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
                 if ((chams == CHAMS || chams == BOTH))
                 {
-                    Managers.RENDER.renderBox(buffer ->
-                    {
-                        buffer.vertex(matrix, (float) (position.getX() + xs[0] - camera.getX()), (float) (position.getY() + ys[0] - camera.getY()), (float) (position.getZ() + zs[0] - camera.getZ())).color(color);
-                        buffer.vertex(matrix, (float) (position.getX() + xs[1] - camera.getX()), (float) (position.getY() + ys[1] - camera.getY()), (float) (position.getZ() + zs[1] - camera.getZ())).color(color);
-                        buffer.vertex(matrix, (float) (position.getX() + xs[2] - camera.getX()), (float) (position.getY() + ys[2] - camera.getY()), (float) (position.getZ() + zs[2] - camera.getZ())).color(color);
-                        buffer.vertex(matrix, (float) (position.getX() + xs[3] - camera.getX()), (float) (position.getY() + ys[3] - camera.getY()), (float) (position.getZ() + zs[3] - camera.getZ())).color(color);
-                    }, !throughWalls);
+                    Mesh mesh = new Mesh(Layers.QUADS, matrix);
+                    mesh.vertex(position.getX() + xs[0] - camera.getX(), position.getY() + ys[0] - camera.getY(), position.getZ() + zs[0] - camera.getZ(), color);
+                    mesh.vertex(position.getX() + xs[1] - camera.getX(), position.getY() + ys[1] - camera.getY(), position.getZ() + zs[1] - camera.getZ(), color);
+                    mesh.vertex(position.getX() + xs[2] - camera.getX(), position.getY() + ys[2] - camera.getY(), position.getZ() + zs[2] - camera.getZ(), color);
+                    mesh.vertex(position.getX() + xs[3] - camera.getX(), position.getY() + ys[3] - camera.getY(), position.getZ() + zs[3] - camera.getZ(), color);
+                    Managers.RENDER.queueMesh(mesh);
                 }
 
                 if ((chams == WIREFRAME || chams == BOTH))
                 {
-                    Managers.RENDER.renderBoundingBox(buffer ->
-                    {
-                        int lineColor = ColorUtil.withTransparency(color, 0.75f);
-                        buffer.vertex(matrix, (float) (position.x + xs[0] - camera.getX()), (float) (position.y + ys[0] - camera.getY()), (float) (position.z + zs[0] - camera.getZ())).color(lineColor);
-                        buffer.vertex(matrix, (float) (position.x + xs[1] - camera.getX()), (float) (position.y + ys[1] - camera.getY()), (float) (position.z + zs[1] - camera.getZ())).color(lineColor);
-                        buffer.vertex(matrix, (float) (position.x + xs[1] - camera.getX()), (float) (position.y + ys[1] - camera.getY()), (float) (position.z + zs[1] - camera.getZ())).color(lineColor);
-                        buffer.vertex(matrix, (float) (position.x + xs[2] - camera.getX()), (float) (position.y + ys[2] - camera.getY()), (float) (position.z + zs[2] - camera.getZ())).color(lineColor);
-                        buffer.vertex(matrix, (float) (position.x + xs[2] - camera.getX()), (float) (position.y + ys[2] - camera.getY()), (float) (position.z + zs[2] - camera.getZ())).color(lineColor);
-                        buffer.vertex(matrix, (float) (position.x + xs[3] - camera.getX()), (float) (position.y + ys[3] - camera.getY()), (float) (position.z + zs[3] - camera.getZ())).color(lineColor);
-                    }, !throughWalls);
+                    int lineColor = ColorUtil.withTransparency(color, 0.75f);
+                    Mesh mesh = new Mesh(RenderLayer.getDebugLineStrip(1.5f), matrix);
+                    mesh.vertex(position.x + xs[0] - camera.getX(), position.y + ys[0] - camera.getY(), position.z + zs[0] - camera.getZ(), lineColor);
+                    mesh.vertex(position.x + xs[1] - camera.getX(), position.y + ys[1] - camera.getY(), position.z + zs[1] - camera.getZ(), lineColor);
+                    mesh.vertex(position.x + xs[1] - camera.getX(), position.y + ys[1] - camera.getY(), position.z + zs[1] - camera.getZ(), lineColor);
+                    mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
+                    mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
+                    mesh.vertex(position.x + xs[3] - camera.getX(), position.y + ys[3] - camera.getY(), position.z + zs[3] - camera.getZ(), lineColor);
+                    Managers.RENDER.queueMesh(mesh);
                 }
 
                 i = 0;

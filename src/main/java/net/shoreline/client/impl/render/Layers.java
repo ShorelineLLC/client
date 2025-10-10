@@ -26,6 +26,23 @@ public class Layers
                     .cull(RenderPhase.Cull.DISABLE_CULLING)
                     .build(false));
 
+    public static final RenderLayer.MultiPhase QUADS = RenderLayer.of(
+            "shoreline_quads", VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS, 1536, false, true,
+            RenderLayer.MultiPhaseParameters.builder()
+                    .program(RenderPhase.POSITION_COLOR_PROGRAM)
+                    .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                    .depthTest(RenderPhase.DepthTest.ALWAYS_DEPTH_TEST)
+                    .build(false));
+
+    public static final RenderLayer.MultiPhase LINES = RenderLayer.of(
+            "shoreline_lines", VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.DEBUG_LINES, 1536, false, true,
+            RenderLayer.MultiPhaseParameters.builder()
+                    .program(RenderPhase.POSITION_COLOR_PROGRAM)
+                    .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                    .depthTest(RenderPhase.DepthTest.ALWAYS_DEPTH_TEST)
+                    .cull(RenderPhase.Cull.DISABLE_CULLING)
+                    .build(false));
+
     public static final BiFunction<Identifier, Boolean, RenderLayer> ENTITY = Util.memoize((texture, affectsOutline) ->
     {
         RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder()

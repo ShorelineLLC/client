@@ -28,15 +28,18 @@ import net.shoreline.eventbus.annotation.EventListener;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Getter
 @Setter
 public class RenderManager extends GenericFeature
 {
-    private final List<CustomBuffer> quadBuffer = new ObjectArrayList<>(1024);
-    private final List<CustomBuffer> lineBuffer = new ObjectArrayList<>(1024);
+    private final List<Mesh> meshQueue = new ObjectArrayList<>(1024);
 
     private final List<BoxRender> quadQueue = new ObjectArrayList<>(512);
     private final List<BoxRender> lineQuadQueue = new ObjectArrayList<>(512);
@@ -102,16 +105,6 @@ public class RenderManager extends GenericFeature
         }
     }
 
-    public void renderBox(Consumer<BufferBuilder> consumer, boolean depth)
-    {
-        queueQuadBuffer(consumer, depth);
-    }
-
-    public void renderBoundingBox(Consumer<BufferBuilder> consumer, boolean depth)
-    {
-        queueLineBuffer(consumer, depth);
-    }
-
     public void renderNametag(MatrixStack matrixStack, Vec3d pos, float scale, String text, int color)
     {
         if (isVisible(Box.from(pos)))
@@ -120,14 +113,9 @@ public class RenderManager extends GenericFeature
         }
     }
 
-    private void queueQuadBuffer(Consumer<BufferBuilder> consumer, boolean depth)
+    public void queueMesh(Mesh mesh)
     {
-        quadBuffer.add(new CustomBuffer(depth, consumer));
-    }
-
-    private void queueLineBuffer(Consumer<BufferBuilder> consumer, boolean depth)
-    {
-        lineBuffer.add(new CustomBuffer(depth, consumer));
+        meshQueue.add(mesh);
     }
 
     private void queueQuad(MatrixStack matrices, Box box, int color, boolean depth)
@@ -166,57 +154,27 @@ public class RenderManager extends GenericFeature
         flushLinesBuffer(tickDelta);
 
         flushTextBuffer();
-
-        flushCustomQuadBuffer();
-        flushCustomLineBuffer();
+        flushMeshes();
 
         quadQueue.clear();
         lineQuadQueue.clear();
         lineQueue.clear();
 
-        quadBuffer.clear();
-        lineBuffer.clear();
+        meshQueue.clear();
         textQueue.clear();
     }
 
-    private void flushCustomQuadBuffer()
+    private void flushMeshes()
     {
-        if (quadBuffer.isEmpty())
+        if (meshQueue.isEmpty())
         {
             return;
         }
 
-        startRender();
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        for (CustomBuffer customBuffer : quadBuffer)
+        for (Mesh mesh : meshQueue)
         {
-            customBuffer.consumer.accept(buffer);
+            mesh.flushVertices(mc.getBufferBuilders().getEntityVertexConsumers());
         }
-
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        endRender();
-    }
-
-    private void flushCustomLineBuffer()
-    {
-        if (lineBuffer.isEmpty())
-        {
-            return;
-        }
-
-        startRender();
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-
-        for (CustomBuffer customBuffer : lineBuffer)
-        {
-            customBuffer.consumer.accept(buffer);
-        }
-
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        endRender();
     }
 
     private void flushQuadsBuffer()
@@ -561,18 +519,6 @@ public class RenderManager extends GenericFeature
             this.pos = pos;
             this.scale = scale;
             this.text = text;
-        }
-    }
-
-    private class CustomBuffer extends BatchedRender
-    {
-        private final Consumer<BufferBuilder> consumer;
-
-        public CustomBuffer(boolean depth,
-                            Consumer<BufferBuilder> consumer)
-        {
-            super(new Matrix4f(), -1, depth);
-            this.consumer = consumer;
         }
     }
 }
