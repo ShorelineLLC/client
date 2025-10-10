@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EndCrystalItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -38,6 +39,7 @@ import net.shoreline.client.impl.inventory.SwapHandler;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
+import net.shoreline.client.impl.module.combat.crystal.CrystalOptimizer;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkUtil;
@@ -56,6 +58,7 @@ import net.shoreline.client.util.math.PerSecond;
 import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -190,6 +193,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private static final Box FULL_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 2.0, 0.5);
     private static final Box HALF_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 1.0, 0.5);
 
+    private final CrystalOptimizer optimizer = new CrystalOptimizer();
+
     private CrystalData<EntityState> currentAttack;
     private CrystalData<BlockPos> currentPlace;
 
@@ -197,6 +202,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private final Timer attackTimer = new NanoTimer();
 
     private final ConcurrentMap<Integer, Long> attackPackets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Entity, Long> attacksOnThread = new ConcurrentHashMap<>();
+
     private final ConcurrentMap<Interaction, Long> placePackets = new ConcurrentHashMap<>();
     private final AtomicInteger crystalsPlaced = new AtomicInteger();
 
@@ -513,8 +520,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (breakDelay.getValue() == 0 || attackTimer.hasPassed(breakDelay.getValue()))
         {
-            attackCrystal(crystalState.getId(), hand);
-            crystalState.getEntity().remove(Entity.RemovalReason.KILLED);
+            EndCrystalEntity crystalEntity = (EndCrystalEntity) crystalState.getEntity();
+            attackCrystal(crystalEntity, hand);
 
             attackTimer.reset();
         }
@@ -599,13 +606,19 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return new CrystalDataWithAngles<>(currentPlace, rotations);
     }
 
+    private void attackCrystal(EndCrystalEntity crystal, Hand hand)
+    {
+        attackCrystal(crystal.getId(), hand);
+        optimizer.setDead(crystal);
+    }
+
     private void attackCrystal(int crystalId, Hand hand)
     {
         StatusEffectInstance weakness = mc.player.getStatusEffect(StatusEffects.WEAKNESS);
         StatusEffectInstance strength = mc.player.getStatusEffect(StatusEffects.STRENGTH);
 
         boolean canBreakCrystal = weakness == null || (strength != null && strength.getAmplifier() >= weakness.getAmplifier());
-       if (!canBreakCrystal && antiWeakness.getValue())
+        if (!canBreakCrystal && antiWeakness.getValue())
         {
             int slot = getAntiWeaknessSlot();
             if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))

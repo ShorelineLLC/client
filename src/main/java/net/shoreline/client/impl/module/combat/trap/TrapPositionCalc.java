@@ -95,7 +95,7 @@ public class TrapPositionCalc
     {
         for (BlockPos blockPos : trapPositions.keySet())
         {
-            if (Managers.MINING.getMiningDamage(blockPos) < 0.7f)
+            if (Managers.MINING.getMiningProgress(blockPos) < 0.5f)
             {
                 continue;
             }

@@ -1,12 +1,10 @@
 package net.shoreline.client.impl.render;
 
-import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
@@ -20,7 +18,6 @@ import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.imixin.IDrawContext;
-import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.eventbus.EventBus;
@@ -409,7 +406,7 @@ public class RenderManager extends GenericFeature
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            FontManager.FONT.drawStringWithShadow(matrices, text, x, y, color);
+            FontManager.FONT_RENDERER.drawStringWithShadow(matrices, text, x, y, color);
             return;
         }
 
@@ -437,7 +434,7 @@ public class RenderManager extends GenericFeature
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            return FontManager.FONT.getStringWidth(text);
+            return FontManager.FONT_RENDERER.getStringWidth(text);
         }
 
         return mc.textRenderer.getWidth(text);

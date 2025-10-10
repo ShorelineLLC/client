@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
@@ -111,7 +112,7 @@ public class AutoTrapModule extends TrapModule
                         extrapolateTicks.getValue(),
                         false);
 
-        final Box playerBox = trapTarget.getBoundingBox(trapTarget.getPose()).offset(targetPos);
+        final Box playerBox = trapTarget.getBoundingBox(EntityPose.STANDING).offset(targetPos);
         Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
 
         EnumSet<TrapLayer> layers = EnumSet.noneOf(TrapLayer.class);
@@ -143,10 +144,12 @@ public class AutoTrapModule extends TrapModule
                 continue;
             }
 
-            if (!mc.world.getBlockState(blockPos).isReplaceable()
-                    && Managers.MINING.getMiningProgress(blockPos) < 0.7f)
+            if (!mc.world.getBlockState(blockPos).isReplaceable())
             {
-                continue;
+                if (!instantReplace.getValue() || Managers.MINING.getMiningProgress(blockPos) < 0.5f)
+                {
+                    continue;
+                }
             }
 
             if (!Managers.INTERACT.canPlaceBlock(blockPos, getCurrentObbyBlock()))

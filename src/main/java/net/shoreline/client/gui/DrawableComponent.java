@@ -3,13 +3,10 @@ package net.shoreline.client.gui;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.FontModule;
-import org.joml.Matrix4f;
 
 public abstract class DrawableComponent
 {
@@ -67,7 +64,7 @@ public abstract class DrawableComponent
 
         if (FontModule.INSTANCE.isEnabled())
         {
-            FontManager.FONT.drawStringWithShadow(context, text, x, y, color);
+            FontManager.FONT_RENDERER.drawStringWithShadow(context, text, x, y, color);
             return;
         }
 
@@ -92,7 +89,7 @@ public abstract class DrawableComponent
         }
 
         return FontModule.INSTANCE.isEnabled()
-                ? FontManager.FONT.getStringWidth(text)
+                ? FontManager.FONT_RENDERER.getStringWidth(text)
                 : mc.textRenderer.getWidth(text);
     }
 }

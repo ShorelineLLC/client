@@ -1,26 +1,34 @@
 package net.shoreline.client.api.font;
 
-import net.minecraft.util.Identifier;
-
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FontManager
 {
-    public static FontRenderer FONT;
+    private static final Map<String, FontRenderer> AVAILABLE_FONTS = new HashMap<>();
+
+    public static FontRenderer FONT_RENDERER;
 
     public static void init()
     {
-        FONT = fromResource("/assets/shoreline/font/verdana.ttf", 9.5f);
+        for (Fonts f : Fonts.values())
+        {
+            AVAILABLE_FONTS.put(f.getName(), new FontRenderer(f.getName(), f.getSize()));
+        }
+
+        FONT_RENDERER = fromSystem("Verdana");
     }
 
-    public void loadFont(Identifier identifier)
+    public static void setFont(FontRenderer fontRenderer)
     {
+        FONT_RENDERER = fontRenderer;
+    }
 
+    public static FontRenderer fromSystem(String name)
+    {
+        return AVAILABLE_FONTS.get(name);
     }
 
     public static FontRenderer fromResource(String resPath, float pxHeight)

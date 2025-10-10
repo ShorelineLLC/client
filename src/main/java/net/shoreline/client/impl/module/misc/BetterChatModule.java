@@ -72,14 +72,14 @@ public class BetterChatModule extends Toggleable
 
             boolean overrideFont = FontModule.INSTANCE.getOverrideChat().getValue();
             double factor = Easing.EXPO_IN_OUT.ease(anim.getFactor());
-            int width = overrideFont ? FontManager.FONT.getStringWidth(event.getString()) : mc.textRenderer.getWidth(event.getText());
+            int width = overrideFont ? FontManager.FONT_RENDERER.getStringWidth(event.getString()) : mc.textRenderer.getWidth(event.getText());
             int renderX = (int) (event.getX() - (width * (1.0f - factor)));
             int color = ColorUtil.withTransparency(Colors.WHITE, (event.getU() / 255.0f) * (float) factor);
 
             event.cancel();
             if (overrideFont)
             {
-                FontManager.FONT.drawStringWithShadow(event.getContext().getMatrices(), event.getString(), renderX, event.getY(), color);
+                FontManager.FONT_RENDERER.drawStringWithShadow(event.getContext().getMatrices(), event.getString(), renderX, event.getY(), color);
             } else
             {
                 event.getContext().drawTextWithShadow(mc.textRenderer, event.getText(), renderX, event.getY(), color);

@@ -1,8 +1,11 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
@@ -16,6 +19,10 @@ import net.shoreline.eventbus.annotation.EventListener;
 
 public class FakePlayerModule extends Toggleable
 {
+    Config<Boolean> crawlingPose = new BooleanConfig.Builder("Crawling")
+            .setDescription("Sets the player in the crawling pose")
+            .setDefaultValue(false).build();
+
     private DamageableFakePlayer fakePlayer;
 
     private final Timer gappleTimer = new NanoTimer();
@@ -58,6 +65,7 @@ public class FakePlayerModule extends Toggleable
             return;
         }
 
+        fakePlayer.setPose(crawlingPose.getValue() ? EntityPose.SWIMMING : EntityPose.STANDING);
         fakePlayer.baseTick();
         if (gappleTimer.hasPassed(1600))
         {
