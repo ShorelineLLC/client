@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
+import lombok.Getter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.Monster;
@@ -14,12 +15,18 @@ import net.shoreline.client.impl.render.ChamsRenderer;
 
 import java.awt.*;
 
+@Getter
 public class ChamsModule extends Toggleable
 {
     private static ChamsModule INSTANCE;
     public Config<ChamsRenderer> mode = new EnumConfig.Builder<ChamsRenderer>("Mode")
             .setValues(ChamsRenderer.values())
             .setDefaultValue(ChamsRenderer.CHAMS).build();
+    public Config<ChamsLayering> layeringConfig = new EnumConfig.Builder<ChamsLayering>("Layering")
+            .setValues(ChamsLayering.values())
+            .setDefaultValue(ChamsLayering.TOP).build();
+    public Config<Boolean> extraLayer = new BooleanConfig.Builder("ExtraLayer")
+            .setDefaultValue(true).build();
     public Config<Boolean> renderPlayers = new BooleanConfig.Builder("Players")
             .setDescription("Render players").setDefaultValue(true).build();
     public Config<Boolean> renderHostiles = new BooleanConfig.Builder("Hostiles")
@@ -84,5 +91,11 @@ public class ChamsModule extends Toggleable
     public float getScale()
     {
         return scale.getValue();
+    }
+
+    public enum ChamsLayering
+    {
+        TOP,
+        BOTTOM
     }
 }

@@ -125,7 +125,10 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
             if (ChamsModule.getInstance().shine.getValue())
             {
                 Layers.QUADS_GLINT.startDrawing();
-                VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, Layers.QUADS_GLINT, true);
+                VertexConsumerProvider provider = ChamsModule.getInstance().layeringConfig.getValue() == ChamsModule.ChamsLayering.TOP
+                        ? MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers()
+                        : vertexConsumerProvider;
+                VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
                 model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, 1.0f));
                 Layers.QUADS_GLINT.endDrawing();
             }
