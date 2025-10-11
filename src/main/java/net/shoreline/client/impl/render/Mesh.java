@@ -1,10 +1,12 @@
 package net.shoreline.client.impl.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
+import net.shoreline.client.impl.imixin.IGameRenderer;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -17,6 +19,11 @@ public class Mesh
     private final RenderLayer layer;
     private final Matrix4f matrix;
     private List<Vertex> vertices;
+
+    public Mesh(RenderLayer renderLayer)
+    {
+        this(renderLayer, null);
+    }
 
     public Mesh(RenderLayer renderLayer, Matrix4f matrix)
     {
@@ -37,8 +44,17 @@ public class Mesh
         {
             consumer.vertex(matrix, vertex.getX(), vertex.getY(), vertex.getZ()).color(vertex.getColor());
         }
+    }
 
-        provider.draw(layer);
+    public BuiltBuffer getBuiltBuffer()
+    {
+        BufferBuilder builder = Tessellator.getInstance().begin(layer.getDrawMode(), layer.getVertexFormat());
+        for (Vertex vertex : vertices)
+        {
+            builder.vertex(vertex.getX(), vertex.getY(), vertex.getZ()).color(vertex.getColor());
+        }
+
+        return builder.end();
     }
 
     public void vertex(double x, double y, double z, int color)

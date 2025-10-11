@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TriState;
 import net.minecraft.util.Util;
 
+import java.util.OptionalDouble;
 import java.util.function.BiFunction;
 
 public class Layers
@@ -32,6 +33,7 @@ public class Layers
                     .program(RenderPhase.POSITION_COLOR_PROGRAM)
                     .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
                     .depthTest(RenderPhase.DepthTest.ALWAYS_DEPTH_TEST)
+                    .cull(RenderPhase.DISABLE_CULLING)
                     .build(false));
 
     public static final RenderLayer.MultiPhase LINES = RenderLayer.of(
@@ -39,6 +41,7 @@ public class Layers
             RenderLayer.MultiPhaseParameters.builder()
                     .program(RenderPhase.POSITION_COLOR_PROGRAM)
                     .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                    .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1.5)))
                     .depthTest(RenderPhase.DepthTest.ALWAYS_DEPTH_TEST)
                     .cull(RenderPhase.Cull.DISABLE_CULLING)
                     .build(false));

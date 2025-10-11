@@ -25,10 +25,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -36,7 +33,7 @@ import java.util.function.Consumer;
 @Setter
 public class RenderManager extends GenericFeature
 {
-    private final List<Mesh> meshQueue = new ObjectArrayList<>(1024);
+    private final List<Mesh> meshQueue = new ArrayList<>(1024);
 
     private final List<BoxRender> quadQueue = new ObjectArrayList<>(512);
     private final List<BoxRender> lineQuadQueue = new ObjectArrayList<>(512);
@@ -170,7 +167,7 @@ public class RenderManager extends GenericFeature
 
         for (Mesh mesh : meshQueue)
         {
-            mesh.flushVertices(mc.getBufferBuilders().getEntityVertexConsumers());
+            mesh.flushVertices(mc.getBufferBuilders().getEffectVertexConsumers());
         }
     }
 

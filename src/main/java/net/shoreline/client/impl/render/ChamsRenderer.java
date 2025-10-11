@@ -1,9 +1,7 @@
 package net.shoreline.client.impl.render;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
@@ -14,11 +12,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.imixin.IEndCrystalEntityRenderer;
-import net.shoreline.client.impl.imixin.ILivingEntityRenderer;
-import net.shoreline.client.impl.imixin.IMultiPhase;
-import net.shoreline.client.impl.imixin.IMultiPhaseParameters;
+import net.shoreline.client.impl.imixin.*;
 import org.joml.Matrix4f;
+
+import java.awt.*;
 
 public enum ChamsRenderer
 {
@@ -52,7 +49,6 @@ public enum ChamsRenderer
 
         EntityRenderer<?, ?> renderer = MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity);
         EntityRenderState renderState = ((EntityRenderer<Entity, EntityRenderState>) renderer).getAndUpdateRenderState(entity, tickDelta);
-        matrices.push();
         if (renderer instanceof LivingEntityRenderer livingEntityRenderer && renderState instanceof LivingEntityRenderState state)
         {
             ((ILivingEntityRenderer) livingEntityRenderer).skipShineRendering(true);
@@ -66,8 +62,6 @@ public enum ChamsRenderer
             crystalRenderer.render(state, matrices, CustomVertexConsumerProvider.INSTANCE, 15);
             ((IEndCrystalEntityRenderer) crystalRenderer).skipShineRendering(false);
         }
-
-        matrices.pop();
     }
 
     private static class CustomVertexConsumerProvider implements VertexConsumerProvider
@@ -112,20 +106,20 @@ public enum ChamsRenderer
                     mesh.vertex(position.getX() + xs[1] - camera.getX(), position.getY() + ys[1] - camera.getY(), position.getZ() + zs[1] - camera.getZ(), color);
                     mesh.vertex(position.getX() + xs[2] - camera.getX(), position.getY() + ys[2] - camera.getY(), position.getZ() + zs[2] - camera.getZ(), color);
                     mesh.vertex(position.getX() + xs[3] - camera.getX(), position.getY() + ys[3] - camera.getY(), position.getZ() + zs[3] - camera.getZ(), color);
-                    mesh.flushVertices(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers());
+                    Managers.RENDER.queueMesh(mesh);
                 }
 
                 if ((chams == WIREFRAME || chams == BOTH))
                 {
-                    int lineColor = ColorUtil.withTransparency(color, 0.75f);
-                    Mesh mesh = new Mesh(RenderLayer.getDebugLineStrip(1.5f), matrix);
+                    int lineColor = (color & 0x00FFFFFF) | 0xFF000000;
+                    Mesh mesh = new Mesh(Layers.LINES, matrix);
                     mesh.vertex(position.x + xs[0] - camera.getX(), position.y + ys[0] - camera.getY(), position.z + zs[0] - camera.getZ(), lineColor);
                     mesh.vertex(position.x + xs[1] - camera.getX(), position.y + ys[1] - camera.getY(), position.z + zs[1] - camera.getZ(), lineColor);
                     mesh.vertex(position.x + xs[1] - camera.getX(), position.y + ys[1] - camera.getY(), position.z + zs[1] - camera.getZ(), lineColor);
                     mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
                     mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
                     mesh.vertex(position.x + xs[3] - camera.getX(), position.y + ys[3] - camera.getY(), position.z + zs[3] - camera.getZ(), lineColor);
-                    mesh.flushVertices(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers());
+                    Managers.RENDER.queueMesh(mesh);
                 }
 
                 i = 0;
