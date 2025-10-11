@@ -19,12 +19,9 @@ import java.awt.*;
 public class ChamsModule extends Toggleable
 {
     private static ChamsModule INSTANCE;
-    public Config<ChamsRenderer> mode = new EnumConfig.Builder<ChamsRenderer>("Mode")
-            .setValues(ChamsRenderer.values())
-            .setDefaultValue(ChamsRenderer.CHAMS).build();
-    public Config<ChamsLayering> layeringConfig = new EnumConfig.Builder<ChamsLayering>("Layering")
-            .setValues(ChamsLayering.values())
-            .setDefaultValue(ChamsLayering.TOP).build();
+    public Config<ChamsMode> mode = new EnumConfig.Builder<ChamsMode>("Mode")
+            .setValues(ChamsMode.values())
+            .setDefaultValue(ChamsMode.CHAMS).build();
     public Config<Boolean> extraLayer = new BooleanConfig.Builder("ExtraLayer")
             .setDefaultValue(true).build();
     public Config<Boolean> renderPlayers = new BooleanConfig.Builder("Players")
@@ -39,19 +36,19 @@ public class ChamsModule extends Toggleable
             .addAll(renderPlayers, renderHostiles, renderPassives, renderCrystals).build();
     public Config<Boolean> throughWalls = new BooleanConfig.Builder("ThroughWalls")
             .setDefaultValue(true).build();
-    public Config<Boolean> shine = new BooleanConfig.Builder("Shine")
-            .setDefaultValue(false).build();
     public Config<Float> scale = new NumberConfig.Builder<Float>("Scale")
             .setMin(0.1f).setMax(2.0f).setDefaultValue(1.0f)
-            .setVisible(shine::getValue).build();
+            .setVisible(() -> mode.getValue() == ChamsMode.SHINE).build();
     public Config<Float> speed = new NumberConfig.Builder<Float>("Speed")
             .setMin(0.0f).setMax(1.0f).setDefaultValue(0.5f)
-            .setVisible(shine::getValue).build();
-    public Config<Boolean> xqz = new BooleanConfig.Builder("XQZ")
+            .setVisible(() -> mode.getValue() == ChamsMode.SHINE).build();
+    public Config<Boolean> model = new BooleanConfig.Builder("Model")
+            .setVisible(() -> mode.getValue() == ChamsMode.SHINE)
             .setDefaultValue(false).build();
-    public Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
+    public Config<Float> opacityConfig = new NumberConfig.Builder<Float>("Opacity")
             .setMin(0.0f).setMax(1.0f).setDefaultValue(1.0f)
-            .setVisible(xqz::getValue).build();
+            .setVisible(() -> mode.getValue() == ChamsMode.SHINE && model.getValue()
+                    || mode.getValue() == ChamsMode.XQZ).build();
     public Config<Color> color = new ColorConfig.Builder("Color")
             .setRgb(0xFFFFFFFF).setTransparency(true).build();
 
@@ -59,6 +56,20 @@ public class ChamsModule extends Toggleable
     {
         super("Chams", "Renders entity models through walls", GuiCategory.RENDER);
         INSTANCE = this;
+    }
+
+    public float getOpacity()
+    {
+        if (mode.getValue() == ChamsMode.XQZ)
+        {
+            return opacityConfig.getValue();
+        }
+        else if (mode.getValue() == ChamsMode.SHINE && model.getValue())
+        {
+            return opacityConfig.getValue();
+        }
+
+        return 0.0f;
     }
 
     public boolean isValid(Entity entity)
@@ -93,9 +104,20 @@ public class ChamsModule extends Toggleable
         return scale.getValue();
     }
 
-    public enum ChamsLayering
+    @Getter
+    public enum ChamsMode
     {
-        TOP,
-        BOTTOM
+        NONE(ChamsRenderer.NONE),
+        XQZ(ChamsRenderer.NONE),
+        CHAMS(ChamsRenderer.CHAMS),
+        WIRECHAMS(ChamsRenderer.BOTH),
+        SHINE(ChamsRenderer.NONE);
+
+        public final ChamsRenderer renderer;
+
+        ChamsMode(ChamsRenderer renderer)
+        {
+            this.renderer = renderer;
+        }
     }
 }

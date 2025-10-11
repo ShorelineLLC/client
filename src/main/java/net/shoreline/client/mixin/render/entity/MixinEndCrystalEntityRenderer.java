@@ -12,7 +12,6 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.impl.imixin.IEndCrystalEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
 import net.shoreline.client.impl.module.render.ChamsModule;
 import net.shoreline.client.impl.module.render.CrystalModelModule;
@@ -26,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EndCrystalEntityRenderer.class)
-public class MixinEndCrystalEntityRenderer implements IEndCrystalEntityRenderer
+public class MixinEndCrystalEntityRenderer
 {
     @Mutable
     @Shadow
@@ -46,15 +45,6 @@ public class MixinEndCrystalEntityRenderer implements IEndCrystalEntityRenderer
 
     @Unique
     private static final Identifier BLANK = Identifier.of("shoreline", "textures/blank.png");
-
-    @Unique
-    private boolean skip = false;
-
-    @Override
-    public void skipShineRendering(boolean skip)
-    {
-        this.skip = skip;
-    }
 
     @Inject(
             method = "updateRenderState(Lnet/minecraft/entity/decoration/EndCrystalEntity;" +
@@ -82,9 +72,11 @@ public class MixinEndCrystalEntityRenderer implements IEndCrystalEntityRenderer
                                     int i,
                                     CallbackInfo info)
     {
-        if (ChamsModule.getInstance().isEnabled() && ChamsModule.getInstance().xqz.getValue() && ChamsModule.getInstance().isValid(last))
+        if (ChamsModule.getInstance().isEnabled()
+                && (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.XQZ)
+                && ChamsModule.getInstance().isValid(last))
         {
-            END_CRYSTAL = Layers.ENTITY.apply(ChamsModule.getInstance().opacity.getValue() == 0.0f ? BLANK : TEXTURE, true);
+            END_CRYSTAL = Layers.ENTITY.apply(ChamsModule.getInstance().getOpacity() == 0.0f ? BLANK : TEXTURE, true);
             return;
         }
 
@@ -102,7 +94,7 @@ public class MixinEndCrystalEntityRenderer implements IEndCrystalEntityRenderer
                     shift = At.Shift.AFTER))
     private void setAnglesHook(EndCrystalEntityRenderState endCrystalEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo info)
     {
-        if (skip)
+        if (ChamsRenderer.rendering)
         {
             return;
         }
@@ -112,21 +104,18 @@ public class MixinEndCrystalEntityRenderer implements IEndCrystalEntityRenderer
         if (ChamsModule.getInstance().isEnabled() && valid)
         {
             int color = ChamsModule.getInstance().color.getValue().getRGB();
-            if (ChamsModule.getInstance().shine.getValue())
+            if (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
             {
                 Layers.QUADS_GLINT.startDrawing();
-                VertexConsumerProvider provider = ChamsModule.getInstance().layeringConfig.getValue() == ChamsModule.ChamsLayering.TOP
-                        ? MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers()
-                        : vertexConsumerProvider;
-
+                VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
                 model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, 1.0f));
                 Layers.QUADS_GLINT.endDrawing();
             }
 
-            ChamsRenderer mode = ChamsModule.getInstance().mode.getValue();
+            ChamsRenderer renderer = ChamsModule.getInstance().mode.getValue().getRenderer();
             float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
-            ChamsRenderer.render(mode, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
+            ChamsRenderer.render(renderer, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
         }
     }
 

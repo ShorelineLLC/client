@@ -12,19 +12,13 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.Direction;
-import net.shoreline.client.impl.imixin.ILivingEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
-import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.render.ChamsModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Layers;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.awt.*;
@@ -41,7 +34,6 @@ import java.awt.*;
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
         S extends LivingEntityRenderState,
         M extends EntityModel<? super S>>
-    implements ILivingEntityRenderer
 {
     @Shadow
     public abstract Identifier getTexture(S state);
@@ -54,15 +46,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
 
     @Unique
     protected LivingEntity last;
-
-    @Unique
-    protected boolean skip;
-
-    @Override
-    public void skipShineRendering(boolean skip)
-    {
-        this.skip = skip;
-    }
 
     @Inject(
             method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;" +
@@ -77,7 +60,9 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
     private RenderLayer getRenderLayerHook(RenderLayer original, @Local(argsOnly = true) S state, @Local(ordinal = 2, argsOnly = true) boolean showOutline)
     {
         Identifier identifier = this.getTexture(state);
-        if (ChamsModule.getInstance().isEnabled() && ChamsModule.getInstance().xqz.getValue() && ChamsModule.getInstance().isValid(last))
+        if (ChamsModule.getInstance().isEnabled()
+                && ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.XQZ
+                && ChamsModule.getInstance().isValid(last))
         {
             return Layers.ENTITY.apply(identifier, true);
         }
@@ -95,9 +80,9 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                             "Lnet/minecraft/client/render/VertexConsumer;III)V"))
     private void renderHook(Args args, S livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
     {
-        if (ChamsModule.getInstance().isEnabled() && ChamsModule.getInstance().xqz.getValue() && ChamsModule.getInstance().isValid(last))
+        if (ChamsModule.getInstance().isEnabled() && ChamsModule.getInstance().getOpacity() != 1.0f && ChamsModule.getInstance().isValid(last))
         {
-            int alpha = (int) (ChamsModule.getInstance().opacity.getValue() * 255.0f);
+            int alpha = (int) (ChamsModule.getInstance().getOpacity() * 255.0f);
             alpha = Math.max(0, Math.min(alpha, 255));
             args.set(4, new Color(255, 255, 255, alpha).getRGB());
         }
@@ -112,7 +97,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                     shift = At.Shift.AFTER))
     private void setAnglesHook(S livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo info)
     {
-        if (skip)
+        if (ChamsRenderer.rendering)
         {
             return;
         }
@@ -122,20 +107,18 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
         if (ChamsModule.getInstance().isEnabled() && valid)
         {
             int color = ChamsModule.getInstance().color.getValue().getRGB();
-            if (ChamsModule.getInstance().shine.getValue())
+            if (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
             {
                 Layers.QUADS_GLINT.startDrawing();
-                VertexConsumerProvider provider = ChamsModule.getInstance().layeringConfig.getValue() == ChamsModule.ChamsLayering.TOP
-                        ? MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers()
-                        : vertexConsumerProvider;
+                VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
                 model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, 1.0f));
                 Layers.QUADS_GLINT.endDrawing();
             }
 
-            ChamsRenderer mode = ChamsModule.getInstance().mode.getValue();
+            ChamsRenderer renderer = ChamsModule.getInstance().mode.getValue().getRenderer();
             float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
-            ChamsRenderer.render(mode, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
+            ChamsRenderer.render(renderer, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
         }
     }
 }

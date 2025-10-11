@@ -2,20 +2,14 @@ package net.shoreline.client.impl.render;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.state.EndCrystalEntityRenderState;
 import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.imixin.*;
 import org.joml.Matrix4f;
-
-import java.awt.*;
 
 public enum ChamsRenderer
 {
@@ -24,13 +18,13 @@ public enum ChamsRenderer
     WIREFRAME,
     BOTH;
 
+    public static boolean rendering = false;
     private static ChamsRenderer chams;
     private static Matrix4f matrix;
     private static Vec3d position;
     private static int color;
-    private static boolean throughWalls;
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("unchecked")
     public static void render(ChamsRenderer chams, Entity entity, float tickDelta, boolean throughWalls, int color)
     {
         if (chams == NONE)
@@ -44,24 +38,13 @@ public enum ChamsRenderer
         ChamsRenderer.chams = chams;
         ChamsRenderer.color = color;
         ChamsRenderer.matrix = matrix4f;
-        ChamsRenderer.throughWalls = throughWalls;
         ChamsRenderer.position = Interpolation.getRenderPosition(entity, tickDelta);
 
-        EntityRenderer<?, ?> renderer = MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity);
-        EntityRenderState renderState = ((EntityRenderer<Entity, EntityRenderState>) renderer).getAndUpdateRenderState(entity, tickDelta);
-        if (renderer instanceof LivingEntityRenderer livingEntityRenderer && renderState instanceof LivingEntityRenderState state)
-        {
-            ((ILivingEntityRenderer) livingEntityRenderer).skipShineRendering(true);
-            livingEntityRenderer.render(state, matrices, CustomVertexConsumerProvider.INSTANCE, 15);
-            ((ILivingEntityRenderer) livingEntityRenderer).skipShineRendering(false);
-        }
-
-        if (renderer instanceof EndCrystalEntityRenderer crystalRenderer && renderState instanceof EndCrystalEntityRenderState state)
-        {
-            ((IEndCrystalEntityRenderer) crystalRenderer).skipShineRendering(true);
-            crystalRenderer.render(state, matrices, CustomVertexConsumerProvider.INSTANCE, 15);
-            ((IEndCrystalEntityRenderer) crystalRenderer).skipShineRendering(false);
-        }
+        rendering = true;
+        var renderer = (EntityRenderer<Entity, EntityRenderState>) MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity);
+        var renderState = renderer.getAndUpdateRenderState(entity, tickDelta);
+        renderer.render(renderState, matrices, CustomVertexConsumerProvider.INSTANCE, 15);
+        rendering = false;
     }
 
     private static class CustomVertexConsumerProvider implements VertexConsumerProvider
@@ -71,7 +54,7 @@ public enum ChamsRenderer
         @Override
         public VertexConsumer getBuffer(RenderLayer layer)
         {
-            if (layer instanceof IMultiPhase phase && ((IMultiPhaseParameters) (Object) phase.hookGetPhases()).getTarget() == RenderLayer.ITEM_ENTITY_TARGET)
+            if (layer instanceof IMultiPhase phase && ((IMultiPhaseParameters) (Object) phase.hookGetPhases()).getTarget() == RenderPhase.ITEM_ENTITY_TARGET)
             {
                 return EmptyVertexConsumer.INSTANCE;
             }
