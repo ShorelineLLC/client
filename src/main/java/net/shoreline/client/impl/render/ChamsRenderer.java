@@ -112,7 +112,7 @@ public enum ChamsRenderer
                     mesh.vertex(position.getX() + xs[1] - camera.getX(), position.getY() + ys[1] - camera.getY(), position.getZ() + zs[1] - camera.getZ(), color);
                     mesh.vertex(position.getX() + xs[2] - camera.getX(), position.getY() + ys[2] - camera.getY(), position.getZ() + zs[2] - camera.getZ(), color);
                     mesh.vertex(position.getX() + xs[3] - camera.getX(), position.getY() + ys[3] - camera.getY(), position.getZ() + zs[3] - camera.getZ(), color);
-                    Managers.RENDER.queueMesh(mesh);
+                    mesh.flushVertices(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers());
                 }
 
                 if ((chams == WIREFRAME || chams == BOTH))
@@ -125,7 +125,7 @@ public enum ChamsRenderer
                     mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
                     mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
                     mesh.vertex(position.x + xs[3] - camera.getX(), position.y + ys[3] - camera.getY(), position.z + zs[3] - camera.getZ(), lineColor);
-                    Managers.RENDER.queueMesh(mesh);
+                    mesh.flushVertices(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers());
                 }
 
                 i = 0;

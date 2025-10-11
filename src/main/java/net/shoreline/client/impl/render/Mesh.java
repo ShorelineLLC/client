@@ -30,13 +30,15 @@ public class Mesh
         this.vertices = vertices;
     }
 
-    public void flushVertices(VertexConsumerProvider provider)
+    public void flushVertices(VertexConsumerProvider.Immediate provider)
     {
         VertexConsumer consumer = provider.getBuffer(layer);
         for (Vertex vertex : vertices)
         {
             consumer.vertex(matrix, vertex.getX(), vertex.getY(), vertex.getZ()).color(vertex.getColor());
         }
+
+        provider.draw(layer);
     }
 
     public void vertex(double x, double y, double z, int color)

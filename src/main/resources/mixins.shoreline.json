@@ -57,6 +57,7 @@
     "render.MixinMultiPhaseParameters",
     "render.MixinRenderTickCounter",
     "render.MixinTextureBase",
+    "render.MixinVertexConsumers",
     "render.MixinWorldRenderer",
     "render.entity.MixinEndCrystalEntityRenderer",
     "render.entity.MixinEntityRenderer",
