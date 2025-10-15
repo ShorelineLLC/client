@@ -68,7 +68,7 @@ public class HudGuiModule extends ListeningToggleable
     @EventListener
     public void onHudOverlay(HudOverlayEvent.Post event)
     {
-        if (mc.currentScreen != null && !(mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof ClickGuiScreen))
+        if (mc.currentScreen != null && !(mc.currentScreen instanceof ChatScreen))
         {
             return;
         }

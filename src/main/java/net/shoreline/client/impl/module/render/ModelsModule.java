@@ -3,14 +3,15 @@ package net.shoreline.client.impl.module.render;
 import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 
 @Getter
-public class CrystalModelModule extends Toggleable
+public class ModelsModule extends Toggleable
 {
-    public static CrystalModelModule INSTANCE;
+    public static ModelsModule INSTANCE;
 
     Config<Float> crystalScale = new NumberConfig.Builder<Float>("Scale")
             .setMin(0.1f).setMax(1.5f).setDefaultValue(1.0f)
@@ -21,10 +22,12 @@ public class CrystalModelModule extends Toggleable
     Config<Boolean> crystalBounce = new BooleanConfig.Builder("Bounce")
             .setDescription("Render the crystal bounce animation")
             .setDefaultValue(true).build();
+    Config<Void> crystalsConfig = new ConfigGroup.Builder("Crystals")
+            .addAll(crystalScale, crystalSpin, crystalBounce).build();
 
-    public CrystalModelModule()
+    public ModelsModule()
     {
-        super("CrystalModel", "Modify the crystal model", GuiCategory.RENDER);
+        super("Models", "Modify entity models", GuiCategory.RENDER);
         INSTANCE = this;
     }
 }

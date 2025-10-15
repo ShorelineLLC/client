@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.module.client;
 
-import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Concurrent;
@@ -15,6 +14,8 @@ import java.awt.*;
 public class ThemeModule extends Concurrent
 {
     public static ThemeModule INSTANCE;
+
+    public static final int COLOR = -2;
 
     Config<Color> primaryColor = new ColorConfig.Builder("PrimaryColor")
             .setRgb(0xff5f5fde)

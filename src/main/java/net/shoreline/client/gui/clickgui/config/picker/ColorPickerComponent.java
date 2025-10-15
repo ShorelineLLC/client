@@ -1,15 +1,15 @@
 package net.shoreline.client.gui.clickgui.config.picker;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
-import net.shoreline.client.gui.clickgui.*;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
+import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
@@ -74,7 +74,13 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getConfig().getDescription());
+        }
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         int color = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());

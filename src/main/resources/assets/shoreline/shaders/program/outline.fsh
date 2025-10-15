@@ -12,7 +12,7 @@ uniform float u_FillAlpha;
 uniform float u_OutlineAlpha;
 
 vec3 getSobelColor(vec2 uv) {
-    for (int r = 1; r <= floor(u_Width); ++r) {
+    for (int r = 1; r <= ceil(u_Width); ++r) {
         vec2 dx = vec2(oneTexel.x * float(r), 0.0);
         vec2 dy = vec2(0.0, oneTexel.y * float(r));
 
@@ -28,7 +28,7 @@ vec3 getSobelColor(vec2 uv) {
         vec2 od = vec2(dx.x, dy.y);
         s = texture(DiffuseSampler, uv + od);
         if (s.a > 0.0) return s.rgb;
-        s = texture(DiffuseSampler, uv + vec2( od.x, -od.y));
+        s = texture(DiffuseSampler, uv + vec2(od.x, -od.y));
         if (s.a > 0.0) return s.rgb;
         s = texture(DiffuseSampler, uv + vec2(-od.x,  od.y));
         if (s.a > 0.0) return s.rgb;

@@ -22,7 +22,6 @@ import net.shoreline.client.impl.module.combat.trap.TrapSpec;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.EnumSet;
-import java.util.List;
 
 public class SelfTrapModule extends TrapModule
 {

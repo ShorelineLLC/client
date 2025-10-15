@@ -59,6 +59,8 @@ public class AutoTrapModule extends TrapModule
             .setDescription("Disables when player y-level changes")
             .setDefaultValue(false).build();
 
+    private PlayerEntity trapTarget;
+
     public AutoTrapModule()
     {
         super("AutoTrap", "Traps enemies with obsidian", GuiCategory.COMBAT);
@@ -67,7 +69,7 @@ public class AutoTrapModule extends TrapModule
     @Override
     public String getModuleData()
     {
-        return String.valueOf(fadeOutAnimations.size());
+        return trapTarget != null ? String.valueOf(fadeOutAnimations.size()) : super.getModuleData();
     }
 
     @EventListener
@@ -90,7 +92,6 @@ public class AutoTrapModule extends TrapModule
             return;
         }
 
-        PlayerEntity trapTarget;
         if (Managers.TARGETING.hasTarget())
         {
             trapTarget = Managers.TARGETING.getTarget();

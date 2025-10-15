@@ -14,7 +14,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.imixin.IModel;
 import net.shoreline.client.impl.module.render.ChamsModule;
-import net.shoreline.client.impl.module.render.CrystalModelModule;
+import net.shoreline.client.impl.module.render.ModelsModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Layers;
@@ -127,7 +127,7 @@ public class MixinEndCrystalEntityRenderer
                     target = "Lnet/minecraft/client/util/math/MatrixStack;scale(FFF)V"))
     private void hookScale(MatrixStack instance, float x, float y, float z)
     {
-        float scale = CrystalModelModule.INSTANCE.isEnabled() ? CrystalModelModule.INSTANCE.getCrystalScale().getValue() : 1.0f;
+        float scale = ModelsModule.INSTANCE.isEnabled() ? ModelsModule.INSTANCE.getCrystalScale().getValue() : 1.0f;
         instance.scale(2.0f * scale, 2.0f * scale, 2.0f * scale);
     }
 }

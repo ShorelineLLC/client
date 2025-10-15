@@ -1,15 +1,14 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.gui.Mouse;
-import net.shoreline.client.gui.clickgui.*;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
+import net.shoreline.client.gui.clickgui.Frame;
+import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Smoother;
@@ -66,7 +65,12 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getConfig().getDescription());
+        }
 
         textComponent.setYOffset(getYOffset());
         textComponent.setX(getTx());

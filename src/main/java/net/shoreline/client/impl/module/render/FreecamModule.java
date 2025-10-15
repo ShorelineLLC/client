@@ -16,7 +16,6 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.MouseEvent;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.PlayerVecEvent;
 import net.shoreline.client.impl.event.render.CameraEvent;

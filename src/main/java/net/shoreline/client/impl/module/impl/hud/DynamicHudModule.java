@@ -91,7 +91,12 @@ public abstract class DynamicHudModule extends HudModule
 
     public void drawTextTransparency(MatrixStack matrices, String text, float x, float y, float transparency)
     {
-        int color = ColorUtil.withTransparency(HudGuiModule.INSTANCE.getColor((int) y), transparency);
+        drawTextTransparency(matrices, text, x, y, HudGuiModule.INSTANCE.getColor((int) y), transparency);
+    }
+
+    public void drawTextTransparency(MatrixStack matrices, String text, float x, float y, int color, float transparency)
+    {
+        int c = ColorUtil.withTransparency(color, transparency);
         drawText(matrices, text, x, y, color);
     }
 }

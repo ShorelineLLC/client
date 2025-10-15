@@ -35,7 +35,13 @@ public class SelectorComponent extends ConfigComponent<Enum<?>>
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getConfig().getDescription());
+        }
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         int color = ColorUtil.brighten(0x00646464, 70, (float) hoverAnim.getFactor());

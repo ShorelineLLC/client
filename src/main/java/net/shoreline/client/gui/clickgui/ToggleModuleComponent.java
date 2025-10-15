@@ -4,11 +4,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.ToggleComponent;
-import net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.gui.clickgui.config.picker.ExpandableComponent;
-import net.shoreline.client.gui.clickgui.config.picker.GroupComponent;
-import net.shoreline.client.gui.clickgui.config.picker.RegistryPickerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Theme;
@@ -37,6 +34,13 @@ public class ToggleModuleComponent extends ModuleComponent
                               float mouseY,
                               float delta)
     {
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getModule().getDescription());
+        }
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
         float scale = ClickGuiModule.INSTANCE.getScale();
 

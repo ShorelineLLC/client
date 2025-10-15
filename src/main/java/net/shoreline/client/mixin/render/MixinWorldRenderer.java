@@ -109,6 +109,11 @@ public abstract class MixinWorldRenderer implements IWorldRenderer
     {
         RenderEntityWorldEvent event = new RenderEntityWorldEvent(entity, vertexConsumers);
         EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled() && event.getVertexConsumerProvider() == null)
+        {
+            return;
+        }
+
         original.call(instance, entity, x, y, z, tickDelta, matrices, event.isCanceled() ? event.getVertexConsumerProvider() : vertexConsumers, light);
     }
 

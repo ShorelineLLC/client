@@ -9,7 +9,6 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.module.impl.MovementModule;

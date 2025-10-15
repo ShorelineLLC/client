@@ -8,7 +8,6 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ShulkerBoxScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;

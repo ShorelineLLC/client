@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.world;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;

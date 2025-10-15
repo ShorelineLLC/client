@@ -19,7 +19,7 @@ public class DynamicEntry
     private final DynamicHudModule module;
     private final Supplier<String> text;
     private final UnboundAnimation animation;
-    private final Animation yAnimation; // y animation should never go out of bounds.
+    protected final Animation yAnimation; // y animation should never go out of bounds.
 
     private Supplier<Boolean> drawing;
     private boolean lastState;

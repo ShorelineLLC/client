@@ -3466,7 +3466,7 @@ net.shoreline.client.impl.module.render.ChamsModule -> net.shoreline.client.hm:
     81:81:net.shoreline.client.impl.module.render.ChamsModule getInstance() -> jb
     86:86:float getSpeed() -> jc
     91:91:float getScale() -> fT
-net.shoreline.client.impl.module.render.CrystalModelModule -> net.shoreline.client.hn:
+net.shoreline.client.impl.module.render.ModelsModule -> net.shoreline.client.hn:
     net.shoreline.client.api.config.Config crystalScale -> pX
     net.shoreline.client.api.config.Config crystalSpin -> pY
     net.shoreline.client.api.config.Config crystalBounce -> pZ

@@ -9,6 +9,7 @@ import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.ac.Anticheat;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2S;
 import net.shoreline.client.impl.rotation.Rotation;
@@ -77,9 +78,13 @@ public class CriticalsModule extends Toggleable
             }
             case GRIM ->
             {
-                sendRotatePacketInternal(0.0f, true);
-                sendRotatePacketInternal(0.0625f, false);
-                sendRotatePacketInternal(0.04535f, false);
+                Rotation playerRotation = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getClientRotation() : new Rotation(mc.player);
+                float pitch = Math.clamp(playerRotation.getPitch(),
+                        -90.0F + Anticheat.GRIM_GCD_DIVISOR,
+                        90.0F - Anticheat.GRIM_GCD_DIVISOR);
+
+                sendRotatePacketInternal(0.0625f, playerRotation.getYaw(), pitch + Anticheat.GRIM_GCD_DIVISOR, false);
+                sendRotatePacketInternal(0.04535f, playerRotation.getYaw(), pitch - Anticheat.GRIM_GCD_DIVISOR, false);
             }
         }
     }
@@ -95,14 +100,13 @@ public class CriticalsModule extends Toggleable
         sendPacket(movePacket);
     }
 
-    private void sendRotatePacketInternal(double yOffset, boolean onGround)
+    private void sendRotatePacketInternal(double yOffset, float yaw, float pitch, boolean onGround)
     {
-        Rotation playerRotation = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getClientRotation() : new Rotation(mc.player);
         Packet<?> movePacket = new PlayerMoveC2SPacket.Full(mc.player.getX(),
                 mc.player.getY() + yOffset,
                 mc.player.getZ(),
-                playerRotation.getYaw(),
-                playerRotation.getPitch(),
+                yaw,
+                pitch,
                 onGround,
                 mc.player.horizontalCollision);
 

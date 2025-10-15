@@ -2,7 +2,7 @@ package net.shoreline.client.mixin.render.entity.model;
 
 import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
 import net.minecraft.client.render.entity.model.EndCrystalEntityModel;
-import net.shoreline.client.impl.module.render.CrystalModelModule;
+import net.shoreline.client.impl.module.render.ModelsModule;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -19,7 +19,7 @@ public class MixinEndCrystalEntityModel
     )
     private float hookAngles(float constant)
     {
-        return CrystalModelModule.INSTANCE.isEnabled() ? CrystalModelModule.INSTANCE.getCrystalSpin().getValue() * constant : constant;
+        return ModelsModule.INSTANCE.isEnabled() ? ModelsModule.INSTANCE.getCrystalSpin().getValue() * constant : constant;
     }
 
     @Redirect(
@@ -29,6 +29,6 @@ public class MixinEndCrystalEntityModel
                     target = "Lnet/minecraft/client/render/entity/EndCrystalEntityRenderer;getYOffset(F)F"))
     private float hookYOffset(float f)
     {
-        return CrystalModelModule.INSTANCE.isEnabled() && CrystalModelModule.INSTANCE.getCrystalBounce().getValue() ? EndCrystalEntityRenderer.getYOffset(f) : -1.1f;
+        return ModelsModule.INSTANCE.isEnabled() && ModelsModule.INSTANCE.getCrystalBounce().getValue() ? EndCrystalEntityRenderer.getYOffset(f) : -1.1f;
     }
 }

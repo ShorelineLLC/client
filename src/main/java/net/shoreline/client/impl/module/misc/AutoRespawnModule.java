@@ -19,12 +19,7 @@ public class AutoRespawnModule extends Toggleable
     @EventListener
     public void onTick(TickEvent.Pre event)
     {
-        if (checkNull())
-        {
-            return;
-        }
-
-        if (respawn && mc.player.isDead())
+        if (!checkNull() && respawn && mc.player.isDead())
         {
             mc.player.requestRespawn();
             respawn = false;

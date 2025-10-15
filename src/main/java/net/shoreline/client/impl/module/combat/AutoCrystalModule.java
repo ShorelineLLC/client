@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EndCrystalItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
@@ -58,7 +57,6 @@ import net.shoreline.client.util.math.PerSecond;
 import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -202,7 +200,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private final Timer attackTimer = new NanoTimer();
 
     private final ConcurrentMap<Integer, Long> attackPackets = new ConcurrentHashMap<>();
-    private final ConcurrentMap<Entity, Long> attacksOnThread = new ConcurrentHashMap<>();
 
     private final ConcurrentMap<Interaction, Long> placePackets = new ConcurrentHashMap<>();
     private final AtomicInteger crystalsPlaced = new AtomicInteger();
@@ -350,8 +347,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
-        cps.count();
-
         if (sequentialBreak.getValue())
         {
             Hand hand = getCrystalHand();
@@ -381,6 +376,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 Long time = attackPackets.remove(id);
                 if (time != null)
                 {
+                    cps.count();
                     breakTime.add(System.currentTimeMillis() - time);
                 }
             }
@@ -609,7 +605,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private void attackCrystal(EndCrystalEntity crystal, Hand hand)
     {
         attackCrystal(crystal.getId(), hand);
-        optimizer.setDead(crystal);
     }
 
     private void attackCrystal(int crystalId, Hand hand)
@@ -628,6 +623,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         sendAttackPacketsInternal(crystalId, swingConfig.getValue(), hand);
+        optimizer.setDead(crystalId);
 
         if (!canBreakCrystal)
         {

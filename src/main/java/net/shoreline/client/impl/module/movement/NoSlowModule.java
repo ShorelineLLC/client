@@ -8,7 +8,6 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;

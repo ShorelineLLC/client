@@ -1,15 +1,14 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
-import net.shoreline.client.impl.module.client.ClickGuiModule;
-import net.shoreline.client.impl.render.Theme;
 import net.shoreline.client.gui.clickgui.components.ToggleComponent;
 import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Theme;
 
 public class CheckboxComponent extends ConfigComponent<Boolean>
 {
@@ -38,6 +37,13 @@ public class CheckboxComponent extends ConfigComponent<Boolean>
                               float mouseY,
                               float delta)
     {
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getConfig().getDescription());
+        }
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         toggleComponent.setYOffset(getYOffset());

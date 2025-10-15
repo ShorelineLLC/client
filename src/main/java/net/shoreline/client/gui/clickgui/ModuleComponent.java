@@ -7,11 +7,8 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.FrameComponent;
-import net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.gui.clickgui.config.picker.ExpandableComponent;
-import net.shoreline.client.gui.clickgui.config.picker.GroupComponent;
-import net.shoreline.client.gui.clickgui.config.picker.RegistryPickerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -72,7 +69,13 @@ public class ModuleComponent extends FrameComponent
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getModule().getDescription());
+        }
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
         float scale = ClickGuiModule.INSTANCE.getScale();
 

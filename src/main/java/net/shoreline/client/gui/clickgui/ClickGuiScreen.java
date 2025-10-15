@@ -1,6 +1,7 @@
 package net.shoreline.client.gui.clickgui;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -9,9 +10,9 @@ import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.FrameComponent;
-import net.shoreline.client.gui.clickgui.components.SearchComponent;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -32,6 +33,9 @@ public class ClickGuiScreen extends Screen
     private boolean draggingMouse;
 
     private boolean shouldCloseOnEsc = true;
+
+    private String descriptionText;
+    private final Animation descAnimation = new Animation(300L);
 
     protected ClickGuiScreen()
     {
@@ -87,21 +91,43 @@ public class ClickGuiScreen extends Screen
             applyBlur();
         }
 
+        if (descriptionText != null)
+        {
+            Managers.RENDER.drawText(context.getMatrices(), descriptionText, 4,
+                    context.getScaledWindowHeight() - 16,
+                    ColorUtil.withTransparency(-1, (float) descAnimation.getFactor()));
+        }
+
         MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
         matrixStack.scale(scale, scale, 1.0f);
+
+        boolean onFrame = false;
         for (Frame frame : guiFrames)
         {
-            if (!draggingMouse && mouse.isHovering(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()) && mouse.isLeftHeld())
+            if (mouse.isHovering(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()))
             {
-                frame.setDragging(true);
-                draggingMouse = true;
+                if (!draggingMouse && mouse.isLeftHeld())
+                {
+                    frame.setDragging(true);
+                    draggingMouse = true;
+                }
+            }
+
+            if (mouse.isHovering(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight() + frame.getComponentHeight()))
+            {
+                onFrame = true;
             }
 
             frame.drawComponent(context, scaledMx, scaledMy, deltaTicks);
         }
 
         matrixStack.pop();
+
+        if (!onFrame)
+        {
+            descAnimation.setState(false);
+        }
 
         mouse.setLeftClicked(false);
         mouse.setRightClicked(false);
@@ -240,6 +266,12 @@ public class ClickGuiScreen extends Screen
         mouse.setRightHeld(false);
         ClickGuiModule.INSTANCE.disable();
         super.close();
+    }
+
+    public void setDescriptionText(String descriptionText)
+    {
+        this.descriptionText = descriptionText;
+        descAnimation.setState(true);
     }
 
     public Theme getTheme()

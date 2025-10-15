@@ -19,7 +19,7 @@ public class ServerStatusHudModule extends HudModule
     private final DecimalFormat decimal = new DecimalFormat("0.0");
 
     private final Timer serverStatus = new NanoTimer();
-    private final Animation statusAnimation = new Animation(false, 300L);
+    private final Animation statusAnimation = new Animation(300L);
 
     public ServerStatusHudModule()
     {

@@ -2,12 +2,14 @@
   "required": true,
   "package": "net.shoreline.client.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": [
+  "mixins": [
     "MixinKeyboard",
     "MixinMinecraftClient",
     "MixinMouse",
     "biome.MixinBiome",
     "biome.MixinFoliageColors",
+    "block.MixinAbstractBlockState",
+    "block.MixinChunkBlockLightProvider",
     "entity.MixinEntity",
     "entity.MixinLivingEntity",
     "entity.decoration.MixinEndCrystalEntity",
@@ -52,9 +54,11 @@
     "render.MixinCamera",
     "render.MixinGameRenderer",
     "render.MixinLayerRenderState",
+    "render.MixinLightDataAccess",
     "render.MixinLightmapTextureManager",
     "render.MixinMultiPhase",
     "render.MixinMultiPhaseParameters",
+    "render.MixinRenderPhase",
     "render.MixinRenderTickCounter",
     "render.MixinTextureBase",
     "render.MixinVertexConsumers",
@@ -66,6 +70,7 @@
     "render.entity.MixinModel",
     "render.entity.MixinPlayerEntityRenderer",
     "render.entity.feature.MixinArmorFeatureRenderer",
+    "render.entity.feature.MixinCapeFeatureRenderer",
     "render.entity.model.MixinEndCrystalEntityModel",
     "render.item.MixinHeldItemRenderer",
     "render.item.MixinItemRenderer",
@@ -83,10 +88,5 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "block.MixinAbstractBlockState",
-    "block.MixinChunkBlockLightProvider",
-    "render.MixinLightDataAccess"
-  ]
+  }
 }

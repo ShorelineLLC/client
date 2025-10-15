@@ -41,7 +41,9 @@ public class GroupComponent extends ExpandableComponent<Void>
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
         float scale = ClickGuiModule.INSTANCE.getScale();
 

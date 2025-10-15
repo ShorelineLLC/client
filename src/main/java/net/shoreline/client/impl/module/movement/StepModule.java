@@ -9,7 +9,6 @@ import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.entity.StepHeightEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.module.world.TimerModule;

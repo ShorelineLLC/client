@@ -1,11 +1,12 @@
 package net.shoreline.client.gui.clickgui.config;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
-import net.shoreline.client.gui.clickgui.*;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
+import net.shoreline.client.gui.clickgui.Frame;
+import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Theme;
@@ -37,7 +38,13 @@ public class TextboxComponent extends ConfigComponent<String>
                               float mouseY,
                               float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getConfig().getDescription());
+        }
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         textComponent.setYOffset(getYOffset());

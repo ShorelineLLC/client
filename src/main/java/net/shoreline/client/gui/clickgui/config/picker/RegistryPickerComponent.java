@@ -82,7 +82,13 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
     @Override
     public void drawComponent(DrawContext context, float mouseX, float mouseY, float delta)
     {
-        hoverAnim.setState(Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height));
+        boolean hovering = Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height);
+        setHoverState(hovering);
+        if (hovering)
+        {
+            ClickGuiScreen.INSTANCE.setDescriptionText(getConfig().getDescription());
+        }
+
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
         float scale = ClickGuiModule.INSTANCE.getScale();
 

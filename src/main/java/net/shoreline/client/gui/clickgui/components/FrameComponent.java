@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.Easing;
@@ -38,6 +39,11 @@ public abstract class FrameComponent extends DrawableComponent implements Intera
         this.height = height;
         this.hoverAnim = new Animation(false, 150L, Easing.LINEAR);
         this.drawAnim = new Animation(true, 100L, Easing.LINEAR);
+    }
+
+    public void setHoverState(boolean state)
+    {
+        hoverAnim.setState(state);
     }
 
     public float getTx()

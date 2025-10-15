@@ -15,6 +15,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.RegistryConfig;
 import net.shoreline.client.impl.event.LoadingEvent;
+import net.shoreline.client.impl.module.client.HudGuiModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
 import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
@@ -28,7 +29,7 @@ import java.util.function.Supplier;
 
 public class PotionsHudModule extends DynamicHudModule
 {
-    Config<PotionColors> potionColors = new EnumConfig.Builder<PotionColors>("OldColors")
+    Config<PotionColors> potionColors = new EnumConfig.Builder<PotionColors>("Color")
             .setValues(PotionColors.values())
             .setDescription("The potion colors in hud")
             .setDefaultValue(PotionColors.DEFAULT).build();
@@ -115,7 +116,7 @@ public class PotionsHudModule extends DynamicHudModule
             return effect.getColor();
         } else if (potionColors.getValue() == PotionColors.THEME)
         {
-            return ThemeModule.INSTANCE.getPrimaryColor().getRGB();
+            return ThemeModule.COLOR;
         }
 
         String id = entry.getIdAsString();
@@ -176,8 +177,15 @@ public class PotionsHudModule extends DynamicHudModule
                 matrices.pop();
             }
 
-            int color1 = ColorUtil.withTransparency(new Color(color.get()), 1.0f);
-            getModule().drawText(matrices, string, x, y, color1);
+            int c = color.get();
+            if (c == ThemeModule.COLOR)
+            {
+                getModule().drawTextTransparency(matrices, string, x, y, (float) yAnimation.getFactor());
+                return;
+            }
+
+            c = ColorUtil.withTransparency(new Color(c), 1.0f);
+            getModule().drawTextTransparency(matrices, string, x, y, c, (float) yAnimation.getFactor());
         }
     }
 
