@@ -72,4 +72,10 @@ public class TimerModule extends ListeningToggleable
         event.cancel();
         event.setTicks(timerTicks);
     }
+
+    public enum TickMode
+    {
+        ALWAYS,
+        PULSE
+    }
 }

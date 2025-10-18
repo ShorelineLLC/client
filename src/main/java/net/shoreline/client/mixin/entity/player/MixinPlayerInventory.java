@@ -16,7 +16,7 @@ public class MixinPlayerInventory
     @Inject(method = "setStack", at = @At(value = "HEAD"), cancellable = true)
     private void hookSetStack(int slot, ItemStack stack, CallbackInfo ci)
     {
-        InsertStackEvent slotEvent = new InsertStackEvent(slot);
+        InsertStackEvent slotEvent = new InsertStackEvent(slot, stack);
         EventBus.INSTANCE.dispatch(slotEvent);
         if (slotEvent.isCanceled())
         {
@@ -27,7 +27,7 @@ public class MixinPlayerInventory
     @Inject(method = "insertStack(ILnet/minecraft/item/ItemStack;)Z", at = @At(value = "HEAD"), cancellable = true)
     private void hookInsertStack(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir)
     {
-        InsertStackEvent slotEvent = new InsertStackEvent(slot);
+        InsertStackEvent slotEvent = new InsertStackEvent(slot, stack);
         EventBus.INSTANCE.dispatch(slotEvent);
         if (slotEvent.isCanceled())
         {

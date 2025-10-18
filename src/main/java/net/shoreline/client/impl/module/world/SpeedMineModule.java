@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.world;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -82,7 +83,8 @@ public class SpeedMineModule extends ListeningToggleable
     @Override
     public String getModuleData()
     {
-        return mainMiningBlock != null ? String.format("%.1f", Math.min(mainMiningBlock.getBlockDamage(), 1.0f)) : super.getModuleData();
+        return mainMiningBlock != null ? (mainMiningBlock.isDoneMining() ? Formatting.GREEN : Formatting.WHITE) +
+                String.format("%.1f", Math.min(mainMiningBlock.getBlockDamage(), 1.0f)) : super.getModuleData();
     }
 
     @Override

@@ -4,17 +4,26 @@ import lombok.experimental.UtilityClass;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @UtilityClass
 public class PhaseUtil
 {
     public List<BlockPos> intersectingBlocks(Entity entity)
     {
-        return BlockPos.stream(entity.getBoundingBox().shrink(0.01, 0.1, 0.01))
-                .filter(pos -> !MinecraftClient.getInstance().world.getBlockState(pos).isReplaceable())
-                .toList();
+        Box box = entity.getBoundingBox();
+        Set<BlockPos> origin = BlockPos.stream(box)
+                .map(BlockPos::toImmutable)
+                .collect(Collectors.toCollection(HashSet::new));
+
+        return origin.stream().filter(pos -> !MinecraftClient.getInstance().world.getBlockState(pos).isReplaceable()).toList();
     }
 
     public boolean isInsideBlock(Entity entity)
@@ -32,6 +41,6 @@ public class PhaseUtil
         BlockPos blockPos = entity.getBlockPos();
         List<BlockPos> blocks = intersectingBlocks(entity);
         return blocks.stream().anyMatch(p -> p.getY() == blockPos.getY())
-                && blocks.stream().anyMatch(p -> p.getY() == blockPos.up().getY());
+                && blocks.stream().anyMatch(p -> p.getY() == blockPos.getY() + 1);
     }
 }

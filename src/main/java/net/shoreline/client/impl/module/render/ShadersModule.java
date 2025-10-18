@@ -6,6 +6,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
+import net.minecraft.util.Colors;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
@@ -15,7 +16,6 @@ import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.item.RenderHandEvent;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
-import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.shader.ShaderEffect;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -26,9 +26,10 @@ public class ShadersModule extends Toggleable
 {
     public static ShadersModule INSTANCE;
 
-    Config<Shaders> shaderConfig = new EnumConfig.Builder<Shaders>("Shader")
-            .setValues(Shaders.values())
-            .setDefaultValue(Shaders.DEFAULT).build();
+    Config<Boolean> depthConfig = new BooleanConfig.Builder("ThroughWalls")
+            .setDescription("Renders shaders through walls")
+            .setDefaultValue(true).build();
+
     Config<Boolean> handsConfig = new BooleanConfig.Builder("Hands")
             .setDescription("Render shaders over hands")
             .setDefaultValue(true).build();
@@ -60,26 +61,54 @@ public class ShadersModule extends Toggleable
             .addAll(handsConfig, playersConfig, selfConfig, crystalsConfig, itemsConfig,
                     xpConfig, pearlsConfig, passiveConfig, hostilesConfig).build();
 
-    Config<Float> opacity = new NumberConfig.Builder<Float>("Opacity")
-            .setMin(0.0f).setDefaultValue(0.5f).setMax(1.0f)
-            .setDescription("Opacity for the shader fill").build();
-
-    Config<Boolean> outlineConfig = new BooleanConfig.Builder("Outline")
+    Config<Shaders> outlineMode = new EnumConfig.Builder<Shaders>("OutlineMode")
+            .setValues(Shaders.values())
             .setDescription("Outlines the entity")
-            .setDefaultValue(true).build();
+            .setDefaultValue(Shaders.DEFAULT).build();
     Config<Float> outlineWidth = new NumberConfig.Builder<Float>("OutlineWidth")
-            .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f)
+            .setMin(0.0f).setMax(5.0f).setDefaultValue(1.0f)
             .setDescription("The width of the outline").build();
-    Config<Float> glowConfig = new NumberConfig.Builder<Float>("Glow")
-            .setMin(0.0f).setMax(5.0f).setDefaultValue(1.0f).build();
-    Config<Integer> qualityConfig = new NumberConfig.Builder<Integer>("Quality")
-            .setMin(1).setMax(5).setDefaultValue(2).build();
     Config<Float> outlineOpacity = new NumberConfig.Builder<Float>("OutlineOpacity")
             .setMin(0.01f).setDefaultValue(1.0f).setMax(1.0f)
             .setDescription("Opacity for the outline").build();
-    Config<Boolean> depthConfig = new BooleanConfig.Builder("ThroughWalls")
-            .setDescription("Renders shaders through walls")
-            .setDefaultValue(true).build();
+    Config<Boolean> glowInside = new BooleanConfig.Builder("GlowInwards")
+            .setDescription("Glow inside the fill")
+            .setVisible(() -> outlineMode.getValue() == Shaders.BLOOM)
+            .setDefaultValue(false).build();
+    Config<Float> glowConfig = new NumberConfig.Builder<Float>("GlowFactor")
+            .setMin(0.0f).setMax(5.0f).setDefaultValue(1.0f)
+            .setVisible(() -> outlineMode.getValue() == Shaders.BLOOM).build();
+    Config<Integer> qualityConfig = new NumberConfig.Builder<Integer>("GlowQuality")
+            .setMin(1).setMax(5).setDefaultValue(2)
+            .setVisible(() -> outlineMode.getValue() == Shaders.BLOOM).build();
+    Config<Void> outlineConfig = new ConfigGroup.Builder("Outline")
+            .addAll(outlineMode, outlineWidth, outlineOpacity, glowInside, glowConfig, qualityConfig).build();
+
+    Config<Fill> fillMode = new EnumConfig.Builder<Fill>("FillMode")
+            .setValues(Fill.values())
+            .setDescription("Fills the entity")
+            .setDefaultValue(Fill.DEFAULT).build();
+    Config<Float> fillOpacity = new NumberConfig.Builder<Float>("FillOpacity")
+            .setMin(0.0f).setDefaultValue(0.5f).setMax(1.0f)
+            .setDescription("Opacity for the shader fill").build();
+    Config<Float> gradientFactor = new NumberConfig.Builder<Float>("GradientFactor")
+            .setMin(0.1f).setDefaultValue(5.0f).setMax(10.0f)
+            .setVisible(() -> fillMode.getValue() == Fill.GRADIENT)
+            .setDescription("The separation between gradient layers").build();
+    Config<Color> gradientColor = new ColorConfig.Builder("GradientColor")
+            .setTransparency(true).setDescription("The color for the gradient")
+            .setVisible(() -> fillMode.getValue() == Fill.GRADIENT)
+            .setDefaultValue(Color.WHITE).build();
+    Config<Integer> flowSpeed = new NumberConfig.Builder<Integer>("FlowSpeed")
+            .setMin(1).setDefaultValue(10).setMax(20)
+            .setVisible(() -> fillMode.getValue() == Fill.FLOW)
+            .setDescription("The separation between gradient layers").build();
+    Config<Float> flowFactor = new NumberConfig.Builder<Float>("FlowFactor")
+            .setMin(0.1f).setDefaultValue(0.6f).setMax(1.0f)
+            .setVisible(() -> fillMode.getValue() == Fill.FLOW)
+            .setDescription("The separation between gradient layers").build();
+    Config<Void> fillConfig = new ConfigGroup.Builder("Fill")
+            .addAll(fillMode, fillOpacity, gradientFactor, gradientColor, flowSpeed, flowFactor).build();
 
     public ShadersModule()
     {
@@ -109,7 +138,7 @@ public class ShadersModule extends Toggleable
     {
         if (!checkNull())
         {
-            Managers.SHADER.render(shaderConfig.getValue().getShaderEffect());
+            Managers.SHADER.render(outlineMode.getValue().getShaderEffect());
         }
     }
 
@@ -173,6 +202,13 @@ public class ShadersModule extends Toggleable
                 || entity instanceof EnderPearlEntity && pearlsConfig.getValue();
     }
 
+    public enum Fill
+    {
+        DEFAULT,
+        GRADIENT,
+        FLOW
+    }
+
     public enum Shaders
     {
         DEFAULT
@@ -181,32 +217,22 @@ public class ShadersModule extends Toggleable
             public ShaderEffect getShaderEffect()
             {
                 ShaderEffect effect = new ShaderEffect("outline");
-                effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineConfig.getValue() ? ShadersModule.INSTANCE.outlineWidth.getValue() : 0.0f);
-                effect.addFltUniform("u_FillAlpha", ShadersModule.INSTANCE.opacity.getValue());
+                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
+                effect.addVec2Uniform("u_Resolution", mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
+                effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
+                effect.addIntUniform("u_FillMode", ShadersModule.INSTANCE.fillMode.getValue().ordinal());
+                effect.addFltUniform("u_FillAlpha", ShadersModule.INSTANCE.fillOpacity.getValue());
+                effect.addFltUniform("u_GradientFactor", ShadersModule.INSTANCE.gradientFactor.getValue() * 16.0f);
+
+                Color gradientColor = ShadersModule.INSTANCE.gradientColor.getValue();
+                effect.addVec4Uniform("u_GradientColor", gradientColor.getRed() / 255.0f,
+                        gradientColor.getGreen() / 255.0f,
+                        gradientColor.getBlue() / 255.0f,
+                        gradientColor.getAlpha() / 255.0f);
+
+                effect.addFltUniform("u_FlowSpeed", ShadersModule.INSTANCE.flowSpeed.getValue());
+                effect.addFltUniform("u_FlowFactor", ShadersModule.INSTANCE.flowFactor.getValue());
                 effect.addFltUniform("u_OutlineAlpha", ShadersModule.INSTANCE.outlineOpacity.getValue());
-                return effect;
-            }
-        },
-        GRADIENT
-        {
-            @Override
-            public ShaderEffect getShaderEffect()
-            {
-                ShaderEffect effect = new ShaderEffect("gradient");
-                Color color = ThemeModule.INSTANCE.getPrimaryColor();
-                Color darker = color.darker().darker();
-                effect.addIntUniform("sobel", 1);
-                effect.addVec2Uniform("texelSize", 1.0f / mc.getWindow().getScaledWidth(), 1.0f / mc.getWindow().getScaledHeight());
-                effect.addVec4Uniform("color", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
-                effect.addVec4Uniform("color1", darker.getRed() / 255f, darker.getGreen() / 255f, darker.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
-                effect.addIntUniform("samples", 8);
-                effect.addIntUniform("steps", 8);
-                effect.addFltUniform("factor", 60f);
-                effect.addFltUniform("time", (float) (System.currentTimeMillis() - startTime) / 5f);
-                effect.addIntUniform("fastOutline", 0);
-                effect.addFltUniform("radius", 1.0f);
-                effect.addIntUniform("glow", 0);
-                effect.addFltUniform("glowRadius", 1.0f);
                 return effect;
             }
         },
@@ -216,12 +242,25 @@ public class ShadersModule extends Toggleable
             public ShaderEffect getShaderEffect()
             {
                 ShaderEffect effect = new ShaderEffect("bloom");
-                Color color = ThemeModule.INSTANCE.getPrimaryColor();
-                effect.addIntUniform("u_Width", (int) (ShadersModule.INSTANCE.outlineConfig.getValue() ? ShadersModule.INSTANCE.outlineWidth.getValue() : 0.0f));
+                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
+                effect.addVec2Uniform("u_Resolution", mc.getWindow().getScaledWidth(), mc.getWindow().getFramebufferHeight());
+                effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
+                effect.addIntUniform("u_GlowInside", ShadersModule.INSTANCE.glowInside.getValue() ? 1 : 0);
                 effect.addIntUniform("u_GlowQuality", ShadersModule.INSTANCE.qualityConfig.getValue());
                 effect.addFltUniform("u_GlowMultiplier", ShadersModule.INSTANCE.glowConfig.getValue());
-                effect.addVec4Uniform("u_FillColor", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.opacity.getValue());
-                effect.addVec4Uniform("u_OutlineColor", color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, ShadersModule.INSTANCE.outlineOpacity.getValue());
+                effect.addIntUniform("u_FillMode", ShadersModule.INSTANCE.fillMode.getValue().ordinal());
+                effect.addFltUniform("u_FillAlpha", ShadersModule.INSTANCE.fillOpacity.getValue());
+                effect.addFltUniform("u_GradientFactor", ShadersModule.INSTANCE.gradientFactor.getValue() * 16.0f);
+
+                Color gradientColor = ShadersModule.INSTANCE.gradientColor.getValue();
+                effect.addVec4Uniform("u_GradientColor", gradientColor.getRed() / 255.0f,
+                        gradientColor.getGreen() / 255.0f,
+                        gradientColor.getBlue() / 255.0f,
+                        ShadersModule.INSTANCE.fillOpacity.getValue());
+
+                effect.addFltUniform("u_FlowSpeed", ShadersModule.INSTANCE.flowSpeed.getValue());
+                effect.addFltUniform("u_FlowFactor", ShadersModule.INSTANCE.flowFactor.getValue());
+                effect.addFltUniform("u_OutlineAlpha", ShadersModule.INSTANCE.outlineOpacity.getValue());
                 return effect;
             }
         };

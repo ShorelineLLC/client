@@ -72,10 +72,10 @@ public class NotifierModule extends Toggleable
 
         if (event.isEnabled())
         {
-            sendClientMessageWithOptionalDeletion(Formatting.GRAY + event.getModule().getName() + Formatting.GREEN + " enabled", hashCode());
+            sendClientMessageWithOptionalDeletion(Formatting.GRAY + event.getModule().getName() + Formatting.GREEN + " enabled", event.getModule().hashCode());
         } else
         {
-            sendClientMessageWithOptionalDeletion(Formatting.GRAY + event.getModule().getName() + Formatting.RED + " disabled", hashCode());
+            sendClientMessageWithOptionalDeletion(Formatting.GRAY + event.getModule().getName() + Formatting.RED + " disabled", event.getModule().hashCode());
         }
     }
 

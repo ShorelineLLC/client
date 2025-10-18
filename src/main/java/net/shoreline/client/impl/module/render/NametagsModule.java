@@ -16,6 +16,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.BooleanConfig;
@@ -112,10 +113,19 @@ public class NametagsModule extends RenderModule
                 continue;
             }
 
+            float yOff = 2.2f;
+            if (player.isSneaking())
+            {
+                yOff = 2.0f;
+            } else if (player.isCrawling())
+            {
+                yOff = 1.2f;
+            }
+
             String info = playerEntry.getInfo();
             Vec3d interp = Interpolation.getRenderPosition(player, event.getTickDelta());
             double x = interp.x - camera.getPos().x;
-            double y = interp.y + (player.isSneaking() ? 2.0f : 2.2f) - camera.getPos().y;
+            double y = interp.y + yOff - camera.getPos().y;
             double z = interp.z - camera.getPos().z;
             float distance = (float) Math.sqrt(camera.getPos().squaredDistanceTo(interp.x, interp.y, interp.z));
             float scaling = 0.0018f + scalingConfig.getValue() * distance;
@@ -307,6 +317,14 @@ public class NametagsModule extends RenderModule
                     LightmapTextureManager.MAX_LIGHT_COORDINATE);
 
             mc.getBufferBuilders().getEntityVertexConsumers().draw();
+        }
+
+        if (stack.isItemBarVisible())
+        {
+            int i = (int) Math.clamp(stack.getItemBarStep() * 0.923076923, 0, 12);
+            int j = stack.getItemBarColor();
+            Managers.RENDER.drawRect(matrixStack, x + 3, y + 13, 12, 1, Colors.BLACK);
+            Managers.RENDER.drawRect(matrixStack, x + 3, y + 13, i, 1, j | Colors.BLACK);
         }
     }
 

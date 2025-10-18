@@ -34,22 +34,64 @@
       "values": [ 1.0, 1.0 ]
     },
     {
+      "name": "u_ShaderTime",
+      "type": "float",
+      "count": 1,
+      "values": [ 3.0 ]
+    },
+    {
+      "name": "u_Resolution",
+      "type": "float",
+      "count": 2,
+      "values": [ 1.0, 1.0 ]
+    },
+    {
       "name": "u_Width",
       "type": "float",
       "count": 1,
       "values": [ 3.0 ]
     },
     {
-      "name": "u_OutlineAlpha",
-      "type": "float",
+      "name": "u_FillMode",
+      "type": "int",
       "count": 1,
-      "values": [ 3.0 ]
+      "values": [1]
     },
     {
       "name": "u_FillAlpha",
       "type": "float",
       "count": 1,
       "values": [ 1.0 ]
+    },
+    {
+      "name": "u_GradientColor",
+      "type": "float",
+      "count": 4,
+      "values": [ 1.0, 1.0, 1.0, 1.0 ]
+    },
+    {
+      "name": "u_GradientFactor",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "u_FlowSpeed",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "u_FlowFactor",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "u_OutlineAlpha",
+      "type": "float",
+      "count": 1,
+      "values": [ 3.0 ]
     }
   ]
 }

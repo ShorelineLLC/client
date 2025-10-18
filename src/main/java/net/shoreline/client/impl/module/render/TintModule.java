@@ -172,9 +172,9 @@ public class TintModule extends Toggleable
         {
             mc.getTextureManager().getTexture(shineTexture).setFilter(true, false);
             RenderSystem.setShaderTexture(0, shineTexture);
-            RenderSystem.setShaderColor((float) tintColor.getValue().getRed() / 255.0F,
-                    (float) tintColor.getValue().getGreen() / 255.0F,
-                    (float) tintColor.getValue().getBlue() / 255.0F, 1.0F);
+            RenderSystem.setShaderColor((float) tintColor.getValue().getRed() / 255.0f,
+                    (float) tintColor.getValue().getGreen() / 255.0f,
+                    (float) tintColor.getValue().getBlue() / 255.0f, 1.0f);
         }
     }
 

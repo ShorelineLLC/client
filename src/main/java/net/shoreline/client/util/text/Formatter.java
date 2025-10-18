@@ -17,6 +17,9 @@ public class Formatter
         } else if (name.equalsIgnoreCase("NCP"))
         {
             return "NCP";
+        } else if (name.equalsIgnoreCase("STRICT_NCP"))
+        {
+            return "NCPStrict";
         }
 
         // no capitalization

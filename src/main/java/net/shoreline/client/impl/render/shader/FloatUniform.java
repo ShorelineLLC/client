@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.render.shader;
 
+import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.ShaderProgram;
 
 public class FloatUniform extends Uniform<Float>
@@ -12,6 +13,10 @@ public class FloatUniform extends Uniform<Float>
     @Override
     public void applyUniform(ShaderProgram program)
     {
-        program.getUniform(getName()).set(getValue());
+        GlUniform uniform = program.getUniform(getName());
+        if (uniform != null)
+        {
+            uniform.set(getValue());
+        }
     }
 }

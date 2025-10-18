@@ -11,8 +11,10 @@ import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
 import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.DecimalFormat;
 import java.util.Collection;
@@ -87,6 +89,12 @@ public class TextRadarHudModule extends DynamicHudModule
         }
 
         super.drawEntries(context, tickDelta);
+    }
+
+    @EventListener
+    public void onDisconnect(WorldEvent.Disconnect event)
+    {
+        getHudEntries().clear();
     }
 
     @Override

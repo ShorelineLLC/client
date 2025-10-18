@@ -7,30 +7,110 @@ in vec2 oneTexel;
 
 out vec4 fragColor;
 
-uniform int u_Width;
-uniform float u_GlowMultiplier;
+uniform float u_ShaderTime;
+uniform vec2 u_Resolution;
+
+uniform float u_Width;
+
+uniform int u_GlowInside;
 uniform int u_GlowQuality;
-uniform vec4 u_FillColor;
-uniform vec4 u_OutlineColor;
+uniform float u_GlowMultiplier;
+
+uniform int u_FillMode;
+uniform float u_FillAlpha;
+
+uniform vec4 u_GradientColor;
+uniform float u_GradientFactor;
+
+uniform float u_FlowSpeed;
+uniform float u_FlowFactor;
+
+uniform float u_OutlineAlpha;
+
+vec4 getFill(vec3 centerColor)
+{
+    if (u_FillMode == 1)
+    {
+        float time = u_ShaderTime / 5.0f;
+        float distance = sqrt(gl_FragCoord.x * gl_FragCoord.x + gl_FragCoord.y * gl_FragCoord.y) + time;
+        distance = distance / u_GradientFactor;
+        distance = ((sin(distance) + 1.0) / 2.0);
+        float j = 1.0 - distance;
+        float r = centerColor.r * distance + u_GradientColor.r * j;
+        float g = centerColor.g * distance + u_GradientColor.g * j;
+        float b = centerColor.b * distance + u_GradientColor.b * j;
+        float a = u_FillAlpha * distance + u_GradientColor.a * j;
+        return vec4(r, g, b, a);
+    }
+
+    if (u_FillMode == 2)
+    {
+        float time = u_ShaderTime / 500.0f;
+        vec2 uv = (2.0 * gl_FragCoord.xy - u_Resolution.xy) / min(u_Resolution.x, u_Resolution.y);
+        for (float i = 1.0; i < u_FlowSpeed; i++)
+        {
+            uv.x += u_FlowFactor / i * cos(i * 2.5 * uv.y + time);
+            uv.y += u_FlowFactor / i * cos(i * 1.5 * uv.x + time);
+        }
+
+        return vec4(centerColor.r / abs(sin(time - uv.y - uv.x)), centerColor.g / abs(sin(time - uv.y - uv.x)), centerColor.b / abs(sin(time - uv.y - uv.x)), u_FillAlpha);
+    }
+
+    return vec4(centerColor, u_FillAlpha);
+}
+
+vec3 getSobelColor(vec2 uv)
+{
+    for (int r = 1; r <= u_GlowQuality * int(u_Width); r += u_GlowQuality)
+    {
+        float rf = float(r);
+        vec2 dx = vec2(oneTexel.x * rf, 0.0);
+        vec2 dy = vec2(0.0, oneTexel.y * rf);
+
+        vec4 s = texture(DiffuseSampler, uv - dx);
+        if (s.a > 0.0) return s.rgb;
+        s = texture(DiffuseSampler, uv + dx);
+        if (s.a > 0.0) return s.rgb;
+        s = texture(DiffuseSampler, uv - dy);
+         if (s.a > 0.0) return s.rgb;
+        s = texture(DiffuseSampler, uv + dy);
+        if (s.a > 0.0) return s.rgb;
+
+        vec2 od = vec2(dx.x, dy.y);
+        s = texture(DiffuseSampler, uv + od);
+        if (s.a > 0.0) return s.rgb;
+        s = texture(DiffuseSampler, uv + vec2(od.x, -od.y));
+        if (s.a > 0.0) return s.rgb;
+        s = texture(DiffuseSampler, uv + vec2(-od.x, od.y));
+        if (s.a > 0.0) return s.rgb;
+        s = texture(DiffuseSampler, uv - od);
+        if (s.a > 0.0) return s.rgb;
+    }
+
+    return vec3(0.0);
+}
 
 float blur(vec4 center, bool outline)
 {
-    if (u_Width == 0.0) return 0.0;
+    if (u_Width == 0)
+    {
+        return 0.0;
+    }
 
-    int w = u_GlowQuality * u_Width;
+    int w = u_GlowQuality * int(u_Width);
     float blurred = 0.0;
 
-    blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(w, 0)).a);
+    blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2( w, 0)).a);
     blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(-w, 0)).a);
-    blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(0, w)).a);
-    blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(0, -w)).a);
+    blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2( 0, w)).a);
+    blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2( 0, -w)).a);
 
     blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(w, w)).a);
     blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(w, -w)).a);
     blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(-w, w)).a);
     blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(-w, -w)).a);
 
-    if (u_Width > 2 && blurred == 0.0)
+    if (int(u_Width) > 2 && blurred == 0.0)
     {
         return 0.0;
     }
@@ -39,67 +119,84 @@ float blur(vec4 center, bool outline)
     {
         for (int y = -w; y <= w; y += u_GlowQuality)
         {
-            if (x == 0 && y == 0)
+            if (x == 0 && y == 0) continue;
+
+            if ((abs(x) == w && abs(y) == w) ||
+                (abs(x) == w && y == 0) ||
+                (abs(y) == w && x == 0))
             {
                 continue;
             }
 
-            if (sign(x) == w && sign(y) == w
-                || sign(x) == w && y == 0
-                || sign(y) == 0 && x == 0)
-            {
-                continue;
-            }
-
-            blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(x, y)).a);
+            blurred += sign(texture(DiffuseSampler, texCoord + oneTexel * vec2(float(x), float(y))).a);
         }
     }
 
-    return clamp(blurred / (((u_Width * u_Width) + u_Width) * 4), 0.0, 1.0) * u_GlowMultiplier;
+    return clamp(blurred / max(float(((int(u_Width) * int(u_Width)) + int(u_Width)) * 4), 1.0), 0.0, 1.0) * u_GlowMultiplier;
 }
 
 void main()
 {
-    vec4 current = texture(DiffuseSampler, texCoord);
-    if (current.a != 0)
+    vec4 center = texture(DiffuseSampler, texCoord);
+
+    if (center.a > 0.0)
     {
-        current = u_FillColor;
-        if (u_Width != 0)
+        vec4 fill = getFill(center.rgb);
+        if (u_GlowInside == 1)
         {
-            current = mix(current, u_OutlineColor, u_GlowMultiplier - blur(current, false));
+            vec4 outline = vec4(center.rgb, u_OutlineAlpha);
+            fragColor = mix(fill, outline, u_GlowMultiplier - blur(fill, false));
+        } else
+        {
+            fragColor = fill;
         }
+
+        return;
     }
-    else
+
+    float glow = blur(center, true);
+    if (glow == 0.0)
     {
-        float alpha = blur(current, true);
-        if (alpha == 0.0)
-        {
-            discard;
-        }
+        discard;
+    }
 
-        for (int x = -1; x <= 1; x++)
+    bool edge = false;
+    for (int x = -1; x <= 1 && !edge; ++x)
+    {
+        for (int y = -1; y <= 1 && !edge; ++y)
         {
-            for (int y = -1; y <= 1; y++)
+            if (x == 0 && y == 0) continue;
+
+            if (texture(DiffuseSampler, texCoord + vec2(float(x), float(y)) * oneTexel).a > 0.0)
             {
-                if (x == 0 && y == 0)
-                {
-                    continue;
-                }
-
-                if (texture(DiffuseSampler, texCoord + vec2(x, y) * oneTexel).a > 0.0)
-                {
-                    current = u_OutlineColor;
-                    current.a = 1.0;
-                }
+                edge = true;
             }
         }
-
-        if (current.a == 0.0)
-        {
-            current = u_OutlineColor;
-            current.a = alpha;
-        }
     }
 
-    fragColor = current;
+    vec3 outlineRGB = getSobelColor(texCoord);
+
+    if (outlineRGB.r + outlineRGB.g + outlineRGB.b == 0.0)
+    {
+        int w = max(1, u_GlowQuality * int(u_Width));
+        vec2 dx = vec2(oneTexel.x * float(w), 0.0);
+        vec2 dy = vec2(0.0, oneTexel.y * float(w));
+
+        vec4 s = texture(DiffuseSampler, texCoord + dx);
+        if (s.a > 0.0) outlineRGB = s.rgb;
+        s = texture(DiffuseSampler, texCoord - dx);
+        if (s.a > 0.0) outlineRGB = s.rgb;
+        s = texture(DiffuseSampler, texCoord + dy);
+        if (s.a > 0.0) outlineRGB = s.rgb;
+        s = texture(DiffuseSampler, texCoord - dy);
+        if (s.a > 0.0) outlineRGB = s.rgb;
+    }
+
+    if (edge)
+    {
+        fragColor = vec4(outlineRGB, u_OutlineAlpha);
+    } else
+    {
+        fragColor = vec4(outlineRGB, glow * u_OutlineAlpha);
+    }
 }

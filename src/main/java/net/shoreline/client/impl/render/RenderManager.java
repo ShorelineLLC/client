@@ -358,6 +358,37 @@ public class RenderManager extends GenericFeature
         RenderSystem.enableDepthTest();
     }
 
+    public void drawRect(MatrixStack matrixStack, float x, float y, float width, float height, int color)
+    {
+        float i;
+        float x2 = x + width;
+        float y2 = y + height;
+        if (x < x2)
+        {
+            i = x;
+            x = x2;
+            x2 = i;
+        }
+
+        if (y < y2)
+        {
+            i = y;
+            y = y2;
+            y2 = i;
+        }
+
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
+        bufferBuilder.vertex(matrix4f, x, y, 0).color(color);
+        bufferBuilder.vertex(matrix4f, x, y2, 0).color(color);
+        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(color);
+        bufferBuilder.vertex(matrix4f, x2, y, 0).color(color);
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+    }
+
     public void drawRect(DrawContext context, float x, float y, float width, float height, int color)
     {
         float i;
