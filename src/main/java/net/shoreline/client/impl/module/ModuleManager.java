@@ -142,6 +142,7 @@ public class ModuleManager
                 new BrandHudModule(),
                 new CoordsHudModule(),
                 new CrosshairHudModule(),
+                new DurabilityHudModule(),
                 new FPSHudModule(),
                 new NotificationsHudModule(),
                 new PacketsHudModule(),

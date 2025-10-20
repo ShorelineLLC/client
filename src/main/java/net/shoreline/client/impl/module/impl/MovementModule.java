@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.impl;
 
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
@@ -87,5 +88,21 @@ public class MovementModule extends Toggleable
         float sin = (float) -Math.sin(Math.toRadians(yaw));
         return new Vec2f((forward * speed * sin) + (strafe * speed * cos),
                 (forward * speed * cos) - (strafe * speed * sin));
+    }
+
+    protected double getAcceleratedSpeed(double baseSpeed,
+                                         double maxSpeed,
+                                         double accelMaxTime,
+                                         long accelTime)
+    {
+        if (maxSpeed >= baseSpeed)
+        {
+            return baseSpeed;
+        } else
+        {
+            double v8 = MathHelper.clamp((double) (System.currentTimeMillis() - accelTime) / (accelMaxTime * 1000.0), 0.0, 1.0);
+            double v10 = maxSpeed + (baseSpeed - maxSpeed) * v8;
+            return Math.min(v10, baseSpeed);
+        }
     }
 }

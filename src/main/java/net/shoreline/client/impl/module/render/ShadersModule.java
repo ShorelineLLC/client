@@ -6,7 +6,6 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
-import net.minecraft.util.Colors;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
@@ -99,16 +98,24 @@ public class ShadersModule extends Toggleable
             .setTransparency(true).setDescription("The color for the gradient")
             .setVisible(() -> fillMode.getValue() == Fill.GRADIENT)
             .setDefaultValue(Color.WHITE).build();
-    Config<Integer> flowSpeed = new NumberConfig.Builder<Integer>("FlowSpeed")
-            .setMin(1).setDefaultValue(10).setMax(20)
+    Config<Integer> flowSpeed = new NumberConfig.Builder<Integer>("FlowLayers")
+            .setMin(1).setDefaultValue(10).setMax(10)
             .setVisible(() -> fillMode.getValue() == Fill.FLOW)
             .setDescription("The separation between gradient layers").build();
     Config<Float> flowFactor = new NumberConfig.Builder<Float>("FlowFactor")
             .setMin(0.1f).setDefaultValue(0.6f).setMax(1.0f)
             .setVisible(() -> fillMode.getValue() == Fill.FLOW)
             .setDescription("The separation between gradient layers").build();
+    Config<Integer> liquidSpeed = new NumberConfig.Builder<Integer>("LiquidLayers")
+            .setMin(1).setDefaultValue(5).setMax(10)
+            .setVisible(() -> fillMode.getValue() == Fill.LIQUID)
+            .setDescription("The separation between gradient layers").build();
+    Config<Float> liquidFactor = new NumberConfig.Builder<Float>("LiquidFactor")
+            .setMin(1.0f).setDefaultValue(5.0f).setMax(10.0f)
+            .setVisible(() -> fillMode.getValue() == Fill.LIQUID)
+            .setDescription("The separation between gradient layers").build();
     Config<Void> fillConfig = new ConfigGroup.Builder("Fill")
-            .addAll(fillMode, fillOpacity, gradientFactor, gradientColor, flowSpeed, flowFactor).build();
+            .addAll(fillMode, fillOpacity, gradientFactor, gradientColor, flowSpeed, flowFactor, liquidSpeed, liquidFactor).build();
 
     public ShadersModule()
     {
@@ -206,7 +213,8 @@ public class ShadersModule extends Toggleable
     {
         DEFAULT,
         GRADIENT,
-        FLOW
+        FLOW,
+        LIQUID
     }
 
     public enum Shaders
@@ -217,7 +225,7 @@ public class ShadersModule extends Toggleable
             public ShaderEffect getShaderEffect()
             {
                 ShaderEffect effect = new ShaderEffect("outline");
-                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
+                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis());
                 effect.addVec2Uniform("u_Resolution", mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
                 effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
                 effect.addIntUniform("u_FillMode", ShadersModule.INSTANCE.fillMode.getValue().ordinal());
@@ -232,6 +240,8 @@ public class ShadersModule extends Toggleable
 
                 effect.addFltUniform("u_FlowSpeed", ShadersModule.INSTANCE.flowSpeed.getValue());
                 effect.addFltUniform("u_FlowFactor", ShadersModule.INSTANCE.flowFactor.getValue());
+                effect.addFltUniform("u_LiquidIntensity", ShadersModule.INSTANCE.liquidSpeed.getValue());
+                effect.addFltUniform("u_LiquidFactor", ShadersModule.INSTANCE.liquidFactor.getValue());
                 effect.addFltUniform("u_OutlineAlpha", ShadersModule.INSTANCE.outlineOpacity.getValue());
                 return effect;
             }
@@ -242,7 +252,7 @@ public class ShadersModule extends Toggleable
             public ShaderEffect getShaderEffect()
             {
                 ShaderEffect effect = new ShaderEffect("bloom");
-                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
+                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis());
                 effect.addVec2Uniform("u_Resolution", mc.getWindow().getScaledWidth(), mc.getWindow().getFramebufferHeight());
                 effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
                 effect.addIntUniform("u_GlowInside", ShadersModule.INSTANCE.glowInside.getValue() ? 1 : 0);
@@ -256,17 +266,17 @@ public class ShadersModule extends Toggleable
                 effect.addVec4Uniform("u_GradientColor", gradientColor.getRed() / 255.0f,
                         gradientColor.getGreen() / 255.0f,
                         gradientColor.getBlue() / 255.0f,
-                        ShadersModule.INSTANCE.fillOpacity.getValue());
+                        gradientColor.getAlpha() / 255.0f);
 
                 effect.addFltUniform("u_FlowSpeed", ShadersModule.INSTANCE.flowSpeed.getValue());
                 effect.addFltUniform("u_FlowFactor", ShadersModule.INSTANCE.flowFactor.getValue());
+                effect.addFltUniform("u_LiquidIntensity", ShadersModule.INSTANCE.liquidSpeed.getValue());
+                effect.addFltUniform("u_LiquidFactor", ShadersModule.INSTANCE.liquidFactor.getValue());
                 effect.addFltUniform("u_OutlineAlpha", ShadersModule.INSTANCE.outlineOpacity.getValue());
                 return effect;
             }
         };
 
         public abstract ShaderEffect getShaderEffect();
-
-        private static final long startTime = System.currentTimeMillis();
     }
 }

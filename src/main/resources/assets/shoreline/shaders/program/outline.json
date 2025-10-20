@@ -88,6 +88,18 @@
       "values": [ 1.0 ]
     },
     {
+      "name": "u_LiquidIntensity",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "u_LiquidFactor",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
       "name": "u_OutlineAlpha",
       "type": "float",
       "count": 1,

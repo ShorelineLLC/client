@@ -1,5 +1,7 @@
 #version 150
 
+#define TAU 6.28318530718
+
 uniform sampler2D DiffuseSampler;
 
 in vec2 texCoord;
@@ -25,13 +27,16 @@ uniform float u_GradientFactor;
 uniform float u_FlowSpeed;
 uniform float u_FlowFactor;
 
+uniform float u_LiquidIntensity;
+uniform float u_LiquidFactor;
+
 uniform float u_OutlineAlpha;
 
 vec4 getFill(vec3 centerColor)
 {
     if (u_FillMode == 1)
     {
-        float time = u_ShaderTime / 5.0f;
+        float time = u_ShaderTime / 5.0;
         float distance = sqrt(gl_FragCoord.x * gl_FragCoord.x + gl_FragCoord.y * gl_FragCoord.y) + time;
         distance = distance / u_GradientFactor;
         distance = ((sin(distance) + 1.0) / 2.0);
@@ -45,7 +50,7 @@ vec4 getFill(vec3 centerColor)
 
     if (u_FillMode == 2)
     {
-        float time = u_ShaderTime / 500.0f;
+        float time = u_ShaderTime / 500.0;
         vec2 uv = (2.0 * gl_FragCoord.xy - u_Resolution.xy) / min(u_Resolution.x, u_Resolution.y);
         for (float i = 1.0; i < u_FlowSpeed; i++)
         {
@@ -54,6 +59,31 @@ vec4 getFill(vec3 centerColor)
         }
 
         return vec4(centerColor.r / abs(sin(time - uv.y - uv.x)), centerColor.g / abs(sin(time - uv.y - uv.x)), centerColor.b / abs(sin(time - uv.y - uv.x)), u_FillAlpha);
+    }
+
+    if (u_FillMode == 3)
+    {
+        float time = u_ShaderTime / 1000.0;
+        vec2 uv = gl_FragCoord.xy / u_Resolution.xy;
+        vec2 p = mod(uv * TAU, TAU) - 250.0;
+
+        vec2 i = vec2(p);
+        float c = 1.0;
+        float inten = u_LiquidIntensity / 1000.0;
+
+        for (int n = 0; n < floor(u_LiquidFactor); n++)
+        {
+        	float t = time * (1.0 - (3.5 / float(n + 1)));
+        	i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
+        	c += 1.0 / length(vec2(p.x / (sin(i.x + t) / inten), p.y / (cos(i.y + t) / inten)));
+        }
+
+        c /= floor(u_LiquidFactor);
+        c = 1.17 - pow(c, 1.4);
+        vec3 color = vec3(pow(abs(c), 8.0));
+        color = clamp(color + centerColor, 0.0, 1.0);
+
+        return vec4(color, u_FillAlpha);
     }
 
     return vec4(centerColor, u_FillAlpha);

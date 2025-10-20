@@ -115,13 +115,11 @@ public class PacketSnifferModule extends Toggleable
         for (NetworkHandler handler : Managers.NETWORK.getHandlers())
         {
             long packets = Managers.NETWORK.getPacketsSent(handler);
-            if (packets >= 100)
-            {
-                log.append(handler.getName())
-                        .append(": ")
-                        .append(packets)
-                        .append(", ");
-            }
+
+            log.append(handler.getName())
+                    .append(": ")
+                    .append(packets)
+                    .append(", ");
         }
 
         Shoreline.info(log.toString());

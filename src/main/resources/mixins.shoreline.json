@@ -74,6 +74,8 @@
     "render.item.MixinHeldItemRenderer",
     "render.item.MixinItemRenderer",
     "render.item.MixinItemRenderState",
+    "sodium.MixinBlockOcclusionCache",
+    "sodium.MixinBlockRenderer",
     "sodium.MixinFluidRendererImplDefaultRenderContext",
     "text.MixinGlyph",
     "text.MixinTextColor",

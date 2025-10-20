@@ -6,6 +6,7 @@ import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
@@ -22,6 +23,12 @@ public class AutoXPModule extends Toggleable
     Config<Boolean> multitaskConfig = new BooleanConfig.Builder("Multitask")
             .setDescription("Allows using items while using XP")
             .setDefaultValue(true).build();
+    Config<Boolean> inAirConfig = new BooleanConfig.Builder("InAir")
+            .setDescription("Uses XP in the air")
+            .setDefaultValue(false).build();
+    Config<Integer> xptConfig = new NumberConfig.Builder<Integer>("BottlesPerTick")
+            .setMin(1).setDefaultValue(1).setMax(10)
+            .setDescription("The number of XP bottles to throw per tick").build();
     Config<RotateMode> rotateConfig = new EnumConfig.Builder<RotateMode>("Rotate")
             .setValues(RotateMode.values())
             .setDescription("Rotate down before using XP")
@@ -47,6 +54,11 @@ public class AutoXPModule extends Toggleable
         }
 
         if (rotateConfig.getValue() == RotateMode.NORMAL && event.isCanceled())
+        {
+            return;
+        }
+
+        if (!mc.player.isOnGround() && !inAirConfig.getValue())
         {
             return;
         }
@@ -81,7 +93,12 @@ public class AutoXPModule extends Toggleable
         if (Managers.INVENTORY.startSwap(itemSlot))
         {
             xpThrow.applyToPlayer();
-            Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
+
+            for (int i = 0; i < xptConfig.getValue(); i++)
+            {
+                Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
+            }
+
             playerRotation.applyToPlayer();
 
             Managers.INVENTORY.endSwap();
