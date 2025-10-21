@@ -58,6 +58,7 @@ import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
@@ -596,8 +597,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             silentRotated = true;
         }
 
-        CrystalData<BlockPos> currentPlace = new CrystalData<>(placePos,
-                crystalVec, targetState, damage, -1.0f, false);
+        CrystalData<BlockPos> currentPlace = new CrystalData<>(
+                placePos, crystalVec, targetState, damage, -1.0f, false);
 
         return new CrystalDataWithAngles<>(currentPlace, rotations);
     }

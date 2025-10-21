@@ -225,7 +225,7 @@ public class ShadersModule extends Toggleable
             public ShaderEffect getShaderEffect()
             {
                 ShaderEffect effect = new ShaderEffect("outline");
-                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis());
+                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
                 effect.addVec2Uniform("u_Resolution", mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
                 effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
                 effect.addIntUniform("u_FillMode", ShadersModule.INSTANCE.fillMode.getValue().ordinal());
@@ -252,7 +252,7 @@ public class ShadersModule extends Toggleable
             public ShaderEffect getShaderEffect()
             {
                 ShaderEffect effect = new ShaderEffect("bloom");
-                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis());
+                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
                 effect.addVec2Uniform("u_Resolution", mc.getWindow().getScaledWidth(), mc.getWindow().getFramebufferHeight());
                 effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
                 effect.addIntUniform("u_GlowInside", ShadersModule.INSTANCE.glowInside.getValue() ? 1 : 0);
@@ -278,5 +278,7 @@ public class ShadersModule extends Toggleable
         };
 
         public abstract ShaderEffect getShaderEffect();
+
+        private static final long startTime = System.currentTimeMillis();
     }
 }
