@@ -9,6 +9,7 @@ import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
@@ -42,7 +43,8 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
 
             runAsync(() ->
             {
-                List<CrystalData<?>> crystalData = baseScanner.scanCrystalBases();
+                List<CrystalData<?>> crystalData = new ArrayList<>();
+                crystalData.addAll(baseScanner.scanCrystalBases());
                 crystalData.addAll(baseScanner.scanCrystalEntities());
                 return crystalData;
             });

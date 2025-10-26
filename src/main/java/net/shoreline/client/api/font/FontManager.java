@@ -10,6 +10,7 @@ public class FontManager
     private static final Map<String, FontRenderer> AVAILABLE_FONTS = new HashMap<>();
 
     public static FontRenderer FONT_RENDERER;
+    private static boolean initialized;
 
     public static void init()
     {
@@ -19,6 +20,18 @@ public class FontManager
         }
 
         FONT_RENDERER = fromSystem("Verdana");
+        initialized = true;
+    }
+
+    public static void close()
+    {
+        if (initialized)
+        {
+            for (FontRenderer renderer : AVAILABLE_FONTS.values())
+            {
+                renderer.close();
+            }
+        }
     }
 
     public static void setFont(FontRenderer fontRenderer)

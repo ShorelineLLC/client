@@ -29,9 +29,9 @@ public class MixinFluidRendererImplDefaultRenderContext
     {
         WorldTintEvent.Lava lavaTintEvent = new WorldTintEvent.Lava();
         EventBus.INSTANCE.dispatch(lavaTintEvent);
-        if (lavaTintEvent.isCanceled() && var1.getDefaultState().isIn(FluidTags.LAVA))
+        if (var1.getDefaultState().isIn(FluidTags.LAVA))
         {
-            cir.setReturnValue((v1, v2, v3, v4, v5, v6) -> getColors(v1, v2, v3, v4, v5, v6, lavaTintEvent.getColor()));
+            cir.setReturnValue((v1, v2, v3, v4, v5, v6) -> getColors(v1, v2, v3, v4, v5, v6, lavaTintEvent.isCanceled(), lavaTintEvent.getColor()));
         }
     }
 
@@ -42,8 +42,13 @@ public class MixinFluidRendererImplDefaultRenderContext
                           FluidState state,
                           ModelQuadView quad,
                           int[] output,
+                          boolean canceled,
                           Color color)
     {
-        Arrays.fill(output, ColorABGR.pack(color.getRed(), color.getGreen(), color.getBlue(), 255));
+        int fillColor = canceled ?
+                ColorABGR.pack(color.getBlue(), color.getGreen(), color.getRed(), 255) :
+                ColorABGR.pack(15, 85, 205, 255);
+
+        Arrays.fill(output, fillColor);
     }
 }

@@ -70,15 +70,17 @@ public class MiningData
 
     public void render(MatrixStack matrixStack,
                        float tickDelta,
+                       BoxRender boxRender,
                        int startColor,
                        int endColor,
                        float alpha)
     {
-        render(matrixStack, tickDelta, startColor, endColor, alpha, maxProgress);
+        render(matrixStack, tickDelta, boxRender, startColor, endColor, alpha, maxProgress);
     }
 
     public void render(MatrixStack matrixStack,
                        float tickDelta,
+                       BoxRender boxRender,
                        int startColor,
                        int endColor,
                        float alpha,
@@ -98,7 +100,7 @@ public class MiningData
         double dz = (boundingBox.maxZ - boundingBox.minZ) * scale;
         Box scaled = Box.of(center, dx, dy, dz);
 
-        BoxRender.FILL.render(matrixStack, scaled, color, alpha);
+        boxRender.render(matrixStack, scaled, color, alpha);
     }
 
     private float getLinearScale(float maxProgress, float tickDelta)

@@ -23,6 +23,7 @@ import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningPackets;
 import net.shoreline.client.impl.mining.MiningUtil;
 import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -57,6 +58,10 @@ public class SpeedMineModule extends ListeningToggleable
             .setDescription("Rotates before mining block")
             .setDefaultValue(false).build();
 
+    Config<BoxRender> boxMode = new EnumConfig.Builder<BoxRender>("BoxMode")
+            .setValues(BoxRender.values())
+            .setDescription("Box rendering mode")
+            .setDefaultValue(BoxRender.FILL).build();
     Config<Color> miningColor = new ColorConfig.Builder("Mining")
             .setDescription("The color when mining a block")
             .setDefaultValue(Color.RED).build();
@@ -64,7 +69,7 @@ public class SpeedMineModule extends ListeningToggleable
             .setDescription("The color when breaking a block")
             .setDefaultValue(Color.GREEN).build();
     Config<Void> renderConfig = new ConfigGroup.Builder("Render")
-            .addAll(miningColor, breakingColor).build();
+            .addAll(boxMode, miningColor, breakingColor).build();
 
     @Setter
     private boolean isManualMining;
@@ -172,6 +177,7 @@ public class SpeedMineModule extends ListeningToggleable
 
             mainState.data.render(event.getMatrixStack(),
                     event.getTickDelta(),
+                    boxMode.getValue(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
                     (float) Easing.SMOOTH_STEP.ease(mainState.getFactor()),
@@ -188,6 +194,7 @@ public class SpeedMineModule extends ListeningToggleable
 
             packetState.data.render(event.getMatrixStack(),
                     event.getTickDelta(),
+                    boxMode.getValue(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
                     (float) Easing.SMOOTH_STEP.ease(packetState.getFactor()), 1.0f);

@@ -306,7 +306,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             {
                 currentPlace = prePlaceData.data();
                 rotations = prePlaceData.angles();
-                if (predictPlace.getValue() == Timing.VANILLA)
+                if (predictPlace.getValue() != Timing.OFF)
                 {
                     placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
                 }
@@ -384,6 +384,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         if (predictPlace.getValue() != Timing.SEQUENTIAL)
+        {
+            return;
+        }
+
+        if (currentPlace != null && currentPlace.getDamageToPlayer() > 0.0f)
         {
             return;
         }
@@ -828,7 +833,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         for (Entity entity : WorldUtil.collectEntitiesInBox(box))
         {
-            if (!canIgnoreEntity(entity) || (!ignoreItems && entity instanceof ItemEntity))
+            if (!canIgnoreEntity(entity, ignoreItems))
             {
                 return true;
             }
@@ -837,9 +842,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return false;
     }
 
-    public boolean canIgnoreEntity(Entity entity)
+    public boolean canIgnoreEntity(Entity entity, boolean ignoreItems)
     {
-        return entity instanceof ExperienceOrbEntity || entity instanceof EndCrystalEntity crystal;
+        return entity instanceof ExperienceOrbEntity || entity instanceof EndCrystalEntity crystal || ignoreItems && entity instanceof ItemEntity;
     }
 
     public Box getCrystalBox(BlockPos blockPos)

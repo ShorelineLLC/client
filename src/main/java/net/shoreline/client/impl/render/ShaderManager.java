@@ -10,6 +10,7 @@ import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.imixin.*;
 import net.shoreline.client.impl.module.render.ShadersModule;
@@ -55,7 +56,7 @@ public class ShaderManager extends GenericFeature
 
     public void render(ShaderEffect shaderEffect)
     {
-        Identifier id = Identifier.of("shoreline", shaderEffect.getName());
+        Identifier id = Identifier.of(ShorelineMod.MOD_ID, shaderEffect.getName());
         PostEffectProcessor shader = mc.getShaderLoader().loadPostEffect(id, DefaultFramebufferSet.MAIN_ONLY);
 
         ShaderProgram program = ((IPostEffectProcessor) shader).getPasses().getFirst().getProgram();

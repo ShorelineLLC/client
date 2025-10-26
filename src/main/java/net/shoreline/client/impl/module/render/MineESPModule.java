@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.render;
 
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
@@ -9,6 +10,7 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -19,6 +21,10 @@ import java.util.concurrent.ConcurrentMap;
 
 public class MineESPModule extends RenderModule
 {
+    Config<BoxRender> boxMode = new EnumConfig.Builder<BoxRender>("Mode")
+            .setValues(BoxRender.values())
+            .setDescription("Box rendering mode")
+            .setDefaultValue(BoxRender.FILL).build();
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(12.0f).setDefaultValue(6.0f).setFormat("m")
             .setDescription("The range to scan for mined blocks").build();
@@ -56,6 +62,7 @@ public class MineESPModule extends RenderModule
             MiningData data = animations.getKey();
 
             data.render(event.getMatrixStack(), event.getTickDelta(),
+                    boxMode.getValue(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
                     (float) Easing.SMOOTH_STEP.ease(animations.getValue().getFactor()), 1.0f);

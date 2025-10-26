@@ -12,6 +12,7 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.impl.imixin.IModel;
 import net.shoreline.client.impl.module.render.ChamsModule;
 import net.shoreline.client.impl.module.render.ModelsModule;
@@ -44,7 +45,7 @@ public class MixinEndCrystalEntityRenderer
     private EndCrystalEntity last;
 
     @Unique
-    private static final Identifier BLANK = Identifier.of("shoreline", "textures/blank.png");
+    private static final Identifier BLANK = Identifier.of(ShorelineMod.MOD_ID, "textures/blank.png");
 
     @Inject(
             method = "updateRenderState(Lnet/minecraft/entity/decoration/EndCrystalEntity;" +

@@ -2,6 +2,7 @@ package net.shoreline.client.impl.module.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
@@ -44,7 +45,8 @@ public class TintModule extends Toggleable
     public TintModule()
     {
         super("Tint", new String[] {"Ambience"}, "Change the world color tint", GuiCategory.RENDER);
-        this.shineTexture = Identifier.of("shoreline", "textures/shine.png");
+
+        this.shineTexture = Identifier.of(ShorelineMod.MOD_ID, "textures/shine.png");
     }
 
     @Override

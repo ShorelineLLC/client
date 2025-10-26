@@ -7,13 +7,14 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TriState;
 import net.minecraft.util.Util;
+import net.shoreline.client.ShorelineMod;
 
 import java.util.OptionalDouble;
 import java.util.function.BiFunction;
 
 public class Layers
 {
-    public static Identifier GLINT = Identifier.of("shoreline", "textures/shine.png");
+    public static Identifier GLINT = Identifier.of(ShorelineMod.MOD_ID, "textures/shine.png");
 
     public static final RenderLayer.MultiPhase QUADS_GLINT = RenderLayer.of(
             "shoreline_quads_glint", VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 1536, false, true,

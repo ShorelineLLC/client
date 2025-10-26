@@ -111,7 +111,7 @@ public class Frame extends DrawableComponent implements Interactable
             collapseAnim.setEasing(frameOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (FrameComponent component : components)
             {
@@ -125,7 +125,7 @@ public class Frame extends DrawableComponent implements Interactable
                               double mouseY,
                               int button)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (FrameComponent component : components)
             {
@@ -139,7 +139,7 @@ public class Frame extends DrawableComponent implements Interactable
                            int scanCode,
                            int modifiers)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (FrameComponent component : components)
             {
@@ -152,7 +152,7 @@ public class Frame extends DrawableComponent implements Interactable
     public void charTyped(char chr,
                           int modifiers)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (FrameComponent component : components)
             {

@@ -109,7 +109,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         for (EntityState entity1 : getOtherEntities(null, box))
         {
             Entity entity = entity1.getEntity();
-            if (!autoCrystal.canIgnoreEntity(entity))
+            if (!autoCrystal.canIgnoreEntity(entity, false))
             {
                 return true;
             }

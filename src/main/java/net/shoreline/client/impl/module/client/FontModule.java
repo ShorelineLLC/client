@@ -18,6 +18,12 @@ public class FontModule extends Toggleable
             .setValues(Fonts.values())
             .setDescription("The font for the client")
             .setDefaultValue(Fonts.VERDANA).build();
+    Config<Boolean> antiAlias = new BooleanConfig.Builder("AntiAlias")
+            .setDescription("Applies AA texturing on font")
+            .setDefaultValue(true).build();
+    Config<Boolean> fractionalMetrics = new BooleanConfig.Builder("FractionalMetrics")
+            .setDescription("Applies fractional metrics on font")
+            .setDefaultValue(false).build();
     Config<Boolean> overrideChat = new BooleanConfig.Builder("OverrideChat")
             .setDescription("Overrides the font in chat")
             .setDefaultValue(false).build();
@@ -28,5 +34,8 @@ public class FontModule extends Toggleable
         INSTANCE = this;
 
         fontsConfig.addListener(v -> FontManager.setFont(FontManager.fromSystem(v.getName())));
+
+        antiAlias.addListener(v -> FontManager.close());
+        fractionalMetrics.addListener(v -> FontManager.close());
     }
 }

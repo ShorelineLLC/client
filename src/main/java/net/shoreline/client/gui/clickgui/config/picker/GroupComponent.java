@@ -107,7 +107,7 @@ public class GroupComponent extends ExpandableComponent<Void>
             collapseAnim.setEasing(pickerOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
-        if (collapseAnim.getFactor() > 0.0)
+        if (pickerOpen)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -124,7 +124,7 @@ public class GroupComponent extends ExpandableComponent<Void>
                               double mouseY,
                               int button)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (pickerOpen)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -141,7 +141,7 @@ public class GroupComponent extends ExpandableComponent<Void>
                            int scanCode,
                            int modifiers)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (pickerOpen)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -157,7 +157,7 @@ public class GroupComponent extends ExpandableComponent<Void>
     public void charTyped(char chr,
                           int modifiers)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (pickerOpen)
         {
             for (ConfigComponent<?> component : components)
             {

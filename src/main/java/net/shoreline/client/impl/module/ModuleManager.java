@@ -91,6 +91,7 @@ public class ModuleManager
                 new ElytraFlyModule(),
                 new FastFallModule(),
                 new FlightModule(),
+                new JesusModule(),
                 new LongJumpModule(),
                 new NoAccelModule(),
                 new NoJumpDelayModule(),

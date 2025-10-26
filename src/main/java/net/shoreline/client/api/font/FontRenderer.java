@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
@@ -12,7 +13,9 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.impl.imixin.IDrawContext;
+import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.misc.NameProtectModule;
@@ -29,6 +32,8 @@ import java.util.regex.Pattern;
 
 public final class FontRenderer implements Closeable
 {
+    @Getter
+    private String name;
     private Font font;
     private final float size;
 
@@ -59,6 +64,7 @@ public final class FontRenderer implements Closeable
 
     public FontRenderer(String name, float size)
     {
+        this.name = name;
         this.font = new Font(name, Font.PLAIN, Math.round(size));
         this.size = size;
         createFont(font, size);
@@ -202,10 +208,13 @@ public final class FontRenderer implements Closeable
             {
                 List<CharLocation> locations = cache.get(identifier);
 
-                AbstractTexture texture = MinecraftClient.getInstance().getTextureManager().getTexture(identifier);
-                if (texture != null)
+                if (FontModule.INSTANCE.getAntiAlias().getValue())
                 {
-                    texture.setFilter(true, true);
+                    AbstractTexture texture = MinecraftClient.getInstance().getTextureManager().getTexture(identifier);
+                    if (texture != null)
+                    {
+                        texture.setFilter(true, true);
+                    }
                 }
 
                 RenderSystem.setShaderTexture(0, identifier);
@@ -311,7 +320,9 @@ public final class FontRenderer implements Closeable
         }
 
         int base = 256 * (int) Math.floor((double) c / (double) 256);
-        GlyphCache glyphCache = new GlyphCache((char) base, (char) (base + 256), font, getGlyphIdentifier(), 5, true, false);
+        GlyphCache glyphCache = new GlyphCache((char) base, (char) (base + 256), font, getGlyphIdentifier(), 5,
+                FontModule.INSTANCE.getAntiAlias().getValue(), FontModule.INSTANCE.getFractionalMetrics().getValue());
+
         caches.add(glyphCache);
         return glyphCache.getGlyph(c);
     }
@@ -336,7 +347,7 @@ public final class FontRenderer implements Closeable
 
     public Identifier getGlyphIdentifier()
     {
-        return Identifier.of("shoreline", "font/storage/" + generateRandomHex(32));
+        return Identifier.of(ShorelineMod.MOD_ID, "font/storage/" + generateRandomHex(32));
     }
 
     private static final String HEX_CHARS = "0123456789abcdef";

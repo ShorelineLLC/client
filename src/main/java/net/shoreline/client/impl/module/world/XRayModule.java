@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.world;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.registry.Registries;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.RegistryConfig;
 import net.shoreline.client.api.module.GuiCategory;
@@ -13,6 +14,10 @@ import java.util.Collection;
 public class XRayModule extends Toggleable
 {
     public static XRayModule INSTANCE;
+
+    Config<Boolean> softReload = new BooleanConfig.Builder("SoftReload")
+            .setDescription("Reloads without refreshing renders")
+            .setDefaultValue(false).build();
 
     Config<Collection<Block>> xrayBlocks = new RegistryConfig.Builder<Block>("Blocks")
             .setRegistry(Registries.BLOCK)
@@ -45,7 +50,19 @@ public class XRayModule extends Toggleable
 
     private void reload()
     {
-        if (mc.worldRenderer != null)
+        if (mc.worldRenderer == null)
+        {
+            return;
+        }
+
+        if (softReload.getValue())
+        {
+            int x = (int) mc.player.getX();
+            int y = (int) mc.player.getY();
+            int z = (int) mc.player.getZ();
+            int d = mc.options.getViewDistance().getValue() * 16;
+            mc.worldRenderer.scheduleBlockRenders(x - d, y - d, z - d, x + d, y + d, z + d);
+        } else
         {
             mc.worldRenderer.reload();
         }

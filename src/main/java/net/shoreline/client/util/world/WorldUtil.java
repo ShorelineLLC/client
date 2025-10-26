@@ -33,7 +33,7 @@ public class WorldUtil
                 continue;
             }
 
-            if (!entityClass.isInstance(entity) || (predicate != null && !predicate.test(entity)))
+            if (!entityClass.isAssignableFrom(entity.getClass()) || (predicate != null && !predicate.test(entity)))
             {
                 continue;
             }

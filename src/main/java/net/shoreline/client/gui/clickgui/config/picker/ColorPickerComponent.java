@@ -4,6 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
@@ -116,13 +117,13 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             hexComponent.setHeight(13);
             hexComponent.drawComponent(context, mouseX, mouseY, delta);
 
-            Identifier resetSprite = Identifier.of("shoreline", "icon/reset_clickgui.png");
+            Identifier resetSprite = Identifier.of(ShorelineMod.MOD_ID, "icon/reset_clickgui.png");
             float resetX = getTx() + pickerLength - 18;
             float resetY = getTy() + height + pickerLength + 5;
             drawRect(context, resetX, resetY, 15, 15, theme.getComponentColor());
             drawTexturedRect(context, resetSprite, resetX + 2, resetY + 1, 12, 12);
 
-            Identifier syncSprite = Identifier.of("shoreline", "icon/sync_clickgui.png");
+            Identifier syncSprite = Identifier.of(ShorelineMod.MOD_ID, "icon/sync_clickgui.png");
             float syncX = getTx() + pickerLength;
             float syncY = getTy() + height + pickerLength + 5;
             drawRect(context, syncX, syncY, 15, 15, colorConfig.isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);

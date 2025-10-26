@@ -38,9 +38,12 @@ public class ViewModelModule extends Toggleable
     Config<Float> rotateZ = new NumberConfig.Builder<Float>("RotateZ")
             .setMin(-180.0f).setMax(180.0f).setDefaultValue(0.0f)
             .setDescription("Rotation in z-direction").build();
-    Config<Float> eatingY = new NumberConfig.Builder<Float>("EatingY")
+    Config<Float> eatingY = new NumberConfig.Builder<Float>("EatingFactor")
             .setMin(0.1f).setMax(1.0f).setDefaultValue(1.0f)
             .setDescription("Eating factor in y-direction").build();
+    Config<Integer> eatingDuration = new NumberConfig.Builder<Integer>("EatingDuration")
+            .setMin(1).setMax(10).setDefaultValue(4)
+            .setDescription("Eating duration length").build();
 
     public ViewModelModule()
     {
@@ -70,5 +73,6 @@ public class ViewModelModule extends Toggleable
     {
         event.cancel();
         event.setFactorY(eatingY.getValue());
+        event.setDuration(eatingDuration.getValue());
     }
 }

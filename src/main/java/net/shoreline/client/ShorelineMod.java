@@ -2,8 +2,10 @@ package net.shoreline.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
@@ -19,6 +21,7 @@ import net.shoreline.client.impl.render.Shaders;
 public class ShorelineMod implements ClientModInitializer
 {
     public static final String MOD_NAME = "Shoreline";
+    public static final String MOD_ID = "shoreline";
     public static final String MOD_VER = BuildConfig.VERSION;
     public static final String MOD_MC_VER = "1.21.4";
 

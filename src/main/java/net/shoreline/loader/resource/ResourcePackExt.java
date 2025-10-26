@@ -9,6 +9,7 @@ import net.minecraft.resource.ResourcePackInfo;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataSerializer;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.ShorelineMod;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -70,7 +71,7 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
                 InputStream is;
                 if ((is = (InputStream) getResourceInternal(formattedName)) != null)
                 {
-                    Identifier id = Identifier.of("shoreline", String.format("sounds/%s", soundFile));
+                    Identifier id = Identifier.of(ShorelineMod.MOD_ID, String.format("sounds/%s", soundFile));
                     consumer.accept(id, () -> is);
                 }
             }

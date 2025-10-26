@@ -19,6 +19,9 @@ import java.awt.*;
 public class HudGuiModule extends ListeningToggleable
 {
     public static HudGuiModule INSTANCE;
+    Config<Float> scaleConfig = new NumberConfig.Builder<Float>("Scale")
+            .setMin(0.5f).setMax(1.5f).setDefaultValue(1.0f)
+            .setDescription("The hud element scale").build();
     Config<ColorEffect> effectConfig = new EnumConfig.Builder<ColorEffect>("Effects")
             .setValues(ColorEffect.values())
             .setDefaultValue(ColorEffect.NONE)

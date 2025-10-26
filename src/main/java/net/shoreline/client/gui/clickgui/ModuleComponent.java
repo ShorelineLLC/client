@@ -166,7 +166,7 @@ public class ModuleComponent extends FrameComponent
             collapseAnim.setEasing(frameOpen ? Easing.CUBIC_OUT : Easing.CUBIC_IN);
         }
 
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -183,7 +183,7 @@ public class ModuleComponent extends FrameComponent
                               double mouseY,
                               int button)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -200,7 +200,7 @@ public class ModuleComponent extends FrameComponent
                            int scanCode,
                            int modifiers)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (ConfigComponent<?> component : components)
             {
@@ -216,7 +216,7 @@ public class ModuleComponent extends FrameComponent
     public void charTyped(char chr,
                           int modifiers)
     {
-        if (collapseAnim.getFactor() > 0.0)
+        if (frameOpen)
         {
             for (ConfigComponent<?> component : components)
             {

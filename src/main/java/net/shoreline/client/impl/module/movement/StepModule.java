@@ -28,10 +28,6 @@ public class StepModule extends ListeningToggleable
             .setDescription("Uses timer to prevent packet spam")
             .setVisible(() -> stepMode.getValue() == StepMode.NCP)
             .setDefaultValue(false).build();
-    Config<Boolean> strictConfig = new BooleanConfig.Builder("Strict")
-            .setDescription("Works on updated NCP servers")
-            .setVisible(() -> stepMode.getValue() == StepMode.NCP)
-            .setDefaultValue(false).build();
 
     private final Timer stepTimer = new NanoTimer();
     private boolean cancelTimer;
@@ -89,7 +85,7 @@ public class StepModule extends ListeningToggleable
             return;
         }
 
-        if (stepMode.getValue() == StepMode.NCP)
+        if (stepMode.getValue() == StepMode.NCP || stepMode.getValue() == StepMode.STRICT_NCP)
         {
             double stepHeight = mc.player.getY() - mc.player.prevY;
             if (stepHeight <= 0.5 || stepHeight > heightConfig.getValue())
@@ -128,7 +124,7 @@ public class StepModule extends ListeningToggleable
     private double[] getStepOffsets(double stepHeight)
     {
         double[] offsets = null;
-        if (strictConfig.getValue())
+        if (stepMode.getValue() == StepMode.STRICT_NCP)
         {
             if (stepHeight > 1.1661)
             {
@@ -163,6 +159,6 @@ public class StepModule extends ListeningToggleable
 
     private enum StepMode
     {
-        NCP, VANILLA
+        NCP, STRICT_NCP, VANILLA
     }
 }

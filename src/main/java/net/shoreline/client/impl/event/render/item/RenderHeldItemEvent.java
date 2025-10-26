@@ -27,5 +27,6 @@ public class RenderHeldItemEvent extends Event
     public static class Eating extends RenderHeldItemEvent
     {
         private float factorY;
+        private int duration;
     }
 }
