@@ -1,5 +1,6 @@
 package net.shoreline.client.gui.clickgui.config;
 
+import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
@@ -18,10 +19,12 @@ import org.lwjgl.glfw.GLFW;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Setter
 public class SliderComponent<T extends Number> extends ConfigComponent<T>
 {
     private final TextComponent textComponent;
     private final Smoother smoother = new Smoother();
+    private boolean dragging;
 
     public SliderComponent(Config<T> config,
                            ModuleComponent moduleComponent,
@@ -87,7 +90,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
         NumberConfig<T> numberConfig = (NumberConfig<T>) getConfig();
         Number min = numberConfig.getMin();
         Number max = numberConfig.getMax();
-        if (mouse.isHovering(getTx(), getTy(), width, height) && mouse.isLeftHeld())
+        if (mouse.isHovering(getTx(), getTy(), width, height) && mouse.isLeftHeld() && dragging)
         {
             setSliderValue(mouseX, min, max);
         }
@@ -119,6 +122,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
         if (Mouse.isHovering(mouseX, mouseY, getTx(), getTy(), width, height)
                 && mouseButton == GLFW.GLFW_MOUSE_BUTTON_LEFT)
         {
+            setDragging(true);
             setSliderValue(mouseX, ((NumberConfig<T>) getConfig()).getMin(),
                     ((NumberConfig<T>) getConfig()).getMax());
         }
@@ -131,7 +135,7 @@ public class SliderComponent<T extends Number> extends ConfigComponent<T>
                               double mouseY,
                               int button)
     {
-
+        setDragging(false);
     }
 
     @Override

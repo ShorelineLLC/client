@@ -74,7 +74,9 @@ public class MixinEndCrystalEntityRenderer
                                     CallbackInfo info)
     {
         if (ChamsModule.getInstance().isEnabled()
-                && (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.XQZ)
+                && (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.X_Q_Z
+                    || ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE
+                    && ChamsModule.getInstance().model.getValue())
                 && ChamsModule.getInstance().isValid(last))
         {
             END_CRYSTAL = Layers.ENTITY.apply(ChamsModule.getInstance().getOpacity() == 0.0f ? BLANK : TEXTURE, true);

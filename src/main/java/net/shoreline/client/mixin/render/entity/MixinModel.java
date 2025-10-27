@@ -32,7 +32,9 @@ public class MixinModel implements IModel
     private RenderLayer getLayerHook(RenderLayer original, @Local(argsOnly = true) Identifier texture)
     {
         if (ChamsModule.getInstance().isEnabled()
-                && ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.XQZ
+                && (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.X_Q_Z
+                  || ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE
+                  && ChamsModule.getInstance().model.getValue())
                 && cancelModel)
         {
             return Layers.ENTITY.apply(texture, true);
@@ -49,7 +51,10 @@ public class MixinModel implements IModel
                             "Lnet/minecraft/client/render/VertexConsumer;III)V"))
     private void render$render(Args args)
     {
-        if (ChamsModule.getInstance().isEnabled() && ChamsModule.getInstance().getOpacity() != 1.0f && cancelModel)
+        if (ChamsModule.getInstance().isEnabled()
+                && (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.X_Q_Z
+                || ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
+                && ChamsModule.getInstance().getOpacity() != 1.0f && cancelModel)
         {
             int alpha = (int) (ChamsModule.getInstance().getOpacity() * 255.0f);
             alpha = Math.max(0, Math.min(alpha, 255));

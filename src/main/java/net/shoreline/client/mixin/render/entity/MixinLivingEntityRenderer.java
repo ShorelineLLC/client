@@ -61,7 +61,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
     {
         Identifier identifier = this.getTexture(state);
         if (ChamsModule.getInstance().isEnabled()
-                && ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.XQZ
+                && ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.X_Q_Z
                 && ChamsModule.getInstance().isValid(last))
         {
             return Layers.ENTITY.apply(identifier, true);
