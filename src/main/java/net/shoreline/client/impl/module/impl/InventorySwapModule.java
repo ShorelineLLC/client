@@ -4,6 +4,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
@@ -21,7 +23,7 @@ public class InventorySwapModule extends Toggleable
         super(name, nameAliases, description, category);
     }
 
-    protected int swapItemWithSlot(Item item, int slot)
+    protected int swapItemWithSlot(Item item, int slot, boolean altSwap)
     {
         PlayerInventory playerInventory = mc.player.getInventory();
         ScreenHandler handler = mc.player.playerScreenHandler;
@@ -34,7 +36,14 @@ public class InventorySwapModule extends Toggleable
             }
 
             int slot1 = InventoryUtil.getPacketSlotIndex(handler, slot);
-            Managers.INVENTORY.clickSwap(i, slot1, item);
+            if (altSwap)
+            {
+                Managers.INVENTORY.swap(i, slot1);
+            } else
+            {
+                Managers.INVENTORY.clickSwap(i, slot1, item);
+            }
+
             return i;
         }
 

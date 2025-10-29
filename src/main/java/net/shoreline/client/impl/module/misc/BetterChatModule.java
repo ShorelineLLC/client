@@ -7,6 +7,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.module.GuiCategory;
@@ -24,7 +25,10 @@ import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,6 +42,11 @@ public class BetterChatModule extends Toggleable
     Config<Boolean> timestampConfig = new BooleanConfig.Builder("Timestamp")
             .setDescription("Adds a timestamp to all messages in chat")
             .setDefaultValue(false).build();
+    Config<TimeFormat> timeFormat = new EnumConfig.Builder<TimeFormat>("TimeFormat")
+            .setValues(TimeFormat.values())
+            .setDescription("Adds a timestamp to all messages in chat")
+            .setDefaultValue(TimeFormat.MERIDIEM_TIME)
+            .setVisible(() -> timestampConfig.getValue()).build();
     Config<Integer> chatLength = new NumberConfig.Builder<Integer>("MaxLength")
             .setMin(100).setMax(1000).setDefaultValue(500)
             .setDescription("The max number of rows in the chat").build();
@@ -115,7 +124,9 @@ public class BetterChatModule extends Toggleable
         MutableText chatPrefix = Text.empty();
         if (timestampConfig.getValue())
         {
-            String time = new SimpleDateFormat("k:mm").format(new Date());
+            String time = LocalTime.now().format(DateTimeFormatter.ofPattern(
+                    timeFormat.getValue() == TimeFormat.MILITARY_TIME ? "k:mm" : "h:mm a", Locale.getDefault()));
+
             chatPrefix = Text.literal(ClientFormatting.THEME + "<" + time + "> ");
         }
 
@@ -153,5 +164,10 @@ public class BetterChatModule extends Toggleable
     public double getChatFactor()
     {
         return isEnabled() && animateConfig.getValue() ? Easing.SMOOTH_STEP.ease(chatAnim.getFactor()) : 1.0f;
+    }
+
+    public enum TimeFormat
+    {
+        MILITARY_TIME, MERIDIEM_TIME
     }
 }

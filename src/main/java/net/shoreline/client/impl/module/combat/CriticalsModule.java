@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
@@ -64,6 +65,21 @@ public class CriticalsModule extends MovementModule
         }
     }
 
+    @EventListener
+    public void onPacketOutbound(PacketEvent.OutboundPost event)
+    {
+        if (checkNull())
+        {
+            return;
+        }
+
+        if (event.getPacket() instanceof PlayerInteractEntityC2SPacket && postUpdateGround)
+        {
+            sendPacketInternal(0.0f, false);
+            postUpdateGround = false;
+        }
+    }
+
     public void sendCritPackets()
     {
         switch (modeConfig.getValue())
@@ -97,26 +113,22 @@ public class CriticalsModule extends MovementModule
 
     private void sendPacketInternal(double yOffset, boolean onGround)
     {
-        Packet<?> movePacket = new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(),
+        sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.getX(),
                 mc.player.getY() + yOffset,
                 mc.player.getZ(),
                 onGround,
-                mc.player.horizontalCollision);
-
-        sendPacket(movePacket);
+                mc.player.horizontalCollision));
     }
 
     private void sendRotatePacketInternal(double yOffset, float yaw, float pitch, boolean onGround)
     {
-        Packet<?> movePacket = new PlayerMoveC2SPacket.Full(mc.player.getX(),
+        sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(),
                 mc.player.getY() + yOffset,
                 mc.player.getZ(),
                 yaw,
                 pitch,
                 onGround,
-                mc.player.horizontalCollision);
-
-        sendPacket(movePacket);
+                mc.player.horizontalCollision));
     }
 
     public enum CritMode

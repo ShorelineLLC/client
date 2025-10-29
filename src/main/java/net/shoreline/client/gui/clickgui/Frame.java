@@ -3,6 +3,7 @@ package net.shoreline.client.gui.clickgui;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
 import net.shoreline.client.gui.Mouse;
@@ -71,6 +72,8 @@ public class Frame extends DrawableComponent implements Interactable
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
         drawText(context, title, x + 3.0f, y + 5.0f, theme.getTextColor());
+        String sizeText = Formatting.GRAY + "[" + Formatting.RESET + components.size() + Formatting.GRAY + "]";
+        drawText(context, sizeText, x + width - getTextWidth(sizeText) - 2.0f, y + 5.0f, theme.getTextColor());
 
         if (collapseAnim.getFactor() > 0.0)
         {

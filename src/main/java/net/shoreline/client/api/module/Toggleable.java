@@ -7,11 +7,14 @@ import net.shoreline.client.api.config.MacroConfig;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.macro.ModuleKeybind;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.util.text.Formatted;
 import net.shoreline.eventbus.EventBus;
 import org.lwjgl.glfw.GLFW;
 
+import java.text.DecimalFormat;
+
 @Getter
-public class Toggleable extends Module
+public class Toggleable extends Module implements Formatted
 {
     protected final Config<Boolean> enabled = new BooleanConfig.Builder("Enabled")
             .setDescription("Module enabled state")
@@ -84,6 +87,11 @@ public class Toggleable extends Module
 
     protected void onToggle() {}
 
+    public String getModuleData()
+    {
+        return null;
+    }
+
     public boolean isEnabled()
     {
         return enabled.getValue();
@@ -125,4 +133,5 @@ public class Toggleable extends Module
     {
         return notify.getValue();
     }
+
 }

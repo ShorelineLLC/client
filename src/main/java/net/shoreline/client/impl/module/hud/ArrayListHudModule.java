@@ -21,12 +21,12 @@ public class ArrayListHudModule extends DynamicHudModule
         {
             if (module instanceof Toggleable toggleable)
             {
-                getHudEntries().add(new DynamicEntry(this, () -> getFullName(module), () -> toggleable.isEnabled() && !toggleable.isHidden()));
+                getHudEntries().add(new DynamicEntry(this, () -> getFullName(toggleable), () -> toggleable.isEnabled() && !toggleable.isHidden()));
             }
         }
     }
 
-    public String getFullName(Module module)
+    public String getFullName(Toggleable module)
     {
         return module.getName() +
                 (module.getModuleData() == null

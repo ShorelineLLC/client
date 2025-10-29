@@ -115,13 +115,13 @@ public class TextRadarHudModule extends DynamicHudModule
                     () ->
                     {
                         StringBuilder builder = new StringBuilder(player.getName().getString());
-                        builder.append(" ");
 
                         if (pingConfig.getValue() && mc.getNetworkHandler() != null)
                         {
                             PlayerListEntry playerEntry = mc.getNetworkHandler().getPlayerListEntry(player.getGameProfile().getId());
                             if (playerEntry != null)
                             {
+                                builder.append(" ");
                                 builder.append(Formatting.WHITE);
                                 builder.append(playerEntry.getLatency());
                                 builder.append("ms");
@@ -139,31 +139,8 @@ public class TextRadarHudModule extends DynamicHudModule
                             int totems = Managers.TOTEM.getTotems(player);
                             if (totems > 0)
                             {
-                                Formatting pcolor = Formatting.GREEN;
-
-                                if (totems > 1)
-                                {
-                                    pcolor = Formatting.DARK_GREEN;
-                                }
-                                if (totems > 2)
-                                {
-                                    pcolor = Formatting.YELLOW;
-                                }
-                                if (totems > 3)
-                                {
-                                    pcolor = Formatting.GOLD;
-                                }
-                                if (totems > 4)
-                                {
-                                    pcolor = Formatting.RED;
-                                }
-                                if (totems > 5)
-                                {
-                                    pcolor = Formatting.DARK_RED;
-                                }
-
-                                builder.append(pcolor);
                                 builder.append(" ");
+                                builder.append(Formatting.WHITE);
                                 builder.append(-totems);
                             }
                         }

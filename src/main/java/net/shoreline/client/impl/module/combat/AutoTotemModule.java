@@ -2,10 +2,12 @@ package net.shoreline.client.impl.module.combat;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
@@ -14,6 +16,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.client.impl.event.TickPriorities;
@@ -33,6 +36,12 @@ public class AutoTotemModule extends InventorySwapModule
     Config<Boolean> damageCheck = new BooleanConfig.Builder("Safe")
             .setDescription("Swaps if potential damage will kill the player")
             .setDefaultValue(true).build();
+    Config<Boolean> instantReplace = new BooleanConfig.Builder("InstantReplace")
+            .setDescription("Instant replaces after popping a totem")
+            .setDefaultValue(false).build();
+    Config<Boolean> fastSwap = new BooleanConfig.Builder("FastSwap")
+            .setDescription("Uses a faster swap method")
+            .setDefaultValue(false).build();
     Config<Boolean> mainhandTotem = new BooleanConfig.Builder("MainhandTotem")
             .setDescription("Holds a totem in your mainhand")
             .setDefaultValue(false).build();
@@ -73,7 +82,7 @@ public class AutoTotemModule extends InventorySwapModule
             ItemStack stack = mc.player.getInventory().getStack(hotbarTotemSlot.getValue());
             if (stack.isEmpty() || stack.getItem() != Items.TOTEM_OF_UNDYING)
             {
-                swapItemWithSlot(Items.TOTEM_OF_UNDYING, hotbarTotemSlot.getValue());
+                swapItemWithSlot(Items.TOTEM_OF_UNDYING, hotbarTotemSlot.getValue(), fastSwap.getValue());
             }
 
             Managers.INVENTORY.setSelectedSlot(hotbarTotemSlot.getValue());
@@ -110,13 +119,28 @@ public class AutoTotemModule extends InventorySwapModule
                 Managers.INVENTORY.pickupSlot(handler, InventoryUtil.OFFHAND_SLOT);
             } else
             {
-                swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT);
+                swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT, fastSwap.getValue());
             }
 
             return;
         }
 
-        swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT);
+        swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT, fastSwap.getValue());
+    }
+
+    @EventListener
+    public void onPacketInbound(PacketEvent.Inbound event)
+    {
+        if (checkNull() || !instantReplace.getValue())
+        {
+            return;
+        }
+
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet && packet.getEntity(mc.world) == mc.player
+                && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING)
+        {
+            swapItemWithSlot(Items.TOTEM_OF_UNDYING, PlayerInventory.OFF_HAND_SLOT, fastSwap.getValue());
+        }
     }
 
     @RequiredArgsConstructor

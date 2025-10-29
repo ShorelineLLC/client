@@ -9,8 +9,6 @@ import java.text.DecimalFormat;
 
 public class TPSHudModule extends DynamicHudModule
 {
-    private final DecimalFormat decimal2 = new DecimalFormat("0.0#");
-
     public TPSHudModule()
     {
         super("TPS", "Displays current server ticks", 200, 225);
@@ -27,7 +25,7 @@ public class TPSHudModule extends DynamicHudModule
         double curr = Managers.TICK.getLatestTPS();
         double avg = Managers.TICK.getAverageTPS();
         return String.format("TPS " + Formatting.WHITE + "%s " + Formatting.GRAY + "[" + Formatting.WHITE + "%s" + Formatting.GRAY + "]",
-            decimal2.format(curr) + (Managers.TICK.getSize() == 20 ? "" : "*"),
-            decimal2.format(avg));
+            DECIMAL_TRIMMED.format(curr) + (Managers.TICK.getSize() == 20 ? "" : "*"),
+            DECIMAL_TRIMMED.format(avg));
     }
 }

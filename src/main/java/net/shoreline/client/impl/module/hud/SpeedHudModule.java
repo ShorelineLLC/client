@@ -16,8 +16,6 @@ public class SpeedHudModule extends DynamicHudModule
             .setDescription("The speed value format")
             .setDefaultValue(Format.KMH).build();
 
-    private final DecimalFormat decimalFormatter = new DecimalFormat("0.0#");
-
     public SpeedHudModule()
     {
         super("Speed", "Displays the player speed", 200, 250);
@@ -50,7 +48,7 @@ public class SpeedHudModule extends DynamicHudModule
         }
 
         String format = formatMode.getValue() == Format.KMH ? "km/h" : "b/s";
-        return String.format("Speed " + Formatting.WHITE + "%s%s", decimalFormatter.format(speed), format);
+        return String.format("Speed " + Formatting.WHITE + "%s%s", DECIMAL_TRIMMED.format(speed), format);
     }
 
     public enum Format

@@ -97,7 +97,7 @@ public class MixinHeldItemRenderer
         RenderHandEvent event = new RenderHandEvent(vertexConsumers);
         EventBus.INSTANCE.dispatch(event);
 
-        original.call(instance, player, tickDelta, pitch, hand, swingProgress, item, equipProgress, matrices, event.getVertexConsumerProvider(), light);
+        original.call(instance, player, tickDelta, pitch, hand, swingProgress, item, equipProgress, matrices, event.isCanceled() ? event.getVertexConsumerProvider() : vertexConsumers, light);
     }
 
     @Inject(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At("TAIL"))

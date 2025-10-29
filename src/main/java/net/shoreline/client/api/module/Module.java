@@ -35,9 +35,4 @@ public abstract class Module extends ConfigContainer
     {
         return String.format(ID_FORMAT, getName().toLowerCase());
     }
-
-    public String getModuleData()
-    {
-        return null;
-    }
 }

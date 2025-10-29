@@ -6,6 +6,7 @@ import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
@@ -25,6 +26,9 @@ public class ShadersModule extends Toggleable
 {
     public static ShadersModule INSTANCE;
 
+    public Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
+            .setMin(0.0f).setDefaultValue(30.0f).setMax(250.0f)
+            .setDescription("If entity is within this range we apply shaders").build();
     Config<Boolean> depthConfig = new BooleanConfig.Builder("ThroughWalls")
             .setDescription("Renders shaders through walls")
             .setDefaultValue(true).build();
@@ -152,7 +156,7 @@ public class ShadersModule extends Toggleable
     @EventListener
     public void onRenderEntity(RenderEntityWorldEvent event)
     {
-        if (!shouldRenderShader(event.getEntity()))
+        if (!shouldRenderShader(event.getEntity()) || MathHelper.square(rangeConfig.getValue()) < event.getEntity().squaredDistanceTo(mc.player))
         {
             return;
         }
@@ -175,6 +179,7 @@ public class ShadersModule extends Toggleable
     {
         if (handsConfig.getValue())
         {
+            event.cancel();
             event.setVertexConsumerProvider(Managers.SHADER.createVertexConsumer(
                     event.getVertexConsumerProvider(), ThemeModule.INSTANCE.getPrimaryColor()));
         }

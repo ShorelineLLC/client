@@ -8,6 +8,7 @@ import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.LoadingEvent;
 import net.shoreline.client.impl.event.particle.TotemParticleEvent;
 import net.shoreline.client.impl.event.render.*;
@@ -65,6 +66,8 @@ public class TintModule extends Toggleable
                 config.addListener(v -> reloadWorld());
             }
         }
+
+        lavaConfig.addListener(v -> Managers.RESOURCE_PACK.toggleResourcePack("lava", v));
     }
 
     @EventListener

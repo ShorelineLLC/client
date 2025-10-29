@@ -11,8 +11,6 @@ import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.render.RenderTickCounterEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.text.DecimalFormat;
-
 public class TimerModule extends ListeningToggleable
 {
     public static TimerModule INSTANCE;
@@ -20,8 +18,6 @@ public class TimerModule extends ListeningToggleable
     Config<Float> ticksConfig = new NumberConfig.Builder<Float>("Ticks")
             .setMin(0.1f).setMax(50.0f).setDefaultValue(1.5f)
             .setDescription("The game ticks speed").build();
-
-    private final DecimalFormat decimal = new DecimalFormat("0.0#");
 
     @Getter
     @Setter
@@ -36,7 +32,7 @@ public class TimerModule extends ListeningToggleable
     @Override
     public String getModuleData()
     {
-        return decimal.format(timerTicks);
+        return DECIMAL_TRIMMED.format(timerTicks);
     }
 
     @Override

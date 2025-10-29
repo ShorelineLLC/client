@@ -287,6 +287,7 @@ public final class FontRenderer implements Closeable
         char[] c = stripControlCodes(text).toCharArray();
         float currentLine = 0;
         float maxPreviousLines = 0;
+        boolean formatting = false;
         for (char c1 : c)
         {
             if (c1 == '\n')
@@ -295,6 +296,19 @@ public final class FontRenderer implements Closeable
                 currentLine = 0;
                 continue;
             }
+
+            if (formatting)
+            {
+                formatting = false;
+                continue;
+            }
+
+            if (c1 == '§')
+            {
+                formatting = true;
+                continue;
+            }
+
             Glyph glyph = glyphs.computeIfAbsent(c1, g1 -> getGlyphFromChar(g1));
             float w = glyph == null ? 0 : glyph.width();
             currentLine += w / (float) this.scale;

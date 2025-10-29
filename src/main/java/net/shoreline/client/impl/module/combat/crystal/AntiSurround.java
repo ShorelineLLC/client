@@ -1,10 +1,13 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
 import lombok.experimental.UtilityClass;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
@@ -18,7 +21,7 @@ import java.util.Set;
 @UtilityClass
 public class AntiSurround
 {
-    public boolean checkAntiSurroundQualifiers(AsyncWorldScanner view, BlockPos blockPos)
+    public boolean checkAntiSurroundQualifiers(AsyncWorldScanner view, BlockPos blockPos, int ticks)
     {
         if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
@@ -32,43 +35,60 @@ public class AntiSurround
         }
 
         MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-        if (currentMine == null || !currentMine.isDoneMining() || SpeedMineModule.INSTANCE.isManualMining())
+        if (currentMine == null || SpeedMineModule.INSTANCE.isManualMining())
         {
             return false;
         }
 
-        BlockPos minePos = currentMine.getBlockPos();
-        EntityState state = view.getEntityById(target.getId());
-
-        float baseDamage = CrystalUtil.getCrystalDamage(view,
-                minePos.toBottomCenterPos(),
-                state.getPos(),
-                state.getBoundingBox(),
-                AutoCrystalModule.INSTANCE.getIgnoreTerrain().getValue(),
-                Set.of(minePos));
-
-        baseDamage *= 0.11f; // We have to assume armor here...
-        if (baseDamage < AutoCrystalModule.INSTANCE.getMinDamage().getValue())
+        if (currentMine.isDoneMining())
         {
-            return false;
-        }
+            BlockPos minePos = currentMine.getBlockPos();
+            EntityState state = view.getEntityById(target.getId());
 
-        for (EntityState entityState : view.getOtherEntities(null, new Box(minePos)))
-        {
-            if (entityState.getEntity() instanceof ItemEntity)
+            float baseDamage = CrystalUtil.getCrystalDamage(view,
+                    minePos.toBottomCenterPos(),
+                    state.getPos(),
+                    state.getBoundingBox(),
+                    AutoCrystalModule.INSTANCE.getIgnoreTerrain().getValue(),
+                    Set.of(minePos));
+
+            baseDamage *= 0.11f; // We have to assume armor here...
+            if (baseDamage < AutoCrystalModule.INSTANCE.getMinDamage().getValue())
             {
-                float damage = CrystalUtil.getCrystalDamage(view,
-                        blockPos.toBottomCenterPos(),
-                        entityState.getPos(),
-                        entityState.getBoundingBox(),
-                        false,
-                        Set.of(minePos));
+                return false;
+            }
 
-                if (damage >= 5.0f)
+            for (EntityState entityState : view.getOtherEntities(null, new Box(minePos)))
+            {
+                if (entityState.getEntity() instanceof ItemEntity)
                 {
-                    return true;
+                    float damage = CrystalUtil.getCrystalDamage(view,
+                            blockPos.toBottomCenterPos(),
+                            entityState.getPos(),
+                            entityState.getBoundingBox(),
+                            false,
+                            Set.of(minePos));
+
+                    if (damage >= 5.0f)
+                    {
+                        return true;
+                    }
                 }
             }
+        }
+
+        else if (currentMine.isAlmostDone(ticks))
+        {
+            BlockPos minePos = currentMine.getBlockPos();
+            Vec3d simPos = minePos.toBottomCenterPos();
+            float damage = CrystalUtil.getCrystalDamage(view,
+                    blockPos.toBottomCenterPos(),
+                    simPos,
+                    EntityDimensions.fixed(0.25f, 0.25f).getBoxAt(simPos),
+                    false,
+                    Set.of(minePos));
+
+            return damage >= 5.0f;
         }
 
         return false;

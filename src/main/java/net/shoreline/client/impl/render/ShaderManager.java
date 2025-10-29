@@ -20,6 +20,7 @@ import net.shoreline.client.impl.render.shader.Uniform;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 public class ShaderManager extends GenericFeature
@@ -111,15 +112,26 @@ public class ShaderManager extends GenericFeature
             vertexConsumerProvider.setColor(color.getRed(), color.getGreen(), color.getBlue(), 255);
 
             RenderPhase.TextureBase texture = ((IMultiPhaseParameters) (Object) ((IMultiPhase) layer).hookGetPhases()).getTexture();
-            VertexConsumer outlineBuffer = vertexConsumerProvider.getBuffer(getOrCreateLayer(texture));
-            return outlineBuffer != null ? VertexConsumers.union(outlineBuffer, parentBuffer) : parentBuffer;
+            RenderLayer layer1 = getOrCreateLayer(texture);
+            if (layer1 == null)
+            {
+                return parentBuffer;
+            }
+
+            VertexConsumer outlineBuffer = vertexConsumerProvider.getBuffer(layer1);
+            if (outlineBuffer == null)
+            {
+                return parentBuffer;
+            }
+
+            return VertexConsumers.union(outlineBuffer, parentBuffer);
         };
     }
 
     private RenderLayer getOrCreateLayer(RenderPhase.TextureBase texture)
     {
-        Identifier id = ((ITextureBase) texture).hookGetId().get();
-        return layerCache.computeIfAbsent(id, layer ->
+        Optional<Identifier> id = ((ITextureBase) texture).hookGetId();
+        return id.map(identifier -> layerCache.computeIfAbsent(identifier, layer ->
                 RenderLayer.of(
                         "shoreline_overlay",
                         VertexFormats.POSITION_TEXTURE_COLOR,
@@ -133,6 +145,6 @@ public class ShaderManager extends GenericFeature
                                 .target(target)
                                 .build(RenderLayer.OutlineMode.IS_OUTLINE)
                 )
-        );
+        )).orElse(null);
     }
 }

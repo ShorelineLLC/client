@@ -26,7 +26,7 @@ public class AutoXPModule extends Toggleable
     Config<Boolean> inAirConfig = new BooleanConfig.Builder("InAir")
             .setDescription("Uses XP in the air")
             .setDefaultValue(false).build();
-    Config<Integer> xptConfig = new NumberConfig.Builder<Integer>("BottlesPerTick")
+    Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("BottlesPerTick")
             .setMin(1).setDefaultValue(1).setMax(10)
             .setDescription("The number of XP bottles to throw per tick").build();
     Config<RotateMode> rotateConfig = new EnumConfig.Builder<RotateMode>("Rotate")
@@ -94,7 +94,7 @@ public class AutoXPModule extends Toggleable
         {
             xpThrow.applyToPlayer();
 
-            for (int i = 0; i < xptConfig.getValue(); i++)
+            for (int i = 0; i < bptConfig.getValue(); i++)
             {
                 Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
             }

@@ -58,8 +58,6 @@ import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -129,15 +127,19 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Void> placeConfig = new ConfigGroup.Builder("Place")
             .addAll(placeRange, placeLimit, sequentialPlace, protocolPlace, basePlace).build();
 
-    Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
-            .setDescription("Targets dropped items blocking placements")
-            .setDefaultValue(false).build();
-    Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("PrePlace")
+    Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("Predict")
             .setValues(Timing.values())
             .setDescription("Attempts to predict the next place")
             .setDefaultValue(Timing.OFF).build();
+    Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
+            .setDescription("Targets dropped items blocking placements")
+            .setDefaultValue(false).build();
+    Config<Integer> prePlace = new NumberConfig.Builder<Integer>("PrePlace")
+            .setMin(0).setMax(10).setDefaultValue(5).setFormat(" ticks")
+            .setDescription("Ticks before to place crystals to clear items")
+            .setVisible(() -> targetItems.getValue()).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
-            .addAll(targetItems, predictPlace).build();
+            .addAll(predictPlace, targetItems, prePlace).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(4.0f)
@@ -210,8 +212,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private final QueueAverage breakTime = new QueueAverage(20, 1000L);
     private final PerSecond cps = new PerSecond();
 
-    private final DecimalFormat numFormat = new DecimalFormat("0.0");
-
     private final ConcurrentMap<CrystalData<BlockPos>, Animation> fadeAnimations = new ConcurrentHashMap<>();
 
     public AutoCrystalModule()
@@ -238,7 +238,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return super.getModuleData();
         }
 
-        return String.format("%sms, %s", numFormat.format(breakTime.average()), cps.getPerSecond());
+        return String.format("%sms, %s", DECIMAL.format(breakTime.average()), cps.getPerSecond());
     }
 
     @EventListener
@@ -383,7 +383,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             }
         }
 
-        if (predictPlace.getValue() != Timing.SEQUENTIAL)
+        if (predictPlace.getValue() != Timing.INSTANT)
         {
             return;
         }
@@ -498,7 +498,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             } else
             {
                 double damage = ExplosionUtil.getAppliedDamageToEntity(placeData.getTarget().getEntity(), (float) placeData.getDamageToTarget());
-                dataNametag = numFormat.format(damage);
+                dataNametag = DECIMAL.format(damage);
             }
 
             Managers.RENDER.renderNametag(event.getMatrixStack(),
@@ -892,7 +892,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private enum Timing
     {
-        VANILLA, SEQUENTIAL, OFF
+        TICK, INSTANT, OFF
     }
 
     private record CrystalDataWithAngles<T>(CrystalData<T> data, float[] angles) {}

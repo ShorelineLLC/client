@@ -8,18 +8,18 @@ public class Formatter
     public String formatEnum(final Enum<?> in)
     {
         String name = in.name();
-        if (name.equalsIgnoreCase("KMH"))
+        if (name.equalsIgnoreCase("KMH") || name.equalsIgnoreCase("BPS") || name.equalsIgnoreCase("NCP") || name.equalsIgnoreCase("XQZ"))
         {
-            return "KMH";
-        } else if (name.equalsIgnoreCase("BPS"))
+            return name.toUpperCase();
+        } else if (name.equalsIgnoreCase("Strict_NCP"))
         {
-            return "BPS";
-        } else if (name.equalsIgnoreCase("NCP"))
+            return "StrictNCP";
+        } else if (name.equalsIgnoreCase("Military_Time"))
         {
-            return "NCP";
-        } else if (name.equalsIgnoreCase("STRICT_NCP"))
+            return "24H";
+        } else if (name.equalsIgnoreCase("Meridiem_Time"))
         {
-            return "NCPStrict";
+            return "12H";
         }
 
         // no capitalization

@@ -316,9 +316,21 @@ public class InventoryManager extends NetworkHandler
         }
     }
 
+    public void swap(int fromSlot, int toSlot)
+    {
+        ScreenHandler handler = mc.player.currentScreenHandler;
+        int slot = InventoryUtil.getPacketSlotIndex(handler, fromSlot);
+        swapSlot(handler, slot, toSlot);
+    }
+
     public void pickupSlot(ScreenHandler handler, int slot)
     {
         mc.interactionManager.clickSlot(handler.syncId, slot, 0, SlotActionType.PICKUP, mc.player);
+    }
+
+    public void swapSlot(ScreenHandler handler, int slot1, int slot2)
+    {
+        mc.interactionManager.clickSlot(handler.syncId, slot1, slot2, SlotActionType.SWAP, mc.player);
     }
 
     private void internalSwapSlot(int slot1, int slot2)

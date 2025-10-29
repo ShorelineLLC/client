@@ -141,6 +141,11 @@ public class MiningData
         return blockDamage >= maxProgress;
     }
 
+    public boolean isAlmostDone(int ticks)
+    {
+        return !isBlockMined() && blockDamage + (ticks * getBlockBreakingDelta()) >= maxProgress;
+    }
+
     public boolean isBlockMined()
     {
         return isDoneMining() && !MiningUtil.canMineBlock(getBlockState());

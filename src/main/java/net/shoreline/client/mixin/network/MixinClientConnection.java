@@ -58,6 +58,17 @@ public abstract class MixinClientConnection implements IClientConnection
         }
     }
 
+    @Inject(method = "sendImmediately", at = @At(value = "TAIL"))
+    private void hookSendImmediately$1(Packet<?> packet,
+                                       PacketCallbacks callbacks,
+                                       boolean flush,
+                                       CallbackInfo ci)
+    {
+        PacketEvent.OutboundPost packetOutboundEvent =
+                new PacketEvent.OutboundPost(packet);
+        EventBus.INSTANCE.dispatch(packetOutboundEvent);
+    }
+
     @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V",
             at = @At(value = "HEAD"), cancellable = true)
     private void hookChannelRead0(ChannelHandlerContext channelHandlerContext,

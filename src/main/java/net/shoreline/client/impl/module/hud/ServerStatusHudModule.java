@@ -16,8 +16,6 @@ import java.text.DecimalFormat;
 
 public class ServerStatusHudModule extends HudModule
 {
-    private final DecimalFormat decimal = new DecimalFormat("0.0");
-
     private final Timer serverStatus = new NanoTimer();
     private final Animation statusAnimation = new Animation(300L);
 
@@ -64,6 +62,6 @@ public class ServerStatusHudModule extends HudModule
     private String getStatusText()
     {
         return String.format(Formatting.WHITE + "Server not responding " + Formatting.GRAY + "(" + Formatting.RESET + "%s.s" + Formatting.GRAY + ")",
-                decimal.format(serverStatus.getElapsedTime() / 1000.0));
+                DECIMAL.format(serverStatus.getElapsedTime() / 1000.0));
     }
 }

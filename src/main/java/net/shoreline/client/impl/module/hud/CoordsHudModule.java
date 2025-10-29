@@ -8,15 +8,14 @@ import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
 import net.shoreline.client.impl.module.impl.hud.DynamicHudModule;
 import net.shoreline.client.impl.render.ClientFormatting;
 
-import java.text.DecimalFormat;
-
 public class CoordsHudModule extends DynamicHudModule
 {
     Config<Boolean> netherConfig = new BooleanConfig.Builder("Nether")
             .setDescription("Show nether coordinates")
             .setDefaultValue(true).build();
-
-    private final DecimalFormat decimal = new DecimalFormat("0.0");
+    Config<Boolean> showDecimal = new BooleanConfig.Builder("ShowDecimal")
+            .setDescription("Shows exact decimal coordinates")
+            .setDefaultValue(false).build();
 
     public CoordsHudModule()
     {
@@ -35,11 +34,14 @@ public class CoordsHudModule extends DynamicHudModule
         double y = mc.player.getY();
         double z = mc.player.getZ();
         boolean nether = mc.world.getRegistryKey() == World.NETHER;
+        double nX = nether ? x * 8 : x / 8;
+        double nZ = nether ? z * 8 : z / 8;
         return String.format("XYZ " + Formatting.WHITE + "%s, %s, %s " + (netherConfig.getValue() ? ClientFormatting.THEME + "(" + Formatting.WHITE + "%s, %s" + ClientFormatting.THEME + ")" : ""),
-                decimal.format(x),
-                decimal.format(y),
-                decimal.format(z),
-                nether ? decimal.format(x * 8) : decimal.format(x / 8),
-                nether ? decimal.format(z * 8) : decimal.format(z / 8));
+                format(x), format(y), format(z), format(nX), format(nZ));
+    }
+
+    public String format(double n)
+    {
+        return showDecimal.getValue() ? DECIMAL.format(n) : WHOLE.format(n);
     }
 }

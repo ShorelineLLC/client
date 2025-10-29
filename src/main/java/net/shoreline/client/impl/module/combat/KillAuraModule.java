@@ -55,6 +55,9 @@ public class KillAuraModule extends CombatModule
     Config<Boolean> requireWeapon = new BooleanConfig.Builder("RequireWeapon")
             .setDescription("Must be holding a weapon to attack")
             .setDefaultValue(false).build();
+    Config<Boolean> awaitCrits = new BooleanConfig.Builder("AwaitCrits")
+            .setDescription("Waits for a crit before attacking when in air")
+            .setDefaultValue(false).build();
     Config<Boolean> swingConfig = new BooleanConfig.Builder("Swing")
             .setDescription("Swings the hand when attacking")
             .setDefaultValue(true).build();
@@ -168,17 +171,15 @@ public class KillAuraModule extends CombatModule
             fadeAnim.setState(false);
         }
 
-        if (targetBox == null)
+        if (targetBox != null)
         {
-            return;
+            fadeAnim.setState(running);
+            double scaledFactor = Easing.SMOOTH_STEP.ease(attackDelayTimer.getFactor());
+            double animFactor = (MathHelper.clamp(0.5f + scaledFactor, 0.0f, 1.0f)) * fadeAnim.getFactor();
+
+            int color = ThemeModule.INSTANCE.getPrimaryColor().getRGB();
+            BoxRender.FILL.render(event.getMatrixStack(), targetBox, color, (float) animFactor);
         }
-
-        fadeAnim.setState(running);
-        double scaledFactor = Easing.SMOOTH_STEP.ease(attackDelayTimer.getFactor());
-        double animFactor = (MathHelper.clamp(0.5f + scaledFactor, 0.0f, 1.0f)) * fadeAnim.getFactor();
-
-        int color = ThemeModule.INSTANCE.getPrimaryColor().getRGB();
-        BoxRender.FILL.render(event.getMatrixStack(), targetBox, color, (float) animFactor);
     }
 
     private void runAttack(final Entity entity)
@@ -211,7 +212,8 @@ public class KillAuraModule extends CombatModule
             ItemStack stack = weaponSlot.getItemStack() == null ? playerInventory.getMainHandStack() : weaponSlot.getItemStack();
             double attackDelay = 1.0 / getAttackSpeed(stack) * 20.0;
 
-            if (attackDelayTimer.hasPassed(attackDelay * 50.0))
+            boolean canCrit = !awaitCrits.getValue() || mc.player.isOnGround() || mc.player.getVelocity().y < 0.0;
+            if (attackDelayTimer.hasPassed(attackDelay * 50.0) && canCrit)
             {
                 attackEntity(entity);
                 attackDelayTimer.reset();

@@ -14,12 +14,10 @@ import net.shoreline.client.impl.event.entity.PushEvent;
 import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
-import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.imixin.IEntityVelocityUpdateS2CPacket;
+import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.util.text.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
-
-import java.text.DecimalFormat;
 
 public class VelocityModule extends Toggleable
 {
@@ -66,8 +64,6 @@ public class VelocityModule extends Toggleable
     private boolean concealVelocity;
     private boolean cancelVelocity;
 
-    private final DecimalFormat percentFormat = new DecimalFormat("0.0");
-
     public VelocityModule()
     {
         super("Velocity", new String[] {"AntiKB"}, "Prevents player knockback", GuiCategory.MOVEMENT);
@@ -79,8 +75,8 @@ public class VelocityModule extends Toggleable
         if (modeConfig.getValue() == VelocityMode.NORMAL)
         {
             return String.format("H:%s%%, V:%s%%",
-                    percentFormat.format(horizontalConfig.getValue()),
-                    percentFormat.format(verticalConfig.getValue()));
+                    DECIMAL.format(horizontalConfig.getValue()),
+                    DECIMAL.format(verticalConfig.getValue()));
         }
 
         return Formatter.formatEnum(modeConfig.getValue());

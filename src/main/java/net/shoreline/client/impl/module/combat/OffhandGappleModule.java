@@ -21,6 +21,9 @@ public class OffhandGappleModule extends InventorySwapModule
 {
     public static OffhandGappleModule INSTANCE;
 
+    Config<Boolean> fastSwap = new BooleanConfig.Builder("FastSwap")
+            .setDescription("Uses a faster swap method")
+            .setDefaultValue(false).build();
     Config<Boolean> swordConfig = new BooleanConfig.Builder("Swords")
             .setDescription("Allows gapples in offhand when holding a sword")
             .setDefaultValue(true).build();
@@ -64,7 +67,7 @@ public class OffhandGappleModule extends InventorySwapModule
             return;
         }
 
-        returnSlot = swapItemWithSlot(Items.ENCHANTED_GOLDEN_APPLE, PlayerInventory.OFF_HAND_SLOT);
+        returnSlot = swapItemWithSlot(Items.ENCHANTED_GOLDEN_APPLE, PlayerInventory.OFF_HAND_SLOT, fastSwap.getValue());
     }
 
     private boolean canEatWhileHolding(Item item)
