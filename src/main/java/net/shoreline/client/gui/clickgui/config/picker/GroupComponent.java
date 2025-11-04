@@ -55,7 +55,7 @@ public class GroupComponent extends ExpandableComponent<Void>
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
 
         float configY = height + (3.0f * scale);
-        if (collapseAnim.getFactor() >= 0.01f)
+        if (collapseAnim.getFactor() > 0.01f)
         {
             for (ConfigComponent<?> component : components)
             {
