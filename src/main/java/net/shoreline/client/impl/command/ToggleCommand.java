@@ -8,30 +8,29 @@ import net.shoreline.client.api.command.argtype.ModuleArgumentType;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.Toggleable;
 
-public class DrawnCommand extends Command
+public class ToggleCommand extends Command
 {
-    public DrawnCommand()
+    public ToggleCommand()
     {
-        super("drawn", new String[] {"d"}, "Toggles drawn state in arraylist");
+        super("toggle", new String[] {"t"}, "Toggles modules");
     }
 
     @Override
     public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
         argumentBuilder.then(buildArgument("module", ModuleArgumentType.module())
-                .executes(c ->
-                {
-                    Module module = ModuleArgumentType.getModule(c, "module");
-                    if (module instanceof Toggleable toggle)
-                    {
-                        boolean hide = !toggle.isHidden();
-                        toggle.setHidden(hide);
-                        sendClientChatMessage(Formatting.GRAY + module.getName() + Formatting.RESET + " is now " +
-                                (hide ? Formatting.RED + "hidden" : Formatting.GREEN + "visible"));
-                    }
+                        .executes(c ->
+                        {
+                            Module module = ModuleArgumentType.getModule(c, "module");
+                            if (module instanceof Toggleable t)
+                            {
+                                t.toggle();
+                                sendClientChatMessage(Formatting.GRAY + module.getName() + Formatting.RESET + " is now " +
+                                        (t.isEnabled() ? Formatting.GREEN + "enabled" : Formatting.RED + "disabled"));
+                            }
 
-                    return 1;
-                }))
+                            return 1;
+                        }))
 
                 .executes(c ->
                 {

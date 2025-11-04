@@ -25,6 +25,9 @@ public class Interaction
 
     private Direction direction;
 
+    @Builder.Default
+    private InteractStatus status = InteractStatus.UNCONFIRMED;
+
     public BlockState getState()
     {
         return MinecraftClient.getInstance().world.getBlockState(pos);

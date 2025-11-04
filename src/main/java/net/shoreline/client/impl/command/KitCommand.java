@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.impl.Managers;
@@ -15,7 +17,7 @@ public class KitCommand extends Command
     }
 
     @Override
-    public void buildCommand()
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
         argumentBuilder.then(buildArgument("save/delete", StringArgumentType.string())
                 .suggests(buildSuggestions("save", "del", "delete", "remove", "list"))

@@ -24,6 +24,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
+import net.shoreline.client.impl.event.world.BlockCollisionEvent;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
@@ -86,13 +87,34 @@ public class InteractManager extends NetworkHandler
                     continue;
                 }
 
-                if (packet.getState().getBlock().equals(interaction.getBlock()))
-                {
-                    // Confirm that we succeeded placement serverside
-                }
-
+                Block serverBlock = packet.getState().getBlock();
+                // Confirm that we succeeded placement serverside
+                interaction.setStatus(serverBlock.equals(interaction.getBlock()) ? InteractStatus.SERVER_CONFIRMED : InteractStatus.SERVER_MISMATCH);
                 break;
             }
+        }
+    }
+
+    @EventListener
+    public void onBlockCollide(BlockCollisionEvent event)
+    {
+        if (checkNull() || !event.getState().isAir() || !interactConfig.getSimulation().getValue())
+        {
+            return;
+        }
+
+        for (Interaction interaction : interactions.keySet())
+        {
+            if (interaction.getStatus() != InteractStatus.UNCONFIRMED ||
+                    !interaction.getPos().equals(event.getBlockPos()))
+            {
+                continue;
+            }
+
+            VoxelShape collisionShape = interaction.getBlock().getDefaultState().getCollisionShape(mc.world, event.getBlockPos());
+            event.cancel();
+            event.setCollisionShape(collisionShape);
+            break;
         }
     }
 

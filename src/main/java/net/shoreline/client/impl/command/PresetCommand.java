@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
@@ -18,7 +20,7 @@ public class PresetCommand extends Command
     }
 
     @Override
-    public void buildCommand()
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
         argumentBuilder.then(buildArgument("save/load", StringArgumentType.string())
                 .suggests(buildSuggestions("save", "load"))

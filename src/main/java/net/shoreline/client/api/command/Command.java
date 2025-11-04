@@ -5,25 +5,38 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import lombok.Getter;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.LoggingFeature;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 public abstract class Command extends LoggingFeature
 {
     private final String description;
-    protected final LiteralArgumentBuilder<CommandSource> argumentBuilder;
+    private final Set<LiteralArgumentBuilder<CommandSource>> argumentBuilders = new HashSet<>();
 
     public Command(String name, String description)
     {
         super(name);
         this.description = description;
-        this.argumentBuilder = LiteralArgumentBuilder.literal(name);
+        this.argumentBuilders.add(LiteralArgumentBuilder.literal(name));
     }
 
-    public abstract void buildCommand();
+    public Command(String name, String[] aliases, String description)
+    {
+        super(name, aliases);
+        this.description = description;
+        this.argumentBuilders.add(LiteralArgumentBuilder.literal(name));
+        for (String alias : aliases)
+        {
+            argumentBuilders.add(LiteralArgumentBuilder.literal(alias));
+        }
+    }
+
+    public abstract void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder);
 
     protected <T> RequiredArgumentBuilder<CommandSource, T> buildArgument(String name, ArgumentType<T> type)
     {

@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.network.ClientCommandSource;
@@ -35,18 +36,23 @@ public class CommandManager extends GenericFeature
         EventBus.INSTANCE.subscribe(this);
 
         registerCommands(
+                new BindCommand(),
                 new DrawnCommand(),
                 new FriendCommand(),
                 new KitCommand(),
                 new NotifyCommand(),
                 new PrefixCommand(),
-                new PresetCommand()
+                new PresetCommand(),
+                new ToggleCommand()
         );
 
         for (Command command : commands)
         {
-            command.buildCommand();
-            dispatcher.register(command.getArgumentBuilder());
+            for (LiteralArgumentBuilder<CommandSource> argumentBuilder : command.getArgumentBuilders())
+            {
+                command.buildCommand(argumentBuilder);
+                dispatcher.register(argumentBuilder);
+            }
         }
     }
 

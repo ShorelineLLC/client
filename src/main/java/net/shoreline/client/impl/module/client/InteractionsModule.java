@@ -36,6 +36,9 @@ public class InteractionsModule extends Concurrent
     Config<Boolean> strictDirection = new BooleanConfig.Builder("StrictDirection")
             .setDescription("Only places on visible faces")
             .setDefaultValue(false).build();
+    Config<Boolean> simulation = new BooleanConfig.Builder("Simulate")
+            .setDescription("Simulates a block placement to prevent movement flags")
+            .setDefaultValue(false).build();
 
     public InteractionsModule()
     {

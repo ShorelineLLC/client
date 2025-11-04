@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.command;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.command.argtype.ModuleArgumentType;
@@ -14,7 +16,7 @@ public class NotifyCommand extends Command
     }
 
     @Override
-    public void buildCommand()
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
         argumentBuilder.then(buildArgument("module", ModuleArgumentType.module())
                         .executes(c ->

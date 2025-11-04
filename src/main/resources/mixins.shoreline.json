@@ -82,6 +82,7 @@
     "text.MixinTextVisitFactory",
     "texture.MixinNativeImage",
     "toast.MixinToastManager",
+    "world.MixinBlockCollisionSpliterator",
     "world.MixinClientWorld",
     "world.MixinProperties",
     "world.MixinServerWorld",
