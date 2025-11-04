@@ -53,8 +53,7 @@ public class TextRadarHudModule extends DynamicHudModule
             {
                 if (entry.isDrawing())
                 {
-                    boolean draw = playerEntry.getPlayer().isDead()
-                            || !mc.world.getPlayers().contains(playerEntry.getPlayer());
+                    boolean draw = playerEntry.getPlayer().isDead() || !mc.world.getPlayers().contains(playerEntry.getPlayer());
                     if (draw)
                     {
                         entry.setDrawing(() -> false);

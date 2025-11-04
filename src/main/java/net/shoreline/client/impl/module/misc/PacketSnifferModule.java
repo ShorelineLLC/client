@@ -116,6 +116,11 @@ public class PacketSnifferModule extends Toggleable
         {
             long packets = Managers.NETWORK.getPacketsSent(handler);
 
+            if (packets == 0)
+            {
+                continue;
+            }
+
             log.append(handler.getName())
                     .append(": ")
                     .append(packets)

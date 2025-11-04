@@ -93,56 +93,62 @@ public class ModuleComponent extends FrameComponent
 
         int pending = 0;
         float configY = scale * 2.0f;
-        for (ConfigComponent<?> component : components)
+        if (collapseAnim.getFactor() >= 0.01f)
         {
-            if (currentAnimation == null)
+            for (ConfigComponent<?> component : components)
             {
-                component.getDrawAnim().setState(component.getConfig().isVisible());
-                if (!component.getDrawAnim().isFinished())
+                if (currentAnimation == null)
                 {
-                    currentAnimation = component;
+                    component.getDrawAnim().setState(component.getConfig().isVisible());
+                    if (!component.getDrawAnim().isFinished())
+                    {
+                        currentAnimation = component;
+                    }
                 }
-            }
-            else if (currentAnimation.getDrawAnim().isFinished())
-            {
-                currentAnimation = null;
-            }
-
-            if (component.getDrawAnim().getFactor() > 0.01)
-            {
-                float totalHeight = component.getHeight() + (float) Math.floor(scale);
-                if (component instanceof ExpandableComponent<?> c)
+                else if (currentAnimation.getDrawAnim().isFinished())
                 {
-                    totalHeight += c.getComponentHeight();
+                    currentAnimation = null;
                 }
 
-                totalHeight *= (float) component.getDrawAnim().getFactor();
+                if (component.getDrawAnim().getFactor() > 0.01)
+                {
+                    float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                    if (component instanceof ExpandableComponent<?> c)
+                    {
+                        totalHeight += c.getComponentHeight();
+                    }
 
-                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
-                component.drawComponent(context, mouseX, mouseY, delta);
-                component.setYOffset(configY);
-                configY += totalHeight;
+                    totalHeight *= (float) component.getDrawAnim().getFactor();
 
-                component.setModuleOffset(configY);
-                disableScissor(context);
+                    enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
+                    component.drawComponent(context, mouseX, mouseY, delta);
+                    component.setYOffset(configY);
+                    configY += totalHeight;
+
+                    component.setModuleOffset(configY);
+                    disableScissor(context);
+                }
+                else
+                {
+                    component.reset();
+                }
+
+                if (!component.getDrawAnim().isFinished()
+                        || component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 1.0
+                        || !component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 0.0)
+                {
+                    pending++;
+                }
             }
-            else
+        } else
+        {
+
+            for (ConfigComponent<?> component : components)
             {
                 component.reset();
-            }
-
-            if (collapseAnim.getFactor() < 0.01f)
-            {
-                component.reset();
-            }
-
-            if (!component.getDrawAnim().isFinished()
-                    || component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 1.0
-                    || !component.getConfig().isVisible() && component.getDrawAnim().getFactor() != 0.0)
-            {
-                pending++;
             }
         }
+
 
         if (currentAnimation != null)
         {

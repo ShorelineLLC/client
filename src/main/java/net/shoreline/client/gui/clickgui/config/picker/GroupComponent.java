@@ -1,7 +1,6 @@
 package net.shoreline.client.gui.clickgui.config.picker;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.gui.Mouse;
@@ -10,10 +9,9 @@ import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
-import net.shoreline.client.impl.render.Theme;
-import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -57,34 +55,40 @@ public class GroupComponent extends ExpandableComponent<Void>
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
 
         float configY = height + (3.0f * scale);
-        for (ConfigComponent<?> component : components)
+        if (collapseAnim.getFactor() >= 0.01f)
         {
-            component.getDrawAnim().setState(component.getConfig().isVisible());
-            if (component.getDrawAnim().getFactor() > 0.01)
+            for (ConfigComponent<?> component : components)
             {
-                float totalHeight = component.getHeight() + (float) Math.floor(scale);
-                if (component instanceof ExpandableComponent<?> c)
+                component.getDrawAnim().setState(component.getConfig().isVisible());
+                if (component.getDrawAnim().getFactor() > 0.01)
                 {
-                    totalHeight += c.getComponentHeight();
+                    float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                    if (component instanceof ExpandableComponent<?> c)
+                    {
+                        totalHeight += c.getComponentHeight();
+                    }
+
+                    totalHeight *= (float) component.getDrawAnim().getFactor();
+
+                    enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
+                    component.setY(getYOffset());
+                    component.drawComponent(context, mouseX, mouseY, delta);
+                    component.setYOffset(configY);
+                    configY += totalHeight;
+
+                    component.setModuleOffset(configY);
+                    disableScissor(context);
                 }
-
-                totalHeight *= (float) component.getDrawAnim().getFactor();
-
-                enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
-                component.setY(getYOffset());
-                component.drawComponent(context, mouseX, mouseY, delta);
-                component.setYOffset(configY);
-                configY += totalHeight;
-
-                component.setModuleOffset(configY);
-                disableScissor(context);
-            }
-            else
-            {
-                component.reset();
+                else
+                {
+                    component.reset();
+                }
             }
 
-            if (collapseAnim.getFactor() < 0.01f)
+        } else
+        {
+
+            for (ConfigComponent<?> component : components)
             {
                 component.reset();
             }
