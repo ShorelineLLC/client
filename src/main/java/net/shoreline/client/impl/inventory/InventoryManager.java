@@ -100,6 +100,12 @@ public class InventoryManager extends NetworkHandler
 
             for (SwapData data : trackedHotbar)
             {
+                if (data.getSwapTime() > 500L)
+                {
+                    trackedHotbar.remove(data);
+                    continue;
+                }
+
                 if (data.getSlotTo() != slot && data.getSlotFrom() != slot)
                 {
                     continue;
@@ -109,7 +115,22 @@ public class InventoryManager extends NetworkHandler
                 if (!ItemStack.areItemsEqual(preStack, packet.getStack()))
                 {
                     event.cancel();
-                    break;
+                    return;
+                }
+            }
+
+            for (SwapData data : trackedInventory)
+            {
+                if (data.getSlotTo() != slot && data.getSlotFrom() != slot)
+                {
+                    continue;
+                }
+
+                ItemStack preStack = data.getPreHotbar().getStack(slot);
+                if (!ItemStack.areItemsEqual(preStack, packet.getStack()))
+                {
+                    event.cancel();
+                    return;
                 }
             }
         }
@@ -207,7 +228,7 @@ public class InventoryManager extends NetworkHandler
             return true;
         }
 
-        HotbarCache swapCache = new HotbarCache(playerInventory);
+        HotbarCache swapCache = new HotbarCache(playerInventory, true);
 
         int fromSlot = multitick.isSwapped() && !mc.player.isUsingItem() ? multitick.getSlotTo() : playerInventory.selectedSlot;
         current.setSwapped(true);

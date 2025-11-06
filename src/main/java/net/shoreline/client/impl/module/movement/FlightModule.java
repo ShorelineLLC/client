@@ -110,6 +110,7 @@ public class FlightModule extends MovementModule
                         stopVerticalMovement = true;
                     }
                 }
+
                 floatingTicks = 0;
                 floating = false;
             }

@@ -1,17 +1,18 @@
 package net.shoreline.client.mixin.entity;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
-import net.shoreline.client.impl.event.entity.HandSwingDurationEvent;
-import net.shoreline.client.impl.event.entity.JumpDelayEvent;
-import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
-import net.shoreline.client.impl.event.entity.StepHeightEvent;
+import net.minecraft.registry.tag.TagKey;
+import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -100,5 +101,22 @@ public class MixinLivingEntity
             cir.cancel();
             cir.setReturnValue(swingSpeedEvent.getSwingDuration());
         }
+    }
+
+    @Redirect(method = "isClimbing",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/block/BlockState;isIn(Lnet/minecraft/registry/tag/TagKey;)Z"
+            ))
+    private boolean hookIsClimbing(BlockState instance, TagKey<Block> tagKey)
+    {
+        ClimbEvent event = new ClimbEvent(instance.getBlock());
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            return false;
+        }
+
+        return instance.isIn(tagKey);
     }
 }

@@ -18,11 +18,13 @@ public class PacketEvent extends Event
     public static class Inbound extends PacketEvent
     {
         private final PacketListener packetListener;
+        private final boolean isBundled;
 
-        public Inbound(PacketListener packetListener, Packet<?> packet)
+        public Inbound(PacketListener packetListener, Packet<?> packet, boolean isBundled)
         {
             super(packet);
             this.packetListener = packetListener;
+            this.isBundled = isBundled;
         }
     }
 

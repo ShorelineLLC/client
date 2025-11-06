@@ -29,7 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TrailsModule extends ListeningToggleable
 {
     Config<Float> trailTime = new NumberConfig.Builder<Float>("MaxTrail")
-            .setMin(0.1f).setMax(2.0f).setDefaultValue(1.0f).setFormat("s")
+            .setMin(0.1f).setMax(5.0f).setDefaultValue(1.0f).setFormat("s")
             .setDescription("The time before removing a trail").build();
     Config<Boolean> playersConfig = new BooleanConfig.Builder("Players")
             .setDescription("Shows trails for players")

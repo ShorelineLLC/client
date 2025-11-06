@@ -1,6 +1,5 @@
 package net.shoreline.client.impl.interact;
 
-import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -27,19 +26,19 @@ import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.world.BlockCollisionEvent;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
+import net.shoreline.client.impl.module.client.InteractionsModule;
 import net.shoreline.client.impl.module.combat.KillAuraModule;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
-import net.shoreline.client.impl.module.client.InteractionsModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.BlockUtil;
+import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.apache.commons.lang3.mutable.MutableObject;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,6 +67,7 @@ public class InteractManager extends NetworkHandler
     public void onTickPost(TickEvent.Post event)
     {
         blocksPlaced.set(0);
+        interactions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
     }
 
     @EventListener
@@ -105,8 +105,7 @@ public class InteractManager extends NetworkHandler
 
         for (Interaction interaction : interactions.keySet())
         {
-            if (interaction.getStatus() != InteractStatus.UNCONFIRMED ||
-                    !interaction.getPos().equals(event.getBlockPos()))
+            if (interaction.getStatus() != InteractStatus.UNCONFIRMED || !interaction.getPos().equals(event.getBlockPos()))
             {
                 continue;
             }
@@ -182,7 +181,7 @@ public class InteractManager extends NetworkHandler
 
         boolean attacked = false;
 
-        for (Entity entity : collectEntitiesInBox(shape.getBoundingBox()))
+        for (Entity entity : WorldUtil.collectEntitiesInBox(shape.getBoundingBox()))
         {
             if (entity.isRemoved() || !entity.intersectionChecked)
             {
@@ -333,19 +332,5 @@ public class InteractManager extends NetworkHandler
         {
             sendPacket(new HandSwingC2SPacket(hand));
         }
-    }
-
-    private List<Entity> collectEntitiesInBox(Box boundingBox)
-    {
-        List<Entity> entities = Lists.newArrayList();
-        for (Entity entity : mc.world.getEntities())
-        {
-            if (entity.getBoundingBox().intersects(boundingBox))
-            {
-                entities.add(entity);
-            }
-        }
-
-        return entities;
     }
 }

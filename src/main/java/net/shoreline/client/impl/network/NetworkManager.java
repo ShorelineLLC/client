@@ -125,7 +125,7 @@ public class NetworkManager extends GenericFeature
             return;
         }
 
-        PacketEvent.Inbound event = new PacketEvent.Inbound(handler, packet);
+        PacketEvent.Inbound event = new PacketEvent.Inbound(handler, packet, false);
         EventBus.INSTANCE.dispatch(event);
         if (event.isCanceled())
         {
