@@ -80,11 +80,15 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                             "Lnet/minecraft/client/render/VertexConsumer;III)V"))
     private void renderHook(Args args, S livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
     {
-        if (ChamsModule.getInstance().isEnabled() && ChamsModule.getInstance().getOpacity() != 1.0f && ChamsModule.getInstance().isValid(last))
+        if (ChamsModule.getInstance().isEnabled())
         {
-            int alpha = (int) (ChamsModule.getInstance().getOpacity() * 255.0f);
-            alpha = Math.max(0, Math.min(alpha, 255));
-            args.set(4, new Color(255, 255, 255, alpha).getRGB());
+            float opacity = ChamsModule.getInstance().getFadedOpacity(last, true);
+            if (opacity != 1.0f && ChamsModule.getInstance().isValid(last))
+            {
+                int alpha = (int) (ChamsModule.getInstance().getFadedOpacity(last, true) * 255.0f);
+                alpha = Math.max(0, Math.min(alpha, 255));
+                args.set(4, new Color(255, 255, 255, alpha).getRGB());
+            }
         }
     }
 
@@ -103,7 +107,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
         }
 
         boolean valid = ChamsModule.getInstance().isValid(last);
-        ((IModel) model).cancelModel(valid);
+        ((IModel) model).update(last, valid);
         if (ChamsModule.getInstance().isEnabled() && valid)
         {
             int color = ChamsModule.getInstance().color.getValue().getRGB();
@@ -112,7 +116,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                 Layers.QUADS_GLINT.startDrawing();
                 VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
-                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, 1.0f));
+                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, ChamsModule.getInstance().getFadedOpacity(last, false)));
                 Layers.QUADS_GLINT.endDrawing();
             }
 

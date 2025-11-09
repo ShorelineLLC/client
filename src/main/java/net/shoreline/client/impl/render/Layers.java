@@ -61,4 +61,18 @@ public class Layers
 
         return RenderLayer.of("shoreline_entity", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);
     });
+
+    public static final BiFunction<Identifier, Boolean, RenderLayer> CRYSTALS = Util.memoize((texture, affectsOutline) ->
+    {
+        RenderLayer.MultiPhaseParameters multiPhaseParameters = RenderLayer.MultiPhaseParameters.builder()
+                .program(RenderPhase.ENTITY_CUTOUT_NONULL_PROGRAM)
+                .texture(new RenderPhase.Texture(texture, TriState.FALSE, false))
+                .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                .cull(RenderPhase.Cull.DISABLE_CULLING)
+                .lightmap(RenderLayer.ENABLE_LIGHTMAP)
+                .overlay(RenderLayer.ENABLE_OVERLAY_COLOR)
+                .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
+                .build(affectsOutline);
+        return RenderLayer.of("entity_cutout_no_cull", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);
+    });
 }

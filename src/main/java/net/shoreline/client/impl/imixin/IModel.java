@@ -1,7 +1,9 @@
 package net.shoreline.client.impl.imixin;
 
+import net.minecraft.entity.Entity;
+
 @IMixin
 public interface IModel
 {
-    void cancelModel(boolean cancelModel);
+    void update(Entity entity, boolean cancel);
 }

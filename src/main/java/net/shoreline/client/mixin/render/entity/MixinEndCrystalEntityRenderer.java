@@ -75,11 +75,10 @@ public class MixinEndCrystalEntityRenderer
     {
         if (ChamsModule.getInstance().isEnabled()
                 && (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.X_Q_Z
-                    || ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE
-                    && ChamsModule.getInstance().model.getValue())
+                    || ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
                 && ChamsModule.getInstance().isValid(last))
         {
-            END_CRYSTAL = Layers.ENTITY.apply(ChamsModule.getInstance().getOpacity() == 0.0f ? BLANK : TEXTURE, true);
+            END_CRYSTAL = Layers.CRYSTALS.apply(ChamsModule.getInstance().getFadedOpacity(last, true) == 0.0f ? BLANK : TEXTURE, true);
             return;
         }
 
@@ -103,7 +102,7 @@ public class MixinEndCrystalEntityRenderer
         }
 
         boolean valid = ChamsModule.getInstance().isValid(last);
-        ((IModel) model).cancelModel(valid);
+        ((IModel) model).update(last, valid);
         if (ChamsModule.getInstance().isEnabled() && valid)
         {
             int color = ChamsModule.getInstance().color.getValue().getRGB();
@@ -112,7 +111,7 @@ public class MixinEndCrystalEntityRenderer
                 Layers.QUADS_GLINT.startDrawing();
                 VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
-                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, 1.0f));
+                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, ChamsModule.getInstance().getFadedOpacity(last, false)));
                 Layers.QUADS_GLINT.endDrawing();
             }
 

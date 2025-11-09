@@ -12,10 +12,14 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.util.math.MathUtil;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class ChamsModule extends Toggleable
@@ -57,10 +61,33 @@ public class ChamsModule extends Toggleable
     public Config<Color> color = new ColorConfig.Builder("Color")
             .setRgb(0xFFFFFFFF).setTransparency(true).build();
 
+    public final Map<Entity, Long> chamsMap = new ConcurrentHashMap<>();
+
     public ChamsModule()
     {
         super("Chams", "Renders entity models through walls", GuiCategory.RENDER);
         INSTANCE = this;
+    }
+
+    @EventListener
+    public void onRender(RenderWorldEvent.Post event)
+    {
+        // no memory leak :p
+        chamsMap.entrySet().removeIf(entry ->
+        {
+            Entity e = entry.getKey();
+            boolean exists = false;
+            for (Entity entity : mc.world.getEntities())
+            {
+                if (entity == e)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+
+            return !exists;
+        });
     }
 
     public float getOpacity()
@@ -77,13 +104,34 @@ public class ChamsModule extends Toggleable
         return 0.0f;
     }
 
+    public float getFadedOpacity(Entity entity, boolean model)
+    {
+        float opacity = model ? getOpacity() : color.getValue().getAlpha() / 255f;
+        if (entity == null || !chamsMap.containsKey(entity))
+        {
+            return opacity;
+        }
+
+        long delta = System.currentTimeMillis() - chamsMap.get(entity);
+        float fade = Math.min(delta / 1000f, 1.0f);
+        return opacity * fade;
+    }
+
     public boolean isValid(Entity entity)
     {
-        if (entity == mc.player
-                || !Managers.RENDER.isVisible(entity.getBoundingBox())
-                || MathHelper.square(range.getValue()) < entity.squaredDistanceTo(mc.player))
+        if (entity == mc.player || !Managers.RENDER.isVisible(entity.getBoundingBox()))
         {
             return false;
+        }
+
+        if (MathHelper.square(range.getValue()) < entity.squaredDistanceTo(mc.player))
+        {
+            chamsMap.remove(entity);
+            return false;
+        }
+        else
+        {
+            chamsMap.putIfAbsent(entity, System.currentTimeMillis());
         }
 
         return switch (entity)
