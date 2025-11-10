@@ -50,7 +50,8 @@ public class ClientDual implements VertexConsumer
         return this;
     }
 
-    public void vertex(float x, float y, float z, int color, float u, float v, int overlay, int light, float normalX, float normalY, float normalZ) {
+    public void vertex(float x, float y, float z, int color, float u, float v, int overlay, int light, float normalX, float normalY, float normalZ)
+    {
         this.first.vertex(x, y, z, color, u, v, overlay, light, normalX, normalY, normalZ);
         this.second.vertex(x, y, z, color, u, v, overlay, light, normalX, normalY, normalZ);
     }

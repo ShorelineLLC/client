@@ -87,9 +87,8 @@ public class InteractManager extends NetworkHandler
                     continue;
                 }
 
-                Block serverBlock = packet.getState().getBlock();
                 // Confirm that we succeeded placement serverside
-                interaction.setStatus(serverBlock.equals(interaction.getBlock()) ? InteractStatus.SERVER_CONFIRMED : InteractStatus.SERVER_MISMATCH);
+                interaction.setStatus(packet.getState().isOf(interaction.getBlock()) ? InteractStatus.SERVER_CONFIRMED : InteractStatus.SERVER_MISMATCH);
                 break;
             }
         }
@@ -113,7 +112,7 @@ public class InteractManager extends NetworkHandler
             VoxelShape collisionShape = interaction.getBlock().getDefaultState().getCollisionShape(mc.world, event.getBlockPos());
             event.cancel();
             event.setCollisionShape(collisionShape);
-            break;
+            return;
         }
     }
 

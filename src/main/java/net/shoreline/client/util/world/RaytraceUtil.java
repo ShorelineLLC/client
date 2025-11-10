@@ -12,9 +12,19 @@ import net.minecraft.world.RaycastContext;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.impl.module.render.FreecamModule;
 
+import java.util.Optional;
+
 @UtilityClass
 public class RaytraceUtil
 {
+    public HitResult raycast(final Entity viewEntity,
+                             final double reach,
+                             Vec3d position,
+                             final float[] angles)
+    {
+        return Optional.ofNullable(raycastFromEntity(viewEntity, reach, position, angles)).orElseGet(() -> raycast(reach, position, angles));
+    }
+
     public HitResult raycast(final double reach, Vec3d position, final float[] angles)
     {
         final Vec3d rotationVector = RotationUtil.getRotationVector(angles[0], angles[1]);

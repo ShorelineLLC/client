@@ -54,6 +54,11 @@ public class Rotation
         apply(MinecraftClient.getInstance().player);
     }
 
+    public float[] getComponents()
+    {
+        return new float[] { yaw, pitch };
+    }
+
     public static Rotation calculateNewRotation(Rotation prev,
                                                 double dx,
                                                 double dy)

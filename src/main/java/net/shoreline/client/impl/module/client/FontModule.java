@@ -8,6 +8,8 @@ import net.shoreline.client.api.font.FontManager;
 import net.shoreline.client.api.font.Fonts;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.LoadingEvent;
+import net.shoreline.eventbus.annotation.EventListener;
 
 @Getter
 public class FontModule extends Toggleable
@@ -33,9 +35,20 @@ public class FontModule extends Toggleable
         super("Font", "Client custom fonts", GuiCategory.CLIENT);
         INSTANCE = this;
 
-        fontsConfig.addListener(v -> FontManager.setFont(FontManager.fromSystem(v.getName())));
+        fontsConfig.addListener(v -> setFont(v.getName()));
 
         antiAlias.addListener(v -> FontManager.close());
         fractionalMetrics.addListener(v -> FontManager.close());
+    }
+
+    @EventListener
+    public void onFinishedLoading(LoadingEvent.Finished event)
+    {
+        setFont(fontsConfig.getValue().getName());
+    }
+
+    public void setFont(String fontName)
+    {
+        FontManager.setFont(FontManager.fromSystem(fontName));
     }
 }

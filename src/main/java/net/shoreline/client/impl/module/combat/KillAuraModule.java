@@ -83,6 +83,11 @@ public class KillAuraModule extends CombatModule
             .setDescription("Swaps to a weapon silently")
             .setVisible(() -> autoSwap.getValue())
             .setDefaultValue(false).build();
+    Config<Boolean> swapBack = new BooleanConfig.Builder("SwapBack")
+            .setVisibilityDependant(true)
+            .setDescription("Swaps back after done")
+            .setVisible(() -> autoSwap.getValue() && !silentSwap.getValue())
+            .setDefaultValue(false).build();
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
             .addAll(autoSwap, silentSwap).build();
 
