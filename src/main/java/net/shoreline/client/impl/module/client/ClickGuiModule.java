@@ -31,6 +31,9 @@ public class ClickGuiModule extends Toggleable
     Config<Integer> scrollSpeedConfig = new NumberConfig.Builder<Integer>("ScrollSpeed")
             .setMin(5).setMax(100).setDefaultValue(30).setFormat("dpi")
             .setDescription("The speed for mouse scrolling").build();
+    Config<Boolean> categoryCount = new BooleanConfig.Builder("ShowCount")
+            .setDescription("Shows the number of modules in each category")
+            .setDefaultValue(true).build();
 
     @Getter
     private final Theme theme;
@@ -120,5 +123,10 @@ public class ClickGuiModule extends Toggleable
     public int getScrollSpeed()
     {
         return scrollSpeedConfig.getValue();
+    }
+
+    public boolean shouldShowCount()
+    {
+        return categoryCount.getValue();
     }
 }

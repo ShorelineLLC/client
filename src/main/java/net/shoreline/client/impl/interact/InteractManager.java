@@ -10,6 +10,9 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.function.BooleanBiFunction;
@@ -217,6 +220,7 @@ public class InteractManager extends NetworkHandler
     private boolean placeBlockInternal(Interaction interaction)
     {
         BlockPos placePos = interaction.getPos();
+        BlockState state = interaction.getBlock().getDefaultState();
         Direction direction = interaction.getDirection();
 
         boolean noValidDir = airPlace.isForceAirPlace() || direction == null;
@@ -259,9 +263,14 @@ public class InteractManager extends NetworkHandler
         Hand hand = airPlacing && airPlace.isGrim() ? Hand.OFF_HAND : interaction.getHand();
         BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
 
-        if (interaction.isPacketPlace() || !mc.isOnThread())
+        boolean onClientThread = mc.isOnThread();
+        if (interaction.isPacketPlace() || !onClientThread)
         {
             sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
+            BlockSoundGroup blockSoundGroup = state.getSoundGroup();
+            mc.execute(() -> mc.world.playSound(mc.player, blockPos, blockSoundGroup.getPlaceSound(),
+                    SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0f) / 2.0f, blockSoundGroup.getPitch() * 0.8f));
+
             actionResult.setValue(ActionResult.SUCCESS);
         } else
         {

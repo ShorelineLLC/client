@@ -6,7 +6,6 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.mixin.network.packet.c2s.AccessorPlayerInteractC2SPacket;
 
 public class CombatModule extends ListeningToggleable
