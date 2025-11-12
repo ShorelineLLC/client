@@ -51,7 +51,7 @@ public class Mesh
         BufferBuilder builder = Tessellator.getInstance().begin(layer.getDrawMode(), layer.getVertexFormat());
         for (Vertex vertex : vertices)
         {
-            builder.vertex(vertex.getX(), vertex.getY(), vertex.getZ()).color(vertex.getColor());
+            builder.vertex(matrix, vertex.getX(), vertex.getY(), vertex.getZ()).color(vertex.getColor());
         }
 
         return builder.end();

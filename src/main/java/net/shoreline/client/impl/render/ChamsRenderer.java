@@ -3,7 +3,9 @@ package net.shoreline.client.impl.render;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
@@ -18,26 +20,19 @@ public enum ChamsRenderer
     WIREFRAME,
     BOTH;
 
+    private static final MatrixStack matrices = new MatrixStack();
+    private static final Matrix4f matrix = matrices.peek().getPositionMatrix();
+
     public static boolean rendering = false;
     private static ChamsRenderer chams;
-    private static Matrix4f matrix;
     private static Vec3d position;
     private static int color;
 
     @SuppressWarnings("unchecked")
     public static void render(ChamsRenderer chams, Entity entity, float tickDelta, boolean throughWalls, int color)
     {
-        if (chams == NONE)
-        {
-            return;
-        }
-
-        MatrixStack matrices = new MatrixStack();
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-
         ChamsRenderer.chams = chams;
         ChamsRenderer.color = color;
-        ChamsRenderer.matrix = matrix4f;
         ChamsRenderer.position = Interpolation.getRenderPosition(entity, tickDelta);
 
         rendering = true;

@@ -91,8 +91,7 @@ public class MixinEndCrystalEntityRenderer
                     "Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/entity/model/EndCrystalEntityModel;" +
-                            "setAngles(Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;)V",
+                    target = "Lnet/minecraft/client/render/entity/model/EndCrystalEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V",
                     shift = At.Shift.AFTER))
     private void setAnglesHook(EndCrystalEntityRenderState endCrystalEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo info)
     {
@@ -109,7 +108,7 @@ public class MixinEndCrystalEntityRenderer
             if (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
             {
                 Layers.QUADS_GLINT.startDrawing();
-                VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers();
+                VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
                 model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, ChamsModule.getInstance().getFadedOpacity(last, false)));
                 Layers.QUADS_GLINT.endDrawing();

@@ -12,13 +12,18 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Direction;
+import net.shoreline.client.impl.imixin.ILivingEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
 import net.shoreline.client.impl.module.render.ChamsModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Layers;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,6 +39,7 @@ import java.awt.*;
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
         S extends LivingEntityRenderState,
         M extends EntityModel<? super S>>
+    implements ILivingEntityRenderer
 {
     @Shadow
     public abstract Identifier getTexture(S state);
@@ -44,8 +50,23 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
     @Shadow
     protected abstract void scale(S state, MatrixStack matrices);
 
+    @Shadow protected abstract void setupTransforms(S state, MatrixStack matrices, float bodyYaw, float baseHeight);
+
+    @Shadow protected abstract int getMixColor(S state);
+
+    @Shadow protected abstract float getAnimationCounter(S state);
+
+    @Shadow @Nullable protected abstract RenderLayer getRenderLayer(S state, boolean showBody, boolean translucent, boolean showOutline);
+
+    @Shadow protected abstract boolean isVisible(S state);
+
     @Unique
     protected LivingEntity last;
+
+    @Override
+    public void renderChams(LivingEntityRenderState livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
+    {
+    }
 
     @Inject(
             method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;" +
@@ -97,7 +118,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                     "Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/entity/model/EntityModel;setAngles(Lnet/minecraft/client/render/entity/state/EntityRenderState;)V",
+                    target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V",
                     shift = At.Shift.AFTER))
     private void setAnglesHook(S livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo info)
     {
@@ -114,9 +135,9 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
             if (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
             {
                 Layers.QUADS_GLINT.startDrawing();
-                VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers();
+                VertexConsumerProvider.Immediate provider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
-                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, ChamsModule.getInstance().getFadedOpacity(last, false)));
+                this.model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, color);
                 Layers.QUADS_GLINT.endDrawing();
             }
 

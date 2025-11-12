@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.render;
 
 import lombok.Getter;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.Monster;

@@ -2,7 +2,6 @@ package net.shoreline.client.mixin.render;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumers;
-import net.shoreline.client.impl.render.util.ClientDual;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(VertexConsumers.class)
 public class MixinVertexConsumers
 {
-    @Inject(
+    /* @Inject(
             method = "union(Lnet/minecraft/client/render/VertexConsumer;" +
                     "Lnet/minecraft/client/render/VertexConsumer;" +
                     ")Lnet/minecraft/client/render/VertexConsumer;",
@@ -21,5 +20,5 @@ public class MixinVertexConsumers
     {
         cir.setReturnValue(new ClientDual(first, second)); // get rid of retarded error.
         cir.cancel();
-    }
+    } */
 }
