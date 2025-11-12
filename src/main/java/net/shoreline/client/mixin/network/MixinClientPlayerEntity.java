@@ -193,6 +193,18 @@ public abstract class MixinClientPlayerEntity
         EventBus.INSTANCE.dispatch(setHandEvent);
     }
 
+    @Inject(method = "getMountJumpStrength", at = @At(value = "HEAD"), cancellable = true)
+    private void hookGetMountJumpStrength(CallbackInfoReturnable<Float> cir)
+    {
+        MountEvent.JumpStrength mountJumpStrengthEvent = new MountEvent.JumpStrength();
+        EventBus.INSTANCE.dispatch(mountJumpStrengthEvent);
+        if (mountJumpStrengthEvent.isCanceled())
+        {
+            cir.cancel();
+            cir.setReturnValue(mountJumpStrengthEvent.getJumpStrength());
+        }
+    }
+
     /** Allows you to open screens in portals **/
     @Redirect(method = "tickNausea", at = @At(value = "FIELD",
             target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;"))

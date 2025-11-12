@@ -203,7 +203,11 @@ public class InventoryManager extends NetworkHandler
 
     public void setSelectedSlot(int slot)
     {
-        mc.player.getInventory().setSelectedSlot(slot);
+        if (slot != mc.player.getInventory().selectedSlot)
+        {
+            mc.player.getInventory().setSelectedSlot(slot);
+        }
+
         if (slot != serverSlot)
         {
             sendPacket(new UpdateSelectedSlotC2SPacket(slot));

@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShapes;
@@ -29,13 +30,13 @@ public class AvoidModule extends Toggleable
             .setDescription("Avoids colliding with berry bush blocks")
             .setDefaultValue(false).build();
     Config<Boolean> avoidLadders = new BooleanConfig.Builder("Ladders")
-            .setDescription("Avoids colliding with berry bush blocks")
+            .setDescription("Avoids climbing ladders")
             .setDefaultValue(false).build();
     Config<Boolean> avoidVines = new BooleanConfig.Builder("Vines")
-            .setDescription("Avoids colliding with berry bush blocks")
+            .setDescription("Avoids climbing vines")
             .setDefaultValue(false).build();
     Config<Boolean> avoidScaffolding = new BooleanConfig.Builder("Scaffolding")
-            .setDescription("Avoids colliding with berry bush blocks")
+            .setDescription("Avoids climbing scaffolding")
             .setDefaultValue(false).build();
     Config<Boolean> avoidUnloaded = new BooleanConfig.Builder("Unloaded")
             .setDescription("Avoids colliding with unloaded chunks")
@@ -49,17 +50,22 @@ public class AvoidModule extends Toggleable
     @EventListener
     public void onBlockCollide(BlockCollisionEvent event)
     {
-        Block block = event.getState().getBlock();
-        if (block == Blocks.CACTUS && avoidCacti.getValue()
-                || block == Blocks.SWEET_BERRY_BUSH && avoidBerryBush.getValue()
+        if (mc.player.isSpectator())
+        {
+            return;
+        }
+
+        BlockState state = event.getState();
+        if (state.isOf(Blocks.CACTUS) && avoidCacti.getValue()
+                || state.isOf(Blocks.SWEET_BERRY_BUSH) && avoidBerryBush.getValue()
                 || !ChunkUtil.isLoaded(event.getBlockPos()) && avoidUnloaded.getValue()
-                || (block == Blocks.FIRE || block == Blocks.SOUL_FIRE) && mc.player.getY() == event.getBlockPos().getY() && avoidFire.getValue())
+                || (state.isOf(Blocks.FIRE) || state.isOf(Blocks.SOUL_FIRE)) && mc.player.getY() == event.getBlockPos().getY() && avoidFire.getValue())
         {
             event.cancel();
             event.setCollisionShape(VoxelShapes.fullCube());
         }
 
-        if (antiVoid.getValue() && !mc.player.isSpectator())
+        if (antiVoid.getValue())
         {
             BlockPos belowPos = EntityUtil.getRoundedBlockPos(mc.player).down();
             if (!event.getBlockPos().equals(belowPos))

@@ -53,12 +53,18 @@ public class FastFallModule extends MovementModule
     @EventListener
     public void onTick(TickEvent.Pre event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         prevOnGround = mc.player.isOnGround();
         if (modeConfig.getValue() == FallMode.STEP)
         {
-            if (!canFastFall() || SpeedModule.INSTANCE.isEnabled()
+            if (!Managers.ANTICHEAT.hasPassedSinceSetback(1000)
+                    || SpeedModule.INSTANCE.isEnabled()
                     || FlightModule.INSTANCE.isEnabled()
-                    || !Managers.ANTICHEAT.hasPassedSinceSetback(1000))
+                    || !canFastFall())
             {
                 return;
             }
@@ -85,10 +91,11 @@ public class FastFallModule extends MovementModule
     {
         if (modeConfig.getValue() == FallMode.SHIFT)
         {
-            if (!canFastFall() || !fallTimer.hasPassed(1000)
+            if (!Managers.ANTICHEAT.hasPassedSinceSetback(1000)
                     || SpeedModule.INSTANCE.isEnabled()
                     || FlightModule.INSTANCE.isEnabled()
-                    || !Managers.ANTICHEAT.hasPassedSinceSetback(1000))
+                    || !canFastFall()
+                    || !fallTimer.hasPassed(1000))
             {
                 return;
             }

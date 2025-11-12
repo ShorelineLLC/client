@@ -37,9 +37,7 @@ public class InteractDirection
                 continue;
             }
 
-            if (state.getBlock() == Blocks.ANVIL
-                    || state.getBlock() == Blocks.CHIPPED_ANVIL
-                    || state.getBlock() == Blocks.DAMAGED_ANVIL)
+            if (state.isOf(Blocks.ANVIL) || state.isOf(Blocks.CHIPPED_ANVIL) || state.isOf(Blocks.DAMAGED_ANVIL))
             {
                 continue;
             }

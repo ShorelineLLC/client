@@ -61,10 +61,7 @@ public class TintModule extends Toggleable
     {
         for (Config<?> config : getConfigs())
         {
-            if (config != lightConfig)
-            {
-                config.addListener(v -> reloadWorld());
-            }
+            config.addListener(v -> reloadWorld());
         }
 
         lavaConfig.addListener(v -> Managers.RESOURCE_PACK.toggleResourcePack("lava", v));

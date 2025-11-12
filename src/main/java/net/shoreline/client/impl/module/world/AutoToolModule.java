@@ -40,7 +40,7 @@ public class AutoToolModule extends Toggleable
 
     public ItemSlot getBestTool(final BlockState state)
     {
-        if (state.getBlock() == Blocks.COBWEB)
+        if (state.isOf(Blocks.COBWEB))
         {
             for (int i = 0; i < 9; i++)
             {

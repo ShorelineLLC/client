@@ -12,6 +12,8 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.util.Calendar;
+
 public class NoWeatherModule extends Toggleable
 {
     Config<Weather> weatherConfig = new EnumConfig.Builder<Weather>("Weather")

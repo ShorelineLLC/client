@@ -56,6 +56,7 @@ public class ModuleManager
                 new KeepSprintModule(),
                 new KillAuraModule(),
                 new OffhandGappleModule(),
+                new PearlBlockerModule(),
                 new ReplenishModule(),
                 new SelfTrapModule(),
                 // Exploit
