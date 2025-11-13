@@ -141,6 +141,38 @@ public class RenderManager extends GenericFeature
         textQueue.add(new TextRender(matrices, color, depth, start, scale, text));
     }
 
+    public void renderBox(Consumer<BufferBuilder> buffer)
+    {
+        startRender();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+
+        BufferBuilder builder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        buffer.accept(builder);
+        BuiltBuffer built = builder.endNullable();
+        if (built != null)
+        {
+            BufferRenderer.drawWithGlobalProgram(built);
+        }
+
+        endRender();
+    }
+
+    public void renderBoundingBox(Consumer<BufferBuilder> buffer)
+    {
+        startRender();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+
+        BufferBuilder builder = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        buffer.accept(builder);
+        BuiltBuffer built = builder.endNullable();
+        if (built != null)
+        {
+            BufferRenderer.drawWithGlobalProgram(built);
+        }
+
+        endRender();
+    }
+
     public void flushBuffer(float tickDelta)
     {
         flushQuadsBuffer();
@@ -167,7 +199,7 @@ public class RenderManager extends GenericFeature
 
         for (Mesh mesh : meshQueue)
         {
-            mesh.flushVertices(mc.getBufferBuilders().getEffectVertexConsumers());
+            mesh.flushVertices(mc.getBufferBuilders().getEntityVertexConsumers());
         }
     }
 

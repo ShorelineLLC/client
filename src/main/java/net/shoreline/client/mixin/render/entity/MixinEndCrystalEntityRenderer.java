@@ -73,17 +73,15 @@ public class MixinEndCrystalEntityRenderer
                                     int i,
                                     CallbackInfo info)
     {
-        if (ChamsModule.getInstance().isEnabled()
-                && (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.X_Q_Z
-                    || ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
-                && ChamsModule.getInstance().isValid(last))
+        if (ChamsModule.getInstance().isEnabled() && ChamsModule.getInstance().isValid(last))
         {
-            END_CRYSTAL = Layers.CRYSTALS.apply(ChamsModule.getInstance().getFadedOpacity(last, true) == 0.0f ? BLANK : TEXTURE, true);
+            END_CRYSTAL = Layers.CRYSTALS.apply(ChamsModule.getInstance().getOpacity() == 0.0f ? BLANK : TEXTURE, true);
             return;
         }
 
         END_CRYSTAL = RenderLayer.getEntityCutoutNoCull(TEXTURE);
     }
+
 
     @Inject(
             method = "render(Lnet/minecraft/client/render/entity/state/EndCrystalEntityRenderState;" +
@@ -101,7 +99,7 @@ public class MixinEndCrystalEntityRenderer
         }
 
         boolean valid = ChamsModule.getInstance().isValid(last);
-        ((IModel) model).update(last, valid);
+        ((IModel) model).cancelModel(valid);
         if (ChamsModule.getInstance().isEnabled() && valid)
         {
             int color = ChamsModule.getInstance().color.getValue().getRGB();
@@ -110,7 +108,7 @@ public class MixinEndCrystalEntityRenderer
                 Layers.QUADS_GLINT.startDrawing();
                 VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
-                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, ColorUtil.withTransparency(color, ChamsModule.getInstance().getFadedOpacity(last, false)));
+                model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, color);
                 Layers.QUADS_GLINT.endDrawing();
             }
 

@@ -5,5 +5,5 @@ import net.minecraft.entity.Entity;
 @IMixin
 public interface IModel
 {
-    void update(Entity entity, boolean cancel);
+    void cancelModel(boolean cancel);
 }

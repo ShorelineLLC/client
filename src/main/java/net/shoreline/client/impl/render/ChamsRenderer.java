@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -8,6 +9,7 @@ import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.imixin.*;
@@ -31,6 +33,11 @@ public enum ChamsRenderer
     @SuppressWarnings("unchecked")
     public static void render(ChamsRenderer chams, Entity entity, float tickDelta, boolean throughWalls, int color)
     {
+        if (chams == NONE)
+        {
+            return;
+        }
+
         ChamsRenderer.chams = chams;
         ChamsRenderer.color = color;
         ChamsRenderer.position = Interpolation.getRenderPosition(entity, tickDelta);
@@ -79,25 +86,27 @@ public enum ChamsRenderer
                 Vec3d camera = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
                 if ((chams == CHAMS || chams == BOTH))
                 {
-                    Mesh mesh = new Mesh(Layers.QUADS, matrix);
-                    mesh.vertex(position.getX() + xs[0] - camera.getX(), position.getY() + ys[0] - camera.getY(), position.getZ() + zs[0] - camera.getZ(), color);
-                    mesh.vertex(position.getX() + xs[1] - camera.getX(), position.getY() + ys[1] - camera.getY(), position.getZ() + zs[1] - camera.getZ(), color);
-                    mesh.vertex(position.getX() + xs[2] - camera.getX(), position.getY() + ys[2] - camera.getY(), position.getZ() + zs[2] - camera.getZ(), color);
-                    mesh.vertex(position.getX() + xs[3] - camera.getX(), position.getY() + ys[3] - camera.getY(), position.getZ() + zs[3] - camera.getZ(), color);
-                    Managers.RENDER.queueMesh(mesh);
+                    Managers.RENDER.renderBox(buffer ->
+                    {
+                        buffer.vertex(matrix, (float) (position.getX() + xs[0] - camera.getX()), (float) (position.getY() + ys[0] - camera.getY()), (float) (position.getZ() + zs[0] - camera.getZ())).color(color);
+                        buffer.vertex(matrix, (float) (position.getX() + xs[1] - camera.getX()), (float) (position.getY() + ys[1] - camera.getY()), (float) (position.getZ() + zs[1] - camera.getZ())).color(color);
+                        buffer.vertex(matrix, (float) (position.getX() + xs[2] - camera.getX()), (float) (position.getY() + ys[2] - camera.getY()), (float) (position.getZ() + zs[2] - camera.getZ())).color(color);
+                        buffer.vertex(matrix, (float) (position.getX() + xs[3] - camera.getX()), (float) (position.getY() + ys[3] - camera.getY()), (float) (position.getZ() + zs[3] - camera.getZ())).color(color);
+                    });
                 }
 
                 if ((chams == WIREFRAME || chams == BOTH))
                 {
-                    int lineColor = (color & 0x00FFFFFF) | 0xFF000000;
-                    Mesh mesh = new Mesh(Layers.LINES, matrix);
-                    mesh.vertex(position.x + xs[0] - camera.getX(), position.y + ys[0] - camera.getY(), position.z + zs[0] - camera.getZ(), lineColor);
-                    mesh.vertex(position.x + xs[1] - camera.getX(), position.y + ys[1] - camera.getY(), position.z + zs[1] - camera.getZ(), lineColor);
-                    mesh.vertex(position.x + xs[1] - camera.getX(), position.y + ys[1] - camera.getY(), position.z + zs[1] - camera.getZ(), lineColor);
-                    mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
-                    mesh.vertex(position.x + xs[2] - camera.getX(), position.y + ys[2] - camera.getY(), position.z + zs[2] - camera.getZ(), lineColor);
-                    mesh.vertex(position.x + xs[3] - camera.getX(), position.y + ys[3] - camera.getY(), position.z + zs[3] - camera.getZ(), lineColor);
-                    Managers.RENDER.queueMesh(mesh);
+                    Managers.RENDER.renderBoundingBox(buffer ->
+                    {
+                        int lineColor = (color & 0x00FFFFFF) | 0xFF000000;
+                        buffer.vertex(matrix, (float) (position.x + xs[0] - camera.getX()), (float) (position.y + ys[0] - camera.getY()), (float) (position.z + zs[0] - camera.getZ())).color(lineColor);
+                        buffer.vertex(matrix, (float) (position.x + xs[1] - camera.getX()), (float) (position.y + ys[1] - camera.getY()), (float) (position.z + zs[1] - camera.getZ())).color(lineColor);
+                        buffer.vertex(matrix, (float) (position.x + xs[1] - camera.getX()), (float) (position.y + ys[1] - camera.getY()), (float) (position.z + zs[1] - camera.getZ())).color(lineColor);
+                        buffer.vertex(matrix, (float) (position.x + xs[2] - camera.getX()), (float) (position.y + ys[2] - camera.getY()), (float) (position.z + zs[2] - camera.getZ())).color(lineColor);
+                        buffer.vertex(matrix, (float) (position.x + xs[2] - camera.getX()), (float) (position.y + ys[2] - camera.getY()), (float) (position.z + zs[2] - camera.getZ())).color(lineColor);
+                        buffer.vertex(matrix, (float) (position.x + xs[3] - camera.getX()), (float) (position.y + ys[3] - camera.getY()), (float) (position.z + zs[3] - camera.getZ())).color(lineColor);
+                    });
                 }
 
                 i = 0;

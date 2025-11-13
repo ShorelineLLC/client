@@ -1,12 +1,11 @@
 package net.shoreline.client.impl.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.client.impl.imixin.IGameRenderer;
+import net.minecraft.util.math.RotationAxis;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import java.util.List;
 public class Mesh
 {
     private final RenderLayer layer;
-    private final Matrix4f matrix;
+    private final MatrixStack matrices;
     private List<Vertex> vertices;
 
     public Mesh(RenderLayer renderLayer)
@@ -25,20 +24,21 @@ public class Mesh
         this(renderLayer, null);
     }
 
-    public Mesh(RenderLayer renderLayer, Matrix4f matrix)
+    public Mesh(RenderLayer renderLayer, MatrixStack matrices)
     {
-        this(renderLayer, matrix, new ArrayList<>());
+        this(renderLayer, matrices, new ArrayList<>());
     }
 
-    public Mesh(RenderLayer renderLayer, Matrix4f matrix, List<Vertex> vertices)
+    public Mesh(RenderLayer renderLayer, MatrixStack matrices, List<Vertex> vertices)
     {
         this.layer = renderLayer;
-        this.matrix = matrix;
+        this.matrices = matrices;
         this.vertices = vertices;
     }
 
     public void flushVertices(VertexConsumerProvider.Immediate provider)
     {
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
         VertexConsumer consumer = provider.getBuffer(layer);
         for (Vertex vertex : vertices)
         {
@@ -48,6 +48,7 @@ public class Mesh
 
     public BuiltBuffer getBuiltBuffer()
     {
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
         BufferBuilder builder = Tessellator.getInstance().begin(layer.getDrawMode(), layer.getVertexFormat());
         for (Vertex vertex : vertices)
         {
