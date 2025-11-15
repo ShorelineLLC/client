@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.render;
 
 import lombok.experimental.UtilityClass;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;

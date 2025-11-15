@@ -9,6 +9,7 @@ import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderHotbarItemEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderTabEvent;
 import net.shoreline.client.impl.module.misc.BetterTabModule;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
@@ -31,16 +32,14 @@ public class MixinInGameHud
     @Redirect(
             method = "renderPlayerList",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"))
-    private boolean inrsHook(KeyBinding instance)
+    private boolean shouldRenderPlayerListHook(KeyBinding instance)
     {
-        BetterTabModule betterTab = BetterTabModule.INSTANCE;
-        if (betterTab.isEnabled()
-                && betterTab.getAnimateConfig().getValue()
-                && betterTab.getTabListAnim().getFactor() > 0.01f
-                && !instance.isPressed())
+        RenderTabEvent event = new RenderTabEvent();
+        event.setPressed(instance.isPressed());
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
         {
-            betterTab.getTabListAnim().setState(false);
-            return true;
+            return event.isPressed();
         }
 
         return instance.isPressed();

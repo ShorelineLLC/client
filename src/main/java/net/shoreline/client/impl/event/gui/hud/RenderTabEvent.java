@@ -1,14 +1,14 @@
 package net.shoreline.client.impl.event.gui.hud;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.shoreline.eventbus.Event;
 import net.shoreline.eventbus.annotation.Cancelable;
 
-@RequiredArgsConstructor
 @Getter
+@Setter
 @Cancelable
-public class OpenTabEvent extends Event
+public class RenderTabEvent extends Event
 {
-    private final boolean visible;
+    private boolean pressed;
 }

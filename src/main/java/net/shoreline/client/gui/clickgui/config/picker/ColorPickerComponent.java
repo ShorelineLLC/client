@@ -90,6 +90,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
 
         drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 0.5f, 0x33000000);
+        drawBackground(context, getTx() + getWidth() - 12, getTy() + 2, getTx() + getWidth(), getTy() + 14, 2);
         drawRect(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, getConfig().getValue().getRGB());
 
         if (collapseAnim.getFactor() > 0.001)
@@ -132,7 +133,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             if (colorConfig.isTransparency())
             {
                 float alphaY = syncY + 17;
-                drawBackground(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, 0.5f);
+                drawBackground(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, 1);
                 drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, ColorUtil.withTransparency(configColor, 0f), true);
             }
 
@@ -266,7 +267,7 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
                 .getVertexConsumerProvider()
                 .getBuffer(RenderLayer.getGui());
 
-        drawRect(context, x, y, x2, y2, 0xFFFFFFFF);
+        drawRect(context, x, y, x2 - x, y2 - y, 0xFFFFFFFF);
         boolean skip = false;
         for (float yPos = y; yPos < y2; yPos += size)
         {

@@ -7,8 +7,8 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.gui.hud.OpenTabEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderPlayerListEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderTabEvent;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.Animation;
@@ -32,8 +32,6 @@ public class BetterTabModule extends Toggleable
 
     @Getter
     private final Animation tabListAnim = new Animation(200L);
-    private boolean close;
-    private boolean skip;
 
     public BetterTabModule()
     {
@@ -47,19 +45,7 @@ public class BetterTabModule extends Toggleable
         if (animateConfig.getValue())
         {
             float animFactor = (float) Easing.CIRC_OUT.ease(tabListAnim.getFactor());
-            if (close)
-            {
-                event.getContext().getMatrices().translate(0, (-event.getY2() * animFactor), 0);
-                if (animFactor == 0.0f)
-                {
-                    mc.options.playerListKey.setPressed(false);
-                    skip = true;
-                }
-            }
-            else
-            {
-                event.getContext().getMatrices().translate(0, -event.getY2() + (event.getY2() * animFactor), 0);
-            }
+            event.getContext().getMatrices().translate(0, -event.getY2() + (event.getY2() * animFactor), 0);
         }
     }
 
@@ -84,17 +70,16 @@ public class BetterTabModule extends Toggleable
     }
 
     @EventListener
-    public void onOpenTab(OpenTabEvent event)
+    public void renderTabEvent(RenderTabEvent event)
     {
-        if (event.isVisible())
+        tabListAnim.setState(event.isPressed());
+        if (animateConfig.getValue() && tabListAnim.getFactor() > 0.01f)
         {
-            close = false;
-            tabListAnim.setState(true);
-        }
-        else
-        {
-            close = true;
-            tabListAnim.setState(false);
+            event.setCanceled(true);
+            if (!event.isPressed())
+            {
+                event.setPressed(true);
+            }
         }
     }
 }

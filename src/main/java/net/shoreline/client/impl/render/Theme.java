@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.render;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
@@ -13,6 +14,7 @@ public class Theme
     private int componentColor;
     private int textColor;
     private int backgroundColor;
+    @Getter
     private int outlineColor;
 
     public void setTitleColor(Color color)
@@ -37,7 +39,7 @@ public class Theme
 
     public void setOutlineColor(Color color)
     {
-        this.outlineColor = ColorUtil.withTransparency(color, 1.0f);
+        this.outlineColor = color.getRGB();
     }
 
     public int getTitleColor()
@@ -68,11 +70,6 @@ public class Theme
     public int getBackgroundColor()
     {
         return getColor(backgroundColor, 1.0f);
-    }
-
-    public int getOutlineColor()
-    {
-        return getColor(outlineColor, 1.0f);
     }
 
     public int getColor(int color, float transparency)

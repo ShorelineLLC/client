@@ -27,7 +27,7 @@ public class ThemeModule extends Concurrent
             .setRgb(0xff000000)
             .setDescription("The Clickgui background color").build();
     Config<Color> outlineColor = new ColorConfig.Builder("OutlineColor")
-            .setRgb(0x00000000)
+            .setRgb(0x00000000).setTransparency(true)
             .setDescription("The Clickgui outline color").build();
     Config<Color> textColor = new ColorConfig.Builder("TextColor")
             .setRgb(0xffffffff)

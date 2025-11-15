@@ -10,7 +10,6 @@ import net.minecraft.scoreboard.number.NumberFormat;
 import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import net.shoreline.client.impl.event.gui.hud.OpenTabEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderPlayerListEvent;
 import net.shoreline.client.impl.module.misc.BetterTabModule;
 import net.shoreline.eventbus.EventBus;
@@ -49,17 +48,6 @@ public abstract class MixinPlayerListHud
 
     @Shadow
     protected abstract List<PlayerListEntry> collectPlayerEntries();
-
-    @Inject(method = "setVisible", at = @At(value = "HEAD"), cancellable = true)
-    private void hookSetVisible(boolean visible, CallbackInfo ci)
-    {
-        OpenTabEvent event = new OpenTabEvent(visible);
-        EventBus.INSTANCE.dispatch(event);
-        if (event.isCanceled())
-        {
-            ci.cancel();
-        }
-    }
 
     @Inject(method = "collectPlayerEntries", at = @At(value = "HEAD"), cancellable = true)
     private void hookCollectEntries(CallbackInfoReturnable<List<PlayerListEntry>> cir)

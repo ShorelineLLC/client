@@ -93,7 +93,7 @@ public class ModuleComponent extends FrameComponent
 
         int pending = 0;
         float configY = scale * 2.0f;
-        if (collapseAnim.getFactor() > 0.01f)
+        if (collapseAnim.getFactor() > 0.01f || frameOpen)
         {
             for (ConfigComponent<?> component : components)
             {

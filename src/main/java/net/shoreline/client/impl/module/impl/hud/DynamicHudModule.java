@@ -70,7 +70,6 @@ public abstract class DynamicHudModule extends HudModule
 
     public void sortEntries()
     {
-        boolean top = isTop();
         getHudEntries().sort(Comparator.comparingDouble(
                 entry -> getTextWidth(entry.getText().get()) * (top ? -1 : 1)));
     }
@@ -97,6 +96,6 @@ public abstract class DynamicHudModule extends HudModule
     public void drawTextTransparency(MatrixStack matrices, String text, float x, float y, int color, float transparency)
     {
         int c = ColorUtil.withTransparency(color, transparency);
-        drawText(matrices, text, x, y, color);
+        drawText(matrices, text, x, y, c);
     }
 }
