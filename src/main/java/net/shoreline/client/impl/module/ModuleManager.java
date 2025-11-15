@@ -41,6 +41,7 @@ public class ModuleManager
                 new SoundsModule(),
                 new ThemeModule(),
                 // Combat
+                new AnchorAuraModule(),
                 new AutoArmorModule(),
                 new AutoBowReleaseModule(),
                 new AutoCrystalModule(),

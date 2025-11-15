@@ -15,6 +15,7 @@ import net.shoreline.client.impl.module.client.InventoryModule;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @UtilityClass
 public class InventoryUtil
@@ -82,6 +83,20 @@ public class InventoryUtil
         {
             ItemStack stack = inventory.getStack(i);
             if (stack.getItem().equals(item))
+            {
+                return i;
+            }
+        }
+
+        return INVALID_SLOT;
+    }
+
+    public int getHotbarSlot(Predicate<ItemStack> predicate)
+    {
+        for (int i = 0; i < PlayerInventory.getHotbarSize(); i++)
+        {
+            ItemStack stack = MinecraftClient.getInstance().player.getInventory().getStack(i);
+            if (predicate.test(stack))
             {
                 return i;
             }

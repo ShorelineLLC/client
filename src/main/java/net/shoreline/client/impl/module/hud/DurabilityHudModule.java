@@ -20,7 +20,7 @@ public class DurabilityHudModule extends DynamicHudModule
     @Override
     public void onEnable()
     {
-        getHudEntries().add(new DynamicDuraEntry(this, () -> mc.player.getMainHandStack().isDamageable()));
+        getHudEntries().add(new DynamicDuraEntry(this, () -> mc.player != null && mc.player.getMainHandStack().isDamageable()));
     }
 
     private static class DynamicDuraEntry extends DynamicEntry

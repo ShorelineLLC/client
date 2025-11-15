@@ -1,7 +1,5 @@
 package net.shoreline.client.api.async;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 import net.shoreline.client.api.GenericFeature;
 
 import java.util.ArrayList;
