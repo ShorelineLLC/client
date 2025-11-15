@@ -135,6 +135,10 @@ public class ToggleModuleComponent extends ModuleComponent
         {
             Toggleable toggleable = (Toggleable) module;
             toggleable.setHidden(!toggleable.isHidden());
+            String notification = toggleable.getName() + (toggleable.isHidden()
+                            ? " is now hidden"
+                            : " is now visible");
+            ClickGuiScreen.INSTANCE.addNotification(notification, 1000);
         }
 
         super.mouseClicked(mouseX, mouseY, mouseButton);

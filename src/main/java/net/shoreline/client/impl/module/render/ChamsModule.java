@@ -84,9 +84,7 @@ public class ChamsModule extends Toggleable
 
     public boolean isValid(Entity entity)
     {
-        if (entity == mc.player
-                || !Managers.RENDER.isVisible(entity.getBoundingBox())
-                || MathHelper.square(range.getValue()) < entity.squaredDistanceTo(mc.player))
+        if (!Managers.RENDER.isVisible(entity.getBoundingBox()) || MathHelper.square(range.getValue()) < entity.squaredDistanceTo(mc.player))
         {
             return false;
         }

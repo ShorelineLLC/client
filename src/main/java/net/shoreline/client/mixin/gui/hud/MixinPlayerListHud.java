@@ -50,11 +50,15 @@ public abstract class MixinPlayerListHud
     @Shadow
     protected abstract List<PlayerListEntry> collectPlayerEntries();
 
-    @Inject(method = "setVisible", at = @At(value = "HEAD"))
+    @Inject(method = "setVisible", at = @At(value = "HEAD"), cancellable = true)
     private void hookSetVisible(boolean visible, CallbackInfo ci)
     {
         OpenTabEvent event = new OpenTabEvent(visible);
         EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "collectPlayerEntries", at = @At(value = "HEAD"), cancellable = true)

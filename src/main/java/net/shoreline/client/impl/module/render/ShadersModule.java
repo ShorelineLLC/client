@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.render;
 
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -16,6 +17,7 @@ import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.item.RenderHandEvent;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
+import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.shader.ShaderEffect;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;

@@ -106,7 +106,7 @@ public class MixinEndCrystalEntityRenderer
             if (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
             {
                 Layers.QUADS_GLINT.startDrawing();
-                VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+                VertexConsumerProvider provider = MinecraftClient.getInstance().getBufferBuilders().getEffectVertexConsumers();
                 VertexConsumer consumer = ItemRenderer.getArmorGlintConsumer(provider, Layers.QUADS_GLINT, true);
                 model.render(matrixStack, consumer, i, OverlayTexture.DEFAULT_UV, color);
                 Layers.QUADS_GLINT.endDrawing();

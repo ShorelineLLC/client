@@ -19,14 +19,17 @@ import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class ClickGuiScreen extends Screen
 {
     public static ClickGuiScreen INSTANCE = new ClickGuiScreen();
 
     private final List<Frame> guiFrames = new ArrayList<>();
+    private final Queue<GuiNotification> notifications = new ArrayDeque<>();
 
     @Getter
     private final Mouse mouse = new Mouse();
@@ -96,6 +99,19 @@ public class ClickGuiScreen extends Screen
             Managers.RENDER.drawText(context.getMatrices(), descriptionText, 4,
                     context.getScaledWindowHeight() - 16,
                     ColorUtil.withTransparency(-1, (float) descAnimation.getFactor()));
+        }
+
+        GuiNotification notification = notifications.peek();
+        if (notification != null)
+        {
+            if (notification.isExpired())
+            {
+                notifications.remove(notification);
+            }
+            else
+            {
+                notification.render(context);
+            }
         }
 
         MatrixStack matrixStack = context.getMatrices();
@@ -272,6 +288,11 @@ public class ClickGuiScreen extends Screen
     {
         this.descriptionText = descriptionText;
         descAnimation.setState(true);
+    }
+
+    public void addNotification(String notification, int duration)
+    {
+        notifications.add(new GuiNotification(notification, duration));
     }
 
     public Theme getTheme()

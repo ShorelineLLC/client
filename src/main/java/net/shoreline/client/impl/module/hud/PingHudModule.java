@@ -23,7 +23,7 @@ public class PingHudModule extends DynamicHudModule
 
     public String getLatencyText()
     {
-        String headless = HeadlessMCModule.INSTANCE.isEnabled() ? ClientFormatting.THEME + " Headless " + Formatting.WHITE + "0ms" : "";
+        String headless = HeadlessMCModule.INSTANCE.isEnabled() ? Formatting.RESET + " Headless " + Formatting.WHITE + "0ms" : "";
         int latency = LatencyModule.INSTANCE.isEnabled() ? LatencyModule.INSTANCE.getCurrentLatency() : Managers.NETWORK.getClientLatency();
         return String.format("Ping " + Formatting.WHITE + "%dms" + headless, latency);
     }

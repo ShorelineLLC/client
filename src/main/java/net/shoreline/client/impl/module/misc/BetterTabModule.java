@@ -30,7 +30,10 @@ public class BetterTabModule extends Toggleable
             .setMin(20).setMax(100).setDefaultValue(20)
             .setDescription("The number of columns to show in tab list").build();
 
+    @Getter
     private final Animation tabListAnim = new Animation(200L);
+    private boolean close;
+    private boolean skip;
 
     public BetterTabModule()
     {
@@ -43,19 +46,20 @@ public class BetterTabModule extends Toggleable
     {
         if (animateConfig.getValue())
         {
-            float animFactor = (float) Easing.QUART_IN_OUT.ease(tabListAnim.getFactor());
-            int h = event.getY2() - event.getY1();
-            int cb = event.getY1() + Math.round(h * animFactor);
-            event.getContext().enableScissor(event.getX1(), event.getY1(), event.getX2(), Math.max(event.getY1(), Math.min(event.getY2(), cb)));
-        }
-    }
-
-    @EventListener
-    public void onRenderPlayerListPost(RenderPlayerListEvent.Post event)
-    {
-        if (animateConfig.getValue())
-        {
-            event.getContext().disableScissor();
+            float animFactor = (float) Easing.CIRC_OUT.ease(tabListAnim.getFactor());
+            if (close)
+            {
+                event.getContext().getMatrices().translate(0, (-event.getY2() * animFactor), 0);
+                if (animFactor == 0.0f)
+                {
+                    mc.options.playerListKey.setPressed(false);
+                    skip = true;
+                }
+            }
+            else
+            {
+                event.getContext().getMatrices().translate(0, -event.getY2() + (event.getY2() * animFactor), 0);
+            }
         }
     }
 
@@ -84,10 +88,13 @@ public class BetterTabModule extends Toggleable
     {
         if (event.isVisible())
         {
+            close = false;
             tabListAnim.setState(true);
-        } else
+        }
+        else
         {
-            tabListAnim.setStateHard(false);
+            close = true;
+            tabListAnim.setState(false);
         }
     }
 }

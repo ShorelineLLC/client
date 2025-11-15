@@ -49,7 +49,7 @@ public enum ChamsRenderer
         rendering = false;
     }
 
-    private static class CustomVertexConsumerProvider implements VertexConsumerProvider
+    public static class CustomVertexConsumerProvider implements VertexConsumerProvider
     {
         public static final CustomVertexConsumerProvider INSTANCE = new CustomVertexConsumerProvider();
 

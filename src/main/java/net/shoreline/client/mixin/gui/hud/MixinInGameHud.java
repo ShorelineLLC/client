@@ -2,12 +2,14 @@ package net.shoreline.client.mixin.gui.hud;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderHotbarItemEvent;
+import net.shoreline.client.impl.module.misc.BetterTabModule;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -24,6 +27,24 @@ public class MixinInGameHud
     @Shadow
     @Final
     private static Identifier POWDER_SNOW_OUTLINE;
+
+    @Redirect(
+            method = "renderPlayerList",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"))
+    private boolean inrsHook(KeyBinding instance)
+    {
+        BetterTabModule betterTab = BetterTabModule.INSTANCE;
+        if (betterTab.isEnabled()
+                && betterTab.getAnimateConfig().getValue()
+                && betterTab.getTabListAnim().getFactor() > 0.01f
+                && !instance.isPressed())
+        {
+            betterTab.getTabListAnim().setState(false);
+            return true;
+        }
+
+        return instance.isPressed();
+    }
 
     @ModifyArgs(method = "renderHotbar", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHotbarItem(Lnet/minecraft/client/gui/DrawContext;IILnet/minecraft/client/render/RenderTickCounter;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;I)V",
