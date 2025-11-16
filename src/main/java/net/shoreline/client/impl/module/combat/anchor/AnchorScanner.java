@@ -17,6 +17,7 @@ import net.shoreline.client.impl.module.combat.AnchorAuraModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionTrace;
+import net.shoreline.client.util.entity.EntityUtil;
 
 import java.util.Collection;
 import java.util.TreeSet;
@@ -59,8 +60,13 @@ public class AnchorScanner extends AsyncWorldScanner
         }
 
         float selfDamage = getDamage(pos, getLocalEntity().getEntity());
-        positionData.setSelfDamage(selfDamage);
+        if (selfDamage > module.getMaxSelfDamageConfig().getValue()
+                || getLocalEntity().getTotalHealth() - selfDamage < 0.5f)
+        {
+            return;
+        }
 
+        positionData.setSelfDamage(selfDamage);
         for (EntityState entityState : getEntities())
         {
             Entity entity = entityState.getEntity();

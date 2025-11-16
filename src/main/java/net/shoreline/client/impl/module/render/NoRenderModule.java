@@ -10,6 +10,7 @@ import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.entity.EntityHurtEvent;
 import net.shoreline.client.impl.event.entity.RenderOnFireEvent;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
@@ -134,6 +135,9 @@ public class NoRenderModule extends Toggleable
             .setDefaultValue(false).build();
     Config<Boolean> totemConfig = new BooleanConfig.Builder("Totem")
             .setDescription("Cancels the totem pop animation")
+            .setDefaultValue(false).build();
+    Config<Boolean> hurt = new BooleanConfig.Builder("Hurt")
+            .setDescription("Cancels the red effect when you hurt a entity")
             .setDefaultValue(false).build();
 
     private final Set<ParticleType<?>> drippingParticles = new HashSet<>(Set.of(
@@ -339,6 +343,15 @@ public class NoRenderModule extends Toggleable
 
         event.setMaxCount(totemParticles.getValue());
         event.setMaxTicks(totemTicks.getValue());
+    }
+
+    @EventListener
+    public void onEntityHurt(EntityHurtEvent event)
+    {
+        if (hurt.getValue())
+        {
+            event.cancel();
+        }
     }
     
     private boolean shouldCancelParticle(ParticleType<?> type)

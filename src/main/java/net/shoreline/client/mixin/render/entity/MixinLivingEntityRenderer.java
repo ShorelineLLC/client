@@ -16,18 +16,20 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.impl.event.entity.EntityHurtEvent;
 import net.shoreline.client.impl.imixin.ILivingEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
 import net.shoreline.client.impl.module.render.ChamsModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.Layers;
-import org.jetbrains.annotations.Nullable;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -158,5 +160,21 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
             float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
             ChamsRenderer.render(renderer, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
         }
+    }
+
+    @Redirect(
+            method = "getOverlay",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;hurt:Z"))
+    private static boolean hurtHook(LivingEntityRenderState instance)
+    {
+        EntityHurtEvent event = new EntityHurtEvent();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            return false;
+        }
+
+        return instance.hurt;
     }
 }

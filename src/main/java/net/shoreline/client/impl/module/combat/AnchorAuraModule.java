@@ -30,6 +30,10 @@ import java.util.List;
 @Getter
 public class AnchorAuraModule extends PlacerModule
 {
+    Config<Float> maxSelfDamageConfig = new NumberConfig.Builder<Float>("MaxSelfDamage")
+            .setMin(0.0f).setDefaultValue(8.0f).setMax(36.0f)
+            .setDescription("If self damage is over this value a position will not be considered.")
+            .build();
     Config<Float> minDamageConfig = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(0.f).setDefaultValue(7.f).setMax(36.f)
             .setDescription("Minimum damage a position needs to deal to a player to be valid").build();

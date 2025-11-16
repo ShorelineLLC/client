@@ -39,6 +39,7 @@ public class FakePlayerModule extends Toggleable
 
     private DamageableFakePlayer fakePlayer;
     private boolean clear;
+    private int index;
 
     private final List<PositionShot> positions = new ArrayList<>();
     private final Timer gappleTimer = new NanoTimer();
@@ -144,9 +145,25 @@ public class FakePlayerModule extends Toggleable
         {
             clear = false;
         }
-        else
+
+        if (play.getValue())
         {
-            
+            record.setValue(false);
+            if (positions.isEmpty())
+            {
+                play.setValue(false);
+                return;
+            }
+
+            if (index >= positions.size())
+            {
+                index = 0;
+            }
+
+            PositionShot shot = positions.get(index++);
+            fakePlayer.updateTrackedPositionAndAngles(shot.x, shot.y, shot.z, shot.yaw, shot.pitch, 2);
+            fakePlayer.setHeadYaw(shot.headYaw);
+            fakePlayer.setVelocity(shot.velocity);
         }
     }
 
@@ -156,11 +173,13 @@ public class FakePlayerModule extends Toggleable
         double y       = mc.player.getY();
         double z       = mc.player.getZ();
         float yaw      = mc.player.getYaw();
+        float headYaw  = mc.player.getHeadYaw();
+        float bodyYaw  = mc.player.getBodyYaw();
         float pitch    = mc.player.getPitch();
         Vec3d velocity = mc.player.getVelocity();
-        PositionShot shot = new PositionShot(x, y, z, yaw, pitch, velocity);
+        PositionShot shot = new PositionShot(x, y, z, yaw, headYaw, bodyYaw, pitch, velocity);
         positions.add(shot);
     }
 
-    public record PositionShot(double x, double y, double z, float yaw, float pitch, Vec3d velocity) {}
+    public record PositionShot(double x, double y, double z, float yaw, float headYaw, float bodyYaw, float pitch, Vec3d velocity) {}
 }
