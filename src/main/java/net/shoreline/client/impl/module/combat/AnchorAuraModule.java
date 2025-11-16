@@ -111,7 +111,7 @@ public class AnchorAuraModule extends PlacerModule
             int slot = -1;
             if (charges <= 0)
             {
-                slot = InventoryUtil.getItemSlot(Items.GLOWSTONE, silentType.getValue());
+                slot = InventoryUtil.getHotbarSlot(Items.GLOWSTONE);
             }
             else
             {
@@ -128,7 +128,7 @@ public class AnchorAuraModule extends PlacerModule
                     .direction(InteractDirection.getInteractDirection(firstAnchor.getPos(), interactConfig.getStrictDirection().getValue()))
                     .hand(Hand.MAIN_HAND)
                     .block(Blocks.RESPAWN_ANCHOR)
-                    .packetPlace(interactConfig.getNoGlitchBlocks().getValue())
+                    .packetPlace(false)
                     .build();
 
             BlockHitResult result = new BlockHitResult(interaction.getPos().toCenterPos().add(interaction.getHitVec()), interaction.getDirection(), interaction.getPos(), false);
