@@ -118,6 +118,11 @@ public class AnchorAuraModule extends PlacerModule
                 slot = InventoryUtil.getHotbarSlot(stack -> !(stack.getItem() instanceof BlockItem));
             }
 
+            if (slot == -1)
+            {
+                return;
+            }
+
             if (!Managers.INVENTORY.startSwap(slot))
             {
                 return;
