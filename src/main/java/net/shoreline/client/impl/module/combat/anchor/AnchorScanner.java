@@ -18,16 +18,14 @@ import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.TreeSet;
 
 @RequiredArgsConstructor
 public class AnchorScanner extends AsyncWorldScanner
 {
     private final AnchorAuraModule module;
-    private Collection<AnchorPositionData> data = new TreeSet<>();
+    private Collection<AnchorData> data = new TreeSet<>();
 
     @Override
     protected void visit(BlockPos pos, AsyncBlockState state)
@@ -45,12 +43,12 @@ public class AnchorScanner extends AsyncWorldScanner
 
         BlockState blockState = getBlockState(pos);
         Block block = blockState.getBlock();
-        if (!Managers.INTERACT.canPlaceBlock(pos, block))
+        if (!Managers.INTERACT.canPlaceBlock(pos, block) && blockState.isReplaceable())
         {
             return;
         }
 
-        AnchorPositionData positionData = new AnchorPositionData(pos);
+        AnchorData positionData = new AnchorData(pos);
         if (block == Blocks.RESPAWN_ANCHOR)
         {
             positionData.setAnchor(true);
@@ -94,7 +92,7 @@ public class AnchorScanner extends AsyncWorldScanner
         return (int) Math.ceil(module.getRangeConfig().getValue());
     }
 
-    public Collection<AnchorPositionData> getData()
+    public Collection<AnchorData> getData()
     {
         data.clear();
         scanBlocks();

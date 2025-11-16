@@ -6,8 +6,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Direction;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
@@ -15,11 +15,12 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.combat.anchor.AnchorManager;
-import net.shoreline.client.impl.module.combat.anchor.AnchorPositionData;
+import net.shoreline.client.impl.module.combat.anchor.AnchorData;
 import net.shoreline.client.impl.module.impl.PlacerModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -40,6 +41,8 @@ public class AnchorAuraModule extends PlacerModule
             .setDescription("Range to explode anchors").build();
     Config<Boolean> ignoreTerrain = new BooleanConfig.Builder("IgnoreTerrain")
             .setDefaultValue(true).build();
+    Config<Boolean> sequential = new BooleanConfig.Builder("Sequential")
+            .setDefaultValue(true).build();
     Config<SilentSwapType> silentType = new EnumConfig.Builder<SilentSwapType>("Swap")
             .setValues(SilentSwapType.values())
             .setDescription("The silent swap type")
@@ -48,7 +51,7 @@ public class AnchorAuraModule extends PlacerModule
     /** Manages anchor calculations */
     private final AnchorManager manager;
     /** The latest data. If no valid data was found last tick this will return null */
-    private List<AnchorPositionData> latestData;
+    private List<AnchorData> latestData;
 
     public AnchorAuraModule()
     {
@@ -65,27 +68,21 @@ public class AnchorAuraModule extends PlacerModule
             return;
         }
 
-        List<AnchorPositionData> list = manager.getResults();
-        if (list.isEmpty())
-        {
-            return;
-        }
-
-        latestData = list;
+        latestData = manager.getResults();
     }
 
     @EventListener
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (checkNull() || latestData == null || latestData.isEmpty())
+        if (latestData == null || latestData.isEmpty())
         {
             return;
         }
 
-        AnchorPositionData firstAnchor = null;
-        AnchorPositionData firstAir = null;
+        AnchorData firstAnchor = null;
+        AnchorData firstAir = null;
 
-        for (AnchorPositionData data : latestData)
+        for (AnchorData data : latestData)
         {
             if (firstAnchor == null && data.isAnchor())
             {
@@ -105,6 +102,11 @@ public class AnchorAuraModule extends PlacerModule
         if (firstAnchor != null)
         {
             BlockState state = mc.world.getBlockState(firstAnchor.getPos());
+            if (state.getBlock() != Blocks.RESPAWN_ANCHOR)
+            {
+                return;
+            }
+
             int charges = state.get(RespawnAnchorBlock.CHARGES);
             int slot = -1;
             if (charges <= 0)
@@ -116,24 +118,32 @@ public class AnchorAuraModule extends PlacerModule
                 slot = InventoryUtil.getHotbarSlot(stack -> !(stack.getItem() instanceof BlockItem));
             }
 
-            if (slot == -1)
-            {
-                return;
-            }
-
-            if (!Managers.INTERACT.startPlacement(slot))
+            if (!Managers.INVENTORY.startSwap(slot))
             {
                 return;
             }
 
             Interaction interaction = Interaction.builder()
                     .pos(firstAnchor.getPos())
-                    .direction(Direction.UP)
+                    .direction(InteractDirection.getInteractDirection(firstAnchor.getPos(), interactConfig.getStrictDirection().getValue()))
+                    .hand(Hand.MAIN_HAND)
                     .block(Blocks.RESPAWN_ANCHOR)
+                    .packetPlace(interactConfig.getNoGlitchBlocks().getValue())
                     .build();
 
-            Managers.INTERACT.placeBlock(interaction);
-            Managers.INTERACT.endPlacement();
+            BlockHitResult result = new BlockHitResult(interaction.getPos().toCenterPos().add(interaction.getHitVec()), interaction.getDirection(), interaction.getPos(), false);
+            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+            Managers.INVENTORY.endSwap();
+        }
+        else if (firstAir != null)
+        {
+            int slot = InventoryUtil.getItemSlot(Items.RESPAWN_ANCHOR);
+            if (slot == -1)
+            {
+                return;
+            }
+
+            runSingleBlockPlacement(firstAir.getPos(), Blocks.RESPAWN_ANCHOR, slot);
         }
     }
 }
