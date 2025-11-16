@@ -8,11 +8,8 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
-public class AnchorManager extends AsyncFeature<AnchorPositionData>
+public class AnchorManager extends AsyncFeature<AnchorData>
 {
     private final AnchorAuraModule module;
     private final AnchorScanner scanner;
