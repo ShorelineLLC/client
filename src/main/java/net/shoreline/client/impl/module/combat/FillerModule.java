@@ -23,7 +23,7 @@ public class FillerModule extends Toggleable
 
     public FillerModule()
     {
-        super("Filler", "Fills in blocks around you", GuiCategory.COMBAT);
+        super("Filler", new String[] {"HoleFill"}, "Fills in blocks around you", GuiCategory.COMBAT);
         INSTANCE = this;
     }
 

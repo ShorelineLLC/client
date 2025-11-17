@@ -249,7 +249,7 @@ public class SpeedModule extends MovementModule
         return Managers.ANTICHEAT.hasPassedSinceSetback(100)
                 && InputUtil.isInputtingMovement()
                 && !mc.player.getAbilities().flying
-                && !mc.player.isRiding()
+                && mc.player.getVehicle() == null
                 && !mc.player.isGliding()
                 && !mc.player.isHoldingOntoLadder()
                 && mc.player.fallDistance <= 2.0f

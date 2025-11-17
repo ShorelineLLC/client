@@ -1,5 +1,7 @@
 package net.shoreline.client.impl.module.impl;
 
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -48,5 +50,10 @@ public class InventorySwapModule extends Toggleable
         }
 
         return -1;
+    }
+
+    protected boolean canSwapInventory()
+    {
+        return mc.currentScreen == null || mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof ChatScreen;
     }
 }

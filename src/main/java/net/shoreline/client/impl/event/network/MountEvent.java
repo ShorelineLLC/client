@@ -19,6 +19,7 @@ public class MountEvent extends Event
         private float jumpStrength;
     }
 
+    @Cancelable
     @RequiredArgsConstructor
     public static class PigAI extends MountEvent
     {

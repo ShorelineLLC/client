@@ -267,10 +267,7 @@ public class InteractManager extends NetworkHandler
         if (interaction.isPacketPlace() || !onClientThread)
         {
             sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
-            BlockSoundGroup blockSoundGroup = state.getSoundGroup();
-            mc.execute(() -> mc.world.playSound(mc.player, blockPos, blockSoundGroup.getPlaceSound(),
-                    SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0f) / 2.0f, blockSoundGroup.getPitch() * 0.8f));
-
+            playBlockPlaceSound(placePos, state);
             actionResult.setValue(ActionResult.SUCCESS);
         } else
         {
@@ -340,5 +337,16 @@ public class InteractManager extends NetworkHandler
         {
             sendPacket(new HandSwingC2SPacket(hand));
         }
+    }
+
+    public void playBlockPlaceSound(BlockPos blockPos, BlockState state)
+    {
+        BlockSoundGroup blockSoundGroup = state.getSoundGroup();
+        mc.execute(() -> mc.world.playSound(mc.player,
+                blockPos,
+                blockSoundGroup.getPlaceSound(),
+                SoundCategory.BLOCKS,
+                (blockSoundGroup.getVolume() + 1.0f) / 2.0f,
+                blockSoundGroup.getPitch() * 0.8f));
     }
 }

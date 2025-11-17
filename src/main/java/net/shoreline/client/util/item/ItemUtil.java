@@ -22,4 +22,10 @@ public class ItemUtil
     {
         return item.getTranslationKey().contains("sword");
     }
+
+    public float getStackPercent(ItemStack stack)
+    {
+        int damage = stack.getMaxDamage() - stack.getDamage();
+        return (float) damage / stack.getMaxDamage();
+    }
 }

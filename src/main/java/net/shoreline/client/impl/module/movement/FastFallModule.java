@@ -151,7 +151,7 @@ public class FastFallModule extends MovementModule
 
     private boolean canFastFall()
     {
-        return !mc.player.isRiding()
+        return mc.player.getVehicle() == null
                 && !mc.player.isGliding()
                 && !mc.player.isHoldingOntoLadder()
                 && !mc.player.isInLava()

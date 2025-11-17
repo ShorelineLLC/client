@@ -84,7 +84,7 @@ public class SprintModule extends MovementModule
     @EventListener
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (modeConfig.getValue() != SprintMode.RAGE || !rotateConfig.getValue() || !InputUtil.isInputtingMovement())
+        if (modeConfig.getValue() != SprintMode.RAGE || !rotateConfig.getValue() || !canSprint())
         {
             return;
         }
@@ -136,7 +136,7 @@ public class SprintModule extends MovementModule
         return InputUtil.isInputtingMovement()
                 && !PhaseUtil.isInsideWeb(mc.player)
                 && !mc.player.isSneaking()
-                && !mc.player.isRiding()
+                && mc.player.getVehicle() == null
                 && !mc.player.isGliding()
                 && !mc.player.isTouchingWater()
                 && !mc.player.isInLava()

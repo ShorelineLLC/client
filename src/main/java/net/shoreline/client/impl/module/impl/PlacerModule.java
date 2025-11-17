@@ -58,7 +58,7 @@ public class PlacerModule extends CombatModule
         boolean result = Managers.INTERACT.placeBlock(interaction);
         if (result)
         {
-            fadeOutAnimations.put(placePos, new Animation(true, 500));
+            addPlaceAnim(placePos);
         }
 
         return result;
@@ -118,6 +118,11 @@ public class PlacerModule extends CombatModule
 
             BoxRender.FILL.render(matrixStack, blockPos, color, (float) Easing.SMOOTH_STEP.ease(animations.getValue().getFactor()));
         }
+    }
+
+    protected void addPlaceAnim(BlockPos blockPos)
+    {
+        fadeOutAnimations.put(blockPos, new Animation(true, 500));
     }
 
     protected boolean canPlaceBlock(BlockPos blockPos, Block block)

@@ -150,6 +150,11 @@ public class InventoryUtil
                 return OFFHAND_SLOT;
             }
 
+            if (slot > 100)
+            {
+                return 108 - slot;
+            }
+
             return slot < PlayerInventory.getHotbarSize() ? slot + PlayerInventory.MAIN_SIZE : slot;
         }
 

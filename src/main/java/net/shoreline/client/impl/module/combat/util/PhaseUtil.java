@@ -59,6 +59,11 @@ public class PhaseUtil
 
     public boolean isInsideBlock(Entity entity)
     {
+        if (entity.isCrawling())
+        {
+            return false;
+        }
+
         Box box = entity.getBoundingBox();
         Box feetBox = new Box(box.minX, box.minY, box.minZ, box.maxX, box.minY + 0.1, box.maxZ);
         return !intersectingBlocks(feetBox).isEmpty();
@@ -66,6 +71,11 @@ public class PhaseUtil
 
     public boolean isInsideWall(Entity entity)
     {
+        if (entity.isCrawling())
+        {
+            return false;
+        }
+
         Box box = entity.getBoundingBox();
         Box bodyBox = new Box(box.minX, box.minY + 1.0, box.minZ, box.maxX, box.minY + 1.1, box.maxZ);
         return !intersectingBlocks(bodyBox).isEmpty();

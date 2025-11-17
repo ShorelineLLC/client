@@ -68,7 +68,7 @@ public class AutoTotemModule extends InventorySwapModule
     @EventListener(priority = TickPriorities.AUTO_TOTEM)
     public void onTick(final TickEvent.Pre event)
     {
-        if (checkNull())
+        if (checkNull() || !canSwapInventory())
         {
             return;
         }

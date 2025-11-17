@@ -59,6 +59,7 @@ public class ModuleManager
                 new OffhandGappleModule(),
                 new PearlBlockerModule(),
                 new ReplenishModule(),
+                new SelfFillerModule(),
                 new SelfTrapModule(),
                 // Exploit
                 new AntiHungerModule(),
@@ -67,6 +68,7 @@ public class ModuleManager
                 new MountControlModule(),
                 new NoFallModule(),
                 new PhaseModule(),
+                new PingSpoofModule(),
                 new ProjectileBoostModule(),
                 new ReachModule(),
                 // Misc

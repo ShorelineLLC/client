@@ -97,16 +97,17 @@ public class CriticalsModule extends MovementModule
             }
             case GRIM ->
             {
-                if (mc.player.input.movementForward != 0.0f || mc.player.input.movementSideways != 0.0f || !PhaseUtil.isInsideWall(mc.player))
+                if (mc.player.input.movementForward != 0.0f || mc.player.input.movementSideways != 0.0f
+                        || !PhaseUtil.isInsideBlock(mc.player) || !PhaseUtil.isInsideWall(mc.player))
                 {
                     return;
                 }
 
                 Rotation playerRotation = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getClientRotation() : new Rotation(mc.player);
-                float pitch = Math.clamp(playerRotation.getPitch(), -90.0f + Anticheat.GRIM_GCD_DIVISOR, 90.0f - Anticheat.GRIM_GCD_DIVISOR);
+                float pitch = Math.clamp(playerRotation.getPitch(), -90.0f + Anticheat.GCD_DIVISOR, 90.0f - Anticheat.GCD_DIVISOR);
 
-                sendRotatePacketInternal(0.0625f, playerRotation.getYaw(), pitch + Anticheat.GRIM_GCD_DIVISOR, false);
-                sendRotatePacketInternal(0.04535f, playerRotation.getYaw(), pitch - Anticheat.GRIM_GCD_DIVISOR, false);
+                sendRotatePacketInternal(0.0625f, playerRotation.getYaw(), pitch + Anticheat.GCD_DIVISOR, false);
+                sendRotatePacketInternal(0.04535f, playerRotation.getYaw(), pitch - Anticheat.GCD_DIVISOR, false);
             }
         }
     }
