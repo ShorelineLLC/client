@@ -263,8 +263,7 @@ public class InteractManager extends NetworkHandler
         Hand hand = airPlacing && airPlace.isGrim() ? Hand.OFF_HAND : interaction.getHand();
         BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
 
-        boolean onClientThread = mc.isOnThread();
-        if (interaction.isPacketPlace() || !onClientThread)
+        if (interaction.isPacketPlace() || !mc.isOnThread())
         {
             sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
             playBlockPlaceSound(placePos, state);

@@ -17,6 +17,17 @@ public class GenericFeature implements Identifiable
         this.nameAliases = new String[0];
     }
 
+    public void runOnThread(Runnable runnable)
+    {
+        if (mc.isOnThread())
+        {
+            runnable.run();
+        } else
+        {
+            mc.execute(runnable);
+        }
+    }
+
     @Override
     public String getName()
     {

@@ -47,13 +47,13 @@ public class LoggingFeature extends GenericFeature
 
     protected void sendChatMessage(String message, int color)
     {
-        mc.inGameHud.getChatHud().addMessage(Text.of(message), null,
-                new MessageIndicator(color, null, Text.empty(), "CLIENT"));
+        runOnThread(() -> mc.inGameHud.getChatHud().addMessage(Text.of(message), null,
+                new MessageIndicator(color, null, Text.empty(), "CLIENT")));
     }
 
     protected void sendChatMessageWithOptionalDeletion(String message, int color, int id)
     {
-        ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(message),
-                new MessageIndicator(color, null, Text.empty(), "CLIENT"), id);
+        runOnThread(() -> ((IChatHud) mc.inGameHud.getChatHud()).addMessage(Text.of(message),
+                new MessageIndicator(color, null, Text.empty(), "CLIENT"), id));
     }
 }

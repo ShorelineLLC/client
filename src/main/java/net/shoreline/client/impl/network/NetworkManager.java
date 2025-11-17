@@ -132,13 +132,7 @@ public class NetworkManager extends GenericFeature
             return;
         }
 
-        if (mc.isOnThread())
-        {
-            packet.apply(handler);
-        } else
-        {
-            mc.executeSync(() -> packet.apply(handler));
-        }
+        runOnThread(() -> packet.apply(handler));
     }
 
     public int getClientLatency()
