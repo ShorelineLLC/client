@@ -8,6 +8,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
@@ -23,6 +24,8 @@ import net.shoreline.client.impl.module.combat.anchor.AnchorManager;
 import net.shoreline.client.impl.module.combat.anchor.AnchorData;
 import net.shoreline.client.impl.module.impl.PlacerModule;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.Rotation;
+import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.List;
@@ -122,27 +125,35 @@ public class AnchorAuraModule extends PlacerModule
                 slot = InventoryUtil.getHotbarSlot(stack -> !(stack.getItem() instanceof BlockItem));
             }
 
-            if (slot == -1)
-            {
-                return;
-            }
-
-            if (!Managers.INVENTORY.startSwap(slot))
+            if (!Managers.INTERACT.startPlacement(slot))
             {
                 return;
             }
 
             Interaction interaction = Interaction.builder()
                     .pos(firstAnchor.getPos())
-                    .direction(InteractDirection.getInteractDirection(firstAnchor.getPos(), interactConfig.getStrictDirection().getValue()))
+                    .direction(InteractDirection.getInteractDirection(firstAnchor.getPos(), isStrictDirection()))
                     .hand(Hand.MAIN_HAND)
                     .block(Blocks.RESPAWN_ANCHOR)
                     .packetPlace(false)
                     .build();
 
+            if (interaction.getDirection() == null)
+            {
+                Managers.INTERACT.endPlacement();
+                return;
+            }
+
+            Vec3d hitVec = interaction.getPos().toCenterPos().add(interaction.getHitVec());
+            if (interactConfig.getInteractRotate().getValue())
+            {
+                float[] rots = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitVec);
+                Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
+            }
+
             BlockHitResult result = new BlockHitResult(interaction.getPos().toCenterPos().add(interaction.getHitVec()), interaction.getDirection(), interaction.getPos(), false);
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
-            Managers.INVENTORY.endSwap();
+            Managers.INTERACT.endPlacement();
         }
         else if (firstAir != null)
         {
@@ -154,5 +165,10 @@ public class AnchorAuraModule extends PlacerModule
 
             runSingleBlockPlacement(firstAir.getPos(), Blocks.RESPAWN_ANCHOR, slot);
         }
+    }
+
+    public boolean isStrictDirection()
+    {
+        return interactConfig.getStrictDirection().getValue();
     }
 }

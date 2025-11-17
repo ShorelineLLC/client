@@ -39,7 +39,7 @@ public class AnchorData implements Comparable<AnchorData>
 
         if (Math.abs(o.damage - damage) < 1.0)
         {
-            return Float.compare(o.selfDamage, selfDamage);
+            return Float.compare(selfDamage, o.selfDamage);
         }
 
         return Float.compare(o.damage, damage);

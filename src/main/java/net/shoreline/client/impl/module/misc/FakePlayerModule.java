@@ -129,23 +129,6 @@ public class FakePlayerModule extends Toggleable
     @EventListener
     public void onPosition(ClientRotationEvent event)
     {
-        if (record.getValue())
-        {
-            if (!clear)
-            {
-                clear = true;
-                positions.clear();
-            }
-
-            play.setValue(false);
-            fakePlayer.setVelocity(new Vec3d(0, 0, 0));
-            snapPosition();
-        }
-        else if (clear)
-        {
-            clear = false;
-        }
-
         if (play.getValue())
         {
             record.setValue(false);
@@ -164,6 +147,22 @@ public class FakePlayerModule extends Toggleable
             fakePlayer.updateTrackedPositionAndAngles(shot.x, shot.y, shot.z, shot.yaw, shot.pitch, 2);
             fakePlayer.setHeadYaw(shot.headYaw);
             fakePlayer.setVelocity(shot.velocity);
+        }
+        else if (record.getValue())
+        {
+            if (!clear)
+            {
+                clear = true;
+                positions.clear();
+            }
+
+            play.setValue(false);
+            fakePlayer.setVelocity(new Vec3d(0, 0, 0));
+            snapPosition();
+        }
+        else if (clear)
+        {
+            clear = false;
         }
     }
 

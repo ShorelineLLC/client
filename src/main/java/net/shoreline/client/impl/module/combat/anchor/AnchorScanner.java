@@ -10,9 +10,11 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.block.AsyncBlockState;
+import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.module.combat.AnchorAuraModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
@@ -20,6 +22,8 @@ import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 import net.shoreline.client.util.entity.EntityUtil;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import java.util.TreeSet;
 
 @RequiredArgsConstructor
@@ -47,6 +51,15 @@ public class AnchorScanner extends AsyncWorldScanner
         if (!Managers.INTERACT.canPlaceBlock(pos, block) && blockState.isReplaceable())
         {
             return;
+        }
+
+        if (blockState.isReplaceable())
+        {
+            Direction direction = InteractDirection.getInteractDirection(pos, module.isStrictDirection());
+            if (direction == null)
+            {
+                return;
+            }
         }
 
         AnchorData positionData = new AnchorData(pos);
@@ -87,9 +100,19 @@ public class AnchorScanner extends AsyncWorldScanner
                 positionData.setDamage(damage);
                 positionData.setTarget((PlayerEntity) entity);
             }
+
+            if (damage > entityState.getTotalHealth()) // prioritize lethal positions.
+            {
+                positionData.setDamage(Float.MAX_VALUE);
+                positionData.setTarget((PlayerEntity) entity);
+                break;
+            }
         }
 
-        data.add(positionData);
+        if (positionData.getDamage() > module.getMinDamageConfig().getValue())
+        {
+            data.add(positionData);
+        }
     }
 
     @Override
@@ -113,7 +136,8 @@ public class AnchorScanner extends AsyncWorldScanner
                 entity.getPos(),
                 entity.getBoundingBox(),
                 10.0f,
-                module.getIgnoreTerrain().getValue());
+                module.getIgnoreTerrain().getValue(),
+                Set.of(pos));
     }
 
     public boolean checkBlocking(BlockPos pos)
