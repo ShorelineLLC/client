@@ -1,23 +1,22 @@
 package net.shoreline.client.impl;
 
 import net.shoreline.client.api.macro.MacroManager;
-import net.shoreline.client.impl.combat.KitManager;
-import net.shoreline.client.impl.combat.TargetManager;
-import net.shoreline.client.impl.file.ResourceManager;
-import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
-import net.shoreline.client.impl.network.NetworkManager;
 import net.shoreline.client.impl.ac.AnticheatManager;
+import net.shoreline.client.impl.combat.KitManager;
 import net.shoreline.client.impl.combat.SafeHoleManager;
+import net.shoreline.client.impl.combat.TargetManager;
 import net.shoreline.client.impl.combat.TotemManager;
 import net.shoreline.client.impl.command.CommandManager;
-import net.shoreline.client.impl.mining.MiningManager;
-import net.shoreline.client.impl.movement.MovementManager;
+import net.shoreline.client.impl.file.ResourceManager;
 import net.shoreline.client.impl.interact.InteractManager;
+import net.shoreline.client.impl.inventory.InventoryManager;
+import net.shoreline.client.impl.mining.MiningManager;
+import net.shoreline.client.impl.module.ModuleManager;
+import net.shoreline.client.impl.movement.MovementManager;
+import net.shoreline.client.impl.network.NetworkManager;
+import net.shoreline.client.impl.render.RenderManager;
 import net.shoreline.client.impl.render.ShaderManager;
 import net.shoreline.client.impl.rotation.RotationManager;
-import net.shoreline.client.impl.module.ModuleManager;
-import net.shoreline.client.impl.inventory.InventoryManager;
-import net.shoreline.client.impl.render.RenderManager;
 import net.shoreline.client.impl.social.SocialManager;
 import net.shoreline.client.impl.world.TickManager;
 
@@ -38,7 +37,6 @@ public class Managers
     public static TotemManager TOTEM;
     public static KitManager KIT;
     public static TargetManager TARGETING;
-    public static CrystalCalcManager CRYSTAL;
     public static RenderManager RENDER;
     public static ShaderManager SHADER;
     public static SocialManager SOCIAL;
@@ -61,7 +59,6 @@ public class Managers
         TOTEM = new TotemManager();
         KIT = new KitManager();
         TARGETING = new TargetManager();
-        CRYSTAL = new CrystalCalcManager();
         RENDER = new RenderManager();
         SOCIAL = new SocialManager();
         RESOURCE_PACK = new ResourceManager();

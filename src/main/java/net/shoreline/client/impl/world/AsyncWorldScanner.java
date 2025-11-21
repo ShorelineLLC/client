@@ -25,6 +25,18 @@ public abstract class AsyncWorldScanner extends AsyncBlockScanner implements Asy
         }
     };
 
+    public void createWorldLookup(ClientWorld world, boolean sphere, Vec3d center)
+    {
+        createEntityLookup(world, center);
+        if (sphere)
+        {
+            createSphere(world, BlockPos.ofFloored(center));
+        } else
+        {
+            createCube(world, BlockPos.ofFloored(center));
+        }
+    }
+
     @Override
     public void createCube(ClientWorld world, BlockPos center)
     {

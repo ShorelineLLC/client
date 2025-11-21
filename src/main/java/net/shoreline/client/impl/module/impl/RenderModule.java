@@ -1,9 +1,11 @@
 package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.module.render.FreecamModule;
 
 public class RenderModule extends Toggleable
 {
@@ -18,6 +20,11 @@ public class RenderModule extends Toggleable
                         final GuiCategory category)
     {
         super(name, nameAliases, description, category);
+    }
+
+    protected Vec3d getCameraPos()
+    {
+        return FreecamModule.INSTANCE.isEnabled() ? FreecamModule.INSTANCE.getPosition() : mc.player.getPos();
     }
 
     public void drawText(MatrixStack matrices, String text, float x, float y)

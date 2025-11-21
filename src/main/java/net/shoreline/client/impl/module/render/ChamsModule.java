@@ -1,29 +1,22 @@
 package net.shoreline.client.impl.module.render;
 
 import lombok.Getter;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
-import net.shoreline.client.util.math.MathUtil;
-import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
-public class ChamsModule extends Toggleable
+public class ChamsModule extends RenderModule
 {
     private static ChamsModule INSTANCE;
     public Config<ChamsMode> mode = new EnumConfig.Builder<ChamsMode>("Mode")
@@ -84,7 +77,8 @@ public class ChamsModule extends Toggleable
 
     public boolean isValid(Entity entity)
     {
-        if (!Managers.RENDER.isVisible(entity.getBoundingBox()) || MathHelper.square(range.getValue()) < entity.squaredDistanceTo(mc.player))
+        if (!Managers.RENDER.isVisible(entity.getBoundingBox())
+                || MathHelper.square(range.getValue()) < entity.squaredDistanceTo(getCameraPos()))
         {
             return false;
         }

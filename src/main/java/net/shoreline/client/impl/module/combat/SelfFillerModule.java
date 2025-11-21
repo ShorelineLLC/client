@@ -64,6 +64,11 @@ public class SelfFillerModule extends ObsidianPlacerModule
 
         if (PhaseUtil.isInsideBlock(mc.player))
         {
+            if (autoDisable.getValue())
+            {
+                disable();
+            }
+
             return;
         }
 

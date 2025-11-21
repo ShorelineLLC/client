@@ -77,8 +77,11 @@ public class NoRenderModule extends Toggleable
     Config<Boolean> fireEffect = new BooleanConfig.Builder("EntityFire")
             .setDescription("Cancels the fire effect on entities")
             .setDefaultValue(false).build();
+    Config<Boolean> hurt = new BooleanConfig.Builder("Hurt")
+            .setDescription("Cancels the red effect when you hurt a entity")
+            .setDefaultValue(false).build();
     Config<Void> effectConfig = new ConfigGroup.Builder("Effects")
-            .addAll(totemEffects, totemParticles, totemTicks, fireEffect).build();
+            .addAll(totemEffects, totemParticles, totemTicks, fireEffect, hurt).build();
 
     Config<Boolean> explosionsConfig = new BooleanConfig.Builder("Explosion")
             .setDescription("Cancels the explosion particles")
@@ -135,9 +138,6 @@ public class NoRenderModule extends Toggleable
             .setDefaultValue(false).build();
     Config<Boolean> totemConfig = new BooleanConfig.Builder("Totem")
             .setDescription("Cancels the totem pop animation")
-            .setDefaultValue(false).build();
-    Config<Boolean> hurt = new BooleanConfig.Builder("Hurt")
-            .setDescription("Cancels the red effect when you hurt a entity")
             .setDefaultValue(false).build();
 
     private final Set<ParticleType<?>> drippingParticles = new HashSet<>(Set.of(

@@ -5,7 +5,6 @@ import net.shoreline.client.api.async.AsyncFeature;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.world.EntityState;
-import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -14,11 +13,14 @@ import java.util.List;
 
 public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
 {
-    private final CrystalBaseScanner baseScanner = new CrystalBaseScanner();
+    private final AutoCrystalModule autoCrystalModule;
+    private final CrystalBaseScanner baseScanner;
 
-    public CrystalCalcManager()
+    public CrystalCalcManager(AutoCrystalModule autoCrystalModule)
     {
         super("End Crystals");
+        this.autoCrystalModule = autoCrystalModule;
+        this.baseScanner = new CrystalBaseScanner(autoCrystalModule);
         EventBus.INSTANCE.subscribe(this);
     }
 
@@ -30,7 +32,7 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
             return;
         }
 
-        if (!AutoCrystalModule.INSTANCE.shouldRunCalcs())
+        if (!autoCrystalModule.shouldRunCalcs())
         {
             currentResult = null;
             return;
@@ -38,9 +40,7 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
 
         if (currentResult == null || currentResult.isDone())
         {
-            baseScanner.createSphere(mc.world, EntityUtil.getRoundedBlockPos(mc.player));
-            baseScanner.createEntityLookup(mc.world, mc.player.getEyePos());
-
+            baseScanner.createWorldLookup(mc.world, true, mc.player.getEyePos());
             runAsync(() ->
             {
                 List<CrystalData<?>> crystalData = new ArrayList<>();

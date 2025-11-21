@@ -3147,8 +3147,8 @@ net.shoreline.client.impl.module.misc.PacketSnifferModule -> net.shoreline.clien
     net.shoreline.client.api.config.Config serverPacketGroup -> nI
     12:94:void <init>() -> <init>
     98:98:java.lang.String formatPacket(net.minecraft.class_2596) -> c
-net.shoreline.client.impl.module.misc.RekitModule -> net.shoreline.client.gL:
-    net.shoreline.client.impl.module.misc.RekitModule INSTANCE -> nJ
+net.shoreline.client.impl.module.misc.ChestStealerModule -> net.shoreline.client.gL:
+    net.shoreline.client.impl.module.misc.ChestStealerModule INSTANCE -> nJ
     net.shoreline.client.api.config.Config kit -> nK
     net.shoreline.client.api.config.Config mode -> nL
     net.shoreline.client.api.config.Config mismatchDelay -> nM
@@ -3162,7 +3162,7 @@ net.shoreline.client.impl.module.misc.RekitModule -> net.shoreline.client.gL:
     net.shoreline.client.api.math.Timer mismatchTimer -> nU
     int sequenced -> nV
     32:67:void <init>() -> <init>
-    71:71:net.shoreline.client.impl.module.misc.RekitModule getInstance() -> iu
+    71:71:net.shoreline.client.impl.module.misc.ChestStealerModule getInstance() -> iu
     76:82:void reset() -> aD
     87:144:void onTick(net.shoreline.client.impl.event.TickEvent$Pre) -> a
     148:151:void addClick(int,int) -> b
@@ -3180,25 +3180,25 @@ net.shoreline.client.impl.module.misc.RekitModule -> net.shoreline.client.gL:
     29:29:net.minecraft.class_310 access$200() -> iz
     29:29:net.minecraft.class_310 access$300() -> iA
     29:29:net.minecraft.class_310 access$400() -> iB
-net.shoreline.client.impl.module.misc.RekitModule$Click -> net.shoreline.client.gM:
+net.shoreline.client.impl.module.misc.ChestStealerModule$Click -> net.shoreline.client.gM:
     int click -> nW
     int sequence -> nX
     boolean doubleClick -> nY
-    net.shoreline.client.impl.module.misc.RekitModule this$0 -> nZ
-    261:265:void <init>(net.shoreline.client.impl.module.misc.RekitModule,int,int) -> <init>
+    net.shoreline.client.impl.module.misc.ChestStealerModule this$0 -> nZ
+    261:265:void <init>(net.shoreline.client.impl.module.misc.ChestStealerModule,int,int) -> <init>
     269:284:void runClick() -> iC
     256:256:int getClick() -> iD
     257:257:int getSequence() -> iE
     258:258:boolean isDoubleClick() -> iF
     253:253:void setDoubleClick(boolean) -> D
-net.shoreline.client.impl.module.misc.RekitModule$RekitMode -> net.shoreline.client.gN:
-    net.shoreline.client.impl.module.misc.RekitModule$RekitMode BUTTON -> oa
-    net.shoreline.client.impl.module.misc.RekitModule$RekitMode AUTO -> ob
-    net.shoreline.client.impl.module.misc.RekitModule$RekitMode[] $VALUES -> oc
-    287:287:net.shoreline.client.impl.module.misc.RekitModule$RekitMode[] values() -> values
-    287:287:net.shoreline.client.impl.module.misc.RekitModule$RekitMode valueOf(java.lang.String) -> valueOf
+net.shoreline.client.impl.module.misc.ChestStealerModule$RekitMode -> net.shoreline.client.gN:
+    net.shoreline.client.impl.module.misc.ChestStealerModule$RekitMode BUTTON -> oa
+    net.shoreline.client.impl.module.misc.ChestStealerModule$RekitMode AUTO -> ob
+    net.shoreline.client.impl.module.misc.ChestStealerModule$RekitMode[] $VALUES -> oc
+    287:287:net.shoreline.client.impl.module.misc.ChestStealerModule$RekitMode[] values() -> values
+    287:287:net.shoreline.client.impl.module.misc.ChestStealerModule$RekitMode valueOf(java.lang.String) -> valueOf
     287:287:void <init>(java.lang.String,int) -> <init>
-    287:287:net.shoreline.client.impl.module.misc.RekitModule$RekitMode[] $values() -> iG
+    287:287:net.shoreline.client.impl.module.misc.ChestStealerModule$RekitMode[] $values() -> iG
     287:290:void <clinit>() -> <clinit>
 net.shoreline.client.impl.module.misc.ShulkerceptionModule -> net.shoreline.client.gO:
     12:13:void <init>() -> <init>
@@ -4666,7 +4666,7 @@ net.shoreline.client.mixin.gui.screen.MixinHandledScreen -> net.shoreline.client
     15:15:void <init>() -> <init>
     net.minecraft.class_1703 method_17577() -> method_17577
     29:39:void hookInit(org.spongepowered.asm.mixin.injection.callback.CallbackInfo) -> f
-    33:33:void lambda$hookInit$0(net.shoreline.client.impl.module.misc.RekitModule,net.minecraft.class_4185) -> a
+    33:33:void lambda$hookInit$0(net.shoreline.client.impl.module.misc.ChestStealerModule,net.minecraft.class_4185) -> a
 net.shoreline.client.mixin.gui.screen.MixinScreen -> net.shoreline.client.jW:
     net.minecraft.class_310 field_22787 -> field_22787
     int field_22789 -> field_22789

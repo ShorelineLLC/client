@@ -37,4 +37,10 @@ public class Interaction
     {
         return new Vec3d(direction.getUnitVector()).multiply(0.5);
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        return o instanceof Interaction i && i.getPos().equals(pos);
+    }
 }

@@ -341,7 +341,7 @@ public class InteractManager extends NetworkHandler
     public void playBlockPlaceSound(BlockPos blockPos, BlockState state)
     {
         BlockSoundGroup blockSoundGroup = state.getSoundGroup();
-        mc.execute(() -> mc.world.playSound(mc.player,
+        runOnThread(() -> mc.world.playSound(mc.player,
                 blockPos,
                 blockSoundGroup.getPlaceSound(),
                 SoundCategory.BLOCKS,

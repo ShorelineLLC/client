@@ -17,9 +17,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CrystalBaseScanner extends CrystalEntityScanner
 {
-    private final AutoCrystalModule autoCrystal = AutoCrystalModule.INSTANCE;
-
     private final List<CrystalData<?>> crystalBases = new CopyOnWriteArrayList<>();
+
+    public CrystalBaseScanner(AutoCrystalModule autoCrystal)
+    {
+        super(autoCrystal);
+    }
 
     @Override
     protected void visit(BlockPos pos, AsyncBlockState asyncState)

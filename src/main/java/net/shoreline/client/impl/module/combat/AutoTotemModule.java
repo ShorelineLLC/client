@@ -128,6 +128,7 @@ public class AutoTotemModule extends InventorySwapModule
         swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT, fastSwap.getValue());
     }
 
+    // Needs fixing
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {

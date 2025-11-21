@@ -26,6 +26,7 @@ import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.world.RaytraceUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
+/** @author auto **/
 @Getter
 public class FreecamModule extends Toggleable
 {

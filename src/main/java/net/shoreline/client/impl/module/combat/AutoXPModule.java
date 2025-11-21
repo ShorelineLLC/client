@@ -96,7 +96,7 @@ public class AutoXPModule extends Toggleable
 
             for (int i = 0; i < bptConfig.getValue(); i++)
             {
-                Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), true);
+                Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), false);
             }
 
             playerRotation.applyToPlayer();

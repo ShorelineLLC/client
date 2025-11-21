@@ -37,6 +37,7 @@ import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.inventory.SwapHandler;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.client.ThemeModule;
+import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.combat.crystal.CrystalOptimizer;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
@@ -191,6 +192,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
             .addAll(autoSwap, silentSwap, antiWeakness, silentType).build();
 
+    private final CrystalCalcManager crystalCalc;
+
     private static final Box FULL_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 2.0, 0.5);
     private static final Box HALF_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 1.0, 0.5);
 
@@ -217,6 +220,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     public AutoCrystalModule()
     {
         super("AutoCrystal", new String[] {"CrystalAura"}, "Best CA on the market", GuiCategory.COMBAT);
+        this.crystalCalc = new CrystalCalcManager(this);
         INSTANCE = this;
     }
 
@@ -257,8 +261,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
-        List<CrystalData<BlockPos>> latestCrystalBases = Managers.CRYSTAL.getBaseResults();
-        List<CrystalData<EntityState>> latestCrystalEntities = Managers.CRYSTAL.getEntityResults();
+        List<CrystalData<BlockPos>> latestCrystalBases = crystalCalc.getBaseResults();
+        List<CrystalData<EntityState>> latestCrystalEntities = crystalCalc.getEntityResults();
 
         currentAttack = getBestData(latestCrystalEntities);
 

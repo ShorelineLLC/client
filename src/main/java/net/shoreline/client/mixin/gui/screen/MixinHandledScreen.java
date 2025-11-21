@@ -4,7 +4,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.shoreline.client.impl.module.misc.RekitModule;
+import net.shoreline.client.impl.module.misc.ChestStealerModule;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,7 +26,7 @@ public abstract class MixinHandledScreen<T extends ScreenHandler> extends MixinS
     @Inject(method = "init", at = @At(value = "RETURN"))
     private void hookInit(CallbackInfo info)
     {
-        RekitModule rekit = RekitModule.getInstance();
+        ChestStealerModule rekit = ChestStealerModule.getInstance();
         if (rekit.isEnabled() && rekit.isValidHandler(getScreenHandler()))
         {
             addDrawableChild(

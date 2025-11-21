@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.function.Function;
 
-public class RekitModule extends Toggleable
+public class ChestStealerModule extends Toggleable
 {
-    private static RekitModule INSTANCE;
+    private static ChestStealerModule INSTANCE;
     Config<String> kit = new StringConfig.Builder("Kit")
             .setDescription("The kit to use")
             .setDefaultValue("").build();
@@ -59,13 +59,13 @@ public class RekitModule extends Toggleable
 
     private int sequenced;
 
-    public RekitModule()
+    public ChestStealerModule()
     {
-        super("Rekit", "Allows you to save your inventory to rekit later", GuiCategory.MISCELLANEOUS);
+        super("ChestStealer", "Allows you to take items out of containers", GuiCategory.MISCELLANEOUS);
         INSTANCE = this;
     }
 
-    public static RekitModule getInstance()
+    public static ChestStealerModule getInstance()
     {
         return INSTANCE;
     }

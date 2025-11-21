@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
+import lombok.RequiredArgsConstructor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
@@ -14,9 +15,10 @@ import net.shoreline.client.util.entity.PlayerUtil;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@RequiredArgsConstructor
 public abstract class CrystalEntityScanner extends AsyncWorldScanner
 {
-    private final AutoCrystalModule autoCrystal = AutoCrystalModule.INSTANCE;
+    protected final AutoCrystalModule autoCrystal;
 
     private final List<CrystalData<?>> crystalEntities = new CopyOnWriteArrayList<>();
 

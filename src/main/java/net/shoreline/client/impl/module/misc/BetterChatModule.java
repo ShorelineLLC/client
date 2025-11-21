@@ -101,7 +101,7 @@ public class BetterChatModule extends Toggleable
     {
         if (animateConfig.getValue())
         {
-            float factor = (float) Easing.SMOOTH_STEP.ease(chatAnim.getFactor());
+            float factor = (float) Easing.CIRC_IN_OUT.ease(chatAnim.getFactor());
             event.cancel();
             Managers.RENDER.drawRect(event.getContext(),
                     event.getX(),

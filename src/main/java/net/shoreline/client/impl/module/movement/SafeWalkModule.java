@@ -93,8 +93,7 @@ public class SafeWalkModule extends Toggleable
             final double deltaX = velocity.getX() - move.x;
             final double deltaZ = velocity.getZ() - move.z;
 
-            sneakOverride = Math.abs(deltaX) > 9.0E-4
-                    || Math.abs(deltaZ) > 9.0E-4;
+            sneakOverride = Math.abs(deltaX) > 9.0E-4 || Math.abs(deltaZ) > 9.0E-4;
             mc.options.sneakKey.setPressed(sneakOverride);
             return;
         }
