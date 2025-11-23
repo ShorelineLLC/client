@@ -15,6 +15,7 @@ import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,7 +74,7 @@ public class HoleESPModule extends RenderModule
     @EventListener
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
-        List<HoleData> latestHoleData = Managers.HOLE.getResults();
+        Collection<HoleData> latestHoleData = Managers.HOLE.getResults();
 
         for (HoleData hole : latestHoleData)
         {

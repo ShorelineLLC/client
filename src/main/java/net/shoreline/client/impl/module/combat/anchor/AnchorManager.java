@@ -8,6 +8,7 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 public class AnchorManager extends AsyncFeature<AnchorData>
 {
@@ -35,7 +36,7 @@ public class AnchorManager extends AsyncFeature<AnchorData>
         {
             scanner.createSphere(mc.world, EntityUtil.getRoundedBlockPos(mc.player));
             scanner.createEntityLookup(mc.world, mc.player.getEyePos());
-            runAsync(() -> new ArrayList<>(scanner.getData()));
+            runAsync(() -> new TreeSet<>(scanner.getData()));
         }
     }
 

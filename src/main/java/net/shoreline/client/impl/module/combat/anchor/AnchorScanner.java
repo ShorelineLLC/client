@@ -8,14 +8,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.block.AsyncBlockState;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.module.combat.AnchorAuraModule;
+import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionTrace;
@@ -30,7 +28,7 @@ import java.util.TreeSet;
 public class AnchorScanner extends AsyncWorldScanner
 {
     private final AnchorAuraModule module;
-    private Collection<AnchorData> data = new TreeSet<>();
+    private final Set<AnchorData> data = new TreeSet<>();
 
     @Override
     protected void visit(BlockPos pos, AsyncBlockState state)
@@ -103,7 +101,7 @@ public class AnchorScanner extends AsyncWorldScanner
 
             if (damage > entityState.getTotalHealth()) // prioritize lethal positions.
             {
-                positionData.setDamage(Float.MAX_VALUE);
+                positionData.setDamage(damage);
                 positionData.setTarget((PlayerEntity) entity);
                 break;
             }
@@ -130,11 +128,22 @@ public class AnchorScanner extends AsyncWorldScanner
 
     public float getDamage(BlockPos pos, Entity entity)
     {
+        int extrapolation = module.getExtrapolateConfig().getValue();
+        Vec3d extrapolatedPos = extrapolation <= 0
+                ? entity.getPos()
+                : MovementExtrapolation.extrapolatePosition(
+                        this,
+                        entity.getVelocity(),
+                        entity.getBoundingBox(),
+                        entity,
+                        extrapolation);
+
+        Box boundingBox = entity.getDimensions(entity.getPose()).getBoxAt(extrapolatedPos);
         return ExplosionTrace.getDamageToPos(
                 this,
                 pos.toCenterPos(),
-                entity.getPos(),
-                entity.getBoundingBox(),
+                extrapolatedPos,
+                boundingBox,
                 10.0f,
                 module.getIgnoreTerrain().getValue(),
                 Set.of(pos));

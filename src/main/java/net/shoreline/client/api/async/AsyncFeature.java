@@ -3,6 +3,7 @@ package net.shoreline.client.api.async;
 import net.shoreline.client.api.GenericFeature;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -10,7 +11,7 @@ import java.util.concurrent.Future;
 
 public class AsyncFeature<T> extends GenericFeature
 {
-    protected Future<List<T>> currentResult;
+    protected Future<Collection<T>> currentResult;
 
     public AsyncFeature(String name)
     {
@@ -23,12 +24,12 @@ public class AsyncFeature<T> extends GenericFeature
     }
 
     @SuppressWarnings("unchecked cast")
-    public void runAsync(Callable<List<T>> calc)
+    public void runAsync(Callable<Collection<T>> calc)
     {
-        currentResult = (Future<List<T>>) ClientExecutorService.INSTANCE.submit(calc);
+        currentResult = (Future<Collection<T>>) ClientExecutorService.INSTANCE.submit(calc);
     }
 
-    public List<T> getResults()
+    public Collection<T> getResults()
     {
         if (currentResult == null || !currentResult.isDone())
         {
@@ -38,7 +39,8 @@ public class AsyncFeature<T> extends GenericFeature
         try
         {
             return currentResult.get();
-        } catch (InterruptedException | ExecutionException e)
+        }
+        catch (InterruptedException | ExecutionException e)
         {
             e.printStackTrace();
             return new ArrayList<>();

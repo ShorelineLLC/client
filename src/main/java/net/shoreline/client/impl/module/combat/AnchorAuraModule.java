@@ -28,6 +28,7 @@ import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -48,21 +49,19 @@ public class AnchorAuraModule extends PlacerModule
             .setDescription("Range to explode anchors").build();
     Config<Boolean> ignoreTerrain = new BooleanConfig.Builder("IgnoreTerrain")
             .setDefaultValue(true).build();
-    Config<Boolean> sequential = new BooleanConfig.Builder("Sequential")
-            .setDefaultValue(true).build();
-    Config<SilentSwapType> silentType = new EnumConfig.Builder<SilentSwapType>("Swap")
-            .setValues(SilentSwapType.values())
-            .setDescription("The silent swap type")
-            .setDefaultValue(SilentSwapType.HOTBAR).build();
+    Config<Integer> extrapolateConfig = new NumberConfig.Builder<Integer>("Extrapolate")
+            .setMin(0).setDefaultValue(0).setMax(20)
+            .setDescription("Extrapolation for movement").build();
+
 
     /** Manages anchor calculations */
     private final AnchorManager manager;
     /** The latest data. If no valid data was found last tick this will return null */
-    private List<AnchorData> latestData;
+    private Collection<AnchorData> latestData;
 
     public AnchorAuraModule()
     {
-        super("AutoAnchor", "Automatically places and explodes anchors", GuiCategory.COMBAT);
+        super("AnchorAura", "Automatically places and explodes anchors", GuiCategory.COMBAT);
         this.manager = new AnchorManager(this);
     }
 
@@ -86,84 +85,69 @@ public class AnchorAuraModule extends PlacerModule
             return;
         }
 
-        AnchorData firstAnchor = null;
-        AnchorData firstAir = null;
-
         for (AnchorData data : latestData)
         {
-            if (firstAnchor == null && data.isAnchor())
+            if (data.isAnchor())
             {
-                firstAnchor = data;
-            }
-            else if (firstAir == null && !data.isAnchor())
-            {
-                firstAir = data;
-            }
+                BlockState state = mc.world.getBlockState(data.getPos());
+                if (state.getBlock() != Blocks.RESPAWN_ANCHOR)
+                {
+                    break;
+                }
 
-            if (firstAnchor != null && firstAir != null)
-            {
-                break;
-            }
-        }
+                int charges = state.get(RespawnAnchorBlock.CHARGES);
+                int slot;
+                if (charges <= 0)
+                {
+                    slot = InventoryUtil.getHotbarSlot(Items.GLOWSTONE);
+                }
+                else
+                {
+                    slot = InventoryUtil.getHotbarSlot(stack -> !(stack.getItem() instanceof BlockItem));
+                }
 
-        if (firstAnchor != null)
-        {
-            BlockState state = mc.world.getBlockState(firstAnchor.getPos());
-            if (state.getBlock() != Blocks.RESPAWN_ANCHOR)
-            {
-                return;
-            }
+                if (!Managers.INTERACT.startPlacement(slot))
+                {
+                    break;
+                }
 
-            int charges = state.get(RespawnAnchorBlock.CHARGES);
-            int slot = -1;
-            if (charges <= 0)
-            {
-                slot = InventoryUtil.getHotbarSlot(Items.GLOWSTONE);
+                Interaction interaction = Interaction.builder()
+                        .pos(data.getPos())
+                        .direction(InteractDirection.getInteractDirection(data.getPos(), isStrictDirection()))
+                        .hand(Hand.MAIN_HAND)
+                        .block(Blocks.RESPAWN_ANCHOR)
+                        .packetPlace(false)
+                        .build();
+
+                if (interaction.getDirection() == null)
+                {
+                    Managers.INTERACT.endPlacement();
+                    break;
+                }
+
+                Vec3d hitVec = interaction.getPos().toCenterPos().add(interaction.getHitVec());
+                if (interactConfig.getInteractRotate().getValue())
+                {
+                    float[] rots = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitVec);
+                    Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
+                }
+
+                BlockHitResult result = new BlockHitResult(interaction.getPos().toCenterPos().add(interaction.getHitVec()), interaction.getDirection(), interaction.getPos(), false);
+                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
+                Managers.INTERACT.endPlacement();
             }
             else
             {
-                slot = InventoryUtil.getHotbarSlot(stack -> !(stack.getItem() instanceof BlockItem));
+                int slot = InventoryUtil.getItemSlot(Items.RESPAWN_ANCHOR);
+                if (slot == -1)
+                {
+                    break;
+                }
+
+                runSingleBlockPlacement(data.getPos(), Blocks.RESPAWN_ANCHOR, slot);
             }
 
-            if (!Managers.INTERACT.startPlacement(slot))
-            {
-                return;
-            }
-
-            Interaction interaction = Interaction.builder()
-                    .pos(firstAnchor.getPos())
-                    .direction(InteractDirection.getInteractDirection(firstAnchor.getPos(), isStrictDirection()))
-                    .hand(Hand.MAIN_HAND)
-                    .block(Blocks.RESPAWN_ANCHOR)
-                    .packetPlace(false)
-                    .build();
-
-            if (interaction.getDirection() == null)
-            {
-                Managers.INTERACT.endPlacement();
-                return;
-            }
-
-            Vec3d hitVec = interaction.getPos().toCenterPos().add(interaction.getHitVec());
-            if (interactConfig.getInteractRotate().getValue())
-            {
-                float[] rots = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitVec);
-                Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
-            }
-
-            BlockHitResult result = new BlockHitResult(interaction.getPos().toCenterPos().add(interaction.getHitVec()), interaction.getDirection(), interaction.getPos(), false);
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, result);
-            Managers.INTERACT.endPlacement();
-        }
-        else if (firstAir != null)
-        {
-            int slot = InventoryUtil.getItemSlot(Items.RESPAWN_ANCHOR);
-            if (slot == -1)
-            {
-                return;
-            }
-
-            runSingleBlockPlacement(firstAir.getPos(), Blocks.RESPAWN_ANCHOR, slot);
+            break;
         }
     }
 
