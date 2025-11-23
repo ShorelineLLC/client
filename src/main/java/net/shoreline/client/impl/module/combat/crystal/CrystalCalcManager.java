@@ -2,45 +2,27 @@ package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.async.AsyncFeature;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.world.EntityState;
-import net.shoreline.eventbus.EventBus;
-import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
 {
-    private final AutoCrystalModule autoCrystalModule;
     private final CrystalBaseScanner baseScanner;
 
     public CrystalCalcManager(AutoCrystalModule autoCrystalModule)
     {
         super("End Crystals");
-        this.autoCrystalModule = autoCrystalModule;
         this.baseScanner = new CrystalBaseScanner(autoCrystalModule);
-        EventBus.INSTANCE.subscribe(this);
     }
 
-    @EventListener
-    public void onTick(TickEvent.Pre event)
+    public void runCalcs()
     {
-        if (checkNull())
-        {
-            return;
-        }
-
-        if (!autoCrystalModule.shouldRunCalcs())
-        {
-            currentResult = null;
-            return;
-        }
-
         if (currentResult == null || currentResult.isDone())
         {
-            baseScanner.createWorldLookup(mc.world, true, mc.player.getEyePos());
+            baseScanner.createWorldLookup(mc.world, mc.player, true);
             runAsync(() ->
             {
                 List<CrystalData<?>> crystalData = new ArrayList<>();

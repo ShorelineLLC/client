@@ -254,8 +254,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
     public void onTick(TickEvent.Pre event)
     {
-        if (!shouldRunCalcs())
+        if (checkNull() || mc.player.isSpectator())
         {
+            crystalCalc.cancelRun();
             currentAttack = null;
             currentPlace = null;
             return;
@@ -273,7 +274,13 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     @EventListener
     public void onTickPost(TickEvent.Post event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+        
         crystalsPlaced.set(0);
+        crystalCalc.runCalcs();
     }
 
     @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
@@ -305,11 +312,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         } else if (predictPlace.getValue() != Timing.OFF)
         {
             MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-            CrystalDataWithAngles<BlockPos> prePlaceData = runPrePlace(currentMine);
+            CrystalData.WithRotation<BlockPos> prePlaceData = runPrePlace(currentMine);
             if (prePlaceData != null)
             {
-                currentPlace = prePlaceData.data();
-                rotations = prePlaceData.angles();
+                currentPlace = prePlaceData;
+                rotations = prePlaceData.getAngles();
                 if (predictPlace.getValue() != Timing.OFF)
                 {
                     placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
@@ -412,16 +419,15 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
         {
-            CrystalDataWithAngles<BlockPos> prePlace = runPrePlace(currentMine);
+            CrystalData.WithRotation<BlockPos> prePlace = runPrePlace(currentMine);
             if (prePlace == null)
             {
                 return;
             }
 
-            CrystalData<BlockPos> currentPlace = prePlace.data;
-            if (packet.getPos().equals(currentPlace.getValue().up()))
+            if (packet.getPos().equals(prePlace.getValue().up()))
             {
-                placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+                placeCrystal(prePlace.getValue(), prePlace.getCrystalVec(), hand);
             }
         }
 
@@ -433,16 +439,15 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 if (entity instanceof ItemEntity)
                 {
                     BlockPos pos = entity.getBlockPos();
-                    CrystalDataWithAngles<BlockPos> prePlace = runPrePlace(currentMine);
+                    CrystalData.WithRotation<BlockPos> prePlace = runPrePlace(currentMine);
                     if (prePlace == null)
                     {
                         continue;
                     }
 
-                    CrystalData<BlockPos> currentPlace = prePlace.data;
-                    if (pos.equals(currentPlace.getValue().up()))
+                    if (pos.equals(prePlace.getValue().up()))
                     {
-                        placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+                        placeCrystal(prePlace.getValue(), prePlace.getCrystalVec(), hand);
                         return;
                     }
                 }
@@ -455,16 +460,15 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             if (entity instanceof ItemEntity)
             {
                 BlockPos pos = entity.getBlockPos();
-                CrystalDataWithAngles<BlockPos> prePlace = runPrePlace(currentMine);
+                CrystalData.WithRotation<BlockPos> prePlace = runPrePlace(currentMine);
                 if (prePlace == null)
                 {
                     return;
                 }
 
-                CrystalData<BlockPos> currentPlace = prePlace.data;
-                if (pos.equals(currentPlace.getValue().up()))
+                if (pos.equals(prePlace.getValue().up()))
                 {
-                    placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+                    placeCrystal(prePlace.getValue(), prePlace.getCrystalVec(), hand);
                 }
             }
         }
@@ -496,7 +500,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                     placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), animFactor);
 
             String dataNametag;
-            if (placeData.isAntiSurround() || placeData.getDamageToPlayer() == -1.0f)
+            if (placeData instanceof CrystalData.Immediate<?>)
             {
                 dataNametag = "AS";
             } else
@@ -559,7 +563,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return rotations;
     }
 
-    private CrystalDataWithAngles<BlockPos> runPrePlace(MiningData currentMine)
+    private CrystalData.WithRotation<BlockPos> runPrePlace(MiningData currentMine)
     {
         if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
@@ -606,10 +610,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             silentRotated = true;
         }
 
-        CrystalData<BlockPos> currentPlace = new CrystalData<>(
-                placePos, crystalVec, targetState, damage, -1.0f, false);
-
-        return new CrystalDataWithAngles<>(currentPlace, rotations);
+        return new CrystalData.WithRotation<>(placePos, crystalVec, targetState, rotations);
     }
 
     private void attackCrystal(EndCrystalEntity crystal, Hand hand)
@@ -735,11 +736,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return Direction.getFacing(eyePos.x - cut.x, eyePos.y - cut.y, eyePos.z - cut.z);
     }
 
-    public boolean shouldRunCalcs()
-    {
-        return isEnabled() && !mc.player.isSpectator();
-    }
-
     private List<CrystalData<BlockPos>> getPlacements(List<CrystalData<BlockPos>> crystalData)
     {
         return crystalData.stream().filter(d ->
@@ -790,7 +786,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 for (CrystalData<T> data : crystals)
                 {
                     LivingEntity entity = (LivingEntity) data.getTarget().getEntity();
-                    if (entity.isDead() || !data.isAntiSurround())
+                    if (entity.isDead() || !(data instanceof CrystalData.Immediate<T>))
                     {
                         continue;
                     }
@@ -898,6 +894,4 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         TICK, INSTANT, OFF
     }
-
-    private record CrystalDataWithAngles<T>(CrystalData<T> data, float[] angles) {}
 }

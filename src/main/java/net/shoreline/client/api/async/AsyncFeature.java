@@ -29,6 +29,15 @@ public class AsyncFeature<T> extends GenericFeature
         currentResult = (Future<Collection<T>>) ClientExecutorService.INSTANCE.submit(calc);
     }
 
+    public void cancelRun()
+    {
+        if (currentResult != null)
+        {
+            currentResult.cancel(false);
+            currentResult = null;
+        }
+    }
+
     public Collection<T> getResults()
     {
         if (currentResult == null || !currentResult.isDone())
