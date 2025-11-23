@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.render;
+package net.shoreline.client.impl.render.manager;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -20,13 +20,13 @@ import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.client.impl.module.client.FontModule;
+import net.shoreline.client.impl.render.Mesh;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Getter

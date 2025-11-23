@@ -14,6 +14,7 @@ import net.shoreline.client.impl.block.AsyncBlockState;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.module.combat.AnchorAuraModule;
 import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
+import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionTrace;
@@ -51,7 +52,7 @@ public class AnchorScanner extends AsyncWorldScanner
             return;
         }
 
-        if (blockState.isReplaceable())
+        if (blockState.isReplaceable() && !AirPlaceModule.INSTANCE.isEnabled())
         {
             Direction direction = InteractDirection.getInteractDirection(pos, module.isStrictDirection());
             if (direction == null)
@@ -70,9 +71,11 @@ public class AnchorScanner extends AsyncWorldScanner
             return;
         }
 
+        float maxSelf = positionData.isAnchor()
+                ? module.getMaxSelfBreak().getValue()
+                : module.getMaxSelfPlace().getValue();
         float selfDamage = getDamage(pos, getLocalEntity().getEntity());
-        if (selfDamage > module.getMaxSelfDamageConfig().getValue()
-                || getLocalEntity().getTotalHealth() - selfDamage < 0.5f)
+        if (selfDamage > maxSelf || getLocalEntity().getTotalHealth() - selfDamage < 0.5f)
         {
             return;
         }
@@ -107,7 +110,11 @@ public class AnchorScanner extends AsyncWorldScanner
             }
         }
 
-        if (positionData.getDamage() > module.getMinDamageConfig().getValue())
+        float minDamage = positionData.isAnchor()
+                ? module.getMinBreakDamage().getValue()
+                : module.getMinDamage().getValue();
+
+        if (positionData.getDamage() > minDamage)
         {
             data.add(positionData);
         }
@@ -141,7 +148,7 @@ public class AnchorScanner extends AsyncWorldScanner
         Box boundingBox = entity.getDimensions(entity.getPose()).getBoxAt(extrapolatedPos);
         return ExplosionTrace.getDamageToPos(
                 this,
-                pos.toCenterPos(),
+                pos.toBottomCenterPos(),
                 extrapolatedPos,
                 boundingBox,
                 10.0f,

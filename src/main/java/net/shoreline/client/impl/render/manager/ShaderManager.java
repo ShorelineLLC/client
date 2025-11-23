@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.render;
+package net.shoreline.client.impl.render.manager;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;

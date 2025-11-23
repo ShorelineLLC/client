@@ -29,6 +29,17 @@ public class AnchorData implements Comparable<AnchorData>
         return placed;
     }
 
+    public AnchorData copy()
+    {
+        AnchorData data = new AnchorData(pos);
+        data.setTarget(target);
+        data.setAnchor(anchor);
+        data.setPlaced(placed);
+        data.setSelfDamage(selfDamage);
+        data.setDamage(damage);
+        return data;
+    }
+
     @Override
     public int compareTo(AnchorData o)
     {

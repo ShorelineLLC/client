@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.combat.anchor;
 
+import lombok.Getter;
 import net.shoreline.client.api.async.AsyncFeature;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.module.combat.AnchorAuraModule;
@@ -10,6 +11,7 @@ import net.shoreline.eventbus.annotation.EventListener;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+@Getter
 public class AnchorManager extends AsyncFeature<AnchorData>
 {
     private final AnchorAuraModule module;

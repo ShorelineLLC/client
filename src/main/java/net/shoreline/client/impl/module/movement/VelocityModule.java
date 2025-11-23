@@ -5,6 +5,7 @@ import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.*;
@@ -15,9 +16,12 @@ import net.shoreline.client.impl.event.network.ExplosionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PushOutOfBlocksEvent;
 import net.shoreline.client.impl.imixin.IEntityVelocityUpdateS2CPacket;
+import net.shoreline.client.impl.imixin.IExplosionS2CPacket;
 import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.util.text.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.Optional;
 
 public class VelocityModule extends Toggleable
 {
@@ -120,6 +124,33 @@ public class VelocityModule extends Toggleable
                 ((IEntityVelocityUpdateS2CPacket) packet).setX((int) (e * 8000.0));
                 ((IEntityVelocityUpdateS2CPacket) packet).setY((int) (f * 8000.0));
                 ((IEntityVelocityUpdateS2CPacket) packet).setZ((int) (g * 8000.0));
+            }
+        }
+
+        if (event.getPacket() instanceof ExplosionS2CPacket packet && cancelExplosion.getValue())
+        {
+            if (modeConfig.getValue() == VelocityMode.WALLS && !PhaseUtil.isInsideBlock(mc.player))
+            {
+                return;
+            }
+
+            switch (modeConfig.getValue())
+            {
+                case NORMAL, WALLS ->
+                {
+                    if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
+                    {
+                        event.cancel();
+                    }
+                    else
+                    {
+                        Vec3d velocity = packet.playerKnockback().orElseGet(() -> new Vec3d(0, 0, 0));
+                        ((IExplosionS2CPacket) event.getPacket()).setPlayerKnockback(Optional.of(new Vec3d(
+                                velocity.x * (horizontalConfig.getValue() / 100f),
+                                velocity.y * (verticalConfig.getValue() / 100f),
+                                velocity.z * (horizontalConfig.getValue() / 100f))));
+                    }
+                }
             }
         }
 

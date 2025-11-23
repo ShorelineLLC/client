@@ -1032,8 +1032,8 @@ net.shoreline.client.impl.Managers -> net.shoreline.client.aS:
     net.shoreline.client.impl.combat.KitManager KIT -> dp
     net.shoreline.client.impl.combat.TargetManager TARGETING -> dq
     net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager CRYSTAL -> dr
-    net.shoreline.client.impl.render.RenderManager RENDER -> ds
-    net.shoreline.client.impl.render.ShaderManager SHADER -> dt
+    net.shoreline.client.impl.render.manager.RenderManager RENDER -> ds
+    net.shoreline.client.impl.render.manager.ShaderManager SHADER -> dt
     net.shoreline.client.impl.social.SocialManager SOCIAL -> du
     23:23:void <init>() -> <init>
     47:65:void init() -> c
@@ -4197,7 +4197,7 @@ net.shoreline.client.impl.render.Programs -> net.shoreline.client.iT:
     net.minecraft.class_4668$class_5942 GLINT -> ue
     9:9:void <init>() -> <init>
     11:12:void <clinit>() -> <clinit>
-net.shoreline.client.impl.render.RenderManager -> net.shoreline.client.iU:
+net.shoreline.client.impl.render.manager.RenderManager -> net.shoreline.client.iU:
     double deltaTime -> uf
     24:24:void <init>() -> <init>
     32:33:void renderBox(net.minecraft.class_4587,net.minecraft.class_2338,int) -> b
@@ -4219,7 +4219,7 @@ net.shoreline.client.impl.render.RenderPhases -> net.shoreline.client.iV:
     18:24:void setupGlintTexturing(float,float) -> c
     13:13:void lambda$static$0() -> kg
     11:11:void <clinit>() -> <clinit>
-net.shoreline.client.impl.render.ShaderManager -> net.shoreline.client.iW:
+net.shoreline.client.impl.render.manager.ShaderManager -> net.shoreline.client.iW:
     net.minecraft.class_4618 vertexConsumerProvider -> uh
     net.minecraft.class_276 framebuffer -> ui
     net.minecraft.class_4668$class_4678 target -> uj
