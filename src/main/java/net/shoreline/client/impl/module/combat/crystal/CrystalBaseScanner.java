@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.block.AsyncBlockState;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
@@ -34,9 +35,8 @@ public class CrystalBaseScanner extends CrystalEntityScanner
             return;
         }
 
-        float placeRange = autoCrystal.getPlaceRange().getValue();
         double placeDist = getLocalEntity().getEyePos().squaredDistanceTo(pos.toCenterPos());
-        if (placeDist > placeRange * placeRange)
+        if (placeDist > MathHelper.square(autoCrystal.getPlaceRange().getValue()))
         {
             return;
         }
@@ -46,7 +46,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         Vec3d localPos = getLocalEntity().getPos();
         Box localBox = getLocalEntity().getBoundingBox();
         float local = !PlayerUtil.isInSurvival(MinecraftClient.getInstance().player) ? 0.0f :
-                CrystalUtil.getCrystalDamage(this, explosionCenter, localPos, localBox, autoCrystal.getIgnoreTerrain().getValue());
+                getExplosionDamage(explosionCenter, localPos, localBox, autoCrystal.getIgnoreTerrain().getValue());
 
         boolean willKillPlayer = getLocalEntity().getTotalHealth() - local < 0.5f;
         if (local > autoCrystal.getMaxSelfDamage().getValue() || willKillPlayer)
@@ -74,24 +74,19 @@ public class CrystalBaseScanner extends CrystalEntityScanner
                 continue;
             }
 
-            float targetRange = autoCrystal.getTargetRange().getValue();
             double dist = getLocalEntity().squaredDistanceTo(entityPos);
-            if (dist > targetRange * targetRange)
+            if (dist > MathHelper.square(autoCrystal.getTargetRange().getValue()))
             {
                 continue;
             }
 
             Box boundingBox = entity.getDimensions().getBoxAt(entityPos);
-            float damage = CrystalUtil.getCrystalDamage(this,
-                    explosionCenter,
+            float damage = getExplosionDamage(explosionCenter,
                     entityPos,
                     boundingBox,
                     autoCrystal.getIgnoreTerrain().getValue());
 
-            boolean antiSurround = AntiSurround.checkAntiSurroundQualifiers(this,
-                    pos.up(), autoCrystal.getPrePlace().getValue());
-
-            crystalBases.add(new CrystalData<>(pos, explosionCenter, entity, damage, local, antiSurround));
+            crystalBases.add(factory.createData(pos, explosionCenter, entity, damage, local));
         }
     }
 

@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.world;
 
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -25,15 +26,15 @@ public abstract class AsyncWorldScanner extends AsyncBlockScanner implements Asy
         }
     };
 
-    public void createWorldLookup(ClientWorld world, boolean sphere, Vec3d center)
+    public void createWorldLookup(ClientWorld world, ClientPlayerEntity player, boolean sphere)
     {
-        createEntityLookup(world, center);
+        createEntityLookup(world, player.getEyePos());
         if (sphere)
         {
-            createSphere(world, BlockPos.ofFloored(center));
+            createSphere(world, BlockPos.ofFloored(player.getEyePos()));
         } else
         {
-            createCube(world, BlockPos.ofFloored(center));
+            createCube(world, BlockPos.ofFloored(player.getEyePos()));
         }
     }
 
