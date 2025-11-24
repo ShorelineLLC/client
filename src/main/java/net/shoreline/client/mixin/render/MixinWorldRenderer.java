@@ -150,9 +150,7 @@ public abstract class MixinWorldRenderer implements IWorldRenderer
     @Inject(method = "onResized", at = @At("TAIL"))
     private void hookResized(int width, int height, CallbackInfo info)
     {
-        if (Managers.SHADER != null)
-        {
-            Managers.SHADER.resize(width, height);
-        }
+        RenderWorldEvent.Resized resizedEvent = new RenderWorldEvent.Resized(width, height);
+        EventBus.INSTANCE.dispatch(resizedEvent);
     }
 }

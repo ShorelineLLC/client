@@ -129,28 +129,17 @@ public class VelocityModule extends Toggleable
 
         if (event.getPacket() instanceof ExplosionS2CPacket packet && cancelExplosion.getValue())
         {
-            if (modeConfig.getValue() == VelocityMode.WALLS && !PhaseUtil.isInsideBlock(mc.player))
+            if (shouldCancelExplosions())
             {
-                return;
+                event.cancel();
             }
-
-            switch (modeConfig.getValue())
+            else if (modeConfig.getValue() == VelocityMode.NORMAL)
             {
-                case NORMAL, WALLS ->
-                {
-                    if (horizontalConfig.getValue() == 0.0f && verticalConfig.getValue() == 0.0f)
-                    {
-                        event.cancel();
-                    }
-                    else
-                    {
-                        Vec3d velocity = packet.playerKnockback().orElseGet(() -> new Vec3d(0, 0, 0));
-                        ((IExplosionS2CPacket) event.getPacket()).setPlayerKnockback(Optional.of(new Vec3d(
-                                velocity.x * (horizontalConfig.getValue() / 100f),
-                                velocity.y * (verticalConfig.getValue() / 100f),
-                                velocity.z * (horizontalConfig.getValue() / 100f))));
-                    }
-                }
+                Vec3d velocity = packet.playerKnockback().orElseGet(() -> new Vec3d(0, 0, 0));
+                ((IExplosionS2CPacket) event.getPacket()).setPlayerKnockback(Optional.of(new Vec3d(
+                        velocity.x * (horizontalConfig.getValue() / 100f),
+                        velocity.y * (verticalConfig.getValue() / 100f),
+                        velocity.z * (horizontalConfig.getValue() / 100f))));
             }
         }
 
@@ -226,30 +215,22 @@ public class VelocityModule extends Toggleable
 
     private boolean shouldCancelKnockback()
     {
-        if (modeConfig.getValue() == VelocityMode.WALLS)
+        return switch (modeConfig.getValue())
         {
-            return PhaseUtil.isInsideBlock(mc.player) && (!groundOnlyConfig.getValue() || mc.player.isOnGround());
-        } else if (modeConfig.getValue() == VelocityMode.NORMAL)
-        {
-            return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
-        } else
-        {
-            return modeConfig.getValue() == VelocityMode.GRIM_V2;
-        }
+            case WALLS -> PhaseUtil.isInsideBlock(mc.player) && (!groundOnlyConfig.getValue() || mc.player.isOnGround());
+            case NORMAL -> horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
+            default -> true;
+        };
     }
 
     private boolean shouldCancelExplosions()
     {
-        if (modeConfig.getValue() == VelocityMode.WALLS)
+        return switch (modeConfig.getValue())
         {
-            return PhaseUtil.isInsideBlock(mc.player);
-        } else if (modeConfig.getValue() == VelocityMode.NORMAL)
-        {
-            return horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
-        } else
-        {
-            return modeConfig.getValue() == VelocityMode.GRIM_V2;
-        }
+            case WALLS -> PhaseUtil.isInsideBlock(mc.player);
+            case NORMAL -> horizontalConfig.getValue() == 0 && verticalConfig.getValue() == 0;
+            default -> true;
+        };
     }
 
     private enum VelocityMode

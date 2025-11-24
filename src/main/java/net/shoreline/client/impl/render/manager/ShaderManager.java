@@ -32,19 +32,25 @@ public class ShaderManager extends GenericFeature
 
     private final Map<Identifier, RenderLayer> layerCache = new HashMap<>();
 
-    private final ShadersModule shaderConfig = ShadersModule.INSTANCE;
+    private final ShadersModule shadersModule;
 
-    public ShaderManager()
+    public ShaderManager(ShadersModule shadersModule)
     {
         super("Shaders");
+        this.shadersModule = shadersModule;
         this.vertexConsumerProvider = new OutlineVertexConsumerProvider(VertexConsumerProvider.immediate(new BufferAllocator(256)));
         this.framebuffer = new SimpleFramebuffer(mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), true);
         this.framebuffer.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        this.target = new RenderPhase.Target("shader_target",
-                () -> {
-                    framebuffer.copyDepthFrom(mc.getFramebuffer());
-                    framebuffer.beginWrite(false);
-                }, () -> mc.getFramebuffer().beginWrite(false));
+        this.target = new RenderPhase.Target("shader_target", () ->
+        {
+            if (!shadersModule.getDepth())
+            {
+                framebuffer.copyDepthFrom(mc.getFramebuffer());
+            }
+
+            framebuffer.beginWrite(false);
+
+        }, () -> mc.getFramebuffer().beginWrite(false));
     }
 
     public void begin()
@@ -63,7 +69,7 @@ public class ShaderManager extends GenericFeature
         ShaderProgram program = ((IPostEffectProcessor) shader).getPasses().getFirst().getProgram();
         program.addSamplerTexture("DiffuseSampler", framebuffer.getColorAttachment());
 
-        for (Uniform<?> uniform : shaderEffect.getUniforms())
+        for (Uniform<?> uniform : shaderEffect.getUniforms().values())
         {
             uniform.applyUniform(program);
         }
@@ -112,13 +118,13 @@ public class ShaderManager extends GenericFeature
             vertexConsumerProvider.setColor(color.getRed(), color.getGreen(), color.getBlue(), 255);
 
             RenderPhase.TextureBase texture = ((IMultiPhaseParameters) (Object) ((IMultiPhase) layer).hookGetPhases()).getTexture();
-            RenderLayer layer1 = getOrCreateLayer(texture);
-            if (layer1 == null)
+            RenderLayer outlineLayer = getOutlineLayer(texture);
+            if (outlineLayer == null)
             {
                 return parentBuffer;
             }
 
-            VertexConsumer outlineBuffer = vertexConsumerProvider.getBuffer(layer1);
+            VertexConsumer outlineBuffer = vertexConsumerProvider.getBuffer(outlineLayer);
             if (outlineBuffer == null)
             {
                 return parentBuffer;
@@ -128,12 +134,12 @@ public class ShaderManager extends GenericFeature
         };
     }
 
-    private RenderLayer getOrCreateLayer(RenderPhase.TextureBase texture)
+    private RenderLayer getOutlineLayer(RenderPhase.TextureBase texture)
     {
         Optional<Identifier> id = ((ITextureBase) texture).hookGetId();
         return id.map(identifier -> layerCache.computeIfAbsent(identifier, layer ->
                 RenderLayer.of(
-                        "shoreline_overlay",
+                        "shoreline_overlay_" + id.get().getPath(),
                         VertexFormats.POSITION_TEXTURE_COLOR,
                         VertexFormat.DrawMode.QUADS,
                         1536,
@@ -141,7 +147,7 @@ public class ShaderManager extends GenericFeature
                                 .program(RenderPhase.OUTLINE_PROGRAM)
                                 .texture(texture)
                                 .cull(RenderPhase.DISABLE_CULLING)
-                                .depthTest(shaderConfig.getDepth() ? RenderPhase.LEQUAL_DEPTH_TEST : RenderPhase.ALWAYS_DEPTH_TEST)
+                                .depthTest(shadersModule.getDepth() ? RenderPhase.ALWAYS_DEPTH_TEST : RenderPhase.LEQUAL_DEPTH_TEST)
                                 .target(target)
                                 .build(RenderLayer.OutlineMode.IS_OUTLINE)
                 )

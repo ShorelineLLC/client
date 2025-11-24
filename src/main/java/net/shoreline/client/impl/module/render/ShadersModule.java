@@ -3,24 +3,34 @@ package net.shoreline.client.impl.module.render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.util.math.MathHelper;
-import net.shoreline.client.api.config.*;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.ColorConfig;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.ConfigGroup;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.LoadingEvent;
 import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.event.render.item.RenderHandEvent;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
+import net.shoreline.client.impl.render.manager.ShaderManager;
 import net.shoreline.client.impl.render.shader.ShaderEffect;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class ShadersModule extends RenderModule
 {
@@ -121,6 +131,8 @@ public class ShadersModule extends RenderModule
     Config<Void> fillConfig = new ConfigGroup.Builder("Fill")
             .addAll(fillMode, fillOpacity, gradientFactor, gradientColor, flowSpeed, flowFactor, liquidSpeed, liquidFactor).build();
 
+    private ShaderManager shaderManager;
+
     public ShadersModule()
     {
         super("Shaders", "Renders shaders over entities", GuiCategory.RENDER);
@@ -128,11 +140,17 @@ public class ShadersModule extends RenderModule
 
         depthConfig.addListener(v ->
         {
-            if (Managers.SHADER != null)
+            if (shaderManager != null)
             {
-                Managers.SHADER.clearCache();
+                shaderManager.clearCache();
             }
         });
+    }
+
+    @EventListener
+    public void onFinishedLoading(LoadingEvent.Finished event)
+    {
+        shaderManager = new ShaderManager(this);
     }
 
     @EventListener
@@ -140,7 +158,16 @@ public class ShadersModule extends RenderModule
     {
         if (!checkNull())
         {
-            Managers.SHADER.begin();
+            shaderManager.begin();
+        }
+    }
+
+    @EventListener
+    public void onResize(RenderWorldEvent.Resized event)
+    {
+        if (shaderManager != null)
+        {
+            shaderManager.resize(event.getWidth(), event.getHeight());
         }
     }
 
@@ -149,29 +176,31 @@ public class ShadersModule extends RenderModule
     {
         if (!checkNull())
         {
-            Managers.SHADER.render(outlineMode.getValue().getShaderEffect());
+            shaderManager.render(outlineMode.getValue().getShaderEffect());
         }
     }
 
     @EventListener
     public void onRenderEntity(RenderEntityWorldEvent event)
     {
-        if (!shouldRenderShader(event.getEntity()) || MathHelper.square(rangeConfig.getValue()) < event.getEntity().squaredDistanceTo(getCameraPos()))
+        if (!shouldRenderShader(event.getEntity()))
         {
             return;
         }
 
-        boolean isFriend = Managers.SOCIAL.isFriend(event.getEntity());
+        Color color = Managers.SOCIAL.isFriend(event.getEntity())
+                ? SocialsModule.INSTANCE.getFriendsColor()
+                : ThemeModule.INSTANCE.getPrimaryColor();
+
         event.cancel();
-        event.setVertexConsumerProvider(Managers.SHADER.createVertexConsumer(
-                event.getVertexConsumerProvider(),
-                isFriend ? SocialsModule.INSTANCE.getFriendsColor() : ThemeModule.INSTANCE.getPrimaryColor()));
+        event.setVertexConsumerProvider(shaderManager.createVertexConsumer(
+                event.getVertexConsumerProvider(), color));
     }
 
     @EventListener
     public void onRenderEntityPost(RenderEntityWorldEvent.Post event)
     {
-        Managers.SHADER.draw();
+        shaderManager.draw();
     }
 
     @EventListener
@@ -180,7 +209,7 @@ public class ShadersModule extends RenderModule
         if (handsConfig.getValue())
         {
             event.cancel();
-            event.setVertexConsumerProvider(Managers.SHADER.createVertexConsumer(
+            event.setVertexConsumerProvider(shaderManager.createVertexConsumer(
                     event.getVertexConsumerProvider(), ThemeModule.INSTANCE.getPrimaryColor()));
         }
     }
@@ -190,28 +219,32 @@ public class ShadersModule extends RenderModule
     {
         if (handsConfig.getValue())
         {
-            Managers.SHADER.draw();
+            shaderManager.draw();
         }
     }
 
     public boolean getDepth()
     {
-        return !depthConfig.getValue();
+        return depthConfig.getValue();
     }
 
     private boolean shouldRenderShader(Entity entity)
     {
-        if (entity instanceof PlayerEntity && playersConfig.getValue())
+        if (MathHelper.square(rangeConfig.getValue()) < entity.squaredDistanceTo(getCameraPos()))
         {
-            return entity != mc.player || selfConfig.getValue();
+            return false;
         }
 
-        return EntityUtil.isHostile(entity) && hostilesConfig.getValue()
-                || EntityUtil.isPassive(entity) && passiveConfig.getValue()
-                || entity instanceof ItemEntity && itemsConfig.getValue()
-                || entity instanceof EndCrystalEntity && crystalsConfig.getValue()
-                || entity instanceof ExperienceBottleEntity && xpConfig.getValue()
-                || entity instanceof EnderPearlEntity && pearlsConfig.getValue();
+        return switch (entity)
+        {
+            case PlayerEntity player when player != mc.player ? playersConfig.getValue() : selfConfig.getValue() -> true;
+            case Monster monster when hostilesConfig.getValue() -> true;
+            case AnimalEntity animalEntity when passiveConfig.getValue() -> true;
+            case ItemEntity itemEntity when itemsConfig.getValue() -> true;
+            case ExperienceBottleEntity xpEntity when xpConfig.getValue() -> true;
+            case EnderPearlEntity pearlEntity when pearlsConfig.getValue() -> true;
+            default -> entity instanceof EndCrystalEntity && crystalsConfig.getValue();
+        };
     }
 
     public enum Fill
@@ -224,66 +257,82 @@ public class ShadersModule extends RenderModule
 
     public enum Shaders
     {
-        DEFAULT
-        {
-            @Override
-            public ShaderEffect getShaderEffect()
-            {
-                ShaderEffect effect = new ShaderEffect("outline");
-                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
-                effect.addVec2Uniform("u_Resolution", mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight());
-                effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
-                effect.addIntUniform("u_FillMode", ShadersModule.INSTANCE.fillMode.getValue().ordinal());
-                effect.addFltUniform("u_FillAlpha", ShadersModule.INSTANCE.fillOpacity.getValue());
-                effect.addFltUniform("u_GradientFactor", ShadersModule.INSTANCE.gradientFactor.getValue() * 16.0f);
+        DEFAULT("outline")
+                {
+                    @Override
+                    protected void updateUniforms(ShadersModule shadersModule)
+                    {
+                        ShaderEffect effect = this.effect;
+                        effect.addFltUniform("u_ShaderTime", (float) (System.currentTimeMillis() - startTime));
+                        effect.addVec2Uniform("u_Resolution",
+                                mc.getWindow().getFramebufferWidth(),
+                                mc.getWindow().getFramebufferHeight());
+                        effect.addFltUniform("u_Width", shadersModule.outlineWidth.getValue());
+                        effect.addIntUniform("u_FillMode", shadersModule.fillMode.getValue().ordinal());
+                        effect.addFltUniform("u_FillAlpha", shadersModule.fillOpacity.getValue());
+                        effect.addFltUniform("u_GradientFactor", shadersModule.gradientFactor.getValue() * 16.0f);
 
-                Color gradientColor = ShadersModule.INSTANCE.gradientColor.getValue();
-                effect.addVec4Uniform("u_GradientColor", gradientColor.getRed() / 255.0f,
-                        gradientColor.getGreen() / 255.0f,
-                        gradientColor.getBlue() / 255.0f,
-                        gradientColor.getAlpha() / 255.0f);
+                        Color gradientColor = shadersModule.gradientColor.getValue();
+                        effect.addVec4Uniform("u_GradientColor",
+                                gradientColor.getRed() / 255.0f,
+                                gradientColor.getGreen() / 255.0f,
+                                gradientColor.getBlue() / 255.0f,
+                                gradientColor.getAlpha() / 255.0f);
 
-                effect.addFltUniform("u_FlowSpeed", ShadersModule.INSTANCE.flowSpeed.getValue());
-                effect.addFltUniform("u_FlowFactor", ShadersModule.INSTANCE.flowFactor.getValue());
-                effect.addFltUniform("u_LiquidIntensity", ShadersModule.INSTANCE.liquidSpeed.getValue());
-                effect.addFltUniform("u_LiquidFactor", ShadersModule.INSTANCE.liquidFactor.getValue());
-                effect.addFltUniform("u_OutlineAlpha", ShadersModule.INSTANCE.outlineOpacity.getValue());
-                return effect;
-            }
-        },
-        BLOOM
-        {
-            @Override
-            public ShaderEffect getShaderEffect()
-            {
-                ShaderEffect effect = new ShaderEffect("bloom");
-                effect.addFltUniform("u_ShaderTime", System.currentTimeMillis() - startTime);
-                effect.addVec2Uniform("u_Resolution", mc.getWindow().getScaledWidth(), mc.getWindow().getFramebufferHeight());
-                effect.addFltUniform("u_Width", ShadersModule.INSTANCE.outlineWidth.getValue());
-                effect.addIntUniform("u_GlowInside", ShadersModule.INSTANCE.glowInside.getValue() ? 1 : 0);
-                effect.addIntUniform("u_GlowQuality", ShadersModule.INSTANCE.qualityConfig.getValue());
-                effect.addFltUniform("u_GlowMultiplier", ShadersModule.INSTANCE.glowConfig.getValue());
-                effect.addIntUniform("u_FillMode", ShadersModule.INSTANCE.fillMode.getValue().ordinal());
-                effect.addFltUniform("u_FillAlpha", ShadersModule.INSTANCE.fillOpacity.getValue());
-                effect.addFltUniform("u_GradientFactor", ShadersModule.INSTANCE.gradientFactor.getValue() * 16.0f);
+                        effect.addFltUniform("u_FlowSpeed", shadersModule.flowSpeed.getValue());
+                        effect.addFltUniform("u_FlowFactor", shadersModule.flowFactor.getValue());
+                        effect.addFltUniform("u_LiquidIntensity", shadersModule.liquidSpeed.getValue());
+                        effect.addFltUniform("u_LiquidFactor", shadersModule.liquidFactor.getValue());
+                        effect.addFltUniform("u_OutlineAlpha", shadersModule.outlineOpacity.getValue());
+                    }
+                },
+        BLOOM("bloom")
+                {
+                    @Override
+                    protected void updateUniforms(ShadersModule shadersModule)
+                    {
+                        ShaderEffect effect = this.effect;
+                        effect.addFltUniform("u_ShaderTime", (float) (System.currentTimeMillis() - startTime));
+                        effect.addVec2Uniform("u_Resolution",
+                                mc.getWindow().getScaledWidth(),
+                                mc.getWindow().getFramebufferHeight());
+                        effect.addFltUniform("u_Width", shadersModule.outlineWidth.getValue());
+                        effect.addIntUniform("u_GlowInside", shadersModule.glowInside.getValue() ? 1 : 0);
+                        effect.addIntUniform("u_GlowQuality", shadersModule.qualityConfig.getValue());
+                        effect.addFltUniform("u_GlowMultiplier", shadersModule.glowConfig.getValue());
+                        effect.addIntUniform("u_FillMode", shadersModule.fillMode.getValue().ordinal());
+                        effect.addFltUniform("u_FillAlpha", shadersModule.fillOpacity.getValue());
+                        effect.addFltUniform("u_GradientFactor", shadersModule.gradientFactor.getValue() * 16.0f);
 
-                Color gradientColor = ShadersModule.INSTANCE.gradientColor.getValue();
-                effect.addVec4Uniform("u_GradientColor", gradientColor.getRed() / 255.0f,
-                        gradientColor.getGreen() / 255.0f,
-                        gradientColor.getBlue() / 255.0f,
-                        gradientColor.getAlpha() / 255.0f);
+                        Color gradientColor = shadersModule.gradientColor.getValue();
+                        effect.addVec4Uniform("u_GradientColor",
+                                gradientColor.getRed() / 255.0f,
+                                gradientColor.getGreen() / 255.0f,
+                                gradientColor.getBlue() / 255.0f,
+                                gradientColor.getAlpha() / 255.0f);
 
-                effect.addFltUniform("u_FlowSpeed", ShadersModule.INSTANCE.flowSpeed.getValue());
-                effect.addFltUniform("u_FlowFactor", ShadersModule.INSTANCE.flowFactor.getValue());
-                effect.addFltUniform("u_LiquidIntensity", ShadersModule.INSTANCE.liquidSpeed.getValue());
-                effect.addFltUniform("u_LiquidFactor", ShadersModule.INSTANCE.liquidFactor.getValue());
-                effect.addFltUniform("u_OutlineAlpha", ShadersModule.INSTANCE.outlineOpacity.getValue());
-                return effect;
-            }
-        };
+                        effect.addFltUniform("u_FlowSpeed", shadersModule.flowSpeed.getValue());
+                        effect.addFltUniform("u_FlowFactor", shadersModule.flowFactor.getValue());
+                        effect.addFltUniform("u_LiquidIntensity", shadersModule.liquidSpeed.getValue());
+                        effect.addFltUniform("u_LiquidFactor", shadersModule.liquidFactor.getValue());
+                        effect.addFltUniform("u_OutlineAlpha", shadersModule.outlineOpacity.getValue());
+                    }
+                };
 
-        public abstract ShaderEffect getShaderEffect();
-
+        protected final ShaderEffect effect;
         private static final long startTime = System.currentTimeMillis();
+
+        Shaders(String shaderName)
+        {
+            this.effect = new ShaderEffect(shaderName);
+        }
+
+        public ShaderEffect getShaderEffect()
+        {
+            updateUniforms(ShadersModule.INSTANCE);
+            return effect;
+        }
+
+        protected abstract void updateUniforms(ShadersModule shadersModule);
     }
 }

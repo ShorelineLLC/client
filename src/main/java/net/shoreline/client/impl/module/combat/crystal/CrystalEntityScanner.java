@@ -150,11 +150,11 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
             float baseDamage = getExplosionDamage(minePos.toBottomCenterPos(),
                     state.getPos(),
                     state.getBoundingBox(),
-                    AutoCrystalModule.INSTANCE.getIgnoreTerrain().getValue(),
+                    autoCrystal.getIgnoreTerrain().getValue(),
                     Set.of(minePos));
 
             baseDamage *= 0.11f; // We have to assume armor here...
-            if (baseDamage < AutoCrystalModule.INSTANCE.getMinDamage().getValue())
+            if (baseDamage < autoCrystal.getMinDamage().getValue())
             {
                 return false;
             }

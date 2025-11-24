@@ -21,4 +21,11 @@ public class RenderWorldEvent extends Event
             super(matrixStack, tickDelta);
         }
     }
+
+    @RequiredArgsConstructor
+    @Getter
+    public static class Resized extends Event
+    {
+        private final int width, height;
+    }
 }

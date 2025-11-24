@@ -38,7 +38,6 @@ public class Managers
     public static KitManager KIT;
     public static TargetManager TARGETING;
     public static RenderManager RENDER;
-    public static ShaderManager SHADER;
     public static SocialManager SOCIAL;
     public static ResourceManager RESOURCE_PACK;
 
@@ -62,10 +61,5 @@ public class Managers
         RENDER = new RenderManager();
         SOCIAL = new SocialManager();
         RESOURCE_PACK = new ResourceManager();
-    }
-
-    public static void postInit()
-    {
-        SHADER = new ShaderManager();
     }
 }

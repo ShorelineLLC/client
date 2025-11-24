@@ -42,7 +42,6 @@ public class Shoreline
     public static void postInit()
     {
         FontManager.init();
-        Managers.postInit();
     }
 
     public static void info(String message)
