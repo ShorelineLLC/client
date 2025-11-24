@@ -102,7 +102,7 @@ public class VelocityModule extends Toggleable
 
         if (event.getPacket() instanceof EntityVelocityUpdateS2CPacket packet && packet.getEntityId() == mc.player.getId())
         {
-            if (concealVelocity && packet.getVelocityX() == 0 && packet.getVelocityZ() == 0 && packet.getVelocityZ() == 0)
+            if (concealVelocity && packet.getVelocityX() == 0.0 && packet.getVelocityZ() == 0.0 && packet.getVelocityZ() == 0.0)
             {
                 concealVelocity = false;
                 return;
@@ -135,7 +135,7 @@ public class VelocityModule extends Toggleable
             }
             else if (modeConfig.getValue() == VelocityMode.NORMAL)
             {
-                Vec3d velocity = packet.playerKnockback().orElseGet(() -> new Vec3d(0, 0, 0));
+                Vec3d velocity = packet.playerKnockback().orElse(Vec3d.ZERO);
                 ((IExplosionS2CPacket) event.getPacket()).setPlayerKnockback(Optional.of(new Vec3d(
                         velocity.x * (horizontalConfig.getValue() / 100f),
                         velocity.y * (verticalConfig.getValue() / 100f),
