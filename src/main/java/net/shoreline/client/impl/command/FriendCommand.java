@@ -30,7 +30,7 @@ public class FriendCommand extends Command
                                     String friendName = StringArgumentType.getString(context, "friend name");
                                     if (action.equalsIgnoreCase("add"))
                                     {
-                                        if (Managers.SOCIAL.isFriend(friendName))
+                                        if (Managers.SOCIAL.isFriendInternal(friendName))
                                         {
                                             sendErrorChatMessage("Player is already friended!");
                                             return 0;
@@ -41,7 +41,7 @@ public class FriendCommand extends Command
 
                                     } else if (action.equalsIgnoreCase("del") || action.equalsIgnoreCase("delete") || action.equalsIgnoreCase("remove"))
                                     {
-                                        if (!Managers.SOCIAL.isFriend(friendName))
+                                        if (!Managers.SOCIAL.isFriendInternal(friendName))
                                         {
                                             sendErrorChatMessage("Player is not friended!");
                                             return 0;

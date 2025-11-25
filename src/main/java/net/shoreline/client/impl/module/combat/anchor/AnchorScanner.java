@@ -17,6 +17,7 @@ import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 import net.shoreline.client.util.entity.EntityUtil;
 
@@ -81,7 +82,7 @@ public class AnchorScanner extends AsyncWorldScanner
         }
 
         positionData.setSelfDamage(selfDamage);
-        for (EntityState entityState : getEntities())
+        for (LivingEntityState entityState : getLivingEntities())
         {
             Entity entity = entityState.getEntity();
             if (!(entity instanceof PlayerEntity) || entity == getLocalEntity().getEntity())
@@ -140,9 +141,9 @@ public class AnchorScanner extends AsyncWorldScanner
                 ? entity.getPos()
                 : MovementExtrapolation.extrapolatePosition(
                         this,
+                        box -> getBlockCollisions(entity, box),
                         entity.getVelocity(),
                         entity.getBoundingBox(),
-                        entity,
                         extrapolation);
 
         Box boundingBox = entity.getDimensions(entity.getPose()).getBoxAt(extrapolatedPos);

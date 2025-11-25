@@ -6,11 +6,13 @@ import java.util.Collection;
 
 public interface AsyncEntityView
 {
-    EntityState getLocalEntity();
+    LivingEntityState getLocalEntity();
 
     EntityState getEntityById(int id);
 
     Collection<EntityState> getOtherEntities(EntityState except, Box box);
 
     Collection<EntityState> getEntities();
+
+    Collection<LivingEntityState> getLivingEntities();
 }

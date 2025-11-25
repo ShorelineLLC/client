@@ -1,8 +1,12 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.LivingEntityState;
 
 @AllArgsConstructor
 @Data
@@ -13,7 +17,7 @@ public class CrystalData<T>
     private Vec3d crystalVec;
 
     @EqualsAndHashCode.Exclude
-    private EntityState target;
+    private LivingEntityState target;
 
     @EqualsAndHashCode.Exclude
     private double damageToTarget, damageToPlayer;
@@ -22,7 +26,7 @@ public class CrystalData<T>
     {
         public Immediate(T value,
                          Vec3d crystalVec,
-                         EntityState target)
+                         LivingEntityState target)
         {
             super(value, crystalVec, target, 0.0f, 0.0f);
         }
@@ -35,7 +39,7 @@ public class CrystalData<T>
 
         public WithRotation(T value,
                             Vec3d crystalVec,
-                            EntityState target,
+                            LivingEntityState target,
                             float[] angles)
         {
             super(value, crystalVec, target);

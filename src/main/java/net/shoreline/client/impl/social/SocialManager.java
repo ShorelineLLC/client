@@ -30,10 +30,15 @@ public class SocialManager extends GenericFeature
 
     public boolean isFriend(Entity entity)
     {
-        return SocialsModule.INSTANCE.getFriendsConfig().getValue() && isFriend(entity.getName().getString());
+        return SocialsModule.INSTANCE.getFriendsConfig().getValue() && isFriendInternal(entity.getName().getString());
     }
 
     public boolean isFriend(String friendName)
+    {
+        return SocialsModule.INSTANCE.getFriendsConfig().getValue() && isFriendInternal(friendName);
+    }
+
+    public boolean isFriendInternal(String friendName)
     {
         return friends.contains(friendName);
     }

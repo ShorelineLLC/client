@@ -1,14 +1,13 @@
 package net.shoreline.client.impl.block;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Map;
 
 @RequiredArgsConstructor
-public abstract class AsyncBlockScanner extends AsyncCollisionView
+public abstract class AsyncBlockScanner extends AsyncCollisionScanner
 {
     private final BlockPos.Mutable mPos = new BlockPos.Mutable();
 

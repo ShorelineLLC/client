@@ -2,9 +2,7 @@ package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -17,6 +15,7 @@ import net.shoreline.client.impl.module.combat.AutoMineModule;
 import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionScanner;
 import net.shoreline.client.util.entity.PlayerUtil;
 
@@ -46,7 +45,7 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
 
         for (EntityState state : getEntities())
         {
-            if (!state.isAlive() || !(state.getEntity() instanceof EndCrystalEntity))
+            if (!state.isAlive() || state.getEntityType() != EntityType.END_CRYSTAL)
             {
                 continue;
             }
@@ -75,24 +74,20 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
         float local = !PlayerUtil.isInSurvival(MinecraftClient.getInstance().player) ? 0.0f :
                 getExplosionDamage(crystal.getPos(), localPos, localBox, autoCrystal.getIgnoreTerrain().getValue());
 
-        boolean willKillPlayer = getLocalEntity().getTotalHealth() - local < 0.5f;
-        if (local > autoCrystal.getMaxSelfDamage().getValue() || willKillPlayer)
+        for (LivingEntityState entity : getLivingEntities())
         {
-            return;
-        }
-
-        for (EntityState entity : getEntities())
-        {
-            if (!(entity.getEntity() instanceof LivingEntity) || !autoCrystal.canTargetEntity(entity.getEntity()))
+            if (Managers.SOCIAL.isFriend(entity.getName())
+                    || entity.getTotalArmor() <= 0 && !autoCrystal.getTargetNakeds().getValue()
+                    || !autoCrystal.canTargetEntity(entity.getEntityType()))
             {
                 continue;
             }
 
             int ticks = autoCrystal.getExtrapolateTicks().getValue();
             Vec3d entityPos = ticks <= 0 ? entity.getPos() : MovementExtrapolation.extrapolatePosition(this,
+                    box -> getBlockCollisions(entity, box),
                     entity.getVelocity(),
                     entity.getBoundingBox(),
-                    entity.getEntity(),
                     ticks);
 
             double entityDist = crystal.squaredDistanceTo(entityPos);
@@ -125,7 +120,7 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
 
     public boolean isAntiSurroundPos(BlockPos blockPos)
     {
-        if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
+        if (!autoCrystal.getTargetItems().getValue() || !AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
             return false;
         }
@@ -145,7 +140,7 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
         if (currentMine.isDoneMining())
         {
             BlockPos minePos = currentMine.getBlockPos();
-            EntityState state = getEntityById(target.getId());
+            LivingEntityState state = (LivingEntityState) getEntityById(target.getId());
 
             float baseDamage = getExplosionDamage(minePos.toBottomCenterPos(),
                     state.getPos(),
@@ -153,7 +148,11 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
                     autoCrystal.getIgnoreTerrain().getValue(),
                     Set.of(minePos));
 
-            baseDamage *= 0.11f; // We have to assume armor here...
+            if (state.getTotalArmor() > 0)
+            {
+                baseDamage *= 0.11f; // We have to assume armor here...
+            }
+
             if (baseDamage < autoCrystal.getMinDamage().getValue())
             {
                 return false;
@@ -161,18 +160,20 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
 
             for (EntityState entityState : getOtherEntities(null, new Box(minePos)))
             {
-                if (entityState.getEntity() instanceof ItemEntity)
+                if (entityState.getEntityType() != EntityType.ITEM)
                 {
-                    float damage = getExplosionDamage(blockPos.toBottomCenterPos(),
-                            entityState.getPos(),
-                            entityState.getBoundingBox(),
-                            false,
-                            Set.of(minePos));
+                    continue;
+                }
 
-                    if (damage >= 5.0f)
-                    {
-                        return true;
-                    }
+                float damage = getExplosionDamage(blockPos.toBottomCenterPos(),
+                        entityState.getPos(),
+                        entityState.getBoundingBox(),
+                        false,
+                        Set.of(minePos));
+
+                if (damage >= 5.0f)
+                {
+                    return true;
                 }
             }
         }

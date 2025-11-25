@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AsyncEntityScanner implements AsyncEntityView
 {
-    protected EntityState localEntity;
+    protected LivingEntityState localEntity;
     protected final ConcurrentMap<Integer, EntityState> entities = new ConcurrentHashMap<>();
 
     public void createEntityLookup(EntityView world, Vec3d c)
@@ -35,12 +35,13 @@ public abstract class AsyncEntityScanner implements AsyncEntityView
             addEntityLookup(entity);
         }
 
-        localEntity = new EntityState(localPlayer);
+        localEntity = new LivingEntityState(localPlayer);
     }
 
     public void addEntityLookup(Entity entity)
     {
-        entities.put(entity.getId(), new EntityState(entity));
+        entities.put(entity.getId(), entity instanceof LivingEntity livingEntity ?
+                new LivingEntityState(livingEntity) : new EntityState(entity));
     }
 
     public void clearEntityLookup()
@@ -49,7 +50,7 @@ public abstract class AsyncEntityScanner implements AsyncEntityView
     }
 
     @Override
-    public EntityState getLocalEntity()
+    public LivingEntityState getLocalEntity()
     {
         return localEntity;
     }
@@ -84,6 +85,15 @@ public abstract class AsyncEntityScanner implements AsyncEntityView
     public Collection<EntityState> getEntities()
     {
         return entities.values();
+    }
+
+    @Override
+    public Collection<LivingEntityState> getLivingEntities()
+    {
+        return getEntities().stream()
+            .filter(e -> e instanceof LivingEntityState)
+            .map(e -> (LivingEntityState) e)
+            .toList();
     }
 
     protected abstract float getRadius();

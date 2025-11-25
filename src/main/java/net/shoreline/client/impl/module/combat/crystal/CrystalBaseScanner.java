@@ -1,16 +1,16 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.block.AsyncBlockState;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.util.entity.PlayerUtil;
 
 import java.util.List;
@@ -48,24 +48,20 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         float local = !PlayerUtil.isInSurvival(MinecraftClient.getInstance().player) ? 0.0f :
                 getExplosionDamage(explosionCenter, localPos, localBox, autoCrystal.getIgnoreTerrain().getValue());
 
-        boolean willKillPlayer = getLocalEntity().getTotalHealth() - local < 0.5f;
-        if (local > autoCrystal.getMaxSelfDamage().getValue() || willKillPlayer)
+        for (LivingEntityState entity : getLivingEntities())
         {
-            return;
-        }
-
-        for (EntityState entity : getEntities())
-        {
-            if (!(entity.getEntity() instanceof LivingEntity) || !autoCrystal.canTargetEntity(entity.getEntity()))
+            if (Managers.SOCIAL.isFriend(entity.getName())
+                    || entity.getTotalArmor() <= 0 && !autoCrystal.getTargetNakeds().getValue()
+                    || !autoCrystal.canTargetEntity(entity.getEntityType()))
             {
                 continue;
             }
 
             int ticks = autoCrystal.getExtrapolateTicks().getValue();
             Vec3d entityPos = ticks <= 0 ? entity.getPos() : MovementExtrapolation.extrapolatePosition(this,
+                    box -> getBlockCollisions(entity, box),
                     entity.getVelocity(),
                     entity.getBoundingBox(),
-                    entity.getEntity(),
                     ticks);
 
             double blockDist = explosionCenter.squaredDistanceTo(entityPos);
@@ -107,8 +103,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
     {
         for (EntityState entity1 : getOtherEntities(null, box))
         {
-            Entity entity = entity1.getEntity();
-            if (!autoCrystal.canIgnoreEntity(entity, false))
+            if (!autoCrystal.canIgnoreEntity(entity1.getEntityType(), false))
             {
                 return true;
             }

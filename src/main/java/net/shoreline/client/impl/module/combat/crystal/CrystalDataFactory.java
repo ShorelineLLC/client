@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.LivingEntityState;
 
 @RequiredArgsConstructor
 public class CrystalDataFactory
@@ -12,7 +13,7 @@ public class CrystalDataFactory
 
     public <T> CrystalData<T> createData(T value,
                                          Vec3d crystalVec,
-                                         EntityState target,
+                                         LivingEntityState target,
                                          float damageToTarget,
                                          float damageToPlayer)
     {

@@ -183,7 +183,7 @@ public class ShadersModule extends RenderModule
     @EventListener
     public void onRenderEntity(RenderEntityWorldEvent event)
     {
-        if (!shouldRenderShader(event.getEntity()))
+        if (!shouldRenderShader(event.getEntity()) || shaderManager == null)
         {
             return;
         }

@@ -58,7 +58,7 @@ public abstract class AsyncWorldScanner extends AsyncBlockScanner implements Asy
     }
 
     @Override
-    public EntityState getLocalEntity()
+    public LivingEntityState getLocalEntity()
     {
         return entityScanner.getLocalEntity();
     }
@@ -79,5 +79,11 @@ public abstract class AsyncWorldScanner extends AsyncBlockScanner implements Asy
     public Collection<EntityState> getEntities()
     {
         return entityScanner.getEntities();
+    }
+
+    @Override
+    public Collection<LivingEntityState> getLivingEntities()
+    {
+        return entityScanner.getLivingEntities();
     }
 }

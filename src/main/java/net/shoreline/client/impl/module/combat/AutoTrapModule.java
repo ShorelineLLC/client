@@ -107,9 +107,9 @@ public class AutoTrapModule extends TrapModule
 
         Vec3d targetPos = extrapolateTicks.getValue() <= 0 ? trapTarget.getPos() :
                 MovementExtrapolation.extrapolatePosition(mc.world,
+                        box -> mc.world.getBlockCollisions(trapTarget, box),
                         trapTarget.getVelocity(),
                         trapTarget.getBoundingBox(),
-                        trapTarget,
                         extrapolateTicks.getValue(),
                         false);
 

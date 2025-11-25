@@ -40,6 +40,7 @@ import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.combat.crystal.CrystalOptimizer;
+import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkUtil;
@@ -52,6 +53,7 @@ import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionUtil;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.PerSecond;
@@ -394,12 +396,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             }
         }
 
-        if (predictPlace.getValue() != Timing.INSTANT)
-        {
-            return;
-        }
-
-        if (currentPlace != null && currentPlace.getDamageToPlayer() > 0.0f)
+        if (predictPlace.getValue() != Timing.INSTANT || currentPlace != null)
         {
             return;
         }
@@ -505,8 +502,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 dataNametag = "AS";
             } else
             {
-                double damage = ExplosionUtil.getAppliedDamageToEntity(placeData.getTarget().getEntity(), (float) placeData.getDamageToTarget());
-                dataNametag = DECIMAL.format(damage);
+                dataNametag = DECIMAL.format(placeData.getDamageToTarget());
             }
 
             Managers.RENDER.renderNametag(event.getMatrixStack(),
@@ -530,9 +526,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (breakDelay.getValue() == 0 || attackTimer.hasPassed(breakDelay.getValue()))
         {
-            EndCrystalEntity crystalEntity = (EndCrystalEntity) crystalState.getEntity();
-            attackCrystal(crystalEntity, hand);
-
+            attackCrystal(crystalState.getId(), hand);
             attackTimer.reset();
         }
 
@@ -593,9 +587,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return null;
         }
 
-        EntityState targetState = new EntityState(target);
-        double damage = ExplosionUtil.crystalDamageToEntity(mc.world, target,
-                minePos.toBottomCenterPos(), ignoreTerrain.getValue(), Set.of(minePos));
+        LivingEntityState targetState = new LivingEntityState(target);
+        double damage = ExplosionUtil.crystalDamageToEntity(mc.world,
+                target,
+                minePos.toBottomCenterPos(),
+                ignoreTerrain.getValue(),
+                Set.of(minePos));
 
         if (damage < minDamage.getValue())
         {
@@ -611,11 +608,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         return new CrystalData.WithRotation<>(placePos, crystalVec, targetState, rotations);
-    }
-
-    private void attackCrystal(EndCrystalEntity crystal, Hand hand)
-    {
-        attackCrystal(crystal.getId(), hand);
     }
 
     private void attackCrystal(int crystalId, Hand hand)
@@ -755,42 +747,53 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         CrystalData<T> bestCrystal = null;
         float bestDamage = 0.0f;
+        float bestSelfDamage = 0.0f;
 
         for (CrystalData<T> data : crystals)
         {
-            LivingEntity entity = (LivingEntity) data.getTarget().getEntity();
+            LivingEntityState state = data.getTarget();
+            if (state == null || state.isDead())
+            {
+                continue;
+            }
+
+            Entity entity = state.getEntity();
+            if (!(entity instanceof LivingEntity target) || target.isDead())
+            {
+                continue;
+            }
+
             float baseDamage = (float) data.getDamageToTarget();
+            float baseSelfDamage = (float) data.getDamageToPlayer();
 
-            if (entity.isDead())
+            if (baseDamage <= 0.0f || baseSelfDamage > maxSelfDamage.getValue())
             {
                 continue;
             }
 
-            if (baseDamage < bestDamage)
+            float appliedSelfDamage = ExplosionUtil.getAppliedDamageToEntity(mc.player, baseSelfDamage);
+            if (appliedSelfDamage > maxSelfDamage.getValue() || DamageUtil.getHealth(mc.player) - appliedSelfDamage < 0.5f)
             {
                 continue;
             }
 
-            float damage = ExplosionUtil.getAppliedDamageToEntity(entity, baseDamage);
-            if (damage > bestDamage)
+            float appliedTargetDamage = ExplosionUtil.getAppliedDamageToEntity(target, baseDamage);
+            if (appliedTargetDamage <= bestDamage)
             {
-                bestDamage = damage;
-                bestCrystal = data;
+                continue;
             }
+
+            bestDamage = appliedTargetDamage;
+            bestSelfDamage = appliedSelfDamage;
+            bestCrystal = data;
         }
 
         if (bestDamage < minDamage.getValue())
         {
-            if (targetItems.getValue())
+            for (CrystalData<T> data : crystals)
             {
-                for (CrystalData<T> data : crystals)
+                if (data instanceof CrystalData.Immediate<T> && !data.getTarget().isDead())
                 {
-                    LivingEntity entity = (LivingEntity) data.getTarget().getEntity();
-                    if (entity.isDead() || !(data instanceof CrystalData.Immediate<T>))
-                    {
-                        continue;
-                    }
-
                     return data;
                 }
             }
@@ -798,8 +801,17 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return null;
         }
 
+        if (bestCrystal == null)
+        {
+            return null;
+        }
+
+        bestCrystal.setDamageToTarget(bestDamage);
+        bestCrystal.setDamageToPlayer(bestSelfDamage);
+
         return bestCrystal;
     }
+
 
     public boolean canUseOnBlock(BlockPos blockPos)
     {
@@ -833,7 +845,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         for (Entity entity : WorldUtil.collectEntitiesInBox(box))
         {
-            if (!canIgnoreEntity(entity, ignoreItems))
+            if (!canIgnoreEntity(entity.getType(), ignoreItems))
             {
                 return true;
             }
@@ -842,9 +854,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return false;
     }
 
-    public boolean canIgnoreEntity(Entity entity, boolean ignoreItems)
+    public boolean canIgnoreEntity(EntityType<?> entity, boolean ignoreItems)
     {
-        return entity instanceof ExperienceOrbEntity || entity instanceof EndCrystalEntity crystal || ignoreItems && entity instanceof ItemEntity;
+        return entity == EntityType.EXPERIENCE_ORB || entity == EntityType.END_CRYSTAL || ignoreItems && entity == EntityType.ITEM;
     }
 
     public Box getCrystalBox(BlockPos blockPos)
@@ -871,18 +883,11 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                         || itemStack.getItem().getTranslationKey().contains("axe")).getSlot();
     }
 
-    public boolean canTargetEntity(Entity entity)
+    public boolean canTargetEntity(EntityType<?> entityType)
     {
-        if (Managers.SOCIAL.isFriend(entity))
-        {
-            return false;
-        }
-
-        return entity instanceof PlayerEntity player
-                && targetPlayers.getValue()
-                && (targetNakeds.getValue() || player.getArmor() > 0)
-                || EntityUtil.isHostile(entity) && targetHostiles.getValue()
-                || EntityUtil.isPassive(entity) && targetPassives.getValue();
+        return entityType == EntityType.PLAYER && targetPlayers.getValue()
+                || EntityUtil.isHostile(entityType) && targetHostiles.getValue()
+                || EntityUtil.isPassive(entityType) && targetPassives.getValue();
     }
 
     public boolean isRunning()

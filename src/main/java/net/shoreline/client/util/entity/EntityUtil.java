@@ -1,9 +1,7 @@
 package net.shoreline.client.util.entity;
 
 import lombok.experimental.UtilityClass;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.Monster;
@@ -26,6 +24,18 @@ public class EntityUtil
     public boolean isPassive(Entity entity)
     {
         return entity instanceof PassiveEntity || entity instanceof AmbientEntity || entity instanceof SquidEntity;
+    }
+
+    public boolean isHostile(EntityType<?> type)
+    {
+        return type.getSpawnGroup() == SpawnGroup.MONSTER;
+    }
+
+    public boolean isPassive(EntityType<?> type)
+    {
+        SpawnGroup group = type.getSpawnGroup();
+        return group == SpawnGroup.CREATURE || group == SpawnGroup.AMBIENT
+                || type == EntityType.SQUID || type == EntityType.GLOW_SQUID;
     }
 
     private boolean isNeutral(Entity entity)
