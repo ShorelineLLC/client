@@ -137,22 +137,7 @@ public class InteractManager extends NetworkHandler
         }
 
         interactions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
-
-        if (blocksPlaced.get() > interactConfig.getBptConfig().getValue())
-        {
-            return false;
-        }
-
-        Optional<Map.Entry<Interaction, Long>> interact = interactions.entrySet().stream()
-                .filter(d -> d.getKey().getPos().equals(blockPos))
-                .findFirst();
-
-        if (interact.isPresent() && System.currentTimeMillis() - interact.get().getValue() < interactConfig.getInteractDelay().getValue())
-        {
-            return false;
-        }
-
-        if (isEntityBlocking(blockPos, interaction.getBlock(), true))
+        if (check(blockPos) || isEntityBlocking(blockPos, interaction.getBlock(), true))
         {
             return false;
         }
@@ -165,6 +150,20 @@ public class InteractManager extends NetworkHandler
         }
 
         return result;
+    }
+
+    public boolean check(BlockPos blockPos)
+    {
+        if (blocksPlaced.get() > interactConfig.getBptConfig().getValue())
+        {
+            return true;
+        }
+
+        Optional<Map.Entry<Interaction, Long>> interact = interactions.entrySet().stream()
+                .filter(d -> d.getKey().getPos().equals(blockPos))
+                .findFirst();
+
+        return interact.isPresent() && System.currentTimeMillis() - interact.get().getValue() < interactConfig.getInteractDelay().getValue();
     }
 
     public boolean canPlaceBlock(BlockPos blockPos, Block block)

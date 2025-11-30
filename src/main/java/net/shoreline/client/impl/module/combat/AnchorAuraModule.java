@@ -38,15 +38,9 @@ import java.util.concurrent.ConcurrentMap;
 @Getter
 public class AnchorAuraModule extends PlacerModule
 {
-    Config<AnchorMode> anchorMode = new EnumConfig.Builder<AnchorMode>("Mode")
-            .setValues(AnchorMode.values()).setDefaultValue(AnchorMode.FAST)
-            .setDescription("Fast will explode placed anchors no matter what. Smart will " +
-                            "perform a new calculation for every stage of anchor explosions")
-            .build();
     Config<Integer> timeout = new NumberConfig.Builder<Integer>("Timeout")
             .setMin(50).setDefaultValue(250).setMax(2000)
-            .setDescription("The time we will use before we consider a anchor unbreakable.")
-            .setVisible(() -> anchorMode.getValue() == AnchorMode.FAST).build();
+            .setDescription("The time we will use before we consider a anchor unbreakable.").build();
     Config<Float> maxSelfPlace = new NumberConfig.Builder<Float>("MaxSelfPlace")
             .setMin(0.0f).setDefaultValue(8.0f).setMax(36.0f)
             .setDescription("If self damage is over this value a position will not be considered.")
@@ -83,7 +77,7 @@ public class AnchorAuraModule extends PlacerModule
     /** Manages anchor calculations */
     private final AnchorManager manager;
     /** For mode Fast. A Map of placed anchors that we can explode */
-    private final Map<AnchorData, Long> placed = new TreeMap<>();
+    private final Map<BlockPos, AnchorData> placed = new TreeMap<>();
     /** The latest data. If no valid data was found last tick this will return null */
     private Collection<AnchorData> latestData;
 
@@ -108,30 +102,27 @@ public class AnchorAuraModule extends PlacerModule
     @EventListener
     public void onClientRotation(ClientRotationEvent event)
     {
-        if (anchorMode.getValue() == AnchorMode.FAST)
+        Iterator<Map.Entry<BlockPos, AnchorData>> it = placed.entrySet().iterator();
+        while (it.hasNext())
         {
-            Iterator<Map.Entry<AnchorData, Long>> it = placed.entrySet().iterator();
-            while (it.hasNext())
+            AnchorData data = it.next().getValue();
+            if (System.currentTimeMillis() - data.getTime()
+                    > timeout.getValue())
             {
-                Map.Entry<AnchorData, Long> entry = it.next();
-                if (System.currentTimeMillis() - entry.getValue()
-                        > timeout.getValue())
-                {
-                    it.remove();
-                    continue;
-                }
+                it.remove();
+                continue;
+            }
 
-                // this looks ass.
-                boolean[] place = place(entry.getKey());
-                if (place[0])
-                {
-                    if (place[1])
-                    {
-                        it.remove();
-                    }
+            if (Managers.INTERACT.check(data.getPos()))
+            {
+                continue;
+            }
 
-                    return;
-                }
+            boolean[] place = place(data);
+            if (place[1])
+            {
+                it.remove();
+                return;
             }
         }
 
@@ -140,23 +131,31 @@ public class AnchorAuraModule extends PlacerModule
             return;
         }
 
-        if (anchorMode.getValue() == AnchorMode.FAST)
-        {
-            scanData();
-        }
-
         for (AnchorData data : latestData)
         {
+            BlockPos pos = data.getPos();
             if (data.isAnchor())
             {
-                if (anchorMode.getValue() == AnchorMode.FAST)
+                PlayerEntity target = data.getTarget();
+                BlockState state = mc.world.getBlockState(pos);
+                if (state.getBlock() != Blocks.RESPAWN_ANCHOR)
                 {
                     continue;
                 }
 
-                if (place(data)[0])
+                AnchorScanner scanner = manager.getScanner();
+                float damage     = scanner.getDamage(pos, target);
+                float selfDamage = scanner.getDamage(pos, mc.player);
+
+                if (selfDamage > maxSelfBreak.getValue())
                 {
-                    break;
+                    continue;
+                }
+
+                if (damage > minBreakDamage.getValue()
+                        || damage > target.getHealth() + target.getAbsorptionAmount())
+                {
+                    placed.put(pos, data.copy());
                 }
             }
             else
@@ -167,45 +166,13 @@ public class AnchorAuraModule extends PlacerModule
                     break;
                 }
 
-                runSingleBlockPlacement(data.getPos(), Blocks.RESPAWN_ANCHOR, slot);
-                if (anchorMode.getValue() == AnchorMode.FAST)
+                if (runSingleBlockPlacement(pos, Blocks.RESPAWN_ANCHOR, slot))
                 {
-                    placed.put(data.copy(), System.currentTimeMillis());
+                    placed.put(pos, data.copy());
                 }
             }
 
             break;
-        }
-    }
-
-    public void scanData()
-    {
-        for (AnchorData data : latestData)
-        {
-            if (data.isAnchor())
-            {
-                PlayerEntity target = data.getTarget();
-                BlockState state = mc.world.getBlockState(data.getPos());
-                if (state.getBlock() != Blocks.RESPAWN_ANCHOR)
-                {
-                    continue;
-                }
-
-                AnchorScanner scanner = manager.getScanner();
-                float damage     = scanner.getDamage(data.getPos(), target);
-                float selfDamage = scanner.getDamage(data.getPos(), mc.player);
-
-                if (selfDamage > maxSelfBreak.getValue())
-                {
-                    continue;
-                }
-
-                if (damage > minBreakDamage.getValue()
-                        || damage > target.getHealth() + target.getAbsorptionAmount())
-                {
-                    placed.put(data.copy(), System.currentTimeMillis());
-                }
-            }
         }
     }
 
@@ -232,7 +199,7 @@ public class AnchorAuraModule extends PlacerModule
 
         if (!Managers.INTERACT.startPlacement(slot))
         {
-            return result;
+            return new boolean[]{false, false};
         }
 
         Interaction interaction = Interaction.builder()
@@ -266,11 +233,5 @@ public class AnchorAuraModule extends PlacerModule
     public boolean isStrictDirection()
     {
         return interactConfig.getStrictDirection().getValue();
-    }
-
-    private enum AnchorMode
-    {
-        SMART,
-        FAST
     }
 }

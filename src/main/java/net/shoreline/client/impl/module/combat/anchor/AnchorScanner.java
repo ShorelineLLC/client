@@ -62,7 +62,7 @@ public class AnchorScanner extends AsyncWorldScanner
             }
         }
 
-        AnchorData positionData = new AnchorData(pos);
+        AnchorData positionData = new AnchorData(pos, System.currentTimeMillis());
         if (block == Blocks.RESPAWN_ANCHOR)
         {
             positionData.setAnchor(true);

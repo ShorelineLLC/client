@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 public class AnchorData implements Comparable<AnchorData>
 {
     private final BlockPos pos;
+    private final Long time;
 
     private PlayerEntity target;
     private boolean anchor;
@@ -31,7 +32,7 @@ public class AnchorData implements Comparable<AnchorData>
 
     public AnchorData copy()
     {
-        AnchorData data = new AnchorData(pos);
+        AnchorData data = new AnchorData(pos, System.currentTimeMillis());
         data.setTarget(target);
         data.setAnchor(anchor);
         data.setPlaced(placed);
