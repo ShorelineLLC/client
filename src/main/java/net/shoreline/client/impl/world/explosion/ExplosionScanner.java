@@ -13,10 +13,10 @@ public abstract class ExplosionScanner extends AsyncWorldScanner
 {
     private final float explosionPower;
 
-    protected float getExplosionDamage(final Vec3d pos,
-                                       final Vec3d entityPos,
-                                       final Box boundingBox,
-                                       final boolean ignoreTerrain)
+    public float getExplosionDamage(final Vec3d pos,
+                                    final Vec3d entityPos,
+                                    final Box boundingBox,
+                                    final boolean ignoreTerrain)
     {
         return ExplosionTrace.getDamageToPos(this,
                 pos,
@@ -26,11 +26,11 @@ public abstract class ExplosionScanner extends AsyncWorldScanner
                 ignoreTerrain);
     }
 
-    protected float getExplosionDamage(final Vec3d pos,
-                                       final Vec3d entityPos,
-                                       final Box boundingBox,
-                                       final boolean ignoreTerrain,
-                                       final Set<BlockPos> ignoredBlocks)
+    public float getExplosionDamage(final Vec3d pos,
+                                    final Vec3d entityPos,
+                                    final Box boundingBox,
+                                    final boolean ignoreTerrain,
+                                    final Set<BlockPos> ignoredBlocks)
     {
         return ExplosionTrace.getDamageToPos(this,
                 pos,

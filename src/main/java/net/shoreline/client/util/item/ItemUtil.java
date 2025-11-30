@@ -25,7 +25,11 @@ public class ItemUtil
 
     public float getStackPercent(ItemStack stack)
     {
-        int damage = stack.getMaxDamage() - stack.getDamage();
-        return (float) damage / stack.getMaxDamage();
+        return (float) getDurability(stack) / stack.getMaxDamage();
+    }
+
+    public int getDurability(ItemStack stack)
+    {
+        return stack.getMaxDamage() - stack.getDamage();
     }
 }

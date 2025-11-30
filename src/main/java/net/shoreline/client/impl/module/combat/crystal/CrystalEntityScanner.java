@@ -25,8 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class CrystalEntityScanner extends ExplosionScanner
 {
-    private static final EntityDimensions ITEM_DIMENSIONS = EntityDimensions.fixed(0.25f, 0.25f);
-
     protected final AutoCrystalModule autoCrystal;
     protected final CrystalDataFactory factory;
 
@@ -36,7 +34,7 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
     {
         super(12.0f);
         this.autoCrystal = autoCrystal;
-        this.factory = new CrystalDataFactory(this);
+        this.factory = new CrystalDataFactory(autoCrystal, this);
     }
 
     public List<CrystalData<?>> scanCrystalEntities()
@@ -116,81 +114,5 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
     protected int getRadius()
     {
         return (int) Math.ceil(autoCrystal.getBreakRange().getValue() + 1.0f);
-    }
-
-    public boolean isAntiSurroundPos(BlockPos blockPos)
-    {
-        if (!autoCrystal.getTargetItems().getValue() || !AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
-        {
-            return false;
-        }
-
-        PlayerEntity target = Managers.TARGETING.getTarget();
-        if (target == null)
-        {
-            return false;
-        }
-
-        MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-        if (currentMine == null || SpeedMineModule.INSTANCE.isManualMining())
-        {
-            return false;
-        }
-
-        if (currentMine.isDoneMining())
-        {
-            BlockPos minePos = currentMine.getBlockPos();
-            LivingEntityState state = (LivingEntityState) getEntityById(target.getId());
-
-            float baseDamage = getExplosionDamage(minePos.toBottomCenterPos(),
-                    state.getPos(),
-                    state.getBoundingBox(),
-                    autoCrystal.getIgnoreTerrain().getValue(),
-                    Set.of(minePos));
-
-            if (state.getTotalArmor() > 0)
-            {
-                baseDamage *= 0.11f; // We have to assume armor here...
-            }
-
-            if (baseDamage < autoCrystal.getMinDamage().getValue())
-            {
-                return false;
-            }
-
-            for (EntityState entityState : getOtherEntities(null, new Box(minePos)))
-            {
-                if (entityState.getEntityType() != EntityType.ITEM)
-                {
-                    continue;
-                }
-
-                float damage = getExplosionDamage(blockPos.toBottomCenterPos(),
-                        entityState.getPos(),
-                        entityState.getBoundingBox(),
-                        false,
-                        Set.of(minePos));
-
-                if (damage >= 5.0f)
-                {
-                    return true;
-                }
-            }
-        }
-
-        else if (currentMine.isAlmostDone(autoCrystal.getPrePlace().getValue()))
-        {
-            BlockPos minePos = currentMine.getBlockPos();
-            Vec3d simPos = minePos.toBottomCenterPos();
-            float damage = getExplosionDamage(blockPos.toBottomCenterPos(),
-                    simPos,
-                    ITEM_DIMENSIONS.getBoxAt(simPos),
-                    false,
-                    Set.of(minePos));
-
-            return damage >= 5.0f;
-        }
-
-        return false;
     }
 }

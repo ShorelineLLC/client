@@ -7,6 +7,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -17,15 +18,19 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.shoreline.client.impl.module.client.InventoryModule;
 import net.shoreline.client.util.item.EnchantUtil;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
 public class ExplosionUtil
@@ -162,5 +167,27 @@ public class ExplosionUtil
         }
 
         return Math.max(damage, 0.0f);
+    }
+
+    public int getArmorDurabilityDamage(ItemStack stack, float damage)
+    {
+        int dmg = (int) (damage / 4.0f);
+        if (dmg < 1)
+        {
+            dmg = 1;
+        }
+
+        int level = EnchantUtil.getLevel(Enchantments.UNBREAKING, stack);
+        double p = 0.6 + 0.4 / (level + 1.0);
+        int result = 0;
+        for (int i = 0; i < dmg; i++)
+        {
+            if (ThreadLocalRandom.current().nextDouble() < p)
+            {
+                result++;
+            }
+        }
+
+        return result;
     }
 }

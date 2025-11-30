@@ -18,7 +18,7 @@ public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
         this.baseScanner = new CrystalBaseScanner(autoCrystalModule);
     }
 
-    public void runCalcs()
+    public void runCalc()
     {
         if (currentResult == null || currentResult.isDone())
         {

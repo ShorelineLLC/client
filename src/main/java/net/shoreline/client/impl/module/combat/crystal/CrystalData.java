@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 
@@ -22,13 +23,40 @@ public class CrystalData<T>
     @EqualsAndHashCode.Exclude
     private double damageToTarget, damageToPlayer;
 
+    @EqualsAndHashCode.Exclude
+    private final Animation animation = new Animation(true, 250);
+
+    public void copyFrom(CrystalData<T> crystalData)
+    {
+        this.crystalVec = crystalData.getCrystalVec();
+        this.target = crystalData.getTarget();
+        this.damageToTarget = crystalData.getDamageToTarget();
+        this.damageToPlayer = crystalData.getDamageToPlayer();
+    }
+
+    @Getter
     public static class Immediate<T> extends CrystalData<T>
     {
+        private final String tag;
+
+        public Immediate(String tag,
+                         T value,
+                         Vec3d crystalVec,
+                         LivingEntityState target,
+                         float damageToTarget,
+                         float damageToPlayer)
+        {
+            super(value, crystalVec, target, damageToTarget, damageToPlayer);
+            this.tag = tag;
+        }
+
         public Immediate(T value,
                          Vec3d crystalVec,
-                         LivingEntityState target)
+                         LivingEntityState target,
+                         float damageToTarget,
+                         float damageToPlayer)
         {
-            super(value, crystalVec, target, 0.0f, 0.0f);
+            this(null, value, crystalVec, target, damageToTarget, damageToPlayer);
         }
     }
 
@@ -42,7 +70,7 @@ public class CrystalData<T>
                             LivingEntityState target,
                             float[] angles)
         {
-            super(value, crystalVec, target);
+            super("AS", value, crystalVec, target, 0.1f, 0.0f);
             this.angles = angles;
         }
     }

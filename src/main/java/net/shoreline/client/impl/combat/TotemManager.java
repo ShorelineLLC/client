@@ -44,9 +44,9 @@ public class TotemManager extends GenericFeature
             {
                 case 3 ->
                 {
+                    clearTotems(entity);
                     EventBus.INSTANCE.dispatch(new EntityDeathEvent(entity,
                             totems.getOrDefault(entity.getUuid(), TotemData.EMPTY).getPops()));
-                    totems.remove(entity.getUuid());
                 }
                 case 35 ->
                 {
@@ -70,6 +70,11 @@ public class TotemManager extends GenericFeature
     public void onDisconnect(WorldEvent.Disconnect event)
     {
         totems.clear();
+    }
+
+    public void clearTotems(Entity entity)
+    {
+        totems.remove(entity.getUuid());
     }
 
     public int getTotems(Entity entity)

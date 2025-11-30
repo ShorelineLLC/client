@@ -3,7 +3,11 @@ package net.shoreline.client.impl.module.combat;
 import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -16,6 +20,7 @@ import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
@@ -139,33 +144,33 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDefaultValue(false).build();
     Config<Integer> prePlace = new NumberConfig.Builder<Integer>("PrePlace")
             .setMin(0).setMax(10).setDefaultValue(5).setFormat(" ticks")
-            .setDescription("Ticks before to place crystals to clear items")
+            .setDescription("Ticks before predicting placement")
             .setVisible(() -> targetItems.getValue()).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
             .addAll(predictPlace, targetItems, prePlace).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
-            .setMin(1.0f).setMax(10.0f).setDefaultValue(4.0f)
+            .setMin(2.0f).setMax(10.0f).setDefaultValue(4.0f)
             .setDescription("The minimum damage to consider crystals").build();
     Config<Float> maxSelfDamage = new NumberConfig.Builder<Float>("MaxSelfDamage")
-            .setMin(1.0f).setMax(20.0f).setDefaultValue(12.0f)
+            .setMin(2.0f).setMax(20.0f).setDefaultValue(12.0f)
             .setDescription("The maximum damage a crystal can do to the player").build();
     Config<Boolean> overrideConfig = new BooleanConfig.Builder("Override")
             .setDescription("Allows overriding minimum damage (e.g. allows crystal spam)")
             .setDefaultValue(true).build();
-    Config<Integer> minArmorDamage = new NumberConfig.Builder<Integer>("MinArmorDamage")
-            .setMin(0).setMax(100).setDefaultValue(5).setFormat("%")
+    Config<Float> armorMultiplier = new NumberConfig.Builder<Float>("ArmorMultiplier")
+            .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f).setFormat("x")
             .setVisible(() -> overrideConfig.getValue())
             .setDescription("The minimum armor damage to consider spamming crystals").build();
     Config<Float> damageMultiplier = new NumberConfig.Builder<Float>("DamageMultiplier")
-            .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f)
+            .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f).setFormat("x")
             .setVisible(() -> overrideConfig.getValue())
             .setDescription("Place if we can kill target in this many crystals").build();
     Config<Boolean> ignoreTerrain = new BooleanConfig.Builder("IgnoreTerrain")
             .setDescription("Ignores explodable terrain during damage calculations")
             .setDefaultValue(false).build();
     Config<Void> damageConfig = new ConfigGroup.Builder("Damage")
-            .addAll(minDamage, maxSelfDamage, overrideConfig, minArmorDamage,
+            .addAll(minDamage, maxSelfDamage, overrideConfig, armorMultiplier,
                     damageMultiplier, ignoreTerrain).build();
 
     Config<RotateMode> rotateConfig = new EnumConfig.Builder<RotateMode>("Rotate")
@@ -206,6 +211,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private final SwapHandler autoSwapHandler = new SwapHandler();
     private final Timer attackTimer = new NanoTimer();
+    private final Timer attackSpeedTimer = new NanoTimer();
 
     private final ConcurrentMap<Integer, Long> attackPackets = new ConcurrentHashMap<>();
 
@@ -217,7 +223,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     private final QueueAverage breakTime = new QueueAverage(20, 1000L);
     private final PerSecond cps = new PerSecond();
 
-    private final ConcurrentMap<CrystalData<BlockPos>, Animation> fadeAnimations = new ConcurrentHashMap<>();
+    private final ConcurrentMap<BlockPos, CrystalData<BlockPos>> fadeAnimations = new ConcurrentHashMap<>();
 
     public AutoCrystalModule()
     {
@@ -267,10 +273,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         List<CrystalData<BlockPos>> latestCrystalBases = crystalCalc.getBaseResults();
         List<CrystalData<EntityState>> latestCrystalEntities = crystalCalc.getEntityResults();
 
-        currentAttack = getBestData(latestCrystalEntities);
+        currentAttack = getBestCrystal(latestCrystalEntities);
 
         List<CrystalData<BlockPos>> placements = getPlacements(latestCrystalBases);
-        currentPlace = getBestData(basePlace.getValue() && placements.isEmpty() ? latestCrystalBases : placements);
+        currentPlace = getBestCrystal(basePlace.getValue() && placements.isEmpty() ? latestCrystalBases : placements);
     }
 
     @EventListener
@@ -282,7 +288,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
         
         crystalsPlaced.set(0);
-        crystalCalc.runCalcs();
+        crystalCalc.runCalc();
     }
 
     @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
@@ -476,40 +482,38 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     {
         if (currentPlace != null)
         {
-            fadeAnimations.put(currentPlace, new Animation(true, 250));
+            fadeAnimations.put(currentPlace.getValue(), currentPlace);
         }
 
-        for (Map.Entry<CrystalData<BlockPos>, Animation> entry : fadeAnimations.entrySet())
+        for (Map.Entry<BlockPos, CrystalData<BlockPos>> entry : fadeAnimations.entrySet())
         {
-            CrystalData<BlockPos> placeData = entry.getKey();
-            BlockPos placePos = placeData.getValue();
-            Animation anim = entry.getValue();
+            BlockPos placePos = entry.getKey();
+            CrystalData<BlockPos> placeData = entry.getValue();
+            Animation anim = placeData.getAnimation();
 
             if (anim.getFactor() <= 0.01)
             {
-                fadeAnimations.remove(placeData);
+                fadeAnimations.remove(placePos);
                 continue;
             }
 
-            float animFactor = (float) Easing.SMOOTH_STEP.ease(anim.getFactor());
+            double animFactor = Easing.SMOOTH_STEP.ease(anim.getFactor());
             anim.setState(false);
             BoxRender.FILL.render(event.getMatrixStack(),
-                    placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), animFactor);
+                    placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), (float) animFactor);
 
-            String dataNametag;
-            if (placeData instanceof CrystalData.Immediate<?>)
+            String dataNametag = DECIMAL.format(placeData.getDamageToTarget());
+            if (placeData instanceof CrystalData.Immediate<?> immediate)
             {
-                dataNametag = "AS";
-            } else
-            {
-                dataNametag = DECIMAL.format(placeData.getDamageToTarget());
+                String dataTag = immediate.getTag();
+                dataNametag = dataTag != null ? dataTag : dataNametag + "x";
             }
 
             Managers.RENDER.renderNametag(event.getMatrixStack(),
                     placePos.toCenterPos(),
                     0.003f,
                     dataNametag,
-                    ColorUtil.withTransparency(-1, animFactor));
+                    ColorUtil.withTransparency(Colors.WHITE, (float) animFactor));
         }
     }
 
@@ -738,80 +742,85 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }).toList();
     }
 
-    private <T> CrystalData<T> getBestData(List<CrystalData<T>> crystals)
+    private <T> CrystalData<T> getBestCrystal(List<CrystalData<T>> crystals)
+    {
+        CrystalData<T> bestCrystal = getBestCrystal(crystals, false);
+        if (bestCrystal == null || bestCrystal.getDamageToTarget() < minDamage.getValue())
+        {
+            return getBestCrystal(crystals, true);
+        }
+
+        return bestCrystal;
+    }
+
+    public <T extends CrystalData<?>> T getBestCrystal(List<T> crystals, boolean onlyImmediate)
     {
         if (crystals.isEmpty())
         {
             return null;
         }
 
-        CrystalData<T> bestCrystal = null;
-        float bestDamage = 0.0f;
-        float bestSelfDamage = 0.0f;
-
-        for (CrystalData<T> data : crystals)
+        T bestCrystal = null;
+        double bestDamage = 0.0f;
+        for (T data : crystals)
         {
-            LivingEntityState state = data.getTarget();
-            if (state == null || state.isDead())
+            if (onlyImmediate && !(data instanceof CrystalData.Immediate<?>))
             {
                 continue;
             }
 
-            Entity entity = state.getEntity();
-            if (!(entity instanceof LivingEntity target) || target.isDead())
+            CrystalData<?> candidate = validateCrystalData((CrystalData<?>) data, bestDamage);
+            if (candidate == null)
             {
                 continue;
             }
 
-            float baseDamage = (float) data.getDamageToTarget();
-            float baseSelfDamage = (float) data.getDamageToPlayer();
-
-            if (baseDamage <= 0.0f || baseSelfDamage > maxSelfDamage.getValue())
-            {
-                continue;
-            }
-
-            float appliedSelfDamage = ExplosionUtil.getAppliedDamageToEntity(mc.player, baseSelfDamage);
-            if (appliedSelfDamage > maxSelfDamage.getValue() || DamageUtil.getHealth(mc.player) - appliedSelfDamage < 0.5f)
-            {
-                continue;
-            }
-
-            float appliedTargetDamage = ExplosionUtil.getAppliedDamageToEntity(target, baseDamage);
-            if (appliedTargetDamage <= bestDamage)
-            {
-                continue;
-            }
-
-            bestDamage = appliedTargetDamage;
-            bestSelfDamage = appliedSelfDamage;
+            bestDamage = candidate.getDamageToTarget();
             bestCrystal = data;
         }
-
-        if (bestDamage < minDamage.getValue())
-        {
-            for (CrystalData<T> data : crystals)
-            {
-                if (data instanceof CrystalData.Immediate<T> && !data.getTarget().isDead())
-                {
-                    return data;
-                }
-            }
-
-            return null;
-        }
-
-        if (bestCrystal == null)
-        {
-            return null;
-        }
-
-        bestCrystal.setDamageToTarget(bestDamage);
-        bestCrystal.setDamageToPlayer(bestSelfDamage);
 
         return bestCrystal;
     }
 
+    private <T> CrystalData<T> validateCrystalData(CrystalData<T> data, double currentBest)
+    {
+        LivingEntityState state = data.getTarget();
+        if (state == null || state.isDead())
+        {
+            return null;
+        }
+
+        Entity entity = state.getEntity();
+        if (!(entity instanceof LivingEntity target) || target.isDead())
+        {
+            return null;
+        }
+
+        float baseDamage = (float) data.getDamageToTarget();
+        float baseSelfDamage = (float) data.getDamageToPlayer();
+
+        if (baseDamage <= 0.0f || baseSelfDamage > maxSelfDamage.getValue())
+        {
+            return null;
+        }
+
+        float selfDamage = ExplosionUtil.getAppliedDamageToEntity(mc.player, baseSelfDamage);
+        if (selfDamage > maxSelfDamage.getValue() || DamageUtil.getHealth(mc.player) - selfDamage < 0.5f)
+        {
+            return null;
+        }
+
+        float targetDamage = ExplosionUtil.getAppliedDamageToEntity(target, baseDamage);
+        if (targetDamage > currentBest)
+        {
+            data.setDamageToTarget(targetDamage);
+            data.setDamageToPlayer(selfDamage);
+
+            return data;
+        }
+
+        return null;
+    }
 
     public boolean canUseOnBlock(BlockPos blockPos)
     {

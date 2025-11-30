@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.shoreline.client.impl.Managers;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,5 +69,6 @@ public class FakePlayerEntity extends OtherClientPlayerEntity
     {
         MinecraftClient.getInstance().world.removeEntity(getId(), RemovalReason.DISCARDED);
         setRemoved(RemovalReason.DISCARDED);
+        Managers.TOTEM.clearTotems(this);
     }
 }

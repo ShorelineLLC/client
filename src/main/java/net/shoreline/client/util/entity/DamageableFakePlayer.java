@@ -19,9 +19,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.client.impl.world.explosion.ExplosionUtil;
+import net.shoreline.client.util.item.ItemUtil;
 
+import java.util.Collections;
 import java.util.Optional;
 
 public class DamageableFakePlayer extends FakePlayerEntity
@@ -106,8 +109,31 @@ public class DamageableFakePlayer extends FakePlayerEntity
 
     public void simulateExplosionFrom(ClientWorld world, Vec3d vec3d)
     {
-        double damage = ExplosionUtil.crystalDamageToEntity(world, this, vec3d);
-        damage(world, getDamageSources().explosion(null), (float) damage);
+        float damage = ExplosionTrace.getDamageToPos(world,
+                vec3d,
+                getPos(),
+                getBoundingBox(),
+                12.0f,
+                false,
+                Collections.emptySet());
+
+        float applied = ExplosionUtil.getAppliedDamageToEntity(this, damage);
+        damage(world, getDamageSources().explosion(null), applied);
+
+//        if (this.hurtTime < 8.0f)
+//        {
+//            for (ItemStack stack : getArmorItems())
+//            {
+//                int armorDamage = ExplosionUtil.getArmorDurabilityDamage(stack, damage);
+//                if (ItemUtil.getDurability(stack) - armorDamage <= 0)
+//                {
+//                    stack.setDamage(0);
+//                    continue;
+//                }
+//
+//                stack.setDamage(stack.getDamage() + armorDamage);
+//            }
+//        }
     }
 
     protected void damage(ClientWorld world, DamageSource source, float amount)
@@ -124,7 +150,6 @@ public class DamageableFakePlayer extends FakePlayerEntity
 
         this.limbAnimator.setSpeed(1.5f);
 
-        boolean bl2 = true;
         if (this.timeUntilRegen > 10.0f && !source.isIn(DamageTypeTags.BYPASSES_COOLDOWN))
         {
             if (amount <= this.lastDamageTaken)
@@ -134,7 +159,6 @@ public class DamageableFakePlayer extends FakePlayerEntity
 
             applyDamage(source, amount - this.lastDamageTaken);
             this.lastDamageTaken = amount;
-            bl2 = false;
         } else
         {
             this.lastDamageTaken = amount;
@@ -142,10 +166,6 @@ public class DamageableFakePlayer extends FakePlayerEntity
             applyDamage(source, amount);
             this.hurtTime = 10;
             this.maxHurtTime = 10;
-        }
-
-        if (bl2)
-        {
             playHurtSound(source);
         }
 

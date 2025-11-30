@@ -147,6 +147,15 @@ public class ShadersModule extends RenderModule
         });
     }
 
+    @Override
+    public void onEnable()
+    {
+        if (shaderManager == null)
+        {
+            shaderManager = new ShaderManager(INSTANCE);
+        }
+    }
+
     @EventListener
     public void onFinishedLoading(LoadingEvent.Finished event)
     {
