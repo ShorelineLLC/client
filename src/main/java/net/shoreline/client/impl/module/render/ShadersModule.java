@@ -150,11 +150,10 @@ public class ShadersModule extends RenderModule
     @Override
     public void onEnable()
     {
-        /* Too early, results in crash because mc.getWindow() is null when we load configs. */
-        //if (shaderManager == null)
-        //{
-        //    shaderManager = new ShaderManager(INSTANCE);
-        //}
+        if (shaderManager == null && mc.getWindow() != null)
+        {
+            shaderManager = new ShaderManager(INSTANCE);
+        }
     }
 
     @EventListener
