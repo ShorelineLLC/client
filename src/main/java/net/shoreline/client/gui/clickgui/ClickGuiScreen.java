@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.gui.Mouse;
@@ -38,6 +39,7 @@ public class ClickGuiScreen extends Screen
     private boolean shouldCloseOnEsc = true;
 
     private String descriptionText;
+    private boolean updateDescText;
     private final Animation descAnimation = new Animation(300L);
 
     protected ClickGuiScreen()
@@ -72,6 +74,7 @@ public class ClickGuiScreen extends Screen
                        int mouseY,
                        float deltaTicks)
     {
+        updateDescText = false;
         float scale = ClickGuiModule.INSTANCE.getScale();
         final int scaledMx = (int) (mouseX / scale);
         final int scaledMy = (int) (mouseY / scale);
@@ -96,9 +99,10 @@ public class ClickGuiScreen extends Screen
 
         if (descriptionText != null)
         {
-            Managers.RENDER.drawText(context.getMatrices(), descriptionText, 4,
+            float width = Managers.RENDER.getTextWidth(descriptionText);
+            Managers.RENDER.drawText(context.getMatrices(),  descriptionText, context.getScaledWindowWidth() - width - 2,
                     context.getScaledWindowHeight() - 16,
-                    ColorUtil.withTransparency(-1, (float) descAnimation.getFactor()));
+                    ColorUtil.withTransparency(Colors.WHITE, (float) descAnimation.getFactor()));
         }
 
         GuiNotification notification = notifications.peek();
@@ -116,9 +120,9 @@ public class ClickGuiScreen extends Screen
 
         MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
+
         matrixStack.scale(scale, scale, 1.0f);
 
-        boolean onFrame = false;
         for (Frame frame : guiFrames)
         {
             if (mouse.isHovering(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight()))
@@ -130,25 +134,22 @@ public class ClickGuiScreen extends Screen
                 }
             }
 
-            if (mouse.isHovering(frame.getX(), frame.getY(), frame.getWidth(), frame.getTitleHeight() + frame.getComponentHeight()))
-            {
-                onFrame = true;
-            }
-
             frame.drawComponent(context, scaledMx, scaledMy, deltaTicks);
         }
 
         matrixStack.pop();
 
-        if (!onFrame)
-        {
-            descAnimation.setState(false);
-        }
-
         mouse.setLeftClicked(false);
         mouse.setRightClicked(false);
         mouse.setMouseX(scaledMx);
         mouse.setMouseY(scaledMy);
+
+        if (updateDescText)
+        {
+            return;
+        }
+
+        descAnimation.setState(false);
     }
 
     @Override
@@ -287,7 +288,8 @@ public class ClickGuiScreen extends Screen
     public void setDescriptionText(String descriptionText)
     {
         this.descriptionText = descriptionText;
-        descAnimation.setState(true);
+        this.updateDescText = true;
+        this.descAnimation.setState(true);
     }
 
     public void addNotification(String notification, int duration)
