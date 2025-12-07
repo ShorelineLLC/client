@@ -1,26 +1,19 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
-import net.shoreline.client.impl.module.combat.AutoMineModule;
 import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
-import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionScanner;
 import net.shoreline.client.util.entity.PlayerUtil;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class CrystalEntityScanner extends ExplosionScanner
@@ -76,7 +69,7 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
         {
             if (Managers.SOCIAL.isFriend(entity.getName())
                     || entity.getTotalArmor() <= 0 && !autoCrystal.getTargetNakeds().getValue()
-                    || !autoCrystal.canTargetEntity(entity.getEntityType()))
+                    || !autoCrystal.isValid(entity.getEntityType()))
             {
                 continue;
             }

@@ -27,7 +27,7 @@ public class Loader implements
 	private static final Logger LOGGER = LogManager.getLogger("Shoreline");
 	public static final String VERSION = "r1.0.2";
 
-	//public static final UserSession SESSION;
+	public static UserSession SESSION;
 
 	static
 	{

@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat.util;
 import lombok.experimental.UtilityClass;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.EnderPearlItem;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
@@ -45,7 +46,7 @@ public class PearlExtrapolation
 
             Box seg = new Box(prev, next).expand(r);
 
-            for (Entity e : world.getOtherEntities(thrower, seg, en -> en.isAlive() && !en.isSpectator() && en != thrower))
+            for (Entity e : world.getOtherEntities(thrower, seg, en -> en instanceof LivingEntity && en.isAlive() && !en.isSpectator() && en != thrower))
             {
                 if (e.getBoundingBox().contains(prev))
                 {

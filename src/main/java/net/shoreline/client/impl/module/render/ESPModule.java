@@ -3,18 +3,17 @@ package net.shoreline.client.impl.module.render;
 import lombok.Getter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.impl.EntityModule;
+import net.shoreline.client.impl.module.impl.TargetingModule;
 import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -27,12 +26,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ESPModule extends EntityModule
+public class ESPModule extends TargetingModule
 {
     public Config<Boolean> items = new BooleanConfig.Builder("Items")
             .setDefaultValue(true).setDescription("Target Items").build();
+    public Config<Boolean> crystals = new BooleanConfig.Builder("Crystals")
+            .setDescription("Target Crystals").setDefaultValue(false).build();
     public Config<Void> targetConfig = new ConfigGroup.Builder("Target")
-            .addAll(players, hostiles, passives, crystals, items).build();
+            .addAll(targetPlayers, targetHostiles, targetPassives, crystals, items).build();
     public Config<Float> range = new NumberConfig.Builder<Float>("Range")
             .setMin(0.f).setDefaultValue(30.0f).setMax(250.f)
             .setDescription("If entity is within this range we render them").build();
@@ -49,6 +50,11 @@ public class ESPModule extends EntityModule
     @EventListener
     public void onRender(RenderWorldEvent.Post event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         Set<Entity> current = new HashSet<>();
         for (Entity entity : mc.world.getEntities())
         {
@@ -92,6 +98,11 @@ public class ESPModule extends EntityModule
                 || entity instanceof ItemEntity)
         {
             return items.getValue();
+        }
+
+        if (entity instanceof EndCrystalEntity)
+        {
+            return crystals.getValue();
         }
 
         return super.isValid(entity);

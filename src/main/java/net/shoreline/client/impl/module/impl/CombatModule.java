@@ -8,9 +8,8 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.mixin.network.packet.c2s.AccessorPlayerInteractC2SPacket;
 
-public class CombatModule extends ListeningToggleable
+public class CombatModule extends TargetingModule
 {
-
     public CombatModule(String name, String description, GuiCategory category) {
         super(name, description, category);
     }
