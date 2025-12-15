@@ -614,7 +614,7 @@ net.shoreline.client.gui.clickgui.Frame -> net.shoreline.client.an:
     float titleHeight -> bz
     boolean frameOpen -> bA
     boolean dragging -> bB
-    net.shoreline.client.impl.render.Animation collapseAnim -> bC
+    net.shoreline.client.impl.render.animation.Animation collapseAnim -> bC
     net.shoreline.client.gui.clickgui.ComponentFactory componentFactory -> bD
     java.util.List components -> bE
     java.util.List allComponents -> bF
@@ -634,7 +634,7 @@ net.shoreline.client.gui.clickgui.Frame -> net.shoreline.client.an:
     29:29:float getTitleHeight() -> bm
     31:31:boolean isFrameOpen() -> bn
     32:32:boolean isDragging() -> bo
-    34:34:net.shoreline.client.impl.render.Animation getCollapseAnim() -> bp
+    34:34:net.shoreline.client.impl.render.animation.Animation getCollapseAnim() -> bp
     37:37:net.shoreline.client.gui.clickgui.ComponentFactory getComponentFactory() -> bq
     38:38:java.util.List getComponents() -> br
     39:39:java.util.List getAllComponents() -> bs
@@ -655,7 +655,7 @@ net.shoreline.client.gui.clickgui.ModuleComponent -> net.shoreline.client.ap:
     net.shoreline.client.gui.clickgui.config.ConfigComponent currentAnimation -> bI
     java.util.List components -> bJ
     boolean frameOpen -> bA
-    net.shoreline.client.impl.render.Animation collapseAnim -> bK
+    net.shoreline.client.impl.render.animation.Animation collapseAnim -> bK
     31:67:void <init>(net.shoreline.client.api.module.Module,net.shoreline.client.gui.clickgui.Frame,float,float,float,float) -> <init>
     75:142:void drawComponent(net.minecraft.class_332,float,float,float) -> a
     149:167:void mouseClicked(double,double,int) -> a
@@ -668,7 +668,7 @@ net.shoreline.client.gui.clickgui.ModuleComponent -> net.shoreline.client.ap:
     29:29:net.shoreline.client.gui.clickgui.config.ConfigComponent getCurrentAnimation() -> bw
     31:31:java.util.List getComponents() -> br
     34:34:boolean isFrameOpen() -> bn
-    35:35:net.shoreline.client.impl.render.Animation getCollapseAnim() -> bp
+    35:35:net.shoreline.client.impl.render.animation.Animation getCollapseAnim() -> bp
     33:33:void setFrameOpen(boolean) -> l
 net.shoreline.client.gui.clickgui.ToggleModuleComponent -> net.shoreline.client.aq:
     net.shoreline.client.gui.clickgui.components.ToggleComponent toggleComponent -> bL
@@ -680,7 +680,7 @@ net.shoreline.client.gui.clickgui.ToggleModuleComponent -> net.shoreline.client.
 net.shoreline.client.gui.clickgui.components.CollapsableComponent -> net.shoreline.client.ar:
     java.util.List subComponents -> bM
     boolean frameOpen -> bA
-    net.shoreline.client.impl.render.Animation collapseAnim -> bN
+    net.shoreline.client.impl.render.animation.Animation collapseAnim -> bN
     16:26:void <init>(net.shoreline.client.gui.clickgui.Frame,int,int,int,int) -> <init>
     31:44:void drawComponent(net.minecraft.class_332,float,float,float) -> a
     50:50:void mouseClicked(double,double,int) -> a
@@ -695,8 +695,8 @@ net.shoreline.client.gui.clickgui.components.FrameComponent -> net.shoreline.cli
     float width -> by
     float height -> bP
     float yOffset -> bQ
-    net.shoreline.client.impl.render.Animation hoverAnim -> bR
-    net.shoreline.client.impl.render.Animation drawAnim -> bS
+    net.shoreline.client.impl.render.animation.Animation hoverAnim -> bR
+    net.shoreline.client.impl.render.animation.Animation drawAnim -> bS
     33:41:void <init>(net.shoreline.client.gui.clickgui.Frame,float,float,float,float) -> <init>
     45:45:float getTx() -> bx
     50:50:float getTy() -> by
@@ -707,8 +707,8 @@ net.shoreline.client.gui.clickgui.components.FrameComponent -> net.shoreline.cli
     20:20:float getWidth() -> bl
     21:21:float getHeight() -> bB
     23:23:float getYOffset() -> bC
-    25:25:net.shoreline.client.impl.render.Animation getHoverAnim() -> bD
-    26:26:net.shoreline.client.impl.render.Animation getDrawAnim() -> bE
+    25:25:net.shoreline.client.impl.render.animation.Animation getHoverAnim() -> bD
+    26:26:net.shoreline.client.impl.render.animation.Animation getDrawAnim() -> bE
     12:12:void setX(float) -> c
     12:12:void setY(float) -> d
     12:12:void setWidth(float) -> g
@@ -754,7 +754,7 @@ net.shoreline.client.gui.clickgui.components.TextComponent -> net.shoreline.clie
     177:177:void lambda$collectToBuffer$1(int) -> g
     66:66:boolean lambda$new$0(int) -> h
 net.shoreline.client.gui.clickgui.components.ToggleComponent -> net.shoreline.client.av:
-    net.shoreline.client.impl.render.Animation toggleAnim -> ce
+    net.shoreline.client.impl.render.animation.Animation toggleAnim -> ce
     java.util.function.Supplier setter -> cf
     31:34:void <init>(net.shoreline.client.gui.clickgui.Frame,float,float,float,float,boolean,java.util.function.Supplier) -> <init>
     42:48:void drawComponent(net.minecraft.class_332,float,float,float) -> a
@@ -765,7 +765,7 @@ net.shoreline.client.gui.clickgui.components.ToggleComponent -> net.shoreline.cl
     71:71:boolean getState() -> bK
     76:77:void setState(boolean) -> p
     81:81:double getFactor() -> bL
-    18:18:net.shoreline.client.impl.render.Animation getToggleAnim() -> bM
+    18:18:net.shoreline.client.impl.render.animation.Animation getToggleAnim() -> bM
 net.shoreline.client.gui.clickgui.config.CheckboxComponent -> net.shoreline.client.aw:
     net.shoreline.client.gui.clickgui.components.ToggleComponent toggleComponent -> cg
     26:33:void <init>(net.shoreline.client.api.config.Config,net.shoreline.client.gui.clickgui.ModuleComponent,net.shoreline.client.gui.clickgui.Frame,float,float,float,float) -> <init>
@@ -779,16 +779,16 @@ net.shoreline.client.gui.clickgui.config.CheckboxComponent -> net.shoreline.clie
     29:31:java.lang.Boolean lambda$new$0(net.shoreline.client.api.config.Config) -> e
 net.shoreline.client.gui.clickgui.config.ColorPickerComponent -> net.shoreline.client.ax:
     net.shoreline.client.api.config.ColorConfig colorConfig -> ch
-    net.shoreline.client.impl.render.Smoother colorSmootherX -> ci
-    net.shoreline.client.impl.render.Smoother colorSmootherY -> cj
-    net.shoreline.client.impl.render.Smoother hueSmootherY -> ck
+    net.shoreline.client.impl.render.animation.Smoother colorSmootherX -> ci
+    net.shoreline.client.impl.render.animation.Smoother colorSmootherY -> cj
+    net.shoreline.client.impl.render.animation.Smoother hueSmootherY -> ck
     float[] selectedColor -> cl
     boolean draggingHue -> cm
     boolean draggingPicker -> cn
     boolean draggingTransparency -> co
     float pickerLength -> cp
     boolean pickerOpen -> cq
-    net.shoreline.client.impl.render.Animation collapseAnim -> cr
+    net.shoreline.client.impl.render.animation.Animation collapseAnim -> cr
     net.shoreline.client.gui.clickgui.components.TextComponent hexComponent -> cs
     50:67:void <init>(net.shoreline.client.api.config.Config,net.shoreline.client.gui.clickgui.ModuleComponent,net.shoreline.client.gui.clickgui.Frame,float,float,float,float) -> <init>
     75:128:void drawComponent(net.minecraft.class_332,float,float,float) -> a
@@ -837,7 +837,7 @@ net.shoreline.client.gui.clickgui.config.SelectorComponent -> net.shoreline.clie
     16:16:void onConfigUpdate(java.lang.Object) -> i
 net.shoreline.client.gui.clickgui.config.SliderComponent -> net.shoreline.client.aB:
     net.shoreline.client.gui.clickgui.components.TextComponent textComponent -> cx
-    net.shoreline.client.impl.render.Smoother smoother -> cy
+    net.shoreline.client.impl.render.animation.Smoother smoother -> cy
     24:60:void <init>(net.shoreline.client.api.config.Config,net.shoreline.client.gui.clickgui.ModuleComponent,net.shoreline.client.gui.clickgui.Frame,float,float,float,float) -> <init>
     68:107:void drawComponent(net.minecraft.class_332,float,float,float) -> a
     114:122:void mouseClicked(double,double,int) -> a
@@ -863,9 +863,9 @@ net.shoreline.client.gui.clickgui.config.TextboxComponent -> net.shoreline.clien
     14:14:void onConfigUpdate(java.lang.Object) -> i
 net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent -> net.shoreline.client.aD:
     net.shoreline.client.api.config.ColorConfig colorConfig -> cA
-    net.shoreline.client.impl.render.Smoother colorSmootherX -> cB
-    net.shoreline.client.impl.render.Smoother colorSmootherY -> cC
-    net.shoreline.client.impl.render.Smoother hueSmootherY -> cD
+    net.shoreline.client.impl.render.animation.Smoother colorSmootherX -> cB
+    net.shoreline.client.impl.render.animation.Smoother colorSmootherY -> cC
+    net.shoreline.client.impl.render.animation.Smoother hueSmootherY -> cD
     float[] selectedColor -> cl
     boolean draggingHue -> cm
     boolean draggingPicker -> cn
@@ -888,7 +888,7 @@ net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent -> net.shor
     57:57:boolean lambda$new$0(int) -> h
 net.shoreline.client.gui.clickgui.config.picker.ExpandableComponent -> net.shoreline.client.aE:
     boolean pickerOpen -> cq
-    net.shoreline.client.impl.render.Animation collapseAnim -> cG
+    net.shoreline.client.impl.render.animation.Animation collapseAnim -> cG
     25:27:void <init>(net.shoreline.client.api.config.Config,net.shoreline.client.gui.clickgui.ModuleComponent,net.shoreline.client.gui.clickgui.Frame,float,float,float,float) -> <init>
     float getComponentHeight() -> bf
     13:13:void setPickerOpen(boolean) -> q
@@ -965,7 +965,7 @@ net.shoreline.client.gui.hud.HudComponent -> net.shoreline.client.aO:
     int width -> aw
     int height -> ax
     boolean dragging -> bB
-    net.shoreline.client.impl.render.Animation hoverAnim -> cW
+    net.shoreline.client.impl.render.animation.Animation hoverAnim -> cW
     34:39:void <init>(net.shoreline.client.impl.module.impl.hud.HudModule,int,int) -> <init>
     47:76:void drawComponent(net.minecraft.class_332,float,float,float) -> a
     82:82:void mouseClicked(double,double,int) -> a
@@ -984,7 +984,7 @@ net.shoreline.client.gui.hud.HudComponent -> net.shoreline.client.aO:
     26:26:int getWidth() -> at
     27:27:int getHeight() -> au
     29:29:boolean isDragging() -> bo
-    31:31:net.shoreline.client.impl.render.Animation getHoverAnim() -> bD
+    31:31:net.shoreline.client.impl.render.animation.Animation getHoverAnim() -> bD
     18:18:void setX(int) -> i
     18:18:void setY(int) -> j
     18:18:void setPx(float) -> e
@@ -2166,14 +2166,14 @@ net.shoreline.client.impl.module.client.ClickGuiModule -> net.shoreline.client.f
     net.shoreline.client.api.config.Config darkenConfig -> hB
     net.shoreline.client.api.config.Config scrollSpeedConfig -> hC
     net.shoreline.client.impl.render.Theme theme -> hD
-    net.shoreline.client.impl.render.Animation fadeInAnimation -> hE
+    net.shoreline.client.impl.render.animation.Animation fadeInAnimation -> hE
     float scale -> hF
     22:51:void <init>() -> <init>
     56:73:void onEnable() -> aN
     78:85:void onDisable() -> aO
     90:91:void onFinishedLoading(net.shoreline.client.impl.event.LoadingEvent$Finished) -> a
     95:103:void setFadeState(boolean) -> y
-    107:107:net.shoreline.client.impl.render.Animation getFadeAnimation() -> fP
+    107:107:net.shoreline.client.impl.render.animation.Animation getFadeAnimation() -> fP
     112:112:boolean shouldBlur() -> fQ
     117:117:boolean shouldDarken() -> fR
     122:122:int getScrollSpeed() -> fS
@@ -2525,7 +2525,7 @@ net.shoreline.client.impl.module.combat.KillAuraModule -> net.shoreline.client.f
     boolean running -> kf
     net.minecraft.class_1297 auraTarget -> kg
     net.minecraft.class_238 targetBox -> kh
-    net.shoreline.client.impl.render.Animation fadeAnim -> ki
+    net.shoreline.client.impl.render.animation.Animation fadeAnim -> ki
     46:100:void <init>() -> <init>
     105:107:void onDisable() -> aO
     112:113:void onWorldDisconnect(net.shoreline.client.impl.event.WorldEvent$Disconnect) -> b
@@ -2720,7 +2720,7 @@ net.shoreline.client.impl.module.exploit.ChorusControlModule -> net.shoreline.cl
     int chorusTeleportId -> kY
     net.minecraft.class_238 teleportBox -> kZ
     net.minecraft.class_2708 teleportPacket -> la
-    net.shoreline.client.impl.render.Animation teleportAnim -> lb
+    net.shoreline.client.impl.render.animation.Animation teleportAnim -> lb
     31:32:void <init>() -> <init>
     37:38:void onDisable() -> aO
     43:56:void onPacketOutbound(net.shoreline.client.impl.event.network.PacketEvent$Outbound) -> a
@@ -2809,7 +2809,7 @@ net.shoreline.client.impl.module.hud.CrosshairHudModule -> net.shoreline.client.
     net.shoreline.client.api.config.Config outlineThicknessConfig -> lC
     net.shoreline.client.api.config.Config opacityConfig -> lD
     net.shoreline.client.api.config.Config colorConfig -> lE
-    net.shoreline.client.impl.render.Animation gapAnim -> lF
+    net.shoreline.client.impl.render.animation.Animation gapAnim -> lF
     21:52:void <init>() -> <init>
     58:58:void drawHudComponent(net.minecraft.class_332,float) -> a
     63:64:void drawGuiComponent(net.minecraft.class_332,float) -> b
@@ -2863,7 +2863,7 @@ net.shoreline.client.impl.module.hud.PotionsHudModule$DynamicPotionEntry -> net.
 net.shoreline.client.impl.module.hud.ServerStatusHudModule -> net.shoreline.client.gk:
     java.text.DecimalFormat decimal -> lP
     net.shoreline.client.api.math.Timer serverStatus -> lQ
-    net.shoreline.client.impl.render.Animation statusAnimation -> lR
+    net.shoreline.client.impl.render.animation.Animation statusAnimation -> lR
     19:27:void <init>() -> <init>
     32:38:void drawHudComponent(net.minecraft.class_332,float) -> a
     43:44:void drawGuiComponent(net.minecraft.class_332,float) -> b
@@ -2946,8 +2946,8 @@ net.shoreline.client.impl.module.impl.hud.DynamicEntry -> net.shoreline.client.g
     net.shoreline.client.impl.module.impl.hud.DynamicHudModule module -> mb
     java.util.function.Supplier text -> mc
     java.util.function.Supplier drawing -> md
-    net.shoreline.client.impl.render.UnboundAnimation animation -> me
-    net.shoreline.client.impl.render.Animation yAnimation -> mf
+    net.shoreline.client.impl.render.animation.UnboundAnimation animation -> me
+    net.shoreline.client.impl.render.animation.Animation yAnimation -> mf
     boolean lastState -> mg
     float lastWidth -> mh
     29:36:void <init>(net.shoreline.client.impl.module.impl.hud.DynamicHudModule,java.util.function.Supplier,java.util.function.Supplier) -> <init>
@@ -2958,8 +2958,8 @@ net.shoreline.client.impl.module.impl.hud.DynamicEntry -> net.shoreline.client.g
     19:19:net.shoreline.client.impl.module.impl.hud.DynamicHudModule getModule() -> if
     20:20:java.util.function.Supplier getText() -> ig
     21:21:java.util.function.Supplier getDrawing() -> ih
-    22:22:net.shoreline.client.impl.render.UnboundAnimation getAnimation() -> ii
-    23:23:net.shoreline.client.impl.render.Animation getYAnimation() -> ij
+    22:22:net.shoreline.client.impl.render.animation.UnboundAnimation getAnimation() -> ii
+    23:23:net.shoreline.client.impl.render.animation.Animation getYAnimation() -> ij
     25:25:boolean isLastState() -> ik
     26:26:float getLastWidth() -> il
     16:16:void setLastState(boolean) -> C
@@ -3553,7 +3553,7 @@ net.shoreline.client.impl.module.render.HoleESPModule -> net.shoreline.client.ht
     141:141:boolean shouldGetQuads() -> jk
     146:146:float getRange() -> jl
     89:109:boolean lambda$onRenderWorld$3(java.util.List,java.util.Map$Entry) -> a
-    84:84:net.shoreline.client.impl.render.Animation lambda$onRenderWorld$2(net.shoreline.client.impl.combat.hole.HoleData) -> b
+    84:84:net.shoreline.client.impl.render.animation.Animation lambda$onRenderWorld$2(net.shoreline.client.impl.combat.hole.HoleData) -> b
     60:60:java.lang.Boolean lambda$new$1() -> fN
     56:56:java.lang.Boolean lambda$new$0() -> aW
 net.shoreline.client.impl.module.render.HoleESPModule$1 -> net.shoreline.client.hu:
@@ -3884,15 +3884,15 @@ net.shoreline.client.impl.module.world.SpeedMineModule -> net.shoreline.client.h
     67:67:void setManualMining(boolean) -> E
 net.shoreline.client.impl.module.world.SpeedMineModule$MiningRenderState -> net.shoreline.client.hT:
     net.shoreline.client.impl.mining.MiningData data -> sK
-    net.shoreline.client.impl.render.Animation animation -> sL
-    347:347:void <init>(net.shoreline.client.impl.mining.MiningData,net.shoreline.client.impl.render.Animation) -> <init>
+    net.shoreline.client.impl.render.animation.Animation animation -> sL
+    347:347:void <init>(net.shoreline.client.impl.mining.MiningData,net.shoreline.client.impl.render.animation.Animation) -> <init>
     351:352:void setState(boolean) -> p
     356:356:float getFactor() -> aF
     347:347:java.lang.String toString() -> toString
     347:347:int hashCode() -> hashCode
     347:347:boolean equals(java.lang.Object) -> equals
     347:347:net.shoreline.client.impl.mining.MiningData data() -> jP
-    347:347:net.shoreline.client.impl.render.Animation animation() -> jQ
+    347:347:net.shoreline.client.impl.render.animation.Animation animation() -> jQ
 net.shoreline.client.impl.module.world.SpeedMineModule$RemineMode -> net.shoreline.client.hU:
     net.shoreline.client.impl.module.world.SpeedMineModule$RemineMode INSTANT -> sM
     net.shoreline.client.impl.module.world.SpeedMineModule$RemineMode OFF -> sN
@@ -3936,7 +3936,7 @@ net.shoreline.client.impl.network.NetworkManager -> net.shoreline.client.hX:
 net.shoreline.client.impl.network.NetworkUtil -> net.shoreline.client.hY:
     12:13:java.lang.String getServerIp() -> jU
     8:8:void <init>() -> <init>
-net.shoreline.client.impl.render.Animation -> net.shoreline.client.hZ:
+net.shoreline.client.impl.render.animation.Animation -> net.shoreline.client.hZ:
     float length -> sV
     long last -> sW
     boolean state -> sX
@@ -4248,14 +4248,14 @@ net.shoreline.client.impl.render.Shaders -> net.shoreline.client.iX:
     12:12:void <init>() -> <init>
     40:40:net.minecraft.class_10157$class_10159 uniform(java.lang.String,java.lang.String,int,java.lang.Float[]) -> a
     14:32:void <clinit>() -> <clinit>
-net.shoreline.client.impl.render.Smoother -> net.shoreline.client.iY:
+net.shoreline.client.impl.render.animation.Smoother -> net.shoreline.client.iY:
     double smoothedValue -> uo
     6:6:void <init>() -> <init>
     12:14:double smooth(double,double,double) -> a
     19:20:void clear() -> aq
     8:8:double getSmoothedValue() -> kq
 net.shoreline.client.impl.render.Theme -> net.shoreline.client.iZ:
-    net.shoreline.client.impl.render.Animation fadeAnimation -> up
+    net.shoreline.client.impl.render.animation.Animation fadeAnimation -> up
     int titleColor -> uq
     int componentColor -> ur
     int textColor -> us
@@ -4274,8 +4274,8 @@ net.shoreline.client.impl.render.Theme -> net.shoreline.client.iZ:
     70:70:int getBackgroundColor() -> ku
     75:75:int getOutlineColor() -> kv
     80:80:int getColor(int,float) -> b
-    7:7:void <init>(net.shoreline.client.impl.render.Animation) -> <init>
-net.shoreline.client.impl.render.UnboundAnimation -> net.shoreline.client.ja:
+    7:7:void <init>(net.shoreline.client.impl.render.animation.Animation) -> <init>
+net.shoreline.client.impl.render.animation.UnboundAnimation -> net.shoreline.client.ja:
     float target -> uv
     float prev -> uw
     long lastMillis -> ux

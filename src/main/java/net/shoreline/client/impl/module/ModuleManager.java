@@ -40,6 +40,7 @@ public class ModuleManager
                 new SocialsModule(),
                 new SoundsModule(),
                 new ThemeModule(),
+                new TitleScreenModule(),
                 // Combat
                 new AnchorAuraModule(),
                 new AutoArmorModule(),

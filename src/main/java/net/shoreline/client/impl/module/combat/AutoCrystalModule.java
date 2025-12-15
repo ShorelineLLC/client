@@ -7,7 +7,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -49,7 +48,7 @@ import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkUtil;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -105,6 +104,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Float> breakRange = new NumberConfig.Builder<Float>("BreakRange")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("The range to break crystals").build();
+    Config<Float> breakTrace = new NumberConfig.Builder<Float>("BreakTrace")
+            .setMin(0.0f).setMax(6.0f).setDefaultValue(3.0f).setFormat("m")
+            .setDescription("The range to break crystals through walls").build();
     Config<Integer> breakDelay = new NumberConfig.Builder<Integer>("BreakDelay")
             .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
             .setDescription("The delay between breaking crystals").build();
@@ -115,11 +117,14 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDescription("Breaks immediately after a placement")
             .setDefaultValue(false).build();
     Config<Void> breakConfig = new ConfigGroup.Builder("Break")
-            .addAll(breakRange, breakDelay, ticksExisted, sequentialBreak).build();
+            .addAll(breakRange, breakTrace, breakDelay, ticksExisted, sequentialBreak).build();
 
     Config<Float> placeRange = new NumberConfig.Builder<Float>("PlaceRange")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("The range to place crystals").build();
+    Config<Float> placeTrace = new NumberConfig.Builder<Float>("PlaceTrace")
+            .setMin(0.0f).setMax(6.0f).setDefaultValue(3.0f).setFormat("m")
+            .setDescription("The range to place crystals through walls").build();
     Config<Integer> placeLimit = new NumberConfig.Builder<Integer>("PlaceLimit")
             .setMin(1).setMax(10).setDefaultValue(2)
             .setDescription("The limit of crystal placements per tick").build();
@@ -133,7 +138,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDescription("Places an obsidian block if there is none")
             .setDefaultValue(false).build();
     Config<Void> placeConfig = new ConfigGroup.Builder("Place")
-            .addAll(placeRange, placeLimit, sequentialPlace, protocolPlace, basePlace).build();
+            .addAll(placeRange, placeTrace, placeLimit, sequentialPlace, protocolPlace, basePlace).build();
 
     Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("Predict")
             .setValues(Timing.values())

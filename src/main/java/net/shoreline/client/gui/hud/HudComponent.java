@@ -10,7 +10,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Mouse;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 

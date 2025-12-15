@@ -1,5 +1,7 @@
 package net.shoreline.client.api.font;
 
+import java.awt.image.BufferedImage;
+
 /**
  * @param value
  * @param textureWidth

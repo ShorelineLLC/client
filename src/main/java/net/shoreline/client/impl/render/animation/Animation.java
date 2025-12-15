@@ -1,7 +1,8 @@
-package net.shoreline.client.impl.render;
+package net.shoreline.client.impl.render.animation;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.shoreline.client.impl.render.Easing;
 
 @Getter
 public class Animation

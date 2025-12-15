@@ -10,7 +10,7 @@ import net.shoreline.client.gui.clickgui.components.FrameComponent;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
 import net.shoreline.client.gui.clickgui.config.picker.ExpandableComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Theme;

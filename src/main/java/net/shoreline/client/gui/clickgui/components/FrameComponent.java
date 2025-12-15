@@ -4,9 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.gui.DrawableComponent;
 import net.shoreline.client.gui.Interactable;
-import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.clickgui.Frame;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.Easing;
 
 @Getter

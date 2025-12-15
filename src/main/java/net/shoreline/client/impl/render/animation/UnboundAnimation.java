@@ -1,8 +1,9 @@
-package net.shoreline.client.impl.render;
+package net.shoreline.client.impl.render.animation;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.impl.render.Easing;
 
 @Getter
 @Setter

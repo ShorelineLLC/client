@@ -5,8 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.impl.render.Animation;
-import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.world.LivingEntityState;
 
 @AllArgsConstructor

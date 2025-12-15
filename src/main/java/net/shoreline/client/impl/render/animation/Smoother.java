@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.render;
+package net.shoreline.client.impl.render.animation;
 
 import lombok.Getter;
 

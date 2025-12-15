@@ -1,7 +1,6 @@
 package net.shoreline.client.gui.clickgui;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -12,9 +11,12 @@ import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.components.FrameComponent;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
+import net.shoreline.client.gui.titlescreen.particle.ParticleManager;
+import net.shoreline.client.gui.titlescreen.particle.snow.SnowManager;
+import net.shoreline.client.gui.titlescreen.particle.snow.SnowParticle;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
@@ -30,6 +32,7 @@ public class ClickGuiScreen extends Screen
 
     private final List<Frame> guiFrames = new ArrayList<>();
     private final Queue<GuiNotification> notifications = new ArrayDeque<>();
+    private final ParticleManager<SnowParticle> snow = new SnowManager(500);
 
     @Getter
     private final Mouse mouse = new Mouse();
@@ -43,7 +46,6 @@ public class ClickGuiScreen extends Screen
     protected ClickGuiScreen()
     {
         super(Text.of("Shoreline-ClickGui"));
-
         float frameOffset = 15.0f;
         for (GuiCategory category : GuiCategory.values())
         {
@@ -51,6 +53,7 @@ public class ClickGuiScreen extends Screen
             {
                 continue;
             }
+
             Frame frame = new GuiCategoryFrame(category, frameOffset, 15, 120, 17);
             guiFrames.add(frame);
             frameOffset += frame.getWidth() + 4.0f;
@@ -76,6 +79,7 @@ public class ClickGuiScreen extends Screen
         final int scaledMx = (int) (mouseX / scale);
         final int scaledMy = (int) (mouseY / scale);
 
+        snow.update();
         if (ClickGuiModule.INSTANCE.shouldDarken())
         {
             Animation animation = ClickGuiModule.INSTANCE.getFadeAnimation();
@@ -118,6 +122,7 @@ public class ClickGuiScreen extends Screen
         matrixStack.push();
         matrixStack.scale(scale, scale, 1.0f);
 
+        snow.render(context, deltaTicks);
         boolean onFrame = false;
         for (Frame frame : guiFrames)
         {

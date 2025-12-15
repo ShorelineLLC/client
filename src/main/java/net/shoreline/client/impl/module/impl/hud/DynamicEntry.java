@@ -1,14 +1,11 @@
 package net.shoreline.client.impl.module.impl.hud;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.Easing;
-import net.shoreline.client.impl.render.UnboundAnimation;
+import net.shoreline.client.impl.render.animation.UnboundAnimation;
 
 import java.util.function.Supplier;
 

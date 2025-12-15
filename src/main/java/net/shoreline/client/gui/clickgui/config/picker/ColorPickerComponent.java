@@ -16,6 +16,8 @@ import net.shoreline.client.impl.imixin.IDrawContext;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.*;
+import net.shoreline.client.impl.render.animation.Animation;
+import net.shoreline.client.impl.render.animation.Smoother;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 

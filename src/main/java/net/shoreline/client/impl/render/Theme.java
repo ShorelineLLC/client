@@ -2,6 +2,7 @@ package net.shoreline.client.impl.render;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.shoreline.client.impl.render.animation.Animation;
 
 import java.awt.*;
 

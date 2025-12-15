@@ -22,7 +22,7 @@ import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningPackets;
 import net.shoreline.client.impl.mining.MiningUtil;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.util.entity.PlayerUtil;

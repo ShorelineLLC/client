@@ -9,7 +9,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.impl.event.LoadingEvent;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Theme;
 import net.shoreline.eventbus.annotation.EventListener;

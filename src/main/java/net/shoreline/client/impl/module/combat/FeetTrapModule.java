@@ -34,6 +34,9 @@ public class FeetTrapModule extends TrapModule
     Config<Boolean> headConfig = new BooleanConfig.Builder("CoverHead")
             .setDescription("Traps player head")
             .setDefaultValue(false).build();
+    Config<Boolean> floor = new BooleanConfig.Builder("Floor")
+            .setDescription("Places blocks under you")
+            .setDefaultValue(false).build();
 
     Config<Boolean> instantReplace = new BooleanConfig.Builder("Instant")
             .setDescription("Replaces instantly after mined")
@@ -101,6 +104,11 @@ public class FeetTrapModule extends TrapModule
         if (headConfig.getValue())
         {
             layers.add(TrapLayer.CEILING);
+        }
+
+        if (floor.getValue())
+        {
+            layers.add(TrapLayer.FLOOR);
         }
 
         TrapSpec trapSpec = TrapSpec.builder()

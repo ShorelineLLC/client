@@ -9,7 +9,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.impl.RenderModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;

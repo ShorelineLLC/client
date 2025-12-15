@@ -57,4 +57,10 @@ public class RaytraceUtil
         Box box = Box.of(position, 0.0, 0.0, 0.0).stretch(vec3d2.multiply(reach)).expand(1.0, 1.0, 1.0);
         return ProjectileUtil.raycast(viewEntity, position, vec3d3, box, entity -> !entity.isSpectator() && entity.canHit(), reach * reach);
     }
+
+    public boolean canSee(Vec3d toSee, Entity entity)
+    {
+        RaycastContext context = new RaycastContext(entity.getEyePos(), toSee, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity);
+        return MinecraftClient.getInstance().world.raycast(context).getType() == HitResult.Type.MISS;
+    }
 }

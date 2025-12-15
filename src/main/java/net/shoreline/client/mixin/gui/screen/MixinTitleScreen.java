@@ -5,10 +5,15 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.ShorelineMod;
+import net.shoreline.client.gui.titlescreen.ShorelineMenuScreen;
+import net.shoreline.client.gui.titlescreen.particle.snow.SnowManager;
+import net.shoreline.client.impl.module.client.TitleScreenModule;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
@@ -19,6 +24,15 @@ public abstract class MixinTitleScreen extends MixinScreen
 
     @Shadow
     private boolean doBackgroundFade;
+
+    @Inject(method = "init", at = @At(value = "RETURN"))
+    private void initHook(CallbackInfo info)
+    {
+        if (TitleScreenModule.INSTANCE.isEnabled())
+        {
+            client.setScreen(new ShorelineMenuScreen());
+        }
+    }
 
     @Inject(method = "render", at = @At("TAIL"))
     public void hookRender(DrawContext context,

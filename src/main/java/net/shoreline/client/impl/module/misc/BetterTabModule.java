@@ -11,7 +11,7 @@ import net.shoreline.client.impl.event.gui.hud.RenderPlayerListEvent;
 import net.shoreline.client.impl.event.gui.hud.RenderTabEvent;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 

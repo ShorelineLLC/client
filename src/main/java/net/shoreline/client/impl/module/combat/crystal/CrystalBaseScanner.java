@@ -12,6 +12,7 @@ import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.util.entity.PlayerUtil;
+import net.shoreline.client.util.world.RaytraceUtil;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -36,6 +37,12 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         }
 
         double placeDist = getLocalEntity().getEyePos().squaredDistanceTo(pos.toCenterPos());
+        if (placeDist > MathHelper.square(autoCrystal.getPlaceTrace().getValue())
+                && !RaytraceUtil.canSee(new Vec3d(pos.up()), getLocalEntity().getEntity()))
+        {
+            return;
+        }
+
         if (placeDist > MathHelper.square(autoCrystal.getPlaceRange().getValue()))
         {
             return;

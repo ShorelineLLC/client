@@ -2,23 +2,19 @@ package net.shoreline.client.impl.rotation;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
 import net.shoreline.client.impl.event.entity.player.TravelEvent;
 import net.shoreline.client.impl.event.input.PlayerInputEvent;
 import net.shoreline.client.impl.event.network.*;
 import net.shoreline.client.impl.event.render.entity.PlayerTransformsEvent;
-import net.shoreline.client.impl.imixin.IPlayerInteractEntityC2S;
-import net.shoreline.client.impl.imixin.IPlayerInteractItemC2S;
 import net.shoreline.client.impl.module.client.RotationsModule;
 import net.shoreline.client.impl.module.client.RotationsModule.MoveFix;
 import net.shoreline.client.impl.network.NetworkHandler;
-import net.shoreline.client.impl.render.Smoother;
+import net.shoreline.client.impl.render.animation.Smoother;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 

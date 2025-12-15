@@ -27,7 +27,7 @@ import net.shoreline.client.impl.inventory.ItemSlot;
 import net.shoreline.client.impl.inventory.SwapHandler;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.CombatModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.impl.render.Interpolation;

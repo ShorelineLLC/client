@@ -5,13 +5,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.client.HudGuiModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import org.lwjgl.glfw.GLFW;
 

@@ -18,6 +18,7 @@ import net.shoreline.client.impl.module.world.AirPlaceModule;
 import net.shoreline.client.impl.world.AsyncWorldScanner;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
+import net.shoreline.client.impl.world.explosion.ExplosionScanner;
 import net.shoreline.client.impl.world.explosion.ExplosionTrace;
 import net.shoreline.client.util.entity.EntityUtil;
 
@@ -97,13 +98,13 @@ public class AnchorScanner extends AsyncWorldScanner
             }
 
             float damage = getDamage(pos, entity);
-            if (damage > positionData.getDamage())
+            if (damage > positionData.getDamage() || damage > entityState.getTotalHealth())
             {
                 positionData.setDamage(damage);
                 positionData.setTarget((PlayerEntity) entity);
             }
 
-            if (damage > entityState.getTotalHealth()) // prioritize lethal positions.
+            if (damage > entityState.getTotalHealth())
             {
                 positionData.setDamage(damage);
                 positionData.setTarget((PlayerEntity) entity);

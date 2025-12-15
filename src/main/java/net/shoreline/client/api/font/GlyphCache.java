@@ -20,7 +20,9 @@ import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GlyphCache
 {
@@ -35,6 +37,8 @@ public class GlyphCache
     private int height;
     private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
     private boolean generated;
+    @Getter
+    private BufferedImage atlas;
 
     private final boolean antiAlias, fractionalMetrics;
 
@@ -106,6 +110,7 @@ public class GlyphCache
             currX += width + padding;
             charX++;
         }
+
         BufferedImage bufferedImage = new BufferedImage(Math.max(maxX + padding, 1), Math.max(maxY + padding, 1), BufferedImage.TYPE_INT_ARGB);
         width = bufferedImage.getWidth();
         height = bufferedImage.getHeight();
@@ -125,6 +130,7 @@ public class GlyphCache
             glyphs.put(glyph.value(), glyph);
         }
         registerTexture(id, bufferedImage);
+        atlas = bufferedImage;
         generated = true;
     }
 

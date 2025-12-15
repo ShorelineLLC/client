@@ -10,7 +10,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.client.util.input.InputUtil;

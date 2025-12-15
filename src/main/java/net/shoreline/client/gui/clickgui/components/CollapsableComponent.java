@@ -5,7 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.shoreline.client.gui.Mouse;
 import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.config.ConfigComponent;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.Easing;
 
 import java.util.ArrayList;

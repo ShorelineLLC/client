@@ -12,7 +12,7 @@ import net.shoreline.client.gui.clickgui.Frame;
 import net.shoreline.client.gui.clickgui.ModuleComponent;
 import net.shoreline.client.gui.clickgui.components.TextComponent;
 import net.shoreline.client.impl.render.ColorUtil;
-import net.shoreline.client.impl.render.Smoother;
+import net.shoreline.client.impl.render.animation.Smoother;
 import net.shoreline.client.impl.render.Theme;
 import org.lwjgl.glfw.GLFW;
 

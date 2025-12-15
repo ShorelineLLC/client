@@ -4,7 +4,6 @@ import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RespawnAnchorBlock;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Items;
@@ -19,21 +18,16 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.inventory.InventoryUtil;
-import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.module.combat.anchor.AnchorManager;
 import net.shoreline.client.impl.module.combat.anchor.AnchorData;
 import net.shoreline.client.impl.module.combat.anchor.AnchorScanner;
-import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.impl.PlacerModule;
-import net.shoreline.client.impl.render.Animation;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Getter
 public class AnchorAuraModule extends PlacerModule

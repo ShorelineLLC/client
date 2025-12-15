@@ -8,11 +8,9 @@ import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
-import net.shoreline.client.impl.render.Animation;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-
-import java.text.DecimalFormat;
 
 public class ServerStatusHudModule extends HudModule
 {

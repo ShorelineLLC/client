@@ -322,7 +322,7 @@ public final class FontRenderer implements Closeable
         return size;
     }
 
-    private Glyph getGlyphFromChar(char c)
+    public Glyph getGlyphFromChar(char c)
     {
         // Return cached glyph
         for (GlyphCache map : caches)

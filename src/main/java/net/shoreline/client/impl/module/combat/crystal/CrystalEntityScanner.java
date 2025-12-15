@@ -1,8 +1,12 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
+import net.minecraft.client.render.entity.model.EndCrystalEntityModel;
+import net.minecraft.client.render.entity.state.EndCrystalEntityRenderState;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -18,6 +22,8 @@ import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionScanner;
 import net.shoreline.client.util.entity.PlayerUtil;
+import net.shoreline.client.util.math.MathUtil;
+import net.shoreline.client.util.world.RaytraceUtil;
 
 import java.util.List;
 import java.util.Set;
@@ -62,6 +68,12 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
         }
 
         double breakDist = getLocalEntity().getEyePos().squaredDistanceTo(crystal.getPos());
+        if (breakDist > MathHelper.square(autoCrystal.getBreakTrace().getValue())
+                && !RaytraceUtil.canSee(crystal.getPos(), getLocalEntity().getEntity()))
+        {
+            return;
+        }
+
         if (breakDist > MathHelper.square(autoCrystal.getBreakRange().getValue()))
         {
             return;
