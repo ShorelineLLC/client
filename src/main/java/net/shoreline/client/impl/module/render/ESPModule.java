@@ -12,7 +12,7 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.impl.EntityModule;
+import net.shoreline.client.impl.module.impl.TargetingModule;
 import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
@@ -25,12 +25,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ESPModule extends EntityModule
+public class ESPModule extends TargetingModule
 {
     public Config<Boolean> items = new BooleanConfig.Builder("Items")
             .setDefaultValue(true).setDescription("Target Items").build();
     public Config<Void> targetConfig = new ConfigGroup.Builder("Target")
-            .addAll(players, hostiles, passives, crystals, items).build();
+            .addAll(targetPlayers, targetHostiles, targetPassives, items).build();
     public Config<Float> range = new NumberConfig.Builder<Float>("Range")
             .setMin(0.f).setDefaultValue(30.0f).setMax(250.f)
             .setDescription("If entity is within this range we render them").build();
