@@ -59,7 +59,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         {
             if (Managers.SOCIAL.isFriend(entity.getName())
                     || entity.getTotalArmor() <= 0 && !autoCrystal.getTargetNakeds().getValue()
-                    || !autoCrystal.canTargetEntity(entity.getEntityType()))
+                    || !autoCrystal.isValid(entity.getEntityType()))
             {
                 continue;
             }

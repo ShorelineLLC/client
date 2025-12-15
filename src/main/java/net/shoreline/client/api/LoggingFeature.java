@@ -35,6 +35,11 @@ public class LoggingFeature extends GenericFeature
         sendChatMessage(PREFIX + message, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
     }
 
+    protected void sendChatMessage(String message)
+    {
+        sendChatMessage(message, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
+    }
+
     protected void sendSuccessChatMessage(String message)
     {
         sendChatMessage(Formatting.GREEN + SUCCESS_PREFIX + message, Colors.GREEN);

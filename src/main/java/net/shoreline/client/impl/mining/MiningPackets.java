@@ -15,6 +15,7 @@ public enum MiningPackets
         {
             handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, blockPos, direction));
             handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
+            handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
             handler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
         }
 
@@ -22,6 +23,7 @@ public enum MiningPackets
         public void sendStopPackets(NetworkHandler handler, BlockPos blockPos, Direction direction)
         {
             handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
+            handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
         }
     },
 

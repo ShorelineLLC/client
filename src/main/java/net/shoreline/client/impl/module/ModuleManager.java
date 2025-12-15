@@ -29,12 +29,14 @@ public class ModuleManager
         registerModules(
 
                 // Client
+                new CapesModule(),
                 new ClickGuiModule(),
                 new FontModule(),
                 new HeadlessMCModule(),
                 new HudGuiModule(),
                 new InteractionsModule(),
                 new InventoryModule(),
+                new IRCModule(),
                 new LatencyModule(),
                 new RotationsModule(),
                 new SocialsModule(),

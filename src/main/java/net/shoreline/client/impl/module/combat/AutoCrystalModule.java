@@ -59,7 +59,6 @@ import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionUtil;
-import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.math.PerSecond;
 import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.client.util.world.WorldUtil;
@@ -90,14 +89,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Integer> extrapolateTicks = new NumberConfig.Builder<Integer>("Extrapolate")
             .setMin(0).setDefaultValue(0).setMax(10).setFormat(" ticks")
             .setDescription("The number of ticks ahead to predict movement").build();
-    Config<Boolean> targetPlayers = new BooleanConfig.Builder("Players")
-            .setDescription("Targets players").setDefaultValue(true).build();
     Config<Boolean> targetNakeds = new BooleanConfig.Builder("Nakeds")
             .setDescription("Targets nakeds").setVisible(targetPlayers::getValue).setDefaultValue(true).build();
-    Config<Boolean> targetHostiles = new BooleanConfig.Builder("Hostiles")
-            .setDescription("Targets hostiles").setDefaultValue(false).build();
-    Config<Boolean> targetPassives = new BooleanConfig.Builder("Passives")
-            .setDescription("Targets passives").setDefaultValue(false).build();
     Config<Void> targetConfig = new ConfigGroup.Builder("Target")
             .addAll(targetRange, extrapolateTicks, targetPlayers, targetNakeds, targetHostiles, targetPassives).build();
 
@@ -895,13 +888,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return InventoryUtil.getItemSlot((ItemStack itemStack) ->
                 itemStack.getItem().getTranslationKey().contains("sword")
                         || itemStack.getItem().getTranslationKey().contains("axe")).getSlot();
-    }
-
-    public boolean canTargetEntity(EntityType<?> entityType)
-    {
-        return entityType == EntityType.PLAYER && targetPlayers.getValue()
-                || EntityUtil.isHostile(entityType) && targetHostiles.getValue()
-                || EntityUtil.isPassive(entityType) && targetPassives.getValue();
     }
 
     public boolean isRunning()

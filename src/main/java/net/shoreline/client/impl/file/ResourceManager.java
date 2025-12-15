@@ -20,7 +20,7 @@ public class ResourceManager extends GenericFeature
     public ResourceManager()
     {
         super("Resource Packs");
-        loadResourcePack("lava", ResourcePackActivationType.NORMAL);
+        loadResourcePack("lava", ResourcePackActivationType.DEFAULT_ENABLED);
     }
 
     public void loadResourcePack(String packName, ResourcePackActivationType type)
