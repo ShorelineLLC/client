@@ -51,7 +51,19 @@ public class RenderManager extends GenericFeature
     @EventListener(priority = Integer.MIN_VALUE)
     public void onRenderWorld(RenderWorldEvent.Post event)
     {
-        flushBuffer(event.getTickDelta());
+        flushQuadsBuffer();
+        flushLinesQuadBuffer();
+        flushLinesBuffer(event.getTickDelta());
+
+        flushTextBuffer();
+        flushMeshes();
+
+        quadQueue.clear();
+        lineQuadQueue.clear();
+        lineQueue.clear();
+
+        meshQueue.clear();
+        textQueue.clear();
     }
 
     public void renderBox(MatrixStack matrixStack,
@@ -171,23 +183,6 @@ public class RenderManager extends GenericFeature
         }
 
         endRender();
-    }
-
-    public void flushBuffer(float tickDelta)
-    {
-        flushQuadsBuffer();
-        flushLinesQuadBuffer();
-        flushLinesBuffer(tickDelta);
-
-        flushTextBuffer();
-        flushMeshes();
-
-        quadQueue.clear();
-        lineQuadQueue.clear();
-        lineQueue.clear();
-
-        meshQueue.clear();
-        textQueue.clear();
     }
 
     private void flushMeshes()
