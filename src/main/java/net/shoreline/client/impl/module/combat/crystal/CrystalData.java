@@ -58,19 +58,4 @@ public class CrystalData<T>
             this(null, value, crystalVec, target, damageToTarget, damageToPlayer);
         }
     }
-
-    @Getter
-    public static class WithRotation<T> extends Immediate<T>
-    {
-        private final float[] angles;
-
-        public WithRotation(T value,
-                            Vec3d crystalVec,
-                            LivingEntityState target,
-                            float[] angles)
-        {
-            super("AS", value, crystalVec, target, 0.1f, 0.0f);
-            this.angles = angles;
-        }
-    }
 }

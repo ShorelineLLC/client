@@ -2,31 +2,36 @@ package net.shoreline.client.api.async;
 
 import net.shoreline.client.api.GenericFeature;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class AsyncFeature<T> extends GenericFeature
 {
-    protected Future<Collection<T>> currentResult;
+    protected Future<T> currentResult;
+
+    private final T nullValue;
 
     public AsyncFeature(String name)
     {
-        super(name);
+        this(name, null);
     }
 
-    public AsyncFeature(String name, String[] nameAliases)
+    public AsyncFeature(String name, T defaultValue)
+    {
+        this(name, new String[0], defaultValue);
+    }
+
+    public AsyncFeature(String name, String[] nameAliases, T defaultValue)
     {
         super(name, nameAliases);
+        this.nullValue = defaultValue;
     }
 
     @SuppressWarnings("unchecked cast")
-    public void runAsync(Callable<Collection<T>> calc)
+    public void runAsync(Callable<T> calc)
     {
-        currentResult = (Future<Collection<T>>) ClientExecutorService.INSTANCE.submit(calc);
+        currentResult = (Future<T>) ClientExecutorService.INSTANCE.submit(calc);
     }
 
     public void cancelRun()
@@ -38,11 +43,11 @@ public class AsyncFeature<T> extends GenericFeature
         }
     }
 
-    public Collection<T> getResults()
+    public T getResults()
     {
         if (currentResult == null || !currentResult.isDone())
         {
-            return new ArrayList<>();
+            return nullValue;
         }
 
         try
@@ -52,7 +57,7 @@ public class AsyncFeature<T> extends GenericFeature
         catch (InterruptedException | ExecutionException e)
         {
             e.printStackTrace();
-            return new ArrayList<>();
+            return nullValue;
         }
     }
 }

@@ -315,18 +315,14 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         if (currentPlace != null)
         {
             rotations = runPlace(currentPlace, hand);
-        } else if (predictPlace.getValue() != Timing.OFF)
+        } else if (AutoMineModule.INSTANCE.isEnabled() && SpeedMineModule.INSTANCE.isEnabled() && predictPlace.getValue() != Timing.OFF)
         {
             MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-            CrystalData.WithRotation<BlockPos> prePlaceData = runPrePlace(currentMine);
-            if (prePlaceData != null)
+            CrystalData.Immediate<BlockPos> prePlaceData = validateMiningData(currentMine);
+            if (prePlaceData != null && predictPlace.getValue() != Timing.OFF)
             {
                 currentPlace = prePlaceData;
-                rotations = prePlaceData.getAngles();
-                if (predictPlace.getValue() != Timing.OFF)
-                {
-                    placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
-                }
+                rotations = placeCrystalImmediately(prePlaceData, hand);
             }
         }
 
@@ -418,9 +414,14 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         Hand hand = getCrystalHand();
 
+        if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
+        {
+            return;
+        }
+
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
         {
-            CrystalData.WithRotation<BlockPos> prePlace = runPrePlace(currentMine);
+            CrystalData.Immediate<BlockPos> prePlace = validateMiningData(currentMine);
             if (prePlace == null)
             {
                 return;
@@ -428,7 +429,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
             if (packet.getPos().equals(prePlace.getValue().up()))
             {
-                placeCrystal(prePlace.getValue(), prePlace.getCrystalVec(), hand);
+                placeCrystalImmediately(prePlace, hand);
             }
         }
 
@@ -440,7 +441,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
                 if (entity instanceof ItemEntity)
                 {
                     BlockPos pos = entity.getBlockPos();
-                    CrystalData.WithRotation<BlockPos> prePlace = runPrePlace(currentMine);
+                    CrystalData.Immediate<BlockPos> prePlace = validateMiningData(currentMine);
                     if (prePlace == null)
                     {
                         continue;
@@ -448,7 +449,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
                     if (pos.equals(prePlace.getValue().up()))
                     {
-                        placeCrystal(prePlace.getValue(), prePlace.getCrystalVec(), hand);
+                        placeCrystalImmediately(prePlace, hand);
                         return;
                     }
                 }
@@ -461,7 +462,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             if (entity instanceof ItemEntity)
             {
                 BlockPos pos = entity.getBlockPos();
-                CrystalData.WithRotation<BlockPos> prePlace = runPrePlace(currentMine);
+                CrystalData.Immediate<BlockPos> prePlace = validateMiningData(currentMine);
                 if (prePlace == null)
                 {
                     return;
@@ -469,7 +470,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
                 if (pos.equals(prePlace.getValue().up()))
                 {
-                    placeCrystal(prePlace.getValue(), prePlace.getCrystalVec(), hand);
+                    placeCrystalImmediately(prePlace, hand);
                 }
             }
         }
@@ -559,57 +560,17 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return rotations;
     }
 
-    private CrystalData.WithRotation<BlockPos> runPrePlace(MiningData currentMine)
+    private float[] placeCrystalImmediately(CrystalData.Immediate<BlockPos> crystalData, Hand hand)
     {
-        if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
-        {
-            return null;
-        }
-
-        if (currentMine == null || !currentMine.isDoneMining() || SpeedMineModule.INSTANCE.isManualMining())
-        {
-            return null;
-        }
-
-        PlayerEntity target = Managers.TARGETING.getTarget();
-        if (target == null)
-        {
-            return null;
-        }
-
-        BlockPos minePos = currentMine.getBlockPos();
-        BlockPos placePos = minePos.down();
-        if (mc.player.squaredDistanceTo(placePos.toCenterPos()) > placeRange.getValue() * placeRange.getValue())
-        {
-            return null;
-        }
-
-        if (hasEntityBlockingCrystal(getCrystalBox(minePos), true))
-        {
-            return null;
-        }
-
-        LivingEntityState targetState = new LivingEntityState(target);
-        double damage = ExplosionUtil.crystalDamageToEntity(mc.world,
-                target,
-                minePos.toBottomCenterPos(),
-                ignoreTerrain.getValue(),
-                Set.of(minePos));
-
-        if (damage < minDamage.getValue())
-        {
-            return null;
-        }
-
-        Vec3d crystalVec = minePos.toBottomCenterPos();
-        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
+        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalData.getCrystalVec());
         if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
         {
             Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
             silentRotated = true;
         }
 
-        return new CrystalData.WithRotation<>(placePos, crystalVec, targetState, rotations);
+        placeCrystal(crystalData.getValue(), crystalData.getCrystalVec(), hand);
+        return rotations;
     }
 
     private void attackCrystal(int crystalId, Hand hand)
@@ -818,6 +779,65 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         return null;
+    }
+
+    private CrystalData.Immediate<BlockPos> validateMiningData(MiningData currentMine)
+    {
+        if (currentMine == null || !currentMine.isDoneMining() || SpeedMineModule.INSTANCE.isManualMining())
+        {
+            return null;
+        }
+
+        PlayerEntity target = Managers.TARGETING.getTarget();
+        if (target == null)
+        {
+            return null;
+        }
+
+        BlockPos minePos = currentMine.getBlockPos();
+        BlockPos placePos = minePos.down();
+
+        double dist = mc.player.squaredDistanceTo(placePos.toCenterPos());
+        if (dist > MathHelper.square(placeRange.getValue()))
+        {
+            return null;
+        }
+
+        if (hasEntityBlockingCrystal(getCrystalBox(minePos), true))
+        {
+            return null;
+        }
+
+        float selfDamage = (float) ExplosionUtil.crystalDamageToEntity(mc.world,
+                target,
+                minePos.toBottomCenterPos(),
+                ignoreTerrain.getValue(),
+                Set.of(minePos));
+
+        if (selfDamage > maxSelfDamage.getValue() || DamageUtil.getHealth(mc.player) - selfDamage < 0.5f)
+        {
+            return null;
+        }
+
+        LivingEntityState targetState = new LivingEntityState(target);
+        float damage = (float) ExplosionUtil.crystalDamageToEntity(mc.world,
+                target,
+                minePos.toBottomCenterPos(),
+                ignoreTerrain.getValue(),
+                Set.of(minePos));
+
+        if (damage < minDamage.getValue())
+        {
+            return null;
+        }
+
+        Vec3d crystalVec = minePos.toBottomCenterPos();
+        return new CrystalData.Immediate<>("AS",
+                placePos,
+                crystalVec,
+                targetState,
+                damage,
+                selfDamage);
     }
 
     public boolean canUseOnBlock(BlockPos blockPos)

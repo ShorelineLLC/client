@@ -47,6 +47,11 @@ public class ESPModule extends TargetingModule
     @EventListener
     public void onRender(RenderWorldEvent.Post event)
     {
+        if (checkNull())
+        {
+            return;
+        }
+
         Set<Entity> current = new HashSet<>();
         for (Entity entity : mc.world.getEntities())
         {

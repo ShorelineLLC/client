@@ -10,13 +10,16 @@ import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
-public class SafeHoleManager extends AsyncFeature<HoleData>
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class SafeHoleManager extends AsyncFeature<Collection<HoleData>>
 {
     private final HoleScanner scanner = new HoleScanner();
 
     public SafeHoleManager()
     {
-        super("Holes");
+        super("Holes", new ArrayList<>());
         EventBus.INSTANCE.subscribe(this);
     }
 
