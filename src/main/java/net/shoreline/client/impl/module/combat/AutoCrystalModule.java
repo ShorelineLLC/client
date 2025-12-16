@@ -322,7 +322,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             if (prePlaceData != null && predictPlace.getValue() != Timing.OFF)
             {
                 currentPlace = prePlaceData;
-                rotations = placeCrystalImmediately(prePlaceData, hand);
+                rotations = runPlace(prePlaceData, hand);
             }
         }
 
@@ -429,7 +429,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
             if (packet.getPos().equals(prePlace.getValue().up()))
             {
-                placeCrystalImmediately(prePlace, hand);
+                runPlace(prePlace, hand);
             }
         }
 
@@ -449,7 +449,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
                     if (pos.equals(prePlace.getValue().up()))
                     {
-                        placeCrystalImmediately(prePlace, hand);
+                        runPlace(prePlace, hand);
                         return;
                     }
                 }
@@ -470,7 +470,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
                 if (pos.equals(prePlace.getValue().up()))
                 {
-                    placeCrystalImmediately(prePlace, hand);
+                    runPlace(prePlace, hand);
                 }
             }
         }
@@ -557,19 +557,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         placeCrystal(crystalPos, crystalVec, hand);
-        return rotations;
-    }
-
-    private float[] placeCrystalImmediately(CrystalData.Immediate<BlockPos> crystalData, Hand hand)
-    {
-        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalData.getCrystalVec());
-        if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
-        {
-            Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
-            silentRotated = true;
-        }
-
-        placeCrystal(crystalData.getValue(), crystalData.getCrystalVec(), hand);
         return rotations;
     }
 
