@@ -62,7 +62,6 @@ public abstract class MixinWorldRenderer implements IWorldRenderer
         RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickDelta);
         EventBus.INSTANCE.dispatch(renderWorldEvent);
 
-        RenderSystem.restoreProjectionMatrix();
         matrixStack.pop();
     }
 

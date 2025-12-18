@@ -61,7 +61,7 @@ public class RenderManager extends GenericFeature
         flushQuadsBuffer();
         flushLinesQuadBuffer();
 
-        flushLinesBuffer(event.getMatrixStack(), event.getTickDelta());
+        flushLinesBuffer(event.getMatrixStack());
 
         flushTextBuffer();
         flushMeshes();
@@ -310,7 +310,7 @@ public class RenderManager extends GenericFeature
         endRender();
     }
 
-    private void flushLinesBuffer(MatrixStack matrices, float tickDelta)
+    private void flushLinesBuffer(MatrixStack matrices)
     {
         if (lineQueue.isEmpty())
         {
