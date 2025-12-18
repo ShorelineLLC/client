@@ -54,12 +54,6 @@ public abstract class MixinWorldRenderer implements IWorldRenderer
                                  CallbackInfo ci)
     {
         MatrixStack matrixStack = new MatrixStack();
-        float h = ((IGameRenderer) client.gameRenderer).invokeGetFov(camera, tickCounter.getTickDelta(true), false);
-        Matrix4f matrix4f = client.gameRenderer.getBasicProjectionMatrix(h);
-        matrix4f.mul(matrixStack.peek().getPositionMatrix());
-        RenderSystem.backupProjectionMatrix();
-        RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.PERSPECTIVE);
-
         matrixStack.push();
         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(client.gameRenderer.getCamera().getPitch()));
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(client.gameRenderer.getCamera().getYaw() + 180f));

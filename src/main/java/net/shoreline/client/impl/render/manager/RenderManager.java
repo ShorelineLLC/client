@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.render.manager;
 
+import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.api.font.FontManager;
@@ -24,9 +26,14 @@ import net.shoreline.client.impl.render.Mesh;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @Getter
@@ -53,7 +60,8 @@ public class RenderManager extends GenericFeature
     {
         flushQuadsBuffer();
         flushLinesQuadBuffer();
-        flushLinesBuffer(event.getTickDelta());
+
+        flushLinesBuffer(event.getMatrixStack(), event.getTickDelta());
 
         flushTextBuffer();
         flushMeshes();
@@ -302,7 +310,7 @@ public class RenderManager extends GenericFeature
         endRender();
     }
 
-    private void flushLinesBuffer(float tickDelta)
+    private void flushLinesBuffer(MatrixStack matrices, float tickDelta)
     {
         if (lineQueue.isEmpty())
         {
@@ -311,33 +319,80 @@ public class RenderManager extends GenericFeature
 
         startRender();
         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.backupProjectionMatrix();
+
         BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
         Camera camera = mc.getEntityRenderDispatcher().camera;
+        float cx = (float) camera.getPos().x;
+        float cy = (float) camera.getPos().y;
+        float cz = (float) camera.getPos().z;
 
-//        MatrixStack matrixStack = new MatrixStack();
-//        float d = ((IGameRenderer) mc.gameRenderer).invokeGetFov(camera, tickDelta, false);
-//        matrixStack.multiplyPositionMatrix(mc.gameRenderer.getBasicProjectionMatrix(d));
-//
-//        RenderSystem.backupProjectionMatrix();
+        MatrixStack matrixStack = new MatrixStack();
+        float h = mc.options.getFov().getValue();
+        Matrix4f matrix4f = mc.gameRenderer.getBasicProjectionMatrix(h);
+        matrix4f.mul(matrixStack.peek().getPositionMatrix());
 
-        for (LineRender batchedRender : lineQueue)
+        for (int i = 0; i < lineQueue.size(); i++)
         {
-            float x1 = (float) (batchedRender.start.x - camera.getPos().x);
-            float y1 = (float) (batchedRender.start.y - camera.getPos().y);
-            float z1 = (float) (batchedRender.start.z - camera.getPos().z);
-            buffer.vertex(batchedRender.matrix, x1, y1, z1).color(batchedRender.color);
+            RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.PERSPECTIVE);
+            LineRender batchedRender = lineQueue.get(i);
+            float x1 = (float) batchedRender.start.x - cx;
+            float y1 = (float) batchedRender.start.y - cy;
+            float z1 = (float) batchedRender.start.z - cz;
+
+            float x2;
+            float y2;
+            float z2;
+            if (batchedRender.end != null)
+            {
+                x2 = (float) batchedRender.end.x - cx;
+                y2 = (float) batchedRender.end.y - cy;
+                z2 = (float) batchedRender.end.z - cz;
+            } else
+            {
+                if (i > 0)
+                {
+                    LineRender prevRender = lineQueue.get(i - 1);
+                    x2 = (float) prevRender.end.x - cx;
+                    y2 = (float) prevRender.end.y - cy;
+                    z2 = (float) prevRender.end.z - cz;;
+                } else
+                {
+                    x2 = cx;
+                    y2 = cy;
+                    z2 = cz;
+                }
+            }
+
+            float k = x2 - x1;
+            float l = y2 - y1;
+            float m = z2 - z1;
+            float n = MathHelper.sqrt(k * k + l * l + m * m);
+            k /= n;
+            l /= n;
+            m /= n;
+
+            Matrix3f normal = matrices.peek().getNormalMatrix();
+            Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
+            Vector3f vector3f = normal.transform(k, l, m, new Vector3f()).normalize();
+            Vector4f vector4f = positionMatrix.transform(new Vector4f(x1, y1, z1, 1.0f));
+
+            buffer.vertex(vector4f.x, vector4f.y, vector4f.z)
+                    .normal(vector3f.x, vector3f.y, vector3f.z)
+                    .color(batchedRender.color);
 
             if (batchedRender.end != null)
             {
-                float x2 = (float) (batchedRender.end.x - camera.getPos().x);
-                float y2 = (float) (batchedRender.end.y - camera.getPos().y);
-                float z2 = (float) (batchedRender.end.z - camera.getPos().z);
-                buffer.vertex(batchedRender.matrix, x2, y2, z2).color(batchedRender.color);
+                Vector4f vector4f2 = positionMatrix.transform(new Vector4f(x2, y2, z2, 1.0f));
+                buffer.vertex(vector4f2.x, vector4f2.y, vector4f2.z)
+                        .normal(vector3f.x, vector3f.y, vector3f.z)
+                        .color(batchedRender.color);
             }
         }
 
         BufferRenderer.drawWithGlobalProgram(buffer.end());
+        RenderSystem.restoreProjectionMatrix();
         endRender();
     }
 
@@ -498,7 +553,7 @@ public class RenderManager extends GenericFeature
     private void startRender()
     {
         RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
+        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
         RenderSystem.disableDepthTest();
     }
 
