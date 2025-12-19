@@ -35,7 +35,7 @@ public abstract class Particle
     protected void resetWindup()
     {
         this.elapsedTime = 0f;
-        this.windupTime = (float) (Math.random() * 5.0); // 0–5 seconds
+        this.windupTime = (float) (Math.random() * 5.0);
     }
 
     public abstract void update(float delta);

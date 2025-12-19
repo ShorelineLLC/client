@@ -10,10 +10,13 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.titlescreen.particle.ParticleManager;
 import net.shoreline.client.gui.titlescreen.particle.snow.SnowManager;
 import net.shoreline.client.gui.titlescreen.particle.snow.SnowParticle;
+import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.TitleScreenModule;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,8 @@ public class ShorelineMenuScreen extends Screen
 {
     private final List<MenuButton> buttons;
     private static ParticleManager<SnowParticle> snowManager;
+    private final ClickGuiScreen clickGuiScreen = ClickGuiScreen.INSTANCE;
+    private boolean renderingGui;
 
     public ShorelineMenuScreen()
     {
@@ -61,17 +66,88 @@ public class ShorelineMenuScreen extends Screen
         snowManager.update();
         snowManager.render(context);
 
+        double mX = renderingGui ? -1 : mouseX;
+        double mY = renderingGui ? -1 : mouseY;
         for (MenuButton button : buttons)
         {
-            button.render(context, mouseX, mouseY, delta);
+            button.render(context, mX, mY, delta);
+        }
+
+        if (renderingGui)
+        {
+            clickGuiScreen.render(context, mouseX, mouseY, delta);
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        buttons.forEach(menuButton -> menuButton.mouseClicked(mouseX, mouseY, button));
+        if (renderingGui)
+        {
+            clickGuiScreen.mouseClicked(mouseX, mouseY, button);
+        }
+        else
+        {
+            buttons.forEach(menuButton -> menuButton.mouseClicked(mouseX, mouseY, button));
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    {
+        if (renderingGui)
+        {
+            clickGuiScreen.mouseReleased(mouseX, mouseY, button);
+        }
+
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
+    {
+        if (renderingGui)
+        {
+            clickGuiScreen.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+    {
+        if (keyCode == ClickGuiModule.INSTANCE.getKeybind().getValue().getKeycode())
+        {
+            renderingGui = true;
+            Window window = client.getWindow();
+            ClickGuiModule.INSTANCE.setFadeState(true);
+            clickGuiScreen.init(client, window.getScaledWidth(), window.getScaledHeight());
+        }
+        else if (keyCode == GLFW.GLFW_KEY_ESCAPE)
+        {
+            renderingGui = false;
+            clickGuiScreen.reset(); // idk
+        }
+        else if (renderingGui)
+        {
+            clickGuiScreen.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers)
+    {
+        if (renderingGui)
+        {
+            clickGuiScreen.charTyped(chr, modifiers);
+        }
+
+        return super.charTyped(chr, modifiers);
     }
 
     @Override
@@ -117,5 +193,6 @@ public class ShorelineMenuScreen extends Screen
     public static void setSnowManager(SnowManager manager)
     {
         ShorelineMenuScreen.snowManager = manager;
+        snowManager.reset();
     }
 }

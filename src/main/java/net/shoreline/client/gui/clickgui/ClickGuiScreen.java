@@ -272,6 +272,13 @@ public class ClickGuiScreen extends Screen
     @Override
     public void close()
     {
+        reset();
+        ClickGuiModule.INSTANCE.disable();
+        super.close();
+    }
+
+    public void reset()
+    {
         for (Frame frame : guiFrames)
         {
             frame.setDragging(false);
@@ -281,8 +288,6 @@ public class ClickGuiScreen extends Screen
         mouse.setRightClicked(false);
         mouse.setLeftHeld(false);
         mouse.setRightHeld(false);
-        ClickGuiModule.INSTANCE.disable();
-        super.close();
     }
 
     public void setDescriptionText(String descriptionText)

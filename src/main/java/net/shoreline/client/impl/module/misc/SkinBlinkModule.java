@@ -42,7 +42,7 @@ public class SkinBlinkModule extends Toggleable
     @Override
     public void onDisable()
     {
-        if (enabledPlayerModelParts == null || mc.options == null)
+        if (enabledPlayerModelParts == null || mc.options == null || mc.player == null)
         {
             return;
         }

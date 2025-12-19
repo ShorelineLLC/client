@@ -55,7 +55,7 @@ public class XRayModule extends Toggleable
             return;
         }
 
-        if (softReload.getValue())
+        if (softReload.getValue() && mc.player != null)
         {
             int x = (int) mc.player.getX();
             int y = (int) mc.player.getY();

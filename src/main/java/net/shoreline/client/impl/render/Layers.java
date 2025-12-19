@@ -80,7 +80,7 @@ public class Layers
             "shoreline_snow",
             VertexFormats.POSITION_TEXTURE_COLOR,
             VertexFormat.DrawMode.QUADS,
-            1024,
+            2048,
             false,
             false,
             RenderLayer.MultiPhaseParameters.builder()
@@ -90,6 +90,5 @@ public class Layers
                             TriState.FALSE,
                             false))
                     .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                    .build(false)
-    );
+                    .build(false));
 }

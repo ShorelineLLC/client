@@ -4,7 +4,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.imixin.IDrawContext;
+import net.shoreline.client.impl.render.manager.ShaderManager;
 
 import java.util.List;
 

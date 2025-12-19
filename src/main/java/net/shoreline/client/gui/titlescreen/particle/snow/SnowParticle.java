@@ -16,7 +16,7 @@ public class SnowParticle extends Particle
     private final float speed;
     private final float swayAmplitude;
     private final float swayFrequency;
-    private float size;
+    private final float size;
     private float time;
 
     public SnowParticle(int screenWidth, int screenHeight)
