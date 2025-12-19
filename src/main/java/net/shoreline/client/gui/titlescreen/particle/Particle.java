@@ -3,7 +3,7 @@ package net.shoreline.client.gui.titlescreen.particle;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.VertexConsumer;
 
 @AllArgsConstructor
 @Getter
@@ -40,7 +40,7 @@ public abstract class Particle
 
     public abstract void update(float delta);
 
-    public abstract void render(DrawContext context, float delta);
+    public abstract void render(VertexConsumer consumer);
 
     public abstract boolean isOutOfBounds();
 

@@ -5,27 +5,40 @@ import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 import net.shoreline.client.gui.titlescreen.particle.ParticleManager;
+import net.shoreline.client.gui.titlescreen.particle.ParticleRenderer;
+import net.shoreline.client.impl.render.Layers;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SnowManager extends ParticleManager<SnowParticle>
 {
     private final Identifier SHORELINE = Identifier.of("shoreline", "textures/shoreline.png");
-    private List<Vec2f> points;
+    private final Map<Long, ArrayList<Vec2f>> points = new HashMap<>();
+    private static final float RAD = 0.75f;
+    private static final float RAD_SQ = RAD * RAD;
+    private static final float SIZE = 4.0f;
 
     public SnowManager(int count)
     {
-        super(count);
-        points = new ArrayList<>();
+        super(count, new ParticleRenderer<>(Layers.SNOW));
         if (mc.getWindow() == null)
         {
             return;
         }
 
         loadImage();
+    }
+
+    public void loadImageAsync()
+    {
+        runAsync(() ->
+        {
+            loadImage();
+            return null;
+        });
     }
 
     public void loadImage()
@@ -37,7 +50,7 @@ public class SnowManager extends ParticleManager<SnowParticle>
         try
         {
             NativeImage image = NativeImage.read(mc.getResourceManager().getResourceOrThrow(SHORELINE).getInputStream());
-            points = sampleImage(image, targetWidth, targetHeight, 4.0f, 0.67f);
+            sampleImage(image, targetWidth, targetHeight, 3.0f, 0.67f);
         }
         catch (IOException e)
         {
@@ -55,118 +68,120 @@ public class SnowManager extends ParticleManager<SnowParticle>
     public void reset()
     {
         super.reset();
-        runAsync(() ->
-        {
-            loadImage();
-            return null;
-        });
+        loadImageAsync();
     }
 
     @Override
     public void update()
     {
-        runAsync(() ->
+        long now = System.currentTimeMillis();
+        float delta = Math.min((now - lastUpdate) / 1000f, 1f);
+        lastUpdate = now;
+
+        int count = 0;
+        for (SnowParticle particle : particles)
         {
-            if (particles.isEmpty())
+            if (particle.isFrozen())
             {
-                reset();
-                return null;
+                continue;
             }
 
-            if (points.isEmpty())
+            if (!freezeParticle(particle))
             {
-                loadImage();
-                return null;
-            }
-
-            long currentTime = System.currentTimeMillis();
-            float delta = Math.min((currentTime - lastUpdate) / 1000.0f, 1.0f);
-            lastUpdate = currentTime;
-
-            int size = particles.size();
-            if (size == 0)
-            {
-                return null;
-            }
-
-            for (SnowParticle particle : particles)
-            {
-                if (!particle.isFrozen())
+                particle.update(delta);
+                if (particle.isOutOfBounds())
                 {
-                    if (!freezeParticle(particle))
-                    {
-                        particle.update(delta);
-                        if (particle.isOutOfBounds())
-                        {
-                            particle.reset();
-                        }
-                    }
+                    particle.reset();
                 }
             }
+            else
+            {
+                count++;
+            }
+        }
 
-            return null;
-        });
+        addParticles(count);
     }
 
     private boolean freezeParticle(SnowParticle particle)
     {
         float px = particle.getX();
         float py = particle.getY();
-        float radius = 2.5f;
-        float chance = 0.9f;
-    
-        for (Vec2f point : points)
-        {
-            float dx = px - point.x;
-            float dy = py - point.y;
 
-            if (dx * dx + dy * dy < radius * radius)
+        int gx = (int) (px / SIZE);
+        int gy = (int) (py / SIZE);
+
+        for (int ox = -1; ox <= 1; ox++)
+        {
+            for (int oy = -1; oy <= 1; oy++)
             {
-                if (Math.random() < chance)
+                ArrayList<Vec2f> cell = points.get(cellKey(gx + ox, gy + oy));
+                if (cell == null)
                 {
-                    particle.setFrozen(true);
-                    points.remove(point);
-                    addParticles(1);
-                    return true;
+                    continue;
                 }
 
-                return false;
+                for (int i = 0; i < cell.size(); i++)
+                {
+                    Vec2f point = cell.get(i);
+                    float dx = px - point.x;
+                    float dy = py - point.y;
+
+                    if (dx * dx + dy * dy < RAD_SQ)
+                    {
+                        if (Math.random() < 0.9f)
+                        {
+                            particle.setFrozen(true);
+                            int last = cell.size() - 1;
+                            cell.set(i, cell.get(last));
+                            cell.remove(last);
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
             }
         }
 
         return false;
     }
 
-    private CopyOnWriteArrayList<Vec2f> sampleImage(NativeImage image, float targetWidth, float targetHeight, float density, float iScale)
+    private void sampleImage(NativeImage image, float targetWidth, float targetHeight, float density, float iScale)
     {
-        CopyOnWriteArrayList<Vec2f> result = new CopyOnWriteArrayList<>();
-        int width = image.getWidth();
-        int height = image.getHeight();
+        points.clear();
+        int w = image.getWidth();
+        int h = image.getHeight();
 
-        float scaleX = targetWidth / width;
-        float scaleY = targetHeight / height;
-        float scale = Math.min(scaleX, scaleY) * iScale;
+        float scale = Math.min(targetWidth / w, targetHeight / h) * iScale;
+        float baseX = (targetWidth - w * scale) / 2f;
+        float baseY = (targetHeight - h * scale) / 2f;
 
-        float baseX = (targetWidth - width * scale) / 2f;
-        float baseY = (targetHeight - height * scale) / 2f;
-
-        for (float x = 0; x < width; x += density)
+        for (float x = 0; x < w; x += density)
         {
-            for (float y = 0; y < height; y += density)
+            for (float y = 0; y < h; y += density)
             {
-                int argb = image.getColorArgb((int) x, (int) y);
-                int alpha = (argb >>> 24) & 0xFF;
+                int alpha = (image.getColorArgb((int) x, (int) y) >>> 24);
                 if (alpha < 50)
                 {
                     continue;
                 }
 
-                float scaledX = baseX + x * scale;
-                float scaledY = baseY + y * scale;
-                result.add(new Vec2f(scaledX, scaledY));
+                float sx = baseX + x * scale;
+                float sy = baseY + y * scale;
+
+                int gx = (int) (sx / SIZE);
+                int gy = (int) (sy / SIZE);
+                long key = cellKey(gx, gy);
+
+                points.computeIfAbsent(key, k -> new ArrayList<>())
+                        .add(new Vec2f(sx, sy));
             }
         }
+    }
 
-        return result;
+    private long cellKey(int x, int y)
+    {
+        return (((long) x) << 32) | (y & 0xffffffffL);
     }
 }

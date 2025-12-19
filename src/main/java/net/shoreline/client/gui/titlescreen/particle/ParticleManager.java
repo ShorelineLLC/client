@@ -4,20 +4,22 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.Window;
 import net.shoreline.client.api.async.AsyncFeature;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class ParticleManager<T extends Particle> extends AsyncFeature<Void>
 {
-    protected List<T> particles = new CopyOnWriteArrayList<>();
+    protected List<T> particles = new ArrayList<>();
+    protected final ParticleRenderer<T> renderer;
     protected final int count;
 
     protected Long lastUpdate;
 
-    public ParticleManager(int count)
+    public ParticleManager(int count, ParticleRenderer<T> renderer)
     {
         super("Particles");
         this.count = count;
+        this.renderer = renderer;
         this.lastUpdate = System.currentTimeMillis();
     }
 
@@ -43,7 +45,7 @@ public abstract class ParticleManager<T extends Particle> extends AsyncFeature<V
     public void reset()
     {
         particles.clear();
-        List<T> newList = new CopyOnWriteArrayList<>();
+        List<T> newList = new ArrayList<>();
         if (mc == null || mc.getWindow() == null)
         {
             return;
@@ -95,7 +97,7 @@ public abstract class ParticleManager<T extends Particle> extends AsyncFeature<V
         });
     }
 
-    public void render(DrawContext context, float delta)
+    public void render(DrawContext context)
     {
         if (particles.isEmpty())
         {
@@ -113,12 +115,6 @@ public abstract class ParticleManager<T extends Particle> extends AsyncFeature<V
             return;
         }
 
-        context.getMatrices().push();
-        for (T particle : particles)
-        {
-            particle.render(context, delta);
-        }
-
-        context.getMatrices().pop();
+        renderer.render(context, particles);
     }
 }

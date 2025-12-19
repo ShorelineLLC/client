@@ -5,6 +5,7 @@ net.shoreline.headless.HeadlessAPI -> net.shoreline.loader.d:
 net.shoreline.loader.Loader -> net.shoreline.loader.give up:
     org.apache.logging.log4j.Logger LOGGER -> b
     java.lang.String VERSION -> c
+    net.shoreline.loader.session.UserSession SESSION -> e
     void <init>() -> <init>
     void onLoad(java.lang.String) -> onLoad
     java.lang.String getRefMapperConfig() -> getRefMapperConfig
@@ -32,7 +33,7 @@ net.shoreline.loader.mixin.MixinServiceExt -> net.shoreline.loader.a:
     java.lang.Object getInternalInputStream(java.lang.Object) -> b
 net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
     java.util.Set REGISTERED_SOUND_FILES -> d
-    net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack parent -> e
+    net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack parent -> f
     void <init>(net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack) -> <init>
     net.minecraft.class_7367 method_14410(java.lang.String[]) -> method_14410
     net.minecraft.class_7367 method_14405(net.minecraft.class_3264,net.minecraft.class_2960) -> method_14405
@@ -48,11 +49,11 @@ net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
     java.io.InputStream lambda$open$0(java.io.InputStream) -> lambda$open$0
     void <clinit>() -> <clinit>
 net.shoreline.loader.session.UserSession -> net.shoreline.loader.c:
-    java.lang.String hardwareId -> f
-    java.lang.String username -> g
-    java.lang.String uid -> h
-    java.lang.String usertype -> i
-    java.util.List runningMods -> j
+    java.lang.String hardwareId -> g
+    java.lang.String username -> h
+    java.lang.String uid -> i
+    java.lang.String usertype -> j
+    java.util.List runningMods -> k
     void <init>(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.util.List) -> <init>
     java.lang.String getHardwareID() -> d
     java.lang.String getUsername() -> e

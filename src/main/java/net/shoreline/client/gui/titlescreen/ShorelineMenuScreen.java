@@ -35,7 +35,7 @@ public class ShorelineMenuScreen extends Screen
     public void resize(MinecraftClient client, int width, int height)
     {
         super.resize(client, width, height);
-        snowManager = TitleScreenModule.INSTANCE.getManager();
+        snowManager.reset();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ShorelineMenuScreen extends Screen
     {
         context.fill(0, 0, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight(), 0xFF000000);
         snowManager.update();
-        snowManager.render(context, delta);
+        snowManager.render(context);
 
         for (MenuButton button : buttons)
         {

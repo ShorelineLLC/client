@@ -75,4 +75,21 @@ public class Layers
                 .build(affectsOutline);
         return RenderLayer.of("entity_cutout_no_cull", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 1536, true, true, multiPhaseParameters);
     });
+
+    public static final RenderLayer SNOW = RenderLayer.of(
+            "shoreline_snow",
+            VertexFormats.POSITION_TEXTURE_COLOR,
+            VertexFormat.DrawMode.QUADS,
+            256,
+            false,
+            false,
+            RenderLayer.MultiPhaseParameters.builder()
+                    .program(RenderPhase.ShaderProgram.POSITION_TEXTURE_COLOR_PROGRAM)
+                    .texture(new RenderPhase.Texture(
+                            Identifier.of("shoreline", "textures/snowflake.png"),
+                            TriState.FALSE,
+                            false))
+                    .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                    .build(false)
+    );
 }
