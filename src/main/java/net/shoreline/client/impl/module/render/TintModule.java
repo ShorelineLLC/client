@@ -191,7 +191,7 @@ public class TintModule extends Toggleable
 
     private void reloadWorld()
     {
-        if (mc.worldRenderer != null)
+        if (mc.worldRenderer != null && mc.player != null)
         {
             int x = (int) mc.player.getX();
             int y = (int) mc.player.getY();
