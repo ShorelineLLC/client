@@ -108,9 +108,9 @@ public class TrailsModule extends ListeningToggleable
 
     private boolean shouldRenderTrail(Entity entity)
     {
-        if (entity instanceof PlayerEntity && playersConfig.getValue())
+        if (entity instanceof PlayerEntity)
         {
-            return entity != mc.player || selfConfig.getValue();
+            return entity != mc.player && playersConfig.getValue() || selfConfig.getValue();
         }
 
         return entity instanceof EnderPearlEntity && pearlsConfig.getValue()

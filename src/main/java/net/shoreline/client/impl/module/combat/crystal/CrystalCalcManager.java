@@ -6,15 +6,16 @@ import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.world.EntityState;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class CrystalCalcManager extends AsyncFeature<CrystalData<?>>
+public class CrystalCalcManager extends AsyncFeature<Collection<CrystalData<?>>>
 {
     private final CrystalBaseScanner baseScanner;
 
     public CrystalCalcManager(AutoCrystalModule autoCrystalModule)
     {
-        super("End Crystals");
+        super("End Crystals", new ArrayList<>());
         this.baseScanner = new CrystalBaseScanner(autoCrystalModule);
     }
 

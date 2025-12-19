@@ -68,14 +68,10 @@ public class NoLagModule extends Toggleable
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (noSoundLag.getValue() && event.getPacket() instanceof PlaySoundFromEntityS2CPacket packet
-                && equipSounds.contains(packet.getSound().value()))
+        if (noSoundLag.getValue() && event.getPacket() instanceof PlaySoundFromEntityS2CPacket packet && equipSounds.contains(packet.getSound().value()))
         {
             event.cancel();
-        }
-
-        else if (noParticleLag.getValue() && event.getPacket() instanceof ParticleS2CPacket packet
-                && packet.getCount() > 512)
+        } else if (noParticleLag.getValue() && event.getPacket() instanceof ParticleS2CPacket packet && packet.getCount() > 512)
         {
             event.cancel();
         }

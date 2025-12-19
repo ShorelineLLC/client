@@ -13,7 +13,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.RotationAxis;
-import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
 import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
 import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
@@ -60,17 +59,9 @@ public abstract class MixinWorldRenderer implements IWorldRenderer
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(client.gameRenderer.getCamera().getYaw() + 180f));
 
         float tickDelta = tickCounter.getTickDelta(true);
-//        MatrixStack matrixStack2 = new MatrixStack();
-//        float d = ((IGameRenderer) gameRenderer).invokeGetFov(camera, tickDelta, false);
-//        matrixStack2.multiplyPositionMatrix(gameRenderer.getBasicProjectionMatrix(d));
-//
-//        RenderSystem.backupProjectionMatrix();
-//        RenderSystem.setProjectionMatrix(matrixStack2.peek().getPositionMatrix(), ProjectionType.PERSPECTIVE);
-
         RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickDelta);
         EventBus.INSTANCE.dispatch(renderWorldEvent);
 
-//        RenderSystem.restoreProjectionMatrix();
         matrixStack.pop();
     }
 

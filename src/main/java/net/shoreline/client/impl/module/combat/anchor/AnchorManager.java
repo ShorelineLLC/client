@@ -9,17 +9,18 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TreeSet;
 
 @Getter
-public class AnchorManager extends AsyncFeature<AnchorData>
+public class AnchorManager extends AsyncFeature<Collection<AnchorData>>
 {
     private final AnchorAuraModule module;
     private final AnchorScanner scanner;
 
     public AnchorManager(AnchorAuraModule module)
     {
-        super("Anchors");
+        super("Anchors", new ArrayList<>());
         this.module = module;
         this.scanner = new AnchorScanner(module);
         EventBus.INSTANCE.subscribe(this);
