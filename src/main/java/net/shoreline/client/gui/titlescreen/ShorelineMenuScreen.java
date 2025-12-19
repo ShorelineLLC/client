@@ -23,7 +23,7 @@ import java.util.Locale;
 public class ShorelineMenuScreen extends Screen
 {
     private final List<MenuButton> buttons;
-    private ParticleManager<SnowParticle> snowManager;
+    private static ParticleManager<SnowParticle> snowManager;
 
     public ShorelineMenuScreen()
     {
@@ -112,5 +112,10 @@ public class ShorelineMenuScreen extends Screen
             buttons.add(new MenuButton(button.getName(), button.getRunnable(), currentX, centerY));
             currentX += button.getWidth() + spacing;
         }
+    }
+
+    public static void setSnowManager(SnowManager manager)
+    {
+        ShorelineMenuScreen.snowManager = manager;
     }
 }

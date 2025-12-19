@@ -80,7 +80,7 @@ public class Layers
             "shoreline_snow",
             VertexFormats.POSITION_TEXTURE_COLOR,
             VertexFormat.DrawMode.QUADS,
-            256,
+            1024,
             false,
             false,
             RenderLayer.MultiPhaseParameters.builder()

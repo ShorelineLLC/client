@@ -20,11 +20,16 @@ public class ParticleRenderer<T extends Particle>
     public void render(DrawContext context, List<T> particles)
     {
         VertexConsumerProvider provider = ((IDrawContext) context).getVertexConsumerProvider();
-        VertexConsumer vc = provider.getBuffer(layer);
+        VertexConsumer consumer = provider.getBuffer(layer);
 
         for (T particle : particles)
         {
-            particle.render(vc);
+            if (particle.isWindingUp())
+            {
+                continue;
+            }
+
+            particle.render(consumer);
         }
     }
 }

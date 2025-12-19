@@ -109,7 +109,7 @@ public abstract class ParticleManager<T extends Particle> extends AsyncFeature<V
         int height = window.getScaledHeight();
 
         if (particles.getFirst().screenWidth != width ||
-                particles.getFirst().screenHeight != height)
+            particles.getFirst().screenHeight != height)
         {
             reset();
             return;

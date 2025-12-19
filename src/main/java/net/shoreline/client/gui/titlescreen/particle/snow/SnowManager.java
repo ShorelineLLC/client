@@ -1,5 +1,6 @@
 package net.shoreline.client.gui.titlescreen.particle.snow;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
@@ -50,7 +51,7 @@ public class SnowManager extends ParticleManager<SnowParticle>
         try
         {
             NativeImage image = NativeImage.read(mc.getResourceManager().getResourceOrThrow(SHORELINE).getInputStream());
-            sampleImage(image, targetWidth, targetHeight, 3.0f, 0.67f);
+            sampleImage(image, targetWidth, targetHeight, 2.5f, 0.67f);
         }
         catch (IOException e)
         {
@@ -93,14 +94,36 @@ public class SnowManager extends ParticleManager<SnowParticle>
                 {
                     particle.reset();
                 }
+
+                continue;
             }
-            else
-            {
-                count++;
-            }
+
+            count++;
         }
 
         addParticles(count);
+    }
+
+    @Override
+    public void render(DrawContext context)
+    {
+        if (particles.isEmpty())
+        {
+            return;
+        }
+
+        Window window = mc.getWindow();
+        int width  = window.getScaledWidth();
+        int height = window.getScaledHeight();
+
+        if (particles.getFirst().getScreenWidth() != width ||
+                particles.getFirst().getScreenHeight() != height)
+        {
+            reset();
+            return;
+        }
+
+        renderer.render(context, particles);
     }
 
     private boolean freezeParticle(SnowParticle particle)
@@ -111,36 +134,26 @@ public class SnowManager extends ParticleManager<SnowParticle>
         int gx = (int) (px / SIZE);
         int gy = (int) (py / SIZE);
 
-        for (int ox = -1; ox <= 1; ox++)
+        long key = cellKey(gx, gy);
+        ArrayList<Vec2f> cell = points.get(key);
+        if (cell == null || cell.isEmpty())
         {
-            for (int oy = -1; oy <= 1; oy++)
+            return false;
+        }
+
+        for (int i = 0; i < cell.size(); i++)
+        {
+            Vec2f point = cell.get(i);
+            float dx = px - point.x;
+            float dy = py - point.y;
+
+            if (dx * dx + dy * dy < RAD_SQ)
             {
-                ArrayList<Vec2f> cell = points.get(cellKey(gx + ox, gy + oy));
-                if (cell == null)
-                {
-                    continue;
-                }
-
-                for (int i = 0; i < cell.size(); i++)
-                {
-                    Vec2f point = cell.get(i);
-                    float dx = px - point.x;
-                    float dy = py - point.y;
-
-                    if (dx * dx + dy * dy < RAD_SQ)
-                    {
-                        if (Math.random() < 0.9f)
-                        {
-                            particle.setFrozen(true);
-                            int last = cell.size() - 1;
-                            cell.set(i, cell.get(last));
-                            cell.remove(last);
-                            return true;
-                        }
-
-                        return false;
-                    }
-                }
+                particle.setFrozen(true);
+                int last = cell.size() - 1;
+                cell.set(i, cell.get(last));
+                cell.remove(last);
+                return true;
             }
         }
 

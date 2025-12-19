@@ -1,11 +1,9 @@
 package net.shoreline.client.gui.titlescreen.particle.snow;
 
 import lombok.Getter;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.gui.titlescreen.particle.Particle;
-import net.shoreline.client.impl.imixin.IDrawContext;
 
 import java.util.Random;
 
@@ -15,10 +13,10 @@ public class SnowParticle extends Particle
     private static final Random RANDOM = new Random();
     private final Identifier SNOWFLAKE = Identifier.of("shoreline", "textures/snowflake.png");
 
-    private final float size;
     private final float speed;
     private final float swayAmplitude;
     private final float swayFrequency;
+    private float size;
     private float time;
 
     public SnowParticle(int screenWidth, int screenHeight)
@@ -28,14 +26,13 @@ public class SnowParticle extends Particle
         r = Math.min(r * r, 0.85f);
         size = 1.5f + r * 2.5f;
 
-        float baseSpeed = (400f + RANDOM.nextFloat() * 70f) / (size / 2f);
+        float baseSpeed = (350f + RANDOM.nextFloat() * 70f) / (size / 2f);
         float randomness = Math.max(0.3f, 1f - (size - 1.5f) / 3f);
 
         speed = baseSpeed * (1f + (RANDOM.nextFloat() * 2f - 1f) * 0.3f * randomness);
         swayAmplitude = 0.3f + RANDOM.nextFloat() * 0.7f;
         swayFrequency = 1f + RANDOM.nextFloat() * 2f;
         time = RANDOM.nextFloat() * (float) Math.PI * 2f;
-
         resetWindup();
     }
 
@@ -44,6 +41,11 @@ public class SnowParticle extends Particle
     {
         if (isWindingUp(delta))
         {
+            if (!isOutOfBounds())
+            {
+                reset();
+            }
+
             return;
         }
 
@@ -55,11 +57,6 @@ public class SnowParticle extends Particle
     @Override
     public void render(VertexConsumer consumer)
     {
-        if (isWindingUp())
-        {
-            return;
-        }
-
         consumer.vertex(x, y, 0)
                 .texture(0, 0)
                 .color(255, 255, 255, 255);
@@ -102,15 +99,5 @@ public class SnowParticle extends Particle
             x = screenWidth + size;
             y = RANDOM.nextFloat() * screenHeight;
         }
-    }
-
-    private void drawTexture(DrawContext context, float x, float y, float x2, float y2, Identifier identifier, int color)
-    {
-        VertexConsumerProvider provider = ((IDrawContext) context).getVertexConsumerProvider();
-        VertexConsumer consumer = provider.getBuffer(RenderLayer.getGuiTextured(identifier));
-        consumer.vertex(x, y, 0).color(color).texture(0, 0);
-        consumer.vertex(x, y2, 0).color(color).texture(0, 1);
-        consumer.vertex(x2, y2, 0).color(color).texture(1, 1);
-        consumer.vertex(x2, y, 0).color(color).texture(1, 0);
     }
 }
