@@ -67,12 +67,12 @@ public class AutoArmorModule extends InventorySwapModule
     {
         int armor    = 44 - slot;
         int provided = findArmor(equipment);
-        Item providedItem = mc.player.getInventory().getStack(provided).getItem();
         if (provided == -1 || armor == provided || checkArmor(armor))
         {
             return false;
         }
 
+        Item providedItem = mc.player.getInventory().getStack(provided).getItem();
         ScreenHandler handler = mc.player.playerScreenHandler;
         if (fastSwap.getValue())
         {
@@ -117,16 +117,5 @@ public class AutoArmorModule extends InventorySwapModule
     private EquipmentSlot getEquipmentSlot(ItemStack itemStack)
     {
         return itemStack.get(DataComponentTypes.EQUIPPABLE).slot();
-    }
-
-    @Override
-    public boolean checkNull()
-    {
-        if (mc.player.getInventory().size() == -1)
-        {
-            return true;
-        }
-
-        return super.checkNull();
     }
 }
