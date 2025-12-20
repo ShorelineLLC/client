@@ -46,13 +46,26 @@ public class CrystalDataFactory
 
         if (autoCrystal.getOverrideConfig().getValue() && (isLethalCrystal(target, appliedDamage) || isArmorBreaker(target, damageToTarget)))
         {
-            return new CrystalData.Immediate<>(value, crystalVec, target, damageToTarget, damageToPlayer);
+            return new CrystalData.Immediate<>(value,
+                    crystalVec,
+                    target,
+                    damageToTarget,
+                    damageToPlayer);
         } else if (autoCrystal.getTargetItems().getValue() && isAntiSurroundPos(blockPos))
         {
-            return new CrystalData.Immediate<>("AS", value, crystalVec, target, damageToTarget, damageToPlayer);
+            return new CrystalData.Immediate<>("AS",
+                    value,
+                    crystalVec,
+                    target,
+                    damageToTarget,
+                    damageToPlayer);
         } else
         {
-            return new CrystalData<>(value, crystalVec, target, damageToTarget, damageToPlayer);
+            return new CrystalData<>(value,
+                    crystalVec,
+                    target,
+                    damageToTarget,
+                    damageToPlayer);
         }
     }
 

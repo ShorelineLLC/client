@@ -2,6 +2,8 @@ package net.shoreline.client.impl.rotation;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
@@ -17,6 +19,8 @@ import net.shoreline.client.impl.network.NetworkHandler;
 import net.shoreline.client.impl.render.animation.Smoother;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -117,13 +121,15 @@ public class RotationManager extends NetworkHandler
             serverRotation.setYaw(packet.getYaw(0.0f));
             serverRotation.setPitch(packet.getPitch(0.0f));
         }
-
     }
 
     @EventListener(priority = Integer.MIN_VALUE)
     public void onUpdatePre(PlayerUpdateEvent.PrePacket event)
     {
-        handler.applyRotations(mc.player);
+        if (hasClientRotation())
+        {
+            handler.applyRotations(mc.player);
+        }
     }
 
     @EventListener(priority = Integer.MAX_VALUE)
@@ -147,16 +153,44 @@ public class RotationManager extends NetworkHandler
         }
     }
 
+    private static final List<Item> PROJECTILE_ITEMS = List.of(
+            Items.SNOWBALL,
+            Items.EGG,
+            Items.ENDER_PEARL,
+            Items.EXPERIENCE_BOTTLE,
+            Items.SPLASH_POTION,
+            Items.LINGERING_POTION,
+            Items.WIND_CHARGE,
+            Items.FIRE_CHARGE
+    );
+
     @EventListener
     public void onInteractItem(InteractItemEvent.Pre event)
     {
-        handler.applyRotations(mc.player);
+        if (!PROJECTILE_ITEMS.contains(event.getItem()) || !hasClientRotation())
+        {
+            return;
+        }
+
+        if (rotationsConfig.getItemFixConfig().getValue())
+        {
+            setSilentRotation(new Rotation(mc.player));
+        } else
+        {
+            handler.applyRotations(mc.player);
+        }
     }
 
     @EventListener
     public void onInteractItem(InteractItemEvent.Post event)
     {
-        handler.revertRotations(mc.player);
+        if (rotationsConfig.getItemFixConfig().getValue() && hasClientRotation())
+        {
+            resetSilentRotation();
+        } else
+        {
+            handler.revertRotations(mc.player);
+        }
     }
 
     @EventListener
@@ -201,7 +235,7 @@ public class RotationManager extends NetworkHandler
     @EventListener
     public void onTravelPre(TravelEvent.Pre event)
     {
-        if (rotationsConfig.getFixTravel().getValue())
+        if (rotationsConfig.getFixTravel().getValue() && hasClientRotation())
         {
             handler.applyRotations(mc.player);
         }

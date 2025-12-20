@@ -2,9 +2,6 @@ package net.shoreline.client.mixin.render;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.systems.ProjectionType;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -18,13 +15,10 @@ import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
 import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
 import net.shoreline.client.impl.event.render.RenderShaderEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.imixin.IGameRenderer;
 import net.shoreline.client.impl.imixin.IWorldRenderer;
 import net.shoreline.eventbus.EventBus;
 import org.joml.Matrix4f;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,10 +29,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer implements IWorldRenderer
 {
-    @Shadow
-    @Final
-    private MinecraftClient client;
-
     @Override
     @Accessor(value = "frustum")
     public abstract Frustum getFrustum();
@@ -55,8 +45,8 @@ public abstract class MixinWorldRenderer implements IWorldRenderer
     {
         MatrixStack matrixStack = new MatrixStack();
         matrixStack.push();
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(client.gameRenderer.getCamera().getPitch()));
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(client.gameRenderer.getCamera().getYaw() + 180f));
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(gameRenderer.getCamera().getPitch()));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(gameRenderer.getCamera().getYaw() + 180f));
 
         float tickDelta = tickCounter.getTickDelta(true);
         RenderWorldEvent.Post renderWorldEvent = new RenderWorldEvent.Post(matrixStack, tickDelta);

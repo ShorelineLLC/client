@@ -37,6 +37,7 @@
     "gui.screen.slot.MixinShulkerBoxSlot",
     "input.MixinInput",
     "input.MixinKeyboardInput",
+    "item.MixinItem",
     "item.MixinItemUsageContext",
     "item.consume.MixinTeleportRandomlyConsumeEffect",
     "network.MixinClientCommonNetworkHandler",
