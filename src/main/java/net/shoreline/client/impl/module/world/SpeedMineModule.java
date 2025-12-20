@@ -247,7 +247,6 @@ public class SpeedMineModule extends ListeningToggleable
         }
 
         mainState = new MiningRenderState(mainMiningBlock, new Animation(true, 300L));
-
         miningPackets.getValue().sendStartPackets(this, mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
     }
 
@@ -298,8 +297,12 @@ public class SpeedMineModule extends ListeningToggleable
         }
 
         miningPackets.getValue().sendStopPackets(this, mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
-
         Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
+
+        if (remineMode.getValue() == RemineMode.OFF)
+        {
+            clearMain();
+        }
     }
 
     private void tickPacket()

@@ -1,18 +1,30 @@
 package net.shoreline.client.impl.module.combat;
 
+import com.google.common.collect.Maps;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;
+
+import java.util.Map;
 
 public class AutoArmorModule extends InventorySwapModule
 {
@@ -22,6 +34,12 @@ public class AutoArmorModule extends InventorySwapModule
     Config<Boolean> fastSwap = new BooleanConfig.Builder("FastSwap")
             .setDescription("Uses a faster swap method")
             .setDefaultValue(false).build();
+
+    private final Map<EquipmentSlot, Integer> equipmentSlots =
+            Map.of(EquipmentSlot.HEAD, 5,
+                   EquipmentSlot.CHEST, 6,
+                   EquipmentSlot.LEGS, 7,
+                   EquipmentSlot.FEET, 8);
 
     public AutoArmorModule()
     {
@@ -36,50 +54,68 @@ public class AutoArmorModule extends InventorySwapModule
             return;
         }
 
-        for (int i = 0; i < 4; i++)
+        for (Map.Entry<EquipmentSlot, Integer> slot : equipmentSlots.entrySet())
         {
-            ItemStack armorStack = mc.player.getInventory().getArmorStack(i);
-            float percent = ItemUtil.getStackPercent(armorStack) * 100.0f;
-            if (armorStack.isEmpty() || percent < armorPercent.getValue())
+            if (check(slot.getKey(), slot.getValue()))
             {
-                swapItemForArmorSlot(i);
+                break;
             }
         }
     }
 
-    private void swapItemForArmorSlot(int armorSlot)
+    private boolean check(EquipmentSlot equipment, int slot)
     {
-        for (Item armorItem : getArmorItemVariations(armorSlot))
+        int armor    = 44 - slot;
+        int provided = findArmor(equipment);
+        Item providedItem = mc.player.getInventory().getStack(provided).getItem();
+        if (provided == -1 || armor == provided || checkArmor(armor))
         {
-            int slot = 103 - armorSlot;
-            if (swapItemWithSlot(armorItem, slot, fastSwap.getValue()) != -1)
+            return false;
+        }
+
+        ScreenHandler handler = mc.player.playerScreenHandler;
+        if (fastSwap.getValue())
+        {
+            Managers.INVENTORY.clickSwap(InventoryUtil.getPacketSlotIndex(handler, provided), slot, providedItem);
+        }
+        else
+        {
+            Managers.INVENTORY.pickupSlot(handler, slot);
+            Managers.INVENTORY.pickupSlot(handler, InventoryUtil.getPacketSlotIndex(handler, provided));
+            Managers.INVENTORY.pickupSlot(handler, slot);
+        }
+
+        return true;
+    }
+
+    private int findArmor(EquipmentSlot equipment)
+    {
+        for (int i = 0; i <= 45; i++)
+        {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (!(stack.getItem() instanceof ArmorItem))
             {
-                return;
+                continue;
+            }
+
+            if (getEquipmentSlot(stack).equals(equipment))
+            {
+                return i;
             }
         }
+
+        return -1;
     }
 
-    public Item[] getArmorItemVariations(int armorSlot)
+    private boolean checkArmor(int armor)
     {
-        String armorName = getArmorName(armorSlot);
-        return new Item[]
-                {
-                        Registries.ITEM.get(Identifier.of("netherite_" + armorName)),
-                        Registries.ITEM.get(Identifier.of("diamond_" + armorName)),
-                        Registries.ITEM.get(Identifier.of("iron_" + armorName)),
-                        Registries.ITEM.get(Identifier.of("golden_" + armorName))
-                };
+        ItemStack armorStack = mc.player.getInventory().getStack(armor);
+        float percent = ItemUtil.getStackPercent(armorStack) * 100.0f;
+        return !(percent < armorPercent.getValue()) && !armorStack.isEmpty();
     }
 
-    public String getArmorName(int armorSlot)
+    private EquipmentSlot getEquipmentSlot(ItemStack itemStack)
     {
-        return switch (armorSlot)
-        {
-            case 0 -> "helmet";
-            case 1 -> "chestplate";
-            case 2 -> "leggings";
-            case 3 -> "boots";
-            default -> throw new IllegalStateException("Unexpected value: " + armorSlot);
-        };
+        return itemStack.get(DataComponentTypes.EQUIPPABLE).slot();
     }
 }

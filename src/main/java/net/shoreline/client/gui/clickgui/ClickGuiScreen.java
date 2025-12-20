@@ -3,7 +3,6 @@ package net.shoreline.client.gui.clickgui;
 import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.entity.feature.CreeperChargeFeatureRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -35,8 +34,6 @@ public class ClickGuiScreen extends Screen
     @Getter
     private final Mouse mouse = new Mouse();
     private boolean draggingMouse;
-
-    private boolean shouldCloseOnEsc = true;
 
     private String descriptionText;
     private boolean updateDescText;
@@ -79,9 +76,14 @@ public class ClickGuiScreen extends Screen
         final int scaledMx = (int) (mouseX / scale);
         final int scaledMy = (int) (mouseY / scale);
 
+        Animation animation = ClickGuiModule.INSTANCE.getFadeAnimation();
+        if (animation.getFactor() < 0.01 && !animation.getState())
+        {
+            close();
+        }
+
         if (ClickGuiModule.INSTANCE.shouldDarken())
         {
-            Animation animation = ClickGuiModule.INSTANCE.getFadeAnimation();
             int backgroundColor = ColorUtil.withTransparency(0x66000000, (float) animation.getFactor());
             context.fill(
                     0,
@@ -94,7 +96,10 @@ public class ClickGuiScreen extends Screen
 
         if (client.world != null && ClickGuiModule.INSTANCE.shouldBlur())
         {
+            int before = client.options.getMenuBackgroundBlurrinessValue();
+            client.options.getMenuBackgroundBlurriness().setValue((int) (before * animation.getFactor()));
             applyBlur();
+            client.options.getMenuBackgroundBlurriness().setValue(before);
         }
 
         if (descriptionText != null)
@@ -226,7 +231,7 @@ public class ClickGuiScreen extends Screen
                               int scanCode,
                               int modifiers)
     {
-        shouldCloseOnEsc = true;
+        boolean shouldCloseOnEsc = true;
         for (Frame frame : guiFrames)
         {
             for (FrameComponent component : frame.getAllComponents())
@@ -240,6 +245,11 @@ public class ClickGuiScreen extends Screen
             }
 
             frame.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        if (keyCode == 256 && shouldCloseOnEsc) // escape
+        {
+            startClosing();
         }
 
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -266,7 +276,7 @@ public class ClickGuiScreen extends Screen
     @Override
     public boolean shouldCloseOnEsc()
     {
-        return shouldCloseOnEsc;
+        return false;
     }
 
     @Override
@@ -275,6 +285,11 @@ public class ClickGuiScreen extends Screen
         reset();
         ClickGuiModule.INSTANCE.disable();
         super.close();
+    }
+
+    public void startClosing()
+    {
+        ClickGuiModule.INSTANCE.setFadeState(false);
     }
 
     public void reset()

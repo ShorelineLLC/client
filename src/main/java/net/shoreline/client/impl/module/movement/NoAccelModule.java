@@ -17,6 +17,9 @@ public class NoAccelModule extends MovementModule
     Config<Boolean> airConfig = new BooleanConfig.Builder("Air")
             .setDescription("Allows instant acceleration in the air")
             .setDefaultValue(false).build();
+    Config<Boolean> waterConfig = new BooleanConfig.Builder("Water")
+            .setDescription("Allows instant acceleration in water")
+            .setDefaultValue(false).build();
     Config<Boolean> fallingConfig = new BooleanConfig.Builder("Falling")
             .setDescription("Allows instant acceleration while falling")
             .setDefaultValue(false).build();
@@ -36,6 +39,7 @@ public class NoAccelModule extends MovementModule
 
         if (!mc.player.isOnGround() && !airConfig.getValue()
                 || !mc.player.isOnGround() && mc.player.getVelocity().y < 0.0 && !fallingConfig.getValue()
+                || mc.player.isTouchingWater() && !waterConfig.getValue()
                 || !InputUtil.isInputtingMovement())
         {
             return;

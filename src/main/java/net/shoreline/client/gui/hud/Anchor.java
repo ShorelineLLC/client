@@ -83,7 +83,12 @@ public enum Anchor
                     @Override
                     public float getY(float screenHeight, float elementHeight, float offset)
                     {
-                        return screenHeight - elementHeight - offset - (15.0f * (float) BetterChatModule.INSTANCE.getChatFactor());
+                        if (MinecraftClient.getInstance().inGameHud.getChatHud().isChatFocused())
+                        {
+                            return screenHeight - elementHeight - offset - (15.0f * (float) BetterChatModule.INSTANCE.getChatFactor());
+                        }
+
+                        return screenHeight - elementHeight - offset;
                     }
                 },
         Middle

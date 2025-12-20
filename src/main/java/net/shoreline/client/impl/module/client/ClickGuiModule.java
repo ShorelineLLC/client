@@ -48,7 +48,7 @@ public class ClickGuiModule extends Toggleable
 
         setKeybind(new ModuleKeybind(GLFW.GLFW_KEY_RIGHT_SHIFT, this));
 
-        this.fadeInAnimation = new Animation(false, 400, Easing.SINE_OUT);
+        this.fadeInAnimation = new Animation(false, 150, Easing.LINEAR);
         this.theme = new Theme(fadeInAnimation);
         INSTANCE = this;
     }
