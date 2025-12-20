@@ -11,13 +11,7 @@ public class RotationHandler
 
     public void applyRotations(ClientPlayerEntity player)
     {
-        if (player == null || !Managers.ROTATION.hasClientRotation())
-        {
-            return;
-        }
-
         cachedRotation = new Rotation(player);
-
         Rotation curr = Managers.ROTATION.getClientRotation();
         curr.apply(player);
     }

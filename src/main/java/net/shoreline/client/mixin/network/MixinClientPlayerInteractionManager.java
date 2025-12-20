@@ -32,14 +32,16 @@ public abstract class MixinClientPlayerInteractionManager implements IClientPlay
     @Inject(method = "interactItem", at = @At(value = "HEAD"))
     private void hookInteractItemHead(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir)
     {
-        InteractItemEvent.Pre interactItemEvent = new InteractItemEvent.Pre();
+        ItemStack itemStack = player.getStackInHand(hand);
+        InteractItemEvent.Pre interactItemEvent = new InteractItemEvent.Pre(itemStack);
         EventBus.INSTANCE.dispatch(interactItemEvent);
     }
 
     @Inject(method = "interactItem", at = @At(value = "TAIL"))
     private void hookInteractItemTail(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir)
     {
-        InteractItemEvent.Post interactItemEvent = new InteractItemEvent.Post();
+        ItemStack itemStack = player.getStackInHand(hand);
+        InteractItemEvent.Post interactItemEvent = new InteractItemEvent.Post(itemStack);
         EventBus.INSTANCE.dispatch(interactItemEvent);
     }
 
@@ -52,7 +54,7 @@ public abstract class MixinClientPlayerInteractionManager implements IClientPlay
             return entity.getStackInHand(hand);
         }
 
-        final ItemUseEvent event = new ItemUseEvent();
+        final ItemUseEvent.Block event = new ItemUseEvent.Block();
         EventBus.INSTANCE.dispatch(event);
         return event.isCanceled() ? event.getItemStack() : entity.getStackInHand(Hand.MAIN_HAND);
     }

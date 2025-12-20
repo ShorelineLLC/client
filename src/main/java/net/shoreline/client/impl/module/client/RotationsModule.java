@@ -32,7 +32,7 @@ public class RotationsModule extends Concurrent
             .setDescription("Fixes the movement while in the air")
             .setVisible(() -> moveFixConfig.getValue() != MoveFix.OFF)
             .setDefaultValue(false).build();
-    Config<Boolean> itemFixConfig = new BooleanConfig.Builder("ItemFix")
+    Config<Boolean> itemFixConfig = new BooleanConfig.Builder("ItemUseFix")
             .setDescription("Fixes rotations when using items")
             .setDefaultValue(false).build();
     Config<Boolean> normalizeMovement = new BooleanConfig.Builder("Normalize")

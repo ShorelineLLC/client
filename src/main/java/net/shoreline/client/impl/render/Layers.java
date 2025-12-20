@@ -19,7 +19,7 @@ public class Layers
     public static final RenderLayer.MultiPhase QUADS_GLINT = RenderLayer.of(
             "shoreline_quads_glint", VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 1536, false, true,
             RenderLayer.MultiPhaseParameters.builder()
-                    .program(Programs.GLINT)
+                    .program(Programs.GLINT_PROGRAM)
                     .texture(new RenderPhase.Texture(GLINT, TriState.DEFAULT, false))
                     .texturing(RenderPhases.GLINT)
                     .transparency(RenderPhase.GLINT_TRANSPARENCY)
@@ -80,7 +80,7 @@ public class Layers
             "shoreline_snow",
             VertexFormats.POSITION_TEXTURE_COLOR,
             VertexFormat.DrawMode.QUADS,
-            2048,
+            256,
             false,
             false,
             RenderLayer.MultiPhaseParameters.builder()
@@ -90,5 +90,6 @@ public class Layers
                             TriState.FALSE,
                             false))
                     .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                    .build(false));
+                    .build(false)
+    );
 }

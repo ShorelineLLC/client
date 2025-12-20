@@ -163,7 +163,7 @@ public class InventoryManager extends NetworkHandler
     }
 
     @EventListener
-    public void onItemUse(ItemUseEvent event)
+    public void onItemUseOnBlock(ItemUseEvent.Block event)
     {
         if (mc.player != null && current.isSwapped())
         {

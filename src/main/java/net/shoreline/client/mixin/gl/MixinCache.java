@@ -2,7 +2,7 @@ package net.shoreline.client.mixin.gl;
 
 import net.minecraft.client.gl.*;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.impl.render.Shaders;
+import net.shoreline.client.impl.render.Programs;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,10 +18,10 @@ public abstract class MixinCache
     @Inject(method = "loadProgram", at = @At(value = "HEAD"), cancellable = true)
     private void hookLoadProgram(ShaderProgramKey key, CallbackInfoReturnable<ShaderProgram> cir)
     {
-        if (key == Shaders.LIGHTMAP)
+        if (key == Programs.LIGHTMAP_KEY)
         {
             cir.cancel();
-            ShaderProgramDefinition lightmapDefinition = Shaders.LIGHTMAP_PROGRAM;
+            ShaderProgramDefinition lightmapDefinition = Programs.LIGHTMAP_PROGRAM;
             Defines defines = lightmapDefinition.defines().withMerged(key.defines());
 
             try

@@ -680,12 +680,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private List<CrystalData<BlockPos>> getPlacements(List<CrystalData<BlockPos>> crystalData)
     {
-        return crystalData.stream().filter(d ->
-        {
-            BlockPos blockPos = d.getValue();
-            return canUseOnBlock(blockPos);
-
-        }).toList();
+        return crystalData.stream().filter(d -> canUseOnBlock(d.getValue())).toList();
     }
 
     private <T> CrystalData<T> getBestCrystal(List<CrystalData<T>> crystals)
@@ -796,7 +791,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         }
 
         float selfDamage = (float) ExplosionUtil.crystalDamageToEntity(mc.world,
-                target,
+                mc.player,
                 minePos.toBottomCenterPos(),
                 ignoreTerrain.getValue(),
                 Set.of(minePos));

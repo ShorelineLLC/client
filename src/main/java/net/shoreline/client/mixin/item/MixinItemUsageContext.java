@@ -16,7 +16,7 @@ public class MixinItemUsageContext
     @Inject(method = "getStack", at = @At(value = "RETURN"), cancellable = true)
     public void hookGetStack(final CallbackInfoReturnable<ItemStack> info)
     {
-        final ItemUseEvent event = new ItemUseEvent();
+        final ItemUseEvent.Block event = new ItemUseEvent.Block();
         EventBus.INSTANCE.dispatch(event);
         if (MinecraftClient.getInstance().player != null && event.isCanceled()
                 && info.getReturnValue().equals(MinecraftClient.getInstance().player.getMainHandStack()))

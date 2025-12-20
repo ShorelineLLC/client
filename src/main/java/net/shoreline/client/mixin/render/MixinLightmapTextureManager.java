@@ -15,7 +15,7 @@ import net.shoreline.client.impl.event.render.BlockLightEvent;
 import net.shoreline.client.impl.event.render.NightVisionEvent;
 import net.shoreline.client.impl.event.render.WorldGammaEvent;
 import net.shoreline.client.impl.event.render.WorldTintEvent;
-import net.shoreline.client.impl.render.Shaders;
+import net.shoreline.client.impl.render.Programs;
 import net.shoreline.eventbus.EventBus;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
@@ -46,7 +46,7 @@ public class MixinLightmapTextureManager
     )
     private ShaderProgram hookUpdateLightmap(ShaderProgramKey shaderProgramKey)
     {
-        lightmapProgram = RenderSystem.setShader(Shaders.LIGHTMAP);
+        lightmapProgram = RenderSystem.setShader(Programs.LIGHTMAP_KEY);
         return lightmapProgram;
     }
 
