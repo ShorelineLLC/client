@@ -145,6 +145,12 @@ public class KillAuraModule extends CombatModule
             return;
         }
 
+        ItemSlot weaponSlot = getAuraWeaponSlot();
+        if (requireWeapon.getValue() && !Managers.INVENTORY.isHolding(weaponSlot.getItem(), Hand.MAIN_HAND))
+        {
+            return;
+        }
+
         float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), auraTarget.getEyePos());
         Rotation rotation = new Rotation(rotations[0], rotations[1]);
         if (rotateConfig.getValue() == RotateMode.NORMAL)
@@ -157,7 +163,7 @@ public class KillAuraModule extends CombatModule
             Managers.ROTATION.setSilentRotation(rotation);
         }
 
-        runAttack(auraTarget);
+        runAttack(auraTarget, weaponSlot);
 
         if (rotateConfig.getValue() == RotateMode.SILENT)
         {
@@ -187,11 +193,9 @@ public class KillAuraModule extends CombatModule
         }
     }
 
-    private void runAttack(final Entity entity)
+    private void runAttack(final Entity entity, ItemSlot weaponSlot)
     {
         PlayerInventory playerInventory = mc.player.getInventory();
-
-        ItemSlot weaponSlot = getAuraWeaponSlot();
         if (weaponSlot.getSlot() != -1)
         {
             if (silentSwap.getValue())
@@ -201,7 +205,8 @@ public class KillAuraModule extends CombatModule
                     return;
                 }
 
-            } else if (autoSwap.getValue())
+            }
+            else if (autoSwap.getValue())
             {
                 autoSwapHandler.handleSwaps();
                 if (autoSwapHandler.canAutoSwap())
@@ -211,18 +216,15 @@ public class KillAuraModule extends CombatModule
             }
         }
 
-        if (!requireWeapon.getValue() || Managers.INVENTORY.isHolding(weaponSlot.getItem(), Hand.MAIN_HAND))
-        {
-            running = true;
-            ItemStack stack = weaponSlot.getItemStack() == null ? playerInventory.getMainHandStack() : weaponSlot.getItemStack();
-            double attackDelay = 1.0 / getAttackSpeed(stack) * 20.0;
+        running = true;
+        ItemStack stack = weaponSlot.getItemStack() == null ? playerInventory.getMainHandStack() : weaponSlot.getItemStack();
+        double attackDelay = 1.0 / getAttackSpeed(stack) * 20.0;
 
-            boolean canCrit = !awaitCrits.getValue() || mc.player.isOnGround() || mc.player.getVelocity().y < 0.0;
-            if (attackDelayTimer.hasPassed(attackDelay * 50.0) && canCrit)
-            {
-                attackEntity(entity);
-                attackDelayTimer.reset();
-            }
+        boolean canCrit = !awaitCrits.getValue() || mc.player.isOnGround() || mc.player.getVelocity().y < 0.0;
+        if (attackDelayTimer.hasPassed(attackDelay * 50.0) && canCrit)
+        {
+            attackEntity(entity);
+            attackDelayTimer.reset();
         }
 
         if (silentSwap.getValue())

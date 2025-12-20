@@ -118,4 +118,15 @@ public class AutoArmorModule extends InventorySwapModule
     {
         return itemStack.get(DataComponentTypes.EQUIPPABLE).slot();
     }
+
+    @Override
+    public boolean checkNull()
+    {
+        if (mc.player.getInventory().size() == -1)
+        {
+            return true;
+        }
+
+        return super.checkNull();
+    }
 }
