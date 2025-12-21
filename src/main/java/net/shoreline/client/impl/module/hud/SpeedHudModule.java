@@ -18,7 +18,7 @@ public class SpeedHudModule extends DynamicHudModule
 
     public SpeedHudModule()
     {
-        super("Speed", "Displays the player speed", 200, 250);
+        super("Speedometer", "Displays the player speed", 200, 250);
     }
 
     @Override
