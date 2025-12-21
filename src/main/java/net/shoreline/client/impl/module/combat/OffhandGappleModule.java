@@ -9,7 +9,7 @@ import net.minecraft.item.Items;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.event.Priorities;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;

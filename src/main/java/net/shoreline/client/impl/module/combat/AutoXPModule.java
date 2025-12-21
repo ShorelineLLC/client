@@ -10,7 +10,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.Priorities;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;

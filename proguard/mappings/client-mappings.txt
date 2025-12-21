@@ -1456,7 +1456,7 @@ net.shoreline.client.impl.event.TickEvent$Post -> net.shoreline.client.bO:
     9:9:void <init>() -> <init>
 net.shoreline.client.impl.event.TickEvent$Pre -> net.shoreline.client.bP:
     7:7:void <init>() -> <init>
-net.shoreline.client.impl.event.Priorities -> net.shoreline.client.bQ:
+net.shoreline.client.impl.module.impl.Priorities -> net.shoreline.client.bQ:
     int AUTO_TOTEM -> fo
     int OFFHAND -> fp
     int AUTO_ARMOR -> fq

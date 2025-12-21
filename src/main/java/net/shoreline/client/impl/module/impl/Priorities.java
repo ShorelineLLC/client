@@ -1,4 +1,4 @@
-package net.shoreline.client.impl.event;
+package net.shoreline.client.impl.module.impl;
 
 public class Priorities
 {

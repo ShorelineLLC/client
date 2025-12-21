@@ -19,7 +19,7 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
-import net.shoreline.client.impl.event.Priorities;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.eventbus.annotation.EventListener;
 

@@ -12,7 +12,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.Priorities;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;

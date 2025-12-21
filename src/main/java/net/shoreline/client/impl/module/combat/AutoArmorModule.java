@@ -12,7 +12,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.Priorities;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.client.util.item.ItemUtil;
