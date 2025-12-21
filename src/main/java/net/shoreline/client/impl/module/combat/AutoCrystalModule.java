@@ -29,8 +29,8 @@ import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.Priorities;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.EntitySpawnEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -257,7 +257,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         disable();
     }
 
-    @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
+    @EventListener(priority = Priorities.AUTO_CRYSTAL)
     public void onTick(TickEvent.Pre event)
     {
         if (checkNull() || mc.player.isSpectator())
@@ -289,7 +289,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         crystalCalc.runCalc();
     }
 
-    @EventListener(priority = TickPriorities.AUTO_CRYSTAL)
+    @EventListener(priority = Priorities.AUTO_CRYSTAL)
     public void onClientRotation(ClientRotationEvent event)
     {
         if (checkNull() || event.isCanceled() || mc.player.isSpectator())
@@ -319,7 +319,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         {
             MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
             CrystalData.Immediate<BlockPos> prePlaceData = validateMiningData(currentMine);
-            if (prePlaceData != null && predictPlace.getValue() != Timing.OFF)
+            if (prePlaceData != null)
             {
                 currentPlace = prePlaceData;
                 rotations = runPlace(prePlaceData, hand);
@@ -328,7 +328,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         if (silentRotated)
         {
-            Managers.ROTATION.resetSilentRotation();
             return;
         }
 
@@ -793,7 +792,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         float selfDamage = (float) ExplosionUtil.crystalDamageToEntity(mc.world,
                 mc.player,
                 minePos.toBottomCenterPos(),
-                ignoreTerrain.getValue(),
+                true,
                 Set.of(minePos));
 
         if (selfDamage > maxSelfDamage.getValue() || DamageUtil.getHealth(mc.player) - selfDamage < 0.5f)
@@ -801,11 +800,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return null;
         }
 
-        LivingEntityState targetState = new LivingEntityState(target);
         float damage = (float) ExplosionUtil.crystalDamageToEntity(mc.world,
                 target,
                 minePos.toBottomCenterPos(),
-                ignoreTerrain.getValue(),
+                true,
                 Set.of(minePos));
 
         if (damage < minDamage.getValue())
@@ -813,6 +811,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return null;
         }
 
+        LivingEntityState targetState = new LivingEntityState(target);
         Vec3d crystalVec = minePos.toBottomCenterPos();
         return new CrystalData.Immediate<>("AS",
                 placePos,

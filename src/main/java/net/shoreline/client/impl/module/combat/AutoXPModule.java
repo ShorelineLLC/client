@@ -10,7 +10,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.event.Priorities;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;
@@ -45,7 +45,7 @@ public class AutoXPModule extends Toggleable
         return String.valueOf(InventoryUtil.getItemCount(Items.EXPERIENCE_BOTTLE));
     }
 
-    @EventListener(priority = TickPriorities.AUTO_XP)
+    @EventListener(priority = Priorities.AUTO_XP)
     public void onClientRotation(ClientRotationEvent event)
     {
         if (mc.player.isUsingItem() && !multitaskConfig.getValue())
@@ -102,11 +102,6 @@ public class AutoXPModule extends Toggleable
             playerRotation.applyToPlayer();
 
             Managers.INVENTORY.endSwap();
-        }
-
-        if (rotateConfig.getValue() == RotateMode.SILENT)
-        {
-            Managers.ROTATION.resetSilentRotation();
         }
     }
 

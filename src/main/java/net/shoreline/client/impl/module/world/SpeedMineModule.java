@@ -12,7 +12,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.event.Priorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
@@ -125,7 +125,7 @@ public class SpeedMineModule extends ListeningToggleable
         }
     }
 
-    @EventListener(priority = TickPriorities.SPEED_MINE)
+    @EventListener(priority = Priorities.SPEED_MINE)
     public void onTickEvent(TickEvent.Pre event)
     {
         if (mc.player == null || mc.world == null)

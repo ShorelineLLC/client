@@ -1,6 +1,6 @@
 package net.shoreline.client.impl.event;
 
-public class TickPriorities
+public class Priorities
 {
     public static final int AUTO_TOTEM = 2147483646;
     public static final int OFFHAND = 2147483645;

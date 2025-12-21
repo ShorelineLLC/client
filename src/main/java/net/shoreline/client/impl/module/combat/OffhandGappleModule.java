@@ -9,8 +9,8 @@ import net.minecraft.item.Items;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.event.Priorities;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.TickPriorities;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.client.util.item.ItemUtil;
@@ -51,7 +51,7 @@ public class OffhandGappleModule extends InventorySwapModule
         return String.valueOf(InventoryUtil.getItemCount(Items.ENCHANTED_GOLDEN_APPLE));
     }
 
-    @EventListener(priority = TickPriorities.OFFHAND)
+    @EventListener(priority = Priorities.OFFHAND)
     public void onTick(TickEvent.Pre event)
     {
         if (checkNull() || AutoTotemModule.INSTANCE.isTotemInOffHand())

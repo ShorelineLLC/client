@@ -313,11 +313,6 @@ public class InteractManager extends NetworkHandler
 
     public void endPlacement()
     {
-        if (interactConfig.getInteractRotate().getValue())
-        {
-            Managers.ROTATION.resetSilentRotation();
-        }
-
         Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
         placementLock = false;
     }

@@ -19,7 +19,7 @@ import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.event.Priorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
@@ -120,7 +120,7 @@ public class KillAuraModule extends CombatModule
         disable();
     }
 
-    @EventListener(priority = TickPriorities.KILL_AURA)
+    @EventListener(priority = Priorities.KILL_AURA)
     public void onClientRotation(ClientRotationEvent event)
     {
         running = false;
@@ -164,11 +164,6 @@ public class KillAuraModule extends CombatModule
         }
 
         runAttack(auraTarget, weaponSlot);
-
-        if (rotateConfig.getValue() == RotateMode.SILENT)
-        {
-            Managers.ROTATION.resetSilentRotation();
-        }
     }
 
     @EventListener

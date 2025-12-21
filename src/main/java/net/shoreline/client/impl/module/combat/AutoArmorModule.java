@@ -1,24 +1,18 @@
 package net.shoreline.client.impl.module.combat;
 
-import com.google.common.collect.Maps;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.event.Priorities;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
 import net.shoreline.client.util.item.ItemUtil;
@@ -46,7 +40,7 @@ public class AutoArmorModule extends InventorySwapModule
         super("AutoArmor", "Automatically equips armor", GuiCategory.COMBAT);
     }
 
-    @EventListener(priority = TickPriorities.AUTO_ARMOR)
+    @EventListener(priority = Priorities.AUTO_ARMOR)
     public void onTick(final TickEvent.Pre event)
     {
         if (checkNull() || !canSwapInventory())

@@ -16,7 +16,7 @@ import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.TickPriorities;
+import net.shoreline.client.impl.event.Priorities;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningUtil;
 import net.shoreline.client.impl.module.combat.trap.TrapLayer;
@@ -85,7 +85,7 @@ public class AutoMineModule extends TrapModule
         speedMine = SpeedMineModule.INSTANCE;
     }
 
-    @EventListener(priority = TickPriorities.AUTO_MINE)
+    @EventListener(priority = Priorities.AUTO_MINE)
     public void onTick(TickEvent.Pre event)
     {
         if (checkNull() || !speedMine.isEnabled() || !PlayerUtil.isInSurvival(mc.player))
