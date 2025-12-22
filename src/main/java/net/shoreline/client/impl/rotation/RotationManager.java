@@ -30,7 +30,6 @@ public class RotationManager extends NetworkHandler
     private final RotationsModule rotationsConfig = RotationsModule.INSTANCE;
 
     private Rotation clientRotation;
-    private boolean silentRotated;
 
     private final RotationHandler handler;
     private final MovementCorrection moveFix;
@@ -48,15 +47,6 @@ public class RotationManager extends NetworkHandler
         this.moveFix = new MovementCorrection();
         this.serverRotation = new Rotation(0.0f, 0.0f);
         EventBus.INSTANCE.subscribe(this);
-    }
-
-    @EventListener(priority = Integer.MIN_VALUE)
-    public void onTick(TickEvent.Post event)
-    {
-        if (silentRotated)
-        {
-            resetSilentRotation();
-        }
     }
 
     @EventListener
@@ -289,7 +279,6 @@ public class RotationManager extends NetworkHandler
             return;
         }
 
-        silentRotated = true;
         sendPacket(new PlayerMoveC2SPacket.Full(
                 mc.player.getX(),
                 mc.player.getY(),
@@ -304,7 +293,6 @@ public class RotationManager extends NetworkHandler
     {
         Rotation playerRotation = hasClientRotation() ? clientRotation : new Rotation(mc.player);
         setSilentRotation(playerRotation);
-        silentRotated = false;
     }
 
     public boolean isFacingYaw(float yaw)

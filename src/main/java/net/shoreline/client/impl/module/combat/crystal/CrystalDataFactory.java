@@ -44,14 +44,20 @@ public class CrystalDataFactory
             appliedDamage *= ASSUMED_ARMOR_REDUCTION; // We have to assume armor here...
         }
 
-        if (autoCrystal.getOverrideConfig().getValue() && (isLethalCrystal(target, appliedDamage) || isArmorBreaker(target, damageToTarget)))
+        if (autoCrystal.getOverrideConfig().getValue()
+                && (isLethalCrystal(target, appliedDamage)
+                || isArmorBreaker(target, damageToTarget)))
         {
             return new CrystalData.Immediate<>(value,
                     crystalVec,
                     target,
                     damageToTarget,
                     damageToPlayer);
-        } else if (autoCrystal.getTargetItems().getValue() && isAntiSurroundPos(blockPos))
+
+        } else if (autoCrystal.getTargetItems().getValue()
+                && AutoMineModule.INSTANCE.isEnabled()
+                && SpeedMineModule.INSTANCE.isEnabled()
+                && isAntiSurroundPos(blockPos))
         {
             return new CrystalData.Immediate<>("AS",
                     value,
@@ -91,11 +97,6 @@ public class CrystalDataFactory
 
     public boolean isAntiSurroundPos(BlockPos blockPos)
     {
-        if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
-        {
-            return false;
-        }
-
         PlayerEntity target = Managers.TARGETING.getTarget();
         if (target == null)
         {

@@ -16,9 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
-import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -106,11 +104,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Integer> ticksExisted = new NumberConfig.Builder<Integer>("MinExisted")
             .setMin(0).setMax(10).setDefaultValue(0).setFormat(" ticks")
             .setDescription("The minimum ticks existed before breaking crystals").build();
-    Config<Boolean> sequentialBreak = new BooleanConfig.Builder("SequentialBreak")
-            .setDescription("Breaks immediately after a placement")
-            .setDefaultValue(false).build();
     Config<Void> breakConfig = new ConfigGroup.Builder("Break")
-            .addAll(breakRange, breakTrace, breakDelay, ticksExisted, sequentialBreak).build();
+            .addAll(breakRange, breakTrace, breakDelay, ticksExisted).build();
 
     Config<Float> placeRange = new NumberConfig.Builder<Float>("PlaceRange")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
@@ -121,9 +116,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Integer> placeLimit = new NumberConfig.Builder<Integer>("PlaceLimit")
             .setMin(1).setMax(10).setDefaultValue(2)
             .setDescription("The limit of crystal placements per tick").build();
-    Config<Boolean> sequentialPlace = new BooleanConfig.Builder("SequentialPlace")
-            .setDescription("Places immediately after breaking a crystal")
-            .setDefaultValue(false).build();
     Config<Boolean> protocolPlace = new BooleanConfig.Builder("Protocol")
             .setDescription("Prevents placements in 1x1 areas")
             .setDefaultValue(false).build();
@@ -131,9 +123,21 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDescription("Places an obsidian block if there is none")
             .setDefaultValue(false).build();
     Config<Void> placeConfig = new ConfigGroup.Builder("Place")
-            .addAll(placeRange, placeTrace, placeLimit, sequentialPlace, protocolPlace, basePlace).build();
+            .addAll(placeRange, placeTrace, placeLimit, protocolPlace, basePlace).build();
 
-    Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("Predict")
+    Config<Boolean> sequentialBreak = new BooleanConfig.Builder("InstantBreak")
+            .setDescription("Breaks immediately after a placement")
+            .setDefaultValue(false).build();
+    Config<Boolean> sequentialPlace = new BooleanConfig.Builder("InstantPlace")
+            .setDescription("Places immediately after breaking a crystal")
+            .setDefaultValue(false).build();
+    Config<Boolean> predictAttack = new BooleanConfig.Builder("Boost")
+            .setDescription("Attempts to predict the next attack (works better on low ping)")
+            .setDefaultValue(false).build();
+    Config<Void> sequentialConfig = new ConfigGroup.Builder("Sequential")
+            .addAll(sequentialBreak, sequentialPlace, predictAttack).build();
+
+    Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("PredictPlace")
             .setValues(Timing.values())
             .setDescription("Attempts to predict the next place")
             .setDefaultValue(Timing.OFF).build();
@@ -144,7 +148,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setMin(0).setMax(10).setDefaultValue(5).setFormat(" ticks")
             .setDescription("Ticks before predicting placement")
             .setVisible(() -> targetItems.getValue()).build();
-    Config<Void> antiSurroundConfig = new ConfigGroup.Builder("AntiSurround")
+    Config<Void> antiSurroundConfig = new ConfigGroup.Builder("SurroundBreak")
             .addAll(predictPlace, targetItems, prePlace).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
@@ -223,6 +227,8 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private final ConcurrentMap<BlockPos, CrystalData<BlockPos>> fadeAnimations = new ConcurrentHashMap<>();
 
+    private long highestId;
+
     public AutoCrystalModule()
     {
         super("AutoCrystal", new String[] {"CrystalAura"}, "Best CA on the market", GuiCategory.COMBAT);
@@ -297,16 +303,10 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
-        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
-        {
-            return;
-        }
-
-        final Hand hand = getCrystalHand();
-
         float[] rotations = null;
         silentRotated = false;
 
+        final Hand hand = getCrystalHand();
         if (currentAttack != null)
         {
             rotations = runAttack(currentAttack, hand);
@@ -322,12 +322,13 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             if (prePlaceData != null)
             {
                 currentPlace = prePlaceData;
-                rotations = runPlace(prePlaceData, hand);
+                rotations = runPlaceInternal(prePlaceData, hand);
             }
         }
 
         if (silentRotated)
         {
+            Managers.ROTATION.resetSilentRotation();
             return;
         }
 
@@ -347,11 +348,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
-        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
-        {
-            return;
-        }
-
         Vec3d crystalPos = event.getPos();
         BlockPos crystalBase = BlockPos.ofFloored(crystalPos.offset(Direction.DOWN, 1.0));
 
@@ -360,16 +356,25 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             return;
         }
 
+        Hand hand = getCrystalHand();
         if (sequentialBreak.getValue())
         {
-            Hand hand = getCrystalHand();
-
             attackCrystal(event.getEntityId(), hand);
             attackTimer.reset();
+        }
 
-            if (currentPlace != null && sequentialPlace.getValue())
+        if (currentPlace != null && sequentialPlace.getValue())
+        {
+            placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+        }
+
+        if (predictAttack.getValue())
+        {
+            int nextAttackId = (int) (highestId + 1);
+            Entity entity = mc.world.getEntityById(nextAttackId);
+            if (entity == null)
             {
-                placeCrystal(currentPlace.getValue(), null, hand);
+                attackCrystal(nextAttackId, hand);
             }
         }
     }
@@ -377,11 +382,6 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (checkNull())
-        {
-            return;
-        }
-
         if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
         {
             for (int id : packet.getEntityIds())
@@ -395,12 +395,17 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             }
         }
 
-        if (predictPlace.getValue() != Timing.INSTANT || currentPlace != null)
+        if (event.getPacket() instanceof ExperienceOrbSpawnS2CPacket packet && packet.getEntityId() > highestId)
         {
-            return;
+            highestId = packet.getEntityId();
         }
 
-        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
+        if (event.getPacket() instanceof EntitySpawnS2CPacket packet && packet.getEntityId() > highestId)
+        {
+            highestId = packet.getEntityId();
+        }
+
+        if (checkNull() || predictPlace.getValue() != Timing.INSTANT || currentPlace != null)
         {
             return;
         }
@@ -428,7 +433,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
             if (packet.getPos().equals(prePlace.getValue().up()))
             {
-                runPlace(prePlace, hand);
+                runPlaceInternal(prePlace, hand);
             }
         }
 
@@ -448,7 +453,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
                     if (pos.equals(prePlace.getValue().up()))
                     {
-                        runPlace(prePlace, hand);
+                        runPlaceInternal(prePlace, hand);
                         return;
                     }
                 }
@@ -469,7 +474,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
                 if (pos.equals(prePlace.getValue().up()))
                 {
-                    runPlace(prePlace, hand);
+                    runPlaceInternal(prePlace, hand);
                 }
             }
         }
@@ -547,6 +552,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             }
         }
 
+        return runPlaceInternal(placement, hand);
+    }
+
+    private float[] runPlaceInternal(CrystalData<BlockPos> placement, Hand hand)
+    {
+        BlockPos crystalPos = placement.getValue();
         Vec3d crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.5, 0.0);
         float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
         if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
@@ -889,6 +900,12 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return InventoryUtil.getItemSlot((ItemStack itemStack) ->
                 itemStack.getItem().getTranslationKey().contains("sword")
                         || itemStack.getItem().getTranslationKey().contains("axe")).getSlot();
+    }
+
+    @Override
+    public boolean checkNull()
+    {
+        return super.checkNull() || (mc.player.isUsingItem() && !multitaskConfig.getValue());
     }
 
     public boolean isRunning()

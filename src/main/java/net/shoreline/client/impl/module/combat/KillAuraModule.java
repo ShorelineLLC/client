@@ -164,6 +164,11 @@ public class KillAuraModule extends CombatModule
         }
 
         runAttack(auraTarget, weaponSlot);
+
+        if (rotateConfig.getValue() == RotateMode.SILENT)
+        {
+            Managers.ROTATION.resetSilentRotation();
+        }
     }
 
     @EventListener

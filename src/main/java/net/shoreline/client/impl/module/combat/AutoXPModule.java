@@ -103,6 +103,11 @@ public class AutoXPModule extends Toggleable
 
             Managers.INVENTORY.endSwap();
         }
+
+        if (rotateConfig.getValue() == RotateMode.SILENT)
+        {
+            Managers.ROTATION.resetSilentRotation();
+        }
     }
 
     private boolean isPlayerFullDurability()

@@ -24,4 +24,5 @@ public class PearlBlockerModule extends ObsidianPlacerModule
         super("PearlBlocker", "Blocks thrown ender pearls", GuiCategory.COMBAT);
     }
 
+
 }

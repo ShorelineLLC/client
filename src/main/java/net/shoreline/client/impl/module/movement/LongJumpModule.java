@@ -77,7 +77,7 @@ public class LongJumpModule extends MovementModule
             slowEffect = 1 + (0.2 * (amplifier + 1));
         }
 
-        final double base = 0.2873f * speedEffect / slowEffect;
+        final double base = 0.272f * speedEffect / slowEffect;
 
         if (strafe == 1)
         {
@@ -90,13 +90,13 @@ public class LongJumpModule extends MovementModule
                 return;
             }
 
-            moveY = 0.42f;
+            moveY = 0.40123128f;
             setMotionY(moveY);
             speed *= 2.149f;
         }
         else if (strafe == 3)
         {
-            double moveSpeed = 0.66 * (distance - base);
+            double moveSpeed = 0.76 * (distance - base);
             speed = distance - moveSpeed;
         }
         else
