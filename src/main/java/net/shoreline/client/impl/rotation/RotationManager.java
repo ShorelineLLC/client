@@ -7,7 +7,6 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
-import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
 import net.shoreline.client.impl.event.entity.PlayerVelocityEvent;
 import net.shoreline.client.impl.event.entity.player.TravelEvent;
@@ -236,7 +235,8 @@ public class RotationManager extends NetworkHandler
     @EventListener
     public void onTravelPre(TravelEvent.Pre event)
     {
-        if (rotationsConfig.getFixTravel().getValue() && hasClientRotation())
+        if (rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF
+                && rotationsConfig.getFixTravel().getValue() && hasClientRotation())
         {
             handler.applyRotations(mc.player);
         }
@@ -245,7 +245,7 @@ public class RotationManager extends NetworkHandler
     @EventListener
     public void onTravelPost(TravelEvent.Post event)
     {
-        if (rotationsConfig.getFixTravel().getValue())
+        if (rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF && rotationsConfig.getFixTravel().getValue())
         {
             handler.revertRotations(mc.player);
         }
