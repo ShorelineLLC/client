@@ -131,7 +131,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
     Config<Boolean> sequentialPlace = new BooleanConfig.Builder("InstantPlace")
             .setDescription("Places immediately after breaking a crystal")
             .setDefaultValue(false).build();
-    Config<Boolean> predictAttack = new BooleanConfig.Builder("Boost")
+    Config<Boolean> predictAttack = new BooleanConfig.Builder("PredictAttack")
             .setDescription("Attempts to predict the next attack (works better on low ping)")
             .setDefaultValue(false).build();
     Config<Void> sequentialConfig = new ConfigGroup.Builder("Sequential")

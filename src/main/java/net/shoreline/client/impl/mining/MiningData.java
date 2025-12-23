@@ -29,6 +29,7 @@ public class MiningData
     private final BlockPos blockPos;
     private final Direction direction;
 
+    private boolean started;
     private final float maxProgress;
     private final ItemStack miningStack;
 
@@ -148,7 +149,12 @@ public class MiningData
 
     public boolean isBlockMined()
     {
-        return isDoneMining() && !MiningUtil.canMineBlock(getBlockState());
+        return isDoneMining() && isAir();
+    }
+
+    public boolean isAir()
+    {
+        return !MiningUtil.canMineBlock(getBlockState());
     }
 
     public boolean hasMinedFor(int ticksMining)

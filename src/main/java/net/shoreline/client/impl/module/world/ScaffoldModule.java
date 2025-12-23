@@ -70,7 +70,6 @@ public class ScaffoldModule extends PlacerModule
         }
 
         int posY = (int) Math.round(mc.player.getY());
-
         if (keepYConfig.getValue() && InputUtil.isInputtingMovement())
         {
             if (mc.player.isOnGround() || groundPosY < mc.world.getBottomY())
@@ -82,7 +81,6 @@ public class ScaffoldModule extends PlacerModule
         }
 
         BlockPos pos = new BlockPos(mc.player.getBlockX(), posY, mc.player.getBlockZ());
-
         createPlacementsFromPositions(currentScaffoldBlock, getScaffoldPlacements(pos.down()), 4.0);
         if (placements.isEmpty() || !Managers.INTERACT.startPlacement(slot))
         {
@@ -254,41 +252,45 @@ public class ScaffoldModule extends PlacerModule
 
     private boolean ensurePlaceableWithSupport(BlockPos pos, List<BlockPos> out)
     {
-        if (mc.world.getBlockState(pos).isReplaceable())
+        if (!mc.world.getBlockState(pos).isReplaceable())
         {
-            Direction face = InteractDirection.getInteractDirection(pos);
-            if (face == null)
-            {
-                BlockPos support = getSupportingBlock(pos);
-                if (support != null)
-                {
-                    double dist = mc.player.squaredDistanceTo(support.toCenterPos());
-                    if (!out.contains(support) && dist <= placeRange.getValue() * placeRange.getValue())
-                    {
-                        out.add(support);
-                    }
-                } else
-                {
-                    BlockPos down = pos.down();
-                    int depth = 0;
-                    while (depth++ < 3 && mc.world.getBlockState(down).isReplaceable())
-                    {
-                        double dist = mc.player.squaredDistanceTo(down.toCenterPos());
-                        if (!out.contains(down) && dist <= placeRange.getValue() * placeRange.getValue())
-                        {
-                            out.add(down);
-                        }
+            return false;
+        }
 
-                        down = down.down();
-                    }
+        Direction face = InteractDirection.getInteractDirection(pos);
+        if (face != null)
+        {
+            return false;
+        }
+
+        BlockPos support = getSupportingBlock(pos);
+        if (support != null)
+        {
+            double dist = mc.player.squaredDistanceTo(support.toCenterPos());
+            if (!out.contains(support) && dist <= placeRange.getValue() * placeRange.getValue())
+            {
+                out.add(support);
+            }
+        } else
+        {
+            BlockPos down = pos.down();
+            int depth = 0;
+            while (depth++ < 3 && mc.world.getBlockState(down).isReplaceable())
+            {
+                double dist = mc.player.squaredDistanceTo(down.toCenterPos());
+                if (!out.contains(down) && dist <= placeRange.getValue() * placeRange.getValue())
+                {
+                    out.add(down);
                 }
-            }
 
-            double dist = mc.player.squaredDistanceTo(pos.toCenterPos());
-            if (!out.contains(pos) && dist <= placeRange.getValue() * placeRange.getValue())
-            {
-                out.add(pos);
+                down = down.down();
             }
+        }
+
+        double dist = mc.player.squaredDistanceTo(pos.toCenterPos());
+        if (!out.contains(pos) && dist <= placeRange.getValue() * placeRange.getValue())
+        {
+            out.add(pos);
         }
 
         return true;

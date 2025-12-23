@@ -15,7 +15,7 @@ public enum BoxRender
         public void render(MatrixStack matrices, Box box, int color, float transparency)
         {
             Color color1 = new Color(color, false);
-            Managers.RENDER.renderBoundingBox(matrices, box, ColorUtil.withTransparency(color1, 0.75f * transparency));
+            Managers.RENDER.renderBoundingBox(matrices, box, ColorUtil.withTransparency(color1, 0.8f * transparency));
             Managers.RENDER.renderBox(matrices, box, ColorUtil.withTransparency(color1, 0.3f * transparency));
         }
     },
@@ -25,7 +25,7 @@ public enum BoxRender
         public void render(MatrixStack matrices, Box box, int color, float transparency)
         {
             Color color1 = new Color(color, false);
-            Managers.RENDER.renderBoundingBox(matrices, box, ColorUtil.withTransparency(color1, 0.75f * transparency));
+            Managers.RENDER.renderBoundingBox(matrices, box, ColorUtil.withTransparency(color1, 0.8f * transparency));
         }
     };
 

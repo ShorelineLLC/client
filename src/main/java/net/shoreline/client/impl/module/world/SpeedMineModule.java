@@ -7,6 +7,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
@@ -57,6 +58,10 @@ public class SpeedMineModule extends ListeningToggleable
     Config<Boolean> rotateConfig = new BooleanConfig.Builder("Rotate")
             .setDescription("Rotates before mining block")
             .setDefaultValue(false).build();
+    Config<SilentSwapType> swapType = new EnumConfig.Builder<SilentSwapType>("Swap")
+            .setValues(SilentSwapType.values())
+            .setDescription("The silent swap type")
+            .setDefaultValue(SilentSwapType.HOTBAR).build();
 
     Config<BoxRender> boxMode = new EnumConfig.Builder<BoxRender>("BoxMode")
             .setValues(BoxRender.values())
@@ -247,7 +252,11 @@ public class SpeedMineModule extends ListeningToggleable
         }
 
         mainState = new MiningRenderState(mainMiningBlock, new Animation(true, 300L));
-        miningPackets.getValue().sendStartPackets(this, mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
+        miningPackets.getValue().sendStartPackets(this,
+                mainMiningBlock.getBlockPos(),
+                mainMiningBlock.getDirection());
+
+        mainMiningBlock.setStarted(true);
     }
 
     private void tickMain()
@@ -257,10 +266,19 @@ public class SpeedMineModule extends ListeningToggleable
             return;
         }
 
-        if (mainMiningBlock.getSquaredDistanceTo() > rangeConfig.getValue() * rangeConfig.getValue())
+        if (mainMiningBlock.getSquaredDistanceTo() > MathHelper.square(rangeConfig.getValue()))
         {
             clearMain();
             return;
+        }
+
+        if (!mainMiningBlock.isStarted() && !mainMiningBlock.isAir() && remineMode.getValue() == RemineMode.FAST)
+        {
+            miningPackets.getValue().sendStartPackets(this,
+                    mainMiningBlock.getBlockPos(),
+                    mainMiningBlock.getDirection());
+
+            mainMiningBlock.setStarted(true);
         }
 
         boolean multiTasking = mc.player.isUsingItem() && !multitaskConfig.getValue();
@@ -270,13 +288,21 @@ public class SpeedMineModule extends ListeningToggleable
             return;
         }
 
-        if (mainMiningBlock.isBlockMined())
+        if (mainMiningBlock.isAir())
         {
             mainMiningBlock.resetTicksMining();
 
             if (isManualMining)
             {
                 isManualMining = false;
+            }
+
+            if (remineMode.getValue() != RemineMode.INSTANT)
+            {
+                mainMiningBlock.setBlockDamage(0.0f);
+                mainMiningBlock.setLastDamage(0.0f);
+                mainMiningBlock.setStarted(false);
+                return;
             }
 
         } else if (mainMiningBlock.hasMinedFor(30))
@@ -291,13 +317,16 @@ public class SpeedMineModule extends ListeningToggleable
         }
 
         ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
-        if (bestTool != null && !Managers.INVENTORY.startSwap(bestTool.getSlot(), SilentSwapType.HOTBAR))
+        if (bestTool != null && !Managers.INVENTORY.startSwap(bestTool.getSlot(), swapType.getValue()))
         {
             return;
         }
 
-        miningPackets.getValue().sendStopPackets(this, mainMiningBlock.getBlockPos(), mainMiningBlock.getDirection());
-        Managers.INVENTORY.endSwap(SilentSwapType.HOTBAR);
+        miningPackets.getValue().sendStopPackets(this,
+                mainMiningBlock.getBlockPos(),
+                mainMiningBlock.getDirection());
+
+        Managers.INVENTORY.endSwap(swapType.getValue());
 
         if (remineMode.getValue() == RemineMode.OFF)
         {
@@ -397,6 +426,6 @@ public class SpeedMineModule extends ListeningToggleable
 
     private enum RemineMode
     {
-        INSTANT, OFF
+        INSTANT, FAST, OFF
     }
 }
