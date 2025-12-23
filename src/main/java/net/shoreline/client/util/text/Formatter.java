@@ -5,6 +5,11 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Formatter
 {
+    public String capitalize(String string)
+    {
+        return string.substring(0, 1).toUpperCase() + string.substring(1);
+    }
+
     public String formatEnum(final Enum<?> in)
     {
         String name = in.name();

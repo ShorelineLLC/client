@@ -113,7 +113,7 @@ public class HudComponent extends DrawableComponent implements Interactable
 
             if (overlaps)
             {
-                getHudModule().setIndex(Integer.MAX_VALUE);
+                getHudModule().setIndex(element.getIndex() + 1);
                 getHudModule().setAnchor(element.getAnchor());
                 return false;
             }

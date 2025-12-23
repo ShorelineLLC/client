@@ -14,6 +14,7 @@ import net.shoreline.client.impl.module.render.*;
 import net.shoreline.client.impl.module.world.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 @Getter
 public class ModuleManager
@@ -197,5 +198,19 @@ public class ModuleManager
     public SequencedCollection<Module> getAllModules()
     {
         return allModules.sequencedValues();
+    }
+
+    public List<Module> getModules(Predicate<Module> tester)
+    {
+        List<Module> result = new ArrayList<>();
+        for (Module module : getAllModules())
+        {
+            if (tester.test(module))
+            {
+                result.add(module);
+            }
+        }
+
+        return result;
     }
 }

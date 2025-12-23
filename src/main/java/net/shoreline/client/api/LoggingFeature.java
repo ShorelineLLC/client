@@ -35,9 +35,19 @@ public class LoggingFeature extends GenericFeature
         sendChatMessage(PREFIX + message, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
     }
 
+    protected void sendClientTextMessage(Text text)
+    {
+        sendChatText(Text.literal(PREFIX).append(text), ThemeModule.INSTANCE.getPrimaryColor().getRGB());
+    }
+
     protected void sendChatMessage(String message)
     {
         sendChatMessage(message, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
+    }
+
+    protected void sendChatText(Text text)
+    {
+        sendChatText(text, ThemeModule.INSTANCE.getPrimaryColor().getRGB());
     }
 
     protected void sendSuccessChatMessage(String message)
@@ -52,7 +62,12 @@ public class LoggingFeature extends GenericFeature
 
     protected void sendChatMessage(String message, int color)
     {
-        runOnThread(() -> mc.inGameHud.getChatHud().addMessage(Text.of(message), null,
+        sendChatText(Text.of(message), color);
+    }
+
+    protected void sendChatText(Text text, int color)
+    {
+        runOnThread(() -> mc.inGameHud.getChatHud().addMessage(text, null,
                 new MessageIndicator(color, null, Text.empty(), "CLIENT")));
     }
 

@@ -38,7 +38,10 @@ public class CommandManager extends GenericFeature
         registerCommands(
                 new BindCommand(),
                 new DrawnCommand(),
+                new FolderCommand(),
                 new FriendCommand(),
+                new HelpCommand(),
+                new HistoryCommand(),
                 new KitCommand(),
                 new NotifyCommand(),
                 new PrefixCommand(),

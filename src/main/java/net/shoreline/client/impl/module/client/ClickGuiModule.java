@@ -95,14 +95,7 @@ public class ClickGuiModule extends Toggleable
 
     public void setFadeState(boolean fadeState)
     {
-        if (fadeState)
-        {
-            fadeInAnimation.setState(true);
-            fadeInAnimation.reset();
-        } else
-        {
-            fadeInAnimation.setState(false);
-        }
+        fadeInAnimation.setState(fadeState);
     }
 
     public Animation getFadeAnimation()
