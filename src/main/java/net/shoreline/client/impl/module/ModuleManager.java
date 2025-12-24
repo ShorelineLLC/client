@@ -96,6 +96,7 @@ public class ModuleManager
                 new XCarryModule(),
                 // Movement
                 new AvoidModule(),
+                new ElytraBoostModule(),
                 new ElytraFlyModule(),
                 new FastFallModule(),
                 new FlightModule(),

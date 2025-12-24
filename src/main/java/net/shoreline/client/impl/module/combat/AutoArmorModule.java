@@ -22,6 +22,7 @@ import java.util.Map;
 
 public class AutoArmorModule extends InventorySwapModule
 {
+    public static AutoArmorModule INSTANCE;
     Config<Integer> armorPercent = new NumberConfig.Builder<Integer>("ReplaceWhen")
             .setMin(0).setMax(20).setDefaultValue(0).setFormat("%")
             .setDescription("The min armor percent before replacing").build();
@@ -38,6 +39,7 @@ public class AutoArmorModule extends InventorySwapModule
     public AutoArmorModule()
     {
         super("AutoArmor", "Automatically equips armor", GuiCategory.COMBAT);
+        INSTANCE = this;
     }
 
     @EventListener(priority = Priorities.AUTO_ARMOR)
@@ -82,23 +84,17 @@ public class AutoArmorModule extends InventorySwapModule
         return true;
     }
 
-    private int findArmor(EquipmentSlot equipment)
+    public int findArmor(EquipmentSlot equipment)
     {
-        for (int i = 0; i <= 45; i++)
+        return InventoryUtil.find(stack ->
         {
-            ItemStack stack = mc.player.getInventory().getStack(i);
             if (!(stack.getItem() instanceof ArmorItem))
             {
-                continue;
+                return false;
             }
 
-            if (getEquipmentSlot(stack).equals(equipment))
-            {
-                return i;
-            }
-        }
-
-        return -1;
+            return getEquipmentSlot(stack).equals(equipment);
+        });
     }
 
     private boolean checkArmor(int armor)

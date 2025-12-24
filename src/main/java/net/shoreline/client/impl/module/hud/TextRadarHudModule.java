@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.module.impl.hud.DynamicEntry;
@@ -20,6 +21,7 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TextRadarHudModule extends DynamicHudModule
 {
@@ -38,6 +40,9 @@ public class TextRadarHudModule extends DynamicHudModule
     Config<RadarSorting> sortingConfig = new EnumConfig.Builder<RadarSorting>("Sorting")
             .setValues(RadarSorting.values())
             .setDefaultValue(RadarSorting.LENGTH).build();
+    Config<Integer> limit = new NumberConfig.Builder<Integer>("Limit")
+            .setMin(1).setMax(100).setDefaultValue(10)
+            .setDescription("Limit for the length of the text radar.").build();
 
     public TextRadarHudModule()
     {
@@ -47,7 +52,7 @@ public class TextRadarHudModule extends DynamicHudModule
     @Override
     public void drawEntries(DrawContext context, float tickDelta)
     {
-        getHudEntries().forEach(entry ->
+        for (DynamicEntry entry : getHudEntries())
         {
             if (entry instanceof PlayerRadarEntry playerEntry)
             {
@@ -64,7 +69,29 @@ public class TextRadarHudModule extends DynamicHudModule
                     getHudEntries().remove(entry);
                 }
             }
-        });
+        }
+
+        // this limit shit looks horrible but its the best way to do it so the animations dont look clunky
+        sortingConfig.getValue().sortEntries(getHudEntries(), isTop());
+        int i = 0;
+        offset = 0;
+        for (DynamicEntry entry : getHudEntries())
+        {
+            if (i >= limit.getValue())
+            {
+                entry.setDrawing(() -> false);
+            }
+
+            if (entry.isDrawing() || !entry.isDone())
+            {
+                entry.draw(context, getX() + (isLeft() ? 0 : getWidth()), getY(), offset, tickDelta);
+            }
+
+            if (entry.isDrawing())
+            {
+                i++;
+            }
+        }
 
         for (PlayerEntity player : mc.world.getPlayers())
         {
@@ -86,8 +113,6 @@ public class TextRadarHudModule extends DynamicHudModule
 
             getHudEntries().add(new PlayerRadarEntry(this, player, playerEntry.getSkinTextures().texture()));
         }
-
-        super.drawEntries(context, tickDelta);
     }
 
     @EventListener

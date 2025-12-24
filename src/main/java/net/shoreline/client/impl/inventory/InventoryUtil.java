@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -117,6 +118,20 @@ public class InventoryUtil
         }
 
         return INVALID_SLOT;
+    }
+
+    public int find(Predicate<ItemStack> tester)
+    {
+        for (int i = 0; i < 45; i++)
+        {
+            ItemStack stack = MinecraftClient.getInstance().player.getInventory().getStack(i);
+            if (tester.test(stack))
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     public int getItemCount(Item item)

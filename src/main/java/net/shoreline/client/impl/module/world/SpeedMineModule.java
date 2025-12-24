@@ -62,6 +62,9 @@ public class SpeedMineModule extends ListeningToggleable
             .setValues(SilentSwapType.values())
             .setDescription("The silent swap type")
             .setDefaultValue(SilentSwapType.HOTBAR).build();
+    Config<Boolean> disable = new BooleanConfig.Builder("Disable")
+            .setDescription("Disables speedmine on death to prevent double mine failing")
+            .setDefaultValue(true).build();
 
     Config<BoxRender> boxMode = new EnumConfig.Builder<BoxRender>("BoxMode")
             .setValues(BoxRender.values())
@@ -112,7 +115,11 @@ public class SpeedMineModule extends ListeningToggleable
     @EventListener
     public void onWorldDisconnect(WorldEvent.Disconnect event)
     {
-        disable();
+        if (disable.getValue())
+        {
+            disable();
+        }
+
         clearPacket();
         clearMain();
         pendingClear = null;
@@ -123,7 +130,11 @@ public class SpeedMineModule extends ListeningToggleable
     {
         if (event.getEntity() == mc.player)
         {
-            disable();
+            if (disable.getValue())
+            {
+                disable();
+            }
+
             clearPacket();
             clearMain();
             pendingClear = null;
