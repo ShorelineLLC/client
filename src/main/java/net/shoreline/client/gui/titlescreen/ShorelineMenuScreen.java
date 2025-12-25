@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.gui.clickgui.ClickGuiScreen;
 import net.shoreline.client.gui.titlescreen.particle.ParticleManager;
 import net.shoreline.client.gui.titlescreen.particle.snow.SnowManager;
@@ -18,6 +19,8 @@ import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.client.TitleScreenModule;
 import org.lwjgl.glfw.GLFW;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -164,12 +167,16 @@ public class ShorelineMenuScreen extends Screen
         float scaledHeight = window.getScaledHeight();
         float spacing = 10;
 
-        MenuButton singleplayerButton = new MenuButton(I18n.translate("menu.singleplayer").toUpperCase(Locale.ROOT), () -> client.setScreen(new SelectWorldScreen(this)), 0, 0);
-        MenuButton multiplayerButton  = new MenuButton(I18n.translate("menu.multiplayer").toUpperCase(Locale.ROOT), () -> client.setScreen(new MultiplayerScreen(this)), 0, 0);
-        MenuButton optionsButton      = new MenuButton(I18n.translate("menu.options").toUpperCase(Locale.ROOT).replace(".", ""), () -> client.setScreen(new OptionsScreen(this, client.options)), 0, 0);
-        MenuButton quitButton         = new MenuButton(I18n.translate("menu.quit").toUpperCase(Locale.ROOT), client::scheduleStop, 0, 0);
+        List<MenuButton> allButtons = new ArrayList<>();
+        allButtons.add(new MenuButton(I18n.translate("menu.singleplayer").toUpperCase(Locale.ROOT), () -> client.setScreen(new SelectWorldScreen(this)), 0, 0));
+        allButtons.add(new MenuButton(I18n.translate("menu.multiplayer").toUpperCase(Locale.ROOT), () -> client.setScreen(new MultiplayerScreen(this)), 0, 0));
+        allButtons.add(new MenuButton(I18n.translate("menu.options").toUpperCase(Locale.ROOT).replace(".", ""), () -> client.setScreen(new OptionsScreen(this, client.options)), 0, 0));
+        allButtons.add(new MenuButton(I18n.translate("menu.quit").toUpperCase(Locale.ROOT), client::scheduleStop, 0, 0));
 
-        MenuButton[] allButtons = {singleplayerButton, multiplayerButton, optionsButton, quitButton};
+        if (hasIAS())
+        {
+            allButtons.add(new MenuButton("Accounts".toUpperCase(), () -> client.setScreen(getAccountScreen(this)), 0, 0));
+        }
 
         float totalWidth = 0;
         for (MenuButton button : allButtons)
@@ -177,7 +184,7 @@ public class ShorelineMenuScreen extends Screen
             totalWidth += button.getWidth();
         }
 
-        totalWidth += spacing * (allButtons.length - 1);
+        totalWidth += spacing * (allButtons.size() - 1);
 
         float startX = (scaledWidth - totalWidth) / 2;
         float centerY = (scaledHeight / 2) + 60;
@@ -194,5 +201,39 @@ public class ShorelineMenuScreen extends Screen
     {
         ShorelineMenuScreen.snowManager = manager;
         snowManager.reset();
+    }
+
+    public boolean hasIAS()
+    {
+        try
+        {
+            Class.forName("ru.vidtu.ias.IASMinecraft");
+            return true;
+        }
+        catch (ClassNotFoundException e)
+        {
+            return false;
+        }
+    }
+
+    public Screen getAccountScreen(Screen parent)
+    {
+        try
+        {
+            String screenName = "ru.vidtu.ias.screen.AccountScreen";
+            Class<?> screen = Class.forName(screenName);
+            Constructor<?> ctr = screen.getDeclaredConstructor(Screen.class);
+            ctr.setAccessible(true);
+            return (Screen) ctr.newInstance(parent);
+        }
+        catch (ClassNotFoundException
+               | InstantiationException
+               | IllegalAccessException
+               | InvocationTargetException
+               | NoSuchMethodException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
