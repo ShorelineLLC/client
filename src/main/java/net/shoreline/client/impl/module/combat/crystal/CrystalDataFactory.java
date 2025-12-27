@@ -12,11 +12,14 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.AutoMineModule;
+import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionUtil;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.item.ItemUtil;
+import net.shoreline.client.util.world.PositionUtil;
 
 import java.util.Set;
 
@@ -38,14 +41,8 @@ public class CrystalDataFactory
     {
         BlockPos blockPos = BlockPos.ofFloored(crystalVec);
 
-        float appliedDamage = damageToTarget;
-        if (target.getTotalArmor() > 0)
-        {
-            appliedDamage *= ASSUMED_ARMOR_REDUCTION; // We have to assume armor here...
-        }
-
         if (autoCrystal.getOverrideConfig().getValue()
-                && (isLethalCrystal(target, appliedDamage)
+                && (isLethalCrystal(target, damageToTarget)
                 || isArmorBreaker(target, damageToTarget)))
         {
             return new CrystalData.Immediate<>(value,
@@ -54,30 +51,44 @@ public class CrystalDataFactory
                     damageToTarget,
                     damageToPlayer);
 
-        } else if (autoCrystal.getTargetItems().getValue()
-                && AutoMineModule.INSTANCE.isEnabled()
-                && SpeedMineModule.INSTANCE.isEnabled()
-                && isAntiSurroundPos(blockPos))
+        } else if (SpeedMineModule.INSTANCE.isUsedByAutoMine())
         {
-            return new CrystalData.Immediate<>("AS",
-                    value,
-                    crystalVec,
-                    target,
-                    damageToTarget,
-                    damageToPlayer);
-        } else
-        {
-            return new CrystalData<>(value,
-                    crystalVec,
-                    target,
-                    damageToTarget,
-                    damageToPlayer);
+            PlayerEntity mineTarget = Managers.TARGETING.getTarget();
+            MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
+            if (mineTarget != null && currentMine != null)
+            {
+                if (autoCrystal.getTargetItems().getValue() && isAntiSurroundPos(blockPos, crystalVec, mineTarget, currentMine))
+                {
+                    return new CrystalData.Immediate<>("AS",
+                            value,
+                            crystalVec,
+                            target,
+                            damageToTarget,
+                            damageToPlayer);
+                }
+
+                else if (autoCrystal.getCevBreak().getValue() && isCevBreakerPos(blockPos, mineTarget, currentMine))
+                {
+                    return new CrystalData.Immediate<>("Cev",
+                            value,
+                            crystalVec,
+                            target,
+                            damageToTarget,
+                            damageToPlayer);
+                }
+            }
         }
+
+        return new CrystalData<>(value,
+                crystalVec,
+                target,
+                damageToTarget,
+                damageToPlayer);
     }
 
     private boolean isLethalCrystal(LivingEntityState target, float damageToTarget)
     {
-        return target.getTotalHealth() - (damageToTarget * autoCrystal.getDamageMultiplier().getValue()) < 0.0f;
+        return target.getTotalHealth() - (getAssumedDamage(damageToTarget, target) * autoCrystal.getDamageMultiplier().getValue()) < 0.0f;
     }
 
     private boolean isArmorBreaker(LivingEntityState target, float damage)
@@ -95,36 +106,22 @@ public class CrystalDataFactory
         return false;
     }
 
-    public boolean isAntiSurroundPos(BlockPos blockPos)
+    public boolean isAntiSurroundPos(BlockPos blockPos,
+                                     Vec3d crystalVec,
+                                     PlayerEntity target,
+                                     MiningData currentMine)
     {
-        PlayerEntity target = Managers.TARGETING.getTarget();
-        if (target == null)
-        {
-            return false;
-        }
+        BlockPos minePos = currentMine.getBlockPos();
+        LivingEntityState state = (LivingEntityState) view.getEntityById(target.getId());
 
-        MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
-        if (currentMine == null || SpeedMineModule.INSTANCE.isManualMining())
+        if (!autoCrystal.getFeetTrap(state.getBoundingBox()).contains(minePos))
         {
             return false;
         }
 
         if (currentMine.isDoneMining())
         {
-            BlockPos minePos = currentMine.getBlockPos();
-            LivingEntityState state = (LivingEntityState) view.getEntityById(target.getId());
-
-            float baseDamage = view.getExplosionDamage(minePos.toBottomCenterPos(),
-                    state.getPos(),
-                    state.getBoundingBox(),
-                    autoCrystal.getIgnoreTerrain().getValue(),
-                    Set.of(minePos));
-
-            if (state.getTotalArmor() > 0)
-            {
-                baseDamage *= ASSUMED_ARMOR_REDUCTION;
-            }
-
+            float baseDamage = getAssumedDamage(minePos.toBottomCenterPos(), Set.of(minePos), state);
             if (baseDamage < autoCrystal.getMinDamage().getValue())
             {
                 return false;
@@ -137,13 +134,11 @@ public class CrystalDataFactory
                     continue;
                 }
 
-                float damage = view.getExplosionDamage(blockPos.toBottomCenterPos(),
+                if (view.getExplosionDamage(crystalVec,
                         entityState.getPos(),
                         entityState.getBoundingBox(),
                         false,
-                        Set.of(minePos));
-
-                if (damage >= 5.0f)
+                        Set.of(minePos)) >= 5.0f)
                 {
                     return true;
                 }
@@ -152,17 +147,43 @@ public class CrystalDataFactory
 
         else if (currentMine.isAlmostDone(autoCrystal.getPrePlace().getValue()))
         {
-            BlockPos minePos = currentMine.getBlockPos();
             Vec3d simPos = minePos.toBottomCenterPos();
-            float damage = view.getExplosionDamage(blockPos.toBottomCenterPos(),
+            return view.getExplosionDamage(blockPos.toBottomCenterPos(),
                     simPos,
                     ITEM_DIMENSIONS.getBoxAt(simPos),
                     false,
-                    Set.of(minePos));
-
-            return damage >= 5.0f;
+                    Set.of(minePos)) >= 5.0f;
         }
 
         return false;
+    }
+
+    private boolean isCevBreakerPos(BlockPos blockPos,
+                                    PlayerEntity target,
+                                    MiningData currentMine)
+    {
+        BlockPos targetHeadPos = EntityUtil.getRoundedBlockPos(target).up(target.isCrawling() ? 1 : 2);
+        if (!blockPos.down().equals(targetHeadPos)
+                || !currentMine.getBlockPos().equals(targetHeadPos)
+                || !(currentMine.isDoneMining() || currentMine.isAlmostDone(5)))
+        {
+            return false;
+        }
+
+        return view.getEntities().stream().noneMatch(e -> e.getEntityType() == EntityType.END_CRYSTAL && e.getBlockPos().equals(blockPos));
+    }
+
+    private float getAssumedDamage(Vec3d crystalVec, Set<BlockPos> ignore, LivingEntityState state)
+    {
+        return getAssumedDamage(view.getExplosionDamage(crystalVec,
+                        state.getPos(),
+                        state.getBoundingBox(),
+                        autoCrystal.getIgnoreTerrain().getValue(),
+                        ignore), state);
+    }
+
+    private float getAssumedDamage(float baseDamage, LivingEntityState state)
+    {
+        return state.getTotalArmor() > 0 ? baseDamage * ASSUMED_ARMOR_REDUCTION : baseDamage;
     }
 }

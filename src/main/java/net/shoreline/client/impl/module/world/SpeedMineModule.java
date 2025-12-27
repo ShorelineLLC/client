@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.world;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Formatting;
@@ -13,6 +14,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.ListeningToggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.module.combat.AutoMineModule;
 import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.entity.EntityDeathEvent;
@@ -185,7 +187,7 @@ public class SpeedMineModule extends ListeningToggleable
     {
         if (mainState != null)
         {
-            if (mainState.getFactor() < 0.01f)
+            if (mainState.getAnimation().getFactor() < 0.01f)
             {
                 mainState = null;
                 return;
@@ -196,13 +198,13 @@ public class SpeedMineModule extends ListeningToggleable
                     boxMode.getValue(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
-                    (float) Easing.SMOOTH_STEP.ease(mainState.getFactor()),
+                    (float) Easing.SMOOTH_STEP.ease(mainState.getAnimation().getFactor()),
                     speedConfig.getValue());
         }
 
         if (packetState != null)
         {
-            if (packetState.getFactor() < 0.01f)
+            if (packetState.getAnimation().getFactor() < 0.01f)
             {
                 packetState = null;
                 return;
@@ -213,7 +215,7 @@ public class SpeedMineModule extends ListeningToggleable
                     boxMode.getValue(),
                     miningColor.getValue().getRGB(),
                     breakingColor.getValue().getRGB(),
-                    (float) Easing.SMOOTH_STEP.ease(packetState.getFactor()), 1.0f);
+                    (float) Easing.SMOOTH_STEP.ease(packetState.getAnimation().getFactor()), 1.0f);
         }
     }
 
@@ -398,7 +400,7 @@ public class SpeedMineModule extends ListeningToggleable
 
         if (mainState != null)
         {
-            mainState.setState(false);
+            mainState.getAnimation().setState(false);
         }
     }
 
@@ -412,7 +414,7 @@ public class SpeedMineModule extends ListeningToggleable
 
         if (packetState != null)
         {
-            packetState.setState(false);
+            packetState.getAnimation().setState(false);
         }
     }
 
@@ -422,17 +424,17 @@ public class SpeedMineModule extends ListeningToggleable
                 || packetMiningBlock != null && packetMiningBlock.getBlockPos().equals(blockPos);
     }
 
-    private record MiningRenderState(MiningData data, Animation animation)
+    public boolean isUsedByAutoMine()
     {
-        public void setState(boolean state)
-        {
-            animation.setState(state);
-        }
+        return AutoMineModule.INSTANCE.isEnabled() && isEnabled();
+    }
 
-        public float getFactor()
-        {
-            return (float) animation.getFactor();
-        }
+    @Getter
+    @RequiredArgsConstructor
+    private static class MiningRenderState
+    {
+        private final MiningData data;
+        private final Animation animation;
     }
 
     private enum RemineMode

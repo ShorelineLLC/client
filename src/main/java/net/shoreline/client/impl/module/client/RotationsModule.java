@@ -29,6 +29,7 @@ public class RotationsModule extends Concurrent
             .setDescription("Applies movement corrections when rotating")
             .setDefaultValue(MoveFix.OFF).build();
     Config<Boolean> fixTravel = new BooleanConfig.Builder("FixInAir")
+            .setVisibilityDependant(true)
             .setDescription("Fixes the movement while in the air")
             .setVisible(() -> moveFixConfig.getValue() != MoveFix.OFF)
             .setDefaultValue(false).build();

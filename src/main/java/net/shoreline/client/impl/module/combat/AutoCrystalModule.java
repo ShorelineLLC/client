@@ -27,7 +27,6 @@ import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.EntitySpawnEvent;
@@ -42,14 +41,17 @@ import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.combat.crystal.CrystalOptimizer;
+import net.shoreline.client.impl.module.combat.trap.TrapLayer;
+import net.shoreline.client.impl.module.combat.trap.TrapModule;
+import net.shoreline.client.impl.module.combat.trap.TrapSpec;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
-import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkUtil;
-import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.BoxRender;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
@@ -62,15 +64,13 @@ import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
-public class AutoCrystalModule extends ObsidianPlacerModule
+public class AutoCrystalModule extends TrapModule
 {
     public static AutoCrystalModule INSTANCE;
 
@@ -141,6 +141,9 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setValues(Timing.values())
             .setDescription("Attempts to predict the next place")
             .setDefaultValue(Timing.OFF).build();
+    Config<Boolean> cevBreak = new BooleanConfig.Builder("CevBreak")
+            .setDescription("Targets crystal placements above the target")
+            .setDefaultValue(false).build();
     Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
             .setDescription("Targets dropped items blocking placements")
             .setDefaultValue(false).build();
@@ -149,7 +152,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
             .setDescription("Ticks before predicting placement")
             .setVisible(() -> targetItems.getValue()).build();
     Config<Void> antiSurroundConfig = new ConfigGroup.Builder("SurroundBreak")
-            .addAll(predictPlace, targetItems, prePlace).build();
+            .addAll(predictPlace, cevBreak, targetItems, prePlace).build();
 
     Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
             .setMin(2.0f).setMax(10.0f).setDefaultValue(4.0f)
@@ -315,7 +318,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         if (currentPlace != null)
         {
             rotations = runPlace(currentPlace, hand);
-        } else if (AutoMineModule.INSTANCE.isEnabled() && SpeedMineModule.INSTANCE.isEnabled() && predictPlace.getValue() != Timing.OFF)
+        } else if (SpeedMineModule.INSTANCE.isUsedByAutoMine() && predictPlace.getValue() != Timing.OFF)
         {
             MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
             CrystalData.Immediate<BlockPos> prePlaceData = validateMiningData(currentMine);
@@ -775,7 +778,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
     private CrystalData.Immediate<BlockPos> validateMiningData(MiningData currentMine)
     {
-        if (currentMine == null || !currentMine.isDoneMining() || SpeedMineModule.INSTANCE.isManualMining())
+        if (currentMine == null || !currentMine.isDoneMining())
         {
             return null;
         }
@@ -788,9 +791,14 @@ public class AutoCrystalModule extends ObsidianPlacerModule
 
         BlockPos minePos = currentMine.getBlockPos();
         BlockPos placePos = minePos.down();
-
         double dist = mc.player.squaredDistanceTo(placePos.toCenterPos());
         if (dist > MathHelper.square(placeRange.getValue()))
+        {
+            return null;
+        }
+
+        BlockState state = mc.world.getBlockState(placePos);
+        if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
         {
             return null;
         }
@@ -860,7 +868,7 @@ public class AutoCrystalModule extends ObsidianPlacerModule
         return !hasEntityBlockingCrystal;
     }
 
-    private boolean hasEntityBlockingCrystal(Box box, boolean ignoreItems)
+    public boolean hasEntityBlockingCrystal(Box box, boolean ignoreItems)
     {
         for (Entity entity : WorldUtil.collectEntitiesInBox(box))
         {

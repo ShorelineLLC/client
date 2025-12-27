@@ -10,6 +10,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
+import net.shoreline.client.util.world.BlockUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,28 +58,48 @@ public class PhaseUtil
         return out;
     }
 
+    public boolean isInsideBedrock(Entity entity)
+    {
+        return getFeetBlocks(entity).stream().anyMatch(BlockUtil::isUnbreakable);
+    }
+
+    public boolean isInsideBedrockWall(Entity entity)
+    {
+        return getWallBlocks(entity).stream().anyMatch(BlockUtil::isUnbreakable);
+    }
+
     public boolean isInsideBlock(Entity entity)
     {
-        if (entity.isCrawling())
-        {
-            return false;
-        }
-
-        Box box = entity.getBoundingBox();
-        Box feetBox = new Box(box.minX, box.minY, box.minZ, box.maxX, box.minY + 0.1, box.maxZ);
-        return !intersectingBlocks(feetBox).isEmpty();
+        return !getFeetBlocks(entity).isEmpty();
     }
 
     public boolean isInsideWall(Entity entity)
     {
+        return !getWallBlocks(entity).isEmpty();
+    }
+
+    public List<BlockPos> getFeetBlocks(Entity entity)
+    {
         if (entity.isCrawling())
         {
-            return false;
+            return new ArrayList<>();
+        }
+
+        Box box = entity.getBoundingBox();
+        Box feetBox = new Box(box.minX, box.minY, box.minZ, box.maxX, box.minY + 0.1, box.maxZ);
+        return intersectingBlocks(feetBox);
+    }
+
+    public List<BlockPos> getWallBlocks(Entity entity)
+    {
+        if (entity.isCrawling())
+        {
+            return new ArrayList<>();
         }
 
         Box box = entity.getBoundingBox();
         Box bodyBox = new Box(box.minX, box.minY + 1.0, box.minZ, box.maxX, box.minY + 1.1, box.maxZ);
-        return !intersectingBlocks(bodyBox).isEmpty();
+        return intersectingBlocks(bodyBox);
     }
 
     public boolean isInsideWeb(Entity entity)

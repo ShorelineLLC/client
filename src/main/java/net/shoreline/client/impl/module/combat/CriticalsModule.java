@@ -97,8 +97,10 @@ public class CriticalsModule extends MovementModule
             }
             case GRIM ->
             {
-                if (mc.player.input.movementForward != 0.0f || mc.player.input.movementSideways != 0.0f
-                        || !PhaseUtil.isInsideBlock(mc.player) || !PhaseUtil.isInsideWall(mc.player))
+                if (mc.player.input.movementForward != 0.0f
+                        || mc.player.input.movementSideways != 0.0f
+                        || !PhaseUtil.isInsideBlock(mc.player)
+                        || !PhaseUtil.isInsideWall(mc.player))
                 {
                     return;
                 }

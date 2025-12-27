@@ -24,7 +24,7 @@ public class ElytraBoostModule extends InventorySwapModule
 
     public ElytraBoostModule()
     {
-        super("ElytrBoost", "Abuses minecraft mechanics to boost yourself in the air", GuiCategory.MOVEMENT);
+        super("ElytraBoost", "Abuses minecraft mechanics to boost yourself in the air", GuiCategory.MOVEMENT);
     }
 
     @EventListener

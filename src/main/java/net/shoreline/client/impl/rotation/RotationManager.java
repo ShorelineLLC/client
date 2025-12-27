@@ -235,8 +235,7 @@ public class RotationManager extends NetworkHandler
     @EventListener
     public void onTravelPre(TravelEvent.Pre event)
     {
-        if (rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF
-                && rotationsConfig.getFixTravel().getValue() && hasClientRotation())
+        if (rotationsConfig.getFixTravel().getValue() && hasClientRotation())
         {
             handler.applyRotations(mc.player);
         }
@@ -245,7 +244,7 @@ public class RotationManager extends NetworkHandler
     @EventListener
     public void onTravelPost(TravelEvent.Post event)
     {
-        if (rotationsConfig.getMoveFixConfig().getValue() != MoveFix.OFF && rotationsConfig.getFixTravel().getValue())
+        if (rotationsConfig.getFixTravel().getValue())
         {
             handler.revertRotations(mc.player);
         }

@@ -3,10 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
@@ -178,7 +175,7 @@ public class AutoMineModule extends TrapModule
             }
 
             double dist = mc.player.squaredDistanceTo(blockPos.toCenterPos());
-            if (dist > speedMine.getRangeConfig().getValue() * speedMine.getRangeConfig().getValue())
+            if (dist > MathHelper.square(speedMine.getRangeConfig().getValue()))
             {
                 continue;
             }
