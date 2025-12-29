@@ -13,6 +13,8 @@ public class ModelsModule extends Toggleable
 {
     public static ModelsModule INSTANCE;
 
+    // Config<Void> playersConfig = new ConfigGroup.Builder("Players").build();
+
     Config<Float> crystalScale = new NumberConfig.Builder<Float>("Scale")
             .setMin(0.1f).setMax(1.5f).setDefaultValue(1.0f)
             .setDescription("The scale of the crystal model").build();

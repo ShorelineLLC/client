@@ -282,7 +282,7 @@ public class AutoCrystalModule extends TrapModule
 
         currentAttack = getBestCrystal(latestCrystalEntities);
 
-        List<CrystalData<BlockPos>> placements = getPlacements(latestCrystalBases);
+        List<CrystalData<BlockPos>> placements = crystalCalc.getBasePlacements();
         currentPlace = getBestCrystal(basePlace.getValue() && placements.isEmpty() ? latestCrystalBases : placements);
     }
 
@@ -691,11 +691,6 @@ public class AutoCrystalModule extends TrapModule
         return Direction.getFacing(eyePos.x - cut.x, eyePos.y - cut.y, eyePos.z - cut.z);
     }
 
-    private List<CrystalData<BlockPos>> getPlacements(List<CrystalData<BlockPos>> crystalData)
-    {
-        return crystalData.stream().filter(d -> canUseOnBlock(d.getValue())).toList();
-    }
-
     private <T> CrystalData<T> getBestCrystal(List<CrystalData<T>> crystals)
     {
         CrystalData<T> bestCrystal = getBestCrystal(crystals, false);
@@ -842,10 +837,10 @@ public class AutoCrystalModule extends TrapModule
 
     public boolean canUseOnBlock(BlockPos blockPos)
     {
-        return canUseOnBlock(mc.world, blockPos, hasEntityBlockingCrystal(getCrystalBox(blockPos.up()), false));
+        return canUseOnBlock(mc.world, blockPos) && !hasEntityBlockingCrystal(getCrystalBox(blockPos.up()), false);
     }
 
-    public boolean canUseOnBlock(BlockView blockView, BlockPos pos, boolean hasEntityBlockingCrystal)
+    public boolean canUseOnBlock(BlockView blockView, BlockPos pos)
     {
         BlockState state = blockView.getBlockState(pos);
         if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
@@ -865,7 +860,7 @@ public class AutoCrystalModule extends TrapModule
             return false;
         }
 
-        return !hasEntityBlockingCrystal;
+        return true;
     }
 
     public boolean hasEntityBlockingCrystal(Box box, boolean ignoreItems)

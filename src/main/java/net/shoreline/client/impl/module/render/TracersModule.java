@@ -21,6 +21,7 @@ import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.Optional;
 
 public class TracersModule extends Toggleable
 {
@@ -108,34 +109,34 @@ public class TracersModule extends Toggleable
                 continue;
             }
 
-            Color color = getTracerColor(entity);
-            if (color != null)
+            Optional<Color> color = getTracerColor(entity);
+            if (color.isPresent())
             {
                 Vec3d entityPos = Interpolation.getRenderPosition(entity, event.getTickDelta());
-                Managers.RENDER.renderLine(event.getMatrixStack(), pos, entityPos, color.getRGB());
+                Managers.RENDER.renderLine(event.getMatrixStack(), pos, entityPos, color.get().getRGB());
             }
         }
     }
 
-    private Color getTracerColor(Entity entity)
+    private Optional<Color> getTracerColor(Entity entity)
     {
         if (entity instanceof PlayerEntity player && playersConfig.getValue())
         {
-            return Managers.SOCIAL.isFriend(player) ? SocialsModule.INSTANCE.getFriendsColor() : playerColor.getValue();
+            return Optional.of(Managers.SOCIAL.isFriend(player) ? SocialsModule.INSTANCE.getFriendsColor() : playerColor.getValue());
         } else if (EntityUtil.isHostile(entity) && hostilesConfig.getValue())
         {
-            return hostilesColor.getValue();
+            return Optional.of(hostilesColor.getValue());
         } else if (EntityUtil.isPassive(entity) && passiveConfig.getValue())
         {
-            return passivesColor.getValue();
+            return Optional.of(passivesColor.getValue());
         } else if (entity instanceof EndCrystalEntity && crystalsConfig.getValue())
         {
-            return crystalsColor.getValue();
+            return Optional.of(crystalsColor.getValue());
         } else if (entity instanceof ItemEntity && itemsConfig.getValue())
         {
-            return itemsColor.getValue();
+            return Optional.of(itemsColor.getValue());
         }
 
-        return null;
+        return Optional.empty();
     }
 }

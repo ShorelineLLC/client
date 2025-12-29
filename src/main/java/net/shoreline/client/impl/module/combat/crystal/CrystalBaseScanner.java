@@ -30,8 +30,7 @@ public class CrystalBaseScanner extends CrystalEntityScanner
     protected void visit(BlockPos pos, AsyncBlockState asyncState)
     {
         Box crystalBB = autoCrystal.getCrystalBox(pos.up());
-        boolean blocking = hasEntityBlockingCrystal(crystalBB);
-        if (!autoCrystal.canUseOnBlock(this, pos, blocking))
+        if (hasEntityBlockingCrystal(crystalBB))
         {
             return;
         }

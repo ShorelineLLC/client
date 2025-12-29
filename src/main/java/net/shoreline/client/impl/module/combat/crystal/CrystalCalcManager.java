@@ -11,11 +11,13 @@ import java.util.List;
 
 public class CrystalCalcManager extends AsyncFeature<Collection<CrystalData<?>>>
 {
+    private final AutoCrystalModule autoCrystalModule;
     private final CrystalBaseScanner baseScanner;
 
     public CrystalCalcManager(AutoCrystalModule autoCrystalModule)
     {
         super("End Crystals", new ArrayList<>());
+        this.autoCrystalModule = autoCrystalModule;
         this.baseScanner = new CrystalBaseScanner(autoCrystalModule);
     }
 
@@ -40,6 +42,13 @@ public class CrystalCalcManager extends AsyncFeature<Collection<CrystalData<?>>>
         return getResults().stream()
                 .filter(d -> d.getValue() instanceof BlockPos)
                 .map(d -> (CrystalData<BlockPos>) d)
+                .toList();
+    }
+
+    public List<CrystalData<BlockPos>> getBasePlacements()
+    {
+        return getBaseResults().stream()
+                .filter(d -> autoCrystalModule.canUseOnBlock(d.getValue()))
                 .toList();
     }
 
