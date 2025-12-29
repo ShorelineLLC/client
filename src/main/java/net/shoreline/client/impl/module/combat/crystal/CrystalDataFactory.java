@@ -11,15 +11,12 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
-import net.shoreline.client.impl.module.combat.AutoMineModule;
-import net.shoreline.client.impl.module.combat.util.PhaseUtil;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.impl.world.explosion.ExplosionUtil;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.item.ItemUtil;
-import net.shoreline.client.util.world.PositionUtil;
 
 import java.util.Set;
 
@@ -28,6 +25,8 @@ public class CrystalDataFactory
 {
     private final AutoCrystalModule autoCrystal;
     private final CrystalEntityScanner view;
+
+    private boolean startedCevSequence;
 
     private static final EntityDimensions ITEM_DIMENSIONS = EntityDimensions.fixed(0.25f, 0.25f);
 
@@ -163,14 +162,28 @@ public class CrystalDataFactory
                                     MiningData currentMine)
     {
         BlockPos targetHeadPos = EntityUtil.getRoundedBlockPos(target).up(target.isCrawling() ? 1 : 2);
-        if (!blockPos.down().equals(targetHeadPos)
-                || !currentMine.getBlockPos().equals(targetHeadPos)
-                || !(currentMine.isDoneMining() || currentMine.isAlmostDone(5)))
+        if (!blockPos.down().equals(targetHeadPos) || !currentMine.getBlockPos().equals(targetHeadPos))
         {
             return false;
         }
 
-        return view.getEntities().stream().noneMatch(e -> e.getEntityType() == EntityType.END_CRYSTAL && e.getBlockPos().equals(blockPos));
+//        if (startedCevSequence)
+//        {
+//            if (!currentMine.isDoneMining())
+//            {
+//                return false;
+//            }
+//
+//            startedCevSequence = false;
+//            return true;
+//        }
+//
+//        else if (currentMine.isAlmostDone(5))
+//        {
+//            return startedCevSequence = true;
+//        }
+
+        return false;
     }
 
     private float getAssumedDamage(Vec3d crystalVec, Set<BlockPos> ignore, LivingEntityState state)

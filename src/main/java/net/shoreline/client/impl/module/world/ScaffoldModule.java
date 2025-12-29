@@ -15,7 +15,6 @@ import net.shoreline.client.api.config.RegistryConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.module.impl.PlacerModule;
 import net.shoreline.client.util.input.InputUtil;
@@ -308,11 +307,5 @@ public class ScaffoldModule extends PlacerModule
         }
 
         return null;
-    }
-
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent.Post event)
-    {
-        renderBlockPlacements(event.getMatrixStack());
     }
 }

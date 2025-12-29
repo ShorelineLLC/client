@@ -9,7 +9,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.text.Text;
-import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.api.ListeningFeature;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
@@ -18,12 +18,15 @@ import net.shoreline.client.impl.imixin.IClientWorld;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.LongAdder;
 
-public class NetworkManager extends GenericFeature
+public class NetworkManager extends ListeningFeature
 {
     @Getter
     private final List<NetworkHandler> handlers = new ArrayList<>();

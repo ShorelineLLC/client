@@ -25,7 +25,7 @@ public class ToggleModuleComponent extends ModuleComponent
         super(module, frame, x, y, frameWidth, frameHeight);
         this.toggleComponent = new ToggleComponent(frame, x, y, frameWidth, frameHeight, module.isEnabled(), module::toggle);
 
-        module.getEnabled().addListener(this::onModuleToggled);
+        module.getEnabled().addObserver(this::onModuleToggled);
     }
 
     @Override

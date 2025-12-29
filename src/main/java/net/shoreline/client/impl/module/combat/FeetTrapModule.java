@@ -72,12 +72,6 @@ public class FeetTrapModule extends TrapModule
     }
 
     @EventListener
-    public void onWorldDisconnect(WorldEvent.Disconnect event)
-    {
-        disable();
-    }
-
-    @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
     {
         if (checkNull())
@@ -164,11 +158,5 @@ public class FeetTrapModule extends TrapModule
                 runSingleObbyPlacement(blockPos);
             }
         }
-    }
-
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent.Post event)
-    {
-        renderBlockPlacements(event.getMatrixStack());
     }
 }

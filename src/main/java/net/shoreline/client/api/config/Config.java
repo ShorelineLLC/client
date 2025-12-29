@@ -52,13 +52,13 @@ public abstract class Config<T> implements Identifiable, Observable<T>, Serializ
     }
 
     @Override
-    public void addListener(Consumer<T> l)
+    public void addObserver(Consumer<T> l)
     {
         listeners.add(l);
     }
 
     @Override
-    public void removeListener(Consumer<T> l)
+    public void removeObserver(Consumer<T> l)
     {
         listeners.remove(l);
     }

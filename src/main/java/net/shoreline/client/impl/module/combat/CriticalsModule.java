@@ -105,11 +105,12 @@ public class CriticalsModule extends MovementModule
                     return;
                 }
 
+                float offset = Anticheat.GCD_DIVISOR;
                 Rotation playerRotation = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getClientRotation() : new Rotation(mc.player);
-                float pitch = Math.clamp(playerRotation.getPitch(), -90.0f + Anticheat.GCD_DIVISOR, 90.0f - Anticheat.GCD_DIVISOR);
+                float pitch = Math.clamp(playerRotation.getPitch(), -90.0f + offset, 90.0f - offset);
 
-                sendRotatePacketInternal(0.0625f, playerRotation.getYaw(), pitch + Anticheat.GCD_DIVISOR, false);
-                sendRotatePacketInternal(0.04535f, playerRotation.getYaw(), pitch - Anticheat.GCD_DIVISOR, false);
+                sendRotatePacketInternal(0.0625f, playerRotation.getYaw(), pitch + offset, false);
+                sendRotatePacketInternal(0.04535f, playerRotation.getYaw(), pitch - offset, false);
             }
         }
     }

@@ -39,7 +39,7 @@ public class ThemeModule extends Concurrent
         INSTANCE = this;
 
         Theme primaryTheme = ClickGuiModule.INSTANCE.getTheme();
-        primaryColor.addListener(value ->
+        primaryColor.addObserver(value ->
         {
             primaryTheme.setComponentColor(value);
             for (Module module : Managers.MODULES.getModules())
@@ -58,10 +58,10 @@ public class ThemeModule extends Concurrent
             }
         });
 
-        titleColor.addListener(primaryTheme::setTitleColor);
-        backgroundColor.addListener(primaryTheme::setBackgroundColor);
-        outlineColor.addListener(primaryTheme::setOutlineColor);
-        textColor.addListener(primaryTheme::setTextColor);
+        titleColor.addObserver(primaryTheme::setTitleColor);
+        backgroundColor.addObserver(primaryTheme::setBackgroundColor);
+        outlineColor.addObserver(primaryTheme::setOutlineColor);
+        textColor.addObserver(primaryTheme::setTextColor);
     }
 
     public Config<Color> getPrimaryConfig()

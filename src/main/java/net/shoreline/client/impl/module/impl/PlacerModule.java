@@ -1,11 +1,16 @@
 package net.shoreline.client.impl.module.impl;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.module.client.ThemeModule;
@@ -28,8 +33,9 @@ public class PlacerModule extends CombatModule
     protected final List<BlockPos> placements = new ArrayList<>();
     protected final ConcurrentMap<BlockPos, Animation> fadeOutAnimations = new ConcurrentHashMap<>();
 
-    public PlacerModule(String name, String description, GuiCategory category) {
-        super(name, description, category);
+    public PlacerModule(String name, String description, GuiCategory category)
+    {
+        this(name, new String[0], description, category);
     }
 
     public PlacerModule(final String name,
@@ -38,6 +44,8 @@ public class PlacerModule extends CombatModule
                         final GuiCategory category)
     {
         super(name, nameAliases, description, category);
+        addListener(WorldEvent.Disconnect.class, e -> disable());
+        addListener(RenderWorldEvent.Post.class, e -> renderBlockPlacements(e.getMatrixStack()));
     }
 
     protected boolean placeBlock(BlockPos placePos, Block block)
@@ -58,7 +66,7 @@ public class PlacerModule extends CombatModule
         boolean result = Managers.INTERACT.placeBlock(interaction);
         if (result)
         {
-            addPlaceAnim(placePos);
+            fadeOutAnimations.put(placePos, new Animation(true, 500));
         }
 
         return result;
@@ -120,8 +128,31 @@ public class PlacerModule extends CombatModule
         }
     }
 
-    protected void addPlaceAnim(BlockPos blockPos)
+    // Squid retarded headass
+    protected void fakePlace(BlockPos blockPos, BlockState blockState)
     {
+        MinecraftServer server = mc.getServer();
+        if (server == null)
+        {
+            return;
+        }
+
+        Managers.INTERACT.playBlockPlaceSound(blockPos, blockState);
+        server.execute(() ->
+        {
+            ServerWorld world = server.getWorld(mc.world.getRegistryKey());
+            if (world == null)
+            {
+                return;
+            }
+
+            world.setBlockState(
+                    blockPos,
+                    blockState,
+                    Block.NOTIFY_ALL | Block.REDRAW_ON_MAIN_THREAD
+            );
+        });
+
         fadeOutAnimations.put(blockPos, new Animation(true, 500));
     }
 

@@ -27,7 +27,6 @@ import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.manager.ShaderManager;
 import net.shoreline.client.impl.render.shader.ShaderEffect;
-import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.Color;
@@ -138,7 +137,7 @@ public class ShadersModule extends RenderModule
         super("Shaders", "Renders shaders over entities", GuiCategory.RENDER);
         INSTANCE = this;
 
-        depthConfig.addListener(v ->
+        depthConfig.addObserver(v ->
         {
             if (shaderManager != null)
             {

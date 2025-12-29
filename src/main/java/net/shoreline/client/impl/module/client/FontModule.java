@@ -35,10 +35,10 @@ public class FontModule extends Toggleable
         super("Font", "Client custom fonts", GuiCategory.CLIENT);
         INSTANCE = this;
 
-        fontsConfig.addListener(v -> setFont(v.getName()));
+        fontsConfig.addObserver(v -> setFont(v.getName()));
 
-        antiAlias.addListener(v -> FontManager.close());
-        fractionalMetrics.addListener(v -> FontManager.close());
+        antiAlias.addObserver(v -> FontManager.close());
+        fractionalMetrics.addObserver(v -> FontManager.close());
     }
 
     @EventListener

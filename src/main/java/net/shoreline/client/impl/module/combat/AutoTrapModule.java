@@ -73,12 +73,6 @@ public class AutoTrapModule extends TrapModule
     }
 
     @EventListener
-    public void onWorldDisconnect(WorldEvent.Disconnect event)
-    {
-        disable();
-    }
-
-    @EventListener
     public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
     {
         if (checkNull())
@@ -147,7 +141,7 @@ public class AutoTrapModule extends TrapModule
 
             if (!mc.world.getBlockState(blockPos).isReplaceable())
             {
-                if (!instantReplace.getValue() || Managers.MINING.getMiningProgress(blockPos) < 0.5f)
+                if (!instantReplace.getValue() || Managers.MINING.getMiningProgress(blockPos) <= 0.5f)
                 {
                     continue;
                 }
@@ -190,11 +184,5 @@ public class AutoTrapModule extends TrapModule
                 runSingleObbyPlacement(blockPos);
             }
         }
-    }
-
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent.Post event)
-    {
-        renderBlockPlacements(event.getMatrixStack());
     }
 }

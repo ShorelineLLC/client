@@ -8,7 +8,7 @@ public interface Observable<T>
 
     T getValue();
 
-    void addListener(Consumer<T> l);
+    void addObserver(Consumer<T> l);
 
-    void removeListener(Consumer<T> l);
+    void removeObserver(Consumer<T> l);
 }

@@ -2,6 +2,7 @@ package net.shoreline.client.api;
 
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.MinecraftClient;
+import net.shoreline.eventbus.EventBus;
 
 @RequiredArgsConstructor
 public class GenericFeature implements Identifiable
@@ -15,17 +16,6 @@ public class GenericFeature implements Identifiable
     {
         this.name = name;
         this.nameAliases = new String[0];
-    }
-
-    public void runOnThread(Runnable runnable)
-    {
-        if (mc.isOnThread())
-        {
-            runnable.run();
-        } else
-        {
-            mc.execute(runnable);
-        }
     }
 
     @Override

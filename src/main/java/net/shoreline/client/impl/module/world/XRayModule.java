@@ -39,7 +39,7 @@ public class XRayModule extends Toggleable
         super("XRay", "See through blocks", GuiCategory.WORLD);
         INSTANCE = this;
 
-        xrayBlocks.addListener(v -> reload());
+        xrayBlocks.addObserver(v -> reload());
     }
 
     @Override

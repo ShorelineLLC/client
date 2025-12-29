@@ -31,6 +31,9 @@ public class ESPModule extends TargetingModule
             .setDefaultValue(true).setDescription("Target Items").build();
     public Config<Void> targetConfig = new ConfigGroup.Builder("Target")
             .addAll(targetPlayers, targetHostiles, targetPassives, items).build();
+    public Config<Boolean> fillConfig = new BooleanConfig.Builder("Fill")
+            .setDescription("Fills in the box")
+            .setDefaultValue(true).build();
     public Config<Float> range = new NumberConfig.Builder<Float>("Range")
             .setMin(0.f).setDefaultValue(30.0f).setMax(250.f)
             .setDescription("If entity is within this range we render them").build();
@@ -101,7 +104,7 @@ public class ESPModule extends TargetingModule
     }
 
     @Getter
-    private static class FadingBox
+    private class FadingBox
     {
         private final Animation animation = new Animation(false, 500, Easing.LINEAR);
         private Box bb;
@@ -126,7 +129,11 @@ public class ESPModule extends TargetingModule
                 return;
             }
 
-            Managers.RENDER.renderBox(matrices, bb, ColorUtil.withTransparency(color.getRGB(), (float) ((color.getAlpha() / 255f) * animation.getFactor())));
+            if (fillConfig.getValue())
+            {
+                Managers.RENDER.renderBox(matrices, bb, ColorUtil.withTransparency(color.getRGB(), (float) ((color.getAlpha() / 255f) * animation.getFactor())));
+            }
+
             Managers.RENDER.renderBoundingBox(matrices, bb, ColorUtil.withTransparency(new Color(color.getRGB(), false).getRGB(), (float) (0.8f * animation.getFactor())));
         }
     }

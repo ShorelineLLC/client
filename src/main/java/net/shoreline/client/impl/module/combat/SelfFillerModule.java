@@ -85,9 +85,10 @@ public class SelfFillerModule extends ObsidianPlacerModule
 
         } else
         {
+            // 3arthqu4ke kys
             if (mc.isInSingleplayer())
             {
-                setBlockState(blockPos, getCurrentObbyBlock().getDefaultState());
+                fakePlace(blockPos, getCurrentObbyBlock().getDefaultState());
                 if (autoDisable.getValue())
                 {
                     disable();
@@ -137,38 +138,6 @@ public class SelfFillerModule extends ObsidianPlacerModule
         {
             disable();
         }
-    }
-
-    private void setBlockState(BlockPos blockPos, BlockState blockState)
-    {
-        MinecraftServer server = mc.getServer();
-        if (server == null)
-        {
-            return;
-        }
-
-        addPlaceAnim(blockPos);
-        Managers.INTERACT.playBlockPlaceSound(blockPos, blockState);
-        server.execute(() ->
-        {
-            ServerWorld world = server.getWorld(mc.world.getRegistryKey());
-            if (world == null)
-            {
-                return;
-            }
-
-            world.setBlockState(
-                    blockPos,
-                    blockState,
-                    Block.NOTIFY_ALL | Block.REDRAW_ON_MAIN_THREAD
-            );
-        });
-    }
-
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent.Post event)
-    {
-        renderBlockPlacements(event.getMatrixStack());
     }
 
     public enum BlockMode

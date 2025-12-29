@@ -8,7 +8,7 @@ import net.shoreline.client.impl.imixin.IChatHud;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.render.ClientFormatting;
 
-public class LoggingFeature extends GenericFeature
+public class LoggingFeature extends ListeningFeature
 {
     protected static final String RAW_PREFIX = "[Shoreline]";
     protected static final String PREFIX = ClientFormatting.THEME + RAW_PREFIX + Formatting.RESET + " ";
