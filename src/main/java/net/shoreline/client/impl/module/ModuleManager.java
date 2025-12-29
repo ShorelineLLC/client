@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module;
 
 import lombok.Getter;
+import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.impl.module.client.*;
 import net.shoreline.client.impl.module.combat.*;
@@ -27,6 +28,11 @@ public class ModuleManager
 
     public ModuleManager()
     {
+        if (ShorelineMod.isBaritonePresent())
+        {
+            registerModule(new BaritoneModule());
+        }
+
         registerModules(
 
                 // Client
@@ -99,6 +105,7 @@ public class ModuleManager
                 new ElytraBoostModule(),
                 new ElytraFlyModule(),
                 new FastFallModule(),
+                new FastWebModule(),
                 new FlightModule(),
                 new JesusModule(),
                 new LongJumpModule(),

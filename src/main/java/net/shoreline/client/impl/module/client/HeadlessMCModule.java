@@ -17,7 +17,7 @@ public class HeadlessMCModule extends Toggleable
     public HeadlessMCModule()
     {
         super("HeadlessMC", "Allows you to connect to a HeadlessMC instance", GuiCategory.CLIENT);
-        unregisterConfig(keybind);
         INSTANCE = this;
+        unregisterConfig(keybind);
     }
 }

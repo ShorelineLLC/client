@@ -36,7 +36,6 @@ public class FontModule extends Toggleable
         INSTANCE = this;
 
         fontsConfig.addObserver(v -> setFont(v.getName()));
-
         antiAlias.addObserver(v -> FontManager.close());
         fractionalMetrics.addObserver(v -> FontManager.close());
     }

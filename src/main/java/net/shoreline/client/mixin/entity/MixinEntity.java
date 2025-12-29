@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.entity;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
@@ -33,6 +34,9 @@ public abstract class MixinEntity implements IEntity
 
     @Shadow
     public abstract Vec3d getPos();
+
+    @Shadow
+    protected Vec3d movementMultiplier;
 
     @Inject(method = "getRotationVec", at = @At(value = "RETURN"), cancellable = true)
     public void hookGetRotationVec(final float tickDelta,
@@ -130,6 +134,20 @@ public abstract class MixinEntity implements IEntity
         {
             cir.cancel();
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "slowMovement", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/entity/Entity;onLanding()V",
+            shift = At.Shift.AFTER), cancellable = true)
+    private void hookSlowMovement(BlockState state, Vec3d multiplier, CallbackInfo ci)
+    {
+        SlowMovementEvent slowMovementEvent = new SlowMovementEvent(state);
+        EventBus.INSTANCE.dispatch(slowMovementEvent);
+        if (slowMovementEvent.isCanceled())
+        {
+            ci.cancel();
+            movementMultiplier = slowMovementEvent.getMultiplier();
         }
     }
 }
