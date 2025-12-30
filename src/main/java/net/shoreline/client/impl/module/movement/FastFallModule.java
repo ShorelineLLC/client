@@ -24,10 +24,6 @@ public class FastFallModule extends MovementModule
     Config<Float> heightConfig = new NumberConfig.Builder<Float>("Height")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(3.0f)
             .setDescription("The fall height to activate fast fall").build();
-    Config<Boolean> accelerateConfig = new BooleanConfig.Builder("Accelerate")
-            .setDescription("Accelerates falling speed")
-            .setVisible(() -> modeConfig.getValue() == FallMode.STEP)
-            .setDefaultValue(false).build();
     Config<Integer> shiftTicksConfig = new NumberConfig.Builder<Integer>("Ticks")
             .setMin(1).setMax(5).setDefaultValue(1)
             .setVisible(() -> modeConfig.getValue() == FallMode.SHIFT)
@@ -72,15 +68,7 @@ public class FastFallModule extends MovementModule
             double fallHeight = traceDown();
             if (fallHeight > 0.01 && fallHeight <= heightConfig.getValue() && mc.player.isOnGround())
             {
-                setMotionXZ(getMotionX() * 0.05, getMotionZ() * 0.05);
-                if (accelerateConfig.getValue())
-                {
-                    addMotionY(-0.62f);
-                } else
-                {
-                    setMotionY(-3.0);
-                }
-
+                mc.player.setVelocity(getMotionX() * 0.05, -3.0, getMotionZ() * 0.05);
                 // Managers.NETWORK.sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(false));
             }
         }

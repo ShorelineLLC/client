@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.module.movement;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.DeathScreen;
 import net.minecraft.client.gui.screen.ingame.SignEditScreen;
@@ -16,6 +17,7 @@ import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.SlowMovementEvent;
 import net.shoreline.client.impl.event.network.MovementFactorEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.imixin.IKeyBinding;
@@ -35,6 +37,12 @@ public class NoSlowModule extends Toggleable
             .setDefaultValue(false).build();
     Config<Boolean> crawlingConfig = new BooleanConfig.Builder("Crawling")
             .setDescription("Removes the slowdown from crawling")
+            .setDefaultValue(false).build();
+    Config<Boolean> soulSandConfig = new BooleanConfig.Builder("SoulSand")
+            .setDescription("Removes the slowdown when walking on soul sand")
+            .setDefaultValue(false).build();
+    Config<Boolean> honeyConfig = new BooleanConfig.Builder("Honey")
+            .setDescription("Removes the slowdown when walking on honey")
             .setDefaultValue(false).build();
     Config<Boolean> inventoryMoveConfig = new BooleanConfig.Builder("InventoryMove")
             .setDescription("Allows the player to move while inventories or menus are open")
@@ -96,6 +104,16 @@ public class NoSlowModule extends Toggleable
     {
         if (sneakingConfig.getValue() && mc.player.isSneaking()
                 || crawlingConfig.getValue() && mc.player.isCrawling())
+        {
+            event.cancel();
+        }
+    }
+
+    @EventListener
+    public void onSlowMovement(SlowMovementEvent.Block event)
+    {
+        if (soulSandConfig.getValue() && event.getBlock() == Blocks.SOUL_SAND
+                || honeyConfig.getValue() && event.getBlock() == Blocks.HONEY_BLOCK)
         {
             event.cancel();
         }

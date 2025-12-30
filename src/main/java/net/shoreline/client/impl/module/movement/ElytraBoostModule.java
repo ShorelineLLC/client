@@ -56,7 +56,7 @@ public class ElytraBoostModule extends InventorySwapModule
             }
             else
             {
-                sendErrorChatMessage("Couldnt find a elytra.");
+                sendErrorChatMessage("Couldn't find an elytra.");
                 this.disable();
             }
 

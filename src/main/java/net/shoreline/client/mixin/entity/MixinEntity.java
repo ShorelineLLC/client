@@ -1,11 +1,13 @@
 package net.shoreline.client.mixin.entity;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.event.entity.*;
+import net.shoreline.client.impl.event.network.MovementFactorEvent;
 import net.shoreline.client.impl.imixin.IEntity;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -142,12 +145,34 @@ public abstract class MixinEntity implements IEntity
             shift = At.Shift.AFTER), cancellable = true)
     private void hookSlowMovement(BlockState state, Vec3d multiplier, CallbackInfo ci)
     {
-        SlowMovementEvent slowMovementEvent = new SlowMovementEvent(state);
-        EventBus.INSTANCE.dispatch(slowMovementEvent);
-        if (slowMovementEvent.isCanceled())
+        if ((Object) this == MinecraftClient.getInstance().player)
         {
-            ci.cancel();
-            movementMultiplier = slowMovementEvent.getMultiplier();
+            SlowMovementEvent slowMovementEvent = new SlowMovementEvent(state);
+            EventBus.INSTANCE.dispatch(slowMovementEvent);
+            if (slowMovementEvent.isCanceled())
+            {
+                ci.cancel();
+                movementMultiplier = slowMovementEvent.getMultiplier();
+            }
         }
+    }
+
+    @Redirect(method = "getVelocityMultiplier",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/block/Block;getVelocityMultiplier()F"))
+    private float hookGetVelocityMultiplier(Block instance)
+    {
+        if ((Object) this == MinecraftClient.getInstance().player)
+        {
+            SlowMovementEvent.Block velocityMultiplierEvent =
+                    new SlowMovementEvent.Block(instance);
+            EventBus.INSTANCE.dispatch(velocityMultiplierEvent);
+            if (velocityMultiplierEvent.isCanceled())
+            {
+                return 1.0f;
+            }
+        }
+
+        return instance.getVelocityMultiplier();
     }
 }

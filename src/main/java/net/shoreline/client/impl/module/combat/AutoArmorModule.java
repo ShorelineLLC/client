@@ -5,6 +5,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
@@ -62,8 +63,14 @@ public class AutoArmorModule extends InventorySwapModule
     private boolean check(EquipmentSlot equipment, int slot)
     {
         int armor    = 44 - slot;
+        ItemStack armorStack = mc.player.getInventory().getStack(armor);
+        if (equipment == EquipmentSlot.CHEST && armorStack.getItem() == Items.ELYTRA)
+        {
+            return false;
+        }
+
         int provided = findArmor(equipment);
-        if (provided == -1 || armor == provided || checkArmor(armor))
+        if (provided == -1 || armor == provided || checkArmor(armorStack))
         {
             return false;
         }
@@ -97,9 +104,8 @@ public class AutoArmorModule extends InventorySwapModule
         });
     }
 
-    private boolean checkArmor(int armor)
+    private boolean checkArmor(ItemStack armorStack)
     {
-        ItemStack armorStack = mc.player.getInventory().getStack(armor);
         float percent = ItemUtil.getStackPercent(armorStack) * 100.0f;
         return !(percent < armorPercent.getValue()) && !armorStack.isEmpty();
     }

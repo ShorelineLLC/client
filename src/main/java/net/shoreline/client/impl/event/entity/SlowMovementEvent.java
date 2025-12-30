@@ -16,4 +16,12 @@ public class SlowMovementEvent extends Event
 {
     private final BlockState blockState;
     private Vec3d multiplier;
+
+    @Cancelable
+    @RequiredArgsConstructor
+    @Getter
+    public static class Block extends Event
+    {
+        private final net.minecraft.block.Block block;
+    }
 }
