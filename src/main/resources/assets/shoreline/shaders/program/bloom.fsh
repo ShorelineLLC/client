@@ -86,6 +86,17 @@ vec4 getFill(vec3 centerColor)
         return vec4(color, u_FillAlpha);
     }
 
+    if (u_FillMode == 4)
+    {
+        float time = u_ShaderTime / 1000.0;
+        vec2 uv = gl_FragCoord.xy / u_Resolution.xy;
+        float hue = uv.x + uv.y + time;
+        hue = mod(hue, 1.0);
+        vec3 rgb = clamp(abs(mod(hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+
+        return vec4(rgb, u_FillAlpha);
+    }
+
     return vec4(centerColor, u_FillAlpha);
 }
 

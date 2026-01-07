@@ -123,31 +123,6 @@ public class ModConfiguration
                 e.printStackTrace();
             }
         }
-
-        applySync();
-    }
-
-    /**
-     * Identifies all ColorConfigs that has a value matching theme color and syncs them.
-     * Should only need to be applied after loading a config or preset.
-     */
-    public static void applySync()
-    {
-        Config<Color> themeConfig = ThemeModule.INSTANCE.getPrimaryConfig();
-        Color theme = themeConfig.getValue();
-        for (Module module : Managers.MODULES.getModules())
-        {
-            for (Config<?> config : module.getConfigs())
-            {
-                if (!(config instanceof ColorConfig colorConfig) || config.equals(themeConfig))
-                {
-                    continue;
-                }
-
-                Color color = colorConfig.getValue();
-                colorConfig.setGlobal((theme.getRGB() & 0x00FFFFFF) == (color.getRGB() & 0x00FFFFFF));
-            }
-        }
     }
 
     public void registerFile(JsonConfigFile file)

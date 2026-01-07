@@ -263,7 +263,8 @@ public class ShadersModule extends RenderModule
         DEFAULT,
         GRADIENT,
         FLOW,
-        LIQUID
+        LIQUID,
+        RAINBOW
     }
 
     public enum Shaders

@@ -96,7 +96,15 @@ public class ConfigContainerFile extends JsonConfigFile
             }
             else if (config.getValue() instanceof Color)
             {
-                ((Config<Color>) config).setValue(new Color((int) Long.parseLong(value.getAsString(), 16), true));
+                String str = value.getAsString();
+                if (str.equalsIgnoreCase("global"))
+                {
+                    ((ColorConfig) config).setGlobal(true);
+                }
+                else
+                {
+                    ((Config<Color>) config).setValue(new Color((int) Long.parseLong(str, 16), true));
+                }
             } else if (config.getValue() instanceof Collection<?>)
             {
                 Set<Object> entries = new HashSet<>();

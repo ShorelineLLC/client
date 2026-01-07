@@ -111,8 +111,6 @@ public abstract class AbstractPreset<T extends ConfigContainer> extends JsonConf
                 }
             }
         }
-
-        ModConfiguration.applySync();
     }
 
     protected abstract void apply(T container, JsonObject object);

@@ -10,11 +10,13 @@ import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.Theme;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ThemeModule extends Concurrent
 {
     public static ThemeModule INSTANCE;
-
     public static final int COLOR = -2;
 
     Config<Color> primaryColor = new ColorConfig.Builder("PrimaryColor")
@@ -33,6 +35,8 @@ public class ThemeModule extends Concurrent
             .setRgb(0xffffffff)
             .setDescription("The Clickgui text color").build();
 
+    private final List<ColorConfig> globals = new ArrayList<>();
+
     public ThemeModule()
     {
         super("Theme", "Customize client colors", GuiCategory.CLIENT);
@@ -42,19 +46,9 @@ public class ThemeModule extends Concurrent
         primaryColor.addObserver(value ->
         {
             primaryTheme.setComponentColor(value);
-            for (Module module : Managers.MODULES.getModules())
+            for (ColorConfig config : globals)
             {
-                for (Config<?> config : module.getConfigs())
-                {
-                    if (!(config instanceof ColorConfig colorConfig)
-                            || colorConfig.equals(primaryColor)
-                            || !colorConfig.isGlobal())
-                    {
-                        continue;
-                    }
-
-                    colorConfig.setValue(new Color(ColorUtil.withTransparency(value, colorConfig.getAlpha() / 255f)));
-                }
+                updateGlobalColor(value, config);
             }
         });
 
@@ -97,5 +91,21 @@ public class ThemeModule extends Concurrent
     public Config<Color> getSetting()
     {
         return primaryColor;
+    }
+
+    public void updateGlobalColor(Color value, ColorConfig global)
+    {
+        global.setValue(new Color(ColorUtil.withTransparency(value, global.getAlpha() / 255f)));
+    }
+
+    public void addGlobal(ColorConfig config)
+    {
+        this.updateGlobalColor(primaryColor.getValue(), config);
+        this.globals.add(config);
+    }
+
+    public void removeGlobal(ColorConfig config)
+    {
+        this.globals.remove(config);
     }
 }

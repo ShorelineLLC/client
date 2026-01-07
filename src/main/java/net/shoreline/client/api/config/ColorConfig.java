@@ -26,7 +26,15 @@ public class ColorConfig extends Config<Color>
     public JsonObject toJson()
     {
         JsonObject jsonObject = super.toJson();
-        jsonObject.addProperty("value", Integer.toHexString(getRGB()));
+        if (global)
+        {
+            jsonObject.addProperty("value", "global");
+        }
+        else
+        {
+            jsonObject.addProperty("value", Integer.toHexString(getRGB()));
+        }
+
         return jsonObject;
     }
 
@@ -36,6 +44,19 @@ public class ColorConfig extends Config<Color>
         if (global)
         {
             setValue(ThemeModule.INSTANCE.getPrimaryColor());
+        }
+    }
+
+    public void setGlobal(boolean global)
+    {
+        this.global = global;
+        if (global)
+        {
+            ThemeModule.INSTANCE.addGlobal(this);
+        }
+        else
+        {
+            ThemeModule.INSTANCE.removeGlobal(this);
         }
     }
 
