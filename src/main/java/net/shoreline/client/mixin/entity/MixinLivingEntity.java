@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.registry.tag.TagKey;
 import net.shoreline.client.impl.event.entity.*;
 import net.shoreline.eventbus.EventBus;
@@ -118,5 +119,19 @@ public class MixinLivingEntity
         }
 
         return instance.isIn(tagKey);
+    }
+
+    @Inject(method = "tryUseDeathProtector", at = @At(value = "HEAD"), cancellable = true)
+    private void hookTryUseDeathProtector(DamageSource source, CallbackInfoReturnable<Boolean> cir)
+    {
+        if ((Object) this == MinecraftClient.getInstance().player)
+        {
+            DeathProtectionEvent deathProtectionEvent = new DeathProtectionEvent();
+            EventBus.INSTANCE.dispatch(deathProtectionEvent);
+            if (deathProtectionEvent.isCanceled())
+            {
+                cir.cancel();
+            }
+        }
     }
 }

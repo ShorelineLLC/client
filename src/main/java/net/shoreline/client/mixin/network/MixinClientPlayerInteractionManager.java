@@ -16,6 +16,7 @@ import net.shoreline.client.impl.event.network.InteractSneakEvent;
 import net.shoreline.client.impl.imixin.IClientPlayerInteractionManager;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,6 +26,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = ClientPlayerInteractionManager.class)
 public abstract class MixinClientPlayerInteractionManager implements IClientPlayerInteractionManager
 {
+    @Accessor("currentBreakingPos")
+    public abstract BlockPos getCurrentBreakingPos();
+
     @Override
     @Invoker(value = "interactBlockInternal", remap = false)
     public abstract ActionResult invokeInteractInternal(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult);

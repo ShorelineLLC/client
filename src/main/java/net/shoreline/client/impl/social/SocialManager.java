@@ -28,6 +28,17 @@ public class SocialManager extends GenericFeature
         friends.remove(friendName);
     }
 
+    public void toggleFriend(String friendName)
+    {
+        if (isFriend(friendName))
+        {
+            removeFriend(friendName);
+        } else
+        {
+            addFriend(friendName);
+        }
+    }
+
     public boolean isFriend(Entity entity)
     {
         return SocialsModule.INSTANCE.getFriendsConfig().getValue() && isFriendInternal(entity.getName().getString());

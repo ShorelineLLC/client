@@ -50,7 +50,7 @@ public class MiddleClickModule extends Toggleable
                 EntityHitResult hitResult = (EntityHitResult) raytrace;
                 if (hitResult.getEntity() instanceof PlayerEntity player && friendConfig.getValue())
                 {
-
+                    Managers.SOCIAL.toggleFriend(player.getName().getString());
                     return;
                 }
             }

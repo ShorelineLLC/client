@@ -148,15 +148,17 @@ public class FeetTrapModule extends TrapModule
                 && packet.getEntityType() == EntityType.END_CRYSTAL && sequentialReplace.getValue())
         {
             BlockPos blockPos = BlockPos.ofFloored(packet.getX(), packet.getY(), packet.getZ());
-            if (trapPos.getTrapPositions().contains(blockPos))
+            if (!trapPos.getTrapPositions().contains(blockPos))
             {
-                if (attackSequential.getValue())
-                {
-                    sendAttackPacketsInternal(packet.getEntityId(), false, Hand.MAIN_HAND);
-                }
-
-                runSingleObbyPlacement(blockPos);
+                return;
             }
+
+            if (attackSequential.getValue())
+            {
+                sendAttackPacketsInternal(packet.getEntityId(), false, Hand.MAIN_HAND);
+            }
+
+            runSingleObbyPlacement(blockPos);
         }
     }
 }

@@ -35,11 +35,7 @@ public class FillerModule extends ObsidianPlacerModule
         INSTANCE = this;
     }
 
-    @EventListener
-    public void onWorldDisconnect(WorldEvent.Disconnect event)
-    {
-        disable();
-    }
+
 
     public boolean shouldGetDoubles()
     {

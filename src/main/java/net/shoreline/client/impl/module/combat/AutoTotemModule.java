@@ -2,12 +2,15 @@ package net.shoreline.client.impl.module.combat;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DeathProtectionComponent;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
@@ -16,11 +19,12 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.entity.DeathProtectionEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
-import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.module.impl.InventorySwapModule;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.eventbus.annotation.EventListener;
 
 public class AutoTotemModule extends InventorySwapModule
@@ -53,6 +57,8 @@ public class AutoTotemModule extends InventorySwapModule
     @Getter
     private boolean isTotemInOffHand, isTotemInMainHand;
 
+    private boolean clearedTotem;
+
     public AutoTotemModule()
     {
         super("AutoTotem", "Automatically replaces totems when you pop", GuiCategory.COMBAT);
@@ -76,7 +82,7 @@ public class AutoTotemModule extends InventorySwapModule
         ScreenHandler handler = mc.player.currentScreenHandler;
         float playerHealth = DamageUtil.getHealth(mc.player);
 
-        isTotemInMainHand = mainhandTotem.getValue() && playerHealth - DamageUtil.getCrystalDamage(mc.player) <= 0.5;
+        isTotemInMainHand = mainhandTotem.getValue() && playerHealth - DamageUtil.getCrystalDamage(mc.player) <= 2.0;
         if (isTotemInMainHand)
         {
             ItemStack stack = mc.player.getInventory().getStack(hotbarTotemSlot.getValue());
@@ -128,7 +134,6 @@ public class AutoTotemModule extends InventorySwapModule
         swapItemWithSlot(requiredItem, PlayerInventory.OFF_HAND_SLOT, fastSwap.getValue());
     }
 
-    // Needs fixing
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
@@ -137,10 +142,36 @@ public class AutoTotemModule extends InventorySwapModule
             return;
         }
 
-        if (event.getPacket() instanceof EntityStatusS2CPacket packet && packet.getEntity(mc.world) == mc.player
+        if (event.getPacket() instanceof EntityStatusS2CPacket packet
+                && packet.getEntity(mc.world) == mc.player
                 && packet.getStatus() == EntityStatuses.USE_TOTEM_OF_UNDYING)
         {
+            ItemStack stack = mc.player.getOffHandStack();
+            DeathProtectionComponent deathProtectionComponent = stack.get(DataComponentTypes.DEATH_PROTECTION);
+            if (deathProtectionComponent == null)
+            {
+                return;
+            }
+
+            stack.decrement(1);
             swapItemWithSlot(Items.TOTEM_OF_UNDYING, PlayerInventory.OFF_HAND_SLOT, fastSwap.getValue());
+            clearedTotem = true;
+        }
+
+        if (event.getPacket() instanceof InventoryS2CPacket packet
+                && packet.getContents().get(45).getItem().equals(Items.AIR) && clearedTotem)
+        {
+            event.cancel();
+            clearedTotem = false;
+        }
+    }
+
+    @EventListener
+    public void onDeathProtect(DeathProtectionEvent event)
+    {
+        if (instantReplace.getValue())
+        {
+            event.cancel();
         }
     }
 

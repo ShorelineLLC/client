@@ -68,8 +68,7 @@ public abstract class MixinClientConnection implements IClientConnection
         EventBus.INSTANCE.dispatch(packetOutboundEvent);
     }
 
-    @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V",
-            at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V", at = @At(value = "HEAD"), cancellable = true)
     private void hookChannelRead0(ChannelHandlerContext channelHandlerContext,
                                   Packet<?> packet,
                                   CallbackInfo ci)
@@ -125,5 +124,15 @@ public abstract class MixinClientConnection implements IClientConnection
         {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "channelRead0(Lio/netty/channel/ChannelHandlerContext;Lnet/minecraft/network/packet/Packet;)V", at = @At(value = "TAIL"))
+    public void hookChannelRead0Post(ChannelHandlerContext channelHandlerContext,
+                                     Packet<?> packet,
+                                     CallbackInfo ci)
+    {
+        PacketEvent.InboundPost packetInboundEvent =
+                new PacketEvent.InboundPost(packet);
+        EventBus.INSTANCE.dispatch(packetInboundEvent);
     }
 }

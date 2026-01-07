@@ -31,7 +31,6 @@ public class TimerModule extends ListeningToggleable
     private int boostTicks;
 
     @Getter
-    @Setter
     private float timerTicks = 1.0f;
     private float prevTimerTicks = 1.0f;
 
@@ -44,8 +43,8 @@ public class TimerModule extends ListeningToggleable
     @Override
     public String getModuleData()
     {
-        return modeConfig.getValue() == TickMode.PULSE ?
-                String.valueOf(boostTicks) : DECIMAL_TRIMMED.format(timerTicks);
+        String ticks = DECIMAL_TRIMMED.format(timerTicks);
+        return modeConfig.getValue() == TickMode.PULSE ? boostTicks + ", " + ticks : ticks;
     }
 
     @Override
@@ -86,9 +85,13 @@ public class TimerModule extends ListeningToggleable
                 float ticksBoosted = Math.max(ticksConfig.getValue(), 2.0f) - 1.0f;
                 if (boostTicks > 0)
                 {
-                    boostTicks -= (int) ticksBoosted;
-                    prevTimerTicks = timerTicks;
-                    timerTicks = ticksConfig.getValue();
+                    boostTicks = Math.max(boostTicks - (int) ticksBoosted, 0);
+                    if (timerTicks < ticksConfig.getValue())
+                    {
+                        prevTimerTicks = timerTicks;
+                        timerTicks = ticksConfig.getValue();
+                    }
+
                 } else
                 {
                     timerTicks = prevTimerTicks;
@@ -117,6 +120,12 @@ public class TimerModule extends ListeningToggleable
     {
         event.cancel();
         event.setTicks(timerTicks);
+    }
+
+    public void setTimerTicks(float timerTicks)
+    {
+        this.timerTicks = timerTicks;
+        this.prevTimerTicks = timerTicks;
     }
 
     public enum TickMode

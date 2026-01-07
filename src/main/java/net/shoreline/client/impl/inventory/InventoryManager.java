@@ -358,6 +358,12 @@ public class InventoryManager extends NetworkHandler
         mc.interactionManager.clickSlot(handler.syncId, slot1, slot2, SlotActionType.SWAP, mc.player);
     }
 
+    private void internalPickupSlot(int slot)
+    {
+        ScreenHandler screenHandler = mc.player.playerScreenHandler;
+
+    }
+
     private void internalSwapSlot(int slot1, int slot2)
     {
         ScreenHandler screenHandler = mc.player.playerScreenHandler;

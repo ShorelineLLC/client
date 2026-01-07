@@ -36,6 +36,13 @@ public class PacketEvent extends Event
         }
     }
 
+    public static class InboundPost extends PacketEvent
+    {
+        public InboundPost(Packet<?> packet) {
+            super(packet);
+        }
+    }
+
     public static class OutboundPost extends PacketEvent
     {
         public OutboundPost(Packet<?> packet) {

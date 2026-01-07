@@ -186,6 +186,11 @@ public class AutoCrystalModule extends TrapModule
     Config<Boolean> autoSwap = new BooleanConfig.Builder("AutoSwap")
             .setDescription("Automatically swaps to crystals before placing")
             .setDefaultValue(false).build();
+    Config<Boolean> swapBack = new BooleanConfig.Builder("SwapBack")
+            .setVisibilityDependant(true)
+            .setDescription("Swaps back to your previously held slot")
+            .setVisible(() -> autoSwap.getValue())
+            .setDefaultValue(false).build();
     Config<Boolean> silentSwap = new BooleanConfig.Builder("SilentSwap")
             .setVisibilityDependant(true)
             .setDescription("Silently swaps to crystals before placing")
@@ -258,12 +263,6 @@ public class AutoCrystalModule extends TrapModule
         }
 
         return String.format("%sms, %s", DECIMAL.format(breakTime.average()), cps.getPerSecond());
-    }
-
-    @EventListener
-    public void onWorldDisconnect(WorldEvent.Disconnect event)
-    {
-        disable();
     }
 
     @EventListener(priority = Priorities.AUTO_CRYSTAL)

@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.world;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.minecraft.block.BlockState;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -64,8 +63,8 @@ public class SpeedMineModule extends ListeningToggleable
             .setValues(SilentSwapType.values())
             .setDescription("The silent swap type")
             .setDefaultValue(SilentSwapType.HOTBAR).build();
-    Config<Boolean> disable = new BooleanConfig.Builder("Disable")
-            .setDescription("Disables speedmine on death to prevent double mine failing")
+    Config<Boolean> autoDisable = new BooleanConfig.Builder("AutoDisable")
+            .setDescription("Disables on death to prevent double mine failing")
             .setDefaultValue(true).build();
 
     Config<BoxRender> boxMode = new EnumConfig.Builder<BoxRender>("BoxMode")
@@ -117,7 +116,7 @@ public class SpeedMineModule extends ListeningToggleable
     @EventListener
     public void onWorldDisconnect(WorldEvent.Disconnect event)
     {
-        if (disable.getValue())
+        if (autoDisable.getValue())
         {
             disable();
         }
@@ -132,7 +131,7 @@ public class SpeedMineModule extends ListeningToggleable
     {
         if (event.getEntity() == mc.player)
         {
-            if (disable.getValue())
+            if (autoDisable.getValue())
             {
                 disable();
             }
@@ -248,8 +247,7 @@ public class SpeedMineModule extends ListeningToggleable
             }
         }
 
-        BlockState state = mc.world.getBlockState(blockPos);
-        ItemSlot slot = AutoToolModule.INSTANCE.getBestTool(state);
+        ItemSlot slot = AutoToolModule.INSTANCE.getBestTool(blockPos);
 
         mainMiningBlock = MiningData.builder()
                 .blockPos(blockPos)
@@ -329,7 +327,7 @@ public class SpeedMineModule extends ListeningToggleable
             return;
         }
 
-        ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockState());
+        ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(mainMiningBlock.getBlockPos());
         if (bestTool != null && !Managers.INVENTORY.startSwap(bestTool.getSlot(), swapType.getValue()))
         {
             return;
@@ -376,7 +374,7 @@ public class SpeedMineModule extends ListeningToggleable
             clearPacket();
         } else
         {
-            ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(packetMiningBlock.getBlockState());
+            ItemSlot bestTool = AutoToolModule.INSTANCE.getBestTool(packetMiningBlock.getBlockPos());
             if (bestTool == null)
             {
                 return;
