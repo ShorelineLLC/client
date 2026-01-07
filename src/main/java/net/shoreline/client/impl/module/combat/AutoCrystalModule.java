@@ -503,7 +503,11 @@ public class AutoCrystalModule extends TrapModule
             }
 
             double animFactor = Easing.SMOOTH_STEP.ease(anim.getFactor());
-            anim.setState(false);
+            if (currentPlace == null || !currentPlace.getValue().equals(placePos))
+            {
+                anim.setState(false);
+            }
+
             BoxRender.FILL.render(event.getMatrixStack(),
                     placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), (float) animFactor);
 
