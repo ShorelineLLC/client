@@ -21,37 +21,37 @@ public class MovementModule extends Toggleable
         super(name, nameAliases, description, category);
     }
 
-    protected double getMotionX()
+    public double getMotionX()
     {
         return mc.player.getVelocity().x;
     }
 
-    protected double getMotionY()
+    public double getMotionY()
     {
         return mc.player.getVelocity().y;
     }
 
-    protected double getMotionZ()
+    public double getMotionZ()
     {
         return mc.player.getVelocity().z;
     }
 
-    protected void setMotionY(double y)
+    public void setMotionY(double y)
     {
         mc.player.setVelocity(getMotionX(), y, getMotionZ());
     }
 
-    protected void addMotionY(double y)
+    public void addMotionY(double y)
     {
         mc.player.setVelocity(mc.player.getVelocity().add(0.0, y, 0.0));
     }
 
-    protected void setMotionXZ(double x, double z)
+    public void setMotionXZ(double x, double z)
     {
         mc.player.setVelocity(x, getMotionY(), z);
     }
 
-    protected Vec2f strafe(float speed)
+    public Vec2f strafe(float speed)
     {
         float forward = mc.player.input.getMovementInput().y;
         float strafe = mc.player.input.getMovementInput().x;
