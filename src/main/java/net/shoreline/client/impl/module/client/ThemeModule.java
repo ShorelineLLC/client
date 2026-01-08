@@ -95,7 +95,7 @@ public class ThemeModule extends Concurrent
 
     public void updateGlobalColor(Color value, ColorConfig global)
     {
-        global.setValue(new Color(ColorUtil.withTransparency(value, global.getAlpha() / 255f)));
+        global.setValue(new Color(ColorUtil.withTransparency(value, global.getAlpha() / 255f), true));
     }
 
     public void addGlobal(ColorConfig config)

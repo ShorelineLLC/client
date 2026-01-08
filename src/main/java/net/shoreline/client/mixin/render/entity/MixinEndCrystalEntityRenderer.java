@@ -114,7 +114,7 @@ public class MixinEndCrystalEntityRenderer
 
             ChamsRenderer renderer = ChamsModule.getInstance().mode.getValue().getRenderer();
             float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
-            ChamsRenderer.render(renderer, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
+            ChamsRenderer.render(renderer, last, tickDelta, color);
         }
     }
 

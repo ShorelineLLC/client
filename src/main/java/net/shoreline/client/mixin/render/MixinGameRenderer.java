@@ -62,7 +62,7 @@ public abstract class MixinGameRenderer implements IGameRenderer
         RenderSystem.getModelViewStack().pushMatrix();
         RenderSystem.getModelViewStack().mul(matrix4f);
         RenderSystem.getModelViewStack().mul(matrices.peek().getPositionMatrix().invert());
-        RenderEntityWorldEvent.Post renderEntityEvent = new RenderEntityWorldEvent.Post();
+        RenderEntityWorldEvent.Post renderEntityEvent = new RenderEntityWorldEvent.Post(tickCounter.getTickDelta(true));
         EventBus.INSTANCE.dispatch(renderEntityEvent);
         RenderSystem.getModelViewStack().popMatrix();
     }

@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.event.render;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.entity.Entity;
@@ -21,5 +22,10 @@ public class RenderEntityWorldEvent extends Event
         this.vertexConsumerProvider = vertexConsumerProvider;
     }
 
-    public static class Post extends Event {}
+    @RequiredArgsConstructor
+    @Getter
+    public static class Post extends Event
+    {
+        private final float tickDelta;
+    }
 }

@@ -1,15 +1,11 @@
 package net.shoreline.client.impl.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.imixin.*;
@@ -29,9 +25,15 @@ public enum ChamsRenderer
     private static ChamsRenderer chams;
     private static Vec3d position;
     private static int color;
+    private static float factor;
 
     @SuppressWarnings("unchecked")
-    public static void render(ChamsRenderer chams, Entity entity, float tickDelta, boolean throughWalls, int color)
+    public static void render(ChamsRenderer chams, Entity entity, float tickDelta, int color)
+    {
+        render(chams, entity, tickDelta, color, 1.0f);
+    }
+
+    public static void render(ChamsRenderer chams, Entity entity, float tickDelta, int color, float factor)
     {
         if (chams == NONE)
         {
@@ -41,6 +43,7 @@ public enum ChamsRenderer
         ChamsRenderer.chams = chams;
         ChamsRenderer.color = color;
         ChamsRenderer.position = Interpolation.getRenderPosition(entity, tickDelta);
+        ChamsRenderer.factor = factor;
 
         rendering = true;
         var renderer = (EntityRenderer<Entity, EntityRenderState>) MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity);
@@ -88,10 +91,11 @@ public enum ChamsRenderer
                 {
                     Managers.RENDER.renderBox(buffer ->
                     {
-                        buffer.vertex(matrix, (float) (position.getX() + xs[0] - camera.getX()), (float) (position.getY() + ys[0] - camera.getY()), (float) (position.getZ() + zs[0] - camera.getZ())).color(color);
-                        buffer.vertex(matrix, (float) (position.getX() + xs[1] - camera.getX()), (float) (position.getY() + ys[1] - camera.getY()), (float) (position.getZ() + zs[1] - camera.getZ())).color(color);
-                        buffer.vertex(matrix, (float) (position.getX() + xs[2] - camera.getX()), (float) (position.getY() + ys[2] - camera.getY()), (float) (position.getZ() + zs[2] - camera.getZ())).color(color);
-                        buffer.vertex(matrix, (float) (position.getX() + xs[3] - camera.getX()), (float) (position.getY() + ys[3] - camera.getY()), (float) (position.getZ() + zs[3] - camera.getZ())).color(color);
+                        int boxColor = ColorUtil.withTransparency(color, factor);
+                        buffer.vertex(matrix, (float) (position.getX() + xs[0] - camera.getX()), (float) (position.getY() + ys[0] - camera.getY()), (float) (position.getZ() + zs[0] - camera.getZ())).color(boxColor);
+                        buffer.vertex(matrix, (float) (position.getX() + xs[1] - camera.getX()), (float) (position.getY() + ys[1] - camera.getY()), (float) (position.getZ() + zs[1] - camera.getZ())).color(boxColor);
+                        buffer.vertex(matrix, (float) (position.getX() + xs[2] - camera.getX()), (float) (position.getY() + ys[2] - camera.getY()), (float) (position.getZ() + zs[2] - camera.getZ())).color(boxColor);
+                        buffer.vertex(matrix, (float) (position.getX() + xs[3] - camera.getX()), (float) (position.getY() + ys[3] - camera.getY()), (float) (position.getZ() + zs[3] - camera.getZ())).color(boxColor);
                     });
                 }
 
@@ -100,6 +104,7 @@ public enum ChamsRenderer
                     Managers.RENDER.renderBoundingBox(buffer ->
                     {
                         int lineColor = (color & 0x00FFFFFF) | 0xFF000000;
+                        lineColor = ColorUtil.withTransparency(lineColor, factor);
                         buffer.vertex(matrix, (float) (position.x + xs[0] - camera.getX()), (float) (position.y + ys[0] - camera.getY()), (float) (position.z + zs[0] - camera.getZ())).color(lineColor);
                         buffer.vertex(matrix, (float) (position.x + xs[1] - camera.getX()), (float) (position.y + ys[1] - camera.getY()), (float) (position.z + zs[1] - camera.getZ())).color(lineColor);
                         buffer.vertex(matrix, (float) (position.x + xs[1] - camera.getX()), (float) (position.y + ys[1] - camera.getY()), (float) (position.z + zs[1] - camera.getZ())).color(lineColor);

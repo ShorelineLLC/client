@@ -26,10 +26,7 @@ import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -90,6 +87,19 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
     private void updateRenderStateHook(T livingEntity, S livingEntityRenderState, float f, CallbackInfo info)
     {
         last = livingEntity;
+    }
+
+    @Inject(
+            method = "updateRenderState(Lnet/minecraft/entity/LivingEntity;" +
+                    "Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;F)V",
+            at = @At(value = "RETURN"))
+    private void updateRenderStateHook_Post(T livingEntity, S livingEntityRenderState, float f, CallbackInfo ci)
+    {
+        if (livingEntity instanceof ChamsModule.PopEntity)
+        {
+            livingEntityRenderState.limbFrequency = livingEntity.limbAnimator.getPos(1f);
+            livingEntityRenderState.limbAmplitudeMultiplier = livingEntity.limbAnimator.getSpeed(1f);
+        }
     }
 
     @ModifyReturnValue(method = "getRenderLayer", at = @At(value = "RETURN"))
@@ -158,7 +168,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
 
             ChamsRenderer renderer = ChamsModule.getInstance().mode.getValue().getRenderer();
             float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
-            ChamsRenderer.render(renderer, last, tickDelta, ChamsModule.getInstance().throughWalls.getValue(), color);
+            ChamsRenderer.render(renderer, last, tickDelta, color);
         }
     }
 

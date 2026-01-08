@@ -73,6 +73,7 @@
     "render.entity.MixinEndCrystalEntityRenderer",
     "render.entity.MixinEntityRenderer",
     "render.entity.MixinItemFrameEntityRenderer",
+    "render.entity.MixinLimbAnimator",
     "render.entity.MixinLivingEntityRenderer",
     "render.entity.MixinModel",
     "render.entity.MixinPlayerEntityRenderer",

@@ -78,11 +78,15 @@ public abstract class MixinMinecraftClient implements IMinecraftClient
         EventBus.INSTANCE.dispatch(tickEvent);
     }
 
-    @Inject(method = "setScreen", at = @At(value = "TAIL"))
+    @Inject(method = "setScreen", at = @At(value = "HEAD"), cancellable = true)
     private void hookSetScreen(Screen screen, CallbackInfo ci)
     {
         OpenScreenEvent screenOpenEvent = new OpenScreenEvent(screen);
         EventBus.INSTANCE.dispatch(screenOpenEvent);
+        if (screenOpenEvent.isCanceled())
+        {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "render", at = @At("HEAD"))
