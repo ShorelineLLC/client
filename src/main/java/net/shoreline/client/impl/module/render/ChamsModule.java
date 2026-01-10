@@ -13,6 +13,7 @@ import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LimbAnimator;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.Monster;
@@ -183,6 +184,8 @@ public class ChamsModule extends RenderModule
             this.prevBodyYaw = bodyYaw;
             this.limbAnimator.setSpeed(player.limbAnimator.getSpeed());
             ((ILimbAnimator) this.limbAnimator).setPos(player.limbAnimator.getPos());
+            this.setSneaking(player.isSneaking());
+            this.setPose(player.getPose());
         }
     }
 

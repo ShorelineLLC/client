@@ -3,19 +3,34 @@ package net.shoreline.client.mixin.render.entity;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.block.AbstractSkullBlock;
+import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ProfileComponent;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.entity.EntityHurtEvent;
 import net.shoreline.client.impl.imixin.ILivingEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
@@ -23,9 +38,7 @@ import net.shoreline.client.impl.module.render.ChamsModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.Layers;
 import net.shoreline.eventbus.EventBus;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
@@ -38,6 +51,7 @@ import java.util.List;
 public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
         S extends LivingEntityRenderState,
         M extends EntityModel<? super S>>
+    extends MixinEntityRenderer<T, S>
     implements ILivingEntityRenderer
 {
     @Shadow
@@ -52,6 +66,13 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
     @Shadow
     protected abstract boolean isVisible(S state);
 
+    @Shadow
+    private static float clampBodyYaw(LivingEntity entity, float degrees, float tickDelta) {return 0;}
+
+    @Shadow
+    public static boolean shouldFlipUpsideDown(LivingEntity entity) {return false;}
+
+    @Shadow @Final protected ItemModelManager itemModelResolver;
     @Unique
     protected LivingEntity last;
 
@@ -156,6 +177,17 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
         ((IModel) model).cancelModel(valid);
         if (ChamsModule.getInstance().isEnabled() && valid)
         {
+            if (model instanceof PlayerEntityModel playerEntityModel)
+            {
+                boolean extraLayer = ChamsModule.getInstance().extraLayer.getValue();
+                playerEntityModel.leftPants.visible = extraLayer;
+                playerEntityModel.rightPants.visible = extraLayer;
+                playerEntityModel.leftSleeve.visible = extraLayer;
+                playerEntityModel.rightSleeve.visible = extraLayer;
+                playerEntityModel.jacket.visible = extraLayer;
+                playerEntityModel.hat.visible = extraLayer;
+            }
+
             int color = ChamsModule.getInstance().color.getValue().getRGB();
             if (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
             {

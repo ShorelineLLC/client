@@ -26,6 +26,9 @@ public abstract class MixinEntityRenderer<T extends Entity, S extends EntityRend
     @Final
     protected EntityRenderDispatcher dispatcher;
 
+    @Shadow
+    public void updateRenderState(T entity, S state, float tickDelta) {}
+
     @Inject(method = "renderLabelIfPresent", at = @At(value = "HEAD"), cancellable = true)
     public void hookRenderLabelIfPresent(EntityRenderState state,
                                          Text text,

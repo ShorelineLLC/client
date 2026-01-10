@@ -15,6 +15,7 @@ import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.inventory.InventoryUtil;
@@ -94,7 +95,7 @@ public class AnchorAuraModule extends PlacerModule
     }
 
     @EventListener
-    public void onClientRotation(ClientRotationEvent event)
+    public void onUpdate(PlayerUpdateEvent.Pre event)
     {
         Iterator<Map.Entry<BlockPos, AnchorData>> it = placed.entrySet().iterator();
         while (it.hasNext())

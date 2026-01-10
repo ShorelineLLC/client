@@ -1,16 +1,26 @@
 package net.shoreline.client.impl.render;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.model.Model;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.imixin.*;
+import net.shoreline.client.impl.module.render.ChamsModule;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
+@SuppressWarnings("unchecked")
 public enum ChamsRenderer
 {
     NONE,
@@ -27,7 +37,6 @@ public enum ChamsRenderer
     private static int color;
     private static float factor;
 
-    @SuppressWarnings("unchecked")
     public static void render(ChamsRenderer chams, Entity entity, float tickDelta, int color)
     {
         render(chams, entity, tickDelta, color, 1.0f);
@@ -45,11 +54,43 @@ public enum ChamsRenderer
         ChamsRenderer.position = Interpolation.getRenderPosition(entity, tickDelta);
         ChamsRenderer.factor = factor;
 
+        matrices.push();
         rendering = true;
         var renderer = (EntityRenderer<Entity, EntityRenderState>) MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity);
         var renderState = renderer.getAndUpdateRenderState(entity, tickDelta);
+
+        if (renderer instanceof LivingEntityRenderer<?,?,?> livingEntityRenderer)
+        {
+            Model model = livingEntityRenderer.getModel();
+            if (model instanceof PlayerEntityModel playerEntityModel)
+            {
+                boolean extraLayer = ChamsModule.getInstance().extraLayer.getValue();
+                playerEntityModel.leftPants.visible = extraLayer;
+                playerEntityModel.rightPants.visible = extraLayer;
+                playerEntityModel.leftSleeve.visible = extraLayer;
+                playerEntityModel.rightSleeve.visible = extraLayer;
+                playerEntityModel.jacket.visible = extraLayer;
+                playerEntityModel.hat.visible = extraLayer;
+            }
+        }
+
+        if (entity.isInSwimmingPose() && entity instanceof ChamsModule.PopEntity popEntity)
+        {
+            float bodyYaw = MathHelper.lerpAngleDegrees(tickDelta, popEntity.prevBodyYaw, popEntity.bodyYaw);
+            if (entity.isInSwimmingPose())
+            {
+                float pitch = popEntity.isTouchingWater() ? -90.0F - popEntity.getPitch() : -90.0F;
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitch));
+                if (popEntity.isInSwimmingPose())
+                {
+                    matrices.translate(0.0F, -1.0F, 0.3F);
+                }
+            }
+        }
+
         renderer.render(renderState, matrices, CustomVertexConsumerProvider.INSTANCE, 15);
         rendering = false;
+        matrices.pop();
     }
 
     public static class CustomVertexConsumerProvider implements VertexConsumerProvider

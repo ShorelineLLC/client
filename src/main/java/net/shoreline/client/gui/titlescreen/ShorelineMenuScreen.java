@@ -171,12 +171,13 @@ public class ShorelineMenuScreen extends Screen
         allButtons.add(new MenuButton(I18n.translate("menu.singleplayer").toUpperCase(Locale.ROOT), () -> client.setScreen(new SelectWorldScreen(this)), 0, 0));
         allButtons.add(new MenuButton(I18n.translate("menu.multiplayer").toUpperCase(Locale.ROOT), () -> client.setScreen(new MultiplayerScreen(this)), 0, 0));
         allButtons.add(new MenuButton(I18n.translate("menu.options").toUpperCase(Locale.ROOT).replace(".", ""), () -> client.setScreen(new OptionsScreen(this, client.options)), 0, 0));
-        allButtons.add(new MenuButton(I18n.translate("menu.quit").toUpperCase(Locale.ROOT), client::scheduleStop, 0, 0));
 
         if (hasIAS())
         {
             allButtons.add(new MenuButton("Accounts".toUpperCase(), () -> client.setScreen(getAccountScreen(this)), 0, 0));
         }
+
+        allButtons.add(new MenuButton(I18n.translate("menu.quit").toUpperCase(Locale.ROOT), client::scheduleStop, 0, 0));
 
         float totalWidth = 0;
         for (MenuButton button : allButtons)
