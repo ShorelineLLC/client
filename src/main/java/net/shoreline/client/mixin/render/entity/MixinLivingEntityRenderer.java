@@ -3,8 +3,6 @@ package net.shoreline.client.mixin.render.entity;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.block.AbstractSkullBlock;
-import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.OverlayTexture;
@@ -12,27 +10,15 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ProfileComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.impl.event.entity.EntityHurtEvent;
-import net.shoreline.client.impl.imixin.ILivingEntityRenderer;
 import net.shoreline.client.impl.imixin.IModel;
 import net.shoreline.client.impl.module.render.ChamsModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
@@ -52,7 +38,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
         S extends LivingEntityRenderState,
         M extends EntityModel<? super S>>
     extends MixinEntityRenderer<T, S>
-    implements ILivingEntityRenderer
 {
     @Shadow
     public abstract Identifier getTexture(S state);
@@ -75,11 +60,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
     @Shadow @Final protected ItemModelManager itemModelResolver;
     @Unique
     protected LivingEntity last;
-
-    @Override
-    public void renderChams(LivingEntityRenderState livingEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
-    {
-    }
 
     @ModifyExpressionValue(
             method = "render(Lnet/minecraft/client/render/entity/state/LivingEntityRenderState;" +

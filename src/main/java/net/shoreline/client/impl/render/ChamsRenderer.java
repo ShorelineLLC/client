@@ -74,16 +74,6 @@ public enum ChamsRenderer
             }
         }
 
-        if (entity.isInSwimmingPose() && entity instanceof ChamsModule.PopEntity popEntity)
-        {
-            float pitch = popEntity.isTouchingWater() ? -90.0F - popEntity.getPitch() : -90.0F;
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(pitch));
-            if (popEntity.isInSwimmingPose())
-            {
-                matrices.translate(0.0F, -1.0F, 0.3F);
-            }
-        }
-
         renderer.render(renderState, matrices, CustomVertexConsumerProvider.INSTANCE, 15);
         rendering = false;
         matrices.pop();

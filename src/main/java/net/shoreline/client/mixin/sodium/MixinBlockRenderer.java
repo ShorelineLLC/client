@@ -4,7 +4,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.util.math.BlockPos;
+import net.shoreline.client.impl.event.render.RenderBlockEvent;
 import net.shoreline.client.impl.module.world.XRayModule;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,10 +28,14 @@ public class MixinBlockRenderer
                                BlockPos origin,
                                CallbackInfo ci)
     {
-        if (MinecraftClient.getInstance().player != null && XRayModule.INSTANCE.isEnabled()
-                && XRayModule.INSTANCE.shouldCancelBlockRender(state.getBlock()))
+        if (MinecraftClient.getInstance().player != null)
         {
-            ci.cancel();
+            RenderBlockEvent event = new RenderBlockEvent(state);
+            EventBus.INSTANCE.dispatch(event);
+            if (event.isCanceled())
+            {
+                ci.cancel();
+            }
         }
     }
 }

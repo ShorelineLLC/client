@@ -8,10 +8,13 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.RegistryConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.render.RenderBlockEvent;
+import net.shoreline.client.impl.module.impl.RenderModule;
+import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.Collection;
 
-public class XRayModule extends Toggleable
+public class XRayModule extends RenderModule
 {
     public static XRayModule INSTANCE;
 
@@ -39,32 +42,21 @@ public class XRayModule extends Toggleable
         super("XRay", "See through blocks", GuiCategory.WORLD);
         INSTANCE = this;
 
-        xrayBlocks.addObserver(v -> reload());
+        xrayBlocks.addObserver(v -> reload(softReload.getValue()));
     }
 
     @Override
     public void onToggle()
     {
-        reload();
+        reload(softReload.getValue());
     }
 
-    private void reload()
+    @EventListener
+    public void onRenderBlock(RenderBlockEvent event)
     {
-        if (mc.worldRenderer == null)
+        if (shouldCancelBlockRender(event.getState().getBlock()))
         {
-            return;
-        }
-
-        if (softReload.getValue() && mc.player != null)
-        {
-            int x = (int) mc.player.getX();
-            int y = (int) mc.player.getY();
-            int z = (int) mc.player.getZ();
-            int d = mc.options.getViewDistance().getValue() * 16;
-            mc.worldRenderer.scheduleBlockRenders(x - d, y - d, z - d, x + d, y + d, z + d);
-        } else
-        {
-            mc.worldRenderer.reload();
+            event.cancel();
         }
     }
 

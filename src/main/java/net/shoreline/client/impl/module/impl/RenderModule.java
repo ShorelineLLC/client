@@ -41,4 +41,24 @@ public class RenderModule extends Toggleable
     {
         return (int) Managers.RENDER.getTextWidth(text);
     }
+
+    protected void reload(boolean soft)
+    {
+        if (mc.worldRenderer == null)
+        {
+            return;
+        }
+
+        if (soft && mc.player != null)
+        {
+            int x = (int) mc.player.getX();
+            int y = (int) mc.player.getY();
+            int z = (int) mc.player.getZ();
+            int d = mc.options.getViewDistance().getValue() * 16;
+            mc.worldRenderer.scheduleBlockRenders(x - d, y - d, z - d, x + d, y + d, z + d);
+        } else
+        {
+            mc.worldRenderer.reload();
+        }
+    }
 }

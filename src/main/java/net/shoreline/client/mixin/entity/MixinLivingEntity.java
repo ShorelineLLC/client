@@ -8,9 +8,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.registry.tag.TagKey;
 import net.shoreline.client.impl.event.entity.*;
+import net.shoreline.client.impl.imixin.ILivingEntity;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -18,10 +20,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public class MixinLivingEntity
+public abstract class MixinLivingEntity implements ILivingEntity
 {
     @Shadow
     private int jumpingCooldown;
+
+    @Override
+    @Accessor(value = "leaningPitch")
+    public abstract void setLeaningPitch(float leaningPitch);
+
+    @Override
+    @Accessor(value = "lastLeaningPitch")
+    public abstract void setLastLeaningPitch(float lastLeaningPitch);
 
     @Inject(method = "jump", at = @At(value = "HEAD"), cancellable = true)
     private void hookJumpPre(CallbackInfo ci)

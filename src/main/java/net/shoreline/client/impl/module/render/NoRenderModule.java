@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.render;
 
 import lombok.Getter;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
@@ -17,18 +19,16 @@ import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
 import net.shoreline.client.impl.event.particle.BlockBreakParticleEvent;
 import net.shoreline.client.impl.event.particle.EmitParticleEvent;
 import net.shoreline.client.impl.event.particle.ParticleEvent;
-import net.shoreline.client.impl.event.render.GlyphShadowEvent;
-import net.shoreline.client.impl.event.render.RenderFloatingItemEvent;
-import net.shoreline.client.impl.event.render.RenderNauseaEvent;
-import net.shoreline.client.impl.event.render.TiltViewEvent;
+import net.shoreline.client.impl.event.render.*;
 import net.shoreline.client.impl.event.render.entity.feature.RenderArmorEvent;
 import net.shoreline.client.impl.event.toast.RenderGuiToastEvent;
+import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class NoRenderModule extends Toggleable
+public class NoRenderModule extends RenderModule
 {
     public static NoRenderModule INSTANCE;
 
@@ -130,6 +130,10 @@ public class NoRenderModule extends Toggleable
     Config<Void> hudConfig = new ConfigGroup.Builder("HUD")
             .addAll(potionsHud, itemName, toastConfig, textShadow).build();
 
+    Config<Boolean> vinesConfig = new BooleanConfig.Builder("Vines")
+            .setDescription("Cancels vines rendering")
+            .setDefaultValue(false)
+            .build();
     Config<Boolean> nauseaConfig = new BooleanConfig.Builder("Nausea")
             .setDescription("Cancels the nausea effect")
             .setDefaultValue(false).build();
@@ -161,6 +165,7 @@ public class NoRenderModule extends Toggleable
     {
         super("NoRender", "Prevents certain game elements from rendering", GuiCategory.RENDER);
         INSTANCE = this;
+        vinesConfig.addObserver(v -> reload(true));
     }
 
     @EventListener
@@ -353,7 +358,20 @@ public class NoRenderModule extends Toggleable
             event.cancel();
         }
     }
-    
+
+    @EventListener
+    public void onRenderBlock(RenderBlockEvent event)
+    {
+        Block block = event.getState().getBlock();
+        if (vinesConfig.getValue())
+        {
+            if (block.equals(Blocks.CAVE_VINES) || block.equals(Blocks.CAVE_VINES_PLANT))
+            {
+                event.cancel();
+            }
+        }
+    }
+
     private boolean shouldCancelParticle(ParticleType<?> type)
     {
         return type == ParticleTypes.ENTITY_EFFECT && statusEffectsConfig.getValue()

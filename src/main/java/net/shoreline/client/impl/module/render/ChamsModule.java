@@ -1,42 +1,34 @@
 package net.shoreline.client.impl.module.render;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.block.CaveVines;
+import net.minecraft.block.CaveVinesHeadBlock;
 import net.minecraft.client.network.OtherClientPlayerEntity;
-import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.EntityModels;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.LimbAnimator;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.combat.TotemPopEvent;
-import net.shoreline.client.impl.event.render.CameraEvent;
 import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.imixin.ILimbAnimator;
+import net.shoreline.client.impl.imixin.ILivingEntity;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.ColorUtil;
 import net.shoreline.client.impl.render.animation.Animation;
+import net.shoreline.client.util.entity.FakePlayerEntity;
 import net.shoreline.eventbus.annotation.EventListener;
-import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.util.Map;
@@ -113,7 +105,7 @@ public class ChamsModule extends RenderModule
             Animation animation = entry.getValue();
             animation.setState(false);
 
-            ChamsRenderer.render(ChamsRenderer.BOTH, entity, event.getTickDelta(), color.getValue().getRGB(), (float) animation.getFactor());
+            ChamsRenderer.render(ChamsRenderer.BOTH, entity, event.getTickDelta(), ColorUtil.withTransparency(color.getValue(), 0.5f), (float) animation.getFactor());
         }
 
         pops.entrySet().removeIf(entry ->
@@ -172,21 +164,18 @@ public class ChamsModule extends RenderModule
         {
             super(mc.world, new GameProfile(UUID.fromString("bee73d65-2fcd-4fbd-a259-468e65274338"), player.getName().getString()));
             this.copyPositionAndRotation(player);
-            this.setPos(player.getX(), player.getY(), player.getZ());
-            this.setYaw(player.getYaw());
-            this.setPitch(player.getPitch());
-            this.refreshPosition();
             this.prevYaw = getYaw();
             this.prevPitch = getPitch();
             this.headYaw = player.getHeadYaw();
             this.prevHeadYaw = headYaw;
             this.bodyYaw = player.bodyYaw;
             this.prevBodyYaw = bodyYaw;
-            this.limbAnimator.setSpeed(player.limbAnimator.getSpeed(1));
-            ((ILimbAnimator) this.limbAnimator).setPos(player.limbAnimator.getPos(1));
-            this.setSneaking(player.isSneaking());
+            this.getAttributes().setFrom(player.getAttributes());
             this.setPose(player.getPose());
-            this.setSwimming(player.isSwimming());
+            this.limbAnimator.setSpeed(player.limbAnimator.getSpeed());
+            ((ILimbAnimator) this.limbAnimator).setPos(player.limbAnimator.getPos());
+            ((ILivingEntity) this).setLeaningPitch(player.getLeaningPitch(1));
+            ((ILivingEntity) this).setLastLeaningPitch(player.getLeaningPitch(1));
         }
     }
 

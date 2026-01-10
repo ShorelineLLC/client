@@ -4,7 +4,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
+import net.shoreline.client.impl.event.render.RenderBlockEvent;
 import net.shoreline.client.impl.module.world.XRayModule;
+import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,10 +29,12 @@ public class MixinBlockOcclusionCache
                                Direction facing,
                                CallbackInfoReturnable<Boolean> cir)
     {
-        if (XRayModule.INSTANCE.isEnabled())
+        RenderBlockEvent event = new RenderBlockEvent(selfBlockState);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
         {
             cir.cancel();
-            cir.setReturnValue(!XRayModule.INSTANCE.shouldCancelBlockRender(selfBlockState.getBlock()));
+            cir.setReturnValue(false);
         }
     }
 }
