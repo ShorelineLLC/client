@@ -182,10 +182,11 @@ public class ChamsModule extends RenderModule
             this.prevHeadYaw = headYaw;
             this.bodyYaw = player.bodyYaw;
             this.prevBodyYaw = bodyYaw;
-            this.limbAnimator.setSpeed(player.limbAnimator.getSpeed());
-            ((ILimbAnimator) this.limbAnimator).setPos(player.limbAnimator.getPos());
+            this.limbAnimator.setSpeed(player.limbAnimator.getSpeed(1));
+            ((ILimbAnimator) this.limbAnimator).setPos(player.limbAnimator.getPos(1));
             this.setSneaking(player.isSneaking());
             this.setPose(player.getPose());
+            this.setSwimming(player.isSwimming());
         }
     }
 
