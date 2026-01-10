@@ -5,6 +5,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.shoreline.client.Shoreline;
+import net.shoreline.client.gui.clickgui.Frame;
+import net.shoreline.client.gui.clickgui.components.FrameComponent;
+import net.shoreline.client.gui.clickgui.components.TextComponent;
+import net.shoreline.client.gui.clickgui.config.KeyListenerComponent;
 import net.shoreline.client.impl.module.client.ClickGuiModule;
 import net.shoreline.client.impl.module.impl.hud.HudModule;
 import net.shoreline.client.gui.Mouse;
@@ -83,6 +88,15 @@ public class HudGuiScreen extends Screen
         context.fill(x, 0, x + 2, screenHeight, lineColor);
         context.fill(0, y, screenWidth, y + 2, lineColor);
 
+        if (mouse.isHovering(hudFrame.getX(), hudFrame.getY(), hudFrame.getWidth(), hudFrame.getTitleHeight()) && mouse.isLeftHeld())
+        {
+            if (!draggingMouse)
+            {
+                hudFrame.setDragging(true);
+                draggingMouse = true;
+            }
+        }
+
         hudFrame.drawComponent(context, mouseX, mouseY, deltaTicks);
 
         runAnchorTick(false);
@@ -143,6 +157,7 @@ public class HudGuiScreen extends Screen
             mouse.setRightHeld(false);
         }
 
+        hudFrame.setDragging(false);
         hudFrame.mouseReleased(mouseX, mouseY, button);
 
         for (HudComponent component : hudComponents)
@@ -152,6 +167,25 @@ public class HudGuiScreen extends Screen
 
         draggingMouse = false;
         return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode,
+                              int scanCode,
+                              int modifiers)
+    {
+        hudFrame.keyPressed(keyCode, scanCode, modifiers);
+        hudComponents.forEach(hudComponent -> hudComponent.keyPressed(keyCode, scanCode, modifiers));
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr,
+                             int modifiers)
+    {
+        hudFrame.charTyped(chr, modifiers);
+        hudComponents.forEach(hudComponent -> hudComponent.charTyped(chr, modifiers));
+        return super.charTyped(chr, modifiers);
     }
 
     @Override

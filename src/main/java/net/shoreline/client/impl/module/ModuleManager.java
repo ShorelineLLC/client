@@ -158,6 +158,7 @@ public class ModuleManager
                 new ArrayListHudModule(),
                 new BrandHudModule(),
                 new CoordsHudModule(),
+                new CountsHudModule(),
                 new CrosshairHudModule(),
                 new DurabilityHudModule(),
                 new FPSHudModule(),
