@@ -94,6 +94,11 @@ public class CrystalDataFactory
     {
         for (ItemStack armorStack : target.getArmorItems())
         {
+            if (armorStack.isEmpty())
+            {
+                continue;
+            }
+
             int armorDamage = ExplosionUtil.getArmorDurabilityDamage(armorStack, damage);
             float durability = ItemUtil.getDurability(armorStack) - (armorDamage * autoCrystal.getArmorMultiplier().getValue());
             if (durability <= 0)
