@@ -15,7 +15,6 @@ import net.shoreline.client.impl.module.movement.speed.BaseSpeedFeature;
 import net.shoreline.client.impl.module.movement.speed.SpeedMode;
 import net.shoreline.client.impl.module.movement.speed.Strafe;
 import net.shoreline.client.util.input.InputUtil;
-import net.shoreline.client.util.text.Formatter;
 import net.shoreline.eventbus.annotation.EventListener;
 
 @Getter
@@ -52,7 +51,7 @@ public class SpeedModule extends MovementModule
     @Override
     public String getModuleData()
     {
-        return Formatter.formatEnum(modeConfig.getValue());
+        return modeConfig.getValue().getFeature().getName();
     }
 
     @Override
