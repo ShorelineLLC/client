@@ -128,6 +128,7 @@ public class ModuleManager
                 new FreecamModule(),
                 new FullbrightModule(),
                 new HoleESPModule(),
+                new LogoutPointsModule(),
                 new MineESPModule(),
                 new ModelsModule(),
                 new NametagsModule(),
