@@ -1,7 +1,5 @@
 package net.shoreline.client.impl.module.hud;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -15,13 +13,9 @@ import java.util.Collection;
 
 public class CountsHudModule extends HudModule
 {
-    Config<Collection<Block>> selectedBlocks = new RegistryConfig.Builder<Block>("Blocks")
-            .setRegistry(Registries.BLOCK)
-            .setValues(Blocks.OBSIDIAN)
-            .setDescription("Block whitelist for counts").build();
     Config<Collection<Item>> selectedItems = new RegistryConfig.Builder<Item>("Items")
             .setRegistry(Registries.ITEM)
-            .setValues(Items.TOTEM_OF_UNDYING, Items.END_CRYSTAL)
+            .setValues(Items.TOTEM_OF_UNDYING, Items.END_CRYSTAL, Items.OBSIDIAN, Items.ENDER_PEARL)
             .setDescription("Item whitelist for counts").build();
 
     private float height;
@@ -35,8 +29,6 @@ public class CountsHudModule extends HudModule
     public void drawHudComponent(DrawContext context, float tickDelta)
     {
         height = 0;
-
-        selectedBlocks.getValue().forEach(block -> drawCount(context, block.asItem()));
         selectedItems.getValue().forEach(item -> drawCount(context, item));
     }
 

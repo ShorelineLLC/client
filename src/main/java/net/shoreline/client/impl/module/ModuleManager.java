@@ -169,7 +169,6 @@ public class ModuleManager
                 new ServerStatusHudModule(),
                 new SpeedHudModule(),
                 new TextRadarHudModule(),
-                new TotemsHudModule(),
                 new TPSHudModule(),
                 new WatermarkHudModule()
         );
