@@ -15,7 +15,6 @@ public class Theme
     private int componentColor;
     private int textColor;
     private int backgroundColor;
-    @Getter
     private int outlineColor;
 
     public void setTitleColor(Color color)
@@ -46,6 +45,11 @@ public class Theme
     public int getTitleColor()
     {
         return getColor(titleColor, 1.0f);
+    }
+
+    public int getOutlineColor()
+    {
+        return getColor(outlineColor, 1.0f);
     }
 
     public int getComponentColor()

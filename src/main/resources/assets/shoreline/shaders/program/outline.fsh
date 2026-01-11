@@ -28,6 +28,12 @@ uniform float u_LiquidFactor;
 
 uniform float u_OutlineAlpha;
 
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
 vec4 getFill(vec3 centerColor)
 {
     if (u_FillMode == 1)
@@ -84,13 +90,38 @@ vec4 getFill(vec3 centerColor)
 
     if (u_FillMode == 4)
     {
-        float time = u_ShaderTime / 1000.0;
-        vec2 uv = gl_FragCoord.xy / u_Resolution.xy;
-        float hue = uv.x + uv.y + time;
-        hue = mod(hue, 1.0);
-        vec3 rgb = clamp(abs(mod(hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+        float zoom = 1; // < 1.0 = zoom out, > 1.0 = zoom in
+        vec2 uv = (gl_FragCoord.xy / u_Resolution.xy - 0.5) * zoom + 0.5;
+        float theta = uv.x * 3.14159;
+        float phi = uv.y * 3.14159 * 0.5;
 
-        return vec4(rgb, u_FillAlpha);
+        vec3 dir = vec3(
+            cos(phi) * cos(theta),
+            sin(phi),
+            cos(phi) * sin(theta)
+        );
+
+        float time = u_ShaderTime / 750.0;
+        float rot = time * 0.2;
+        mat2 rotMat = mat2(cos(rot), -sin(rot), sin(rot), cos(rot));
+        dir.xz = rotMat * dir.xz;
+
+        float dist = length(dir.xy);
+        float angle = atan(dir.y, dir.x);
+        float spiral = sin(dist * 10.0 - angle * 3.0 - time * 2.0);
+
+        float hue = fract(dist * 2.0 - time * 0.3 + angle / 6.28318);
+        vec3 rainbowColor = hsv2rgb(vec3(hue, 0.8, 1.0));
+
+        float rings = sin(dist * 20.0 - time * 3.0);
+        rings = pow(max(0.0, rings), 3.0);
+
+        vec3 finalColor = rainbowColor * (spiral * 0.3 + 0.7);
+        finalColor += vec3(1.0) * rings * 0.5;
+
+        float glow = exp(-dist * 3.0);
+        finalColor += vec3(1.0, 0.9, 1.0) * glow * 0.5;
+        return vec4(finalColor, u_FillAlpha);
     }
 
     return vec4(centerColor, u_FillAlpha);
@@ -146,8 +177,17 @@ void main()
     }
 
     if (edge > 0.0)
-     {
-        vec3 outlineRGB = getSobelColor(texCoord);
+    {
+        vec3 outlineRGB;
+        if (u_FillMode == 4)
+        {
+            outlineRGB = getSobelColor(texCoord);
+        }
+        else
+        {
+            outlineRGB = vec3(getFill(center.rgb);
+        }
+
         fragColor = vec4(outlineRGB, edge * u_OutlineAlpha);
     } else
     {

@@ -1,5 +1,6 @@
 package net.shoreline.client.mixin.render.item;
 
+import com.google.common.base.MoreObjects;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
