@@ -1,6 +1,7 @@
 package net.shoreline.client.impl.module.client;
 
 import lombok.Getter;
+import net.minecraft.entity.Entity;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
@@ -32,5 +33,10 @@ public class SocialsModule extends Concurrent
     public Color getFriendsColor()
     {
         return friendsColor.getValue();
+    }
+
+    public Color getFriendColor(Entity entity, Color fallback)
+    {
+        return null;
     }
 }

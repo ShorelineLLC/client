@@ -6,9 +6,9 @@ public abstract class ConfigBuilder<T>
 {
     private ConfigFactory<T> factory;
 
-    private final String name;
+    protected final String name;
 
-    private String description;
+    protected String description;
     private String[] nameAliases;
     private T defaultValue;
     private Supplier<Boolean> visible;
@@ -46,24 +46,28 @@ public abstract class ConfigBuilder<T>
 
     public Config<T> build()
     {
+        return buildWithoutFactory(factory.create(name, description));
+    }
+
+    public Config<T> buildWithoutFactory(Config<T> config)
+    {
         if (factory == null)
         {
             throw new IllegalStateException("Config has no default value!");
         }
 
-        final Config<T> build = factory.create(name, description);
         if (nameAliases != null)
         {
-            build.setNameAliases(nameAliases);
+            config.setNameAliases(nameAliases);
         }
 
         if (defaultValue != null)
         {
-            build.setValue(defaultValue);
-            build.setDefaultValue(defaultValue);
+            config.setValue(defaultValue);
+            config.setDefaultValue(defaultValue);
         }
 
-        build.setVisible(visible);
-        return build;
+        config.setVisible(visible);
+        return config;
     }
 }

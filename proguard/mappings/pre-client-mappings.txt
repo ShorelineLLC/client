@@ -44,5 +44,5 @@ net.shoreline.client.init.Managers -> net.shoreline.client.lI:
 net.shoreline.client.impl.movement.ModuleManager -> net.shoreline.client.fD:
 net.shoreline.client.ShutdownHook -> net.shoreline.client.c:
 net.shoreline.client.api.file.ClientConfiguration -> net.shoreline.client.Q:
-net.shoreline.client.api.config.ConfigContainer -> net.shoreline.client.E:
-net.shoreline.client.impl.movement.client.CommandManager -> net.shoreline.client.gi:
+net.shoreline.client.api.config.ConfigContainer -> net.shoreline.client.E:Z
+net.shoreline.client.impl.command.CommandManager -> net.shoreline.client.gi:

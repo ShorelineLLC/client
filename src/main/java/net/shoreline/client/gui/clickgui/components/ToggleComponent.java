@@ -29,7 +29,7 @@ public class ToggleComponent extends FrameComponent
                            Supplier<Boolean> setter)
     {
         super(frame, x, y, width, height);
-        this.toggleAnim = new Animation(state, 200L, Easing.CUBIC_IN_OUT);
+        this.toggleAnim = new Animation(state, 150);
         this.setter = setter;
     }
 

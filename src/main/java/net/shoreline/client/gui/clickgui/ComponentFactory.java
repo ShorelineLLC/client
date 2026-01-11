@@ -2,6 +2,7 @@ package net.shoreline.client.gui.clickgui;
 
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
+import net.shoreline.client.api.config.ToggleableConfigGroup;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.module.Module;
 import net.shoreline.client.api.module.Toggleable;
@@ -9,6 +10,7 @@ import net.shoreline.client.gui.clickgui.config.*;
 import net.shoreline.client.gui.clickgui.config.picker.ColorPickerComponent;
 import net.shoreline.client.gui.clickgui.config.picker.GroupComponent;
 import net.shoreline.client.gui.clickgui.config.picker.RegistryPickerComponent;
+import net.shoreline.client.gui.clickgui.config.picker.ToggleableGroupComponent;
 
 import java.awt.*;
 import java.util.Collection;
@@ -41,15 +43,30 @@ public class ComponentFactory
     {
         if (!config.getChildren().isEmpty())
         {
-            GroupComponent groupComponent = new GroupComponent((Config<Void>) config, moduleComponent, frame, x, y, width, height);
-            for (Config<?> cfg : (ConfigGroup) config)
+            if (config.getValue() instanceof Boolean)
             {
-                ConfigComponent<?> component = createConfigComponent(cfg, moduleComponent, frame, x + 2, y, width - 2, height);
-                groupComponent.getComponents().add(component);
-                frame.getAllComponents().add(component);
-            }
+                ToggleableGroupComponent group = new ToggleableGroupComponent((Config<Boolean>) config, moduleComponent, frame, x, y, width, height);
+                for (Config<?> cfg : (ToggleableConfigGroup) config)
+                {
+                    ConfigComponent<?> component = createConfigComponent(cfg, moduleComponent, frame, x  + 2, y, width - 2, height);
+                    group.getComponents().add(component);
+                    frame.getAllComponents().add(component);
+                }
 
-            return groupComponent;
+                return group;
+            }
+            else
+            {
+                GroupComponent groupComponent = new GroupComponent((Config<Void>) config, moduleComponent, frame, x, y, width, height);
+                for (Config<?> cfg : (ConfigGroup) config)
+                {
+                    ConfigComponent<?> component = createConfigComponent(cfg, moduleComponent, frame, x + 2, y, width - 2, height);
+                    groupComponent.getComponents().add(component);
+                    frame.getAllComponents().add(component);
+                }
+
+                return groupComponent;
+            }
         } else
         {
             if (config.getValue() instanceof Macro)

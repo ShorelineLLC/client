@@ -2,6 +2,7 @@ package net.shoreline.client.mixin.render.item;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -21,9 +22,7 @@ import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HeldItemRenderer.class)
@@ -39,25 +38,79 @@ public class MixinHeldItemRenderer
     @Shadow
     private float equipProgressMainHand;
 
-    @Inject(method = "renderFirstPersonItem", at = @At(value = "HEAD"), cancellable = true)
-    private void hookRenderFirstPersonItem(AbstractClientPlayerEntity player,
-                                           float tickDelta,
-                                           float pitch,
-                                           Hand hand,
-                                           float swingProgress,
-                                           ItemStack item,
-                                           float equipProgress,
-                                           MatrixStack matrices,
-                                           VertexConsumerProvider vertexConsumers,
-                                           int light,
-                                           CallbackInfo ci)
+    @ModifyArg(
+            method = "updateHeldItems",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F",
+                    ordinal = 2),
+            index = 0)
+    private float renderFirstPersonItemHook_HandProgressMainhand(float value)
     {
-        RenderHeldItemEvent.Pre renderFirstPersonEvent = new RenderHeldItemEvent.Pre();
-        EventBus.INSTANCE.dispatch(renderFirstPersonEvent);
-        if (renderFirstPersonEvent.isCanceled())
+        RenderHeldItemEvent.EquipProgress event = new RenderHeldItemEvent.EquipProgress(Hand.MAIN_HAND, value);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
         {
-            ci.cancel();
+            return value - event.getHeight();
         }
+
+        return value;
+    }
+
+    @ModifyArg(
+            method = "updateHeldItems",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F",
+                    ordinal = 3),
+            index = 0)
+    private float renderFirstPersonItemHook_HandProgressOffhand(float value)
+    {
+        RenderHeldItemEvent.EquipProgress event = new RenderHeldItemEvent.EquipProgress(Hand.OFF_HAND, value);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            return value - event.getHeight();
+        }
+
+        return value;
+    }
+
+    @ModifyVariable(
+            method = "renderFirstPersonItem",
+            at = @At(value = "HEAD"),
+            ordinal = 2,
+            argsOnly = true)
+    private float renderFirstPersonItemHook_SwingProgress(float value, @Local(argsOnly = true) Hand hand)
+    {
+        RenderHeldItemEvent.HandSwing event = new RenderHeldItemEvent.HandSwing(hand, value);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            return value + event.getSwingProgress();
+        }
+
+        return value;
+    }
+
+    @Inject(
+            method = "renderFirstPersonItem",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/util/math/MatrixStack;push()V",
+                    shift = At.Shift.AFTER))
+    private void renderItemHook(AbstractClientPlayerEntity player,
+                                float tickDelta,
+                                float pitch,
+                                Hand hand,
+                                float swingProgress,
+                                ItemStack item,
+                                float equipProgress,
+                                MatrixStack matrices,
+                                VertexConsumerProvider vertexConsumers,
+                                int light,
+                                CallbackInfo info)
+    {
+        RenderHeldItemEvent.Scaling event = new RenderHeldItemEvent.Scaling(matrices);
+        EventBus.INSTANCE.dispatch(event);
     }
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE",
@@ -74,8 +127,24 @@ public class MixinHeldItemRenderer
                                 int light,
                                 CallbackInfo ci)
     {
-        RenderHeldItemEvent.FirstPerson renderHeldItemEvent = new RenderHeldItemEvent.FirstPerson(matrices, hand);
+        RenderHeldItemEvent.Size renderHeldItemEvent = new RenderHeldItemEvent.Size(matrices);
         EventBus.INSTANCE.dispatch(renderHeldItemEvent);
+    }
+
+    @Inject(
+            method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;" +
+                    "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;" +
+                    "Lnet/minecraft/client/network/ClientPlayerEntity;I)V",
+            at = @At(value = "HEAD"))
+    private void renderFirstPersonItemHook(float tickDelta,
+                                           MatrixStack matrices,
+                                           VertexConsumerProvider.Immediate vertexConsumers,
+                                           ClientPlayerEntity player,
+                                           int light,
+                                           CallbackInfo info)
+    {
+        RenderHeldItemEvent.Translation event = new RenderHeldItemEvent.Translation(matrices);
+        EventBus.INSTANCE.dispatch(event);
     }
 
     @WrapOperation(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V",

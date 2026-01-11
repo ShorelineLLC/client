@@ -21,7 +21,7 @@ public abstract class Config<T> implements Identifiable, Observable<T>, Serializ
     private final String name;
     private final String description;
 
-    private ConfigGroup configGroup;
+    private Config<?> configGroup;
 
     private String[] nameAliases;
 
