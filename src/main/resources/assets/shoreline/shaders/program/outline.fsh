@@ -181,11 +181,11 @@ void main()
         vec3 outlineRGB;
         if (u_FillMode == 4)
         {
-            outlineRGB = getSobelColor(texCoord);
+            outlineRGB = vec3(getFill(center.rgb));
         }
         else
         {
-            outlineRGB = vec3(getFill(center.rgb);
+            outlineRGB = getSobelColor(texCoord);
         }
 
         fragColor = vec4(outlineRGB, edge * u_OutlineAlpha);
