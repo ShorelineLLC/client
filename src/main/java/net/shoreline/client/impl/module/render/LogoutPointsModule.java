@@ -145,16 +145,23 @@ public class LogoutPointsModule extends RenderModule
 
             PlayerEntity offlinePlayer = data.getOfflinePlayer();
             StringBuilder logoutTag = new StringBuilder(offlinePlayer.getName().getString() + "'s Logout");
+
+            boolean hasExtraInfo = false;
             if (showDistance.getValue())
             {
+                hasExtraInfo = true;
                 double dist = Math.sqrt(mc.player.squaredDistanceTo(offlinePlayer.getPos()));
-                logoutTag.append(" ").append(DECIMAL.format(dist)).append("m");
+                logoutTag.append(" - ").append(DECIMAL.format(dist)).append("m");
             }
 
             if (showTimePassed.getValue())
             {
-                long seconds = (System.currentTimeMillis() - data.getLogoutTime()) / 1000;
+                if (!hasExtraInfo)
+                {
+                    logoutTag.append(" -");
+                }
 
+                long seconds = (System.currentTimeMillis() - data.getLogoutTime()) / 1000;
                 if (seconds < 60)
                 {
                     logoutTag.append(" ").append(seconds).append("s");
