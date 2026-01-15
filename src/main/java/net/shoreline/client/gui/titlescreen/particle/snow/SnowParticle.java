@@ -3,6 +3,7 @@ package net.shoreline.client.gui.titlescreen.particle.snow;
 import lombok.Getter;
 import net.minecraft.client.render.*;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.gui.titlescreen.particle.Particle;
 
 import java.util.Random;
@@ -13,6 +14,7 @@ public class SnowParticle extends Particle
     private static final Random RANDOM = new Random();
     private final Identifier SNOWFLAKE = Identifier.of("shoreline", "textures/snowflake.png");
 
+    private boolean collisionCheck;
     private final float speed;
     private final float swayAmplitude;
     private final float swayFrequency;
@@ -83,21 +85,30 @@ public class SnowParticle extends Particle
     @Override
     public void reset()
     {
+        collisionCheck = true;
         float spawnSide = RANDOM.nextFloat();
+        float rnd       = RANDOM.nextFloat();
         if (spawnSide < 0.5f)
         {
             y = -size;
-            x = RANDOM.nextFloat() * screenWidth;
+            x = rnd * screenWidth;
+
+            if (rnd > 0.75f || rnd < 0.05f)
+            {
+                collisionCheck = false;
+            }
         }
         else if (spawnSide < 0.75f)
         {
             x = -size;
-            y = RANDOM.nextFloat() * screenHeight;
+            y = rnd * screenHeight;
+            collisionCheck = false;
         }
         else
         {
             x = screenWidth + size;
-            y = RANDOM.nextFloat() * screenHeight;
+            y = rnd * screenHeight;
+            collisionCheck = false;
         }
     }
 }

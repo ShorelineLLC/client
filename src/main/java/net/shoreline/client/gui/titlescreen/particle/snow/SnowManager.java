@@ -87,18 +87,17 @@ public class SnowManager extends ParticleManager<SnowParticle>
                 continue;
             }
 
-            if (!freezeParticle(particle))
+            if (particle.isCollisionCheck() && freezeParticle(particle))
             {
-                particle.update(delta);
-                if (particle.isOutOfBounds())
-                {
-                    particle.reset();
-                }
-
+                count++;
                 continue;
             }
 
-            count++;
+            particle.update(delta);
+            if (particle.isOutOfBounds())
+            {
+                particle.reset();
+            }
         }
 
         addParticles(count);
