@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.MacroConfig;
+import net.shoreline.client.api.macro.HoldKeybind;
 import net.shoreline.client.api.macro.Macro;
 import net.shoreline.client.api.macro.ModuleKeybind;
 import net.shoreline.client.api.module.Toggleable;
@@ -70,9 +71,18 @@ public class KeyListenerComponent extends ConfigComponent<Macro>
             }
             else if (mouseButton == GLFW.GLFW_MOUSE_BUTTON_2 && !listening)
             {
-                // Reset the bind
-                config.setValue(new ModuleKeybind(GLFW.GLFW_KEY_UNKNOWN,
-                        (Toggleable) getModuleComponent().getModule()));
+                int keyCode = config.getValue().getKeycode();
+                boolean hold = config.getValue() instanceof HoldKeybind;
+                if (hold)
+                {
+                    config.setValue(new ModuleKeybind(keyCode, (Toggleable) getModuleComponent().getModule()));
+                }
+                else
+                {
+                    config.setValue(new HoldKeybind(keyCode, (Toggleable) getModuleComponent().getModule()));
+                }
+
+                ClickGuiScreen.INSTANCE.addNotification(String.format("Bind set to %s", !hold ? "Hold" : "Toggle"), 1000);
             }
             else
             {

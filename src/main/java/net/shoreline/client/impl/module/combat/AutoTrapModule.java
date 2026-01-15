@@ -1,11 +1,14 @@
 package net.shoreline.client.impl.module.combat;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
@@ -16,6 +19,7 @@ import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
+import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.module.combat.trap.TrapLayer;
 import net.shoreline.client.impl.module.combat.trap.TrapModule;
 import net.shoreline.client.impl.module.combat.trap.TrapSpec;
@@ -49,6 +53,9 @@ public class AutoTrapModule extends TrapModule
     Config<Boolean> crawlConfig = new BooleanConfig.Builder("Crawl")
             .setDescription("Attempts to prevent target from standing up")
             .setDefaultValue(false).build();
+    Config<Boolean> supportConfig = new BooleanConfig.Builder("Support")
+            .setDescription("Supporting blocks for autotrap")
+            .setDefaultValue(true).build();
     Config<Void> targetConfig = new ConfigGroup.Builder("Target")
             .addAll(targetRange, extrapolateTicks, feetConfig, bodyConfig, headConfig, crawlConfig).build();
 
@@ -162,6 +169,19 @@ public class AutoTrapModule extends TrapModule
 
         for (BlockPos placement : placements)
         {
+            Direction direction = InteractDirection.getInteractDirection(placement);
+            if (direction == null && supportConfig.getValue())
+            {
+                for (Direction dir : Direction.values())
+                {
+                    BlockPos offset = placement.offset(dir);
+                    if (placeBlock(offset, Blocks.OBSIDIAN))
+                    {
+                        break;
+                    }
+                }
+            }
+
             placeObby(placement);
         }
 

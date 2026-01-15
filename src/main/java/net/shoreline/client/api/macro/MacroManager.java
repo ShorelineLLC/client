@@ -30,34 +30,54 @@ public class MacroManager extends GenericFeature
 
         for (Macro macro : macros)
         {
-            if (macro.getKeycode() > GLFW.GLFW_KEY_LAST)
+            onInput(event.getKey(), event.getAction(), macro, false);
+        }
+    }
+
+    @EventListener
+    public void onMouseInput(InputEvent.Mouse event)
+    {
+        if (checkNull() || mc.currentScreen != null)
+        {
+            return;
+        }
+
+        for (Macro macro : macros)
+        {
+            onInput(event.getButton(), event.getAction(), macro, true);
+        }
+    }
+
+    public void onInput(int eventKey, int action, Macro macro, boolean mouse)
+    {
+        int key = macro.getKeycode();
+        if (mouse)
+        {
+            key -= GLFW.GLFW_KEY_LAST;
+        }
+
+        if (macro instanceof HoldKeybind hold)
+        {
+            if (eventKey == key
+                    && (action == GLFW.GLFW_PRESS
+                    || action == GLFW.GLFW_REPEAT))
             {
-                continue;
+                hold.onKeyPress();
+            } else if (action == GLFW.GLFW_RELEASE)
+            {
+                hold.onKeyRelease();
+            }
+        }
+        else
+        {
+            if (key == GLFW.GLFW_KEY_UNKNOWN || action != GLFW.GLFW_PRESS)
+            {
+                return;
             }
 
-            if (macro instanceof HoldKeybind hold)
+            if (eventKey == key)
             {
-                if (event.getKey() == macro.getKeycode()
-                        && (event.getAction() == GLFW.GLFW_PRESS
-                        || event.getAction() == GLFW.GLFW_REPEAT))
-                {
-                    hold.onKeyPress();
-                } else if (event.getAction() == GLFW.GLFW_RELEASE)
-                {
-                    hold.onKeyRelease();
-                }
-            }
-            else
-            {
-                if (event.getKey() == GLFW.GLFW_KEY_UNKNOWN || event.getAction() != GLFW.GLFW_PRESS)
-                {
-                    continue;
-                }
-
-                if (event.getKey() == macro.getKeycode())
-                {
-                    macro.onKeyPress();
-                }
+                macro.onKeyPress();
             }
         }
     }

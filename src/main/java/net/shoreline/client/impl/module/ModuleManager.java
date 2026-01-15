@@ -58,6 +58,7 @@ public class ModuleManager
                 new AutoDisconnectModule(),
                 new AutoMaceModule(),
                 new AutoMineModule(),
+                new AutoPotModule(),
                 new AutoTotemModule(),
                 new AutoTrapModule(),
                 new AutoXPModule(),
