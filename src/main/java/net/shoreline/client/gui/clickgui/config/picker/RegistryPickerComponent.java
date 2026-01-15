@@ -1,5 +1,6 @@
 package net.shoreline.client.gui.clickgui.config.picker;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.minecraft.block.Block;
@@ -9,6 +10,7 @@ import net.minecraft.block.FluidBlock;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
@@ -171,12 +173,15 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
                 if (idx < results.size())
                 {
                     T entry = results.get(idx);
+                    updateDescription(entry, tg);
                     cellEntries[idx] = entry;
                     tg.drawComponent(context, mouseX, mouseY, delta);
-
                     int ix = (int) (cellX + (cell - 16.0f) / 2.0f);
                     int iy = (int) (cellY + (cell - 16.0f) / 2.0f);
                     renderEntry(context, entry, ix, iy);
+
+                    RegistryConfig<T> reg = (RegistryConfig<T>) getConfig();
+                    tg.setState(reg.contains(entry));
                 } else
                 {
                     tg.drawComponent(context, mouseX, mouseY, delta);
@@ -265,6 +270,22 @@ public class RegistryPickerComponent<T> extends ExpandableComponent<Collection<T
         if (pickerOpen)
         {
             searchBar.charTyped(chr, modifiers);
+        }
+    }
+
+    private void updateDescription(T entry, ToggleComponent component)
+    {
+        if (component.getHoverAnim().getState())
+        {
+            if (entry instanceof Block block)
+            {
+                ClickGuiScreen.INSTANCE.setDescriptionText(I18n.translate(block.getTranslationKey()));
+            }
+            else
+            {
+                ItemStack stack = toStack(entry);
+                ClickGuiScreen.INSTANCE.setDescriptionText(stack.getItem().getName().toString());
+            }
         }
     }
 

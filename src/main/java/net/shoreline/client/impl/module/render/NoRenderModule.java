@@ -6,10 +6,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
-import net.shoreline.client.api.config.BooleanConfig;
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.ConfigGroup;
-import net.shoreline.client.api.config.NumberConfig;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.entity.EntityHurtEvent;
@@ -25,6 +24,7 @@ import net.shoreline.client.impl.event.toast.RenderGuiToastEvent;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -130,10 +130,14 @@ public class NoRenderModule extends RenderModule
     Config<Void> hudConfig = new ConfigGroup.Builder("HUD")
             .addAll(potionsHud, itemName, toastConfig, textShadow).build();
 
-    Config<Boolean> vinesConfig = new BooleanConfig.Builder("Vines")
-            .setDescription("Cancels vines rendering")
-            .setDefaultValue(false)
+    Config<Collection<Block>> blockBlackListConfig = new RegistryConfig.Builder<Block>("Blacklist")
+            .setValues(Blocks.CAVE_VINES, Blocks.CAVE_VINES_PLANT)
+            .setRegistry(Registries.BLOCK)
+            .setDescription("List of blocks that you dont want to render")
             .build();
+    Config<Boolean> blocksConfig = new ToggleableConfigGroup.Builder("Blocks")
+            .add(blockBlackListConfig)
+            .setDefaultValue(false).build();
     Config<Boolean> nauseaConfig = new BooleanConfig.Builder("Nausea")
             .setDescription("Cancels the nausea effect")
             .setDefaultValue(false).build();
@@ -165,7 +169,8 @@ public class NoRenderModule extends RenderModule
     {
         super("NoRender", "Prevents certain game elements from rendering", GuiCategory.RENDER);
         INSTANCE = this;
-        vinesConfig.addObserver(v -> reload(true));
+        blockBlackListConfig.addObserver(v -> reload(true));
+        blocksConfig.addObserver(v -> reload(true));
     }
 
     @EventListener
@@ -362,13 +367,15 @@ public class NoRenderModule extends RenderModule
     @EventListener
     public void onRenderBlock(RenderBlockEvent event)
     {
-        Block block = event.getState().getBlock();
-        if (vinesConfig.getValue())
+        if (!blocksConfig.getValue())
         {
-            if (block.equals(Blocks.CAVE_VINES) || block.equals(Blocks.CAVE_VINES_PLANT))
-            {
-                event.cancel();
-            }
+            return;
+        }
+
+        Block block = event.getState().getBlock();
+        if (blockBlackListConfig.getValue().contains(block))
+        {
+            event.cancel();
         }
     }
 
