@@ -122,6 +122,11 @@ public class MiningManager extends GenericFeature
         }
     }
 
+    public MiningData getData(BlockPos pos)
+    {
+        return miningBlocks.get(pos);
+    }
+
     public int getMiningCount(PlayerEntity playerEntity)
     {
         int count = 0;

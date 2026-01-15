@@ -4,10 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.*;
-import net.shoreline.client.api.config.BooleanConfig;
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.ConfigGroup;
-import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.math.NanoTimer;
 import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
@@ -24,6 +21,7 @@ import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +37,14 @@ public class AutoMineModule extends TrapModule
     Config<Integer> delayConfig = new NumberConfig.Builder<Integer>("Delay")
             .setMin(100).setMax(500).setDefaultValue(200).setFormat("ms")
             .setDescription("The delay between mines").build();
+    Config<Boolean> fallBackConfig = new BooleanConfig.Builder("Fallback")
+            .setDescription("Fallbacks to positions mined by friends")
+            .setDefaultValue(true)
+            .build();
+    Config<Boolean> friendSyncConfig = new ToggleableConfigGroup.Builder("FriendSync")
+            .add(fallBackConfig)
+            .setDescription("Attempts to avoid positions where players you have added as a friend is mining.")
+            .setDefaultValue(false).build();
     Config<Boolean> antiCrawl = new BooleanConfig.Builder("AntiCrawl")
             .setDescription("Attempts to mine blocks to prevent player crawl")
             .setDefaultValue(true).build();
@@ -153,6 +159,7 @@ public class AutoMineModule extends TrapModule
         float crystalRange = AutoCrystalModule.INSTANCE.getPlaceRange().getValue();
 
         Map.Entry<BlockPos, TrapLayer> bestMine = null;
+        Map.Entry<BlockPos, TrapLayer> fallBack = null;
         boolean inRange = false;
 
         List<Map.Entry<BlockPos, TrapLayer>> trapLayers = trapPos.entriesSortedByLayer(
@@ -206,12 +213,18 @@ public class AutoMineModule extends TrapModule
                     }
                 }
             }
-
             else if (feetConfig.getValue())
             {
                 if (layer == TrapLayer.FEET_INTERSECT && !MiningUtil.isEmpty(state) && !speedMine.isMining(blockPos))
                 {
-                    return trapLayer;
+                    if (checkFriendSync(blockPos))
+                    {
+                        fallBack = trapLayer;
+                    }
+                    else
+                    {
+                        return trapLayer;
+                    }
                 }
 
                 if (layer == TrapLayer.FEET)
@@ -219,6 +232,12 @@ public class AutoMineModule extends TrapModule
                     BlockState state2 = mc.world.getBlockState(blockPos.down());
                     if (!state2.isOf(Blocks.OBSIDIAN) && !state2.isOf(Blocks.BEDROCK))
                     {
+                        continue;
+                    }
+
+                    if (checkFriendSync(blockPos))
+                    {
+                        fallBack = trapLayer;
                         continue;
                     }
 
@@ -237,7 +256,32 @@ public class AutoMineModule extends TrapModule
             }
         }
 
+        if (bestMine == null
+                && friendSyncConfig.getValue()
+                && fallBackConfig.getValue()
+                && fallBack != null)
+        {
+            return fallBack;
+        }
+
         return bestMine;
+    }
+
+    public boolean checkFriendSync(BlockPos pos)
+    {
+        if (!friendSyncConfig.getValue())
+        {
+            return false;
+        }
+
+        MiningData data = Managers.MINING.getData(pos);
+        if (data == null)
+        {
+            return false;
+        }
+
+        PlayerEntity player = data.getPlayer();
+        return Managers.SOCIAL.isFriend(player);
     }
 
     private boolean canStartMining(BlockPos currentMine)
