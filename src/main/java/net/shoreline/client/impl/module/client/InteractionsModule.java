@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.client;
 import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.Concurrent;
 import net.shoreline.client.api.module.GuiCategory;
@@ -24,25 +25,41 @@ public class InteractionsModule extends Concurrent
     Config<Boolean> attackCrystals = new BooleanConfig.Builder("AttackCrystal")
             .setDescription("Attacks crystals blocking placements")
             .setDefaultValue(false).build();
-    Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("BlocksPerTick")
-            .setMin(1).setMax(10).setDefaultValue(2)
-            .setDescription("The max interactions per tick").build();
-    Config<Integer> interactDelay = new NumberConfig.Builder<Integer>("Delay")
-            .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
-            .setDescription("The delay between interactions").build();
-    Config<Integer> interactAttempts = new NumberConfig.Builder<Integer>("Limit")
-            .setMin(0).setMax(100).setDefaultValue(20)
-            .setDescription("Max attempts to interact on blocks").build();
     Config<Boolean> strictDirection = new BooleanConfig.Builder("StrictDirection")
             .setDescription("Only places on visible faces")
             .setDefaultValue(false).build();
     Config<Boolean> simulation = new BooleanConfig.Builder("Simulate")
             .setDescription("Simulates a block placement to prevent movement flags")
             .setDefaultValue(false).build();
+    Config<InteractMode> modeConfig = new EnumConfig.Builder<InteractMode>("Mode")
+            .setValues(InteractMode.values())
+            .setDescription("The interaction mode")
+            .setDefaultValue(InteractMode.SHIFT).build();
+    Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("BlocksPer")
+            .setMin(1).setMax(100).setDefaultValue(2)
+            .setDescription("The max interactions per interval")
+            .setVisible(() -> modeConfig.getValue() != InteractMode.SYNC).build();
+    Config<Float> interactInterval = new NumberConfig.Builder<Float>("Interval")
+            .setMin(0.05f).setMax(5.0f).setDefaultValue(0.05f).setFormat("s")
+            .setDescription("The interval between interactions")
+            .setVisible(() -> modeConfig.getValue() == InteractMode.LIMIT).build();
+    Config<Integer> interactDelay = new NumberConfig.Builder<Integer>("Delay")
+            .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
+            .setDescription("The delay between interactions").build();
+    Config<Integer> interactAttempts = new NumberConfig.Builder<Integer>("Limit")
+            .setMin(0).setMax(100).setDefaultValue(20)
+            .setDescription("Max attempts to interact on blocks").build();
 
     public InteractionsModule()
     {
         super("Interactions", "Manages world interactions", GuiCategory.CLIENT);
         INSTANCE = this;
+    }
+
+    public enum InteractMode
+    {
+        LIMIT,
+        SHIFT,
+        SYNC
     }
 }

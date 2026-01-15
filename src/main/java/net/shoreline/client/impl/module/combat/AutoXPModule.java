@@ -10,6 +10,7 @@ import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.interact.ItemInteraction;
 import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.rotation.ClientRotationEvent;
@@ -92,14 +93,13 @@ public class AutoXPModule extends Toggleable
 
         if (Managers.INVENTORY.startSwap(itemSlot))
         {
-            xpThrow.applyToPlayer();
-
             for (int i = 0; i < bptConfig.getValue(); i++)
             {
-                Managers.INTERACT.interactItem(Hand.MAIN_HAND, xpThrow.getYaw(), xpThrow.getPitch(), false);
+                Managers.INTERACT.interactItem(new ItemInteraction(Items.EXPERIENCE_BOTTLE,
+                        Hand.MAIN_HAND,
+                        xpThrow,
+                        true));
             }
-
-            playerRotation.applyToPlayer();
 
             Managers.INVENTORY.endSwap();
         }

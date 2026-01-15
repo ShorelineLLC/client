@@ -7,19 +7,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -41,7 +35,6 @@ import net.shoreline.client.util.world.BlockUtil;
 import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
-import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.Map;
 import java.util.Optional;
@@ -54,7 +47,7 @@ public class InteractManager extends NetworkHandler
     private final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
     private final AirPlaceModule airPlace = AirPlaceModule.INSTANCE;
 
-    private final ConcurrentMap<Interaction, Long> interactions = new ConcurrentHashMap<>();
+    private final ConcurrentMap<PlaceInteraction, Long> placeInteractions = new ConcurrentHashMap<>();
     private final ConcurrentMap<Entity, Integer> placedEntityIds = new ConcurrentHashMap<>();
 
     private final AtomicInteger blocksPlaced = new AtomicInteger();
@@ -71,7 +64,7 @@ public class InteractManager extends NetworkHandler
     public void onTickPost(TickEvent.Post event)
     {
         blocksPlaced.set(0);
-        interactions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
+        placeInteractions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
     }
 
     @EventListener
@@ -84,15 +77,16 @@ public class InteractManager extends NetworkHandler
 
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
         {
-            for (Interaction interaction : interactions.keySet())
+            for (PlaceInteraction placeInteraction : placeInteractions.keySet())
             {
-                if (!interaction.getPos().equals(packet.getPos()))
+                if (!placeInteraction.getInteract().equals(packet.getPos()))
                 {
                     continue;
                 }
 
                 // Confirm that we succeeded placement serverside
-                interaction.setStatus(packet.getState().isOf(interaction.getBlock()) ? InteractStatus.SERVER_CONFIRMED : InteractStatus.SERVER_MISMATCH);
+                placeInteraction.setStatus(packet.getState().isOf(placeInteraction.getBlock()) ?
+                        InteractStatus.SERVER_CONFIRMED : InteractStatus.SERVER_MISMATCH);
                 break;
             }
         }
@@ -106,23 +100,23 @@ public class InteractManager extends NetworkHandler
             return;
         }
 
-        for (Interaction interaction : interactions.keySet())
+        for (PlaceInteraction placeInteraction : placeInteractions.keySet())
         {
-            if (interaction.getStatus() != InteractStatus.UNCONFIRMED || !interaction.getPos().equals(event.getBlockPos()))
+            if (placeInteraction.getStatus() != InteractStatus.UNCONFIRMED || !placeInteraction.getInteract().equals(event.getBlockPos()))
             {
                 continue;
             }
 
-            VoxelShape collisionShape = interaction.getBlock().getDefaultState().getCollisionShape(mc.world, event.getBlockPos());
+            VoxelShape collisionShape = placeInteraction.getBlock().getDefaultState().getCollisionShape(mc.world, event.getBlockPos());
             event.cancel();
             event.setCollisionShape(collisionShape);
             return;
         }
     }
 
-    public boolean placeBlock(Interaction interaction)
+    public boolean placeBlock(PlaceInteraction placeInteraction)
     {
-        final BlockPos blockPos = interaction.getPos();
+        final BlockPos blockPos = placeInteraction.getPos();
         if (!mc.world.isInBuildLimit(blockPos))
         {
             return false;
@@ -137,16 +131,16 @@ public class InteractManager extends NetworkHandler
             }
         }
 
-        interactions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
-        if (check(blockPos) || isEntityBlocking(blockPos, interaction.getBlock(), true))
+        placeInteractions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
+        if (check(blockPos) || isEntityBlocking(blockPos, placeInteraction.getBlock(), true))
         {
             return false;
         }
 
-        boolean result = placeBlockInternal(interaction);
+        boolean result = placeBlockInternal(placeInteraction);
         if (result)
         {
-            interactions.put(interaction, System.currentTimeMillis());
+            placeInteractions.put(placeInteraction, System.currentTimeMillis());
             blocksPlaced.incrementAndGet();
         }
 
@@ -160,8 +154,8 @@ public class InteractManager extends NetworkHandler
             return true;
         }
 
-        Optional<Map.Entry<Interaction, Long>> interact = interactions.entrySet().stream()
-                .filter(d -> d.getKey().getPos().equals(blockPos))
+        Optional<Map.Entry<PlaceInteraction, Long>> interact = placeInteractions.entrySet().stream()
+                .filter(d -> d.getKey().getInteract().equals(blockPos))
                 .findFirst();
 
         return interact.isPresent() && System.currentTimeMillis() - interact.get().getValue() < interactConfig.getInteractDelay().getValue();
@@ -217,18 +211,14 @@ public class InteractManager extends NetworkHandler
         return false;
     }
 
-    private boolean placeBlockInternal(Interaction interaction)
+    private boolean placeBlockInternal(PlaceInteraction placeInteraction)
     {
-        BlockPos placePos = interaction.getPos();
-        BlockState state = interaction.getBlock().getDefaultState();
-        Direction direction = interaction.getDirection();
-
-        boolean noValidDir = airPlace.isForceAirPlace() || direction == null;
-        boolean airPlacing = interaction.getHand() == Hand.MAIN_HAND && noValidDir && airPlace.isEnabled();
+        Direction direction = placeInteraction.getDirection();
+        boolean airPlacing = placeInteraction.getHand() == Hand.MAIN_HAND && direction == null && airPlace.isEnabled() && !airPlace.isForceAirPlace();
         if (airPlacing)
         {
             direction = Direction.DOWN;
-            interaction.setDirection(direction);
+            placeInteraction.setDirection(direction);
 
             if (airPlace.isGrim())
             {
@@ -242,41 +232,29 @@ public class InteractManager extends NetworkHandler
         }
 
         Vec3d eyePos = mc.player.getEyePos();
-        Box box = new Box(placePos);
-        BlockPos blockPos = airPlacing ? placePos : placePos.offset(direction.getOpposite());
-
-        boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(blockPos) && !mc.player.isSneaking();
+        boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(placeInteraction.getPos()) && !mc.player.isSneaking();
         if (shouldSneak)
         {
             Managers.MOVEMENT.setSilentSneaking(true);
         }
 
-        MutableObject<ActionResult> actionResult = new MutableObject<>();
-
-        Vec3d interactionVec = blockPos.toCenterPos().add(interaction.getHitVec());
         if (interactConfig.getInteractRotate().getValue())
         {
-            float[] rots = RotationUtil.getRotationsTo(eyePos, interactionVec);
+            float[] rots = RotationUtil.getRotationsTo(eyePos, placeInteraction.getInteractVec());
             Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
         }
 
-        Hand hand = airPlacing && airPlace.isGrim() ? Hand.OFF_HAND : interaction.getHand();
-        BlockHitResult result = new BlockHitResult(interactionVec, direction, blockPos, box.contains(eyePos));
-
-        if (interaction.isPacketPlace() || !mc.isOnThread())
+        if (airPlacing && airPlace.isGrim())
         {
-            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
-            playBlockPlaceSound(placePos, state);
-            actionResult.setValue(ActionResult.SUCCESS);
-        } else
-        {
-            actionResult.setValue(mc.interactionManager.interactBlock(mc.player, hand, result));
+            placeInteraction.setHand(Hand.OFF_HAND);
         }
 
-        boolean success = actionResult.getValue() != null && actionResult.getValue().isAccepted();
+        ActionResult actionResult = placeInteraction.applyInteraction();
+
+        boolean success = actionResult != null && actionResult.isAccepted();
         if (success)
         {
-            sendPacket(new HandSwingC2SPacket(hand));
+            sendPacket(new HandSwingC2SPacket(placeInteraction.getHand()));
         }
 
         if (shouldSneak)
@@ -323,18 +301,13 @@ public class InteractManager extends NetworkHandler
         placementLock = false;
     }
 
-    public void interactItem(Hand hand, boolean swing)
+    public void interactItem(ItemInteraction itemInteraction)
     {
-        Rotation playerRotation = Managers.ROTATION.hasClientRotation() ? Managers.ROTATION.getClientRotation() : new Rotation(mc.player);
-        interactItem(hand, playerRotation.getYaw(), playerRotation.getPitch(), swing);
-    }
-
-    public void interactItem(Hand hand, float yaw, float pitch, boolean swing)
-    {
-        sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(hand, id, yaw, pitch));
-        if (swing)
+        ActionResult actionResult = itemInteraction.applyInteraction();
+        boolean success = actionResult != null && actionResult.isAccepted();
+        if (success)
         {
-            sendPacket(new HandSwingC2SPacket(hand));
+            sendPacket(new HandSwingC2SPacket(itemInteraction.getHand()));
         }
     }
 

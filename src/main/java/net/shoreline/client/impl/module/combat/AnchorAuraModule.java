@@ -18,12 +18,12 @@ import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.interact.Interaction;
+import net.shoreline.client.impl.interact.PlaceInteraction;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.anchor.AnchorManager;
 import net.shoreline.client.impl.module.combat.anchor.AnchorData;
 import net.shoreline.client.impl.module.combat.anchor.AnchorScanner;
 import net.shoreline.client.impl.module.impl.PlacerModule;
-import net.shoreline.client.impl.rotation.ClientRotationEvent;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -197,28 +197,27 @@ public class AnchorAuraModule extends PlacerModule
             return new boolean[]{false, false};
         }
 
-        Interaction interaction = Interaction.builder()
+        PlaceInteraction placeInteraction = new PlaceInteraction.Builder()
                 .pos(data.getPos())
                 .direction(InteractDirection.getInteractDirection(data.getPos(), isStrictDirection()))
                 .hand(Hand.MAIN_HAND)
                 .block(Blocks.RESPAWN_ANCHOR)
-                .packetPlace(false)
                 .build();
 
-        if (interaction.getDirection() == null)
+        if (placeInteraction.getDirection() == null)
         {
             Managers.INTERACT.endPlacement();
             return result;
         }
 
-        Vec3d hitVec = interaction.getPos().toCenterPos().add(interaction.getHitVec());
+        Vec3d hitVec = placeInteraction.getInteractVec();
         if (interactConfig.getInteractRotate().getValue())
         {
             float[] rots = RotationUtil.getRotationsTo(mc.player.getEyePos(), hitVec);
             Managers.ROTATION.setSilentRotation(new Rotation(rots[0], rots[1]));
         }
 
-        BlockHitResult bhr = new BlockHitResult(interaction.getPos().toCenterPos().add(interaction.getHitVec()), interaction.getDirection(), interaction.getPos(), false);
+        BlockHitResult bhr = new BlockHitResult(placeInteraction.getInteractVec(), placeInteraction.getDirection(), placeInteraction.getPos(), false);
         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, bhr);
         Managers.INTERACT.endPlacement();
         result[0] = true;

@@ -33,16 +33,17 @@ public class RotationsModule extends Concurrent
             .setDescription("Fixes the movement while in the air")
             .setVisible(() -> moveFixConfig.getValue() != MoveFix.OFF)
             .setDefaultValue(false).build();
-    Config<Boolean> itemFixConfig = new BooleanConfig.Builder("ItemUseFix")
-            .setDescription("Fixes rotations when using items")
-            .setDefaultValue(false).build();
     Config<Boolean> normalizeMovement = new BooleanConfig.Builder("Normalize")
             .setDescription("Normalizes the movement vector")
             .setVisible(() -> moveFixConfig.getValue() != MoveFix.OFF)
             .setDefaultValue(false).build();
     Config<Boolean> gcdFixConfig = new BooleanConfig.Builder("MouseSensFix")
             .setDescription("Corrects rotations based on mouse sensitivity")
+            .setVisible(() -> moveFixConfig.getValue() != MoveFix.OFF)
             .setDefaultValue(true).build();
+    Config<Boolean> itemFixConfig = new BooleanConfig.Builder("ItemUseFix")
+            .setDescription("Fixes rotations when using items")
+            .setDefaultValue(false).build();
     Config<Boolean> tickSyncConfig = new BooleanConfig.Builder("TickSync")
             .setDescription("Sends rotation packets every tick")
             .setDefaultValue(false).build();

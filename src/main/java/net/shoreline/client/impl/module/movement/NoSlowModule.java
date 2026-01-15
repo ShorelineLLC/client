@@ -9,6 +9,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
@@ -82,10 +83,10 @@ public class NoSlowModule extends Toggleable
         {
             if (mc.player.getActiveHand() == Hand.OFF_HAND && !canUseItem(mc.player.getMainHandStack()))
             {
-                Managers.INTERACT.interactItem(Hand.MAIN_HAND, false);
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
             } else if (!canUseItem(mc.player.getOffHandStack()))
             {
-                Managers.INTERACT.interactItem(Hand.OFF_HAND, false);
+                sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
             }
         }
     }

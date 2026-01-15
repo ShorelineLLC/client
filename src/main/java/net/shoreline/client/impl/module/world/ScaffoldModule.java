@@ -88,7 +88,7 @@ public class ScaffoldModule extends PlacerModule
 
         for (BlockPos blockPos : placements)
         {
-            placeBlock(blockPos, currentScaffoldBlock, false, false);
+            placeBlock(blockPos, currentScaffoldBlock, true, false);
             lastPlacement = blockPos;
         }
 

@@ -13,6 +13,7 @@ import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.interact.ItemInteraction;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.util.item.ArmorUtil;
 
@@ -54,7 +55,7 @@ public class ChestSwapModule extends Toggleable
                     int fireworkSlot = InventoryUtil.getItemSlot(Items.FIREWORK_ROCKET);
                     if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot))
                     {
-                        Managers.INTERACT.interactItem(Hand.MAIN_HAND, true);
+                        Managers.INTERACT.interactItem(new ItemInteraction(Items.FIREWORK_ROCKET, Hand.MAIN_HAND, true));
                         Managers.INVENTORY.endSwap();
                     }
                 }

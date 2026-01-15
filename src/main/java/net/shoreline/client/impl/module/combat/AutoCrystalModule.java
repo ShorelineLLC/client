@@ -28,11 +28,10 @@ import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.EntitySpawnEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.interact.Interaction;
+import net.shoreline.client.impl.interact.PlaceInteraction;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.inventory.SilentSwapType;
 import net.shoreline.client.impl.inventory.SwapHandler;
@@ -41,9 +40,7 @@ import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.combat.crystal.CrystalOptimizer;
-import net.shoreline.client.impl.module.combat.trap.TrapLayer;
 import net.shoreline.client.impl.module.combat.trap.TrapModule;
-import net.shoreline.client.impl.module.combat.trap.TrapSpec;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
 import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
@@ -225,7 +222,7 @@ public class AutoCrystalModule extends TrapModule
 
     private final ConcurrentMap<Integer, Long> attackPackets = new ConcurrentHashMap<>();
 
-    private final ConcurrentMap<Interaction, Long> placePackets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<PlaceInteraction, Long> placePackets = new ConcurrentHashMap<>();
     private final AtomicInteger crystalsPlaced = new AtomicInteger();
 
     private boolean silentRotated;
@@ -655,7 +652,7 @@ public class AutoCrystalModule extends TrapModule
             }
         }
 
-        Interaction placeInteraction = Interaction.builder()
+        PlaceInteraction placeInteraction = PlaceInteraction.builder()
                 .pos(blockPos)
                 .direction(placeDir)
                 .build();

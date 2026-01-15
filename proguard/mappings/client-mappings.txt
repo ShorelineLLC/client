@@ -2289,11 +2289,11 @@ net.shoreline.client.impl.interact.InteractManager -> net.shoreline.client.fQ:
     73:75:void onTickPost(net.shoreline.client.impl.event.TickEvent$Post) -> a
     80:99:void onPacketInbound(net.shoreline.client.impl.event.network.PacketEvent$Inbound) -> a
     104:121:void onBlockCollide(net.shoreline.client.impl.event.world.BlockCollisionEvent) -> a
-    125:153:boolean placeBlock(net.shoreline.client.impl.interact.Interaction) -> a
+    125:153:boolean placeBlock(net.shoreline.client.impl.interact.PlaceInteraction) -> a
     158:167:boolean check(net.minecraft.class_2338) -> d
     172:172:boolean canPlaceBlock(net.minecraft.class_2338,net.minecraft.class_2248) -> a
     177:217:boolean isEntityBlocking(net.minecraft.class_2338,net.minecraft.class_2248,boolean) -> a
-    222:292:boolean placeBlockInternal(net.shoreline.client.impl.interact.Interaction) -> b
+    222:292:boolean placeBlockInternal(net.shoreline.client.impl.interact.PlaceInteraction) -> b
     297:312:boolean startPlacement(int) -> A
     317:324:void endPlacement() -> fD
     328:330:void interactItem(net.minecraft.class_1268,boolean) -> a
@@ -2315,7 +2315,7 @@ net.shoreline.client.impl.interact.InteractStatus -> net.shoreline.client.fS:
     3:3:void <init>(java.lang.String,int) -> <init>
     3:3:net.shoreline.client.impl.interact.InteractStatus[] $values() -> fE
     3:7:void <clinit>() -> <clinit>
-net.shoreline.client.impl.interact.Interaction -> net.shoreline.client.fT:
+net.shoreline.client.impl.interact.PlaceInteraction -> net.shoreline.client.fT:
     net.minecraft.class_2248 block -> hT
     net.minecraft.class_2338 pos -> hU
     net.minecraft.class_1268 hand -> hV
@@ -2328,7 +2328,7 @@ net.shoreline.client.impl.interact.Interaction -> net.shoreline.client.fT:
     16:16:boolean $default$packetPlace() -> fG
     16:16:net.shoreline.client.impl.interact.InteractStatus $default$status() -> fH
     16:16:void <init>(net.minecraft.class_2248,net.minecraft.class_2338,net.minecraft.class_1268,boolean,net.minecraft.class_2350,net.shoreline.client.impl.interact.InteractStatus) -> <init>
-    16:16:net.shoreline.client.impl.interact.Interaction$InteractionBuilder builder() -> fI
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder builder() -> fI
     19:19:net.minecraft.class_2248 getBlock() -> dx
     20:20:net.minecraft.class_2338 getPos() -> eg
     21:21:net.minecraft.class_1268 getHand() -> et
@@ -2337,7 +2337,7 @@ net.shoreline.client.impl.interact.Interaction -> net.shoreline.client.fT:
     29:29:net.shoreline.client.impl.interact.InteractStatus getStatus() -> fK
     15:15:void setDirection(net.minecraft.class_2350) -> a
     15:15:void setStatus(net.shoreline.client.impl.interact.InteractStatus) -> a
-net.shoreline.client.impl.interact.Interaction$InteractionBuilder -> net.shoreline.client.fU:
+net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder -> net.shoreline.client.fU:
     net.minecraft.class_2248 block -> fs
     net.minecraft.class_2338 pos -> gv
     net.minecraft.class_1268 hand -> gN
@@ -2347,13 +2347,13 @@ net.shoreline.client.impl.interact.Interaction$InteractionBuilder -> net.shoreli
     boolean status$set -> ia
     net.shoreline.client.impl.interact.InteractStatus status$value -> ib
     16:16:void <init>() -> <init>
-    16:16:net.shoreline.client.impl.interact.Interaction$InteractionBuilder block(net.minecraft.class_2248) -> b
-    16:16:net.shoreline.client.impl.interact.Interaction$InteractionBuilder pos(net.minecraft.class_2338) -> e
-    16:16:net.shoreline.client.impl.interact.Interaction$InteractionBuilder hand(net.minecraft.class_1268) -> a
-    16:16:net.shoreline.client.impl.interact.Interaction$InteractionBuilder packetPlace(boolean) -> y
-    16:16:net.shoreline.client.impl.interact.Interaction$InteractionBuilder direction(net.minecraft.class_2350) -> b
-    16:16:net.shoreline.client.impl.interact.Interaction$InteractionBuilder status(net.shoreline.client.impl.interact.InteractStatus) -> b
-    16:16:net.shoreline.client.impl.interact.Interaction build() -> fL
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder block(net.minecraft.class_2248) -> b
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder pos(net.minecraft.class_2338) -> e
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder hand(net.minecraft.class_1268) -> a
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder packetPlace(boolean) -> y
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder direction(net.minecraft.class_2350) -> b
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction$InteractionBuilder status(net.shoreline.client.impl.interact.InteractStatus) -> b
+    16:16:net.shoreline.client.impl.interact.PlaceInteraction build() -> fL
     16:16:java.lang.String toString() -> toString
 net.shoreline.client.impl.inventory.HotbarCache -> net.shoreline.client.fV:
     net.minecraft.class_1799[] hotbarItems -> ic
@@ -3034,7 +3034,7 @@ net.shoreline.client.impl.module.combat.AutoCrystalModule -> net.shoreline.clien
     907:908:java.lang.Boolean lambda$getAntiWeaknessSlot$10(net.minecraft.class_1799) -> h
     665:665:net.minecraft.class_2596 lambda$placeCrystal$9(net.minecraft.class_1268,net.minecraft.class_3965,int) -> b
     624:624:boolean lambda$placeCrystal$8(net.minecraft.class_243,net.minecraft.class_1297) -> a
-    356:356:boolean lambda$onEntitySpawn$7(net.minecraft.class_2338,net.shoreline.client.impl.interact.Interaction) -> a
+    356:356:boolean lambda$onEntitySpawn$7(net.minecraft.class_2338,net.shoreline.client.impl.interact.PlaceInteraction) -> a
     207:207:java.lang.Boolean lambda$new$6() -> jf
     202:202:java.lang.Boolean lambda$new$5() -> jg
     197:197:java.lang.Boolean lambda$new$4() -> jh

@@ -1,46 +1,35 @@
 package net.shoreline.client.impl.interact;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.network.NetworkHandler;
 
 @Getter
 @Setter
-@Builder
-public class Interaction
+public abstract class Interaction<T> extends NetworkHandler
 {
-    private final Block block;
-    private final BlockPos pos;
-    private final Hand hand;
+    protected T interact;
+    protected Hand hand;
+    protected boolean clientInteract;
 
-    @Builder.Default
-    private final boolean packetPlace = true;
+    protected InteractStatus status = InteractStatus.UNCONFIRMED;
 
-    private Direction direction;
-
-    @Builder.Default
-    private InteractStatus status = InteractStatus.UNCONFIRMED;
-
-    public BlockState getState()
+    public Interaction(String name, T interact, Hand hand, boolean clientInteract)
     {
-        return MinecraftClient.getInstance().world.getBlockState(pos);
+        super(name);
+        this.interact = interact;
+        this.hand = hand;
+        this.clientInteract = clientInteract;
     }
 
-    public Vec3d getHitVec()
+    public Interaction(String name, Hand hand, boolean clientInteract)
     {
-        return new Vec3d(direction.getUnitVector()).multiply(0.5);
+        super(name);
+        this.hand = hand;
+        this.clientInteract = clientInteract;
     }
 
-    @Override
-    public boolean equals(Object o)
-    {
-        return o instanceof Interaction i && i.getPos().equals(pos);
-    }
+    public abstract ActionResult applyInteraction();
 }

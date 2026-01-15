@@ -12,7 +12,7 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
-import net.shoreline.client.impl.interact.Interaction;
+import net.shoreline.client.impl.interact.PlaceInteraction;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.client.InteractionsModule;
 import net.shoreline.client.impl.render.animation.Animation;
@@ -50,20 +50,20 @@ public class PlacerModule extends CombatModule
 
     protected boolean placeBlock(BlockPos placePos, Block block)
     {
-        return placeBlock(placePos, block, interactConfig.getNoGlitchBlocks().getValue(), interactConfig.getStrictDirection().getValue());
+        return placeBlock(placePos, block, !interactConfig.getNoGlitchBlocks().getValue(), interactConfig.getStrictDirection().getValue());
     }
 
-    protected boolean placeBlock(BlockPos placePos, Block block, boolean packetPlace, boolean strictDir)
+    protected boolean placeBlock(BlockPos placePos, Block block, boolean clientInteract, boolean strictDir)
     {
-        final Interaction interaction = Interaction.builder()
+        final PlaceInteraction placeInteraction = PlaceInteraction.builder()
                 .pos(placePos)
                 .direction(InteractDirection.getInteractDirection(placePos, strictDir))
                 .hand(Hand.MAIN_HAND)
                 .block(block)
-                .packetPlace(packetPlace)
+                .clientInteract(clientInteract)
                 .build();
 
-        boolean result = Managers.INTERACT.placeBlock(interaction);
+        boolean result = Managers.INTERACT.placeBlock(placeInteraction);
         if (result)
         {
             fadeOutAnimations.put(placePos, new Animation(true, 500));
