@@ -65,9 +65,8 @@ public class Frame extends DrawableComponent implements Interactable
         }
 
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
-        float scale = ClickGuiModule.INSTANCE.getScale();
 
-        float frameHeight = getComponentHeight() + scale;
+        float frameHeight = getComponentHeight() + ClickGuiModule.INSTANCE.getScale();
         drawOutline(context, x, y, width, titleHeight + (int) (frameHeight * collapseAnim.getFactor()), 0.5f, theme.getOutlineColor());
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
@@ -170,15 +169,15 @@ public class Frame extends DrawableComponent implements Interactable
 
     public float getComponentHeight()
     {
-        float scale = ClickGuiModule.INSTANCE.getScale();
-        float frameHeight = scale * 2.0f;
+        float frameHeight = 2;
         for (FrameComponent component : components)
         {
-            float height = component.getHeight() + scale;
+            float height = component.getHeight() + 1;
             if (component instanceof ModuleComponent c1)
             {
                 height += c1.getScaledHeight();
             }
+
             frameHeight += height;
         }
 

@@ -236,13 +236,13 @@ public class ModuleComponent extends FrameComponent
 
     public float getComponentHeight()
     {
-        float scale = ClickGuiModule.INSTANCE.getScale();
-        float frameHeight = 2.0f * scale;
+        float scaling = ClickGuiModule.INSTANCE.getScale();
+        float frameHeight = scaling * 2;
         for (ConfigComponent<?> component : components)
         {
             if (component.getDrawAnim().getFactor() > 0.01)
             {
-                float totalHeight = component.getHeight() + (float) Math.floor(scale);
+                float totalHeight = component.getHeight() + (float) Math.floor(scaling);
                 if (component instanceof ExpandableComponent<?> c)
                 {
                     totalHeight += c.getComponentHeight();

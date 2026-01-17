@@ -356,11 +356,10 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
 
     public float getComponentHeight()
     {
-        float scale = ClickGuiModule.INSTANCE.getScale();
-        float pickerHeight = pickerLength + (20.0f * scale);
+        float pickerHeight = pickerLength + 20.0f;
         if (colorConfig.isTransparency())
         {
-            pickerHeight += 14.0f * scale;
+            pickerHeight += 14.0f;
         }
 
         return (float) (pickerHeight * collapseAnim.getFactor());

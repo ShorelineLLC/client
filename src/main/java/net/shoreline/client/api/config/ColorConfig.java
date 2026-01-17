@@ -9,6 +9,7 @@ import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.HexFormat;
 
 @Getter
 @Setter
@@ -26,15 +27,8 @@ public class ColorConfig extends Config<Color>
     public JsonObject toJson()
     {
         JsonObject jsonObject = super.toJson();
-        if (global)
-        {
-            jsonObject.addProperty("value", "global");
-        }
-        else
-        {
-            jsonObject.addProperty("value", Integer.toHexString(getRGB()));
-        }
-
+        String value = Integer.toHexString(getRGB()) + "-" + global;
+        jsonObject.addProperty("value", value);
         return jsonObject;
     }
 

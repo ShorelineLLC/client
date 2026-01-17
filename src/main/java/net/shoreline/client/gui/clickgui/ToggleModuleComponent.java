@@ -120,7 +120,7 @@ public class ToggleModuleComponent extends ModuleComponent
             }
 
             int color = ColorUtil.brighten(theme.getComponentColor(), 70, (float) toggleComponent.getHoverAnim().getFactor());
-            drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight(), 1.0f, (float) (configY * collapseAnim.getFactor()), color);
+            drawRect(context, getTx() + getWidth() - 1.0f, getTy() + getHeight() + 0.1f, 1.0f, (float) (configY * collapseAnim.getFactor()), color);
             disableScissor(context);
         }
     }

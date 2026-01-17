@@ -1,7 +1,6 @@
 package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.item.Items;
-import net.minecraft.item.SplashPotionItem;
 import net.minecraft.util.Hand;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.module.Toggleable;

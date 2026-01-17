@@ -29,6 +29,9 @@ public class BetterTabModule extends Toggleable
     Config<Integer> playerColumns = new NumberConfig.Builder<Integer>("Columns")
             .setMin(20).setMax(100).setDefaultValue(20)
             .setDescription("The number of columns to show in tab list").build();
+    Config<Float> scale = new NumberConfig.Builder<Float>("Scale")
+            .setMin(0.1f).setMax(2.0f).setDefaultValue(1.0f)
+            .setDescription("The scale of the tab").build();
 
     @Getter
     private final Animation tabListAnim = new Animation(200L);
@@ -45,7 +48,12 @@ public class BetterTabModule extends Toggleable
         if (animateConfig.getValue())
         {
             float animFactor = (float) Easing.CIRC_OUT.ease(tabListAnim.getFactor());
-            event.getContext().getMatrices().translate(0, -event.getY2() + (event.getY2() * animFactor), 0);
+            float width = (event.getX1() + event.getX2()) / 2f;
+            var matrices = event.getContext().getMatrices();
+
+            matrices.translate(width, -event.getY2() + (event.getY2() * animFactor), 0);
+            matrices.scale(scale.getValue(), scale.getValue(), 1.0f);
+            matrices.translate(-width, -0, 0);
         }
     }
 

@@ -96,14 +96,35 @@ public class ConfigContainerFile extends JsonConfigFile
             }
             else if (config.getValue() instanceof Color)
             {
+                ColorConfig colorConfig = (ColorConfig) config;
                 String str = value.getAsString();
-                if (str.equalsIgnoreCase("global"))
+                if (str.contains("-")) // remove this when u have updated ur configs linus
                 {
-                    ((ColorConfig) config).setGlobal(true);
+                    String[] split = str.split("-");
+                    if (split[0] != null)
+                    {
+                        Color color = new Color((int) Long.parseLong(split[0], 16), true);
+                        colorConfig.setValue(color);
+                    }
+
+                    if (split[1] != null)
+                    {
+                        boolean global = Boolean.parseBoolean(split[1]);
+                        colorConfig.setGlobal(global);
+                    }
                 }
                 else
                 {
-                    ((Config<Color>) config).setValue(new Color((int) Long.parseLong(str, 16), true));
+                    // and this
+                    if (str.equalsIgnoreCase("global"))
+                    {
+                        colorConfig.setGlobal(true);
+                    }
+                    else
+                    {
+                        Color color = new Color((int) Long.parseLong(str, 16), true);
+                        colorConfig.setValue(color);
+                    }
                 }
             } else if (config.getValue() instanceof Collection<?>)
             {
