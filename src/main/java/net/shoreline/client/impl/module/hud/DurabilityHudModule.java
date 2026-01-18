@@ -29,26 +29,19 @@ public class DurabilityHudModule extends DynamicHudModule
         {
             super(mod, () ->
             {
-                String duraText = ClientFormatting.THEME + "Durability";
                 if (mc.player.getMainHandStack().isDamageable())
                 {
-                    int n = mc.player.getMainHandStack().getMaxDamage();
-                    int n2 = mc.player.getMainHandStack().getDamage();
-                    return duraText + " " + Formatting.RESET + (n - n2);
+                    int maxDmg = mc.player.getMainHandStack().getMaxDamage();
+                    int dmg = mc.player.getMainHandStack().getDamage();
+                    int color = ColorUtil.hslToColor((float) (maxDmg - dmg) / (float) maxDmg * 120.0f,
+                                100.0f,
+                                50.0f,
+                                1.0f).getRGB();
+                    return "Durability " + ClientFormatting.HEX + Integer.toHexString(color) + (maxDmg - dmg);
                 }
 
-                return duraText;
-
+                return "Durability";
             }, drawing);
-        }
-
-        @Override
-        public void drawText(DrawContext context, String string, float x, float y)
-        {
-            int n = mc.player.getMainHandStack().getMaxDamage();
-            int n2 = mc.player.getMainHandStack().getDamage();
-            Color color = ColorUtil.hslToColor((float) (n - n2) / (float) n * 120.0f, 100.0f, 50.0f, 1.0f);
-            getModule().drawTextTransparency(context.getMatrices(), string, x, y, color.getRGB(), (float) yAnimation.getFactor());
         }
     }
 }

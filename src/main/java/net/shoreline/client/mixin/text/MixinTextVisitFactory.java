@@ -1,9 +1,11 @@
 package net.shoreline.client.mixin.text;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.text.Style;
 import net.minecraft.text.TextVisitFactory;
 import net.minecraft.util.Formatting;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.impl.event.text.TextVisitedEvent;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
@@ -45,7 +47,7 @@ public class MixinTextVisitFactory
     )
     private static Formatting hookVisitFormatted$2(char code)
     {
-        return code == 'g' || code == 'h' ? Formatting.WHITE : Formatting.byCode(code);
+        return code == 'j' || code == 'g' || code == 'h' ? Formatting.WHITE : Formatting.byCode(code);
     }
 
     @Redirect(
@@ -57,7 +59,9 @@ public class MixinTextVisitFactory
     )
     private static Style hookVisitFormatted(Style instance,
                                             Formatting formatting,
-                                            @Local(name = "d") char d)
+                                            @Local(name = "d") char d,
+                                            @Local(name = "j") LocalIntRef iRef,
+                                            @Local(argsOnly = true) String text)
     {
         if (d == 'g')
         {
@@ -65,6 +69,21 @@ public class MixinTextVisitFactory
         } else if (d == 'h')
         {
             return instance.withColor(SocialsModule.INSTANCE.getFriendsColor().getRGB());
+        }
+        else if (d == 'j')
+        {
+            int start  = iRef.get() + 2;
+            int end    = Math.min(start + 8, text.length());
+            String hex = text.substring(start, end);
+            try
+            {
+                int argb = (int) Long.parseLong(hex, 16);
+                iRef.set(end - 2);
+                return instance.withColor(argb);
+            }
+            catch (NumberFormatException ignored)
+            {
+            }
         }
 
         return instance.withExclusiveFormatting(formatting);

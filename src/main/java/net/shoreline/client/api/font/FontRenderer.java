@@ -15,11 +15,14 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.shoreline.client.ShorelineMod;
 import net.shoreline.client.impl.imixin.IDrawContext;
+import net.shoreline.client.impl.inventory.SwapData;
 import net.shoreline.client.impl.module.client.FontModule;
 import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.misc.NameProtectModule;
 import net.shoreline.client.impl.render.ColorUtil;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.joml.Matrix4f;
 
 import java.awt.*;
@@ -39,8 +42,6 @@ public final class FontRenderer implements Closeable
 
     private int scale;
     private int lastScale;
-
-    private static final Pattern PATTERN_CONTROL_CODE = Pattern.compile("(?i)\\u00A7[0-9A-FK-OG]");
 
     private final ObjectList<GlyphCache> caches = new ObjectArrayList<>();
     private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
@@ -70,9 +71,31 @@ public final class FontRenderer implements Closeable
         createFont(font, size);
     }
 
-    public static String stripControlCodes(String text)
+    public static String stripControlCodes(String text) // TODO: do this with pattern again.
     {
-        return PATTERN_CONTROL_CODE.matcher(text).replaceAll("");
+        StringBuilder out = new StringBuilder(text.length());
+        for (int i = 0; i < text.length(); i++)
+        {
+            char c = text.charAt(i);
+            if (c == '\u00A7' && i + 1 < text.length() && text.charAt(i + 1) == 'j')
+            {
+                i += 1;
+                int remaining = text.length() - (i + 1);
+                int skip = Math.min(8, remaining);
+                i += skip;
+                continue;
+            }
+
+            if (c == '\u00A7' && i + 1 < text.length())
+            {
+                i++;
+                continue;
+            }
+
+            out.append(c);
+        }
+
+        return out.toString();
     }
 
     private void createFont(Font font, float size)
@@ -160,8 +183,10 @@ public final class FontRenderer implements Closeable
         glyphs.clear();
         synchronized (cache)
         {
-            for (char c : chars)
+            Mutable<Integer> index = new MutableObject<>(0);
+            for (; index.getValue() < chars.length; index.setValue(index.getValue() + 1))
             {
+                char c = chars[index.getValue()];
                 if (formatting)
                 {
                     formatting = false;
@@ -172,7 +197,7 @@ public final class FontRenderer implements Closeable
                         b2 = b;
                     } else
                     {
-                        int colorCode = getColorFromCode(c);
+                        int colorCode = getColorFromCode(text, index, c);
                         int[] col = ColorUtil.getRGBColorValues(colorCode);
                         r2 = col[0] / 255.0f * brightnessMultiplier;
                         g2 = col[1] / 255.0f * brightnessMultiplier;
@@ -377,7 +402,7 @@ public final class FontRenderer implements Closeable
         return hexString.toString();
     }
 
-    private int getColorFromCode(char code)
+    private int getColorFromCode(String str, Mutable<Integer> index, char code)
     {
         return switch (code)
         {
@@ -399,6 +424,23 @@ public final class FontRenderer implements Closeable
             case 'f' -> 0xffffffff;
             case 'g' -> ThemeModule.INSTANCE.getPrimaryColor().getRGB();
             case 'h' -> SocialsModule.INSTANCE.getFriendsColor().getRGB();
+            case 'j' ->
+            {
+                int start  = index.getValue() + 2;
+                int end    = Math.min(start + 8, str.length());
+                String hex = str.substring(start, end);
+                try
+                {
+                    index.setValue(end - 2);
+                    yield (int) Long.parseLong(hex, 16);
+                }
+                catch (NumberFormatException ignored)
+                {
+                }
+
+                yield 0xFFFFFFFF;
+            }
+
             default -> -1;
         };
     }
