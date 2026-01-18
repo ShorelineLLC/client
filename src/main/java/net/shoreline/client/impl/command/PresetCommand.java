@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.api.preset.AbstractPreset;
@@ -30,7 +31,7 @@ public class PresetCommand extends Command
                 .then(buildArgument("name", StringArgumentType.string())
                            .executes(context ->
                            {
-                               String preset = StringArgumentType.getString(context, "modules/renders");
+                               String preset = StringArgumentType.getString(context, "modules/renders/combat");
                                String action = StringArgumentType.getString(context, "save/load");
                                String name   = StringArgumentType.getString(context, "name");
 

@@ -54,7 +54,7 @@ public class GroupComponent extends ExpandableComponent<Void>
 
         enableScissor(context, getTx(), getTy() + height, getTx() + width, getTy() + height + getComponentHeight());
 
-        float configY = height + (3.0f);
+        float configY = height + (2.0f);
         if (collapseAnim.getFactor() > 0.01f)
         {
             for (ConfigComponent<?> component : components)
@@ -62,14 +62,13 @@ public class GroupComponent extends ExpandableComponent<Void>
                 component.getDrawAnim().setState(component.getConfig().isVisible());
                 if (component.getDrawAnim().getFactor() > 0.01)
                 {
-                    float totalHeight = component.getHeight();
+                    float totalHeight = component.getHeight() + (float) Math.floor(ClickGuiModule.INSTANCE.getScale());
                     if (component instanceof ExpandableComponent<?> c)
                     {
                         totalHeight += c.getComponentHeight();
                     }
 
                     totalHeight *= (float) component.getDrawAnim().getFactor();
-
                     enableScissor(context, component.getTx(), component.getTy(), component.getTx() + component.getWidth(), component.getTy() + totalHeight);
                     component.setY(getYOffset());
                     component.drawComponent(context, mouseX, mouseY, delta);
@@ -177,7 +176,7 @@ public class GroupComponent extends ExpandableComponent<Void>
     public float getComponentHeight()
     {
         float scaling = ClickGuiModule.INSTANCE.getScale();
-        float frameHeight = scaling * 4;
+        float frameHeight = scaling * 2;
         for (ConfigComponent<?> component : components)
         {
             if (component.getDrawAnim().getFactor() > 0.01)
