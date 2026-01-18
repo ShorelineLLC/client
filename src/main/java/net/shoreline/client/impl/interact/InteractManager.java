@@ -232,7 +232,7 @@ public class InteractManager extends NetworkHandler
         }
 
         Vec3d eyePos = mc.player.getEyePos();
-        boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(placeInteraction.getPos()) && !mc.player.isSneaking();
+        boolean shouldSneak = !airPlacing && BlockUtil.isInteractable(placeInteraction.getInteractPos()) && !mc.player.isSneaking();
         if (shouldSneak)
         {
             Managers.MOVEMENT.setSilentSneaking(true);
