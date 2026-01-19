@@ -31,6 +31,7 @@ public class InteractionsModule extends Concurrent
     Config<Boolean> simulation = new BooleanConfig.Builder("Simulate")
             .setDescription("Simulates a block placement to prevent movement flags")
             .setDefaultValue(false).build();
+
     Config<InteractMode> modeConfig = new EnumConfig.Builder<InteractMode>("Mode")
             .setValues(InteractMode.values())
             .setDescription("The interaction mode")
@@ -39,8 +40,8 @@ public class InteractionsModule extends Concurrent
             .setMin(1).setMax(100).setDefaultValue(2)
             .setDescription("The max interactions per interval")
             .setVisible(() -> modeConfig.getValue() != InteractMode.SYNC).build();
-    Config<Float> interactInterval = new NumberConfig.Builder<Float>("Interval")
-            .setMin(0.05f).setMax(5.0f).setDefaultValue(0.05f).setFormat("s")
+    Config<Integer> interactInterval = new NumberConfig.Builder<Integer>("Interval")
+            .setMin(50).setMax(1000).setDefaultValue(100).setFormat("ms")
             .setDescription("The interval between interactions")
             .setVisible(() -> modeConfig.getValue() == InteractMode.LIMIT).build();
     Config<Integer> interactDelay = new NumberConfig.Builder<Integer>("Delay")

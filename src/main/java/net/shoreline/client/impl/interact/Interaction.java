@@ -14,6 +14,8 @@ public abstract class Interaction<T> extends NetworkHandler
     protected Hand hand;
     protected boolean clientInteract;
 
+    private final long interactionTime;
+
     protected InteractStatus status = InteractStatus.UNCONFIRMED;
 
     public Interaction(String name, T interact, Hand hand, boolean clientInteract)
@@ -22,6 +24,7 @@ public abstract class Interaction<T> extends NetworkHandler
         this.interact = interact;
         this.hand = hand;
         this.clientInteract = clientInteract;
+        this.interactionTime = System.currentTimeMillis();
     }
 
     public Interaction(String name, Hand hand, boolean clientInteract)
@@ -29,6 +32,7 @@ public abstract class Interaction<T> extends NetworkHandler
         super(name);
         this.hand = hand;
         this.clientInteract = clientInteract;
+        this.interactionTime = System.currentTimeMillis();
     }
 
     public abstract ActionResult applyInteraction();

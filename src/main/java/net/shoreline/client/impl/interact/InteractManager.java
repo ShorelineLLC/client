@@ -36,23 +36,26 @@ import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static net.shoreline.client.impl.module.client.InteractionsModule.InteractMode;
 
 public class InteractManager extends NetworkHandler
 {
     private final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
     private final AirPlaceModule airPlace = AirPlaceModule.INSTANCE;
 
-    private final ConcurrentMap<PlaceInteraction, Long> placeInteractions = new ConcurrentHashMap<>();
+    private final ConcurrentLinkedDeque<PlaceInteraction> placeInteractions = new ConcurrentLinkedDeque<>();
     private final ConcurrentMap<Entity, Integer> placedEntityIds = new ConcurrentHashMap<>();
 
-    private final AtomicInteger blocksPlaced = new AtomicInteger();
-
     private boolean placementLock;
+
+    private long limitWindowStartMs;
+    private AtomicInteger limitWindowCount = new AtomicInteger();
 
     public InteractManager()
     {
@@ -63,8 +66,25 @@ public class InteractManager extends NetworkHandler
     @EventListener(priority = Integer.MIN_VALUE)
     public void onTickPost(TickEvent.Post event)
     {
-        blocksPlaced.set(0);
-        placeInteractions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
+        long now = System.currentTimeMillis();
+
+        if (interactConfig.getModeConfig().getValue() == InteractMode.LIMIT)
+        {
+            if (now - limitWindowStartMs >= 100L)
+            {
+                limitWindowStartMs = now;
+                limitWindowCount.set(0);
+                PlaceInteraction.GLOBAL_COUNT.set(0);
+                ItemInteraction.GLOBAL_COUNT.set(0);
+            }
+        }
+        else
+        {
+            PlaceInteraction.GLOBAL_COUNT.set(0);
+            ItemInteraction.GLOBAL_COUNT.set(0);
+        }
+
+        placeInteractions.removeIf(d -> now - d.getInteractionTime() > 1000L);
     }
 
     @EventListener
@@ -77,16 +97,17 @@ public class InteractManager extends NetworkHandler
 
         if (event.getPacket() instanceof BlockUpdateS2CPacket packet)
         {
-            for (PlaceInteraction placeInteraction : placeInteractions.keySet())
+            for (PlaceInteraction placeInteraction : placeInteractions)
             {
                 if (!placeInteraction.getInteract().equals(packet.getPos()))
                 {
                     continue;
                 }
 
-                // Confirm that we succeeded placement serverside
-                placeInteraction.setStatus(packet.getState().isOf(placeInteraction.getBlock()) ?
-                        InteractStatus.SERVER_CONFIRMED : InteractStatus.SERVER_MISMATCH);
+                placeInteraction.setStatus(
+                        packet.getState().isOf(placeInteraction.getBlock()) ?
+                                InteractStatus.SERVER_CONFIRMED :
+                                InteractStatus.SERVER_MISMATCH);
                 break;
             }
         }
@@ -100,7 +121,7 @@ public class InteractManager extends NetworkHandler
             return;
         }
 
-        for (PlaceInteraction placeInteraction : placeInteractions.keySet())
+        for (PlaceInteraction placeInteraction : placeInteractions)
         {
             if (placeInteraction.getStatus() != InteractStatus.UNCONFIRMED || !placeInteraction.getInteract().equals(event.getBlockPos()))
             {
@@ -112,6 +133,26 @@ public class InteractManager extends NetworkHandler
             event.setCollisionShape(collisionShape);
             return;
         }
+    }
+
+    private boolean tryConsumePaperLimit(int amount)
+    {
+        long now = System.currentTimeMillis();
+        if (now - limitWindowStartMs >= 100L)
+        {
+            limitWindowStartMs = now;
+            limitWindowCount.set(0);
+            PlaceInteraction.GLOBAL_COUNT.set(0);
+            ItemInteraction.GLOBAL_COUNT.set(0);
+        }
+
+        if (limitWindowCount.get() + amount > 8)
+        {
+            return false;
+        }
+
+        limitWindowCount.addAndGet(amount);
+        return true;
     }
 
     public boolean placeBlock(PlaceInteraction placeInteraction)
@@ -131,7 +172,9 @@ public class InteractManager extends NetworkHandler
             }
         }
 
-        placeInteractions.values().removeIf(t -> System.currentTimeMillis() - t > 1000);
+        long now = System.currentTimeMillis();
+        placeInteractions.removeIf(d -> now - d.getInteractionTime() > 1000L);
+
         if (check(blockPos) || isEntityBlocking(blockPos, placeInteraction.getBlock(), true))
         {
             return false;
@@ -140,8 +183,8 @@ public class InteractManager extends NetworkHandler
         boolean result = placeBlockInternal(placeInteraction);
         if (result)
         {
-            placeInteractions.put(placeInteraction, System.currentTimeMillis());
-            blocksPlaced.incrementAndGet();
+            placeInteractions.add(placeInteraction);
+            PlaceInteraction.GLOBAL_COUNT.incrementAndGet();
         }
 
         return result;
@@ -149,16 +192,16 @@ public class InteractManager extends NetworkHandler
 
     public boolean check(BlockPos blockPos)
     {
-        if (blocksPlaced.get() > interactConfig.getBptConfig().getValue())
+        if (PlaceInteraction.GLOBAL_COUNT.get() > interactConfig.getBptConfig().getValue())
         {
             return true;
         }
 
-        Optional<Map.Entry<PlaceInteraction, Long>> interact = placeInteractions.entrySet().stream()
-                .filter(d -> d.getKey().getInteract().equals(blockPos))
+        Optional<PlaceInteraction> interact = placeInteractions.stream()
+                .filter(d -> d.getInteract().equals(blockPos))
                 .findFirst();
 
-        return interact.isPresent() && System.currentTimeMillis() - interact.get().getValue() < interactConfig.getInteractDelay().getValue();
+        return interact.isPresent() && System.currentTimeMillis() - interact.get().getInteractionTime() < interactConfig.getInteractDelay().getValue();
     }
 
     public boolean canPlaceBlock(BlockPos blockPos, Block block)
@@ -226,7 +269,7 @@ public class InteractManager extends NetworkHandler
             }
         }
 
-        if (direction == null)
+        if (direction == null || interactConfig.getModeConfig().getValue() == InteractMode.LIMIT && !tryConsumePaperLimit(1))
         {
             return false;
         }
@@ -249,6 +292,15 @@ public class InteractManager extends NetworkHandler
             placeInteraction.setHand(Hand.OFF_HAND);
         }
 
+        if (shouldSneak)
+        {
+            Managers.MOVEMENT.setSilentSneaking(false);
+        }
+
+        if (airPlacing && airPlace.isGrim())
+        {
+            sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, direction));
+        }
         ActionResult actionResult = placeInteraction.applyInteraction();
 
         boolean success = actionResult != null && actionResult.isAccepted();
@@ -303,7 +355,13 @@ public class InteractManager extends NetworkHandler
 
     public void interactItem(ItemInteraction itemInteraction)
     {
+        if (interactConfig.getModeConfig().getValue() == InteractMode.LIMIT && !tryConsumePaperLimit(1))
+        {
+            return;
+        }
+
         ActionResult actionResult = itemInteraction.applyInteraction();
+        ItemInteraction.GLOBAL_COUNT.incrementAndGet();
         boolean success = actionResult != null && actionResult.isAccepted();
         if (success)
         {

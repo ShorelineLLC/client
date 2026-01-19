@@ -7,8 +7,12 @@ import net.minecraft.util.Hand;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.rotation.Rotation;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class ItemInteraction extends Interaction<Item>
 {
+    public static final AtomicInteger GLOBAL_COUNT = new AtomicInteger();
+
     private final Rotation rotation;
 
     public ItemInteraction(Item interact, Hand hand, Rotation rotation, boolean clientInteract)

@@ -16,10 +16,14 @@ import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.module.world.AirPlaceModule;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Getter
 @Setter
 public class PlaceInteraction extends Interaction<BlockPos>
 {
+    public static final AtomicInteger GLOBAL_COUNT = new AtomicInteger();
+
     private final Block block;
     private final boolean airPlace;
 
