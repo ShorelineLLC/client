@@ -45,6 +45,32 @@ public enum MiningPackets
             handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
             handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
         }
+    },
+
+    GRIM_V3 {
+        @Override
+        public void sendStartPackets(NetworkHandler handler, BlockPos blockPos, Direction direction)
+        {
+            handler.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
+            handler.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, blockPos, direction));
+            handler.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
+            handler.sendPacket(new PlayerActionC2SPacket(
+                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
+
+            handler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            handler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+            handler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        }
+
+        @Override
+        public void sendStopPackets(NetworkHandler handler, BlockPos blockPos, Direction direction)
+        {
+            handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, blockPos, direction));
+            handler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, blockPos, direction));
+        }
     };
 
     public abstract void sendStartPackets(NetworkHandler handler, BlockPos blockPos, Direction direction);
