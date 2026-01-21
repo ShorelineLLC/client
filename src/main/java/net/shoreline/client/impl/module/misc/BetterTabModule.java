@@ -1,6 +1,8 @@
 package net.shoreline.client.impl.module.misc;
 
 import lombok.Getter;
+import net.minecraft.client.network.PlayerListEntry;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
@@ -16,6 +18,9 @@ import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 public class BetterTabModule extends Toggleable
@@ -34,6 +39,9 @@ public class BetterTabModule extends Toggleable
     Config<Float> scale = new NumberConfig.Builder<Float>("Scale")
             .setMin(0.1f).setMax(2.0f).setDefaultValue(1.0f)
             .setDescription("The scale of the tab").build();
+    Config<Boolean> onlySocials = new BooleanConfig.Builder("OnlySocials")
+            .setDescription("Only shows people you have added as a friend/enemy in tab")
+            .setDefaultValue(false).build();
 
     @Getter
     private final Animation tabListAnim = new Animation(200L);
@@ -45,13 +53,30 @@ public class BetterTabModule extends Toggleable
     }
 
     @EventListener
+    public void onRenderPlayerList_Collect(RenderPlayerListEvent.Collect event)
+    {
+        event.cancel();
+        Collection<PlayerListEntry> playerList = mc.player.networkHandler.getListedPlayerListEntries();
+        if (onlySocials.getValue())
+        {
+            event.setPlayers(playerList.stream()
+                     .filter(entry -> Managers.SOCIAL.getType(entry.getProfile().getName()) != null
+                             || entry.getProfile().getName().equalsIgnoreCase(mc.player.getGameProfile().getName()))
+                     .limit(playerLimit.getValue()).toList());
+            return;
+        }
+
+        event.setPlayers(playerList.stream().limit(playerLimit.getValue()).toList());
+    }
+
+    @EventListener
     public void onRenderPlayerListPre(RenderPlayerListEvent.Pre event)
     {
         if (animateConfig.getValue())
         {
             float animFactor = (float) Easing.CIRC_OUT.ease(tabListAnim.getFactor());
-            float width = (event.getX1() + event.getX2()) / 2f;
-            var matrices = event.getContext().getMatrices();
+            float width      = (event.getX1() + event.getX2()) / 2f;
+            var matrices     = event.getContext().getMatrices();
 
             matrices.translate(width, -event.getY2() + (event.getY2() * animFactor), 0);
             matrices.scale(scale.getValue(), scale.getValue(), 1.0f);

@@ -52,13 +52,12 @@ public abstract class MixinPlayerListHud
     @Inject(method = "collectPlayerEntries", at = @At(value = "HEAD"), cancellable = true)
     private void hookCollectEntries(CallbackInfoReturnable<List<PlayerListEntry>> cir)
     {
-        if (BetterTabModule.INSTANCE.isEnabled())
+        RenderPlayerListEvent.Collect event = new RenderPlayerListEvent.Collect();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
         {
             cir.cancel();
-            cir.setReturnValue(client.player.networkHandler.getListedPlayerListEntries().stream()
-                    .sorted(ENTRY_ORDERING)
-                    .limit(BetterTabModule.INSTANCE.getPlayerLimit().getValue())
-                    .toList());
+            cir.setReturnValue(event.getPlayers());
         }
     }
 

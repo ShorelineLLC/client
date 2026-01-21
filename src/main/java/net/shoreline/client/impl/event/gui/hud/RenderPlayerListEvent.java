@@ -1,12 +1,16 @@
 package net.shoreline.client.impl.event.gui.hud;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import net.shoreline.eventbus.Event;
 import net.shoreline.eventbus.annotation.Cancelable;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
@@ -43,5 +47,13 @@ public class RenderPlayerListEvent extends Event
     {
         private final Text text;
         private int color;
+    }
+
+    @Getter
+    @Setter
+    @Cancelable
+    public static class Collect extends Event
+    {
+        private List<PlayerListEntry> players;
     }
 }

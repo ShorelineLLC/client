@@ -91,9 +91,9 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
 
         drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
 
-        drawOutline(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, 0.5f, 0x33000000);
-        drawBackground(context, getTx() + getWidth() - 12, getTy() + 2, getTx() + getWidth(), getTy() + 14, 2);
-        drawRect(context, getTx() + getWidth() - 12, getTy() + 2, 12, 12, getConfig().getValue().getRGB());
+        drawOutline(context, getTx() + getWidth() - 14, getTy() + 1.5f, 12, 12, 0.5f, 0x33000000);
+        drawBackground(context, getTx() + getWidth() - 14, getTy() + 1.5f, getTx() + getWidth() - 2, getTy() + 13.5f, 2);
+        drawRect(context, getTx() + getWidth() - 14, getTy() + 1.5f, 12, 12, getConfig().getValue().getRGB());
 
         if (collapseAnim.getFactor() > 0.001)
         {

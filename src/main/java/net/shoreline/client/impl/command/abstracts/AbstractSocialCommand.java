@@ -84,6 +84,8 @@ public class AbstractSocialCommand extends Command
 
     private String format(String string)
     {
-        return string.replaceAll("<type>", type.name().toLowerCase());
+        return string
+                .replace("<type>", type.name().toLowerCase())
+                .replace("enemys", "enemies"); // this just bothered me
     }
 }
