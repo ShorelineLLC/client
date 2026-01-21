@@ -65,11 +65,11 @@ public class AbstractSocialCommand extends Command
                         Set<String> playerNames = Managers.SOCIAL.getTypes(type);
                         if (playerNames.isEmpty())
                         {
-                            sendErrorChatMessage("You have no <type>s!");
+                            sendErrorChatMessage(format("You have no <type>s!"));
                             return 0;
                         }
 
-                        sendClientChatMessage(Formatting.GRAY + "<type>s: " + Formatting.WHITE + String.join(", ", playerNames));
+                        sendClientChatMessage(format(Formatting.GRAY + "<type>s: " + Formatting.WHITE + String.join(", ", playerNames)));
                         return 1;
                     }
 
@@ -77,7 +77,7 @@ public class AbstractSocialCommand extends Command
                 }))
                 .executes(context ->
                 {
-                    sendErrorChatMessage("Invalid command usage! Usage: <type> <save/delete/list> *<player_name>");
+                    sendErrorChatMessage(format("Invalid command usage! Usage: <type> <save/delete/list> *<player_name>"));
                     return 1;
                 });
     }
