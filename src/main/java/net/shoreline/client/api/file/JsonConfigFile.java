@@ -1,8 +1,6 @@
 package net.shoreline.client.api.file;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import lombok.Getter;
 
 import java.io.IOException;

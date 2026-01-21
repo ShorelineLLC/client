@@ -168,7 +168,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity,
                 playerEntityModel.hat.visible = extraLayer;
             }
 
-            int color = ChamsModule.getInstance().color.getValue().getRGB();
+            int color = ChamsModule.getInstance().getColor(last).getRGB();
             if (ChamsModule.getInstance().mode.getValue() == ChamsModule.ChamsMode.SHINE)
             {
                 Layers.QUADS_GLINT.startDrawing();

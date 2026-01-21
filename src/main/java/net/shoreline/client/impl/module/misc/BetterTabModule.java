@@ -15,6 +15,8 @@ import net.shoreline.client.impl.render.animation.Animation;
 import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
+import java.awt.*;
+
 @Getter
 public class BetterTabModule extends Toggleable
 {
@@ -68,10 +70,11 @@ public class BetterTabModule extends Toggleable
                 event.cancel();
                 event.setColor(ThemeModule.INSTANCE.getPrimaryColor().getRGB());
                 return;
-            } else if (Managers.SOCIAL.isFriend(s))
+            }
+            else if (Managers.SOCIAL.getType(s) != null)
             {
                 event.cancel();
-                event.setColor(SocialsModule.INSTANCE.getFriendsColor().getRGB());
+                event.setColor(SocialsModule.INSTANCE.getEntityColor(s, Color.WHITE).getRGB());
                 return;
             }
         }

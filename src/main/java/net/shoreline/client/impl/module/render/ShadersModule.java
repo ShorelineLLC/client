@@ -196,9 +196,8 @@ public class ShadersModule extends RenderModule
             return;
         }
 
-        Color color = Managers.SOCIAL.isFriend(event.getEntity())
-                ? SocialsModule.INSTANCE.getFriendsColor()
-                : ThemeModule.INSTANCE.getPrimaryColor();
+        Color color = SocialsModule.INSTANCE.getEntityColor(
+                event.getEntity(), ThemeModule.INSTANCE.getPrimaryColor());
 
         event.cancel();
         event.setVertexConsumerProvider(shaderManager.createVertexConsumer(

@@ -23,6 +23,7 @@ import net.shoreline.client.impl.combat.TotemPopEvent;
 import net.shoreline.client.impl.event.render.RenderEntityWorldEvent;
 import net.shoreline.client.impl.imixin.ILimbAnimator;
 import net.shoreline.client.impl.imixin.ILivingEntity;
+import net.shoreline.client.impl.module.client.SocialsModule;
 import net.shoreline.client.impl.module.impl.RenderModule;
 import net.shoreline.client.impl.render.ChamsRenderer;
 import net.shoreline.client.impl.render.ColorUtil;
@@ -146,6 +147,11 @@ public class ChamsModule extends RenderModule
     public static ChamsModule getInstance()
     {
         return INSTANCE;
+    }
+
+    public Color getColor(Entity entity)
+    {
+        return SocialsModule.INSTANCE.getEntityColor(entity, color.getValue());
     }
 
     public float getSpeed()

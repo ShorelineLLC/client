@@ -7,6 +7,7 @@ import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.module.Concurrent;
 import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 
 import java.awt.*;
 
@@ -23,6 +24,11 @@ public class SocialsModule extends Concurrent
             .setVisible(() -> friendsConfig.getValue())
             .setDescription("The color for friends in renders")
             .build();
+    Config<Color> enemyColor = new ColorConfig.Builder("EnemiesColor")
+            .setRgb(0xffff192d)
+            .setVisible(() -> friendsConfig.getValue())
+            .setDescription("The color for enemies in renders")
+            .build();
 
     public SocialsModule()
     {
@@ -35,8 +41,27 @@ public class SocialsModule extends Concurrent
         return friendsColor.getValue();
     }
 
-    public Color getFriendColor(Entity entity, Color fallback)
+    public Color getEnemiesColor()
     {
-        return null;
+        return enemyColor.getValue();
+    }
+
+    public Color getEntityColor(Entity entity, Color fallback)
+    {
+        return getEntityColor(entity.getName().getString(), fallback);
+    }
+
+    public Color getEntityColor(String name, Color fallback)
+    {
+        if (Managers.SOCIAL.isFriend(name))
+        {
+            return friendsColor.getValue();
+        }
+        else if (Managers.SOCIAL.isEnemy(name))
+        {
+            return enemyColor.getValue();
+        }
+
+        return fallback;
     }
 }
