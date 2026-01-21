@@ -26,7 +26,6 @@ public class SocialsModule extends Concurrent
             .build();
     Config<Color> enemyColor = new ColorConfig.Builder("EnemiesColor")
             .setRgb(0xffff192d)
-            .setVisible(() -> friendsConfig.getValue())
             .setDescription("The color for enemies in renders")
             .build();
 

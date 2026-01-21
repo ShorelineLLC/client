@@ -67,7 +67,7 @@ public class Frame extends DrawableComponent implements Interactable
         Theme theme = ClickGuiScreen.INSTANCE.getTheme();
 
         float frameHeight = getComponentHeight() + ClickGuiModule.INSTANCE.getScale();
-        drawOutline(context, x, y, width, titleHeight + (int) (frameHeight * collapseAnim.getFactor()), 0.5f, theme.getOutlineColor());
+        drawOutline(context, x, y, width, titleHeight + (int) (frameHeight * collapseAnim.getFactor()), 0.6f, theme.getOutlineColor());
         drawRect(context, x, y, width, titleHeight, theme.getBackgroundColor());
         drawRect(context, x, y, width, titleHeight, theme.getTitleColor());
         drawText(context, title, x + 3.0f, y + 5.0f, theme.getTextColor());

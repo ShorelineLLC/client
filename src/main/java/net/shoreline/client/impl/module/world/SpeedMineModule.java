@@ -316,6 +316,8 @@ public class SpeedMineModule extends ListeningToggleable
                 return;
             }
 
+            return;
+
         } else if (mainMiningBlock.hasMinedFor(30))
         {
             clearMain();
