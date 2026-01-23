@@ -47,6 +47,14 @@ public class SpeedMineModule extends ListeningToggleable
             .setValues(RemineMode.values())
             .setDescription("The mode for remining mined blocks")
             .setDefaultValue(RemineMode.OFF).build();
+    Config<Integer> instantLimit = new NumberConfig.Builder<Integer>("Limit")
+            .setMin(1).setMax(20).setDefaultValue(10)
+            .setDescription("Maximum mines per interval")
+            .setVisible(() -> remineMode.getValue() == RemineMode.INSTANT).build();
+    Config<Integer> limitInterval = new NumberConfig.Builder<Integer>("Interval")
+            .setMin(25).setMax(1000).setDefaultValue(100).setFormat("ms")
+            .setDescription("The interval for the limit")
+            .setVisible(() -> remineMode.getValue() == RemineMode.INSTANT).build();
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("Range")
             .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
             .setDescription("The max range to mine").build();
@@ -88,6 +96,9 @@ public class SpeedMineModule extends ListeningToggleable
 
     private MiningData pendingClear;
 
+    private long instantStartMs;
+    private int instantCount;
+
     public SpeedMineModule()
     {
         super("SpeedMine", new String[] {"SpeedyGonzales"}, "Mine faster", GuiCategory.WORLD);
@@ -111,6 +122,8 @@ public class SpeedMineModule extends ListeningToggleable
 
         clearMain();
         pendingClear = null;
+        instantStartMs = 0L;
+        instantCount = 0;
     }
 
     @EventListener
@@ -124,6 +137,8 @@ public class SpeedMineModule extends ListeningToggleable
         clearPacket();
         clearMain();
         pendingClear = null;
+        instantStartMs = 0L;
+        instantCount = 0;
     }
 
     @EventListener
@@ -139,6 +154,8 @@ public class SpeedMineModule extends ListeningToggleable
             clearPacket();
             clearMain();
             pendingClear = null;
+            instantStartMs = 0L;
+            instantCount = 0;
         }
     }
 
@@ -270,6 +287,35 @@ public class SpeedMineModule extends ListeningToggleable
         mainMiningBlock.setStarted(true);
     }
 
+    private boolean tryConsumeInstantBudget()
+    {
+        if (remineMode.getValue() != RemineMode.INSTANT)
+        {
+            return true;
+        }
+
+        long now = System.currentTimeMillis();
+        int windowMs = limitInterval.getValue();
+        if (windowMs <= 0)
+        {
+            windowMs = 100;
+        }
+
+        if (instantStartMs == 0L || now - instantStartMs >= (long) windowMs)
+        {
+            instantStartMs = now;
+            instantCount = 0;
+        }
+
+        int limit = instantLimit.getValue();
+        if (limit < 1)
+        {
+            limit = 1;
+        }
+
+        return instantCount < limit;
+    }
+
     private void tickMain()
     {
         if (mainMiningBlock == null)
@@ -316,7 +362,10 @@ public class SpeedMineModule extends ListeningToggleable
                 return;
             }
 
-            return;
+            if (!tryConsumeInstantBudget())
+            {
+                return;
+            }
 
         } else if (mainMiningBlock.hasMinedFor(30))
         {
@@ -335,6 +384,7 @@ public class SpeedMineModule extends ListeningToggleable
             return;
         }
 
+        instantCount++;
         miningPackets.getValue().sendStopPackets(this,
                 mainMiningBlock.getBlockPos(),
                 mainMiningBlock.getDirection());

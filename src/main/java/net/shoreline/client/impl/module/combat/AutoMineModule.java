@@ -39,8 +39,7 @@ public class AutoMineModule extends TrapModule
             .setDescription("The delay between mines").build();
     Config<Boolean> fallBackConfig = new BooleanConfig.Builder("Fallback")
             .setDescription("Fallbacks to positions mined by friends")
-            .setDefaultValue(true)
-            .build();
+            .setDefaultValue(true).build();
     Config<Boolean> friendSyncConfig = new ToggleableConfigGroup.Builder("FriendSync")
             .add(fallBackConfig)
             .setDescription("Attempts to avoid positions where players you have added as a friend is mining.")

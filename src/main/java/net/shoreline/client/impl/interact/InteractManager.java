@@ -42,8 +42,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static net.shoreline.client.impl.module.client.InteractionsModule.InteractMode;
-
 public class InteractManager extends NetworkHandler
 {
     private final InteractionsModule interactConfig = InteractionsModule.INSTANCE;
@@ -68,7 +66,7 @@ public class InteractManager extends NetworkHandler
     {
         long now = System.currentTimeMillis();
 
-        if (interactConfig.getModeConfig().getValue() == InteractMode.LIMIT)
+        if (interactConfig.getIntervalMode().getValue())
         {
             if (now - limitWindowStartMs >= 100L)
             {
@@ -269,7 +267,7 @@ public class InteractManager extends NetworkHandler
             }
         }
 
-        if (direction == null || interactConfig.getModeConfig().getValue() == InteractMode.LIMIT && !tryConsumePaperLimit(1))
+        if (direction == null || interactConfig.getIntervalMode().getValue() && !tryConsumePaperLimit(1))
         {
             return false;
         }
@@ -355,7 +353,7 @@ public class InteractManager extends NetworkHandler
 
     public void interactItem(ItemInteraction itemInteraction)
     {
-        if (interactConfig.getModeConfig().getValue() == InteractMode.LIMIT && !tryConsumePaperLimit(1))
+        if (interactConfig.getIntervalMode().getValue() && !tryConsumePaperLimit(1))
         {
             return;
         }

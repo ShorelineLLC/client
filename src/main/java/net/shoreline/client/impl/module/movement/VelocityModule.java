@@ -237,6 +237,7 @@ public class VelocityModule extends Toggleable
     {
         NORMAL,
         WALLS,
-        GRIM_V2
+        GRIM_V2,
+        JUMP
     }
 }

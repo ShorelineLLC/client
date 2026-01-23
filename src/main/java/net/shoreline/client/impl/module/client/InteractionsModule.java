@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.client;
 import lombok.Getter;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.EnumConfig;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.Concurrent;
 import net.shoreline.client.api.module.GuiCategory;
@@ -32,18 +31,17 @@ public class InteractionsModule extends Concurrent
             .setDescription("Simulates a block placement to prevent movement flags")
             .setDefaultValue(false).build();
 
-    Config<InteractMode> modeConfig = new EnumConfig.Builder<InteractMode>("Mode")
-            .setValues(InteractMode.values())
-            .setDescription("The interaction mode")
-            .setDefaultValue(InteractMode.SHIFT).build();
-    Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("BlocksPer")
+
+    Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("InteractsPer")
             .setMin(1).setMax(100).setDefaultValue(2)
-            .setDescription("The max interactions per interval")
-            .setVisible(() -> modeConfig.getValue() != InteractMode.SYNC).build();
+            .setDescription("The max interactions per interval").build();
+    Config<Boolean> intervalMode = new BooleanConfig.Builder("UseThreshold")
+            .setDescription("Limits the placements by interval instead of tick")
+            .setDefaultValue(false).build();
     Config<Integer> interactInterval = new NumberConfig.Builder<Integer>("Interval")
             .setMin(50).setMax(1000).setDefaultValue(100).setFormat("ms")
             .setDescription("The interval between interactions")
-            .setVisible(() -> modeConfig.getValue() == InteractMode.LIMIT).build();
+            .setVisible(() -> intervalMode.getValue()).build();
     Config<Integer> interactDelay = new NumberConfig.Builder<Integer>("Delay")
             .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
             .setDescription("The delay between interactions").build();
@@ -55,12 +53,5 @@ public class InteractionsModule extends Concurrent
     {
         super("Interactions", "Manages world interactions", GuiCategory.CLIENT);
         INSTANCE = this;
-    }
-
-    public enum InteractMode
-    {
-        LIMIT,
-        SHIFT,
-        SYNC
     }
 }
