@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class NumberConfig<T extends Number> extends Config<T>

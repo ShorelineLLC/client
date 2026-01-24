@@ -8,6 +8,8 @@ import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.api.command.Command;
+import net.shoreline.client.api.module.Module;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.gui.screen.ChatScreenEvent;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;
@@ -44,11 +46,17 @@ public class CommandManager extends GenericFeature
                 new HelpCommand(),
                 new HistoryCommand(),
                 new KitCommand(),
+                new MacroCommand(),
                 new NotifyCommand(),
                 new PrefixCommand(),
                 new PresetCommand(),
                 new ToggleCommand()
         );
+
+        for (Module module : Managers.MODULES.getModules())
+        {
+            registerCommand(new ModuleCommand(module));
+        }
 
         for (Command command : commands)
         {
@@ -71,12 +79,17 @@ public class CommandManager extends GenericFeature
             try
             {
                 String literal = text.substring(1);
-                dispatcher.execute(dispatcher.parse(literal, source));
+                execute(literal);
             } catch (Exception exception)
             {
                 // exception.printStackTrace();
             }
         }
+    }
+
+    public void execute(String string) throws Exception
+    {
+        dispatcher.execute(string, source);
     }
 
     private void registerCommand(Command command)

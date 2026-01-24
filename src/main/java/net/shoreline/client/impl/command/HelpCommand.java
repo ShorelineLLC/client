@@ -6,6 +6,7 @@ import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
 import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.render.ClientFormatting;
 import net.shoreline.client.util.text.Formatter;
 
 public class HelpCommand extends Command
@@ -22,7 +23,7 @@ public class HelpCommand extends Command
         {
             for (Command command : Managers.COMMANDS.getCommands())
             {
-                MutableText text = Text.literal(Formatting.GOLD + Formatter.capitalize(command.getName()));
+                MutableText text = Text.literal(ClientFormatting.THEME + Formatter.capitalize(command.getName()));
                 ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getSuggestion(command));
                 HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(command.getDescription()));
                 Style style = Style.EMPTY.withClickEvent(clickEvent).withHoverEvent(hoverEvent);

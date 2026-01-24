@@ -11,15 +11,12 @@ public class HoldKeybind extends ModuleKeybind
     }
 
     @Override
-    public Runnable getCommand()
+    public void execute(String command)
     {
-        return () ->
+        if (!module.isEnabled())
         {
-            if (!module.isEnabled())
-            {
-                module.enable();
-            }
-        };
+            module.enable();
+        }
     }
 
     public void onKeyRelease()

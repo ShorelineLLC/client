@@ -82,6 +82,24 @@ public class MacroManager extends GenericFeature
         }
     }
 
+    public Macro getMacro(String string)
+    {
+        for (Macro macro : macros)
+        {
+            if (macro instanceof ModuleKeybind)
+            {
+                continue;
+            }
+
+            if (macro.getName().equalsIgnoreCase(string))
+            {
+                return macro;
+            }
+        }
+
+        return null;
+    }
+
     public void register(Macro macro)
     {
         macros.addIfAbsent(macro);

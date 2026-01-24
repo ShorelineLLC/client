@@ -44,7 +44,7 @@ public class DynamicEntry
         boolean left = getModule().isLeft();
         boolean top = getModule().isTop();
         float paddingX = left ? 2 : -2;
-        float paddingY = top ? 2 : -2;
+        float paddingY = top ? 2 : 0;
         getModule().setOffset((float) (currentOffset + (height * yAnimation.getFactor())));
 
         String current = text.get();

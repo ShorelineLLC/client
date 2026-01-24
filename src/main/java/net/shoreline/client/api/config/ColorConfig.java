@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import net.shoreline.client.impl.event.LoadingEvent;
+import net.shoreline.client.impl.file.ModConfiguration;
 import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.eventbus.EventBus;
 import net.shoreline.eventbus.annotation.EventListener;

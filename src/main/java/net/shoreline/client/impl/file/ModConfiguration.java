@@ -82,7 +82,8 @@ public class ModConfiguration
                     new KeybindFile(saveDirectory),
                     new PvpKitFile(saveDirectory),
                     new ToggleStateFile(saveDirectory),
-                    new SocialsFile(saveDirectory)
+                    new SocialsFile(saveDirectory),
+                    new MacroFile(saveDirectory)
             );
 
             for (Module module : Managers.MODULES.getAllModules())

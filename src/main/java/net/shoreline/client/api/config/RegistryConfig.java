@@ -34,6 +34,12 @@ public class RegistryConfig<T> extends Config<Collection<T>>
         setValue(val);
     }
 
+    public void clear()
+    {
+        Collection<T> val = new LinkedHashSet<>();
+        setValue(val);
+    }
+
     public boolean contains(T element)
     {
         return getValue().contains(element);

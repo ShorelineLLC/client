@@ -90,6 +90,11 @@ public abstract class Config<T> implements Identifiable, Observable<T>, Serializ
         return String.format("%s_config", name.toLowerCase());
     }
 
+    public void reset()
+    {
+        setValue(getDefaultValue());
+    }
+
     public boolean isVisible()
     {
         return visible != null ? visible.get() : true;

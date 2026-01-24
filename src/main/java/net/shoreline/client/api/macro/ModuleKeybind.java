@@ -11,14 +11,15 @@ public class ModuleKeybind extends Macro
 
     public ModuleKeybind(int keycode, Toggleable module)
     {
-        super(keycode, null);
+        super(module.getId(), keycode, null);
         this.module = module;
     }
 
     @Override
-    public Runnable getCommand()
+    public void execute(String command)
     {
-        return module::toggle;
+        /* We just toggle the module directly instead of executing a ToggleCommand. */
+        module.toggle();
     }
 
     @Override

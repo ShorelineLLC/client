@@ -3,6 +3,7 @@ package net.shoreline.client.api.config;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
+import net.shoreline.client.impl.file.ModConfiguration;
 
 @Getter
 @Setter
