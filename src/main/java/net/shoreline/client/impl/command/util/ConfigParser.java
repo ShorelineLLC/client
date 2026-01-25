@@ -51,7 +51,7 @@ public class ConfigParser
         Function<Config<?>, Collection<String>> provider = SUGGESTIONS.get(config.getClass());
         if (provider == null)
         {
-            return CommandSource.suggestMatching(Lists.newArrayList("reset"), builder);
+            return CommandSource.suggestMatching(Lists.newArrayList(), builder);
         }
 
         List<String> result = new ArrayList<>(provider.apply(config));

@@ -32,12 +32,13 @@ public abstract class DrawableComponent
                                     float x,
                                     float y,
                                     float width,
-                                    float height)
+                                    float height,
+                                    int color)
     {
         int rWidth = Math.round(width);
         int rHeight = Math.round(height);
         context.drawTexture(RenderLayer::getGuiTextured, sprite,
-                Math.round(x), Math.round(y), 0.0f, 0.0f, rWidth, rHeight, rWidth, rHeight, -1);
+                Math.round(x), Math.round(y), 0.0f, 0.0f, rWidth, rHeight, rWidth, rHeight, color);
     }
 
     protected void drawOutline(DrawContext context,

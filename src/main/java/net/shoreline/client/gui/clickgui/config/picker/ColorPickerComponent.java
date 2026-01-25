@@ -91,9 +91,9 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
 
         drawText(context, getConfig().getName(), getTx() + 3, getTy() + 4, theme.getTextColor());
 
-        drawOutline(context, getTx() + getWidth() - 14, getTy() + 1.5f, 12, 12, 0.5f, 0x33000000);
-        drawBackground(context, getTx() + getWidth() - 14, getTy() + 1.5f, getTx() + getWidth() - 2, getTy() + 13.5f, 2);
-        drawRect(context, getTx() + getWidth() - 14, getTy() + 1.5f, 12, 12, getConfig().getValue().getRGB());
+        drawOutline(context, getTx() + getWidth() - 14, getTy() + 1.5f, 12, 12, 0.5f, theme.getColor(0x000000, 0.33f));
+        drawBackground(context, getTx() + getWidth() - 14, getTy() + 1.5f, getTx() + getWidth() - 2, getTy() + 13.5f, 2, theme);
+        drawRect(context, getTx() + getWidth() - 14, getTy() + 1.5f, 12, 12, theme.getColor(getConfig().getValue().getRGB(), 1.0f));
 
         if (collapseAnim.getFactor() > 0.001)
         {
@@ -102,14 +102,14 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             for (int i = 0; i < pickerLength - 1; i++)
             {
                 float hue = i / (float) pickerLength;
-                drawRect(context, getTx() + pickerLength + 3, getTy() + i + height + 3, 11, 1, Color.getHSBColor(hue, 1.0f, 1.0f).getRGB());
+                drawRect(context, getTx() + pickerLength + 3, getTy() + i + height + 3, 11, 1, theme.getColor(Color.getHSBColor(hue, 1.0f, 1.0f).getRGB(), 1.0f));
             }
             // drawOutline(context, getTx() + pickerLength + 3, getTy() + height + 5, 10, pickerLength - 2, 1, Colors.BLACK);
 
-            int clr = Color.HSBtoRGB(colorConfig.getHsb()[0], 1.0f, 1.0f);
-            int configColor = new Color(colorConfig.getRGB(), false).getRGB();
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0xffffffff, clr, true);
-            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0x00000000, 0xff000000, false);
+            int clr = theme.getColor(Color.HSBtoRGB(colorConfig.getHsb()[0], 1.0f, 1.0f), 1.0f);
+            int configColor = theme.getColor(new Color(colorConfig.getRGB(), false).getRGB(), 1.0f);
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, theme.getColor(0xFFFFFFFF, 1.0f), clr, true);
+            drawGradientRect(context, getTx() + 2, getTy() + height + 4, getTx() + pickerLength, getTy() + height + pickerLength + 2, 0x00000000, theme.getColor(0xFF000000, 1.0f), false);
 
             drawOutline(context, getTx() + 3, getTy() + height + pickerLength + 6, pickerLength - 24, 13, 1, theme.getComponentColor());
 
@@ -124,18 +124,18 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
             float resetX = getTx() + pickerLength - 18;
             float resetY = getTy() + height + pickerLength + 5;
             drawRect(context, resetX, resetY, 15, 15, theme.getComponentColor());
-            drawTexturedRect(context, resetSprite, resetX + 2, resetY + 1, 12, 12);
+            drawTexturedRect(context, resetSprite, resetX + 2, resetY + 1, 12, 12, theme.getColor(-1, 1.0f));
 
             Identifier syncSprite = Identifier.of(ShorelineMod.MOD_ID, "icon/sync_clickgui.png");
             float syncX = getTx() + pickerLength;
             float syncY = getTy() + height + pickerLength + 5;
-            drawRect(context, syncX, syncY, 15, 15, colorConfig.isGlobal() ? theme.getComponentColor() : 0xFFAAAAAA);
-            drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13);
+            drawRect(context, syncX, syncY, 15, 15, colorConfig.isGlobal() ? theme.getComponentColor() : theme.getColor(0xFFAAAAAA, 0.5f));
+            drawTexturedRect(context, syncSprite, syncX, syncY + 1, 13, 13, theme.getColor(-1, 1.0f));
 
             if (colorConfig.isTransparency())
             {
                 float alphaY = syncY + 17;
-                drawBackground(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, 1);
+                drawBackground(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, 1, theme);
                 drawGradientRect(context, getTx() + 2, alphaY, getTx() + 14 + pickerLength, alphaY + 15, configColor, ColorUtil.withTransparency(configColor, 0f), true);
             }
 
@@ -262,15 +262,16 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         }
     }
 
-    private void drawBackground(DrawContext context, float x, float y, float x2, float y2, float size)
+    private void drawBackground(DrawContext context, float x, float y, float x2, float y2, float size, Theme theme)
     {
         Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
         VertexConsumer vc = ((IDrawContext) context)
                 .getVertexConsumerProvider()
                 .getBuffer(RenderLayer.getGui());
 
-        drawRect(context, x, y, x2 - x, y2 - y, 0xFFFFFFFF);
+        drawRect(context, x, y, x2 - x, y2 - y, theme.getColor(0xFFFFFF, 1.0f));
         boolean skip = false;
+        int clr = theme.getColor(0xFF808080, 1.0f);
         for (float yPos = y; yPos < y2; yPos += size)
         {
             skip = !skip;
@@ -282,16 +283,20 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
                     continue;
                 }
 
-                vc.vertex(matrix4f, xPos+ 0f, yPos + size, 0f).color(0xFF808080);
-                vc.vertex(matrix4f, xPos + size, yPos + size, 0f).color(0xFF808080);
-                vc.vertex(matrix4f, xPos + size, yPos + 0f, 0f).color(0xFF808080);
-                vc.vertex(matrix4f, xPos + 0f, yPos + 0f, 0f).color(0xFF808080);
+                vc.vertex(matrix4f, xPos+ 0f, yPos + size, 0f).color(clr);
+                vc.vertex(matrix4f, xPos + size, yPos + size, 0f).color(clr);
+                vc.vertex(matrix4f, xPos + size, yPos + 0f, 0f).color(clr);
+                vc.vertex(matrix4f, xPos + 0f, yPos + 0f, 0f).color(clr);
             }
         }
     }
 
     public void drawSelectors(DrawContext context, float mouseX, float mouseY, float delta)
     {
+        Theme theme = ClickGuiScreen.INSTANCE.getTheme();
+        int white = theme.getColor(0xFFFFFFFF, 1.0f);
+        int black = theme.getColor(0xFF000000, 1.0f);
+
         float[] hsb = colorConfig.getHsb();
         float alpha = colorConfig.getAlpha() / 255f;
         float hueX = getTx() + pickerLength + 3;
@@ -308,13 +313,13 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         float posY = pickerY + (1.0f - hsb[2]) * pickerH;
         float smootherX = (float) colorSmootherX.smooth(posX, 0.5f, delta);
         float smootherY = (float) colorSmootherY.smooth(posY, 0.5f, delta);
-        drawRect(context, smootherX - 2, smootherY - 2, 4, 4, 0xFF000000);
-        drawRect(context, smootherX - 1, smootherY - 1, 2, 2, 0xFFFFFFFF);
+        drawRect(context, smootherX - 2, smootherY - 2, 4, 4, black);
+        drawRect(context, smootherX - 1, smootherY - 1, 2, 2, white);
 
         float hueSelectorY = hueY + hsb[0] * hueH;
         float hueSmoothY = (float) hueSmootherY.smooth(hueSelectorY - 2, 0.5f, delta);
-        drawRect(context, hueX - 1, hueSmoothY, hueW + 2, 3, 0xFF000000);
-        drawRect(context, hueX, hueSmoothY + 1, hueW + 1, 1, 0xFFFFFFFF);
+        drawRect(context, hueX - 1, hueSmoothY, hueW + 2, 3, black);
+        drawRect(context, hueX, hueSmoothY + 1, hueW + 1, 1, white);
 
         float alphaY = getTy() + height + pickerLength + 22;
         float alphaW = pickerLength + 10;
@@ -322,8 +327,8 @@ public class ColorPickerComponent extends ExpandableComponent<Color>
         {
             float alphaSelectorX = pickerX + (alphaW * (1.0f - alpha));
             float smootherSelector = (float) alphaSmoother.smooth(alphaSelectorX, 0.5f, delta);
-            drawRect(context, smootherSelector - 1, alphaY - 1, 4, 17, 0xFF000000);
-            drawRect(context, smootherSelector, alphaY, 2, 15, 0xFFFFFFFF);
+            drawRect(context, smootherSelector - 1, alphaY - 1, 4, 17, black);
+            drawRect(context, smootherSelector, alphaY, 2, 15, white);
         }
 
         if (draggingPicker && !colorConfig.isGlobal())

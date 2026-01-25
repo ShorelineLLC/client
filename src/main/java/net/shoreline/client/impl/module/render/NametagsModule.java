@@ -305,18 +305,7 @@ public class NametagsModule extends RenderModule
         if (stack.getCount() != 1)
         {
             String count = String.valueOf(stack.getCount());
-            mc.textRenderer.draw(count,
-                    x + 17 - getTextWidth(count),
-                    y + 8,
-                    -1,
-                    true,
-                    matrixStack.peek().getPositionMatrix(),
-                    mc.getBufferBuilders().getEntityVertexConsumers(),
-                    TextRenderer.TextLayerType.SEE_THROUGH,
-                    0,
-                    LightmapTextureManager.MAX_LIGHT_COORDINATE);
-
-            mc.getBufferBuilders().getEntityVertexConsumers().draw();
+            drawText(matrixStack, count, x + 17 - getTextWidth(count), y + 9.0f, -1);
         }
 
         if (stack.isItemBarVisible())

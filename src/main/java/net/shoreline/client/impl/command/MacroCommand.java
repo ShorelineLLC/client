@@ -36,8 +36,8 @@ public class MacroCommand extends Command
                                 continue;
                             }
 
-                            String hover = macro.getCommand() + " : " + macro.getKeycode();
-                            MutableText text = Text.literal(ClientFormatting.THEME + Formatter.capitalize(macro.getName()));
+                            String hover = macro.getCommand() + " : " + Keyboard.getKeyName(macro.getKeycode());
+                            MutableText text = Text.literal(Formatter.capitalize(macro.getName()));
                             HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(hover));
                             Style style = Style.EMPTY.withHoverEvent(hoverEvent);
                             sendClientTextMessage(text.setStyle(style));
