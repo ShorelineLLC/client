@@ -142,6 +142,7 @@ public class ModuleManager
                 new TintModule(),
                 new TracersModule(),
                 new TrailsModule(),
+                new TrajectoriesModule(),
                 new ViewClipModule(),
                 new ViewModelModule(),
                 new ZoomModule(),
