@@ -9,7 +9,6 @@ import java.util.concurrent.Future;
 public class AsyncFeature<T> extends GenericFeature
 {
     protected Future<T> currentResult;
-
     private final T nullValue;
 
     public AsyncFeature(String name)

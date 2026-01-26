@@ -3,6 +3,7 @@ package net.shoreline.client.impl.combat;
 import lombok.Getter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import net.shoreline.client.api.GenericFeature;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.eventbus.EventBus;
@@ -41,7 +42,7 @@ public class TargetManager extends GenericFeature
             }
 
             double dist = mc.player.squaredDistanceTo(entity);
-            if (dist > targetRange * targetRange)
+            if (dist > MathHelper.square(targetRange))
             {
                 continue;
             }

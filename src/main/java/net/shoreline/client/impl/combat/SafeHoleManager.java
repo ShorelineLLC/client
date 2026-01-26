@@ -1,5 +1,6 @@
 package net.shoreline.client.impl.combat;
 
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.async.AsyncFeature;
 import net.shoreline.client.impl.combat.hole.HoleData;
 import net.shoreline.client.impl.combat.hole.HoleScanner;
@@ -24,7 +25,7 @@ public class SafeHoleManager extends AsyncFeature<Collection<HoleData>>
     }
 
     @EventListener
-    public void onTick(TickEvent.Pre event)
+    public void onTick(TickEvent.Post event)
     {
         if (checkNull())
         {

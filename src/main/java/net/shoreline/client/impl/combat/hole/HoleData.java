@@ -4,12 +4,16 @@ import lombok.Data;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 @Data
 public class HoleData
 {
     private final HoleBlockType blockType;
     private final BlockPos[] holePos;
+    /** If this hole is a 2x1 or a 2x2. */
+    private final boolean big;
 
     public HoleData(boolean hasObsidian, boolean hasBedrock, BlockPos... holePos)
     {
@@ -28,11 +32,22 @@ public class HoleData
         }
 
         this.holePos = holePos;
+        this.big = holePos.length > 1;
+    }
+
+    public boolean checkRange(Vec3d pos, float range)
+    {
+        return squaredDistanceTo(pos) > MathHelper.square(range);
     }
 
     public double squaredDistanceTo(Entity entity)
     {
-        return entity.getPos().squaredDistanceTo(getBoundingBox(1.0f).getCenter());
+        return squaredDistanceTo(entity.getPos());
+    }
+
+    public double squaredDistanceTo(Vec3d pos)
+    {
+        return pos.squaredDistanceTo(getBoundingBox(1.0f).getCenter());
     }
 
     public Box getBoundingBox(double height)
