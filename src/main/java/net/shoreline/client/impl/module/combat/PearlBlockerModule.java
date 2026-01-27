@@ -2,25 +2,21 @@ package net.shoreline.client.impl.module.combat;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.Shoreline;
-import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.EntitySpawnEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
-import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
-import net.shoreline.client.impl.module.combat.util.PearlExtrapolation;
+import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
-import net.shoreline.client.impl.render.animation.Animation;
-import net.shoreline.client.util.math.Extrapolation;
 import net.shoreline.client.util.math.TrajectoryUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
@@ -71,18 +67,33 @@ public class PearlBlockerModule extends ObsidianPlacerModule
                 continue;
             }
 
-            Vec3d position = entity.getPos();
-            Vec3d extrapolation = MovementExtrapolation.extrapolatePosition(mc.world,
-                    box -> mc.world.getBlockCollisions(entity, box),
-                    entity.getVelocity(),
-                    entity.getBoundingBox(),
-                    extrapolateTicks.getValue(),
-                    true);
+            List<Vec3d> trajectory = TrajectoryUtil.getPearlTrajectory(entity, extrapolateTicks.getValue() * 2).reversed();
+            for (Vec3d vec : trajectory)
+            {
+                if (mc.player.squaredDistanceTo(vec) > MathHelper.square(placeRange.getValue()))
+                {
+                    continue;
+                }
 
-            Vec3d motionDir = extrapolation.subtract(position).normalize();
-            Vec3d targetPos = position.add(motionDir.multiply(placeDistance.getValue()));
-            placements.add(BlockPos.ofFloored(targetPos));
-            iterator.remove();
+                BlockPos pos = BlockPos.ofFloored(vec);
+                Direction dir = InteractDirection.getInteractDirection(pos);
+                if (dir == null)
+                {
+                    for (Direction direction : Direction.values())
+                    {
+                        BlockPos offset = pos.offset(direction);
+                        Direction helpingDir = InteractDirection.getInteractDirection(offset);
+                        if (helpingDir != null)
+                        {
+                            placements.add(offset);
+                            break;
+                        }
+                    }
+                }
+
+                placements.add(pos);
+                break;
+            }
         }
 
         if (placements.isEmpty() || !Managers.INTERACT.startPlacement(obbySlot))
