@@ -6,7 +6,6 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -67,6 +66,16 @@ public class InventoryUtil
         return new ItemSlot(bestSlot, itemStack);
     }
 
+    public ItemSlot getItem(Item item)
+    {
+        return getItem(item, InventoryModule.INSTANCE.getSilentSwapType());
+    }
+
+    public ItemSlot getItem(Item item, SilentSwapType type)
+    {
+        return type == SilentSwapType.INVENTORY ? getInventorySlot(item) : getHotbarItem(item);
+    }
+
     public int getItemSlot(Item item)
     {
         return getItemSlot(item, InventoryModule.INSTANCE.getSilentSwapType());
@@ -74,10 +83,10 @@ public class InventoryUtil
 
     public int getItemSlot(Item item, SilentSwapType type)
     {
-        return type == SilentSwapType.INVENTORY ? getInventorySlot(item) : getHotbarSlot(item);
+        return type == SilentSwapType.INVENTORY ? getInventorySlot(item).getSlot() : getHotbarItem(item).getSlot();
     }
 
-    public int getInventorySlot(Item item)
+    public ItemSlot getInventorySlot(Item item)
     {
         PlayerInventory inventory = MinecraftClient.getInstance().player.getInventory();
         for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++)
@@ -85,39 +94,39 @@ public class InventoryUtil
             ItemStack stack = inventory.getStack(i);
             if (stack.getItem().equals(item))
             {
-                return i;
+                return new ItemSlot(i, stack);
             }
         }
 
-        return INVALID_SLOT;
+        return new ItemSlot(INVALID_SLOT, ItemStack.EMPTY);
     }
 
-    public int getHotbarSlot(Predicate<ItemStack> predicate)
+    public ItemSlot getHotbarItem(Predicate<ItemStack> predicate)
     {
         for (int i = 0; i < PlayerInventory.getHotbarSize(); i++)
         {
             ItemStack stack = MinecraftClient.getInstance().player.getInventory().getStack(i);
             if (predicate.test(stack))
             {
-                return i;
+                return new ItemSlot(i, stack);
             }
         }
 
-        return INVALID_SLOT;
+        return new ItemSlot(INVALID_SLOT, ItemStack.EMPTY);
     }
 
-    public int getHotbarSlot(Item item)
+    public ItemSlot getHotbarItem(Item item)
     {
         for (int i = 0; i < PlayerInventory.getHotbarSize(); i++)
         {
             ItemStack stack = MinecraftClient.getInstance().player.getInventory().getStack(i);
             if (stack.getItem().equals(item))
             {
-                return i;
+                return new ItemSlot(i, stack);
             }
         }
 
-        return INVALID_SLOT;
+        return new ItemSlot(INVALID_SLOT, ItemStack.EMPTY);
     }
 
     public int find(Predicate<ItemStack> tester)

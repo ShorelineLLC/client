@@ -17,7 +17,6 @@ import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
-import net.shoreline.client.impl.interact.Interaction;
 import net.shoreline.client.impl.interact.PlaceInteraction;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 import net.shoreline.client.impl.module.combat.anchor.AnchorManager;
@@ -184,11 +183,11 @@ public class AnchorAuraModule extends PlacerModule
         int slot;
         if (charges <= 0)
         {
-            slot = InventoryUtil.getHotbarSlot(Items.GLOWSTONE);
+            slot = InventoryUtil.getHotbarItem(Items.GLOWSTONE).getSlot();
         }
         else
         {
-            slot = InventoryUtil.getHotbarSlot(stack -> !(stack.getItem() instanceof BlockItem));
+            slot = InventoryUtil.getHotbarItem(stack -> !(stack.getItem() instanceof BlockItem)).getSlot();
             result[1] = true;
         }
 

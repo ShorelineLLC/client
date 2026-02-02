@@ -1,25 +1,22 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.*;
-import net.shoreline.client.Shoreline;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.config.*;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.combat.hole.HoleData;
-import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
 import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
 import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 public class FillerModule extends ObsidianPlacerModule
 {

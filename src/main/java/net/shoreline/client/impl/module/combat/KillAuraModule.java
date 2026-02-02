@@ -3,6 +3,7 @@ package net.shoreline.client.impl.module.combat;
 import lombok.Getter;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -36,6 +37,7 @@ import net.shoreline.client.impl.rotation.RotateMode;
 import net.shoreline.client.impl.rotation.Rotation;
 import net.shoreline.client.impl.rotation.RotationUtil;
 import net.shoreline.client.util.entity.EntityUtil;
+import net.shoreline.client.util.item.EnchantUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 import org.apache.commons.lang3.mutable.MutableDouble;
 
@@ -66,14 +68,20 @@ public class KillAuraModule extends CombatModule
             .setDescription("Rotates to the entity before attacking")
             .setDefaultValue(RotateMode.OFF).build();
 
-    Config<Boolean> targetPlayers = new BooleanConfig.Builder("Players")
-            .setDescription("Targets players").setDefaultValue(true).build();
-    Config<Boolean> targetHostiles = new BooleanConfig.Builder("Hostiles")
-            .setDescription("Targets hostiles").setDefaultValue(false).build();
-    Config<Boolean> targetPassives = new BooleanConfig.Builder("Passives")
-            .setDescription("Targets passives").setDefaultValue(false).build();
     Config<Void> targetConfig = new ConfigGroup.Builder("Target")
             .addAll(targetPlayers, targetHostiles, targetPassives).build();
+
+    Config<Float> minBonusDamage = new NumberConfig.Builder<Float>("MinDamage")
+            .setMin(1.0f).setMax(36.0f).setDefaultValue(4.0f)
+            .setDescription("The minimum fall bonus damage before attacking").build();
+    Config<Boolean> maceBreach = new BooleanConfig.Builder("BreachSwap")
+            .setDescription("Swaps to mace before attacking to apply breach effect")
+            .setDefaultValue(false).build();
+    Config<Boolean> maceAura = new ToggleableConfigGroup.Builder("Mace")
+            .addAll(minBonusDamage, maceBreach)
+            .setDefaultValue(false)
+            .setDescription("Automatically attacks with a mace")
+            .build();
 
     Config<Boolean> autoSwap = new BooleanConfig.Builder("AutoSwap")
             .setDescription("Automatically swaps to a weapon before attacking")
@@ -198,13 +206,13 @@ public class KillAuraModule extends CombatModule
         PlayerInventory playerInventory = mc.player.getInventory();
         if (weaponSlot.getSlot() != -1)
         {
+            sendChatMessage(""+weaponSlot.getSlot());
             if (silentSwap.getValue())
             {
                 if (!Managers.INVENTORY.startSwap(weaponSlot.getSlot()))
                 {
                     return;
                 }
-
             }
             else if (autoSwap.getValue())
             {
@@ -273,6 +281,17 @@ public class KillAuraModule extends CombatModule
 
     private ItemSlot getAuraWeaponSlot()
     {
+        float fallDist = Managers.FALL_DIST.getFallDistance();
+        if (maceAura.getValue() && fallDist > 1.5f)
+        {
+            ItemSlot maceItem = InventoryUtil.getItem(Items.MACE);
+            float damage = getMaceBonusDamage(fallDist, maceItem.getItemStack());
+            if (damage >= minBonusDamage.getValue())
+            {
+                return maceItem;
+            }
+        }
+
         ItemSlot swordSlot = InventoryUtil.getItemSlot((ItemStack itemStack) -> itemStack.getItem().getTranslationKey().contains("sword"));
         if (swordSlot.getSlot() != InventoryUtil.INVALID_SLOT)
         {
@@ -293,7 +312,7 @@ public class KillAuraModule extends CombatModule
         Entity target = null;
         for (Entity entity : mc.world.getEntities())
         {
-            if (entity.equals(mc.player) || !entity.isAlive() || !canTargetToAttack(entity))
+            if (entity.equals(mc.player) || !entity.isAlive() || !isValid(entity))
             {
                 continue;
             }
@@ -310,15 +329,30 @@ public class KillAuraModule extends CombatModule
         return target;
     }
 
-    private boolean canTargetToAttack(Entity entity)
+    private float getMaceBonusDamage(float fallDistance, ItemStack itemStack)
+    {
+        int densityLevel = EnchantUtil.getLevel(Enchantments.DENSITY, itemStack);
+        int h = (int) Math.floor(Math.max(0.0f, fallDistance));
+        float i = h <= 3.0f ? 4.0f * h : (h <= 8.0f ? 12.0f + 2.0f * (h - 3.0f) : 22.0f + h - 8.0f);
+
+        float damage = 6.0f + i;
+
+        if (densityLevel > 0)
+        {
+            damage += 0.5f * densityLevel * h;
+        }
+
+        return damage;
+    }
+
+    @Override
+    public boolean isValid(Entity entity)
     {
         if (Managers.SOCIAL.isFriend(entity))
         {
             return false;
         }
 
-        return entity instanceof PlayerEntity && targetPlayers.getValue()
-                || EntityUtil.isHostile(entity) && targetHostiles.getValue()
-                || EntityUtil.isPassive(entity) && targetPassives.getValue();
+        return super.isValid(entity);
     }
 }

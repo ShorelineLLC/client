@@ -5,9 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
-import net.shoreline.client.api.Observable;
 import net.shoreline.client.api.module.GuiCategory;
-import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.inventory.InventoryUtil;
 
 @Getter
@@ -38,11 +36,11 @@ public class ObsidianPlacerModule extends PlacerModule
 
     protected int findBestObbySlot()
     {
-        int slot = InventoryUtil.getHotbarSlot(Items.OBSIDIAN);
+        int slot = InventoryUtil.getHotbarItem(Items.OBSIDIAN).getSlot();
         if (slot == -1)
         {
             currentObbyBlock = Blocks.ENDER_CHEST;
-            return InventoryUtil.getHotbarSlot(Items.ENDER_CHEST);
+            return InventoryUtil.getHotbarItem(Items.ENDER_CHEST).getSlot();
         }
 
         currentObbyBlock = Blocks.OBSIDIAN;

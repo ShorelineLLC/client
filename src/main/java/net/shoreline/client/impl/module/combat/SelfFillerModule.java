@@ -69,7 +69,7 @@ public class SelfFillerModule extends ObsidianPlacerModule
         BlockPos blockPos = EntityUtil.getRoundedBlockPos(mc.player);
         if (blockMode.getValue() == BlockMode.WEB)
         {
-            int slot = InventoryUtil.getHotbarSlot(Items.COBWEB);
+            int slot = InventoryUtil.getHotbarItem(Items.COBWEB).getSlot();
             if (slot == -1)
             {
                 return;
@@ -92,8 +92,8 @@ public class SelfFillerModule extends ObsidianPlacerModule
             }
 
             int slot = blockMode.getValue() == BlockMode.ENDER_CHEST ?
-                    InventoryUtil.getHotbarSlot(Items.ENDER_CHEST) :
-                    InventoryUtil.getHotbarSlot(Items.OBSIDIAN);
+                    InventoryUtil.getHotbarItem(Items.ENDER_CHEST).getSlot() :
+                    InventoryUtil.getHotbarItem(Items.OBSIDIAN).getSlot();
 
             if (slot == -1)
             {

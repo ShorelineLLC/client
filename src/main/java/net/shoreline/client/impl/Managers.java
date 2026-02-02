@@ -18,6 +18,7 @@ import net.shoreline.client.impl.render.manager.RenderManager;
 import net.shoreline.client.impl.render.manager.ShaderManager;
 import net.shoreline.client.impl.rotation.RotationManager;
 import net.shoreline.client.impl.social.SocialManager;
+import net.shoreline.client.impl.world.FallDistManager;
 import net.shoreline.client.impl.world.TickManager;
 
 public class Managers
@@ -30,6 +31,7 @@ public class Managers
     public static RotationManager ROTATION;
     public static InventoryManager INVENTORY;
     public static MovementManager MOVEMENT;
+    public static FallDistManager FALL_DIST;
     public static InteractManager INTERACT;
     public static TickManager TICK;
     public static MiningManager MINING;
@@ -51,6 +53,7 @@ public class Managers
         ROTATION = new RotationManager();
         INVENTORY = new InventoryManager();
         MOVEMENT = new MovementManager();
+        FALL_DIST = new FallDistManager();
         INTERACT = new InteractManager();
         TICK = new TickManager();
         MINING = new MiningManager();

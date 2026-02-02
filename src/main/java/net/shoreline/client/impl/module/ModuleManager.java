@@ -56,7 +56,6 @@ public class ModuleManager
                 new AutoBowReleaseModule(),
                 new AutoCrystalModule(),
                 new AutoDisconnectModule(),
-                new AutoMaceModule(),
                 new AutoMineModule(),
                 new AutoPotModule(),
                 new AutoTotemModule(),
