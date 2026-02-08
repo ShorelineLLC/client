@@ -8,17 +8,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
 import net.shoreline.client.api.config.ConfigGroup;
 import net.shoreline.client.api.config.NumberConfig;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
-import net.shoreline.client.impl.event.WorldEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
 import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
 import net.shoreline.client.impl.interact.InteractDirection;
 import net.shoreline.client.impl.module.combat.trap.TrapLayer;
 import net.shoreline.client.impl.module.combat.trap.TrapModule;
@@ -117,23 +114,7 @@ public class AutoTrapModule extends TrapModule
         final Box playerBox = trapTarget.getBoundingBox(EntityPose.STANDING).offset(targetPos);
         Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
 
-        EnumSet<TrapLayer> layers = EnumSet.noneOf(TrapLayer.class);
-        if (feetConfig.getValue())
-        {
-            layers.add(TrapLayer.FEET);
-        } if (bodyConfig.getValue())
-        {
-            layers.add(TrapLayer.BODY);
-        } if (headConfig.getValue())
-        {
-            layers.add(TrapLayer.CEILING);
-        } if (crawlConfig.getValue())
-        {
-            layers.add(TrapLayer.BODY_INTERSECT);
-            layers.add(TrapLayer.FLOOR);
-        }
-
-        TrapSpec trapSpec = TrapSpec.builder().layers(layers).build();
+        TrapSpec trapSpec = TrapSpec.builder().layers(getLayers()).build();
         trapPos.calcTrap(boundingBox, trapSpec);
 
         placements.clear();
@@ -204,5 +185,27 @@ public class AutoTrapModule extends TrapModule
                 runSingleObbyPlacement(blockPos);
             }
         }
+    }
+
+    @Override
+    public EnumSet<TrapLayer> getLayers()
+    {
+        EnumSet<TrapLayer> layers = EnumSet.noneOf(TrapLayer.class);
+        if (feetConfig.getValue())
+        {
+            layers.add(TrapLayer.FEET);
+        } if (bodyConfig.getValue())
+        {
+            layers.add(TrapLayer.BODY);
+        } if (headConfig.getValue())
+        {
+            layers.add(TrapLayer.CEILING);
+        } if (crawlConfig.getValue())
+        {
+            layers.add(TrapLayer.BODY_INTERSECT);
+            layers.add(TrapLayer.FLOOR);
+        }
+
+        return layers;
     }
 }

@@ -206,7 +206,6 @@ public class KillAuraModule extends CombatModule
         PlayerInventory playerInventory = mc.player.getInventory();
         if (weaponSlot.getSlot() != -1)
         {
-            sendChatMessage(""+weaponSlot.getSlot());
             if (silentSwap.getValue())
             {
                 if (!Managers.INVENTORY.startSwap(weaponSlot.getSlot()))

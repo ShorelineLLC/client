@@ -40,8 +40,8 @@ import net.shoreline.client.impl.module.client.ThemeModule;
 import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
 import net.shoreline.client.impl.module.combat.crystal.CrystalData;
 import net.shoreline.client.impl.module.combat.crystal.CrystalOptimizer;
-import net.shoreline.client.impl.module.combat.trap.TrapModule;
 import net.shoreline.client.impl.module.combat.util.DamageUtil;
+import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
 import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.network.NetworkUtil;
@@ -61,13 +61,15 @@ import net.shoreline.client.util.math.QueueAverage;
 import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
-public class AutoCrystalModule extends TrapModule
+public class AutoCrystalModule extends ObsidianPlacerModule
 {
     public static AutoCrystalModule INSTANCE;
 

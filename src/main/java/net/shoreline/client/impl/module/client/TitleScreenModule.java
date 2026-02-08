@@ -17,7 +17,7 @@ public class TitleScreenModule extends Toggleable
 
     public TitleScreenModule()
     {
-        super("TitleScreen", "Enables shorelines custom title screen", GuiCategory.CLIENT);
+        super("TitleScreen", "Enables the custom title screen", GuiCategory.CLIENT);
         INSTANCE = this;
     }
 

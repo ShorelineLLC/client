@@ -27,7 +27,7 @@ public abstract class CrystalEntityScanner extends ExplosionScanner
     {
         super(12.0f);
         this.autoCrystal = autoCrystal;
-        this.factory = new CrystalDataFactory(autoCrystal, this);
+        this.factory = new CrystalDataFactory(autoCrystal);
     }
 
     public List<CrystalData<?>> scanCrystalEntities()

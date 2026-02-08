@@ -10,18 +10,17 @@ import net.shoreline.client.api.math.Timer;
 import net.shoreline.client.api.module.GuiCategory;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.mining.MiningUtil;
 import net.shoreline.client.impl.module.combat.trap.TrapLayer;
 import net.shoreline.client.impl.module.combat.trap.TrapModule;
 import net.shoreline.client.impl.module.combat.trap.TrapSpec;
+import net.shoreline.client.impl.module.impl.Priorities;
 import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.client.util.entity.PlayerUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -310,5 +309,11 @@ public class AutoMineModule extends TrapModule
         }
 
         return packet == null;
+    }
+
+    @Override
+    public EnumSet<TrapLayer> getLayers()
+    {
+        return trapSpec.getLayers();
     }
 }
