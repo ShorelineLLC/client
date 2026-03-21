@@ -2,12 +2,14 @@ package net.shoreline.client.impl.module.movement.speed;
 
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.impl.module.world.TimerModule;
 import net.shoreline.client.util.math.MathUtil;
 
 public class StrafeNCP extends Strafe
 {
+    protected static final SpeedModule SPEED_MODULE = SpeedModule.INSTANCE;
     private int strictTicks;
 
     public StrafeNCP()

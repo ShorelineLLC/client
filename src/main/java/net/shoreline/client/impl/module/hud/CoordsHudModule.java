@@ -23,7 +23,7 @@ public class CoordsHudModule extends DynamicHudModule
     }
 
     @Override
-    public void onEnable()
+    public void loadEntries()
     {
         getHudEntries().add(new DynamicEntry(this, this::getCoordsText, () -> true));
     }

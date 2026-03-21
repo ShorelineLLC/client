@@ -114,6 +114,7 @@ public class ModuleManager
                 new NoSlowModule(),
                 new ParkourModule(),
                 new PatherModule(),
+                new PhaseSnapModule(),
                 new SafeWalkModule(),
                 new SpeedModule(),
                 new SprintModule(),

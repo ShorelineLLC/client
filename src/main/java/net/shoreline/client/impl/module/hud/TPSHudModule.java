@@ -15,7 +15,7 @@ public class TPSHudModule extends DynamicHudModule
     }
 
     @Override
-    public void onEnable()
+    public void loadEntries()
     {
         getHudEntries().add(new DynamicEntry(this, this::getTPSText, () -> true));
     }

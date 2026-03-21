@@ -26,6 +26,14 @@ public abstract class DynamicHudModule extends HudModule
         super(name, description, x, y);
     }
 
+    public abstract void loadEntries();
+
+    @Override
+    public void onEnable()
+    {
+        loadEntries();
+    }
+
     @Override
     public void onDisable()
     {

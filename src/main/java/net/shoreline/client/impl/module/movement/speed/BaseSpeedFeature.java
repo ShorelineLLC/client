@@ -4,14 +4,14 @@ import lombok.Getter;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.api.GenericFeature;
+import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.impl.module.world.TimerModule;
 
 @Getter
-public abstract class BaseSpeedFeature extends GenericFeature
+public abstract class BaseSpeedFeature<M extends MovementModule>
+        extends GenericFeature
 {
-    protected static final SpeedModule speedModule = SpeedModule.INSTANCE;
-
     protected double speed;
     protected double distance;
 
@@ -20,7 +20,7 @@ public abstract class BaseSpeedFeature extends GenericFeature
         super(name);
     }
 
-    public abstract Vec3d onMoveUpdate(SpeedModule module, Vec3d currentMove);
+    public abstract Vec3d onMoveUpdate(M module, Vec3d currentMove);
 
     public void reset()
     {
@@ -63,6 +63,11 @@ public abstract class BaseSpeedFeature extends GenericFeature
     protected double getBaseSpeed(double speedEffect, double slowEffect)
     {
         return 0.2873f * speedEffect / slowEffect;
+    }
+
+    protected double getBaseSpeed()
+    {
+        return getBaseSpeed(getSpeedModifier(), getSlownessModifier());
     }
 
     protected float getJumpModifier()

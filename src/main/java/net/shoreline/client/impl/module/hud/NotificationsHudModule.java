@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Supplier;
 
+// these are so ugly
 public class NotificationsHudModule extends DynamicHudModule
 {
     Config<Integer> maxNotifications = new NumberConfig.Builder<Integer>("Max")
@@ -31,6 +32,9 @@ public class NotificationsHudModule extends DynamicHudModule
     {
         super("Notifications", "Displays notifications on the HUD", 200, 200);
     }
+
+    @Override
+    public void loadEntries() {}
 
     @Override
     public void cacheWidth()

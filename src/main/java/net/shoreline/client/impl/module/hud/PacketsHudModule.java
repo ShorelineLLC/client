@@ -18,7 +18,7 @@ public class PacketsHudModule extends DynamicHudModule
     }
 
     @Override
-    public void onEnable()
+    public void loadEntries()
     {
         getHudEntries().add(new DynamicEntry(this, this::getPacketsText, () -> true));
     }

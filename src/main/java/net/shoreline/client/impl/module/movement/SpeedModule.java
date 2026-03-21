@@ -77,7 +77,7 @@ public class SpeedModule extends MovementModule
             return;
         }
 
-        BaseSpeedFeature speedFeature = modeConfig.getValue().getFeature();
+        BaseSpeedFeature<SpeedModule> speedFeature = modeConfig.getValue().getFeature();
         if (!canApplySpeed())
         {
             speedFeature.reset();

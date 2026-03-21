@@ -140,7 +140,7 @@ public class FillerModule extends ObsidianPlacerModule
         Collection<HoleData> latestHoleData = Managers.HOLE.getResults();
         latestHoleData.removeIf(hole ->
                 hole.checkRange(mc.player.getPos(), placeRange.getValue())
-                        || (hole.isBig() && !doublesConfig.getValue()));
+                        || (hole.getHolePos().length > 1 && !doublesConfig.getValue()));
 
         if (smartFill.getValue())
         {

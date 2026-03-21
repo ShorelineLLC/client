@@ -16,7 +16,7 @@ public class PingHudModule extends DynamicHudModule
     }
 
     @Override
-    public void onEnable()
+    public void loadEntries()
     {
         getHudEntries().add(new DynamicEntry(this, this::getLatencyText, () -> !mc.isInSingleplayer()));
     }

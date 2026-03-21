@@ -4,7 +4,7 @@ import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 
-public class Vanilla extends BaseSpeedFeature
+public class Vanilla extends BaseSpeedFeature<SpeedModule>
 {
     public Vanilla()
     {

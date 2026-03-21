@@ -3,7 +3,6 @@ package net.shoreline.client.impl.module.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Getter;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.item.ItemRenderState;
@@ -41,10 +40,7 @@ import org.joml.Matrix4f;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NametagsModule extends RenderModule
@@ -363,13 +359,6 @@ public class NametagsModule extends RenderModule
         float n2 = -14.0f;
         n2 -= (n - 3) * 4.5f;
         return n2;
-    }
-
-    private String getEnchantmentName(String id, int level)
-    {
-        id = id.replace("minecraft:", "");
-        id = level > 1 ? id.substring(0, 2) : id.substring(0, 3);
-        return id.substring(0, 1).toUpperCase() + id.substring(1) + (level > 1 ? level : "");
     }
 
     private int getNametagColor(PlayerEntity player)

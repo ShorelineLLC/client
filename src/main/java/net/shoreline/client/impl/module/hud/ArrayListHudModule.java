@@ -21,7 +21,7 @@ public class ArrayListHudModule extends DynamicHudModule
     }
 
     @Override
-    public void onEnable()
+    public void loadEntries()
     {
         for (Module module : Managers.MODULES.getModules())
         {

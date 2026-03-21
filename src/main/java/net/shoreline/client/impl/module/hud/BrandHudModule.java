@@ -11,7 +11,7 @@ public class BrandHudModule extends DynamicHudModule
     }
 
     @Override
-    public void onEnable()
+    public void loadEntries()
     {
         getHudEntries().add(new DynamicEntry(this, this::getBrandText, () -> true));
     }

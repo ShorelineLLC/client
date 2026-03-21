@@ -50,6 +50,9 @@ public class TextRadarHudModule extends DynamicHudModule
     }
 
     @Override
+    public void loadEntries() {}
+
+    @Override
     public void drawEntries(DrawContext context, float tickDelta)
     {
         for (DynamicEntry entry : getHudEntries())

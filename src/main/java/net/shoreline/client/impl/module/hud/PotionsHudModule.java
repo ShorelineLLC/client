@@ -48,8 +48,17 @@ public class PotionsHudModule extends DynamicHudModule
         super("Potions", "Displays the status effects the local player has", 80, 80);
     }
 
+    @Override
+    public void onEnable() {}
+
     @EventListener
     public void onFinishedLoading(LoadingEvent.Finished event)
+    {
+        loadEntries();
+    }
+
+    @Override
+    public void loadEntries()
     {
         for (StatusEffect effect : Registries.STATUS_EFFECT)
         {

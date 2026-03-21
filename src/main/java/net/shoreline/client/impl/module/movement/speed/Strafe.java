@@ -2,10 +2,11 @@ package net.shoreline.client.impl.module.movement.speed;
 
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.impl.module.impl.MovementModule;
 import net.shoreline.client.impl.module.movement.SpeedModule;
 import net.shoreline.client.impl.module.world.TimerModule;
 
-public class Strafe extends BaseSpeedFeature
+public class Strafe extends BaseSpeedFeature<SpeedModule>
 {
     protected static final float AIR_FRICTION = 159.077f;
 

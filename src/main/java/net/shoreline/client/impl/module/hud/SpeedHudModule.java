@@ -22,7 +22,7 @@ public class SpeedHudModule extends DynamicHudModule
     }
 
     @Override
-    public void onEnable()
+    public void loadEntries()
     {
         getHudEntries().add(new DynamicEntry(this, this::getSpeedometerText, () -> true));
     }
