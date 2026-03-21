@@ -77,9 +77,7 @@ public class AutoXPModule extends Toggleable
             return;
         }
 
-        Rotation playerRotation = new Rotation(mc.player);
         Rotation xpThrow = new Rotation(mc.player.getYaw(), 90.0f);
-
         switch (rotateConfig.getValue())
         {
             case SILENT -> Managers.ROTATION.setSilentRotation(xpThrow);

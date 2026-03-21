@@ -94,14 +94,8 @@ public class SelfTrapModule extends TrapModule
 
         final Box playerBox = mc.player.getBoundingBox();
         Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
-        EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET, TrapLayer.BODY);
-        if (headConfig.getValue())
-        {
-            layers.add(TrapLayer.CEILING);
-        }
-
         TrapSpec trapSpec = TrapSpec.builder()
-                .layers(layers)
+                .layers(getLayers())
                 .extendFeet(extendFeet.getValue())
                 .extendBody(extendBody.getValue())
                 .build();
@@ -155,5 +149,17 @@ public class SelfTrapModule extends TrapModule
 
             runSingleObbyPlacement(blockPos);
         }
+    }
+
+    @Override
+    public EnumSet<TrapLayer> getLayers()
+    {
+        EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET, TrapLayer.BODY);
+        if (headConfig.getValue())
+        {
+            layers.add(TrapLayer.CEILING);
+        }
+
+        return layers;
     }
 }

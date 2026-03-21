@@ -1,14 +1,17 @@
 package net.shoreline.client.impl.module.combat.crystal;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.block.AsyncBlockState;
+import net.shoreline.client.impl.mining.MiningData;
 import net.shoreline.client.impl.module.combat.AutoCrystalModule;
 import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
+import net.shoreline.client.impl.module.world.SpeedMineModule;
 import net.shoreline.client.impl.world.EntityState;
 import net.shoreline.client.impl.world.LivingEntityState;
 import net.shoreline.client.util.entity.PlayerUtil;
@@ -17,7 +20,7 @@ import net.shoreline.client.util.world.RaytraceUtil;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class CrystalBaseScanner extends CrystalEntityScanner
+public class CrystalBaseScanner extends CrystalCevScanner
 {
     private final List<CrystalData<?>> crystalBases = new CopyOnWriteArrayList<>();
 
@@ -88,8 +91,14 @@ public class CrystalBaseScanner extends CrystalEntityScanner
                     boundingBox,
                     autoCrystal.getIgnoreTerrain().getValue());
 
-            crystalBases.add(factory.createData(pos, explosionCenter, entity, damage, local));
+            crystalBases.add(factory.createData(pos, explosionCenter, entity, damage, local, () -> getImmediateTag(pos, explosionCenter)));
         }
+    }
+
+    @Override
+    protected int getRadius()
+    {
+        return (int) Math.ceil(autoCrystal.getTargetRange().getValue());
     }
 
     public List<CrystalData<?>> scanCrystalBases()
@@ -97,12 +106,6 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         crystalBases.clear();
         scanBlocks();
         return crystalBases;
-    }
-
-    @Override
-    protected int getRadius()
-    {
-        return (int) Math.ceil(autoCrystal.getTargetRange().getValue());
     }
 
     private boolean hasEntityBlockingCrystal(Box box)
@@ -116,5 +119,32 @@ public class CrystalBaseScanner extends CrystalEntityScanner
         }
 
         return false;
+    }
+
+    private String getImmediateTag(BlockPos pos, Vec3d crystalVec)
+    {
+        if (!SpeedMineModule.INSTANCE.isUsedByAutoMine())
+        {
+            return null;
+        }
+
+        PlayerEntity target = Managers.TARGETING.getTarget();
+        MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
+        if (target == null || currentMine == null)
+        {
+            return null;
+        }
+
+        if (autoCrystal.getTargetItems().getValue() && isSurroundBreakPos(pos, crystalVec, target, currentMine))
+        {
+            return "AS";
+        }
+
+        if (autoCrystal.getCevBreak().getValue() && isCevBreakerPos(pos, target, currentMine))
+        {
+            return "Cev";
+        }
+
+        return null;
     }
 }

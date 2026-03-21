@@ -2,7 +2,7 @@ package net.shoreline.client.impl.module.combat.crystal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.EqualsAndHashCode.Exclude;
 import lombok.Getter;
 import net.minecraft.util.math.Vec3d;
 import net.shoreline.client.impl.render.animation.Animation;
@@ -13,16 +13,15 @@ import net.shoreline.client.impl.world.LivingEntityState;
 public class CrystalData<T>
 {
     private T value;
-
     private Vec3d crystalVec;
 
-    @EqualsAndHashCode.Exclude
+    @Exclude
     private LivingEntityState target;
 
-    @EqualsAndHashCode.Exclude
+    @Exclude
     private double damageToTarget, damageToPlayer;
 
-    @EqualsAndHashCode.Exclude
+    @Exclude
     private final Animation animation = new Animation(true, 250);
 
     public void copyFrom(CrystalData<T> crystalData)

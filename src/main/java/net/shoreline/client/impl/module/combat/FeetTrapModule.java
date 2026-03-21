@@ -94,19 +94,8 @@ public class FeetTrapModule extends TrapModule
 
         final Box playerBox = mc.player.getBoundingBox();
         Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
-        EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET);
-        if (headConfig.getValue())
-        {
-            layers.add(TrapLayer.CEILING);
-        }
-
-        if (floor.getValue())
-        {
-            layers.add(TrapLayer.FLOOR);
-        }
-
         TrapSpec trapSpec = TrapSpec.builder()
-                .layers(layers)
+                .layers(getLayers())
                 .extendFeet(extendFeet.getValue())
                 .build();
 
@@ -160,5 +149,22 @@ public class FeetTrapModule extends TrapModule
 
             runSingleObbyPlacement(blockPos);
         }
+    }
+
+    @Override
+    public EnumSet<TrapLayer> getLayers()
+    {
+        EnumSet<TrapLayer> layers = EnumSet.of(TrapLayer.FEET);
+        if (headConfig.getValue())
+        {
+            layers.add(TrapLayer.CEILING);
+        }
+
+        if (floor.getValue())
+        {
+            layers.add(TrapLayer.FLOOR);
+        }
+
+        return layers;
     }
 }

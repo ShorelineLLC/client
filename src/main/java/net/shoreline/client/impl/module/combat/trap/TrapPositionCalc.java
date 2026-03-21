@@ -15,13 +15,21 @@ import java.util.stream.Collectors;
 @Getter
 public class TrapPositionCalc
 {
-    private static final Comparator<Vec3i> TRAP_ORDER =
-            Comparator.comparingInt(Vec3i::getY)
-                    .thenComparingInt(Vec3i::getX)
-                    .thenComparingInt(Vec3i::getZ);
+    private final Comparator<Vec3i> trapOrdering;
+    private final ConcurrentNavigableMap<BlockPos, TrapLayer> trapPositions;
 
-    private final ConcurrentNavigableMap<BlockPos, TrapLayer> trapPositions
-            = new ConcurrentSkipListMap<>(TRAP_ORDER);
+    public TrapPositionCalc()
+    {
+        this(Comparator.comparingInt(Vec3i::getY)
+                .thenComparingInt(Vec3i::getX)
+                .thenComparingInt(Vec3i::getZ));
+    }
+
+    public TrapPositionCalc(Comparator<Vec3i> trapOrdering)
+    {
+        this.trapOrdering = trapOrdering;
+        this.trapPositions = new ConcurrentSkipListMap<>(trapOrdering);
+    }
 
     public void calcTrap(Box boundingBox, TrapSpec trapSpec)
     {
@@ -138,7 +146,7 @@ public class TrapPositionCalc
         List<Map.Entry<BlockPos, TrapLayer>> list = new ArrayList<>(trapPositions.entrySet());
         if (layerOrder == null || layerOrder.length == 0)
         {
-            list.sort(Map.Entry.comparingByKey(TRAP_ORDER));
+            list.sort(Map.Entry.comparingByKey(trapOrdering));
             return list;
         }
 
@@ -150,7 +158,7 @@ public class TrapPositionCalc
 
         list.sort(
                 Comparator.<Map.Entry<BlockPos, TrapLayer>>comparingInt(e -> rank.getOrDefault(e.getValue(), Integer.MAX_VALUE))
-                        .thenComparing(Map.Entry::getKey, TRAP_ORDER)
+                        .thenComparing(Map.Entry::getKey, trapOrdering)
         );
 
         return list;
