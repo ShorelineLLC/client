@@ -468,6 +468,11 @@ public class SpeedMineModule extends ListeningToggleable
         }
     }
 
+    public boolean hasFreeMine()
+    {
+        return mainMiningBlock == null || packetMiningBlock == null;
+    }
+
     public boolean isMining(BlockPos blockPos)
     {
         return mainMiningBlock != null && mainMiningBlock.getBlockPos().equals(blockPos)

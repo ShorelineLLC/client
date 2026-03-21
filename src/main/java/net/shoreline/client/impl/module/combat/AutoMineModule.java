@@ -28,7 +28,7 @@ import java.util.Map;
 public class AutoMineModule extends TrapModule
 {
     public static AutoMineModule INSTANCE;
-    private static SpeedMineModule speedMine;
+    public static SpeedMineModule speedMine;
 
     Config<Float> rangeConfig = new NumberConfig.Builder<Float>("TargetRange")
             .setMin(1.0f).setMax(10.0f).setDefaultValue(6.0f).setFormat("m")
@@ -130,7 +130,7 @@ public class AutoMineModule extends TrapModule
         }
     }
 
-    private void startAutoMine(BlockPos blockPos)
+    public void startAutoMine(BlockPos blockPos)
     {
         BlockState state = mc.world.getBlockState(blockPos);
         if (!MiningUtil.canMineBlock(state) || speedMine.isMining(blockPos))
@@ -282,7 +282,7 @@ public class AutoMineModule extends TrapModule
         return Managers.SOCIAL.isFriend(player);
     }
 
-    private boolean canStartMining(BlockPos currentMine)
+    public boolean canStartMining(BlockPos currentMine)
     {
         MiningData main = speedMine.getMainMiningBlock();
         MiningData packet = speedMine.getPacketMiningBlock();
