@@ -22,7 +22,7 @@ public class NukeScanner extends AsyncBlockScanner
     {
         this.module = module;
         this.result = new ConcurrentSkipListSet<>(Comparator.comparing(pos ->
-                MinecraftClient.getInstance().player.squaredDistanceTo(pos.toCenterPos())));
+                -MinecraftClient.getInstance().player.squaredDistanceTo(pos.toCenterPos())));
     }
 
     @Override
@@ -35,7 +35,7 @@ public class NukeScanner extends AsyncBlockScanner
 
         double dist = MinecraftClient.getInstance().player.
                 squaredDistanceTo(pos.toCenterPos());
-        if (dist > MathHelper.square(dist))
+        if (dist > MathHelper.square(module.getRange()))
         {
             return;
         }
