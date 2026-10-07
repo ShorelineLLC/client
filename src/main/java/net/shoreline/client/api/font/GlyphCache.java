@@ -2,11 +2,12 @@ package net.shoreline.client.api.font;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
+import lombok.Getter;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.mixin.accessor.AccessorNativeImage;
-import net.shoreline.client.util.Globals;
+import net.shoreline.client.impl.imixin.INativeImage;
 import org.lwjgl.system.MemoryUtil;
 
 import java.awt.*;
@@ -19,17 +20,25 @@ import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class GlyphCache implements Globals
+public class GlyphCache
 {
     private final char start, end;
     private final Font font;
+    @Getter
     private final Identifier id;
     private final int padding;
-    private int width, height;
+    @Getter
+    private int width;
+    @Getter
+    private int height;
     private final Char2ObjectArrayMap<Glyph> glyphs = new Char2ObjectArrayMap<>();
     private boolean generated;
+    @Getter
+    private BufferedImage atlas;
 
     private final boolean antiAlias, fractionalMetrics;
 
@@ -55,7 +64,7 @@ public class GlyphCache implements Globals
 
     public void clear()
     {
-        mc.getTextureManager().destroyTexture(id);
+        MinecraftClient.getInstance().getTextureManager().destroyTexture(id);
         glyphs.clear();
         generated = false;
     }
@@ -101,6 +110,7 @@ public class GlyphCache implements Globals
             currX += width + padding;
             charX++;
         }
+
         BufferedImage bufferedImage = new BufferedImage(Math.max(maxX + padding, 1), Math.max(maxY + padding, 1), BufferedImage.TYPE_INT_ARGB);
         width = bufferedImage.getWidth();
         height = bufferedImage.getHeight();
@@ -120,22 +130,8 @@ public class GlyphCache implements Globals
             glyphs.put(glyph.value(), glyph);
         }
         registerTexture(id, bufferedImage);
+        atlas = bufferedImage;
         generated = true;
-    }
-
-    public Identifier getId()
-    {
-        return id;
-    }
-
-    public int getWidth()
-    {
-        return width;
-    }
-
-    public int getHeight()
-    {
-        return height;
     }
 
     // https://github.com/0x3C50/Renderer
@@ -146,7 +142,7 @@ public class GlyphCache implements Globals
             int imageWidth = bufferedImage.getWidth();
             int imageHeight = bufferedImage.getHeight();
             NativeImage image = new NativeImage(NativeImage.Format.RGBA, imageWidth, imageHeight, false);
-            long ptr = ((AccessorNativeImage) (Object) image).hookGetPointer();
+            long ptr = ((INativeImage) (Object) image).getPointer();
             IntBuffer backingBuffer = MemoryUtil.memIntBuffer(ptr, image.getWidth() * image.getHeight());
             WritableRaster raster = bufferedImage.getRaster();
             ColorModel colorModel = bufferedImage.getColorModel();
@@ -161,6 +157,7 @@ public class GlyphCache implements Globals
                 case DataBuffer.TYPE_DOUBLE -> new double[bands];
                 default -> throw new IllegalArgumentException("Unknown data buffer type: " + dataType);
             };
+
             for (int y = 0; y < imageHeight; y++)
             {
                 for (int x = 0; x < imageWidth; x++)
@@ -174,16 +171,17 @@ public class GlyphCache implements Globals
                     backingBuffer.put(argb);
                 }
             }
+
             NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
             texture.upload();
             texture.setFilter(true, true);
             if (RenderSystem.isOnRenderThread())
             {
-                mc.getTextureManager().registerTexture(identifier, texture);
+                MinecraftClient.getInstance().getTextureManager().registerTexture(identifier, texture);
             }
             else
             {
-                RenderSystem.recordRenderCall(() -> mc.getTextureManager().registerTexture(identifier, texture));
+                RenderSystem.recordRenderCall(() -> MinecraftClient.getInstance().getTextureManager().registerTexture(identifier, texture));
             }
         }
         catch (Throwable e)

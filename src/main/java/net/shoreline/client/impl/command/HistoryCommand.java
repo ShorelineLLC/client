@@ -1,54 +1,61 @@
 package net.shoreline.client.impl.command;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
-import net.shoreline.client.api.command.PlayerArgumentType;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.api.command.argtype.PlayerArgumentType;
+import net.shoreline.client.util.LookupUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class HistoryCommand extends Command
 {
-
     public HistoryCommand()
     {
-        super("History", "View the name history of a player", literal("history"));
+        super("history", "Shows the name history of a player");
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
-        builder.then(argument("player", PlayerArgumentType.player()).executes(c ->
+        argumentBuilder.then(buildArgument("player", PlayerArgumentType.player()).executes(context ->
         {
-            String playerName = PlayerArgumentType.getPlayer(c, "player");
-            UUID uuid = Managers.LOOKUP.getUUIDFromName(playerName);
+            String playerName = PlayerArgumentType.getPlayer(context, "player");
+            UUID uuid = LookupUtil.getUUID(playerName);
             if (uuid == null)
             {
-                ChatUtil.error("Could not find player UUID!");
+                sendErrorChatMessage("Failed to find player UUID.");
                 return 0;
             }
-            Map<String, String> nameHistory = Managers.LOOKUP.getNameHistoryFromUUID(uuid);
-            if (nameHistory == null)
+
+            Map<String, String> history = LookupUtil.getHistory(uuid);
+            if (history == null)
             {
-                ChatUtil.error("Could not find player name history!");
+                sendErrorChatMessage("Failed to find player name history.");
                 return 0;
             }
-            ArrayList<String> nameHistoryList = new ArrayList<>();
-            for (Map.Entry<String, String> entry : nameHistory.entrySet())
+
+            boolean first = true;
+            sendClientChatMessage("History:");
+            for (Map.Entry<String, String> entry : history.entrySet())
             {
-                nameHistoryList.add(entry.getValue() + " - " + entry.getKey().substring(0, 10));
+                Formatting format  = first ? Formatting.GOLD : Formatting.WHITE;
+                String name        = entry.getValue();
+                String nameHistory = entry.getKey().substring(0, 10);
+                sendClientChatMessage(format + name + " - " + nameHistory);
+                first = false;
             }
-            if (nameHistoryList.isEmpty())
-            {
-                ChatUtil.error("No player name history!");
-                return 0;
-            }
-            ChatUtil.clientSendMessageRaw("§7History: §f" + String.join(", ", nameHistoryList));
+
             return 1;
-        }));
+        })).executes(context ->
+        {
+            sendErrorChatMessage("Please provide a player.");
+            return 0;
+        });
     }
 }

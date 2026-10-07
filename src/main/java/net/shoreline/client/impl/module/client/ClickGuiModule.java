@@ -1,196 +1,125 @@
 package net.shoreline.client.impl.module.client;
 
-import net.shoreline.client.Shoreline;
+import lombok.Getter;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
-import net.shoreline.client.impl.gui.click.ClickGuiScreen;
-import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.render.animation.Easing;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.macro.ModuleKeybind;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.gui.clickgui.ClickGuiScreen;
+import net.shoreline.client.impl.event.LoadingEvent;
+import net.shoreline.client.impl.render.animation.Animation;
+import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.Theme;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 import org.lwjgl.glfw.GLFW;
 
-/**
- * @author linus
- * @see ClickGuiScreen
- * @since 1.0
- */
-public class ClickGuiModule extends ToggleModule
+public class ClickGuiModule extends Toggleable
 {
+    public static ClickGuiModule INSTANCE;
 
-    private static ClickGuiModule INSTANCE;
+    Config<Float> scaleConfig = new NumberConfig.Builder<Float>("Scale")
+            .setMin(0.5f).setMax(1.5f).setDefaultValue(1.0f)
+            .setDescription("The global gui scale").build();
+    Config<Boolean> blurConfig = new BooleanConfig.Builder("Blur")
+            .setDescription("Blurs the screen background")
+            .setDefaultValue(true).build();
+    Config<Boolean> darkenConfig = new BooleanConfig.Builder("Darken")
+            .setDescription("Darkens the screen background")
+            .setDefaultValue(true).build();
+    Config<Integer> scrollSpeedConfig = new NumberConfig.Builder<Integer>("ScrollSpeed")
+            .setMin(5).setMax(100).setDefaultValue(30).setFormat("dpi")
+            .setDescription("The speed for mouse scrolling").build();
+    Config<Boolean> categoryCount = new BooleanConfig.Builder("ShowCount")
+            .setDescription("Shows the number of modules in each category")
+            .setDefaultValue(true).build();
 
-    // Config<Boolean> gradientConfig = register(new BooleanConfig("Gradient", "Adds a gradient to the elements", false));
-    Config<Boolean> blurConfig = register(new BooleanConfig("Blur", "Adds a blur background to the panels", false));
-    Config<Float> scaleConfig = register(new NumberConfig<>("Scale", "The gui scale", 0.5f, 1.0f, 3.0f));
-    Config<Integer> scrollSpeedConfig = register(new NumberConfig<>("ScrollSpeed", "The speed of GUI scrolling", 5, 30, 100));
-    Config<Boolean> soundsConfig = register(new BooleanConfig("Sounds", "Click sounds", true));
-    Config<Boolean> descriptionsConfig = register(new BooleanConfig("Descriptions", "Shows feature descriptions", true));
+    @Getter
+    private final Theme theme;
+    private final Animation fadeInAnimation;
 
-    public static ClickGuiScreen CLICK_GUI_SCREEN;
-    public static float CLICK_GUI_SCALE = 1.0f;
-    private final Animation openCloseAnimation = new Animation(false, 400, Easing.BACK_OUT);
-    private final Animation transparencyAnimation = new Animation(false, 300, Easing.CUBIC_IN_OUT);
+    @Getter
+    private float scale = 1.0f;
 
-    /**
-     *
-     */
     public ClickGuiModule()
     {
-        super("ClickGui", "Opens the clickgui screen", ModuleCategory.CLIENT, GLFW.GLFW_KEY_RIGHT_SHIFT);
-        INSTANCE = this;
-    }
+        super("ClickGui", "The client mod menu", GuiCategory.CLIENT);
 
-    public static ClickGuiModule getInstance()
-    {
-        return INSTANCE;
+        setKeybind(new ModuleKeybind(GLFW.GLFW_KEY_RIGHT_SHIFT, this));
+
+        this.fadeInAnimation = new Animation(false, 150, Easing.LINEAR);
+        this.theme = new Theme(fadeInAnimation);
+        INSTANCE = this;
     }
 
     @Override
     public void onEnable()
     {
-        if (mc.player == null || mc.world == null)
+        if (mc.isFinishedLoading())
         {
-            toggle();
-            return;
-        }
-        // initialize the null gui screen instance
-        if (CLICK_GUI_SCREEN == null)
-        {
-            CLICK_GUI_SCALE = scaleConfig.getValue();
-            CLICK_GUI_SCREEN = new ClickGuiScreen(this);
-            Shoreline.CONFIG.loadClickGui();
-        }
-        if (CLICK_GUI_SCALE != scaleConfig.getValue())
-        {
-            CLICK_GUI_SCALE = scaleConfig.getValue();
-            CLICK_GUI_SCREEN = new ClickGuiScreen(this);
-        }
-        openCloseAnimation.setState(true);
-        transparencyAnimation.setState(true);
-        openCloseAnimation.reset();
-        transparencyAnimation.reset();
+            if (scale != scaleConfig.getValue())
+            {
+                scale = scaleConfig.getValue();
+            }
 
-        mc.setScreen(CLICK_GUI_SCREEN);
+            ThemeModule primaryTheme = ThemeModule.INSTANCE;
+            theme.setComponentColor(primaryTheme.getPrimaryColor());
+            theme.setTitleColor(primaryTheme.getTitleColor());
+            theme.setBackgroundColor(primaryTheme.getBackgroundColor());
+            theme.setOutlineColor(primaryTheme.getOutlineColor());
+            theme.setTextColor(primaryTheme.getTextColor());
+
+            setFadeState(true);
+            mc.setScreen(ClickGuiScreen.INSTANCE);
+        }
     }
 
     @Override
     public void onDisable()
     {
-        if (mc.player == null || mc.world == null)
+        setFadeState(false);
+        if (checkNull())
         {
-            toggle();
             return;
         }
-        if (CLICK_GUI_SCREEN != null)
-        {
-            Shoreline.CONFIG.saveClickGui();
-        }
+
         mc.player.closeScreen();
-        openCloseAnimation.setState(false);
-        transparencyAnimation.setState(false);
     }
 
     @EventListener
-    public void onConfigUpdate(ConfigUpdateEvent event)
+    public void onFinishedLoading(LoadingEvent.Finished event)
     {
-        if (event.getStage() == StageEvent.EventStage.POST
-                && event.getConfig() == scaleConfig && mc.world == null)
-        {
-            CLICK_GUI_SCALE = scaleConfig.getValue();
-        }
+        scale = scaleConfig.getValue();
     }
 
-    public int getColor()
+    public void setFadeState(boolean fadeState)
     {
-        return ColorsModule.getInstance().getColor((int) (100 * openCloseAnimation.getFactor())).getRGB();
+        fadeInAnimation.setState(fadeState);
     }
 
-    public int getColor(int a)
+    public Animation getFadeAnimation()
     {
-        return ColorsModule.getInstance().getColor((int) (a * openCloseAnimation.getFactor())).getRGB();
+        return fadeInAnimation;
     }
 
-    public int getColor(float alpha)
-    {
-        return ColorsModule.getInstance().getColor((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB();
-    }
-
-    public int getColor(int a, float alpha)
-    {
-        return ColorsModule.getInstance().getColor((int) (a * alpha * openCloseAnimation.getFactor())).getRGB();
-    }
-
-//    public int getGradient()
-//    {
-//        return gradientConfig.getValue() ? ColorsModule.getInstance().getGradient((int) (100 * openCloseAnimation.getFactor())).getRGB() : getColor();
-//    }
-//
-//    public int getGradient(int a)
-//    {
-//        return gradientConfig.getValue() ? ColorsModule.getInstance().getGradient((int) (a * openCloseAnimation.getFactor())).getRGB() : getColor(a);
-//    }
-//
-//    public int getGradient(float alpha)
-//    {
-//        return gradientConfig.getValue() ? ColorsModule.getInstance().getGradient((int) (100 * alpha * openCloseAnimation.getFactor())).getRGB() : getColor(alpha);
-//    }
-//
-//    public int getGradient(int a, float alpha)
-//    {
-//        return gradientConfig.getValue() ? ColorsModule.getInstance().getGradient((int) (a * alpha * openCloseAnimation.getFactor())).getRGB() : getColor(a, alpha);
-//    }
-
-    // Applies a transparency to a color
-    public int fixTransparency(int color)
-    {
-        float alpha = getAlpha();
-
-        if (alpha == 1.0F)
-        {
-            return color;
-        }
-
-        float colorAlpha = (color >> 24) & 0xFF;
-
-        alpha = Math.max(0.0F, Math.min(1.0F, alpha));
-
-        int colorAlphaInt = Math.max(10, (int) (colorAlpha * alpha));
-
-        return (colorAlphaInt << 24) | (color & 0xFFFFFF);
-    }
-
-    public boolean getBlur()
+    public boolean shouldBlur()
     {
         return blurConfig.getValue();
     }
 
-    public boolean getSounds()
+    public boolean shouldDarken()
     {
-        return soundsConfig.getValue();
-    }
-
-    public boolean getDescriptions()
-    {
-        return descriptionsConfig.getValue();
-    }
-
-    public float getAlpha()
-    {
-        return (float) (transparencyAnimation.getFactor());
-    }
-
-    public float getScaleFactor()
-    {
-        return (float) (openCloseAnimation.getFactor());
+        return darkenConfig.getValue();
     }
 
     public int getScrollSpeed()
     {
         return scrollSpeedConfig.getValue();
+    }
+
+    public boolean shouldShowCount()
+    {
+        return categoryCount.getValue();
     }
 }

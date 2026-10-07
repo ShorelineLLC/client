@@ -1,86 +1,40 @@
 package net.shoreline.client.impl.module.render;
 
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
-import net.shoreline.client.impl.event.network.GameJoinEvent;
-import net.shoreline.client.impl.event.render.LightmapGammaEvent;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.render.NightVisionEvent;
+import net.shoreline.client.impl.event.render.WorldGammaEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class FullbrightModule extends ToggleModule
+public class FullbrightModule extends Toggleable
 {
-    Config<Brightness> brightnessConfig = register(new EnumConfig<>("Mode", "Mode for world brightness", Brightness.GAMMA, Brightness.values()));
+    Config<Brightness> modeConfig = new EnumConfig.Builder<Brightness>("Mode")
+            .setValues(Brightness.values())
+            .setDescription("The client world brightness mode")
+            .setDefaultValue(Brightness.GAMMA).build();
 
     public FullbrightModule()
     {
-        super("Fullbright", "Brightens the world", ModuleCategory.RENDER);
-    }
-
-    @Override
-    public void onEnable()
-    {
-        if (mc.player != null && mc.world != null
-                && brightnessConfig.getValue() == Brightness.POTION)
-        {
-            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, -1, 0)); // INFINITE
-        }
-    }
-
-    @Override
-    public void onDisable()
-    {
-        if (mc.player != null && mc.world != null
-                && brightnessConfig.getValue() == Brightness.POTION)
-        {
-            mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
-        }
+        super("Fullbright", "Brightens the world", GuiCategory.RENDER);
     }
 
     @EventListener
-    public void onGameJoin(GameJoinEvent event)
+    public void onWorldGamma(WorldGammaEvent event)
     {
-        onDisable();
-        onEnable();
-    }
-
-    @EventListener
-    public void onLightmapGamma(LightmapGammaEvent event)
-    {
-        if (brightnessConfig.getValue() == Brightness.GAMMA)
+        if (modeConfig.getValue() == Brightness.GAMMA)
         {
             event.cancel();
-            event.setGamma(0xffffffff);
         }
     }
 
     @EventListener
-    public void onConfigUpdate(ConfigUpdateEvent event)
+    public void onNightVision(NightVisionEvent event)
     {
-        if (mc.player != null && brightnessConfig == event.getConfig()
-                && event.getStage() == StageEvent.EventStage.POST
-                && brightnessConfig.getValue() != Brightness.POTION)
+        if (modeConfig.getValue() == Brightness.POTION)
         {
-            mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
-        }
-    }
-
-    @EventListener
-    public void onTick(TickEvent event)
-    {
-        if (brightnessConfig.getValue() == Brightness.POTION
-                && !mc.player.hasStatusEffect(StatusEffects.NIGHT_VISION))
-        {
-            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, -1, 0));
+            event.cancel();
         }
     }
 

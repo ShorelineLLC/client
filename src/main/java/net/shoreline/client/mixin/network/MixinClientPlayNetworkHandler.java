@@ -1,27 +1,17 @@
 package net.shoreline.client.mixin.network;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.c2s.play.TeleportConfirmC2SPacket;
-import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.chunk.WorldChunk;
-import net.shoreline.client.impl.event.gui.chat.ChatMessageEvent;
-import net.shoreline.client.impl.event.network.GameJoinEvent;
-import net.shoreline.client.impl.event.network.InventoryEvent;
-import net.shoreline.client.impl.event.network.ServerRotationEvent;
-import net.shoreline.client.impl.event.world.LoadChunkBlockEvent;
-import net.shoreline.client.impl.event.world.LoadChunkEvent;
+import net.shoreline.client.impl.event.network.EntitySpawnEvent;
+import net.shoreline.client.impl.event.network.ExplosionEvent;
+import net.shoreline.client.impl.event.network.RotationUpdateEvent;
+import net.shoreline.client.impl.imixin.IClientConnection;
 import net.shoreline.client.impl.imixin.IClientPlayNetworkHandler;
-import net.shoreline.client.mixin.accessor.AccessorClientConnection;
-import net.shoreline.client.util.Globals;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,146 +19,69 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * @author linus
- * @since 1.0
- */
 @Mixin(ClientPlayNetworkHandler.class)
-public abstract class MixinClientPlayNetworkHandler implements IClientPlayNetworkHandler, Globals
+public abstract class MixinClientPlayNetworkHandler extends MixinClientCommonNetworkHandler implements IClientPlayNetworkHandler
 {
     @Shadow
     public abstract ClientConnection getConnection();
 
-    @Shadow
-    private ClientWorld world;
+    @Inject(method = "onPlayerPositionLook", at = @At(value = "HEAD"))
+    private void hookPlayerPositionLookPre(PlayerPositionLookS2CPacket packet, CallbackInfo ci)
+    {
+        RotationUpdateEvent.Pre event = new RotationUpdateEvent.Pre();
+        EventBus.INSTANCE.dispatch(event);
+    }
 
-    /**
-     * @param content
-     * @param ci
-     */
-    @Inject(method = "sendChatMessage", at = @At(value = "HEAD"),
+    @Inject(method = "onPlayerPositionLook", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/network/ClientConnection;send(Lnet/minecraft/network/packet/Packet;)V",
+            shift = At.Shift.BEFORE,
+            ordinal = 0))
+    private void hookPlayerPositionLookPrePacket(PlayerPositionLookS2CPacket packet, CallbackInfo ci)
+    {
+        RotationUpdateEvent.PrePacket event = new RotationUpdateEvent.PrePacket();
+        EventBus.INSTANCE.dispatch(event);
+    }
+
+    @Inject(method = "onPlayerPositionLook", at = @At(value = "TAIL"))
+    public void hookPlayerPositionLook(PlayerPositionLookS2CPacket packet,
+                                       CallbackInfo ci)
+    {
+        RotationUpdateEvent event = new RotationUpdateEvent(client.player.getYaw(), client.player.getPitch());
+        EventBus.INSTANCE.dispatch(event);
+    }
+
+    @Inject(method = "onExplosion", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/world/ClientWorld;addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
+            shift = At.Shift.AFTER),
             cancellable = true)
-    private void hookSendChatMessage(String content, CallbackInfo ci)
+    private void hookExplosion(ExplosionS2CPacket packet, CallbackInfo ci)
     {
-        ChatMessageEvent.Server chatInputEvent =
-                new ChatMessageEvent.Server(content);
-        EventBus.INSTANCE.dispatch(chatInputEvent);
-        // prevent chat packet from sending
-        if (chatInputEvent.isCanceled())
+        final ExplosionEvent event = new ExplosionEvent(packet.center(), packet.playerKnockback().isPresent() ? packet.playerKnockback().get() : Vec3d.ZERO);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
         {
             ci.cancel();
-        }
-    }
-
-    /**
-     * @param packet
-     * @param ci
-     */
-    @Inject(method = "onGameJoin", at = @At(value = "TAIL"))
-    private void hookOnGameJoin(GameJoinS2CPacket packet, CallbackInfo ci)
-    {
-        GameJoinEvent gameJoinEvent = new GameJoinEvent();
-        EventBus.INSTANCE.dispatch(gameJoinEvent);
-    }
-
-    /**
-     * @param packet
-     * @param ci
-     */
-    @Inject(method = "onInventory", at = @At(value = "TAIL"))
-    private void hookOnInventory(InventoryS2CPacket packet, CallbackInfo ci)
-    {
-        InventoryEvent inventoryEvent = new InventoryEvent(packet);
-        EventBus.INSTANCE.dispatch(inventoryEvent);
-    }
-
-    @Inject(method = "onChunkData", at = @At(value = "RETURN"))
-    private void hookOnChunkData(ChunkDataS2CPacket packet, CallbackInfo ci)
-    {
-        WorldChunk chunk = world.getChunkManager().getWorldChunk(packet.getChunkX(), packet.getChunkZ(), false);
-        int startX = chunk.getPos().getStartX();
-        int startZ = chunk.getPos().getStartZ();
-        LoadChunkEvent loadChunkEvent = new LoadChunkEvent(chunk);
-        EventBus.INSTANCE.dispatch(loadChunkEvent);
-        for (int y = chunk.getBottomY(); y < chunk.getHeight(); y++)
-        {
-            for (int x1 = startX; x1 < startX + 16; x1++)
+            Vec3d newVelo = event.getPlayerVelocity();
+            if (newVelo != null)
             {
-                for (int z1 = startZ; z1 < startZ + 16; z1++)
-                {
-                    BlockPos pos = new BlockPos(x1, y, z1);
-                    BlockState state = chunk.getBlockState(pos);
-                    LoadChunkBlockEvent loadChunkBlockEvent = new LoadChunkBlockEvent(pos, state);
-                    EventBus.INSTANCE.dispatch(loadChunkBlockEvent);
-                }
+                client.player.addVelocityInternal(newVelo);
             }
         }
     }
 
-    @Inject(method = "onPlayerPositionLook", at = @At(value = "HEAD"), cancellable = true)
-    private void onPlayerPositionLook(PlayerPositionLookS2CPacket packet, CallbackInfo ci)
+    @Inject(method = "onEntitySpawn", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V",
+            shift = At.Shift.AFTER))
+    private void hookEntitySpawn(EntitySpawnS2CPacket packet, CallbackInfo ci)
     {
-        ServerRotationEvent serverRotationEvent = new ServerRotationEvent();
-        EventBus.INSTANCE.dispatch(serverRotationEvent);
-        if (serverRotationEvent.isCanceled())
-        {
-            ci.cancel();
-            double i;
-            double h;
-            double g;
-            double f;
-            double e;
-            double d;
-            NetworkThreadUtils.forceMainThread(packet, (ClientPlayNetworkHandler) (Object) this, mc);
-            ClientPlayerEntity playerEntity = mc.player;
-            Vec3d vec3d = playerEntity.getVelocity();
-            boolean bl = packet.getFlags().contains(PositionFlag.X);
-            boolean bl2 = packet.getFlags().contains(PositionFlag.Y);
-            boolean bl3 = packet.getFlags().contains(PositionFlag.Z);
-            if (bl) {
-                d = vec3d.getX();
-                e = playerEntity.getX() + packet.getX();
-                playerEntity.lastRenderX += packet.getX();
-                playerEntity.prevX += packet.getX();
-            } else {
-                d = 0.0;
-                playerEntity.lastRenderX = e = packet.getX();
-                playerEntity.prevX = e;
-            }
-            if (bl2) {
-                f = vec3d.getY();
-                g = playerEntity.getY() + packet.getY();
-                playerEntity.lastRenderY += packet.getY();
-                playerEntity.prevY += packet.getY();
-            } else {
-                f = 0.0;
-                playerEntity.lastRenderY = g = packet.getY();
-                playerEntity.prevY = g;
-            }
-            if (bl3) {
-                h = vec3d.getZ();
-                i = playerEntity.getZ() + packet.getZ();
-                playerEntity.lastRenderZ += packet.getZ();
-                playerEntity.prevZ += packet.getZ();
-            } else {
-                h = 0.0;
-                playerEntity.lastRenderZ = i = packet.getZ();
-                playerEntity.prevZ = i;
-            }
-            float yaw = serverRotationEvent.getYaw();
-            float pitch = serverRotationEvent.getPitch();
-            playerEntity.setPosition(e, g, i);
-            playerEntity.setVelocity(d, f, h);
-            getConnection().send(new TeleportConfirmC2SPacket(packet.getTeleportId()));
-            getConnection().send(new PlayerMoveC2SPacket.Full(playerEntity.getX(), playerEntity.getY(),
-                    playerEntity.getZ(), Float.isNaN(yaw) ? playerEntity.getYaw() : yaw,
-                    Float.isNaN(pitch) ? playerEntity.getPitch() : pitch, false));
-        }
+        EntitySpawnEvent event = new EntitySpawnEvent(new Vec3d(packet.getX(), packet.getY(), packet.getZ()),
+                packet.getEntityId(), packet.getEntityType());
+        EventBus.INSTANCE.dispatch(event);
     }
 
     @Override
     public void sendQuietPacket(Packet<?> packet)
     {
-        ((AccessorClientConnection) getConnection()).hookSendInternal(packet, null, true);
+        ((IClientConnection) getConnection()).hookSendInternal(packet, null, true);
     }
 }

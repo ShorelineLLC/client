@@ -10,8 +10,9 @@ import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.11-SNAPSHOT'
     id 'com.github.gmazzo.buildconfig' version '5.3.5'
+    id 'io.franzbecker.gradle-lombok' version '5.0.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_21
@@ -41,9 +42,12 @@ loom {
 }
 
 repositories {
-    mavenCentral() {
-        url "https://jitpack.io"
-        url "https://impactdevelopment.github.io/maven/"
+    mavenCentral()
+    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://impactdevelopment.github.io/maven/") }
+    maven {
+        name = "modrinth"
+        url = "https://api.modrinth.com/maven"
     }
 }
 
@@ -52,8 +56,29 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_version}:v2"
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "cabaletta:baritone-api:${baritone_api_version}"
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") {
+        exclude group: "net.fabricmc.fabric-api", module: "fabric-loot-api-v3"
+        exclude group: "net.fabricmc.fabric-api", module: "fabric-loot-api-v2"
+    }
+    modImplementation "cabaletta:baritone-api:${project.baritone_api_version}"
+    modImplementation "maven.modrinth:sodium:${project.sodium_version}"
+
+    implementation platform("org.lwjgl:lwjgl-bom:3.3.3")
+    implementation "org.lwjgl:lwjgl-harfbuzz:3.3.3"
+    implementation "org.lwjgl:lwjgl-freetype"
+    runtimeOnly "org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-macos-arm64"
+    runtimeOnly "org.lwjgl:lwjgl-freetype:3.3.3:natives-macos-arm64"
+    runtimeOnly "org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-windows"
+    runtimeOnly "org.lwjgl:lwjgl-freetype:3.3.3:natives-windows"
+
+    compileOnly("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("org.projectlombok:lombok:1.18.38")
+
+    testCompileOnly("org.projectlombok:lombok:1.18.38")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 
 processResources {

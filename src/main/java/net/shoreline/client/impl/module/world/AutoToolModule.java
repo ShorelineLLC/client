@@ -4,79 +4,90 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.ToolItem;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
+import net.minecraft.util.math.BlockPos;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.Config;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.client.impl.event.network.AttackBlockEvent;
-import net.shoreline.client.util.player.EnchantmentUtil;
+import net.shoreline.client.impl.imixin.IClientPlayerInteractionManager;
+import net.shoreline.client.impl.inventory.ItemSlot;
+import net.shoreline.client.util.entity.PlayerUtil;
+import net.shoreline.client.util.item.EnchantUtil;
+import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-/**
- * @author xgraza
- * @since 1.0
- */
-public final class AutoToolModule extends ToggleModule
+public class AutoToolModule extends Toggleable
 {
-    private static AutoToolModule INSTANCE;
+    public static AutoToolModule INSTANCE;
+
+    Config<Boolean> swapBack = new BooleanConfig.Builder("SwapBack")
+            .setDescription("Swaps back to your previously held item")
+            .setDefaultValue(false).build();
+
+    private int prevSlot = -1;
 
     public AutoToolModule()
     {
-        super("AutoTool", "Automatically switches to a tool before mining", ModuleCategory.WORLD);
+        super("AutoTool", "Automatically switches to a tool before mining", GuiCategory.WORLD);
         INSTANCE = this;
     }
 
-    public static AutoToolModule getInstance()
-    {
-        return INSTANCE;
-    }
-
     @EventListener
-    public void onBreakBlock(final AttackBlockEvent event)
+    public void onTickPre(TickEvent.Pre event)
     {
-        final BlockState state = mc.world.getBlockState(event.getPos());
-        final int blockSlot = getBestToolNoFallback(state);
-        if (blockSlot != -1)
+        if (checkNull() || mc.interactionManager == null || !PlayerUtil.isInSurvival(mc.player))
         {
-            mc.player.getInventory().selectedSlot = blockSlot;
+            return;
+        }
+
+        if (mc.interactionManager.isBreakingBlock())
+        {
+            ItemSlot blockSlot = getBestTool(((IClientPlayerInteractionManager) mc.interactionManager).getCurrentBreakingPos());
+            int holding = mc.player.getInventory().selectedSlot;
+            if (blockSlot != null && blockSlot.getSlot() != holding)
+            {
+                prevSlot = holding;
+                mc.player.getInventory().setSelectedSlot(blockSlot.getSlot());
+            }
+        } else if (swapBack.getValue() && prevSlot != -1)
+        {
+            mc.player.getInventory().setSelectedSlot(prevSlot);
+            prevSlot = -1;
         }
     }
 
-    public int getBestTool(final BlockState state)
+    public ItemSlot getBestTool(BlockPos breakingPos)
     {
-        int slot = getBestToolNoFallback(state);
-        if (slot != -1)
-        {
-            return slot;
-        }
-        return mc.player.getInventory().selectedSlot;
-    }
-
-    public int getBestToolNoFallback(final BlockState state)
-    {
-        if (state.getBlock() == Blocks.COBWEB)
+        final BlockState state = mc.world.getBlockState(breakingPos);
+        if (state.isOf(Blocks.COBWEB))
         {
             for (int i = 0; i < 9; i++)
             {
                 final ItemStack stack = mc.player.getInventory().getStack(i);
-                if (stack.isEmpty() || !(stack.getItem() instanceof SwordItem))
+                if (stack.isEmpty() || !ItemUtil.isSword(stack.getItem()))
                 {
                     continue;
                 }
-                return i;
+
+                return new ItemSlot(i, stack);
             }
         }
+
         int slot = -1;
+        ItemStack toolStack = null;
+
         float bestTool = 0.0f;
         for (int i = 0; i < 9; i++)
         {
             final ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.isEmpty() || !(stack.getItem() instanceof ToolItem))
+            if (stack.isEmpty() || !ItemUtil.isTool(stack.getItem()))
             {
                 continue;
             }
             float speed = stack.getMiningSpeedMultiplier(state);
-            final int efficiency = EnchantmentUtil.getLevel(stack, Enchantments.EFFICIENCY);
+            final int efficiency = EnchantUtil.getLevel(Enchantments.EFFICIENCY, stack);
             if (efficiency > 0)
             {
                 speed += efficiency * efficiency + 1.0f;
@@ -84,9 +95,16 @@ public final class AutoToolModule extends ToggleModule
             if (speed > bestTool)
             {
                 bestTool = speed;
+                toolStack = stack.copy();
                 slot = i;
             }
         }
-        return slot;
+
+        if (slot == -1 || toolStack == null)
+        {
+            return null;
+        }
+
+        return new ItemSlot(slot, toolStack);
     }
 }

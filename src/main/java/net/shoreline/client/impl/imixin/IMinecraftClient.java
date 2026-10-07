@@ -3,7 +3,9 @@ package net.shoreline.client.impl.imixin;
 @IMixin
 public interface IMinecraftClient
 {
-    void leftClick();
+    void hookDoItemUse();
 
-    void rightClick();
+    int getItemUseCooldown();
+
+    void setItemUseCooldown(int itemUseCooldown);
 }

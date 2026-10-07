@@ -1,29 +1,14 @@
 package net.shoreline.client.impl.event.network;
 
-import net.shoreline.eventbus.event.StageEvent;
+import net.shoreline.eventbus.Event;
 
-public class PlayerUpdateEvent extends StageEvent
+public class PlayerUpdateEvent extends Event
 {
-    private float yaw;
-    private float pitch;
+    public static class Pre extends PlayerUpdateEvent {}
 
-    public float getYaw()
-    {
-        return yaw;
-    }
+    public static class Peri extends PlayerUpdateEvent {}
 
-    public void setYaw(float yaw)
-    {
-        this.yaw = yaw;
-    }
+    public static class PrePacket extends PlayerUpdateEvent {}
 
-    public float getPitch()
-    {
-        return pitch;
-    }
-
-    public void setPitch(float pitch)
-    {
-        this.pitch = pitch;
-    }
+    public static class Post extends PlayerUpdateEvent {}
 }

@@ -1,15 +1,15 @@
 package net.shoreline.client.impl.module.misc;
 
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.gui.screen.slot.ShulkerNestedEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-public class ShulkerceptionModule extends ToggleModule
+public class ShulkerceptionModule extends Toggleable
 {
     public ShulkerceptionModule()
     {
-        super("Shulkerception", "Allows you to put shulkers in shulkers", ModuleCategory.MISCELLANEOUS);
+        super("Shulkerception", "Put shulkers inside shulkers", GuiCategory.MISCELLANEOUS);
     }
 
     @EventListener

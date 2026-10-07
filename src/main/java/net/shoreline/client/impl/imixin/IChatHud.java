@@ -6,6 +6,5 @@ import net.minecraft.text.Text;
 @IMixin
 public interface IChatHud
 {
-
-    void addMessage(Text message, MessageIndicator indicator, int id);
+    void addMessage(Text message, MessageIndicator messageIndicator, int id);
 }

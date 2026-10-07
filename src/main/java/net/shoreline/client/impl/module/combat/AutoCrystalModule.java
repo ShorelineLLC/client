@@ -1,1757 +1,925 @@
 package net.shoreline.client.impl.module.combat;
 
-import com.google.common.collect.Lists;
+import lombok.Getter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.item.EndCrystalItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
-import net.minecraft.world.RaycastContext;
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.NumberDisplay;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.render.RenderBuffers;
-import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.impl.event.RunTickEvent;
-import net.shoreline.client.impl.event.network.DisconnectEvent;
+import net.minecraft.world.BlockView;
+import net.shoreline.client.api.config.*;
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.event.network.EntitySpawnEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.event.world.AddEntityEvent;
-import net.shoreline.client.impl.module.CombatModule;
-import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.exploit.FastLatencyModule;
-import net.shoreline.client.impl.module.world.AutoMineModule;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.collection.EvictingQueue;
-import net.shoreline.client.util.entity.EntityUtil;
-import net.shoreline.client.util.math.PerSecondCounter;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
-import net.shoreline.client.util.player.InventoryUtil;
-import net.shoreline.client.util.player.PlayerUtil;
-import net.shoreline.client.util.player.RotationUtil;
-import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.world.BlastResistantBlocks;
-import net.shoreline.client.util.world.ExplosionUtil;
+import net.shoreline.client.impl.interact.PlaceInteraction;
+import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.impl.inventory.SilentSwapType;
+import net.shoreline.client.impl.inventory.SwapHandler;
+import net.shoreline.client.impl.mining.MiningData;
+import net.shoreline.client.impl.module.client.ThemeModule;
+import net.shoreline.client.impl.module.combat.crystal.CrystalCalcManager;
+import net.shoreline.client.impl.module.combat.crystal.CrystalData;
+import net.shoreline.client.impl.module.combat.crystal.CrystalOptimizer;
+import net.shoreline.client.impl.module.combat.util.DamageUtil;
+import net.shoreline.client.impl.module.impl.ObsidianPlacerModule;
+import net.shoreline.client.impl.module.impl.Priorities;
+import net.shoreline.client.impl.module.world.SpeedMineModule;
+import net.shoreline.client.impl.network.NetworkUtil;
+import net.shoreline.client.impl.render.BoxRender;
+import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.animation.Animation;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.RotateMode;
+import net.shoreline.client.impl.rotation.Rotation;
+import net.shoreline.client.impl.rotation.RotationUtil;
+import net.shoreline.client.impl.world.EntityState;
+import net.shoreline.client.impl.world.LivingEntityState;
+import net.shoreline.client.impl.world.explosion.ExplosionUtil;
+import net.shoreline.client.util.math.PerSecond;
+import net.shoreline.client.util.math.QueueAverage;
+import net.shoreline.client.util.world.WorldUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.loader.Loader;
 
-import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.List;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class AutoCrystalModule extends CombatModule
+@Getter
+public class AutoCrystalModule extends ObsidianPlacerModule
 {
-    private static AutoCrystalModule INSTANCE;
+    public static AutoCrystalModule INSTANCE;
 
-    Config<Boolean> whileMiningConfig = register(new BooleanConfig("WhileMining", "Allows attacking while mining blocks", false));
-    Config<Float> targetRangeConfig = register(new NumberConfig<>("EnemyRange", "Range to search for potential enemies", 1.0f, 10.0f, 13.0f));
-    Config<Boolean> instantConfig = register(new BooleanConfig("Instant", "Instantly attacks crystals when they spawn", false));
-    Config<Sequential> sequentialConfig = register(new EnumConfig<>("Sequential", "Places a crystal after spawn", Sequential.NONE, Sequential.values()));
-    Config<Boolean> idPredictConfig = register(new BooleanConfig("BreakPredict", "Attempts to predict crystal entity ids", false));
-    Config<Boolean> instantCalcConfig = register(new BooleanConfig("Instant-Calc", "Calculates a crystal when it spawns and attacks if it meets MINIMUM requirements, this will result in non-ideal crystal attacks", false, () -> false));
-    Config<Float> instantDamageConfig = register(new NumberConfig<>("InstantDamage", "Minimum damage to attack crystals instantly", 1.0f, 6.0f, 10.0f, () -> false));
-    Config<Boolean> instantMaxConfig = register(new BooleanConfig("InstantMax", "Attacks crystals instantly if they exceed the previous max attack damage (Note: This is still not a perfect check because the next tick could have better damages)", true, () -> false));
-    Config<Boolean> raytraceConfig = register(new BooleanConfig("Raytrace", "Raytrace to crystal position", true));
-    Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swing hand when placing and attacking crystals", true));
-    // ROTATE SETTINGS
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate before placing and breaking", false));
-    // Config<Boolean> rotateSilentConfig = register(new BooleanConfig("RotateSilent", "Silently updates rotations to server", false));
-    Config<Rotate> strictRotateConfig = register(new EnumConfig<>("YawStep", "Rotates yaw over multiple ticks to prevent certain rotation flags in NCP", Rotate.OFF, Rotate.values(), () -> rotateConfig.getValue()));
-    Config<Integer> rotateLimitConfig = register(new NumberConfig<>("YawStep-Limit", "Maximum yaw rotation in degrees for one tick", 1, 180, 180, NumberDisplay.DEGREES, () -> rotateConfig.getValue() && strictRotateConfig.getValue() != Rotate.OFF));
-    // Config<Boolean> rotateTickFactorConfig = register(new BooleanConfig("Rotate-TickReduction", "Factors in angles when calculating crystals", false, () -> rotateConfig.getValue() && strictRotateConfig.getValue() != Rotate.OFF));
+    Config<Boolean> multitaskConfig = new BooleanConfig.Builder("Multitask")
+            .setDescription("Allows using items while interacting")
+            .setDefaultValue(true).build();
+    Config<Boolean> swingConfig = new BooleanConfig.Builder("Swing")
+            .setDescription("Swings the hand when attacking")
+            .setDefaultValue(true).build();
 
-    Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Target players", true));
-    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Target monsters", false));
-    Config<Boolean> neutralsConfig = register(new BooleanConfig("Neutrals", "Target neutrals", false));
-    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Target animals", false));
-    Config<Boolean> shulkersConfig = register(new BooleanConfig("Shulkers", "Target shulker boxes", false));
-    // BREAK SETTINGS
-    Config<Float> breakSpeedConfig = register(new NumberConfig<>("BreakSpeed", "Speed to break crystals", 0.1f, 18.0f, 20.0f));
-    Config<Float> attackDelayConfig = register(new NumberConfig<>("AttackDelay", "Added delays", 0.0f, 0.0f, 5.0f));
-    Config<Integer> attackFactorConfig = register(new NumberConfig<>("AttackFactor", "Factor of attack delay", 0, 0, 3, () -> attackDelayConfig.getValue() > 0.0));
-    Config<Float> attackLimitConfig = register(new NumberConfig<>("AttackLimit", "The number of attacks before considering a crystal unbreakable", 0.5f, 1.5f, 20.0f));
-    // Config<Float> randomSpeedConfig = register(new NumberConfig<>("RandomSpeed", "Randomized delay for breaking crystals", 0.0f, 0.0f, 10.0f));
-    Config<Boolean> breakDelayConfig = register(new BooleanConfig("BreakDelay", "Uses attack latency to calculate break delays", false));
-    Config<Float> breakTimeoutConfig = register(new NumberConfig<>("BreakTimeout", "Time after waiting for the average break time before considering a crystal attack failed", 0.0f, 3.0f, 10.0f, () -> breakDelayConfig.getValue()));
-    Config<Float> minTimeoutConfig = register(new NumberConfig<>("MinTimeout", "Minimum time before considering a crystal break/place failed", 0.0f, 5.0f, 20.0f, () -> breakDelayConfig.getValue()));
-    Config<Integer> ticksExistedConfig = register(new NumberConfig<>("TicksExisted", "Minimum ticks alive to consider crystals for attack", 0, 0, 10));
-    Config<Float> breakRangeConfig = register(new NumberConfig<>("BreakRange", "Range to break crystals", 0.1f, 4.0f, 6.0f));
-    Config<Float> maxYOffsetConfig = register(new NumberConfig<>("MaxYOffset", "Maximum crystal y-offset difference", 1.0f, 5.0f, 10.0f));
-    Config<Float> breakWallRangeConfig = register(new NumberConfig<>("BreakWallRange", "Range to break crystals through walls", 0.1f, 4.0f, 6.0f));
-    Config<Swap> antiWeaknessConfig = register(new EnumConfig<>("AntiWeakness", "Swap to tools before attacking crystals", Swap.OFF, Swap.values()));
-    Config<Float> swapDelayConfig = register(new NumberConfig<>("SwapPenalty", "Delay for attacking after swapping items which prevents NCP flags", 0.0f, 0.0f, 10.0f));
-    //
-    Config<Boolean> inhibitConfig = register(new BooleanConfig("Inhibit", "Prevents excessive attacks", true));
-    Config<Boolean> placeConfig = register(new BooleanConfig("Place", "Places crystals to damage enemies. Place settings will only function if this setting is enabled.", true));
-    Config<Float> placeSpeedConfig = register(new NumberConfig<>("PlaceSpeed", "Speed to place crystals", 0.1f, 18.0f, 20.0f, () -> placeConfig.getValue()));
-    Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "Range to place crystals", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
-    Config<Float> placeWallRangeConfig = register(new NumberConfig<>("PlaceWallRange", "Range to place crystals through walls", 0.1f, 4.0f, 6.0f, () -> placeConfig.getValue()));
-    Config<Boolean> placeRangeEyeConfig = register(new BooleanConfig("PlaceRangeEye", "Calculates place ranges starting from the eye position of the player", false, () -> placeConfig.getValue()));
-    Config<Boolean> placeRangeCenterConfig = register(new BooleanConfig("PlaceRangeCenter", "Calculates place ranges to the center of the block", true, () -> placeConfig.getValue()));
-    Config<Swap> autoSwapConfig = register(new EnumConfig<>("Swap", "Swaps to an end crystal before placing if the player is not holding one", Swap.OFF, Swap.values(), () -> placeConfig.getValue()));
-    // Config<Float> alternateSpeedConfig = register(new NumberConfig<>("AlternateSpeed", "Speed for alternative swapping crystals", 1.0f, 18.0f, 20.0f, () -> placeConfig.getValue() && autoSwapConfig.getValue() == Swap.SILENT_ALT));
-    Config<Boolean> antiSurroundConfig = register(new BooleanConfig("AntiSurround", "Places on mining blocks that when broken, can be placed on to damage enemies. Instantly destroys items spawned from breaking block and allows faster placing", false, () -> placeConfig.getValue()));
-    Config<ForcePlace> forcePlaceConfig = register(new EnumConfig<>("PreventReplace", "Attempts to replace crystals in surrounds", ForcePlace.NONE, ForcePlace.values()));
-    Config<Boolean> breakValidConfig = register(new BooleanConfig("Strict", "Only places crystals that can be attacked", false, () -> placeConfig.getValue()));
-    Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Interacts with only visible directions when placing crystals", false, () -> placeConfig.getValue()));
-    Config<Placements> placementsConfig = register(new EnumConfig<>("Placements", "Version standard for placing end crystals", Placements.NATIVE, Placements.values(), () -> placeConfig.getValue()));
-    // Damage settings
-    Config<Float> minDamageConfig = register(new NumberConfig<>("MinDamage", "Minimum damage required to consider attacking or placing an end crystal", 1.0f, 4.0f, 10.0f));
-    Config<Float> maxLocalDamageConfig = register(new NumberConfig<>("MaxLocalDamage", "The maximum player damage", 4.0f, 12.0f, 20.0f));
-    Config<Boolean> assumeArmorConfig = register(new BooleanConfig("AssumeBestArmor", "Assumes Prot 0 armor is max armor", false));
-    Config<Boolean> armorBreakerConfig = register(new BooleanConfig("ArmorBreaker", "Attempts to break enemy armor with crystals", true));
-    Config<Float> armorScaleConfig = register(new NumberConfig<>("ArmorScale", "Armor damage scale before attempting to break enemy armor with crystals", 1.0f, 5.0f, 20.0f, NumberDisplay.PERCENT, () -> armorBreakerConfig.getValue()));
-    Config<Float> lethalMultiplier = register(new NumberConfig<>("LethalMultiplier", "If we can kill an enemy with this many crystals, disregard damage values", 0.0f, 1.5f, 4.0f));
-    Config<Boolean> antiTotemConfig = register(new BooleanConfig("Lethal-Totem", "Predicts totems and places crystals to instantly double pop and kill the target", false, () -> placeConfig.getValue()));
-    Config<Boolean> lethalDamageConfig = register(new BooleanConfig("Lethal-DamageTick", "Places lethal crystals only on ticks where they damage entities", false));
-    Config<Boolean> safetyConfig = register(new BooleanConfig("Safety", "Accounts for total player safety when attacking and placing crystals", true));
-    Config<Boolean> safetyOverride = register(new BooleanConfig("SafetyOverride", "Overrides the safety checks if the crystal will kill an enemy", false));
-    Config<Boolean> blockDestructionConfig = register(new BooleanConfig("BlockDestruction", "Accounts for explosion block destruction when calculating damages", false));
-    Config<Boolean> selfExtrapolateConfig = register(new BooleanConfig("SelfExtrapolate", "Accounts for motion when calculating self damage", false));
-    Config<Integer> extrapolateTicksConfig = register(new NumberConfig<>("ExtrapolationTicks", "Accounts for motion when calculating enemy positions, not fully accurate.", 0, 0, 10));
-    // Render settings
-    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders the current placement", true));
-    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
-    Config<Boolean> disableDeathConfig = register(new BooleanConfig("DisableOnDeath", "Disables during disconnect/death", false));
-    Config<Boolean> debugConfig = new BooleanConfig("Debug", "Adds extra debug info to arraylist", false);
-    Config<Boolean> debugDamageConfig = new BooleanConfig("Debug-Damage", "Renders damage", false, () -> renderConfig.getValue());
-    //
-    private DamageData<EndCrystalEntity> attackCrystal;
-    private DamageData<BlockPos> placeCrystal;
-    //
-    private BlockPos renderPos;
-    private double renderDamage;
-    private BlockPos renderSpawnPos;
-    //
-    private Vec3d crystalRotation;
-    private boolean attackRotate;
-    private boolean rotated;
-    private float[] silentRotations;
-    private float calculatePlaceCrystalTime = 0;
-    //
-    private static final Box FULL_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 2.0, 1.0);
-    private static final Box HALF_CRYSTAL_BB = new Box(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-    private final CacheTimer lastAttackTimer = new CacheTimer();
-    private final Timer lastPlaceTimer = new CacheTimer();
-    private final Timer lastSwapTimer = new CacheTimer();
-    private final Timer autoSwapTimer = new CacheTimer();
-    // default NCP config
-    // fight.speed: limit: 13
-    // shortterm: ticks: 8
-    // limitforseconds: half: 8, one: 15, two: 30, four: 60, eight: 100
-    private final Deque<Long> attackLatency = new EvictingQueue<>(20);
-    private final Map<Integer, Long> attackPackets =
-            Collections.synchronizedMap(new ConcurrentHashMap<>());
-    private final Map<BlockPos, Long> placePackets =
-            Collections.synchronizedMap(new ConcurrentHashMap<>());
-    private final PerSecondCounter crystalCounter = new PerSecondCounter();
-    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
-    private long predictId;
-    // Antistuck
-    private final Map<Integer, Integer> antiStuckCrystals = new HashMap<>();
-    private final List<AntiStuckData> stuckCrystals = new CopyOnWriteArrayList<>();
+    Config<Float> targetRange = new NumberConfig.Builder<Float>("TargetRange")
+            .setMin(1.0f).setMax(15.0f).setDefaultValue(10.0f).setFormat("m")
+            .setDescription("The range to target entities").build();
+    Config<Integer> extrapolateTicks = new NumberConfig.Builder<Integer>("Extrapolate")
+            .setMin(0).setDefaultValue(0).setMax(10).setFormat(" ticks")
+            .setDescription("The number of ticks ahead to predict movement").build();
+    Config<Boolean> targetNakeds = new BooleanConfig.Builder("Nakeds")
+            .setDescription("Targets nakeds").setVisible(targetPlayers::getValue).setDefaultValue(true).build();
+    Config<Void> targetConfig = new ConfigGroup.Builder("Target")
+            .addAll(targetRange, extrapolateTicks, targetPlayers, targetNakeds, targetHostiles, targetPassives).build();
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    Config<Float> breakRange = new NumberConfig.Builder<Float>("BreakRange")
+            .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
+            .setDescription("The range to break crystals").build();
+    Config<Float> breakTrace = new NumberConfig.Builder<Float>("BreakTrace")
+            .setMin(0.0f).setMax(6.0f).setDefaultValue(3.0f).setFormat("m")
+            .setDescription("The range to break crystals through walls").build();
+    Config<Integer> breakDelay = new NumberConfig.Builder<Integer>("BreakDelay")
+            .setMin(0).setMax(1000).setDefaultValue(100).setFormat("ms")
+            .setDescription("The delay between breaking crystals").build();
+    Config<Integer> ticksExisted = new NumberConfig.Builder<Integer>("MinExisted")
+            .setMin(0).setMax(10).setDefaultValue(0).setFormat(" ticks")
+            .setDescription("The minimum ticks existed before breaking crystals").build();
+    Config<Void> breakConfig = new ConfigGroup.Builder("Break")
+            .addAll(breakRange, breakTrace, breakDelay, ticksExisted).build();
+
+    Config<Float> placeRange = new NumberConfig.Builder<Float>("PlaceRange")
+            .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
+            .setDescription("The range to place crystals").build();
+    Config<Float> placeTrace = new NumberConfig.Builder<Float>("PlaceTrace")
+            .setMin(0.0f).setMax(6.0f).setDefaultValue(3.0f).setFormat("m")
+            .setDescription("The range to place crystals through walls").build();
+    Config<Integer> placeLimit = new NumberConfig.Builder<Integer>("PlaceLimit")
+            .setMin(1).setMax(10).setDefaultValue(2)
+            .setDescription("The limit of crystal placements per tick").build();
+    Config<Boolean> protocolPlace = new BooleanConfig.Builder("Protocol")
+            .setDescription("Prevents placements in 1x1 areas")
+            .setDefaultValue(false).build();
+    Config<Boolean> basePlace = new BooleanConfig.Builder("Support")
+            .setDescription("Places an obsidian block if there is none")
+            .setDefaultValue(false).build();
+    Config<Void> placeConfig = new ConfigGroup.Builder("Place")
+            .addAll(placeRange, placeTrace, placeLimit, protocolPlace, basePlace).build();
+
+    Config<Boolean> sequentialBreak = new BooleanConfig.Builder("InstantBreak")
+            .setDescription("Breaks immediately after a placement")
+            .setDefaultValue(false).build();
+    Config<Boolean> sequentialPlace = new BooleanConfig.Builder("InstantPlace")
+            .setDescription("Places immediately after breaking a crystal")
+            .setDefaultValue(false).build();
+    Config<Boolean> predictAttack = new BooleanConfig.Builder("PredictAttack")
+            .setDescription("Attempts to predict the next attack (works better on low ping)")
+            .setDefaultValue(false).build();
+    Config<Void> sequentialConfig = new ConfigGroup.Builder("Sequential")
+            .addAll(sequentialBreak, sequentialPlace, predictAttack).build();
+
+    Config<Timing> predictPlace = new EnumConfig.Builder<Timing>("PredictPlace")
+            .setValues(Timing.values())
+            .setDescription("Attempts to predict the next place")
+            .setDefaultValue(Timing.OFF).build();
+    Config<Boolean> cevBreak = new BooleanConfig.Builder("CevBreak")
+            .setDescription("Targets crystal placements above the target")
+            .setDefaultValue(false).build();
+    Config<Boolean> targetItems = new BooleanConfig.Builder("TargetItems")
+            .setDescription("Targets dropped items blocking placements")
+            .setDefaultValue(false).build();
+    Config<Integer> prePlace = new NumberConfig.Builder<Integer>("PrePlace")
+            .setMin(0).setMax(10).setDefaultValue(5).setFormat(" ticks")
+            .setDescription("Ticks before predicting placement")
+            .setVisible(() -> targetItems.getValue()).build();
+    Config<Void> antiSurroundConfig = new ConfigGroup.Builder("SurroundBreak")
+            .addAll(predictPlace, cevBreak, targetItems, prePlace).build();
+
+    Config<Float> minDamage = new NumberConfig.Builder<Float>("MinDamage")
+            .setMin(2.0f).setMax(10.0f).setDefaultValue(4.0f)
+            .setDescription("The minimum damage to consider crystals").build();
+    Config<Float> maxSelfDamage = new NumberConfig.Builder<Float>("MaxSelfDamage")
+            .setMin(2.0f).setMax(20.0f).setDefaultValue(12.0f)
+            .setDescription("The maximum damage a crystal can do to the player").build();
+    Config<Boolean> overrideConfig = new BooleanConfig.Builder("Override")
+            .setDescription("Allows overriding minimum damage (e.g. allows crystal spam)")
+            .setDefaultValue(true).build();
+    Config<Float> armorMultiplier = new NumberConfig.Builder<Float>("ArmorMultiplier")
+            .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f).setFormat("x")
+            .setVisible(() -> overrideConfig.getValue())
+            .setDescription("The minimum armor damage to consider spamming crystals").build();
+    Config<Float> damageMultiplier = new NumberConfig.Builder<Float>("DamageMultiplier")
+            .setMin(1.0f).setMax(5.0f).setDefaultValue(1.0f).setFormat("x")
+            .setVisible(() -> overrideConfig.getValue())
+            .setDescription("Place if we can kill target in this many crystals").build();
+    Config<Boolean> ignoreTerrain = new BooleanConfig.Builder("IgnoreTerrain")
+            .setDescription("Ignores explodable terrain during damage calculations")
+            .setDefaultValue(false).build();
+    Config<Void> damageConfig = new ConfigGroup.Builder("Damage")
+            .addAll(minDamage, maxSelfDamage, overrideConfig, armorMultiplier,
+                    damageMultiplier, ignoreTerrain).build();
+
+    Config<RotateMode> rotateConfig = new EnumConfig.Builder<RotateMode>("Rotate")
+            .setValues(RotateMode.values())
+            .setDescription("Rotates to before interacting")
+            .setDefaultValue(RotateMode.OFF).build();
+
+    Config<Boolean> autoSwap = new BooleanConfig.Builder("AutoSwap")
+            .setDescription("Automatically swaps to crystals before placing")
+            .setDefaultValue(false).build();
+    Config<Boolean> swapBack = new BooleanConfig.Builder("SwapBack")
+            .setVisibilityDependant(true)
+            .setDescription("Swaps back to your previously held slot")
+            .setVisible(() -> autoSwap.getValue())
+            .setDefaultValue(false).build();
+    Config<Boolean> silentSwap = new BooleanConfig.Builder("SilentSwap")
+            .setVisibilityDependant(true)
+            .setDescription("Silently swaps to crystals before placing")
+            .setVisible(() -> autoSwap.getValue())
+            .setDefaultValue(false).build();
+    Config<Boolean> antiWeakness = new BooleanConfig.Builder("AntiWeakness")
+            .setVisibilityDependant(true)
+            .setDescription("Swaps to sword before attacking crystals")
+            .setVisible(() -> autoSwap.getValue() && silentSwap.getValue())
+            .setDefaultValue(false).build();
+    Config<SilentSwapType> silentType = new EnumConfig.Builder<SilentSwapType>("Swap")
+            .setValues(SilentSwapType.values())
+            .setDescription("The silent swap type")
+            .setVisible(() -> autoSwap.getValue() && silentSwap.getValue())
+            .setDefaultValue(SilentSwapType.HOTBAR).build();
+    Config<Void> swapConfig = new ConfigGroup.Builder("Swap")
+            .addAll(autoSwap, silentSwap, antiWeakness, silentType).build();
+
+    private final CrystalCalcManager crystalCalc;
+
+    private static final Box FULL_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 2.0, 0.5);
+    private static final Box HALF_CRYSTAL_BB = new Box(-0.5, 0.0, -0.5, 0.5, 1.0, 0.5);
+
+    private final CrystalOptimizer optimizer = new CrystalOptimizer();
+
+    private CrystalData<EntityState> currentAttack;
+    private CrystalData<BlockPos> currentPlace;
+
+    private final SwapHandler autoSwapHandler = new SwapHandler();
+    private final Timer attackTimer = new NanoTimer();
+    private final Timer attackSpeedTimer = new NanoTimer();
+
+    private final ConcurrentMap<Integer, Long> attackPackets = new ConcurrentHashMap<>();
+
+    private final ConcurrentMap<PlaceInteraction, Long> placePackets = new ConcurrentHashMap<>();
+    private final AtomicInteger crystalsPlaced = new AtomicInteger();
+
+    private boolean silentRotated;
+
+    private final QueueAverage breakTime = new QueueAverage(20, 1000L);
+    private final PerSecond cps = new PerSecond();
+
+    private final ConcurrentMap<BlockPos, CrystalData<BlockPos>> fadeAnimations = new ConcurrentHashMap<>();
+
+    private long highestId;
 
     public AutoCrystalModule()
     {
-        super("AutoCrystal", "Attacks entities with end crystals",
-                ModuleCategory.COMBAT, 750);
+        super("AutoCrystal", new String[] {"CrystalAura"}, "Best CA on the market", GuiCategory.COMBAT);
+        this.crystalCalc = new CrystalCalcManager(this);
         INSTANCE = this;
-
-        if (!Loader.SESSION.getUserType().equals("release"))
-        {
-            register(debugConfig);
-            register(debugDamageConfig);
-        }
-    }
-
-    public static AutoCrystalModule getInstance()
-    {
-        return INSTANCE;
-    }
-
-    @Override
-    public String getModuleData()
-    {
-        if (debugConfig.getValue())
-        {
-            return String.format("%sms, %.0f, %dms, %d".formatted(
-                    new DecimalFormat("0.00")
-                            .format(calculatePlaceCrystalTime / 1E6),
-                    placeCrystal == null ? 0 : lastAttackTimer.getLastResetTime() / 1E6,
-                    lastAttackTimer.passed(((20.0f - breakSpeedConfig.getValue()) * 50.0f) + 2000.0f) ? 0 : getBreakMs(),
-                    crystalCounter.getPerSecond()));
-        }
-        else
-        {
-            return String.format("%dms, %d",
-                    lastAttackTimer.passed(((20.0f - breakSpeedConfig.getValue()) * 50.0f) + 2000.0f) ? 0 : getBreakMs(),
-                    crystalCounter.getPerSecond());
-        }
     }
 
     @Override
     public void onDisable()
     {
-        renderPos = null;
-        attackCrystal = null;
-        placeCrystal = null;
-        crystalRotation = null;
-        silentRotations = null;
-        calculatePlaceCrystalTime = 0;
-        stuckCrystals.clear();
+        currentAttack = null;
+        currentPlace = null;
         attackPackets.clear();
-        antiStuckCrystals.clear();
         placePackets.clear();
-        attackLatency.clear();
-        fadeList.clear();
-        setStage("NONE");
+        silentRotated = false;
+    }
+
+    @Override
+    public String getModuleData()
+    {
+        if (!isRunning())
+        {
+            return super.getModuleData();
+        }
+
+        return String.format("%sms, %s", DECIMAL.format(breakTime.average()), cps.getPerSecond());
+    }
+
+    @EventListener(priority = Priorities.AUTO_CRYSTAL)
+    public void onTick(TickEvent.Pre event)
+    {
+        if (checkNull() || mc.player.isSpectator())
+        {
+            crystalCalc.cancelRun();
+            currentAttack = null;
+            currentPlace = null;
+            return;
+        }
+
+        List<CrystalData<BlockPos>> latestCrystalBases = crystalCalc.getBaseResults();
+        List<CrystalData<EntityState>> latestCrystalEntities = crystalCalc.getEntityResults();
+
+        currentAttack = getBestCrystal(latestCrystalEntities);
+
+        List<CrystalData<BlockPos>> placements = crystalCalc.getBasePlacements();
+        currentPlace = getBestCrystal(basePlace.getValue() && placements.isEmpty() ? latestCrystalBases : placements);
     }
 
     @EventListener
-    public void onDisconnect(DisconnectEvent event)
+    public void onTickPost(TickEvent.Post event)
     {
-        if (disableDeathConfig.getValue())
+        if (checkNull())
         {
-            disable();
+            return;
         }
-        else
-        {
-            onDisable();
-        }
+        
+        crystalsPlaced.set(0);
+        crystalCalc.runCalc();
     }
 
-    @EventListener
-    public void onPlayerUpdate(PlayerTickEvent event)
+    @EventListener(priority = Priorities.AUTO_CRYSTAL)
+    public void onClientRotation(ClientRotationEvent event)
     {
-        if (mc.player.isSpectator() || isSilentSwap(autoSwapConfig.getValue()) && AutoMineModule.getInstance().isSilentSwapping())
+        if (checkNull() || event.isCanceled() || mc.player.isSpectator())
         {
             return;
         }
 
-        for (AntiStuckData d : stuckCrystals)
-        {
-            double dist = mc.player.squaredDistanceTo(d.pos());
-            double diff = d.stuckDist() - dist;
-            if (diff > 0.5)
-            {
-                stuckCrystals.remove(d);
-            }
-        }
+        float[] rotations = null;
+        silentRotated = false;
 
-        if (mc.player.isUsingItem() && mc.player.getActiveHand() == Hand.MAIN_HAND
-                || mc.options.attackKey.isPressed() || PlayerUtil.isHotbarKeysPressed())
-        {
-            autoSwapTimer.reset();
-        }
-        renderPos = null;
-        ArrayList<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-        List<BlockPos> blocks = getSphere(placeRangeEyeConfig.getValue() ? mc.player.getEyePos() : mc.player.getPos());
-        long timePre = System.nanoTime();
-        if (placeConfig.getValue())
-        {
-            placeCrystal = calculatePlaceCrystal(blocks, entities);
-        }
-        attackCrystal = calculateAttackCrystal(entities);
-        if (attackCrystal == null)
-        {
-            if (placeCrystal != null)
-            {
-                EndCrystalEntity crystalEntity = intersectingCrystalCheck(placeCrystal.getDamageData());
-                if (crystalEntity != null)
-                {
-                    double self = ExplosionUtil.getDamageTo(mc.player, crystalEntity.getPos(),
-                            blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
-                    if (!safetyConfig.getValue() || !playerDamageCheck(self))
-                    {
-                        attackCrystal = new DamageData<>(crystalEntity, placeCrystal.getAttackTarget(),
-                                placeCrystal.getDamage(), self, crystalEntity.getBlockPos().down(), false);
-                    }
-                }
-            }
-            calculatePlaceCrystalTime = System.nanoTime() - timePre;
-        }
-
-        if (inhibitConfig.getValue() && attackCrystal != null
-                && attackPackets.containsKey(attackCrystal.getDamageData().getId()))
-        {
-            float delay;
-            if (attackDelayConfig.getValue() > 0.0)
-            {
-                float attackFactor = 50.0f / Math.max(1.0f, attackFactorConfig.getValue());
-                delay = attackDelayConfig.getValue() * attackFactor;
-            }
-            else
-            {
-                delay = 1000.0f - breakSpeedConfig.getValue() * 50.0f;
-            }
-            lastAttackTimer.setDelay(delay + 100.0f);
-            attackPackets.remove(attackCrystal.getDamageData().getId());
-        }
-
-        float breakDelay = getBreakDelay();
-        if (breakDelayConfig.getValue())
-        {
-            breakDelay = Math.max(minTimeoutConfig.getValue() * 50.0f, getBreakMs() + breakTimeoutConfig.getValue() * 50.0f);
-        }
-        attackRotate = attackCrystal != null && attackDelayConfig.getValue() <= 0.0 && lastAttackTimer.passed(breakDelay);
-        if (attackCrystal != null)
-        {
-            crystalRotation = attackCrystal.damageData.getPos();
-        }
-        else if (placeCrystal != null)
-        {
-            crystalRotation = placeCrystal.damageData.toCenterPos().add(0.0, 0.5, 0.0);
-        }
-        if (rotateConfig.getValue() && crystalRotation != null && (placeCrystal == null || canHoldCrystal()))
-        {
-            float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalRotation);
-            if (strictRotateConfig.getValue() == Rotate.FULL || strictRotateConfig.getValue() == Rotate.SEMI && attackRotate)
-            {
-                float yaw;
-                float serverYaw = Managers.ROTATION.getWrappedYaw();
-                float diff = serverYaw - rotations[0];
-                float diff1 = Math.abs(diff);
-                if (diff1 > 180.0f)
-                {
-                    diff += diff > 0.0f ? -360.0f : 360.0f;
-                }
-                int dir = diff > 0.0f ? -1 : 1;
-                float deltaYaw = dir * rotateLimitConfig.getValue();
-                if (diff1 > rotateLimitConfig.getValue())
-                {
-                    yaw = serverYaw + deltaYaw;
-                    rotated = false;
-                }
-                else
-                {
-                    yaw = rotations[0];
-                    rotated = true;
-                    crystalRotation = null;
-                }
-                rotations[0] = yaw;
-            }
-            else
-            {
-                rotated = true;
-                crystalRotation = null;
-            }
-            setRotation(rotations[0], rotations[1]);
-        }
-        else
-        {
-            silentRotations = null;
-        }
-        if (isRotationBlocked() || !rotated && rotateConfig.getValue())
-        {
-            return;
-        }
-//        if (rotateSilentConfig.getValue() && silentRotations != null) {
-//            setRotationSilent(silentRotations[0], silentRotations[1]);
-//        }
         final Hand hand = getCrystalHand();
-        if (attackCrystal != null)
+        if (currentAttack != null)
         {
-            // ChatUtil.clientSendMessage("yaw: " + rotations[0] + ", pitch: " + rotations[1]);
-            if (attackRotate)
+            rotations = runAttack(currentAttack, hand);
+        }
+
+        if (currentPlace != null)
+        {
+            rotations = runPlace(currentPlace, hand);
+        } else if (SpeedMineModule.INSTANCE.isUsedByAutoMine() && predictPlace.getValue() != Timing.OFF)
+        {
+            MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
+            CrystalData.Immediate<BlockPos> prePlaceData = validateMiningData(currentMine);
+            if (prePlaceData != null)
             {
-                // ChatUtil.clientSendMessage("break range:" + Math.sqrt(mc.player.getEyePos().squaredDistanceTo(attackCrystal.getDamageData().getPos())));
-                attackCrystal(attackCrystal.getDamageData(), hand);
-                setStage("ATTACKING");
-                lastAttackTimer.reset();
+                currentPlace = prePlaceData;
+                rotations = runPlaceInternal(prePlaceData, hand);
             }
         }
-        boolean placeRotate = lastPlaceTimer.passed(1000.0f - placeSpeedConfig.getValue() * 50.0f);
-        if (placeCrystal != null)
+
+        if (silentRotated)
         {
-            renderPos = placeCrystal.getDamageData();
-            renderDamage = placeCrystal.getDamage();
-            if (placeRotate)
-            {
-                // ChatUtil.clientSendMessage("place range:" + Math.sqrt(mc.player.getEyePos().squaredDistanceTo(placeCrystal.getDamageData().toCenterPos())));
-                placeCrystal(placeCrystal.getDamageData(), hand);
-                setStage("PLACING");
-                lastPlaceTimer.reset();
-            }
+            Managers.ROTATION.resetSilentRotation();
+            return;
+        }
+
+        if (rotations != null && rotateConfig.getValue() == RotateMode.NORMAL)
+        {
+            event.cancel();
+            event.setYaw(rotations[0]);
+            event.setPitch(rotations[1]);
         }
     }
 
     @EventListener
-    public void onRunTick(RunTickEvent event)
+    public void onEntitySpawn(EntitySpawnEvent event)
     {
-        if (mc.player == null)
+        if (checkNull() || event.getType() != EntityType.END_CRYSTAL)
         {
             return;
         }
-        final Hand hand = getCrystalHand();
-        if (attackDelayConfig.getValue() > 0.0)
+
+        Vec3d crystalPos = event.getPos();
+        BlockPos crystalBase = BlockPos.ofFloored(crystalPos.offset(Direction.DOWN, 1.0));
+
+        if (!placePackets.keySet().removeIf(d -> d.getPos().equals(crystalBase)))
         {
-            float attackFactor = 50.0f / Math.max(1.0f, attackFactorConfig.getValue());
-            if (attackCrystal != null && lastAttackTimer.passed(attackDelayConfig.getValue() * attackFactor))
+            return;
+        }
+
+        Hand hand = getCrystalHand();
+        if (sequentialBreak.getValue())
+        {
+            attackCrystal(event.getEntityId(), hand);
+            attackTimer.reset();
+        }
+
+        if (currentPlace != null && sequentialPlace.getValue())
+        {
+            placeCrystal(currentPlace.getValue(), currentPlace.getCrystalVec(), hand);
+        }
+
+        if (predictAttack.getValue())
+        {
+            int nextAttackId = (int) (highestId + 1);
+            Entity entity = mc.world.getEntityById(nextAttackId);
+            if (entity == null)
             {
-                attackCrystal(attackCrystal.getDamageData(), hand);
-                lastAttackTimer.reset();
+                attackCrystal(nextAttackId, hand);
             }
         }
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event)
-    {
-        if (renderConfig.getValue())
-        {
-            RenderBuffers.preRender();
-            BlockPos renderPos1 = null;
-            double factor = 0.0f;
-            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
-            {
-                if (set.getKey() == renderPos)
-                {
-                    continue;
-                }
-
-                if (set.getValue().getFactor() > factor)
-                {
-                    renderPos1 = set.getKey();
-                    factor = set.getValue().getFactor();
-                }
-
-                set.getValue().setState(false);
-                int boxAlpha = (int) (40 * set.getValue().getFactor());
-                int lineAlpha = (int) (100 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
-                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
-                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
-                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
-            }
-
-            if (debugDamageConfig.getValue() && renderPos1 != null)
-            {
-                RenderManager.renderSign(String.format("%.1f", renderDamage),
-                        renderPos1.toCenterPos(), new Color(255, 255, 255, (int) (255.0f * factor)).getRGB());
-            }
-
-            RenderBuffers.postRender();
-
-            fadeList.entrySet().removeIf(e ->
-                    e.getValue().getFactor() == 0.0);
-
-            if (renderPos != null && isHoldingCrystal())
-            {
-                Animation animation = new Animation(true, fadeTimeConfig.getValue());
-                fadeList.put(renderPos, animation);
-            }
-        }
-    }
-
-    @EventListener(priority = Integer.MAX_VALUE)
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (mc.player == null || mc.world == null)
-        {
-            return;
-        }
-
-        if (event.getPacket() instanceof BundleS2CPacket packet)
-        {
-            for (Packet<?> packet1 : packet.getPackets())
-            {
-                handleServerPackets(packet1);
-            }
-        }
-        else
-        {
-            handleServerPackets(event.getPacket());
-        }
-    }
-
-    private void handleServerPackets(Packet<?> serverPacket)
-    {
-        if (serverPacket instanceof ExplosionS2CPacket packet)
-        {
-            for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
-            {
-                if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
-                {
-                    mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
-                    antiStuckCrystals.remove(entity.getId());
-                    Long attackTime = attackPackets.remove(entity.getId());
-                    if (attackTime != null)
-                    {
-                        attackLatency.add(System.currentTimeMillis() - attackTime);
-                    }
-                }
-            }
-        }
-
-        if (serverPacket instanceof PlaySoundS2CPacket packet)
-        {
-            if (packet.getSound().value() == SoundEvents.ENTITY_GENERIC_EXPLODE.value() && packet.getCategory() == SoundCategory.BLOCKS)
-            {
-                for (Entity entity : Lists.newArrayList(mc.world.getEntities()))
-                {
-                    if (entity instanceof EndCrystalEntity && entity.squaredDistanceTo(packet.getX(), packet.getY(), packet.getZ()) < 144.0)
-                    {
-                        mc.executeSync(() -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
-                        antiStuckCrystals.remove(entity.getId());
-                        Long attackTime = attackPackets.remove(entity.getId());
-                        if (attackTime != null)
-                        {
-                            attackLatency.add(System.currentTimeMillis() - attackTime);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (serverPacket instanceof EntitiesDestroyS2CPacket packet)
+        if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
         {
             for (int id : packet.getEntityIds())
             {
-                antiStuckCrystals.remove(id);
-                Long attackTime = attackPackets.remove(id);
-                if (attackTime != null)
+                Long time = attackPackets.remove(id);
+                if (time != null)
                 {
-                    attackLatency.add(System.currentTimeMillis() - attackTime);
+                    cps.count();
+                    breakTime.add(System.currentTimeMillis() - time);
                 }
             }
         }
 
-        if (serverPacket instanceof ExperienceOrbSpawnS2CPacket packet && packet.getEntityId() > predictId)
+        if (event.getPacket() instanceof ExperienceOrbSpawnS2CPacket packet && packet.getEntityId() > highestId)
         {
-            predictId = packet.getEntityId();
+            highestId = packet.getEntityId();
         }
 
-        if (serverPacket instanceof EntitySpawnS2CPacket packet && packet.getEntityId() > predictId)
+        if (event.getPacket() instanceof EntitySpawnS2CPacket packet && packet.getEntityId() > highestId)
         {
-            predictId = packet.getEntityId();
+            highestId = packet.getEntityId();
         }
-    }
 
-    @EventListener
-    public void onAddEntity(AddEntityEvent event)
-    {
-        if (!(event.getEntity() instanceof EndCrystalEntity crystalEntity))
+        if (checkNull() || predictPlace.getValue() != Timing.INSTANT || currentPlace != null)
         {
             return;
         }
-        Vec3d crystalPos = crystalEntity.getPos();
-        BlockPos blockPos = BlockPos.ofFloored(crystalPos.add(0.0, -1.0, 0.0));
-        renderSpawnPos = blockPos;
-        Long time = placePackets.remove(blockPos);
-        attackRotate = time != null;
-        if (attackRotate)
-        {
-            crystalCounter.updateCounter();
-        }
-        if (!instantConfig.getValue())
+
+        MiningData currentMine = SpeedMineModule.INSTANCE.getMainMiningBlock();
+        if (currentMine == null)
         {
             return;
         }
-        if (attackRotate)
+
+        Hand hand = getCrystalHand();
+
+        if (!AutoMineModule.INSTANCE.isEnabled() || !SpeedMineModule.INSTANCE.isEnabled())
         {
-            final Hand hand = getCrystalHand();
-            attackInternal(crystalEntity, hand);
-            setStage("ATTACKING");
-            lastAttackTimer.reset();
-            if (sequentialConfig.getValue() == Sequential.NORMAL)
+            return;
+        }
+
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir())
+        {
+            CrystalData.Immediate<BlockPos> prePlace = validateMiningData(currentMine);
+            if (prePlace == null)
             {
-                placeSequentialCrystal(hand);
+                return;
+            }
+
+            if (packet.getPos().equals(prePlace.getValue().up()))
+            {
+                runPlaceInternal(prePlace, hand);
             }
         }
-        else if (instantCalcConfig.getValue())
-        {
-            if (attackRangeCheck(crystalPos))
-            {
-                return;
-            }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalPos,
-                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
-            if (playerDamageCheck(selfDamage))
-            {
-                return;
-            }
-            for (Entity entity : mc.world.getEntities())
-            {
-                if (entity == null || !entity.isAlive() || entity == mc.player
-                        || !isValidTarget(entity)
-                        || Managers.SOCIAL.isFriend(entity.getName()))
-                {
-                    continue;
-                }
-                double crystalDist = crystalPos.squaredDistanceTo(entity.getPos());
-                if (crystalDist > 144.0f)
-                {
-                    continue;
-                }
-                double dist = mc.player.squaredDistanceTo(entity);
-                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
-                {
-                    continue;
-                }
 
-                double damage = ExplosionUtil.getDamageTo(entity, crystalPos, blockDestructionConfig.getValue(),
-                        extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
-                // TODO: Test this
-                DamageData<EndCrystalEntity> data = new DamageData<>(crystalEntity,
-                        entity, damage, selfDamage, crystalEntity.getBlockPos().down(), false);
-                attackRotate = damage > instantDamageConfig.getValue() || attackCrystal != null
-                        && damage >= attackCrystal.getDamage() && instantMaxConfig.getValue()
-                        || entity instanceof LivingEntity entity1 && isCrystalLethalTo(data, entity1);
-                if (attackRotate)
+        if (event.getPacket() instanceof EntitiesDestroyS2CPacket packet)
+        {
+            for (int id : packet.getEntityIds())
+            {
+                Entity entity = mc.world.getEntityById(id);
+                if (entity instanceof ItemEntity)
                 {
-                    final Hand hand = getCrystalHand();
-                    attackInternal(crystalEntity, hand);
-                    setStage("ATTACKING");
-                    lastAttackTimer.reset();
-                    if (sequentialConfig.getValue() == Sequential.NORMAL)
+                    BlockPos pos = entity.getBlockPos();
+                    CrystalData.Immediate<BlockPos> prePlace = validateMiningData(currentMine);
+                    if (prePlace == null)
                     {
-                        placeSequentialCrystal(hand);
+                        continue;
                     }
-                    break;
+
+                    if (pos.equals(prePlace.getValue().up()))
+                    {
+                        runPlaceInternal(prePlace, hand);
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (event.getPacket() instanceof ItemPickupAnimationS2CPacket packet)
+        {
+            Entity entity = mc.world.getEntityById(packet.getEntityId());
+            if (entity instanceof ItemEntity)
+            {
+                BlockPos pos = entity.getBlockPos();
+                CrystalData.Immediate<BlockPos> prePlace = validateMiningData(currentMine);
+                if (prePlace == null)
+                {
+                    return;
+                }
+
+                if (pos.equals(prePlace.getValue().up()))
+                {
+                    runPlaceInternal(prePlace, hand);
                 }
             }
         }
     }
 
     @EventListener
-    public void onPacketOutbound(PacketEvent.Outbound event)
+    public void onRenderWorld(RenderWorldEvent.Post event)
     {
-        if (mc.player == null)
+        if (currentPlace != null)
         {
-            return;
+            fadeAnimations.put(currentPlace.getValue(), currentPlace);
         }
-        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket)
+
+        for (Map.Entry<BlockPos, CrystalData<BlockPos>> entry : fadeAnimations.entrySet())
         {
-            lastSwapTimer.reset();
+            BlockPos placePos = entry.getKey();
+            CrystalData<BlockPos> placeData = entry.getValue();
+            Animation anim = placeData.getAnimation();
+
+            if (anim.getFactor() <= 0.01)
+            {
+                fadeAnimations.remove(placePos);
+                continue;
+            }
+
+            double animFactor = Easing.SMOOTH_STEP.ease(anim.getFactor());
+            if (currentPlace == null || !currentPlace.getValue().equals(placePos))
+            {
+                anim.setState(false);
+            }
+
+            BoxRender.FILL.render(event.getMatrixStack(),
+                    placePos, ThemeModule.INSTANCE.getPrimaryColor().getRGB(), (float) animFactor);
+
+            String dataNametag = DECIMAL.format(placeData.getDamageToTarget());
+            if (placeData instanceof CrystalData.Immediate<?> immediate)
+            {
+                String dataTag = immediate.getTag();
+                dataNametag = dataTag != null ? dataTag : dataNametag + "x";
+            }
+
+            Managers.RENDER.renderNametag(event.getMatrixStack(),
+                    placePos.toCenterPos(),
+                    0.003f,
+                    dataNametag,
+                    ColorUtil.withTransparency(Colors.WHITE, (float) animFactor));
         }
     }
 
-    public boolean isAttacking()
+    private float[] runAttack(CrystalData<EntityState> attack, Hand hand)
     {
-        return attackCrystal != null;
-    }
-
-    public boolean isPlacing()
-    {
-        return placeCrystal != null && isHoldingCrystal();
-    }
-
-    public void attackCrystal(EndCrystalEntity entity, Hand hand)
-    {
-        if (attackCheckPre(hand))
+        EntityState crystalState = attack.getValue();
+        Vec3d crystalVec = crystalState.getPos().add(0.0, 0.5, 0.0);
+        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
+        if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
         {
-            return;
+            Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
+            silentRotated = true;
         }
+
+        if (breakDelay.getValue() == 0 || attackTimer.hasPassed(breakDelay.getValue()))
+        {
+            attackCrystal(crystalState.getId(), hand);
+            attackTimer.reset();
+        }
+
+        return rotations;
+    }
+
+    private float[] runPlace(CrystalData<BlockPos> placement, Hand hand)
+    {
+        BlockPos crystalPos = placement.getValue();
+        if (basePlace.getValue() && !canUseOnBlock(crystalPos))
+        {
+            if (!runSingleObbyPlacement(crystalPos))
+            {
+                currentPlace = null;
+                return null;
+            }
+        }
+
+        return runPlaceInternal(placement, hand);
+    }
+
+    private float[] runPlaceInternal(CrystalData<BlockPos> placement, Hand hand)
+    {
+        BlockPos crystalPos = placement.getValue();
+        Vec3d crystalVec = crystalPos.toBottomCenterPos().add(0.0, 1.5, 0.0);
+        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), crystalVec);
+        if (rotateConfig.getValue() == RotateMode.SILENT && !silentRotated)
+        {
+            Managers.ROTATION.setSilentRotation(new Rotation(rotations[0], rotations[1]));
+            silentRotated = true;
+        }
+
+        placeCrystal(crystalPos, crystalVec, hand);
+        return rotations;
+    }
+
+    private void attackCrystal(int crystalId, Hand hand)
+    {
         StatusEffectInstance weakness = mc.player.getStatusEffect(StatusEffects.WEAKNESS);
         StatusEffectInstance strength = mc.player.getStatusEffect(StatusEffects.STRENGTH);
-        if (weakness != null && (strength == null || weakness.getAmplifier() > strength.getAmplifier()))
-        {
-            int slot = -1;
-            for (int i = 0; i < 9; ++i)
-            {
-                ItemStack stack = mc.player.getInventory().getStack(i);
-                if (!stack.isEmpty() && (stack.getItem() instanceof SwordItem
-                        || stack.getItem() instanceof AxeItem
-                        || stack.getItem() instanceof PickaxeItem))
-                {
-                    slot = i;
-                    break;
-                }
-            }
-            if (slot != -1)
-            {
-                boolean canSwap = slot != Managers.INVENTORY.getServerSlot() && (antiWeaknessConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500));
-                if (antiWeaknessConfig.getValue() != Swap.OFF && canSwap)
-                {
-                    if (antiWeaknessConfig.getValue() == Swap.SILENT_ALT)
-                    {
-                        mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                                slot + 36, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    }
-                    else if (antiWeaknessConfig.getValue() == Swap.SILENT)
-                    {
-                        Managers.INVENTORY.setSlot(slot);
-                    }
-                    else
-                    {
-                        Managers.INVENTORY.setClientSlot(slot);
-                    }
-                }
-                attackInternal(entity, Hand.MAIN_HAND);
-                if (canSwap)
-                {
-                    if (antiWeaknessConfig.getValue() == Swap.SILENT_ALT)
-                    {
-                        mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                                slot + 36, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    }
-                    else if (antiWeaknessConfig.getValue() == Swap.SILENT)
-                    {
-                        Managers.INVENTORY.syncToClient();
-                    }
-                }
 
-                if (sequentialConfig.getValue() == Sequential.STRICT)
-                {
-                    placeSequentialCrystal(hand);
-                }
-            }
-        }
-        else
+        boolean canBreakCrystal = weakness == null || (strength != null && strength.getAmplifier() >= weakness.getAmplifier());
+        if (!canBreakCrystal && antiWeakness.getValue())
         {
-            attackInternal(entity, hand);
-            if (sequentialConfig.getValue() == Sequential.STRICT)
-            {
-                placeSequentialCrystal(hand);
-            }
-        }
-    }
-
-    private void attackInternal(EndCrystalEntity crystalEntity, Hand hand)
-    {
-        attackInternal(crystalEntity.getId(), hand);
-    }
-
-    private void attackInternal(int crystalEntity, Hand hand)
-    {
-        hand = hand != null ? hand : Hand.MAIN_HAND;
-        EndCrystalEntity entity2 = new EndCrystalEntity(mc.world, 0.0, 0.0, 0.0);
-        entity2.setId(crystalEntity);
-        PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity2, mc.player.isSneaking());
-        Managers.NETWORK.sendPacket(packet);
-        if (swingConfig.getValue())
-        {
-            mc.player.swingHand(hand);
-        }
-        else
-        {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
-        }
-
-        attackPackets.put(crystalEntity, System.currentTimeMillis());
-        Integer antiStuckCount = antiStuckCrystals.get(crystalEntity);
-        if (antiStuckCount != null)
-        {
-            antiStuckCrystals.replace(crystalEntity, antiStuckCount + 1);
-        }
-        else
-        {
-            antiStuckCrystals.put(crystalEntity, 1);
-        }
-    }
-
-    private void placeSequentialCrystal(Hand hand)
-    {
-        if (placeCrystal == null)
-        {
-            return;
-        }
-        int latency = FastLatencyModule.getInstance().isEnabled() ? (int)
-                FastLatencyModule.getInstance().getLatency() : Managers.NETWORK.getClientLatency();
-        if (!Managers.NETWORK.is2b2t() || latency >= 50)
-        {
-            placeCrystal(placeCrystal.getBlockPos(), hand);
-        }
-    }
-
-    private void placeCrystal(BlockPos blockPos, Hand hand)
-    {
-        if (isRotationBlocked() || !rotated && rotateConfig.getValue())
-        {
-            return;
-        }
-
-        placeCrystal(blockPos, hand, true);
-    }
-
-    public void placeCrystal(BlockPos blockPos, Hand hand, boolean checkPlacement)
-    {
-        if (checkPlacement && checkCanUseCrystal())
-        {
-            return;
-        }
-        Direction sidePlace = getPlaceDirection(blockPos);
-        // Vec3d vec3d = mc.player.getCameraPosVec(1.0f);
-        // Vec3d vec3d1 = RotationUtil.getRotationVector();
-        // Vec3d vec3d3 = vec3d.add(vec3d1.x * placeRangeConfig.getValue(),
-        //        vec3d1.y * placeRangeConfig.getValue(), vec3d1.z * placeRangeConfig.getValue());
-        // HitResult hitResult = mc.world.raycast(new RaycastContext(vec3d, vec3d3,
-        //        RaycastContext.ShapeType.OUTLINE,
-        //        RaycastContext.FluidHandling.NONE, mc.player));
-        BlockHitResult result = new BlockHitResult(blockPos.toCenterPos(), sidePlace, blockPos, false);
-        if (autoSwapConfig.getValue() != Swap.OFF && hand != Hand.OFF_HAND && getCrystalHand() == null)
-        {
-            if (isSilentSwap(autoSwapConfig.getValue()) && InventoryUtil.count(Items.END_CRYSTAL) == 0)
+            int slot = getAntiWeaknessSlot();
+            if (slot == -1 || !Managers.INVENTORY.startSwap(slot, silentType.getValue()))
             {
                 return;
             }
-            int crystalSlot = getCrystalSlot();
-            if (crystalSlot != -1)
-            {
-                boolean canSwap = crystalSlot != Managers.INVENTORY.getServerSlot() && (autoSwapConfig.getValue() != Swap.NORMAL || autoSwapTimer.passed(500));
-                if (canSwap)
-                {
-                    if (autoSwapConfig.getValue() == Swap.SILENT_ALT)
-                    {
-                        mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                                crystalSlot + 36, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    }
-                    else if (autoSwapConfig.getValue() == Swap.SILENT)
-                    {
-                        Managers.INVENTORY.setSlot(crystalSlot);
-                    }
-                    else
-                    {
-                        Managers.INVENTORY.setClientSlot(crystalSlot);
-                    }
-                }
-                placeInternal(result, Hand.MAIN_HAND);
-                placePackets.put(blockPos, System.currentTimeMillis());
-                if (canSwap)
-                {
-                    if (autoSwapConfig.getValue() == Swap.SILENT_ALT)
-                    {
-                        mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId,
-                                crystalSlot + 36, mc.player.getInventory().selectedSlot, SlotActionType.SWAP, mc.player);
-                    }
-                    else if (autoSwapConfig.getValue() == Swap.SILENT)
-                    {
-                        Managers.INVENTORY.syncToClient();
-                    }
-                }
-            }
         }
-        else if (isHoldingCrystal())
+
+        sendAttackPacketsInternal(crystalId, swingConfig.getValue(), hand);
+        optimizer.setDead(crystalId);
+
+        if (!canBreakCrystal)
         {
-            placeInternal(result, hand);
-            placePackets.put(blockPos, System.currentTimeMillis());
+            Managers.INVENTORY.endSwap(silentType.getValue());
         }
+
+        attackPackets.put(crystalId, System.currentTimeMillis());
     }
 
-    private void placeInternal(BlockHitResult result, Hand hand)
+    private void placeCrystal(BlockPos blockPos, Vec3d crystalVec, Hand hand)
     {
-        if (hand == null)
+        int slot = InventoryUtil.getItemSlot(Items.END_CRYSTAL, silentType.getValue());
+        if (slot == -1)
         {
             return;
         }
-        Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
-        if (swingConfig.getValue())
+
+        if (crystalsPlaced.get() > placeLimit.getValue())
         {
-            mc.player.swingHand(hand);
-        }
-        else
-        {
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(hand));
+            return;
         }
 
-        // Entity ID predict
-        if (idPredictConfig.getValue())
+        if (currentAttack == null && crystalVec != null)
         {
-            boolean flag = AutoXPModule.getInstance().isEnabled() || mc.player.isUsingItem() && mc.player.getStackInHand(mc.player.getActiveHand()).getItem() instanceof ExperienceBottleItem;
-            int id = (int) (predictId + 1);
-            if (flag || attackPackets.containsKey(id))
+            Box placeArea = FULL_CRYSTAL_BB.offset(crystalVec);
+
+            List<EndCrystalEntity> blocking = WorldUtil.collectEntitiesInBox(EndCrystalEntity.class,
+                    placeArea,
+                    e -> ExplosionUtil.crystalDamageToEntity(mc.world, mc.player, crystalVec) <= maxSelfDamage.getValue());
+
+            if (!blocking.isEmpty())
+            {
+                attackCrystal(blocking.getFirst().getId(), hand);
+                attackTimer.reset();
+            }
+        }
+
+        Box baseBox = new Box(blockPos);
+        Vec3d eyePos = mc.player.getEyePos();
+        Vec3d cut = new Vec3d(MathHelper.clamp(eyePos.getX(), baseBox.minX, baseBox.maxX),
+                MathHelper.clamp(eyePos.getY(), baseBox.minY, baseBox.maxY),
+                MathHelper.clamp(eyePos.getZ(), baseBox.minZ, baseBox.maxZ));
+
+        Direction placeDir = getPlaceDirection(blockPos, baseBox, eyePos, cut);
+        BlockHitResult result = new BlockHitResult(cut, placeDir, blockPos, baseBox.contains(eyePos));
+
+        if (silentSwap.getValue())
+        {
+            if (!Managers.INVENTORY.startSwap(slot, silentType.getValue()))
             {
                 return;
             }
-            Entity entity = mc.world.getEntityById(id);
-            if (entity != null && !(entity instanceof EndCrystalEntity))
-            {
-                return;
-            }
-            EndCrystalEntity entity2 = new EndCrystalEntity(mc.world, 0.0, 0.0, 0.0);
-            entity2.setId(id);
-            PlayerInteractEntityC2SPacket packet = PlayerInteractEntityC2SPacket.attack(entity2, false);
-            Managers.NETWORK.sendPacket(packet);
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            attackPackets.put(id, System.currentTimeMillis());
-        }
-    }
 
-    private boolean isSilentSwap(Swap swap)
-    {
-        return swap == Swap.SILENT || swap == Swap.SILENT_ALT;
-    }
-
-    private int getCrystalSlot()
-    {
-        int slot = -1;
-        for (int i = 0; i < 9; i++)
+        } else if (autoSwap.getValue())
         {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() instanceof EndCrystalItem)
+            autoSwapHandler.handleSwaps();
+            if (autoSwapHandler.canAutoSwap())
             {
-                slot = i;
-                break;
+                Managers.INVENTORY.setSelectedSlot(slot);
             }
         }
-        return slot;
+
+        PlaceInteraction placeInteraction = PlaceInteraction.builder()
+                .pos(blockPos)
+                .direction(placeDir)
+                .build();
+
+        if (Managers.INVENTORY.isHolding(Items.END_CRYSTAL, hand))
+        {
+            sendSequencedPacket(id -> new PlayerInteractBlockC2SPacket(hand, result, id));
+            if (swingConfig.getValue())
+            {
+                mc.player.swingHand(hand);
+            } else
+            {
+                sendPacket(new HandSwingC2SPacket(hand));
+            }
+        }
+
+        if (silentSwap.getValue())
+        {
+            Managers.INVENTORY.endSwap(silentType.getValue());
+        }
+
+        placePackets.put(placeInteraction, System.currentTimeMillis());
+        crystalsPlaced.incrementAndGet();
     }
 
-    private Direction getPlaceDirection(BlockPos blockPos)
+    private Direction getPlaceDirection(BlockPos blockPos, Box box, Vec3d eyePos, Vec3d cut)
     {
-        int x = blockPos.getX();
-        int y = blockPos.getY();
-        int z = blockPos.getZ();
-        if (strictDirectionConfig.getValue())
+        if (eyePos.y >= box.maxY)
         {
-            if (mc.player.getY() >= blockPos.getY())
-            {
-                return Direction.UP;
-            }
-            BlockHitResult result = mc.world.raycast(new RaycastContext(
-                    mc.player.getEyePos(), new Vec3d(x + 0.5, y + 0.5, z + 0.5),
-                    RaycastContext.ShapeType.OUTLINE,
-                    RaycastContext.FluidHandling.NONE, mc.player));
-            if (result != null && result.getType() == HitResult.Type.BLOCK)
-            {
-                return result.getSide();
-            }
-        }
-        else
+            return Direction.UP;
+        } else if (blockPos.getY() >= mc.world.getTopYInclusive())
         {
-            if (mc.world.isInBuildLimit(blockPos))
-            {
-                return Direction.DOWN;
-            }
-            BlockHitResult result = mc.world.raycast(new RaycastContext(
-                    mc.player.getEyePos(), new Vec3d(x + 0.5, y + 0.5, z + 0.5),
-                    RaycastContext.ShapeType.OUTLINE,
-                    RaycastContext.FluidHandling.NONE, mc.player));
-            if (result != null && result.getType() == HitResult.Type.BLOCK)
-            {
-                return result.getSide();
-            }
+            return Direction.DOWN;
         }
-        return Direction.UP;
+
+        return Direction.getFacing(eyePos.x - cut.x, eyePos.y - cut.y, eyePos.z - cut.z);
     }
 
-    private DamageData<EndCrystalEntity> calculateAttackCrystal(List<Entity> entities)
+    private <T> CrystalData<T> getBestCrystal(List<CrystalData<T>> crystals)
     {
-        if (entities.isEmpty())
+        CrystalData<T> bestCrystal = getBestCrystal(crystals, false);
+        if (bestCrystal == null || bestCrystal.getDamageToTarget() < minDamage.getValue())
+        {
+            return getBestCrystal(crystals, true);
+        }
+
+        return bestCrystal;
+    }
+
+    public <T extends CrystalData<?>> T getBestCrystal(List<T> crystals, boolean onlyImmediate)
+    {
+        if (crystals.isEmpty())
         {
             return null;
         }
 
-        final List<DamageData<EndCrystalEntity>> validData = new ArrayList<>();
-
-        DamageData<EndCrystalEntity> data = null;
-        for (Entity crystal : entities)
+        T bestCrystal = null;
+        double bestDamage = 0.0f;
+        for (T data : crystals)
         {
-            if (!(crystal instanceof EndCrystalEntity crystal1) || !crystal.isAlive()
-                    || stuckCrystals.stream().anyMatch(d -> d.id() == crystal.getId()))
+            if (onlyImmediate && !(data instanceof CrystalData.Immediate<?>))
             {
                 continue;
             }
-            Long time = attackPackets.get(crystal.getId());
-            boolean attacked = time != null && time < getBreakMs();
-            if ((crystal.age < ticksExistedConfig.getValue() || attacked) && inhibitConfig.getValue())
-            {
-                continue;
-            }
-            if (attackRangeCheck(crystal1))
-            {
-                continue;
-            }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystal.getPos(),
-                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
-            boolean unsafeToPlayer = playerDamageCheck(selfDamage);
-            if (unsafeToPlayer && !safetyOverride.getValue())
-            {
-                continue;
-            }
-            for (Entity entity : entities)
-            {
-                if (entity == null || !entity.isAlive() || entity == mc.player
-                        || !isValidTarget(entity)
-                        || Managers.SOCIAL.isFriend(entity.getName()))
-                {
-                    continue;
-                }
-                double crystalDist = crystal.squaredDistanceTo(entity);
-                if (crystalDist > 144.0f)
-                {
-                    continue;
-                }
-                double dist = mc.player.squaredDistanceTo(entity);
-                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
-                {
-                    continue;
-                }
 
-                boolean antiSurround = false;
-                if (antiSurroundConfig.getValue() && entity instanceof PlayerEntity player
-                        && !BlastResistantBlocks.isUnbreakable(player.getBlockPos()))
-                {
-                    Set<BlockPos> miningPositions = new HashSet<>();
-                    BlockPos miningBlock = AutoMineModule.getInstance().getMiningBlock();
-                    if (AutoMineModule.getInstance().isEnabled() && miningBlock != null)
-                    {
-                        miningPositions.add(miningBlock);
-                    }
-                    if (Managers.BLOCK.getMines(0.75f).contains(player.getBlockPos().up()))
-                    {
-                        miningPositions.add(player.getBlockPos().up());
-                    }
-                    for (BlockPos miningBlockPos : miningPositions)
-                    {
-                        if (!SurroundModule.getInstance().getSurroundNoDown(player).contains(miningBlockPos))
-                        {
-                            continue;
-                        }
-                        for (Direction direction : Direction.values())
-                        {
-                            BlockPos pos1 = miningBlockPos.offset(direction);
-                            if (crystal.getBlockPos().equals(pos1.down()))
-                            {
-                                antiSurround = true;
-                            }
-                        }
-                    }
-                }
-
-                double damage = ExplosionUtil.getDamageTo(entity, crystal.getPos(), blockDestructionConfig.getValue(),
-                        extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
-                if (checkOverrideSafety(unsafeToPlayer, damage, entity))
-                {
-                    continue;
-                }
-
-                DamageData<EndCrystalEntity> currentData = new DamageData<>(crystal1, entity,
-                        damage, selfDamage, crystal1.getBlockPos().down(), antiSurround);
-                validData.add(currentData);
-                if (data == null || damage > data.getDamage())
-                {
-                    data = currentData;
-                }
+            CrystalData<?> candidate = validateCrystalData((CrystalData<?>) data, bestDamage);
+            if (candidate == null)
+            {
+                continue;
             }
+
+            bestDamage = candidate.getDamageToTarget();
+            bestCrystal = data;
         }
-        if (data == null || targetDamageCheck(data))
-        {
-            if (antiSurroundConfig.getValue())
-            {
-                return validData.stream()
-                        .filter(DamageData::isAntiSurround)
-                        .min(Comparator.comparingDouble(d -> mc.player.squaredDistanceTo(d.getBlockPos().toCenterPos())))
-                        .orElse(null);
-            }
-            return null;
-        }
-        return data;
+
+        return bestCrystal;
     }
 
-    private boolean attackRangeCheck(EndCrystalEntity entity)
+    private <T> CrystalData<T> validateCrystalData(CrystalData<T> data, double currentBest)
     {
-        return attackRangeCheck(entity.getPos());
-    }
-
-    /**
-     * @param entityPos
-     * @return
-     */
-    private boolean attackRangeCheck(Vec3d entityPos)
-    {
-        double breakRange = breakRangeConfig.getValue();
-        double breakWallRange = breakWallRangeConfig.getValue();
-        Vec3d playerPos = mc.player.getEyePos();
-        double dist = playerPos.squaredDistanceTo(entityPos);
-        if (dist > breakRange * breakRange)
-        {
-            return true;
-        }
-        double yOff = Math.abs(entityPos.getY() - mc.player.getY());
-        if (yOff > maxYOffsetConfig.getValue())
-        {
-            return true;
-        }
-        BlockHitResult result = mc.world.raycast(new RaycastContext(
-                playerPos, entityPos, RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE, mc.player));
-        return result.getType() != HitResult.Type.MISS && dist > breakWallRange * breakWallRange;
-    }
-
-    private DamageData<BlockPos> calculatePlaceCrystal(List<BlockPos> placeBlocks, List<Entity> entities)
-    {
-        if (placeBlocks.isEmpty() || entities.isEmpty())
+        LivingEntityState state = data.getTarget();
+        if (state == null || state.isDead())
         {
             return null;
         }
 
-        final List<DamageData<BlockPos>> validData = new ArrayList<>();
-
-        DamageData<BlockPos> data = null;
-        for (BlockPos pos : placeBlocks)
+        Entity entity = state.getEntity();
+        if (!(entity instanceof LivingEntity target) || target.isDead())
         {
-            if (!canUseCrystalOnBlock(pos) || placeRangeCheck(pos) || intersectingAntiStuckCheck(pos))
-            {
-                continue;
-            }
-            double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalDamageVec(pos),
-                    blockDestructionConfig.getValue(), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
-            boolean unsafeToPlayer = playerDamageCheck(selfDamage);
-            if (unsafeToPlayer && !safetyOverride.getValue())
-            {
-                continue;
-            }
-            for (Entity entity : entities)
-            {
-                if (entity == null || !entity.isAlive() || entity == mc.player
-                        || !isValidTarget(entity)
-                        || Managers.SOCIAL.isFriend(entity.getName()))
-                {
-                    continue;
-                }
-                double blockDist = pos.getSquaredDistance(entity.getPos());
-                if (blockDist > 144.0f)
-                {
-                    continue;
-                }
-                double dist = mc.player.squaredDistanceTo(entity);
-                if (dist > targetRangeConfig.getValue() * targetRangeConfig.getValue())
-                {
-                    continue;
-                }
-
-                boolean antiSurround = false;
-                if (antiSurroundConfig.getValue() && entity instanceof PlayerEntity player
-                        && !BlastResistantBlocks.isUnbreakable(player.getBlockPos()))
-                {
-                    Set<BlockPos> miningPositions = new HashSet<>();
-                    BlockPos miningBlock = AutoMineModule.getInstance().getMiningBlock();
-                    if (AutoMineModule.getInstance().isEnabled() && miningBlock != null)
-                    {
-                        miningPositions.add(miningBlock);
-                    }
-                    if (Managers.BLOCK.getMines(0.75f).contains(player.getBlockPos().up()))
-                    {
-                        miningPositions.add(player.getBlockPos().up());
-                    }
-                    for (BlockPos miningBlockPos : miningPositions)
-                    {
-                        if (!SurroundModule.getInstance().getSurroundNoDown(player).contains(miningBlockPos))
-                        {
-                            continue;
-                        }
-                        for (Direction direction : Direction.values())
-                        {
-                            BlockPos pos1 = miningBlockPos.offset(direction);
-                            if (pos.equals(pos1.down()))
-                            {
-                                antiSurround = true;
-                            }
-                        }
-                    }
-                }
-
-                double damage;
-                damage = ExplosionUtil.getDamageTo(entity, crystalDamageVec(pos), blockDestructionConfig.getValue(),
-                        extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
-                if (checkOverrideSafety(unsafeToPlayer, damage, entity))
-                {
-                    continue;
-                }
-
-                DamageData<BlockPos> currentData = new DamageData<>(pos, entity,
-                        damage, selfDamage, antiSurround);
-                validData.add(currentData);
-                if (data == null || damage > data.getDamage())
-                {
-                    data = currentData;
-                }
-            }
-        }
-        if (data == null || targetDamageCheck(data))
-        {
-            if (antiSurroundConfig.getValue())
-            {
-                return validData.stream()
-                        .filter(DamageData::isAntiSurround)
-                        .min(Comparator.comparingDouble(d -> mc.player.squaredDistanceTo(d.getBlockPos().toCenterPos())))
-                        .orElse(null);
-            }
             return null;
         }
-        return data;
+
+        float baseDamage = (float) data.getDamageToTarget();
+        float baseSelfDamage = (float) data.getDamageToPlayer();
+
+        if (baseDamage <= 0.0f || baseSelfDamage > maxSelfDamage.getValue())
+        {
+            return null;
+        }
+
+        float selfDamage = ExplosionUtil.getAppliedDamageToEntity(mc.player, baseSelfDamage);
+        if (selfDamage > maxSelfDamage.getValue() || DamageUtil.getHealth(mc.player) - selfDamage < 0.5f)
+        {
+            return null;
+        }
+
+        float targetDamage = ExplosionUtil.getAppliedDamageToEntity(target, baseDamage);
+        if (targetDamage > currentBest)
+        {
+            data.setDamageToTarget(targetDamage);
+            data.setDamageToPlayer(selfDamage);
+
+            return data;
+        }
+
+        return null;
     }
 
-    /**
-     * @param pos
-     * @return
-     */
-    private boolean placeRangeCheck(BlockPos pos)
+    private CrystalData.Immediate<BlockPos> validateMiningData(MiningData currentMine)
     {
-        double placeRange = placeRangeConfig.getValue();
-        double placeWallRange = placeWallRangeConfig.getValue();
-        Vec3d player = placeRangeEyeConfig.getValue() ? mc.player.getEyePos() : mc.player.getPos();
-        double dist = placeRangeCenterConfig.getValue() ?
-                player.squaredDistanceTo(pos.toCenterPos()) : pos.getSquaredDistance(player.x, player.y, player.z);
-        if (dist > placeRange * placeRange)
+        if (currentMine == null || !currentMine.isDoneMining())
         {
-            return true;
+            return null;
         }
-        Vec3d raytrace = Vec3d.of(pos).add(0.5, 2.70000004768372, 0.5);
-        BlockHitResult result = mc.world.raycast(new RaycastContext(
-                mc.player.getEyePos(), raytrace,
-                RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE, mc.player));
-        float maxDist = breakRangeConfig.getValue() * breakRangeConfig.getValue();
-        if (result != null && result.getType() == HitResult.Type.BLOCK && !result.getBlockPos().equals(pos))
+
+        PlayerEntity target = Managers.TARGETING.getTarget();
+        if (target == null)
         {
-            maxDist = breakWallRangeConfig.getValue() * breakWallRangeConfig.getValue();
-            if (!raytraceConfig.getValue() || dist > placeWallRange * placeWallRange)
-            {
-                return true;
-            }
+            return null;
         }
-        return breakValidConfig.getValue() && dist > maxDist;
+
+        BlockPos minePos = currentMine.getBlockPos();
+        BlockPos placePos = minePos.down();
+        double dist = mc.player.squaredDistanceTo(placePos.toCenterPos());
+        if (dist > MathHelper.square(placeRange.getValue()))
+        {
+            return null;
+        }
+
+        BlockState state = mc.world.getBlockState(placePos);
+        if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
+        {
+            return null;
+        }
+
+        if (hasEntityBlockingCrystal(getCrystalBox(minePos), true))
+        {
+            return null;
+        }
+
+        float selfDamage = (float) ExplosionUtil.crystalDamageToEntity(mc.world,
+                mc.player,
+                minePos.toBottomCenterPos(),
+                true,
+                Set.of(minePos));
+
+        if (selfDamage > maxSelfDamage.getValue() || DamageUtil.getHealth(mc.player) - selfDamage < 0.5f)
+        {
+            return null;
+        }
+
+        float damage = (float) ExplosionUtil.crystalDamageToEntity(mc.world,
+                target,
+                minePos.toBottomCenterPos(),
+                true,
+                Set.of(minePos));
+
+        if (damage < minDamage.getValue())
+        {
+            return null;
+        }
+
+        LivingEntityState targetState = new LivingEntityState(target);
+        Vec3d crystalVec = minePos.toBottomCenterPos();
+        return new CrystalData.Immediate<>("AS",
+                placePos,
+                crystalVec,
+                targetState,
+                damage,
+                selfDamage);
     }
 
-    public void placeCrystalForTarget(PlayerEntity target, BlockPos blockPos)
+    public boolean canUseOnBlock(BlockPos blockPos)
     {
-        if (target == null || target.isDead() || placeRangeCheck(blockPos) || !canUseCrystalOnBlock(blockPos))
-        {
-            return;
-        }
-        double selfDamage = ExplosionUtil.getDamageTo(mc.player, crystalDamageVec(blockPos),
-                blockDestructionConfig.getValue(), Set.of(blockPos), selfExtrapolateConfig.getValue() ? extrapolateTicksConfig.getValue() : 0, false);
-        if (playerDamageCheck(selfDamage))
-        {
-            return;
-        }
-        double damage = ExplosionUtil.getDamageTo(target, crystalDamageVec(blockPos), blockDestructionConfig.getValue(),
-                Set.of(blockPos), extrapolateTicksConfig.getValue(), assumeArmorConfig.getValue());
-        if (damage < minDamageConfig.getValue() && !isCrystalLethalTo(damage, target)
-                || placeCrystal != null && placeCrystal.getDamage() >= damage)
-        {
-            return;
-        }
-
-        float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), blockPos.toCenterPos());
-        setRotation(rotations[0], rotations[1]);
-        placeCrystal(blockPos, Hand.MAIN_HAND, false);
-        fadeList.put(blockPos, new Animation(true, fadeTimeConfig.getValue()));
+        return canUseOnBlock(mc.world, blockPos) && !hasEntityBlockingCrystal(getCrystalBox(blockPos.up()), false);
     }
 
-    private boolean checkOverrideSafety(boolean unsafeToPlayer, double damage, Entity entity)
+    public boolean canUseOnBlock(BlockView blockView, BlockPos pos)
     {
-        return safetyOverride.getValue() && unsafeToPlayer && damage < EntityUtil.getHealth(entity) + 0.5;
-    }
-
-    private boolean targetDamageCheck(DamageData<?> crystal)
-    {
-        double minDmg = minDamageConfig.getValue();
-        if (crystal.getAttackTarget() instanceof LivingEntity entity && isCrystalLethalTo(crystal, entity))
-        {
-            minDmg = 2.0f;
-        }
-        return crystal.getDamage() < minDmg;
-    }
-
-    private boolean playerDamageCheck(double playerDamage)
-    {
-        if (!mc.player.isCreative())
-        {
-            float health = mc.player.getHealth() + mc.player.getAbsorptionAmount();
-            if (safetyConfig.getValue() && playerDamage >= health + 0.5f)
-            {
-                return true;
-            }
-            return playerDamage > maxLocalDamageConfig.getValue();
-        }
-        return false;
-    }
-
-    private boolean isFeetSurrounded(LivingEntity entity)
-    {
-        BlockPos pos1 = entity.getBlockPos();
-        if (!mc.world.getBlockState(pos1).isReplaceable())
-        {
-            return true;
-        }
-        for (Direction direction : Direction.values())
-        {
-            if (!direction.getAxis().isHorizontal())
-            {
-                continue;
-            }
-            BlockPos pos2 = pos1.offset(direction);
-            if (mc.world.getBlockState(pos2).isReplaceable())
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean checkAntiTotem(double damage, LivingEntity entity)
-    {
-        if (entity instanceof PlayerEntity p)
-        {
-            float phealth = EntityUtil.getHealth(p);
-            if (phealth <= 2.0f && phealth - damage < 0.5f)
-            {
-                long time = Managers.TOTEM.getLastPopTime(p);
-                if (time != -1)
-                {
-                    return System.currentTimeMillis() - time <= 500;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean isCrystalLethalTo(DamageData<?> crystal, LivingEntity entity)
-    {
-        return isCrystalLethalTo(crystal.getDamage(), entity);
-    }
-
-    private boolean isCrystalLethalTo(double damage, LivingEntity entity)
-    {
-        if (lethalDamageConfig.getValue() && lastAttackTimer.passed(500))
-        {
-            return true;
-        }
-
-        if (antiTotemConfig.getValue() && checkAntiTotem(damage, entity))
-        {
-            return true;
-        }
-        float health = entity.getHealth() + entity.getAbsorptionAmount();
-        if (damage * (1.0f + lethalMultiplier.getValue()) >= health + 0.5f)
-        {
-            return true;
-        }
-        if (armorBreakerConfig.getValue())
-        {
-            for (ItemStack armorStack : entity.getArmorItems())
-            {
-                int n = armorStack.getDamage();
-                int n1 = armorStack.getMaxDamage();
-                float durability = ((n1 - n) / (float) n1) * 100.0f;
-                if (durability < armorScaleConfig.getValue())
-                {
-                    return true;
-                }
-            }
-        }
-
-        // Antiregear
-        if (shulkersConfig.getValue() && entity instanceof PlayerEntity)
-        {
-            for (BlockPos pos : getSphere(3.0f, entity.getPos()))
-            {
-                BlockState state = mc.world.getBlockState(pos);
-                if (state.getBlock() instanceof ShulkerBoxBlock)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean attackCheckPre(Hand hand)
-    {
-        if (!lastSwapTimer.passed(swapDelayConfig.getValue() * 25.0f))
-        {
-            return true;
-        }
-        if (hand == Hand.MAIN_HAND)
-        {
-            return checkCanUseCrystal();
-        }
-        return false;
-    }
-
-    private boolean checkCanUseCrystal()
-    {
-        return !multitaskConfig.getValue() && checkMultitask()
-                || !whileMiningConfig.getValue() && mc.interactionManager.isBreakingBlock();
-    }
-
-    private boolean isHoldingCrystal()
-    {
-        if (!checkCanUseCrystal() && (autoSwapConfig.getValue() == Swap.SILENT || autoSwapConfig.getValue() == Swap.SILENT_ALT))
-        {
-            return true;
-        }
-        return getCrystalHand() != null;
-    }
-
-    private Vec3d crystalDamageVec(BlockPos pos)
-    {
-        return Vec3d.of(pos).add(0.5, 1.0, 0.5);
-    }
-
-    /**
-     * Returns <tt>true</tt> if the {@link Entity} is a valid enemy to attack.
-     *
-     * @param e The potential enemy entity
-     * @return <tt>true</tt> if the entity is an enemy
-     */
-    private boolean isValidTarget(Entity e)
-    {
-        return e instanceof PlayerEntity && playersConfig.getValue()
-                || EntityUtil.isMonster(e) && monstersConfig.getValue()
-                || EntityUtil.isNeutral(e) && neutralsConfig.getValue()
-                || EntityUtil.isPassive(e) && animalsConfig.getValue();
-    }
-
-    /**
-     * Returns <tt>true</tt> if an {@link EndCrystalItem} can be used on the
-     * param {@link BlockPos}.
-     *
-     * @param pos The block pos
-     * @return Returns <tt>true</tt> if the crystal item can be placed on the
-     * block
-     */
-    public boolean canUseCrystalOnBlock(BlockPos pos)
-    {
-        BlockState state = mc.world.getBlockState(pos);
+        BlockState state = blockView.getBlockState(pos);
         if (!state.isOf(Blocks.OBSIDIAN) && !state.isOf(Blocks.BEDROCK))
         {
             return false;
         }
-        return isCrystalHitboxClear(pos);
-    }
 
-    public boolean isCrystalHitboxClear(BlockPos pos)
-    {
         BlockPos p2 = pos.up();
-        BlockState state2 = mc.world.getBlockState(p2);
-        // ver 1.12.2 and below
-        if (placementsConfig.getValue() == Placements.PROTOCOL && !mc.world.isAir(p2.up()))
+        BlockState state2 = blockView.getBlockState(p2);
+        if (protocolPlace.getValue() && !blockView.getBlockState(p2.up()).isAir())
         {
             return false;
         }
-        if (!mc.world.isAir(p2) && !state2.isOf(Blocks.FIRE))
+
+        if (!state2.isAir() && !state2.isOf(Blocks.FIRE))
         {
             return false;
         }
-        else
-        {
-            final Box bb = Managers.NETWORK.isCrystalPvpCC() ? HALF_CRYSTAL_BB : FULL_CRYSTAL_BB;
-            double d = p2.getX();
-            double e = p2.getY();
-            double f = p2.getZ();
-            List<Entity> list = getEntitiesBlockingCrystal(new Box(d, e, f,
-                    d + bb.maxX, e + bb.maxY, f + bb.maxZ));
-            return list.isEmpty();
-        }
+
+        return true;
     }
 
-    private List<Entity> getEntitiesBlockingCrystal(Box box)
+    public boolean hasEntityBlockingCrystal(Box box, boolean ignoreItems)
     {
-        List<Entity> entities = new CopyOnWriteArrayList<>(
-                mc.world.getOtherEntities(null, box));
-        //
-        for (Entity entity : entities)
+        for (Entity entity : WorldUtil.collectEntitiesInBox(box))
         {
-            if (entity == null || !entity.isAlive()
-                    || entity instanceof ExperienceOrbEntity
-                    || forcePlaceConfig.getValue() != ForcePlace.NONE
-                    && entity instanceof ItemEntity && entity.age <= 10)
+            if (!canIgnoreEntity(entity.getType(), ignoreItems))
             {
-                entities.remove(entity);
-            }
-            else if (entity instanceof EndCrystalEntity entity1
-                    && entity1.getBoundingBox().intersects(box))
-            {
-                Integer antiStuckAttacks = antiStuckCrystals.get(entity1.getId());
-                if (!attackRangeCheck(entity1) && (antiStuckAttacks == null || antiStuckAttacks <= attackLimitConfig.getValue() * 10.0f))
-                {
-                    entities.remove(entity);
-                }
-                else
-                {
-                    double dist = mc.player.squaredDistanceTo(entity1);
-                    stuckCrystals.add(new AntiStuckData(entity1.getId(), entity1.getBlockPos(), entity1.getPos(), dist));
-                }
+                return true;
             }
         }
-        return entities;
+
+        return false;
     }
 
-    private boolean intersectingAntiStuckCheck(BlockPos blockPos)
+    public boolean canIgnoreEntity(EntityType<?> entity, boolean ignoreItems)
     {
-        if (stuckCrystals.isEmpty())
-        {
-            return false;
-        }
-        return stuckCrystals.stream().anyMatch(d -> d.blockPos().equals(blockPos.up()));
+        return entity == EntityType.EXPERIENCE_ORB || entity == EntityType.END_CRYSTAL || ignoreItems && entity == EntityType.ITEM;
     }
 
-    private EndCrystalEntity intersectingCrystalCheck(BlockPos pos)
+    public Box getCrystalBox(BlockPos blockPos)
     {
-        return (EndCrystalEntity) mc.world.getOtherEntities(null, new Box(pos)).stream()
-                .filter(e -> e instanceof EndCrystalEntity).min(Comparator.comparingDouble(e -> mc.player.distanceTo(e))).orElse(null);
-    }
-
-    private List<BlockPos> getSphere(Vec3d origin)
-    {
-        double rad = Math.ceil(placeRangeConfig.getValue());
-        return getSphere(rad, origin);
-    }
-
-    private List<BlockPos> getSphere(double rad, Vec3d origin)
-    {
-        List<BlockPos> sphere = new ArrayList<>();
-        for (double x = -rad; x <= rad; ++x)
-        {
-            for (double y = -rad; y <= rad; ++y)
-            {
-                for (double z = -rad; z <= rad; ++z)
-                {
-                    Vec3i pos = new Vec3i((int) (origin.getX() + x),
-                            (int) (origin.getY() + y), (int) (origin.getZ() + z));
-                    final BlockPos p = new BlockPos(pos);
-                    sphere.add(p);
-                }
-            }
-        }
-        return sphere;
-    }
-
-    private boolean canHoldCrystal()
-    {
-        return isHoldingCrystal() || autoSwapConfig.getValue() != Swap.OFF && getCrystalSlot() != -1;
+        Box crystalBB = NetworkUtil.getServerIp().contains("crystalpvp.cc") ? HALF_CRYSTAL_BB : FULL_CRYSTAL_BB;
+        return crystalBB.offset(blockPos.toBottomCenterPos());
     }
 
     private Hand getCrystalHand()
     {
         final ItemStack offhand = mc.player.getOffHandStack();
-        final ItemStack mainhand = mc.player.getMainHandStack();
         if (offhand.getItem() instanceof EndCrystalItem)
         {
             return Hand.OFF_HAND;
         }
-        else if (mainhand.getItem() instanceof EndCrystalItem)
-        {
-            return Hand.MAIN_HAND;
-        }
-        return null;
+
+        return Hand.MAIN_HAND;
     }
 
-    public float getBreakDelay()
+    private int getAntiWeaknessSlot()
     {
-        return 1000.0f - breakSpeedConfig.getValue() * 50.0f;
+        return InventoryUtil.getItemSlot((ItemStack itemStack) ->
+                itemStack.getItem().getTranslationKey().contains("sword")
+                        || itemStack.getItem().getTranslationKey().contains("axe")).getSlot();
     }
 
-    // Debug info
-    public void setStage(String crystalStage)
+    @Override
+    public boolean checkNull()
     {
-        // this.crystalStage = crystalStage;
+        return super.checkNull() || (mc.player.isUsingItem() && !multitaskConfig.getValue());
     }
 
-    public int getBreakMs()
+    public boolean isRunning()
     {
-        if (attackLatency.isEmpty())
-        {
-            return 0;
-        }
-        float avg = 0.0f;
-        // fix ConcurrentModificationException
-        ArrayList<Long> latencyCopy = Lists.newArrayList(attackLatency);
-        if (!latencyCopy.isEmpty())
-        {
-            for (float t : latencyCopy)
-            {
-                avg += t;
-            }
-            avg /= latencyCopy.size();
-        }
-        return (int) avg;
+        return isEnabled() && (currentAttack != null || currentPlace != null);
     }
 
-    public boolean shouldPreForcePlace()
+    private enum Timing
     {
-        return forcePlaceConfig.getValue() == ForcePlace.PRE;
-    }
-
-    public float getPlaceRange()
-    {
-        return placeRangeConfig.getValue();
-    }
-
-    public enum Swap
-    {
-        NORMAL,
-        SILENT,
-        SILENT_ALT,
-        OFF
-    }
-
-    public enum Sequential
-    {
-        NORMAL,
-        STRICT,
-        NONE
-    }
-
-    public enum ForcePlace
-    {
-        PRE,
-        POST,
-        NONE
-    }
-
-    public enum Placements
-    {
-        NATIVE,
-        PROTOCOL
-    }
-
-    public enum Rotate
-    {
-        FULL,
-        SEMI,
-        OFF
-    }
-
-    private record AntiStuckData(int id, BlockPos blockPos, Vec3d pos, double stuckDist) {}
-
-    private static class DamageData<T>
-    {
-        //
-        private final List<String> tags = new ArrayList<>();
-        private T damageData;
-        private Entity attackTarget;
-        private BlockPos blockPos;
-        //
-        private double damage, selfDamage;
-        private boolean antiSurround;
-
-        //
-        public DamageData()
-        {
-
-        }
-
-        public DamageData(BlockPos damageData, Entity attackTarget, double damage,
-                          double selfDamage, boolean antiSurround)
-        {
-            this.damageData = (T) damageData;
-            this.attackTarget = attackTarget;
-            this.damage = damage;
-            this.selfDamage = selfDamage;
-            this.blockPos = damageData;
-            this.antiSurround = antiSurround;
-        }
-
-        public DamageData(T damageData, Entity attackTarget, double damage,
-                          double selfDamage, BlockPos blockPos, boolean antiSurround)
-        {
-            this.damageData = damageData;
-            this.attackTarget = attackTarget;
-            this.damage = damage;
-            this.selfDamage = selfDamage;
-            this.blockPos = blockPos;
-            this.antiSurround = antiSurround;
-        }
-
-        public void setDamageData(T damageData, Entity attackTarget, double damage, double selfDamage)
-        {
-            this.damageData = damageData;
-            this.attackTarget = attackTarget;
-            this.damage = damage;
-            this.selfDamage = selfDamage;
-        }
-
-        public T getDamageData()
-        {
-            return damageData;
-        }
-
-        public Entity getAttackTarget()
-        {
-            return attackTarget;
-        }
-
-        public double getDamage()
-        {
-            return damage;
-        }
-
-        public double getSelfDamage()
-        {
-            return selfDamage;
-        }
-
-        public BlockPos getBlockPos()
-        {
-            return blockPos;
-        }
-
-        public boolean isAntiSurround()
-        {
-            return antiSurround;
-        }
-    }
-
-    private class AttackCrystalTask implements Callable<DamageData<EndCrystalEntity>>
-    {
-        private final List<Entity> threadSafeEntities;
-
-        public AttackCrystalTask(List<Entity> threadSafeEntities)
-        {
-            this.threadSafeEntities = threadSafeEntities;
-        }
-
-        @Override
-        public DamageData<EndCrystalEntity> call() throws Exception
-        {
-            return calculateAttackCrystal(threadSafeEntities);
-        }
-    }
-
-    private class PlaceCrystalTask implements Callable<DamageData<BlockPos>>
-    {
-        private final List<BlockPos> threadSafeBlocks;
-        private final List<Entity> threadSafeEntities;
-
-        public PlaceCrystalTask(List<BlockPos> threadSafeBlocks,
-                                List<Entity> threadSafeEntities)
-        {
-            this.threadSafeBlocks = threadSafeBlocks;
-            this.threadSafeEntities = threadSafeEntities;
-        }
-
-        @Override
-        public DamageData<BlockPos> call() throws Exception
-        {
-            return calculatePlaceCrystal(threadSafeBlocks, threadSafeEntities);
-        }
+        TICK, INSTANT, OFF
     }
 }

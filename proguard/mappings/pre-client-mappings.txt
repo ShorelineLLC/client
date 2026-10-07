@@ -1,11 +1,11 @@
 net.shoreline.client.ShorelineMod -> net.shoreline.client.bs:
     void onInitializeClient() -> a
 
-net.shoreline.client.api.render.layers.RenderLayersClient -> net.shoreline.client.lc:
+net.shoreline.client.api.font.layers.RenderLayersClient -> net.shoreline.client.lc:
 
 net.shoreline.client.impl.imixin.IMixin -> net.shoreline.client.im:
 
-net.shoreline.eventbus.event.Event -> net.shoreline.client.fR:
+net.shoreline.eventbus.Event -> net.shoreline.client.fR:
 
 net.shoreline.eventbus.event.StageEvent$EventStage -> net.shoreline.client.es:
 
@@ -41,8 +41,8 @@ net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
 net.shoreline.client.Shoreline -> net.shoreline.client.b:
 net.shoreline.client.init.Fonts -> net.shoreline.client.lH:
 net.shoreline.client.init.Managers -> net.shoreline.client.lI:
-net.shoreline.client.impl.manager.ModuleManager -> net.shoreline.client.fD:
+net.shoreline.client.impl.movement.ModuleManager -> net.shoreline.client.fD:
 net.shoreline.client.ShutdownHook -> net.shoreline.client.c:
 net.shoreline.client.api.file.ClientConfiguration -> net.shoreline.client.Q:
-net.shoreline.client.api.config.ConfigContainer -> net.shoreline.client.E:
-net.shoreline.client.impl.manager.client.CommandManager -> net.shoreline.client.gi:
+net.shoreline.client.api.config.ConfigContainer -> net.shoreline.client.E:Z
+net.shoreline.client.impl.command.CommandManager -> net.shoreline.client.gi:

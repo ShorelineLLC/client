@@ -7,8 +7,9 @@ import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackInfo;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.resource.metadata.ResourceMetadataReader;
+import net.minecraft.resource.metadata.ResourceMetadataSerializer;
 import net.minecraft.util.Identifier;
+import net.shoreline.client.ShorelineMod;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -70,7 +71,7 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
                 InputStream is;
                 if ((is = (InputStream) getResourceInternal(formattedName)) != null)
                 {
-                    Identifier id = Identifier.of("shoreline", String.format("sounds/%s", soundFile));
+                    Identifier id = Identifier.of(ShorelineMod.MOD_ID, String.format("sounds/%s", soundFile));
                     consumer.accept(id, () -> is);
                 }
             }
@@ -87,9 +88,9 @@ public final class ResourcePackExt implements ResourcePack, ModResourcePack
 
     @Nullable
     @Override
-    public <T> T parseMetadata(ResourceMetadataReader<T> metaReader) throws IOException
+    public <T> T parseMetadata(ResourceMetadataSerializer<T> metadataSerializer) throws IOException
     {
-        return this.parent.parseMetadata(metaReader);
+        return this.parent.parseMetadata(metadataSerializer);
     }
 
     @Override

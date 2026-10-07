@@ -1,87 +1,94 @@
 package net.shoreline.client.impl.module.render;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.world.biome.BiomeParticleConfig;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.biome.BiomeEffectsEvent;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.util.string.EnumFormatter;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class NoWeatherModule extends ToggleModule
+import java.util.Calendar;
+
+public class NoWeatherModule extends Toggleable
 {
+    Config<Weather> weatherConfig = new EnumConfig.Builder<Weather>("Weather")
+            .setValues(Weather.values())
+            .setDescription("The client world weather")
+            .setDefaultValue(Weather.CLEAR).build();
+    Config<Time> timeConfig = new EnumConfig.Builder<Time>("Time")
+            .setValues(Time.values())
+            .setDescription("The client world time")
+            .setDefaultValue(Time.AFTERNOON).build();
 
-    Config<Weather> weatherConfig = register(new EnumConfig<>("Weather", "The world weather", Weather.CLEAR, Weather.values()));
-    // The current weather mode
-    private Weather weather;
+    private Weather prevWeather;
+    private long prevTime;
 
     public NoWeatherModule()
     {
-        super("NoWeather", "Prevents weather rendering", ModuleCategory.RENDER);
-    }
-
-    @Override
-    public String getModuleData()
-    {
-        return EnumFormatter.formatEnum(weatherConfig.getValue());
+        super("NoWeather", "Disables client weather", GuiCategory.RENDER);
     }
 
     @Override
     public void onEnable()
     {
-        if (mc.world != null)
+        if (checkNull())
         {
-            if (mc.world.isThundering())
-            {
-                weather = Weather.THUNDER;
-            }
-            else if (mc.world.isRaining())
-            {
-                weather = Weather.RAIN;
-            }
-            else
-            {
-                weather = Weather.CLEAR;
-            }
-            setWeather(weatherConfig.getValue());
+            return;
+        }
+
+        prevTime = mc.world.getLevelProperties().getTimeOfDay();
+        if (mc.world.isThundering())
+        {
+            prevWeather = Weather.THUNDER;
+        } else if (mc.world.isRaining())
+        {
+            prevWeather = Weather.RAIN;
+        } else
+        {
+            prevWeather = Weather.CLEAR;
         }
     }
 
     @Override
     public void onDisable()
     {
-        if (mc.world != null && weather != null)
+        if (mc.world != null && prevWeather != null)
         {
-            setWeather(weather);
+            setWeather(prevWeather);
+            mc.world.getLevelProperties().setTimeOfDay(prevTime);
         }
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTickPost(TickEvent.Post event)
     {
-        if (event.getStage() == StageEvent.EventStage.POST)
+        if (!checkNull())
         {
             setWeather(weatherConfig.getValue());
+            mc.world.getLevelProperties().setTimeOfDay(timeConfig.getValue().getTime());
         }
     }
 
     @EventListener
-    public void onBiomeEffects(BiomeEffectsEvent event)
+    public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (weatherConfig.getValue() == Weather.ASH)
+        if (event.getPacket() instanceof GameStateChangeS2CPacket packet
+                && (packet.getReason() == GameStateChangeS2CPacket.RAIN_STARTED
+                || packet.getReason() == GameStateChangeS2CPacket.RAIN_STOPPED
+                || packet.getReason() == GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED
+                || packet.getReason() == GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED))
         {
             event.cancel();
-            event.setParticleConfig(new BiomeParticleConfig(ParticleTypes.WHITE_ASH, 0.118093334f));
+        }
+
+        if (event.getPacket() instanceof WorldTimeUpdateS2CPacket)
+        {
+            event.cancel();
         }
     }
 
@@ -89,7 +96,7 @@ public class NoWeatherModule extends ToggleModule
     {
         switch (weather)
         {
-            case CLEAR, ASH ->
+            case CLEAR ->
             {
                 mc.world.getLevelProperties().setRaining(false);
                 mc.world.setRainGradient(0.0f);
@@ -110,26 +117,25 @@ public class NoWeatherModule extends ToggleModule
         }
     }
 
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (event.getPacket() instanceof GameStateChangeS2CPacket packet)
-        {
-            if (packet.getReason() == GameStateChangeS2CPacket.RAIN_STARTED
-                    || packet.getReason() == GameStateChangeS2CPacket.RAIN_STOPPED
-                    || packet.getReason() == GameStateChangeS2CPacket.RAIN_GRADIENT_CHANGED
-                    || packet.getReason() == GameStateChangeS2CPacket.THUNDER_GRADIENT_CHANGED)
-            {
-                event.cancel();
-            }
-        }
-    }
-
-    public enum Weather
+    private enum Weather
     {
         CLEAR,
         RAIN,
-        THUNDER,
-        ASH
+        THUNDER
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    private enum Time
+    {
+        SUNRISE(0),
+        MORNING(3000),
+        NOON(6000),
+        AFTERNOON(9000),
+        SUNSET(12000),
+        EVENING(15000),
+        MIDNIGHT(18000);
+
+        private final long time;
     }
 }

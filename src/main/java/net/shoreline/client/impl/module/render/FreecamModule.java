@@ -1,75 +1,64 @@
 package net.shoreline.client.impl.module.render;
 
+import lombok.Getter;
 import net.minecraft.client.input.KeyboardInput;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.util.PlayerInput;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.config.setting.MacroConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.macro.Macro;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.MouseUpdateEvent;
-import net.shoreline.client.impl.event.PerspectiveEvent;
-import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.camera.CameraPositionEvent;
-import net.shoreline.client.impl.event.camera.CameraRotationEvent;
-import net.shoreline.client.impl.event.camera.EntityCameraPositionEvent;
-import net.shoreline.client.impl.event.entity.EntityDeathEvent;
-import net.shoreline.client.impl.event.entity.EntityRotationVectorEvent;
-import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
-import net.shoreline.client.impl.event.network.DisconnectEvent;
-import net.shoreline.client.impl.event.render.BobViewEvent;
-import net.shoreline.client.impl.event.render.item.RenderFirstPersonEvent;
-import net.shoreline.client.impl.manager.player.rotation.Rotation;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.player.RayCastUtil;
-import net.shoreline.client.util.player.RotationUtil;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.MouseEvent;
+import net.shoreline.client.impl.event.WorldEvent;
+import net.shoreline.client.impl.event.entity.PlayerVecEvent;
+import net.shoreline.client.impl.event.render.CameraEvent;
+import net.shoreline.client.impl.event.render.RenderPlayerThirdPersonEvent;
+import net.shoreline.client.impl.event.render.item.RenderHeldItemEvent;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.RotationUtil;
+import net.shoreline.client.util.world.RaytraceUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
-import org.lwjgl.glfw.GLFW;
 
-/**
- * @author auto
- * @since 1.0
- */
-public class FreecamModule extends ToggleModule
+/** @author auto **/
+@Getter
+public class FreecamModule extends Toggleable
 {
-    private static FreecamModule INSTANCE;
+    public static FreecamModule INSTANCE;
 
-    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The move speed of the camera", 0.1f, 4.0f, 10.0f));
-    Config<Macro> controlConfig = register(new MacroConfig("ControlKey", "", new Macro(getId() + "-control", GLFW.GLFW_KEY_LEFT_ALT, () -> {})));
-    Config<Boolean> toggleControlConfig = register(new BooleanConfig("ToggleControl", "Allows toggling control key instead of holding", false));
-    Config<Interact> interactConfig = register(new EnumConfig<>("Interact", "The interaction type of the camera", Interact.CAMERA, Interact.values()));
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotate to the point of interaction", false));
+    Config<Float> speedConfig = new NumberConfig.Builder<Float>("Speed")
+            .setMin(0.1f).setMax(10.0f).setDefaultValue(5.0f)
+            .setDescription("The camera move speed").build();
+    Config<Interact> interactConfig = new EnumConfig.Builder<Interact>("Interact")
+            .setValues(Interact.values()).setDefaultValue(Interact.CAMERA)
+            .setDescription("Where to interact from").build();
+    Config<Boolean> rotateConfig = new BooleanConfig.Builder("Rotate")
+            .setDescription("Rotates the player before interacting")
+            .setVisible(() -> interactConfig.getValue() == Interact.CAMERA)
+            .setDefaultValue(false).build();
 
-    public Vec3d position, lastPosition;
-
-    public float yaw, pitch;
-
-    public boolean control = false;
+    private Vec3d position, lastPosition;
+    private float yaw, pitch;
 
     public FreecamModule()
     {
-        super("Freecam", "Allows you to control the camera separately from the player", ModuleCategory.RENDER);
+        super("Freecam", "Look around freely", GuiCategory.RENDER);
         INSTANCE = this;
-    }
-
-    public static FreecamModule getInstance()
-    {
-        return INSTANCE;
     }
 
     @Override
     protected void onEnable()
     {
-        if (mc.player == null) return;
-        control = false;
+        if (checkNull())
+        {
+            return;
+        }
 
         position = mc.gameRenderer.getCamera().getPos();
         lastPosition = position;
@@ -83,175 +72,99 @@ public class FreecamModule extends ToggleModule
     @Override
     protected void onDisable()
     {
-        if (mc.player == null) return;
+        if (checkNull())
+        {
+            return;
+        }
+
         mc.player.input = new KeyboardInput(mc.options);
     }
 
     @EventListener
-    public void onDeath(EntityDeathEvent event)
-    {
-        if (event.getEntity() == mc.player)
-        {
-            disable();
-        }
-    }
-
-    @EventListener
-    public void onKey(KeyboardInputEvent event)
-    {
-        // Do nothing for GLFW_REPEAT
-        if (event.getAction() != GLFW.GLFW_REPEAT && event.getKeycode() == controlConfig.getValue().getKeycode())
-        {
-            if (!toggleControlConfig.getValue())
-            {
-                control = event.getAction() == GLFW.GLFW_PRESS;
-            }
-            else
-            {
-                if (event.getAction() == GLFW.GLFW_PRESS)
-                {
-                    control = !control;
-                }
-            }
-        }
-    }
-
-    @EventListener
-    public void onDisconnect(DisconnectEvent event)
+    public void onWorldDisconnect(WorldEvent.Disconnect event)
     {
         disable();
     }
 
     @EventListener
-    public void onCameraPosition(CameraPositionEvent event)
+    public void onCameraPosition(CameraEvent.Position event)
     {
-        event.setPosition(control ? position : lastPosition.lerp(position, event.getTickDelta()));
+        final Vec3d pos = lastPosition.lerp(position, event.getTickDelta());
+
+        event.cancel();
+        event.setX(pos.x);
+        event.setY(pos.y);
+        event.setZ(pos.z);
     }
 
     @EventListener
-    public void onCameraRotation(CameraRotationEvent event)
+    public void onCameraRotation(CameraEvent.Rotation event)
     {
-        event.setRotation(new Vec2f(yaw, pitch));
+        event.cancel();
+        event.setYaw(yaw);
+        event.setPitch(pitch);
     }
 
     @EventListener
-    public void onMouseUpdate(MouseUpdateEvent event)
+    public void onMouseUpdate(MouseEvent event)
     {
-        if (!control)
+        event.cancel();
+        changeLookDirection(event.getCursorDeltaX(), event.getCursorDeltaY());
+    }
+
+    @EventListener
+    public void onEntityCameraPosition(PlayerVecEvent.Camera event)
+    {
+        if (interactConfig.getValue() == Interact.CAMERA)
         {
             event.cancel();
-            changeLookDirection(event.getCursorDeltaX(), event.getCursorDeltaY());
+            event.setVec(position);
         }
     }
 
     @EventListener
-    public void onEntityCameraPosition(EntityCameraPositionEvent event)
+    public void onEntityRotation(PlayerVecEvent.Rotation event)
     {
-        if (event.getEntity() != mc.player) return;
-        if (!control && interactConfig.getValue() == Interact.CAMERA)
+        if (interactConfig.getValue() == Interact.CAMERA)
         {
-            event.setPosition(position);
+            event.cancel();
+            event.setVec(RotationUtil.getRotationVector(yaw, pitch));
         }
     }
 
     @EventListener
-    public void onEntityRotation(EntityRotationVectorEvent event)
+    public void onRenderPlayerThirdPerson(RenderPlayerThirdPersonEvent event)
     {
-        if (event.getEntity() != mc.player) return;
-        if (!control && interactConfig.getValue() == Interact.CAMERA)
-        {
-            event.setPosition(RotationUtil.getRotationVector(pitch, yaw));
-        }
+        event.cancel();
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onClientRotation(ClientRotationEvent event)
     {
-        if (event.getStage() != StageEvent.EventStage.PRE) return;
-        if (!control && rotateConfig.getValue())
+        if (event.isCanceled())
         {
-            float[] currentAngles = {yaw, pitch};
+            return;
+        }
+
+        if (rotateConfig.getValue())
+        {
+            float[] currentAngles = { yaw, pitch };
             Vec3d eyePos = position;
-            HitResult result = RayCastUtil.rayCast(mc.player.getBlockInteractionRange(), eyePos, currentAngles);
-            if (result.getType() == HitResult.Type.BLOCK)
+            HitResult result = RaytraceUtil.raycast(mc.player.getBlockInteractionRange(), eyePos, currentAngles);
+            if (result instanceof BlockHitResult blockResult)
             {
-                float[] newAngles = RotationUtil.getRotationsTo(mc.player.getEyePos(), result.getPos());
-                Managers.ROTATION.setRotation(new Rotation(1, newAngles[0], newAngles[1]));
+                float[] newAngles = RotationUtil.getRotationsTo(mc.player.getEyePos(), blockResult.getBlockPos().toCenterPos());
+                event.cancel();
+                event.setYaw(newAngles[0]);
+                event.setPitch(newAngles[1]);
             }
         }
     }
 
-    // Render the player in third person
     @EventListener
-    public void onPerspective(PerspectiveEvent event)
+    public void onRenderHeldItem(RenderHeldItemEvent.Pre event)
     {
         event.cancel();
-    }
-
-    @EventListener
-    public void onRenderArm(RenderFirstPersonEvent.Head event)
-    {
-        event.cancel();
-    }
-
-    @EventListener
-    public void onBob(BobViewEvent event)
-    {
-        if (control) event.cancel();
-    }
-
-    public class FreecamKeyboardInput extends KeyboardInput
-    {
-
-        private final GameOptions options;
-
-        public FreecamKeyboardInput(GameOptions options)
-        {
-            super(options);
-            this.options = options;
-        }
-
-        @Override
-        public void tick(boolean slowDown, float slowDownFactor)
-        {
-            if (control)
-            {
-                super.tick(slowDown, slowDownFactor);
-            }
-            else
-            {
-                unset();
-                float speed = speedConfig.getValue() / 10f;
-                float fakeMovementForward = getMovementMultiplier(options.forwardKey.isPressed(), options.backKey.isPressed());
-                float fakeMovementSideways = getMovementMultiplier(options.leftKey.isPressed(), options.rightKey.isPressed());
-                Vec2f dir = handleVanillaMotion(speed, fakeMovementForward, fakeMovementSideways);
-
-                float y = 0;
-                if (options.jumpKey.isPressed())
-                {
-                    y += speed;
-                }
-                else if (options.sneakKey.isPressed())
-                {
-                    y -= speed;
-                }
-
-                lastPosition = position;
-                position = position.add(dir.x, y, dir.y);
-            }
-        }
-
-        private void unset()
-        {
-            this.pressingForward = false;
-            this.pressingBack = false;
-            this.pressingLeft = false;
-            this.pressingRight = false;
-            this.movementForward = 0;
-            this.movementSideways = 0;
-            this.jumping = false;
-            this.sneaking = false;
-        }
     }
 
     /**
@@ -277,8 +190,7 @@ public class FreecamModule extends ToggleModule
         if (forward == 0.0f && strafe == 0.0f)
         {
             return Vec2f.ZERO;
-        }
-        else if (forward != 0.0f && strafe != 0.0f)
+        } else if (forward != 0.0f && strafe != 0.0f)
         {
             forward *= (float) Math.sin(0.7853981633974483);
             strafe *= (float) Math.cos(0.7853981633974483);
@@ -301,25 +213,50 @@ public class FreecamModule extends ToggleModule
         this.pitch = MathHelper.clamp(pitch, -90.0F, 90.0F);
     }
 
-    public Vec3d getCameraPosition()
-    {
-        return position;
-    }
-
-    public Vec3d getLastCameraPosition()
-    {
-        return lastPosition;
-    }
-
-    public float[] getCameraRotations()
-    {
-        return new float[]{yaw, pitch};
-    }
-
     public enum Interact
     {
         PLAYER,
         CAMERA
     }
-}
 
+    public class FreecamKeyboardInput extends KeyboardInput
+    {
+        private final GameOptions options;
+
+        public FreecamKeyboardInput(GameOptions options)
+        {
+            super(options);
+            this.options = options;
+        }
+
+        @Override
+        public void tick()
+        {
+            unset();
+            float speed = speedConfig.getValue() / 10.0f;
+            float fakeMovementForward = getMovementMultiplier(options.forwardKey.isPressed(), options.backKey.isPressed());
+            float fakeMovementSideways = getMovementMultiplier(options.leftKey.isPressed(), options.rightKey.isPressed());
+            Vec2f dir = handleVanillaMotion(speed, fakeMovementForward, fakeMovementSideways);
+
+            float y = 0;
+            if (options.jumpKey.isPressed())
+            {
+                y += speed;
+            }
+            else if (options.sneakKey.isPressed())
+            {
+                y -= speed;
+            }
+
+            lastPosition = position;
+            position = position.add(dir.x, y, dir.y);
+        }
+
+        private void unset()
+        {
+            this.playerInput = new PlayerInput(false, false, false, false, false, false, false);
+            this.movementForward = 0;
+            this.movementSideways = 0;
+        }
+    }
+}

@@ -1,16 +1,5 @@
 package net.shoreline.eventbus.dev;
 
-import net.shoreline.eventbus.EventBus;
-import net.shoreline.eventbus.event.Event;
-import net.shoreline.loader.Loader;
-
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Map;
-
 /**
  * This class is not exported with the loader or client.
  * It is kept as a dev environment loader ONLY, for the event bus to function.
@@ -18,9 +7,7 @@ import java.util.Map;
 @SuppressWarnings("unused") // Called natively
 public final class DevEventBusLoader
 {
-    /**
-     * Loads all the event types into the event bus map
-     */
+    /*
     public static void load()
     {
         try
@@ -79,4 +66,5 @@ public final class DevEventBusLoader
             }
         }
     }
+    */
 }

@@ -3,44 +3,40 @@ package net.shoreline.client.impl.command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.Formatting;
-import net.shoreline.client.api.Hideable;
 import net.shoreline.client.api.command.Command;
-import net.shoreline.client.api.command.ModuleArgumentType;
+import net.shoreline.client.api.command.argtype.ModuleArgumentType;
 import net.shoreline.client.api.module.Module;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.api.module.Toggleable;
 
-/**
- * @author linus
- * @see Hideable
- * @since 1.0
- */
 public class DrawnCommand extends Command
 {
     public DrawnCommand()
     {
-        super("Drawn", "Toggles the drawn state of the module", literal("drawn"));
+        super("drawn", new String[] {"d"}, "Toggles drawn state in arraylist");
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
-        builder.then(argument("module", ModuleArgumentType.module())
+        argumentBuilder.then(buildArgument("module", ModuleArgumentType.module())
                 .executes(c ->
                 {
                     Module module = ModuleArgumentType.getModule(c, "module");
-                    if (module instanceof ToggleModule toggle)
+                    if (module instanceof Toggleable toggle)
                     {
                         boolean hide = !toggle.isHidden();
                         toggle.setHidden(hide);
-                        ChatUtil.clientSendMessage("§7" + module.getName() + "§f is now " +
-                                (hide ? "§chidden§f" : "§svisible§f") + Formatting.RESET + " in the Hud");
+                        sendClientChatMessage(Formatting.GRAY + module.getName() + Formatting.RESET + " is now " +
+                                (hide ? Formatting.RED + "hidden" : Formatting.GREEN + "visible"));
                     }
+
                     return 1;
-                })).executes(c ->
-        {
-            ChatUtil.error("Must provide module to draw!");
-            return 1;
-        });
+                }))
+
+                .executes(c ->
+                {
+                    sendErrorChatMessage("Must provide module!");
+                    return 1;
+                });
     }
 }

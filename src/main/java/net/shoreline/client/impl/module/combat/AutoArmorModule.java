@@ -1,254 +1,201 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.screen.ScreenHandler;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.NumberDisplay;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.init.Managers;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.TickEvent;
+import net.shoreline.client.impl.inventory.InventoryManager;
+import net.shoreline.client.impl.module.impl.Priorities;
+import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.impl.module.impl.InventorySwapModule;
+import net.shoreline.client.util.item.ItemUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
+import java.util.function.Consumer;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class AutoArmorModule extends ToggleModule
+public class AutoArmorModule extends InventorySwapModule
 {
+    public static AutoArmorModule INSTANCE;
+    Config<Integer> delay = new NumberConfig.Builder<Integer>("Delay")
+            .setMin(0).setMax(500).setDefaultValue(250)
+            .setDescription("The delay between clicks").build();
+    Config<Integer> armorPercent = new NumberConfig.Builder<Integer>("ReplaceWhen")
+            .setMin(0).setMax(20).setDefaultValue(0).setFormat("%")
+            .setDescription("The min armor percent before replacing").build();
+    Config<Boolean> fastSwap = new BooleanConfig.Builder("FastSwap")
+            .setDescription("Uses a faster swap method")
+            .setDefaultValue(false).build();
+    Config<Boolean> multiClick = new BooleanConfig.Builder("MultiClick")
+            .setDefaultValue(true).build();
 
-    //
-    Config<Priority> priorityConfig = register(new EnumConfig<>("Priority", "Armor enchantment priority", Priority.BLAST_PROTECTION, Priority.values()));
-    Config<Float> minDurabilityConfig = register(new NumberConfig<>("MinDurability", "Durability percent to replace armor", 0.0f, 0.0f, 20.0f, NumberDisplay.PERCENT));
-    Config<Boolean> elytraPriorityConfig = register(new BooleanConfig("ElytraPriority", "Prioritizes existing elytras in the chestplate armor slot", true));
-    Config<Boolean> blastLeggingsConfig = register(new BooleanConfig("Leggings-BlastPriority", "Prioritizes Blast Protection leggings", true));
-    Config<Boolean> noBindingConfig = register(new BooleanConfig("NoBinding", "Avoids armor with the Curse of Binding enchantment", true));
-    Config<Boolean> inventoryConfig = register(new BooleanConfig("AllowInventory", "Allows armor to be swapped while in the inventory menu", false));
-    //
-    private final Queue<ArmorSlot> helmet = new PriorityQueue<>();
-    private final Queue<ArmorSlot> chestplate = new PriorityQueue<>();
-    private final Queue<ArmorSlot> leggings = new PriorityQueue<>();
-    private final Queue<ArmorSlot> boots = new PriorityQueue<>();
+    private final Map<EquipmentSlot, Integer> equipmentSlots =
+            Map.of(EquipmentSlot.HEAD, 5,
+                   EquipmentSlot.CHEST, 6,
+                   EquipmentSlot.LEGS, 7,
+                   EquipmentSlot.FEET, 8);
 
-    /**
-     *
-     */
+    private final Timer timer = new NanoTimer();
+    private final Queue<Click> clicks = new LinkedList<>();
+
     public AutoArmorModule()
     {
-        super("AutoArmor", "Automatically replaces armor pieces", ModuleCategory.COMBAT);
+        super("AutoArmor", "Automatically equips armor", GuiCategory.COMBAT);
+        INSTANCE = this;
     }
 
-    @EventListener
-    public void onTick(PlayerTickEvent event)
+    @EventListener(priority = Priorities.AUTO_ARMOR)
+    public void onTick(final TickEvent.Pre event)
     {
-        if (mc.currentScreen != null && !(mc.currentScreen instanceof InventoryScreen && inventoryConfig.getValue()))
+        if (checkNull() || !canSwapInventory())
         {
             return;
         }
-        //
-        helmet.clear();
-        chestplate.clear();
-        leggings.clear();
-        boots.clear();
-        for (int j = 0; j < 36; j++)
+
+        if (clicks.isEmpty())
         {
-            ItemStack stack = mc.player.getInventory().getStack(j);
-            if (stack.isEmpty() || !(stack.getItem() instanceof ArmorItem armor))
+            for (Map.Entry<EquipmentSlot, Integer> slot : equipmentSlots.entrySet())
             {
-                continue;
-            }
-            if (noBindingConfig.getValue() && hasEnchantment(stack, Enchantments.BINDING_CURSE))
-            {
-                continue;
-            }
-            int index = armor.getSlotType().getEntitySlotId();
-            float dura = (stack.getMaxDamage() - stack.getDamage()) / (float) stack.getMaxDamage();
-            if (dura < minDurabilityConfig.getValue())
-            {
-                continue;
-            }
-            ArmorSlot data = new ArmorSlot(index, j, stack);
-            switch (index)
-            {
-                case 0 -> helmet.add(data);
-                case 1 -> chestplate.add(data);
-                case 2 -> leggings.add(data);
-                case 3 -> boots.add(data);
+                if (check(slot.getKey(), slot.getValue()))
+                {
+                    break;
+                }
             }
         }
-        for (int i = 0; i < 4; i++)
+
+        if (timer.hasPassed(delay.getValue()))
         {
-            ItemStack armorStack = mc.player.getInventory().getArmorStack(i);
-            if (elytraPriorityConfig.getValue() && armorStack.getItem() == Items.ELYTRA)
+            Click click = clicks.poll();
+            if (click != null)
             {
-                continue;
-            }
-            float armorDura = (armorStack.getMaxDamage() - armorStack.getDamage()) / (float) armorStack.getMaxDamage();
-            if (!armorStack.isEmpty() || armorDura >= minDurabilityConfig.getValue())
-            {
-                continue;
-            }
-            switch (i)
-            {
-                case 0 ->
-                {
-                    if (!helmet.isEmpty())
-                    {
-                        ArmorSlot helmetSlot = helmet.poll();
-                        swapArmor(helmetSlot.getType(), helmetSlot.getSlot());
-                    }
-                }
-                case 1 ->
-                {
-                    if (!chestplate.isEmpty())
-                    {
-                        ArmorSlot chestSlot = chestplate.poll();
-                        swapArmor(chestSlot.getType(), chestSlot.getSlot());
-                    }
-                }
-                case 2 ->
-                {
-                    if (!leggings.isEmpty())
-                    {
-                        ArmorSlot leggingsSlot = leggings.poll();
-                        swapArmor(leggingsSlot.getType(), leggingsSlot.getSlot());
-                    }
-                }
-                case 3 ->
-                {
-                    if (!boots.isEmpty())
-                    {
-                        ArmorSlot bootsSlot = boots.poll();
-                        swapArmor(bootsSlot.getType(), bootsSlot.getSlot());
-                    }
-                }
+                click.execute();
+                timer.reset();
             }
         }
     }
 
-    public void swapArmor(int armorSlot, int slot)
+    private boolean check(EquipmentSlot equipment, int slot)
     {
-        ItemStack stack = mc.player.getInventory().getArmorStack(armorSlot);
-        //
-        armorSlot = 8 - armorSlot;
-        Managers.INVENTORY.pickupSlot(slot < 9 ? slot + 36 : slot);
-        boolean rt = !stack.isEmpty();
-        Managers.INVENTORY.pickupSlot(armorSlot);
-        if (rt)
+        int armor = 44 - slot;
+        ItemStack armorStack = mc.player.getInventory().getStack(armor);
+        if (equipment == EquipmentSlot.CHEST && armorStack.getItem() == Items.ELYTRA)
         {
-            Managers.INVENTORY.pickupSlot(slot < 9 ? slot + 36 : slot);
-        }
-    }
-
-    public enum Priority
-    {
-        BLAST_PROTECTION(Enchantments.BLAST_PROTECTION),
-        PROTECTION(Enchantments.PROTECTION),
-        PROJECTILE_PROTECTION(Enchantments.PROJECTILE_PROTECTION);
-
-        //
-        private final RegistryKey<Enchantment> enchant;
-
-        Priority(RegistryKey<Enchantment> enchant)
-        {
-            this.enchant = enchant;
+            return false;
         }
 
-        public RegistryKey<Enchantment> getEnchantment()
+        int provided = findArmor(equipment);
+        if (provided == -1 || armor == provided || checkArmor(armorStack))
         {
-            return enchant;
+            return false;
         }
-    }
 
-    public boolean hasEnchantment(ItemStack armorStack, RegistryKey<Enchantment> enchantment)
-    {
-        if (armorStack.getComponents().contains(DataComponentTypes.ENCHANTMENTS))
+        ItemStack providedStack = mc.player.getInventory().getStack(provided);
+        ScreenHandler handler = mc.player.playerScreenHandler;
+        int providedSlot = InventoryUtil.getPacketSlotIndex(handler, provided);
+        if (fastSwap.getValue())
         {
-            for (RegistryEntry<Enchantment> entry : armorStack.getComponents()
-                    .get(DataComponentTypes.ENCHANTMENTS).getEnchantments())
+            Click click = new Click(slot, -1);
+            queueClick(click.setFast(providedSlot, providedStack.getItem()));
+        }
+        else
+        {
+            queueClick(slot, providedSlot);
+            if (!multiClick.getValue())
             {
-                if (entry.getKey().isPresent() && entry.getKey().get().equals(enchantment))
-                {
-                    return true;
-                }
+                queueClick(providedSlot, -1);
+                queueClick(slot, -1);
             }
         }
-        return false;
+
+        return true;
     }
 
-    //
-    public class ArmorSlot implements Comparable<ArmorSlot>
+    private void queueClick(int slot, int target)
     {
-        //
-        private final int armorType;
+        queueClick(new Click(slot, target));
+    }
+
+    private void queueClick(Click click)
+    {
+        clicks.add(click);
+    }
+
+    public int findArmor(EquipmentSlot equipment)
+    {
+        return InventoryUtil.find(stack ->
+        {
+            if (!(stack.getItem() instanceof ArmorItem))
+            {
+                return false;
+            }
+
+            return getEquipmentSlot(stack).equals(equipment);
+        });
+    }
+
+    private boolean checkArmor(ItemStack armorStack)
+    {
+        float percent = ItemUtil.getStackPercent(armorStack) * 100.0f;
+        return !(percent < armorPercent.getValue()) && !armorStack.isEmpty();
+    }
+
+    private EquipmentSlot getEquipmentSlot(ItemStack itemStack)
+    {
+        return itemStack.get(DataComponentTypes.EQUIPPABLE).slot();
+    }
+
+    private class Click
+    {
         private final int slot;
-        private final ItemStack armorStack;
+        private final int target;
 
-        public ArmorSlot(int armorType, int slot, ItemStack armorStack)
+        private int fastSlot;
+        private Item fastItem;
+
+        public Click(int slot, int target)
         {
-            this.armorType = armorType;
             this.slot = slot;
-            this.armorStack = armorStack;
+            this.target = target;
+            this.fastSlot = -1;
         }
 
-        @Override
-        public int compareTo(ArmorSlot other)
+        public void execute()
         {
-            if (armorType != other.armorType)
+            InventoryManager inventory = Managers.INVENTORY;
+            ScreenHandler handler = mc.player.playerScreenHandler;
+            if (slot != -1 && fastSlot != -1)
             {
-                return 0;
+                inventory.clickSwap(fastSlot, slot, fastItem);
+                return;
             }
-            final ItemStack otherStack = other.getArmorStack();
-            ArmorItem armorItem = (ArmorItem) armorStack.getItem();
-            ArmorItem otherItem = (ArmorItem) otherStack.getItem();
-            int durabilityDiff = armorItem.getMaterial().value().getProtection(armorItem.getType())
-                    - otherItem.getMaterial().value().getProtection(otherItem.getType());
-            if (durabilityDiff != 0)
+
+            if (slot != -1)
             {
-                return durabilityDiff;
-            }
-            RegistryKey<Enchantment> enchantment = priorityConfig.getValue().getEnchantment();
-            if (blastLeggingsConfig.getValue() && armorType == 2
-                    && hasEnchantment(armorStack, Enchantments.BLAST_PROTECTION))
-            {
-                return -1;
-            }
-            if (hasEnchantment(armorStack, enchantment))
-            {
-                return hasEnchantment(otherStack, enchantment) ? 0 : -1;
-            }
-            else
-            {
-                return hasEnchantment(otherStack, enchantment) ? 1 : 0;
+                inventory.pickupSlot(handler, slot);
+                if (target != -1 && multiClick.getValue())
+                {
+                    inventory.pickupSlot(handler, target);
+                    inventory.pickupSlot(handler, slot);
+                }
             }
         }
 
-        public ItemStack getArmorStack()
+        public Click setFast(int fastSlot, Item fastItem)
         {
-            return armorStack;
-        }
-
-        public int getType()
-        {
-            return armorType;
-        }
-
-        public int getSlot()
-        {
-            return slot;
+            this.fastSlot = fastSlot;
+            this.fastItem = fastItem;
+            return this;
         }
     }
 }

@@ -1,79 +1,53 @@
 package net.shoreline.client.impl.module.client;
 
+import lombok.Getter;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.config.ConfigUpdateEvent;
-import net.shoreline.client.init.Fonts;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.api.font.Fonts;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.LoadingEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class FontModule extends ToggleModule
+@Getter
+public class FontModule extends Toggleable
 {
-    private static FontModule INSTANCE;
+    public static FontModule INSTANCE;
 
-    Config<Boolean> antiAliasConfig = register(new BooleanConfig("AntiAlias", "Applies antialiasing to font", true));
-    Config<Boolean> fractionalMetrics = register(new BooleanConfig("FractionalMetrics", "Applies fractional metrics to font", false));
-    Config<Integer> sizeConfig = register(new NumberConfig<>("Size", "The font size", 5, 9, 12));
-    Config<Float> vanillaShadowConfig = register(new NumberConfig<>("VanillaShadow", "The vanilla shadow offset", 0.1f, 1.0f, 1.5f));
+    Config<Fonts> fontsConfig = new EnumConfig.Builder<Fonts>("Font")
+            .setValues(Fonts.values())
+            .setDescription("The font for the client")
+            .setDefaultValue(Fonts.VERDANA).build();
+    Config<Boolean> antiAlias = new BooleanConfig.Builder("AntiAlias")
+            .setDescription("Applies AA texturing on font")
+            .setDefaultValue(true).build();
+    Config<Boolean> fractionalMetrics = new BooleanConfig.Builder("FractionalMetrics")
+            .setDescription("Applies fractional metrics on font")
+            .setDefaultValue(false).build();
+    Config<Boolean> overrideChat = new BooleanConfig.Builder("OverrideChat")
+            .setDescription("Overrides the font in chat")
+            .setDefaultValue(false).build();
 
-    /**
-     *
-     */
     public FontModule()
     {
-        super("Font", "Changes the client text to custom font rendering", ModuleCategory.CLIENT);
+        super("Font", "Client custom fonts", GuiCategory.CLIENT);
         INSTANCE = this;
-    }
 
-    public static FontModule getInstance()
-    {
-        return INSTANCE;
-    }
-
-    @EventListener
-    public void onTick(TickEvent event)
-    {
-        if (event.getStage() == StageEvent.EventStage.PRE && Fonts.FONT_SIZE != sizeConfig.getValue())
-        {
-            Fonts.setSize(sizeConfig.getValue());
-        }
+        fontsConfig.addObserver(v -> setFont(v.getName()));
+        antiAlias.addObserver(v -> FontManager.close());
+        fractionalMetrics.addObserver(v -> FontManager.close());
     }
 
     @EventListener
-    public void onConfigUpdate(ConfigUpdateEvent event)
+    public void onFinishedLoading(LoadingEvent.Finished event)
     {
-        if (!Fonts.isInitialized())
-        {
-            return;
-        }
-
-        if (event.getStage() == StageEvent.EventStage.POST
-                && (event.getConfig() == antiAliasConfig || event.getConfig() == fractionalMetrics))
-        {
-            Fonts.closeFonts();
-        }
+        setFont(fontsConfig.getValue().getName());
     }
 
-    public boolean getAntiAlias()
+    public void setFont(String fontName)
     {
-        return antiAliasConfig.getValue();
-    }
-
-    public boolean getFractionalMetrics()
-    {
-        return fractionalMetrics.getValue();
-    }
-
-    public float getVanillaShadow()
-    {
-        return vanillaShadowConfig.getValue();
+        FontManager.setFont(FontManager.fromSystem(fontName));
     }
 }

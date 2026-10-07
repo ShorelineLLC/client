@@ -1,14 +1,8 @@
 package net.shoreline.client.impl.event.render;
 
+import net.shoreline.eventbus.Event;
 import net.shoreline.eventbus.annotation.Cancelable;
-import net.shoreline.eventbus.event.Event;
 
-/**
- * @author linus
- * @since 1.0
- */
 @Cancelable
-public class RenderNauseaEvent extends Event
-{
-
+public class RenderNauseaEvent extends Event {
 }

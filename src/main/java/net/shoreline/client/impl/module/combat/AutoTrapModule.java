@@ -1,414 +1,211 @@
 package net.shoreline.client.impl.module.combat;
 
-import com.google.common.collect.Lists;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.render.RenderBuffers;
-import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.api.config.ConfigGroup;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.ObsidianPlacerModule;
-import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.impl.module.world.AirPlaceModule;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.position.PositionUtil;
-import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.world.BlastResistantBlocks;
+import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.interact.InteractDirection;
+import net.shoreline.client.impl.module.combat.trap.TrapLayer;
+import net.shoreline.client.impl.module.combat.trap.TrapModule;
+import net.shoreline.client.impl.module.combat.trap.TrapSpec;
+import net.shoreline.client.impl.module.combat.util.MovementExtrapolation;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.awt.*;
-import java.util.List;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
 
-/**
- * @author Shoreline
- * @since 1.0
- */
-public final class AutoTrapModule extends ObsidianPlacerModule
+public class AutoTrapModule extends TrapModule
 {
-    private static AutoTrapModule INSTANCE;
+    Config<Float> placeRange = new NumberConfig.Builder<Float>("Range")
+            .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
+            .setDescription("Range to place blocks").build();
 
-    Config<Boolean> multitaskConfig = register(new BooleanConfig("Multitask", "Allows placing while eating", true));
-    Config<Float> placeRangeConfig = register(new NumberConfig<>("PlaceRange", "The placement range for trap", 0.0f, 4.0f, 6.0f));
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates to block before placing", false));
-    Config<Boolean> attackConfig = register(new BooleanConfig("Attack", "Attacks crystals in the way of trap ", true));
-    Config<Boolean> extendConfig = register(new BooleanConfig("Extend", "Extends trap if the player is not in the center of a block", true));
-    Config<Boolean> supportConfig = register(new BooleanConfig("Support", "Creates a floor for the trap if there is none", false));
-    Config<Boolean> headConfig = register(new BooleanConfig("Head", "Place a block at targets head", true));
-    Config<Boolean> antiStepConfig = register(new BooleanConfig("PreventStep", "Prevents target from stepping out of the trap", false));
-    Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of blocks to place per tick", 1, 2, 10));
-    Config<Float> shiftDelayConfig = register(new NumberConfig<>("ShiftDelay", "The delay between each block placement interval", 0.0f, 1.0f, 5.0f));
-    Config<Boolean> autoDisableConfig = register(new BooleanConfig("AutoDisable", "Disables after placing the blocks", true));
-    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where trap is placing blocks", false));
-    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
+    Config<Float> targetRange = new NumberConfig.Builder<Float>("TargetRange")
+            .setMin(1.0f).setMax(15.0f).setDefaultValue(10.0f).setFormat("m")
+            .setDescription("The range to target entities").build();
+    Config<Integer> extrapolateTicks = new NumberConfig.Builder<Integer>("Extrapolate")
+            .setMin(0).setDefaultValue(0).setMax(10).setFormat(" ticks")
+            .setDescription("The number of ticks ahead to predict movement").build();
+    Config<Boolean> feetConfig = new BooleanConfig.Builder("Feet")
+            .setDescription("Traps player feet")
+            .setDefaultValue(true).build();
+    Config<Boolean> bodyConfig = new BooleanConfig.Builder("Body")
+            .setDescription("Traps player body")
+            .setDefaultValue(true).build();
+    Config<Boolean> headConfig = new BooleanConfig.Builder("Head")
+            .setDescription("Traps player head")
+            .setDefaultValue(false).build();
+    Config<Boolean> crawlConfig = new BooleanConfig.Builder("Crawl")
+            .setDescription("Attempts to prevent target from standing up")
+            .setDefaultValue(false).build();
+    Config<Boolean> supportConfig = new BooleanConfig.Builder("Support")
+            .setDescription("Supporting blocks for autotrap")
+            .setDefaultValue(true).build();
+    Config<Void> targetConfig = new ConfigGroup.Builder("Target")
+            .addAll(targetRange, extrapolateTicks, feetConfig, bodyConfig, headConfig, crawlConfig).build();
 
-    private List<BlockPos> surround = new ArrayList<>();
-    private List<BlockPos> placements = new ArrayList<>();
-    private final Map<BlockPos, Long> packets = new HashMap<>();
-    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
-    private int blocksPlaced;
+    Config<Boolean> instantReplace = new BooleanConfig.Builder("InstantReplace")
+            .setDescription("Replaces instantly after mined")
+            .setDefaultValue(false).build();
+    Config<Boolean> autoDisable = new BooleanConfig.Builder("AutoDisable")
+            .setDescription("Disables when player y-level changes")
+            .setDefaultValue(false).build();
+
+    private PlayerEntity trapTarget;
 
     public AutoTrapModule()
     {
-        super("AutoTrap", "Fully traps enemies with blocks", ModuleCategory.COMBAT, 900);
-        INSTANCE = this;
-    }
-
-    public static AutoTrapModule getInstance()
-    {
-        return INSTANCE;
+        super("AutoTrap", "Traps enemies with obsidian", GuiCategory.COMBAT);
     }
 
     @Override
-    public void onDisable()
+    public String getModuleData()
     {
-        surround.clear();
-        placements.clear();
-        packets.clear();
-        fadeList.clear();
+        return trapTarget != null ? String.valueOf(fadeOutAnimations.size()) : super.getModuleData();
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event)
+    public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
     {
-        blocksPlaced = 0;
-
-        if (!multitaskConfig.getValue() && checkMultitask() || stopMotionConfig.getValue() && !mc.player.isOnGround())
+        if (checkNull())
         {
-            surround.clear();
-            placements.clear();
             return;
         }
 
-        BlockSlot blockItem = getResistantBlockItem();
-        if (blockItem == null)
+        int obbySlot = findBestObbySlot();
+        if (obbySlot == -1)
         {
-            surround.clear();
-            placements.clear();
             return;
         }
-        PlayerEntity trapTarget = getTrapTarget();
+
+        if (Managers.TARGETING.hasTarget())
+        {
+            trapTarget = Managers.TARGETING.getTarget();
+        } else
+        {
+            trapTarget = Managers.TARGETING.getClosestTarget(targetRange.getValue());
+        }
+
         if (trapTarget == null)
         {
-            surround.clear();
-            placements.clear();
             return;
         }
 
-        BlockPos targetBlockPos = PositionUtil.getRoundedBlockPos(trapTarget.getX(), trapTarget.getY(), trapTarget.getZ());
-        surround = getSurround(targetBlockPos, trapTarget);
-        if (surround.isEmpty())
+        Vec3d targetPos = extrapolateTicks.getValue() <= 0 ? trapTarget.getPos() :
+                MovementExtrapolation.extrapolatePosition(mc.world,
+                        box -> mc.world.getBlockCollisions(trapTarget, box),
+                        trapTarget.getVelocity(),
+                        trapTarget.getBoundingBox(),
+                        extrapolateTicks.getValue(),
+                        false);
+
+        final Box playerBox = trapTarget.getBoundingBox(EntityPose.STANDING).offset(targetPos);
+        Box boundingBox = playerBox.withMinY(Math.round(playerBox.minY)).shrink(0.01, 0.1, 0.01);
+
+        TrapSpec trapSpec = TrapSpec.builder().layers(getLayers()).build();
+        trapPos.calcTrap(boundingBox, trapSpec);
+
+        placements.clear();
+        for (Map.Entry<BlockPos, TrapLayer> entry : trapPos.getTrapPositionLayers().entrySet())
         {
-            return;
-        }
-        if (attackConfig.getValue())
-        {
-            attackBlockingCrystals(surround);
-        }
-        placements = getPlacementsFromSurround(surround, blockItem.block());
-        if (placements.isEmpty())
-        {
-            if (autoDisableConfig.getValue())
+            BlockPos blockPos = entry.getKey();
+            double dist = mc.player.squaredDistanceTo(blockPos.toCenterPos());
+            if (dist > placeRange.getValue() * placeRange.getValue())
             {
-                disable();
+                continue;
             }
-            return;
-        }
-        if (supportConfig.getValue())
-        {
-            for (BlockPos block : new ArrayList<>(placements))
+
+            if (!mc.world.getBlockState(blockPos).isReplaceable())
             {
-                if (block.getY() > targetBlockPos.getY())
+                if (!instantReplace.getValue() || Managers.MINING.getMiningProgress(blockPos) <= 0.5f)
                 {
                     continue;
                 }
-                Direction direction = Managers.INTERACT.getInteractDirectionInternal(block, strictDirectionConfig.getValue());
-                if (direction == null)
+            }
+
+            if (!Managers.INTERACT.canPlaceBlock(blockPos, getCurrentObbyBlock()))
+            {
+                continue;
+            }
+
+            placements.add(blockPos);
+        }
+
+        if (placements.isEmpty() || !Managers.INTERACT.startPlacement(obbySlot))
+        {
+            return;
+        }
+
+        for (BlockPos placement : placements)
+        {
+            Direction direction = InteractDirection.getInteractDirection(placement);
+            if (direction == null && supportConfig.getValue())
+            {
+                for (Direction dir : Direction.values())
                 {
-                    placements.add(block.down());
+                    BlockPos offset = placement.offset(dir);
+                    if (placeBlock(offset, Blocks.OBSIDIAN))
+                    {
+                        break;
+                    }
                 }
             }
-        }
-        placements.sort(Comparator.comparingInt(Vec3i::getY));
 
-        Vec3d prevMotion = mc.player.getVelocity();
-        if (stopMotionConfig.getValue())
-        {
-            mc.player.setVelocity(0.0, 0.0, 0.0);
+            placeObby(placement);
         }
 
-        while (blocksPlaced < shiftTicksConfig.getValue())
-        {
-            if (blocksPlaced >= placements.size())
-            {
-                break;
-            }
-            BlockPos targetPos = placements.get(blocksPlaced);
-            // All rotations for shift ticks must send extra packet
-            // This may not work on all servers
-            placeBlock(targetPos, blockItem);
-            blocksPlaced++;
-        }
-
-        if (rotateConfig.getValue())
-        {
-            Managers.ROTATION.setRotationSilentSync();
-        }
-
-        if (stopMotionConfig.getValue())
-        {
-            mc.player.setVelocity(prevMotion);
-        }
+        Managers.INTERACT.endPlacement();
     }
 
     @EventListener
     public void onPacketInbound(PacketEvent.Inbound event)
     {
-        if (mc.player == null || mc.world == null)
+        if (checkNull())
         {
             return;
         }
-        if (event.getPacket() instanceof BundleS2CPacket packet)
-        {
-            for (Packet<?> packet1 : packet.getPackets())
-            {
-                handlePackets(packet1);
-            }
-        }
-        else
-        {
-            handlePackets(event.getPacket());
-        }
-    }
 
-    private void handlePackets(Packet<?> serverPacket)
-    {
-        if (serverPacket instanceof BlockUpdateS2CPacket packet)
+        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && packet.getState().isAir() && instantReplace.getValue())
         {
-            final BlockState blockState = packet.getState();
-            final BlockPos targetPos = packet.getPos();
-            if (surround.contains(targetPos))
+            BlockPos blockPos = packet.getPos();
+            if (trapPos.getTrapPositions().contains(blockPos))
             {
-                if (blockState.isReplaceable())
-                {
-                    BlockSlot blockItem = getResistantBlockItem();
-                    if (blockItem == null)
-                    {
-                        return;
-                    }
-                    placeBlock(targetPos, blockItem);
-                }
-                else if (BlastResistantBlocks.isBlastResistant(blockState))
-                {
-                    packets.remove(targetPos);
-                }
+                runSingleObbyPlacement(blockPos);
             }
         }
     }
 
-    private void placeBlock(BlockPos pos, BlockSlot blockItem)
+    @Override
+    public EnumSet<TrapLayer> getLayers()
     {
-        Managers.INTERACT.placeBlock(pos, blockItem.block(), blockItem.slot(), strictDirectionConfig.getValue(), false, true, (state, angles) ->
+        EnumSet<TrapLayer> layers = EnumSet.noneOf(TrapLayer.class);
+        if (feetConfig.getValue())
         {
-            if (rotateConfig.getValue() && state)
-            {
-                Managers.ROTATION.setRotationSilent(angles[0], angles[1]);
-            }
-        });
-        packets.put(pos, System.currentTimeMillis());
-    }
-
-    private PlayerEntity getTrapTarget()
-    {
-        final List<Entity> entities = Lists.newArrayList(mc.world.getEntities());
-        return (PlayerEntity) entities.stream()
-                .filter(e -> e instanceof PlayerEntity && e.isAlive() && mc.player != e && !Managers.SOCIAL.isFriend(e.getName()))
-                .filter(e -> mc.player.squaredDistanceTo(e) <= ((NumberConfig<Float>) placeRangeConfig).getValueSq())
-                .min(Comparator.comparingDouble(e -> mc.player.squaredDistanceTo(e)))
-                .orElse(null);
-    }
-
-    public void attackBlockingCrystals(List<BlockPos> posList)
-    {
-        for (BlockPos pos : posList)
+            layers.add(TrapLayer.FEET);
+        } if (bodyConfig.getValue())
         {
-            Entity crystalEntity = mc.world.getOtherEntities(null, new Box(pos)).stream()
-                    .filter(e -> e instanceof EndCrystalEntity).findFirst().orElse(null);
-            if (crystalEntity == null)
-            {
-                continue;
-            }
-            Managers.NETWORK.sendPacket(PlayerInteractEntityC2SPacket.attack(crystalEntity, mc.player.isSneaking()));
-            Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            return;
-        }
-    }
-
-    public List<BlockPos> getPlacementsFromSurround(List<BlockPos> surround, Block block)
-    {
-        List<BlockPos> placements = new ArrayList<>();
-        for (BlockPos surroundPos : surround)
+            layers.add(TrapLayer.BODY);
+        } if (headConfig.getValue())
         {
-            Long placed = packets.get(surroundPos);
-            if (shiftDelayConfig.getValue() > 0.0f && placed != null && System.currentTimeMillis() - placed < shiftDelayConfig.getValue() * 50.0f)
-            {
-                continue;
-            }
-            if (!mc.world.getBlockState(surroundPos).isReplaceable())
-            {
-                continue;
-            }
-            double dist = mc.player.squaredDistanceTo(surroundPos.toCenterPos());
-            if (dist > ((NumberConfig) placeRangeConfig).getValueSq())
-            {
-                continue;
-            }
-
-            if (!Managers.INTERACT.canPlace(surroundPos, block))
-            {
-                continue;
-            }
-
-            placements.add(surroundPos);
-        }
-        return placements;
-    }
-
-    public List<BlockPos> getSurround(BlockPos playerPos, PlayerEntity player)
-    {
-        List<BlockPos> surroundBlocks = new ArrayList<>();
-        List<BlockPos> playerBlocks = getPlayerBlocks(playerPos, player);
-        for (BlockPos pos : playerBlocks)
+            layers.add(TrapLayer.CEILING);
+        } if (crawlConfig.getValue())
         {
-            for (Direction dir : Direction.values())
-            {
-                if (!dir.getAxis().isHorizontal())
-                {
-                    continue;
-                }
-                BlockPos pos1 = pos.offset(dir);
-                if (surroundBlocks.contains(pos1) || playerBlocks.contains(pos1))
-                {
-                    continue;
-                }
-
-                surroundBlocks.add(pos1);
-                surroundBlocks.add(pos1.up());
-            }
-        }
-        if (headConfig.getValue())
-        {
-            boolean support = false;
-            final List<BlockPos> headBlocks = new ArrayList<>();
-            for (BlockPos pos : playerBlocks)
-            {
-                BlockPos headPos = pos.offset(Direction.UP, 2);
-                if (!mc.world.getBlockState(headPos).isReplaceable())
-                {
-                    support = true;
-                }
-                headBlocks.add(headPos);
-                if (antiStepConfig.getValue())
-                {
-                    BlockPos antiStepPos = pos.offset(Direction.UP, 3);
-                    headBlocks.add(antiStepPos);
-                }
-            }
-            if (!AirPlaceModule.getInstance().isEnabled())
-            {
-                BlockPos supportingPos = null;
-                double min = Double.MAX_VALUE;
-                for (BlockPos pos : surroundBlocks)
-                {
-                    BlockPos pos1 = pos.offset(Direction.UP, 2);
-                    if (!mc.world.getBlockState(pos1).isReplaceable())
-                    {
-                        support = true;
-                        break;
-                    }
-                    double dist = mc.player.squaredDistanceTo(pos1.toCenterPos());
-                    if (dist < min)
-                    {
-                        supportingPos = pos1;
-                        min = dist;
-                    }
-                }
-                if (supportingPos != null && !support)
-                {
-                    surroundBlocks.add(supportingPos);
-                }
-            }
-            surroundBlocks.addAll(headBlocks);
-        }
-        return surroundBlocks;
-    }
-
-    public List<BlockPos> getPlayerBlocks(BlockPos playerPos, PlayerEntity entity)
-    {
-        final List<BlockPos> playerBlocks = new ArrayList<>();
-        if (extendConfig.getValue())
-        {
-            playerBlocks.addAll(PositionUtil.getAllInBox(entity.getBoundingBox(), playerPos));
-        }
-        else
-        {
-            playerBlocks.add(playerPos);
-        }
-        return playerBlocks;
-    }
-
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent event)
-    {
-        if (renderConfig.getValue())
-        {
-            RenderBuffers.preRender();
-            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
-            {
-                set.getValue().setState(false);
-                int boxAlpha = (int) (40 * set.getValue().getFactor());
-                int lineAlpha = (int) (100 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
-                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
-                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
-                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
-            }
-            RenderBuffers.postRender();
-
-            if (placements.isEmpty())
-            {
-                return;
-            }
-
-            for (BlockPos pos : placements)
-            {
-                Animation animation = new Animation(true, fadeTimeConfig.getValue());
-                fadeList.put(pos, animation);
-            }
+            layers.add(TrapLayer.BODY_INTERSECT);
+            layers.add(TrapLayer.FLOOR);
         }
 
-        fadeList.entrySet().removeIf(e ->
-                e.getValue().getFactor() == 0.0);
-    }
-
-    public boolean isPlacing()
-    {
-        return !placements.isEmpty();
+        return layers;
     }
 }

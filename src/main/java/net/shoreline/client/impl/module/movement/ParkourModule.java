@@ -1,55 +1,47 @@
 package net.shoreline.client.impl.module.movement;
 
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
+import net.minecraft.util.math.Box;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.TickEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class ParkourModule extends ToggleModule
+public class ParkourModule extends Toggleable
 {
+    private boolean jumping;
 
-    private boolean override;
-
-    /**
-     *
-     */
     public ParkourModule()
     {
-        super("Parkour", "Automatically jumps at the edge of blocks", ModuleCategory.MOVEMENT);
+        super("Parkour", "Jumps at the edge of blocks", GuiCategory.MOVEMENT);
     }
 
     @Override
-    protected void onDisable()
+    public void onDisable()
     {
-        super.onDisable();
-
-        if (override)
+        if (jumping)
         {
-            override = false;
             mc.options.jumpKey.setPressed(false);
+            jumping = false;
         }
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event)
+    public void onTick(TickEvent.Pre event)
     {
-        if (mc.player.isOnGround() && !mc.player.isSneaking()
-                && mc.world.isSpaceEmpty(mc.player.getBoundingBox().offset(0.0, -0.5, 0.0).expand(-0.001, 0.0, -0.001)))
+        if (checkNull())
+        {
+            return;
+        }
+
+        Box playerBox = mc.player.getBoundingBox().offset(0.0, -0.5, 0.0).expand(-0.001, 0.0, -0.001);
+        if (mc.player.isOnGround() && !mc.player.isSneaking() && mc.world.isSpaceEmpty(playerBox))
         {
             mc.options.jumpKey.setPressed(true);
-            override = true;
-        }
-        else
+            jumping = true;
+        } else if (jumping)
         {
-            if (override)
-            {
-                override = false;
-                mc.options.jumpKey.setPressed(false);
-            }
+            mc.options.jumpKey.setPressed(false);
+            jumping = false;
         }
     }
 }

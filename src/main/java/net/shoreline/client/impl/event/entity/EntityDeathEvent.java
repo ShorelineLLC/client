@@ -1,20 +1,14 @@
 package net.shoreline.client.impl.event.entity;
 
-import net.minecraft.entity.LivingEntity;
-import net.shoreline.eventbus.event.Event;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import net.minecraft.entity.Entity;
+import net.shoreline.eventbus.Event;
 
+@RequiredArgsConstructor
+@Getter
 public class EntityDeathEvent extends Event
 {
-
-    private final LivingEntity entity;
-
-    public EntityDeathEvent(LivingEntity entity)
-    {
-        this.entity = entity;
-    }
-
-    public LivingEntity getEntity()
-    {
-        return entity;
-    }
+    private final Entity entity;
+    private final int pops;
 }

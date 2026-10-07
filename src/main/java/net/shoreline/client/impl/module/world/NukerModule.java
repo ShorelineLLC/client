@@ -1,772 +1,172 @@
 package net.shoreline.client.impl.module.world;
 
+import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.math.BlockPos;
+import net.shoreline.client.Shoreline;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.*;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.render.RenderBuffers;
-import net.shoreline.client.api.render.RenderManager;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.config.RegistryConfig;
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.block.AsyncBlockScanner;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.network.AttackBlockEvent;
-import net.shoreline.client.impl.event.network.PacketEvent;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.CombatModule;
-import net.shoreline.client.impl.module.client.AnticheatModule;
-import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.player.RotationUtil;
-import net.shoreline.client.util.render.ColorUtil;
-import net.shoreline.client.util.render.animation.Animation;
-import net.shoreline.client.util.world.BlastResistantBlocks;
+import net.shoreline.client.impl.module.combat.AutoMineModule;
+import net.shoreline.client.impl.module.world.nuker.NukeCalcManager;
+import net.shoreline.client.impl.module.world.nuker.NukeScanner;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
-import java.awt.*;
+import java.util.Collection;
 import java.util.List;
-import java.util.Queue;
-import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class NukerModule extends CombatModule
+@Getter
+public class NukerModule extends Toggleable
 {
-    Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
-    Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN));
-    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist"));
-    Config<NukeMode> modeConfig = register(new EnumConfig<>("Mode", "The nuker selection mode", NukeMode.SPHERE, NukeMode.values()));
-    Config<Boolean> flattenConfig = register(new BooleanConfig("Flatten", "Only clears above the player y-level", false, () -> modeConfig.getValue() == NukeMode.SPHERE));
-    Config<Boolean> strictDirectionConfig = register(new BooleanConfig("StrictDirection", "Only mines on visible faces", false));
-    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The range to mine blocks", 0.0f, 4.0f, 6.0f));
-    Config<Boolean> doubleBreakConfig = register(new BooleanConfig("DoubleBreak", "Allows you to mine two blocks at once", false));
-    Config<Integer> mineTicksConfig = register(new NumberConfig<>("MiningTicks", "The max number of ticks to hold a pickaxe for the packet mine", 5, 20, 60, () -> doubleBreakConfig.getValue()));
-    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to mine blocks", 0.1f, 1.0f, 1.0f));
-    Config<Swap> swapConfig = register(new EnumConfig<>("AutoSwap", "Swaps to the best tool once the mining is complete", Swap.SILENT, Swap.values()));
-    Config<Boolean> swapBeforeConfig = register(new BooleanConfig("SwapBefore", "Swaps before mining", false, () -> swapConfig.getValue() != Swap.OFF));
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates when mining the block", true));
-    Config<Boolean> switchResetConfig = register(new BooleanConfig("SwitchReset", "Resets mining after switching items", false));
-    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim block breaking speeds", false));
-    Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Allows mining on new grim servers", false, () -> grimConfig.getValue()));
-    Config<Color> colorConfig = register(new ColorConfig("MineColor", "The mine render color", Color.RED, false, false));
-    Config<Color> colorDoneConfig = register(new ColorConfig("DoneColor", "The done render color", Color.GREEN, false, false));
-    Config<Boolean> debugTicksConfig = register(new BooleanConfig("Debug-Ticks", "Shows the mining ticks", false));
-    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Time to fade", 0, 250, 1000, () -> false));
-    Config<Boolean> smoothColorConfig = register(new BooleanConfig("SmoothColor", "Interpolates from start to done color", false, () -> false));
+    public static NukerModule INSTANCE;
+    Config<NukeMode> mode = new EnumConfig.Builder<NukeMode>("Mode")
+            .setValues(NukeMode.values())
+            .setDefaultValue(NukeMode.BLOCKS)
+            .setDescription("Nuking mode")
+            .build();
+    Config<ScanMode> scanMode = new EnumConfig.Builder<ScanMode>("Scan")
+            .setValues(ScanMode.values())
+            .setDefaultValue(ScanMode.SPHERE)
+            .setDescription("Scanning mode")
+            .build();
+    Config<Collection<Block>> blocks = new RegistryConfig.Builder<Block>("Blocks")
+            .setValues()
+            .setRegistry(Registries.BLOCK)
+            .setDescription("What blocks to nuke")
+            .build();
+    Config<Integer> delay = new NumberConfig.Builder<Integer>("Delay")
+            .setMin(0).setDefaultValue(250).setMax(1000)
+            .setDescription("The delay between each nuking scan")
+            .build();
+    Config<Float> range = new NumberConfig.Builder<Float>("Range")
+            .setMin(0.f).setDefaultValue(4.f).setMax(6.f)
+            .setFormat("m")
+            .setDescription("The range to nuke blocks")
+            .build();
 
-    private MineData packetMine, instantMine; // mining2 should always be the instant mine
-    private boolean packetSwapBack;
-    private boolean changedInstantMine;
-    private boolean waitForPacketMine;
-
-    private final Queue<BlockPos> selectedBlocks = new LinkedList<>();
-    private final Queue<MineData> autoMineQueue = new ArrayDeque<>();
-    private int autoMineTickDelay;
-
-    private MineAnimation packetMineAnim = new MineAnimation(
-            MineData.empty(), new Animation(true, 200));
-    private MineAnimation instantMineAnim = new MineAnimation(
-            MineData.empty(), new Animation(true, 200));
+    private final NukeCalcManager calculation =
+            new NukeCalcManager(new NukeScanner(this));
+    private final Timer timer = new NanoTimer();
 
     public NukerModule()
     {
-        super("Nuker", "Clears nearby blocks", ModuleCategory.WORLD);
-    }
-
-    @Override
-    public void onDisable()
-    {
-        autoMineQueue.clear();
-        packetMine = null;
-        if (instantMine != null)
-        {
-            abortMining(instantMine);
-            instantMine = null;
-        }
-        packetMineAnim = new MineAnimation(MineData.empty(), new Animation(true, 200));
-        instantMineAnim = new MineAnimation(MineData.empty(), new Animation(true, 200));
-        autoMineTickDelay = 0;
-        waitForPacketMine = false;
-        if (packetSwapBack)
-        {
-            Managers.INVENTORY.syncToClient();
-            packetSwapBack = false;
-        }
+        super("Nuker", "Clears nearby blocks", GuiCategory.WORLD);
+        INSTANCE = this;
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTick(TickEvent.Post event)
     {
-        if (mc.player.isCreative() || mc.player.isSpectator() || event.getStage() != StageEvent.EventStage.PRE)
+        if (checkNull())
         {
             return;
         }
 
-        if (isInstantMineComplete())
+        if (timer.hasPassed(delay.getValue()))
         {
-            if (changedInstantMine)
-            {
-                changedInstantMine = false;
-            }
-            if (waitForPacketMine)
-            {
-                waitForPacketMine = false;
-            }
+            calculation.runCalc(scanMode.getValue());
+            timer.reset();
+            return;
         }
 
-        autoMineTickDelay--;
-
-        // Mining packet handling
-        if (packetMine != null && packetMine.getTicksMining() > mineTicksConfig.getValue())
-        {
-            packetMineAnim.animation.setState(false);
-            if (packetSwapBack)
-            {
-                Managers.INVENTORY.syncToClient();
-                packetSwapBack = false;
-            }
-            selectedBlocks.remove(packetMine.getPos());
-            packetMine = null;
-            if (!isInstantMineComplete())
-            {
-                waitForPacketMine = true;
-            }
-        }
-
-        if (packetMine != null)
-        {
-            final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
-                    packetMine.getState(), mc.world, packetMine.getPos());
-            packetMine.addBlockDamage(damageDelta);
-
-            int slot = packetMine.getBestSlot();
-            float damageDone = packetMine.getBlockDamage() + (swapBeforeConfig.getValue() ? damageDelta : 0.0f);
-            if (damageDone >= 1.0f && canMine(packetMine.getState()) && slot != -1 && !checkMultitask())
-            {
-                packetMine.markAttemptedMine();
-                Managers.INVENTORY.setSlot(slot);
-                packetSwapBack = true;
-            }
-        }
-
-        if (packetSwapBack && (packetMine == null || !canMine(packetMine.getState())))
-        {
-            Managers.INVENTORY.syncToClient();
-            packetSwapBack = false;
-            packetMineAnim.animation.setState(false);
-            if (packetMine != null)
-            {
-                selectedBlocks.remove(packetMine.getPos());
-            }
-            packetMine = null;
-            if (!isInstantMineComplete())
-            {
-                waitForPacketMine = true;
-            }
-        }
-
-        if (instantMine != null)
-        {
-            final double distance = mc.player.getEyePos().squaredDistanceTo(instantMine.getPos().toCenterPos());
-            if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq()
-                    || instantMine.getTicksMining() > mineTicksConfig.getValue())
-            {
-                abortMining(instantMine);
-                instantMineAnim.animation.setState(false);
-                selectedBlocks.remove(instantMine.getPos());
-                instantMine = null;
-            }
-        }
-
-        if (instantMine != null)
-        {
-            final float damageDelta = SpeedmineModule.getInstance().calcBlockBreakingDelta(
-                    instantMine.getState(), mc.world, instantMine.getPos());
-            instantMine.addBlockDamage(damageDelta);
-
-            if (instantMine.getBlockDamage() >= speedConfig.getValue())
-            {
-                if (canMine(instantMine.getState()))
-                {
-                    if (!checkMultitask() || multitaskConfig.getValue() || swapConfig.getValue() == Swap.OFF)
-                    {
-                        stopMining(instantMine);
-                        instantMine.markAttemptedMine();
-                    }
-                }
-                else
-                {
-                    abortMining(instantMine);
-                    instantMineAnim.animation.setState(false);
-                    selectedBlocks.remove(instantMine.getPos());
-                    instantMine = null;
-                }
-            }
-        }
-
-        if (!autoMineQueue.isEmpty() && autoMineTickDelay <= 0)
-        {
-            MineData nextMine = autoMineQueue.poll();
-            if (nextMine != null)
-            {
-                startMining(nextMine);
-                autoMineTickDelay = 5;
-            }
-        }
-
-        if (autoMineQueue.isEmpty())
-        {
-            MineData bestMine = getNukerMine();
-            if (bestMine != null && (packetMine == null
-                    && doubleBreakConfig.getValue() || isInstantMineComplete()))
-            {
-                startAutoMine(bestMine);
-            }
-        }
-    }
-
-    @EventListener
-    public void onAttackBlock(AttackBlockEvent event)
-    {
-        if (mc.player.isCreative() || mc.player.isSpectator())
+        Collection<BlockPos> result = calculation.getResults();
+        if (result == null || result.isEmpty())
         {
             return;
         }
 
-        event.cancel();
+        AutoMineModule autoMine = AutoMineModule.INSTANCE;
+        SpeedMineModule speedMine = SpeedMineModule.INSTANCE;
+        autoMine.onEnable(); // ensure AutoMines speedmine instance isnt null.
 
-        // Do not try to break unbreakable blocks
-        if (event.getState().getBlock().getHardness() == -1.0f || !canMine(event.getState())
-                || selectedBlocks.contains(event.getPos()))
+        if (!AutoMineModule.speedMine.hasFreeMine()
+                || !speedMine.getDoubleMine().getValue() && speedMine.getMainMiningBlock() != null && !speedMine.getMainMiningBlock().isDoneMining())
         {
             return;
         }
 
-        final double distance = mc.player.getEyePos().squaredDistanceTo(event.getPos().toCenterPos());
-        if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq())
+        for (BlockPos pos : result)
         {
-            return;
-        }
-
-        selectedBlocks.add(event.getPos());
-    }
-
-    @EventListener
-    public void onPacketOutbound(PacketEvent.Outbound event)
-    {
-        if (event.getPacket() instanceof UpdateSelectedSlotC2SPacket && switchResetConfig.getValue())
-        {
-            instantMine.setTotalBlockDamage(0.0f, 0.0f);
-        }
-    }
-
-    @EventListener
-    public void onPacketInbound(PacketEvent.Inbound event)
-    {
-        if (event.getPacket() instanceof BlockUpdateS2CPacket packet && !canMine(packet.getState())
-                && packetMine != null && packetMine.getPos().equals(packet.getPos()))
-        {
-            packetMineAnim.animation.setState(false);
-            if (packetSwapBack)
+            if (!autoMine.canStartMining(pos))
             {
-                Managers.INVENTORY.syncToClient();
-                packetSwapBack = false;
-            }
-            packetMine = null;
-            waitForPacketMine = false;
-            if (!isInstantMineComplete())
-            {
-                waitForPacketMine = true;
-            }
-        }
-    }
-
-    private List<BlockPos> getSphere(Vec3d origin)
-    {
-        List<BlockPos> sphere = new ArrayList<>();
-        double rad = Math.ceil(rangeConfig.getValue());
-        for (double x = -rad; x <= rad; ++x)
-        {
-            for (double y = flattenConfig.getValue() ? 0.0 : -rad; y <= rad; ++y)
-            {
-                for (double z = -rad; z <= rad; ++z)
-                {
-                    Vec3i pos = new Vec3i((int) (origin.getX() + x),
-                            (int) (origin.getY() + y), (int) (origin.getZ() + z));
-                    final BlockPos p = new BlockPos(pos);
-                    sphere.add(p);
-                }
-            }
-        }
-        return sphere;
-    }
-
-    public void startAutoMine(MineData data)
-    {
-        if (!canMine(data.getState()) || isMining(data.getPos()))
-        {
-            return;
-        }
-
-        if (!doubleBreakConfig.getValue())
-        {
-            instantMine = data;
-            autoMineQueue.offer(data);
-            return;
-        }
-
-        if (changedInstantMine && !isInstantMineComplete() || waitForPacketMine)
-        {
-            return;
-        }
-
-        boolean updateChanged = false;
-        if (!isInstantMineComplete() && !changedInstantMine)
-        {
-            if (packetMine == null)
-            {
-                packetMine = instantMine.copy();
-                packetMineAnim = new MineAnimation(packetMine,
-                        new Animation(true, fadeTimeConfig.getValue()));
-            }
-            else
-            {
-                updateChanged = true;
-            }
-        }
-
-        instantMine = data;
-        autoMineQueue.offer(data);
-
-        if (updateChanged)
-        {
-            changedInstantMine = true;
-        }
-    }
-
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent event)
-    {
-        if (mc.player.isCreative() || mc.player.isSpectator())
-        {
-            return;
-        }
-
-        RenderBuffers.preRender();
-
-        for (BlockPos pos : selectedBlocks)
-        {
-            RenderManager.renderBoundingBox(event.getMatrices(), pos, 2.0f, ColorsModule.getInstance().getRGB(160));
-        }
-
-        if (instantMineAnim != null && instantMineAnim.animation().getFactor() > 0.01f)
-        {
-            renderMiningData(event.getMatrices(), event.getTickDelta(),
-                    instantMineAnim, true);
-        }
-
-        if (packetMineAnim != null && packetMineAnim.animation().getFactor() > 0.01f)
-        {
-            renderMiningData(event.getMatrices(), event.getTickDelta(),
-                    packetMineAnim, false);
-        }
-        RenderBuffers.postRender();
-    }
-
-    public void renderMiningData(MatrixStack matrixStack, float tickDelta,
-                                 MineAnimation mineAnimation, boolean instantMine)
-    {
-        MineData data = mineAnimation.data();
-        Animation animation = mineAnimation.animation();
-        int boxAlpha = (int) (40 * animation.getFactor());
-        int lineAlpha = (int) (100 * animation.getFactor());
-
-        int boxColor;
-        int lineColor;
-        if (smoothColorConfig.getValue())
-        {
-            boxColor = !canMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) :
-                    ColorUtil.interpolateColor(Math.min(data.getBlockDamage(), 1.0f), ((ColorConfig) colorDoneConfig).getValue(boxAlpha), ((ColorConfig) colorConfig).getValue(boxAlpha)).getRGB();
-            lineColor = !canMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) :
-                    ColorUtil.interpolateColor(Math.min(data.getBlockDamage(), 1.0f), ((ColorConfig) colorDoneConfig).getValue(lineAlpha), ((ColorConfig) colorConfig).getValue(lineAlpha)).getRGB();
-        }
-        else
-        {
-            boxColor = data.getBlockDamage() >= 0.95f || !canMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(boxAlpha) : ((ColorConfig) colorConfig).getRgb(boxAlpha);
-            lineColor = data.getBlockDamage() >= 0.95f || !canMine(data.getState()) ? ((ColorConfig) colorDoneConfig).getRgb(lineAlpha) : ((ColorConfig) colorConfig).getRgb(lineAlpha);
-        }
-
-        BlockPos mining = data.getPos();
-        VoxelShape outlineShape = VoxelShapes.fullCube();
-        if (!instantMine || data.getBlockDamage() < speedConfig.getValue())
-        {
-            outlineShape = data.getState().getOutlineShape(mc.world, mining);
-            outlineShape = outlineShape.isEmpty() ? VoxelShapes.fullCube() : outlineShape;
-        }
-        Box render1 = outlineShape.getBoundingBox();
-        Vec3d center = render1.offset(mining).getCenter();
-        float total = instantMine ? speedConfig.getValue() : 1.0f;
-        float scale = (instantMine && data.getBlockDamage() >= speedConfig.getValue()) || !canMine(data.getState()) ? 1.0f :
-                MathHelper.clamp((data.getBlockDamage() + (data.getBlockDamage() - data.getLastDamage()) * tickDelta) / total, 0.0f, 1.0f);
-        double dx = (render1.maxX - render1.minX) / 2.0;
-        double dy = (render1.maxY - render1.minY) / 2.0;
-        double dz = (render1.maxZ - render1.minZ) / 2.0;
-        final Box scaled = new Box(center, center).expand(dx * scale, dy * scale, dz * scale);
-        RenderManager.renderBox(matrixStack, scaled, boxColor);
-        RenderManager.renderBoundingBox(matrixStack, scaled, 1.5f, lineColor);
-        if (debugTicksConfig.getValue())
-        {
-            RenderManager.renderSign(String.valueOf(data.getTicksMining()), center, -1);
-        }
-    }
-
-    // Should be sorted by y level and distance
-    public MineData getNukerMine()
-    {
-        if (modeConfig.getValue() == NukeMode.SPHERE)
-        {
-            List<BlockPos> sphere = getSphere(mc.player.getPos());
-
-            BlockPos minePos = null;
-            int yLevel = -128;
-            double dist = Double.MAX_VALUE;
-            for (BlockPos blockPos : sphere)
-            {
-                BlockState state = mc.world.getBlockState(blockPos);
-                if (!canMine(state) || isMining(blockPos))
-                {
-                    continue;
-                }
-
-                final double distance = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
-                if (distance > ((NumberConfig<Float>) rangeConfig).getValueSq())
-                {
-                    continue;
-                }
-
-                int y = blockPos.getY();
-                double distToPlayer = mc.player.getEyePos().squaredDistanceTo(blockPos.toCenterPos());
-
-                if (y > yLevel || (y == yLevel && distToPlayer < dist))
-                {
-                    minePos = blockPos;
-                    yLevel = y;
-                    dist = distToPlayer;
-                }
+                continue;
             }
 
-            if (minePos != null)
-            {
-                return new MineData(minePos, strictDirectionConfig.getValue() ?
-                        Managers.INTERACT.getInteractDirection(minePos, false) : Direction.UP);
-            }
+            autoMine.startAutoMine(pos);
+            break;
         }
 
-        else
-        {
-            if (selectedBlocks.isEmpty())
-            {
-                return null;
-            }
-
-            if (packetMine != null && instantMine != null)
-            {
-                return null;
-            }
-
-            Queue<BlockPos> blocks = new LinkedList<>(selectedBlocks);
-            BlockPos minePos = blocks.poll();
-            if (instantMine != null && instantMine.getPos().equals(minePos))
-            {
-                minePos = selectedBlocks.poll();
-            }
-            if (minePos != null)
-            {
-                return new MineData(minePos, strictDirectionConfig.getValue() ?
-                        Managers.INTERACT.getInteractDirection(minePos, false) : Direction.UP);
-            }
-        }
-
-        return null;
+        calculation.getScanner().getResult().clear();
     }
 
-    public void startMining(MineData data)
+    public float getRange()
     {
-        if (doubleBreakConfig.getValue())
-        {
-            // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L76
-            // https://github.com/GrimAnticheat/Grim/blob/2.0/src/main/java/ac/grim/grimac/checks/impl/misc/FastBreak.java#L98
-            if (grimNewConfig.getValue())
-            {
-                if (!AnticheatModule.getInstance().getMiningFix())
-                {
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                }
-                else
-                {
-                    Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                }
-
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            }
-            else
-            {
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-                Managers.NETWORK.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            }
-        }
-        else
-        {
-            Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            if (!grimConfig.getValue())
-            {
-                Managers.NETWORK.sendSequencedPacket(id -> new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection(), id));
-                Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                        PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-            }
-        }
-
-        instantMineAnim = new MineAnimation(data, new Animation(true, fadeTimeConfig.getValue()));
+        return range.getValue();
     }
 
-    public void abortMining(MineData data)
+    public boolean isValid(BlockPos pos, BlockState state)
     {
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-    }
-
-    public void stopMining(MineData data)
-    {
-        if (rotateConfig.getValue())
-        {
-            float[] rotations = RotationUtil.getRotationsTo(mc.player.getEyePos(), data.getPos().toCenterPos());
-            if (grimConfig.getValue())
-            {
-                setRotationSilent(rotations[0], rotations[1]);
-            }
-            else
-            {
-                setRotation(rotations[0], rotations[1]);
-            }
-        }
-        int slot = data.getBestSlot();
-        boolean canSwap = slot != -1 && slot != Managers.INVENTORY.getServerSlot();
-        if (canSwap)
-        {
-            swapTo(slot);
-        }
-
-        stopMiningInternal(data);
-
-        if (canSwap)
-        {
-            swapSync(slot);
-        }
-
-        if (rotateConfig.getValue())
-        {
-            Managers.ROTATION.setRotationSilentSync();
-        }
-    }
-
-    private void stopMiningInternal(MineData data)
-    {
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-        Managers.NETWORK.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, data.getPos(), data.getDirection()));
-    }
-
-    public boolean isInstantMineComplete()
-    {
-        return instantMine == null || instantMine.getBlockDamage() >= speedConfig.getValue() && !canMine(instantMine.getState());
-    }
-
-    private void swapTo(int slot)
-    {
-        switch (swapConfig.getValue())
-        {
-            case NORMAL -> Managers.INVENTORY.setClientSlot(slot);
-            case SILENT -> Managers.INVENTORY.setSlot(slot);
-            case SILENT_ALT -> Managers.INVENTORY.setSlotAlt(slot);
-        }
-    }
-
-    private void swapSync(int slot)
-    {
-        switch (swapConfig.getValue())
-        {
-            case SILENT -> Managers.INVENTORY.syncToClient();
-            case SILENT_ALT -> Managers.INVENTORY.setSlotAlt(slot);
-        }
-    }
-
-    private boolean isMining(BlockPos blockPos)
-    {
-        return instantMine != null && instantMine.getPos().equals(blockPos) ||
-                packetMine != null && packetMine.getPos().equals(blockPos);
-    }
-
-    private boolean validNukerBlock(Block block)
-    {
-        if (BlastResistantBlocks.isUnbreakable(block))
+        SpeedMineModule speedMine = SpeedMineModule.INSTANCE;
+        if (speedMine.isMining(pos))
         {
             return false;
         }
-        return switch (selectionConfig.getValue())
+
+        if (mode.getValue() == NukeMode.SHULKERS)
         {
-            case WHITELIST -> ((BlockListConfig<?>) whitelistConfig).contains(block);
-            case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
-            case ALL -> true;
+            BlockEntity entity = calculation.getScanner().getBlockEntity(pos);
+            if (entity instanceof ShulkerBoxBlockEntity)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        return blocks.getValue().contains(state.getBlock());
+    }
+
+    public enum ScanMode
+    {
+        SPHERE
+        {
+            @Override
+            public void scan(AsyncBlockScanner scanner, ClientWorld world)
+            {
+                scanner.createSphere(world, mc.player.getBlockPos());
+            }
+        },
+        CUBE
+        {
+            @Override
+            public void scan(AsyncBlockScanner scanner, ClientWorld world)
+            {
+                scanner.createCube(world, mc.player.getBlockPos());
+            }
         };
+
+        public abstract void scan(AsyncBlockScanner scanner, ClientWorld world);
     }
 
-    public boolean canMine(BlockState state)
+    private enum NukeMode
     {
-        return !state.isAir() && state.getFluidState().isEmpty();
-    }
-
-    public static class MineData
-    {
-        private final BlockPos pos;
-        private final Direction direction;
-        //
-        private int ticksMining;
-        private float blockDamage, lastDamage;
-
-        public MineData(BlockPos pos, Direction direction)
-        {
-            this.pos = pos;
-            this.direction = direction;
-        }
-
-        @Override
-        public boolean equals(Object obj)
-        {
-            return obj instanceof MineData d && d.getPos().equals(pos);
-        }
-
-        public void resetMiningTicks()
-        {
-            ticksMining = 0;
-        }
-
-        public void markAttemptedMine()
-        {
-            ticksMining++;
-        }
-
-        public void addBlockDamage(float blockDamage)
-        {
-            this.lastDamage = this.blockDamage;
-            this.blockDamage += blockDamage;
-        }
-
-        public void setTotalBlockDamage(float blockDamage, float lastDamage)
-        {
-            this.blockDamage = blockDamage;
-            this.lastDamage = lastDamage;
-        }
-
-        public static MineData empty()
-        {
-            return new MineData(BlockPos.ORIGIN, Direction.UP);
-        }
-
-        public MineData copy()
-        {
-            final MineData data = new MineData(pos, direction);
-            data.setTotalBlockDamage(blockDamage, lastDamage);
-            return data;
-        }
-
-        public BlockPos getPos()
-        {
-            return pos;
-        }
-
-        public Direction getDirection()
-        {
-            return direction;
-        }
-
-        public int getTicksMining()
-        {
-            return ticksMining;
-        }
-
-        public float getBlockDamage()
-        {
-            return blockDamage;
-        }
-
-        public float getLastDamage()
-        {
-            return lastDamage;
-        }
-
-        public BlockState getState()
-        {
-            return mc.world.getBlockState(pos);
-        }
-
-        public int getBestSlot()
-        {
-            return AutoToolModule.getInstance().getBestToolNoFallback(getState());
-        }
-    }
-
-    public record MineAnimation(MineData data, Animation animation) {}
-
-    public enum Selection
-    {
-        WHITELIST,
-        BLACKLIST,
-        ALL
-    }
-
-    public enum NukeMode
-    {
-        SPHERE,
-        SELECT
-    }
-
-    public enum Swap
-    {
-        NORMAL,
-        SILENT,
-        SILENT_ALT,
-        OFF
+        BLOCKS,
+        SHULKERS
     }
 }
-

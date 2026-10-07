@@ -1,26 +1,26 @@
 package net.shoreline.client.impl.event.gui.hud;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.text.Text;
+import net.shoreline.eventbus.Event;
 import net.shoreline.eventbus.annotation.Cancelable;
-import net.shoreline.eventbus.event.Event;
 
+@AllArgsConstructor
 @Cancelable
+@Getter
+@Setter
 public class ChatMessageEvent extends Event
 {
     private Text text;
 
-    public ChatMessageEvent(Text text)
+    @RequiredArgsConstructor
+    @Getter
+    public static class Visible extends Event
     {
-        this.text = text;
-    }
-
-    public void setText(Text text)
-    {
-        this.text = text;
-    }
-
-    public Text getText()
-    {
-        return text;
+        private final ChatHudLine.Visible chatLine;
     }
 }

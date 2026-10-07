@@ -1,140 +1,123 @@
 package net.shoreline.client.impl.module.combat;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ExperienceBottleItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.NumberDisplay;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.impl.module.RotationModule;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.timer.TickTimer;
-import net.shoreline.client.util.player.InventoryUtil;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.interact.ItemInteraction;
+import net.shoreline.client.impl.module.impl.Priorities;
+import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.impl.rotation.RotateMode;
+import net.shoreline.client.impl.rotation.Rotation;
+import net.shoreline.client.util.entity.EntityUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-/**
- * @author hockeyl8
- * @since 1.0
- */
-public class AutoXPModule extends RotationModule
+public class AutoXPModule extends Toggleable
 {
-    private static AutoXPModule INSTANCE;
-
-    Config<Boolean> multiTaskConfig = register(new BooleanConfig("MultiTask", "Allows you to throw xp while using items", false));
-    Config<Float> delayConfig = register(new NumberConfig<>("Delay", "Delay to throw xp in ticks", 1.0f, 1.0f, 10.0f, NumberDisplay.DEFAULT));
-    Config<Integer> shiftTicksConfig = register(new NumberConfig<>("ShiftTicks", "The number of xp bottles to throw in one tick", 1, 1, 64));
-    Config<Boolean> durabilityCheckConfig = register(new BooleanConfig("DurabilityCheck", "Check if your armor and held item durability is full then disables if it is", true));
-    Config<Boolean> rotateConfig = register(new BooleanConfig("Rotate", "Rotates the player while throwing xp", false));
-    Config<Boolean> swingConfig = register(new BooleanConfig("Swing", "Swings hand while throwing xp", false));
-
-    private final TickTimer delayTimer = new TickTimer();
+    Config<Boolean> multitaskConfig = new BooleanConfig.Builder("Multitask")
+            .setDescription("Allows using items while using XP")
+            .setDefaultValue(true).build();
+    Config<Boolean> inAirConfig = new BooleanConfig.Builder("InAir")
+            .setDescription("Uses XP in the air")
+            .setDefaultValue(false).build();
+    Config<Integer> bptConfig = new NumberConfig.Builder<Integer>("BottlesPerTick")
+            .setMin(1).setDefaultValue(1).setMax(10)
+            .setDescription("The number of XP bottles to throw per tick").build();
+    Config<RotateMode> rotateConfig = new EnumConfig.Builder<RotateMode>("Rotate")
+            .setValues(RotateMode.values())
+            .setDescription("Rotate down before using XP")
+            .setDefaultValue(RotateMode.OFF).build();
 
     public AutoXPModule()
     {
-        super("AutoXP", "Automatically throws xp silently.", ModuleCategory.COMBAT, 850);
-        INSTANCE = this;
-    }
-
-    public static AutoXPModule getInstance()
-    {
-        return INSTANCE;
+        super("AutoXP", "Automatically mends items", GuiCategory.COMBAT);
     }
 
     @Override
     public String getModuleData()
     {
-        return String.valueOf(InventoryUtil.count(Items.EXPERIENCE_BOTTLE));
+        return String.valueOf(InventoryUtil.getItemCount(Items.EXPERIENCE_BOTTLE));
     }
 
-    @EventListener
-    public void onPlayerTick(PlayerTickEvent event)
+    @EventListener(priority = Priorities.AUTO_XP)
+    public void onClientRotation(ClientRotationEvent event)
     {
-
-        if (mc.player == null || !delayTimer.passed(delayConfig.getValue()))
+        if (mc.player.isUsingItem() && !multitaskConfig.getValue())
         {
             return;
         }
 
-        if (mc.player.isUsingItem() && !multiTaskConfig.getValue())
+        if (rotateConfig.getValue() == RotateMode.NORMAL && event.isCanceled())
         {
             return;
         }
 
-        if (durabilityCheckConfig.getValue() && areItemsFullDura(mc.player))
+        if (!mc.player.isOnGround() && !inAirConfig.getValue())
+        {
+            return;
+        }
+
+        if (isPlayerFullDurability())
         {
             disable();
             return;
         }
 
-        int slot = -1;
-        for (int i = 0; i < 9; i++)
-        {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() instanceof ExperienceBottleItem)
-            {
-                slot = i;
-                break;
-            }
-        }
-        if (slot == -1)
+        int itemSlot = InventoryUtil.getItemSlot(Items.EXPERIENCE_BOTTLE);
+        if (itemSlot == -1)
         {
             disable();
             return;
         }
 
-        Managers.INVENTORY.setSlot(slot);
-        if (rotateConfig.getValue())
+        Rotation xpThrow = new Rotation(mc.player.getYaw(), 90.0f);
+        switch (rotateConfig.getValue())
         {
-            setRotation(mc.player.getYaw(), 90.0f);
-            if (isRotationBlocked())
+            case SILENT -> Managers.ROTATION.setSilentRotation(xpThrow);
+            case NORMAL ->
             {
-                return;
+                event.cancel();
+                event.setYaw(xpThrow.getYaw());
+                event.setPitch(xpThrow.getPitch());
             }
         }
-        for (int i = 0; i < shiftTicksConfig.getValue(); i++)
+
+        if (Managers.INVENTORY.startSwap(itemSlot))
         {
-            Managers.NETWORK.sendSequencedPacket(id -> new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, id, mc.player.getYaw(), mc.player.getPitch()));
-            if (swingConfig.getValue())
+            for (int i = 0; i < bptConfig.getValue(); i++)
             {
-                mc.player.swingHand(Hand.MAIN_HAND);
+                Managers.INTERACT.interactItem(new ItemInteraction(Items.EXPERIENCE_BOTTLE,
+                        Hand.MAIN_HAND,
+                        xpThrow,
+                        true));
             }
+
+            Managers.INVENTORY.endSwap();
         }
-        Managers.INVENTORY.syncToClient();
-        delayTimer.reset();
+
+        if (rotateConfig.getValue() == RotateMode.SILENT)
+        {
+            Managers.ROTATION.resetSilentRotation();
+        }
     }
 
-    private boolean areItemsFullDura(PlayerEntity player)
+    private boolean isPlayerFullDurability()
     {
-        if (!isItemFullDura(player.getMainHandStack()) || !isItemFullDura(player.getOffHandStack()))
+        for (ItemStack stack : EntityUtil.getEquippedItems(mc.player))
         {
-            return false;
-        }
-
-        for (ItemStack stack : player.getArmorItems())
-        {
-            if (!isItemFullDura(stack))
+            if (!stack.isEmpty() && stack.isDamaged())
             {
                 return false;
             }
         }
 
         return true;
-    }
-
-    private boolean isItemFullDura(ItemStack stack)
-    {
-        if (stack.isEmpty())
-        {
-            return true;
-        }
-        int maxDura = stack.getMaxDamage();
-        int currentDura = stack.getDamage();
-        return currentDura == 0 || maxDura == 0;
     }
 }

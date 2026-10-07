@@ -1,85 +1,23 @@
 accessWidener v1 named
+
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractAtHandler
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler
-accessible class net/minecraft/client/font/TextRenderer$Drawer
-accessible method net/minecraft/client/font/TextRenderer tweakTransparency (I)I
-accessible method net/minecraft/client/font/TextRenderer drawLayer (Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)F
-accessible field net/minecraft/client/font/TextRenderer validateAdvance Z
-accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
-accessible field net/minecraft/client/network/ClientPlayerEntity lastX D
-accessible field net/minecraft/client/network/ClientPlayerEntity lastBaseY D
-accessible field net/minecraft/client/network/ClientPlayerEntity lastZ D
-accessible field com/mojang/blaze3d/systems/RenderSystem shaderLightDirections [Lorg/joml/Vector3f;
-accessible method net/minecraft/client/render/RenderLayer of (Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;ILnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;
-accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
-accessible class net/minecraft/client/render/RenderPhase$Texture
-accessible field net/minecraft/client/render/RenderPhase GLINT_PROGRAM Lnet/minecraft/client/render/RenderPhase$ShaderProgram;
-accessible field net/minecraft/client/render/RenderPhase COLOR_MASK Lnet/minecraft/client/render/RenderPhase$WriteMaskState;
-accessible field net/minecraft/client/render/RenderPhase DISABLE_CULLING Lnet/minecraft/client/render/RenderPhase$Cull;
-accessible field net/minecraft/client/render/RenderPhase GLINT_TRANSPARENCY Lnet/minecraft/client/render/RenderPhase$Transparency;
-accessible field net/minecraft/client/render/RenderPhase GLINT_TEXTURING Lnet/minecraft/client/render/RenderPhase$Texturing;
-accessible field net/minecraft/client/render/RenderPhase EQUAL_DEPTH_TEST Lnet/minecraft/client/render/RenderPhase$DepthTest;
-accessible field net/minecraft/client/render/RenderPhase ALWAYS_DEPTH_TEST Lnet/minecraft/client/render/RenderPhase$DepthTest;
-accessible class net/minecraft/client/render/RenderPhase$DepthTest
-accessible class net/minecraft/client/render/RenderPhase$ShaderProgram
-accessible class net/minecraft/client/render/RenderPhase$Lightmap
-accessible class net/minecraft/client/render/RenderPhase$Toggleable
-accessible field net/minecraft/client/render/RenderPhase beginAction Ljava/lang/Runnable;
-accessible field net/minecraft/client/render/RenderPhase endAction Ljava/lang/Runnable;
-accessible class net/minecraft/client/texture/PlayerSkinProvider$FileCache
+accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket ATTACK Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler;
+
+accessible class net/minecraft/client/gui/DrawContext$ScissorStack
+accessible field net/minecraft/client/gui/DrawContext$ScissorStack stack Ljava/util/Deque;
+
 accessible class net/minecraft/client/MinecraftClient$LoadingContext
-accessible method net/minecraft/client/render/entity/PlayerEntityRenderer setModelPose (Lnet/minecraft/client/network/AbstractClientPlayerEntity;)V
-accessible class net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
-accessible method net/minecraft/client/MinecraftClient doAttack ()Z
-accessible field net/minecraft/client/option/SimpleOption callbacks Lnet/minecraft/client/option/SimpleOption$Callbacks;
-accessible class net/minecraft/client/particle/FireworksSparkParticle$Explosion
-accessible method net/minecraft/client/render/entity/PlayerEntityRenderer getArmPose (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/client/render/entity/model/BipedEntityModel$ArmPose;
-accessible method net/minecraft/client/render/entity/LivingEntityRenderer setupTransforms (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFFF)V
-accessible method net/minecraft/client/render/entity/LivingEntityRenderer scale (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V
-accessible method net/minecraft/client/render/entity/PlayerEntityRenderer setupTransforms (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;FFFF)V
-accessible method net/minecraft/client/render/entity/PlayerEntityRenderer scale (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel head Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel body Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel rightHindLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftHindLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel rightFrontLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftFrontLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel rightChest Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/LlamaEntityModel leftChest Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/entity/TrackedPosition pos Lnet/minecraft/util/math/Vec3d;
-accessible class net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk$RebuildTask
-accessible class net/minecraft/client/world/ClientChunkManager$ClientChunkMap
-accessible method net/minecraft/client/world/ClientChunkManager$ClientChunkMap getIndex (II)I
-accessible field net/minecraft/client/world/ClientChunkManager$ClientChunkMap chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
-accessible method net/minecraft/client/render/entity/LivingEntityRenderer getAnimationProgress (Lnet/minecraft/entity/LivingEntity;F)F
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel head Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel leftEar Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel rightEar Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel nose Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel leftHindLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel rightHindLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel leftHaunch Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel rightHaunch Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel body Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel leftFrontLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel rightFrontLeg Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/model/RabbitEntityModel tail Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer bottom Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer frame Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer core Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/model/ModelPart cuboids Ljava/util/List;
-accessible field net/minecraft/client/model/ModelPart children Ljava/util/Map;
-accessible field net/minecraft/client/model/ModelPart$Cuboid sides [Lnet/minecraft/client/model/ModelPart$Quad;
-accessible field net/minecraft/entity/LimbAnimator pos F
-accessible field net/minecraft/client/gui/screen/ingame/AnvilScreen nameField Lnet/minecraft/client/gui/widget/TextFieldWidget;
-accessible field net/minecraft/client/render/entity/LivingEntityRenderer features Ljava/util/List;
-accessible field net/minecraft/entity/LivingEntity leaningPitch F
-accessible field net/minecraft/entity/LivingEntity lastLeaningPitch F
-accessible field net/minecraft/client/render/item/HeldItemRenderer prevEquipProgressMainHand F
-accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgressMainHand F
-accessible field net/minecraft/client/render/item/HeldItemRenderer prevEquipProgressOffHand F
-accessible field net/minecraft/client/render/item/HeldItemRenderer equipProgressOffHand F
-accessible field net/minecraft/block/spawner/MobSpawnerLogic spawnDelay I
-accessible field net/minecraft/entity/data/DataTracker entries [Lnet/minecraft/entity/data/DataTracker$Entry;
-accessible field net/minecraft/entity/Entity POSE Lnet/minecraft/entity/data/TrackedData;
+
+accessible field net/minecraft/entity/LivingEntity lastDamageSource Lnet/minecraft/entity/damage/DamageSource;
+accessible field net/minecraft/entity/LivingEntity lastDamageTime J
+
+accessible field net/minecraft/entity/player/PlayerEntity ABSORPTION_AMOUNT Lnet/minecraft/entity/data/TrackedData;
+
+# Item Rendering
+accessible method net/minecraft/client/render/item/ItemRenderer getDynamicDisplayGlintConsumer (Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack$Entry;)Lnet/minecraft/client/render/VertexConsumer;
+accessible method net/minecraft/client/render/item/ItemRenderer renderBakedItemModel (Lnet/minecraft/client/render/model/BakedModel;[IIILnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;)V
+
+accessible class net/minecraft/client/gl/ShaderLoader$Cache
+accessible method net/minecraft/client/gl/ShaderLoader createProgram (Lnet/minecraft/client/gl/ShaderProgramKey;Lnet/minecraft/client/gl/ShaderProgramDefinition;Lnet/minecraft/client/gl/CompiledShader;Lnet/minecraft/client/gl/CompiledShader;)Lnet/minecraft/client/gl/ShaderProgram;

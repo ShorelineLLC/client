@@ -1,12 +1,11 @@
 {
-  "blend":
-  {
+  "blend": {
     "func": "add",
     "srcrgb": "srcalpha",
     "dstrgb": "1-srcalpha"
   },
-  "vertex": "sobel",
-  "fragment": "shoreline:outline",
+  "vertex": "minecraft:post/sobel",
+  "fragment": "shoreline:program/outline",
   "attributes": [
     "Position"
   ],
@@ -35,70 +34,76 @@
       "values": [ 1.0, 1.0 ]
     },
     {
-      "name": "sobel",
-      "type": "int",
+      "name": "u_ShaderTime",
+      "type": "float",
       "count": 1,
-      "values": [ 1.0 ]
+      "values": [ 3.0 ]
     },
     {
-      "name": "texelSize",
+      "name": "u_Resolution",
       "type": "float",
       "count": 2,
       "values": [ 1.0, 1.0 ]
     },
     {
-      "name": "color",
+      "name": "u_Width",
+      "type": "float",
+      "count": 1,
+      "values": [ 3.0 ]
+    },
+    {
+      "name": "u_FillMode",
+      "type": "int",
+      "count": 1,
+      "values": [1]
+    },
+    {
+      "name": "u_FillAlpha",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "u_GradientColor",
       "type": "float",
       "count": 4,
       "values": [ 1.0, 1.0, 1.0, 1.0 ]
     },
     {
-      "name": "samples",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "steps",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "dots",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "dotRadius",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "fastOutline",
-      "type": "int",
-      "count": 1,
-      "values": [ 1.0 ]
-    },
-    {
-      "name": "radius",
+      "name": "u_GradientFactor",
       "type": "float",
       "count": 1,
       "values": [ 1.0 ]
     },
     {
-      "name": "glow",
-      "type": "int",
+      "name": "u_FlowSpeed",
+      "type": "float",
       "count": 1,
       "values": [ 1.0 ]
     },
     {
-      "name": "glowRadius",
+      "name": "u_FlowFactor",
       "type": "float",
       "count": 1,
       "values": [ 1.0 ]
+    },
+    {
+      "name": "u_LiquidIntensity",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "u_LiquidFactor",
+      "type": "float",
+      "count": 1,
+      "values": [ 1.0 ]
+    },
+    {
+      "name": "u_OutlineAlpha",
+      "type": "float",
+      "count": 1,
+      "values": [ 3.0 ]
     }
   ]
 }

@@ -1,57 +1,66 @@
 package net.shoreline.client.impl.module.client;
 
+import lombok.Getter;
+import net.minecraft.entity.Entity;
+import net.shoreline.client.api.config.BooleanConfig;
+import net.shoreline.client.api.config.ColorConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.ColorConfig;
-import net.shoreline.client.api.module.ConcurrentModule;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.impl.event.ClientColorEvent;
-import net.shoreline.eventbus.annotation.EventListener;
+import net.shoreline.client.api.module.Concurrent;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 
 import java.awt.*;
 
-public class SocialsModule extends ConcurrentModule
+@Getter
+public class SocialsModule extends Concurrent
 {
-    private static SocialsModule INSTANCE;
+    public static SocialsModule INSTANCE;
 
-    Config<Boolean> friendsConfig = register(new BooleanConfig("Friends", "Allows friend system to function", true));
-    Config<Boolean> addNotifyConfig = register(new BooleanConfig("AddNotify", "Notifies players when you add them as a friend", false, () -> friendsConfig.getValue()));
-    Config<Color> friendsColorConfig = register(new ColorConfig("FriendsColor", "The color for friends in the client", new Color(0xff66ffff), false, false, () -> friendsConfig.getValue()));
+    Config<Boolean> friendsConfig = new BooleanConfig.Builder("Friends")
+            .setDescription("Won't target added friends")
+            .setDefaultValue(false).build();
+    Config<Color> friendsColor = new ColorConfig.Builder("FriendsColor")
+            .setRgb(0xff66ffff)
+            .setVisible(() -> friendsConfig.getValue())
+            .setDescription("The color for friends in renders")
+            .build();
+    Config<Color> enemyColor = new ColorConfig.Builder("EnemiesColor")
+            .setRgb(0xffff192d)
+            .setDescription("The color for enemies in renders")
+            .build();
 
     public SocialsModule()
     {
-        super("Socials", "The client socials system", ModuleCategory.CLIENT);
+        super("Socials", "Manages client socials", GuiCategory.CLIENT);
         INSTANCE = this;
     }
 
-    public static SocialsModule getInstance()
+    public Color getFriendsColor()
     {
-        return INSTANCE;
+        return friendsColor.getValue();
     }
 
-    @EventListener
-    public void onClientFriendColor(ClientColorEvent.Friend event)
+    public Color getEnemiesColor()
     {
-        event.setRgb(getFriendRGB());
+        return enemyColor.getValue();
     }
 
-    public boolean isFriendsEnabled()
+    public Color getEntityColor(Entity entity, Color fallback)
     {
-        return friendsConfig.getValue();
+        return getEntityColor(entity.getName().getString(), fallback);
     }
 
-    public boolean shouldNotify()
+    public Color getEntityColor(String name, Color fallback)
     {
-        return addNotifyConfig.getValue();
-    }
+        if (Managers.SOCIAL.isFriend(name))
+        {
+            return friendsColor.getValue();
+        }
+        else if (Managers.SOCIAL.isEnemy(name))
+        {
+            return enemyColor.getValue();
+        }
 
-    public Color getFriendColor()
-    {
-        return friendsColorConfig.getValue();
-    }
-
-    public int getFriendRGB()
-    {
-        return getFriendColor().getRGB();
+        return fallback;
     }
 }

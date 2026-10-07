@@ -9,46 +9,14 @@ import java.util.List;
 
 public class DesktopUtil
 {
-    public static boolean browse(URI uri)
-    {
-        if (openSystemSpecific(uri.toString()))
-        {
-            return true;
-        }
-        if (browseDesktop(uri))
-        {
-            return true;
-        }
-        return false;
-    }
-
     public static boolean open(File file)
     {
         if (openSystemSpecific(file.getPath()))
         {
             return true;
         }
-        if (openDesktop(file))
-        {
-            return true;
-        }
-        return false;
-    }
 
-    public static boolean edit(File file)
-    {
-        // you can try something like
-        // runCommand("gimp", "%s", file.getPath())
-        // based on user preferences.
-        if (openSystemSpecific(file.getPath()))
-        {
-            return true;
-        }
-        if (editDesktop(file))
-        {
-            return true;
-        }
-        return false;
+        return openDesktop(file);
     }
 
     private static boolean openSystemSpecific(String what)
@@ -64,7 +32,7 @@ public class DesktopUtil
             {
                 return true;
             }
-            if (runCommand("xdg-open", "%s", what)) 
+            if (runCommand("xdg-open", "%s", what))
             {
                 return true;
             }
@@ -72,38 +40,18 @@ public class DesktopUtil
 
         if (os.isMac())
         {
-            if (runCommand("open", "%s", what)) return true;
+            if (runCommand("open", "%s", what))
+            {
+                return true;
+            }
         }
 
         if (os.isWindows())
         {
-            if (runCommand("explorer", "%s", what)) return true;
+            return runCommand("explorer", "%s", what);
         }
 
         return false;
-    }
-
-    private static boolean browseDesktop(URI uri)
-    {
-        try
-        {
-            if (!Desktop.isDesktopSupported())
-            {
-                return false;
-            }
-
-            if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
-            {
-                return false;
-            }
-
-            Desktop.getDesktop().browse(uri);
-            return true;
-        }
-        catch (Throwable t)
-        {
-            return false;
-        }
     }
 
     private static boolean openDesktop(File file)
@@ -129,37 +77,16 @@ public class DesktopUtil
         }
     }
 
-    private static boolean editDesktop(File file)
-    {
-        try
-        {
-            if (!Desktop.isDesktopSupported())
-            {
-                return false;
-            }
-
-            if (!Desktop.getDesktop().isSupported(Desktop.Action.EDIT))
-            {
-                return false;
-            }
-
-            Desktop.getDesktop().edit(file);
-            return true;
-        }
-        catch (Throwable t)
-        {
-            t.printStackTrace();
-            return false;
-        }
-    }
-
     private static boolean runCommand(String command, String args, String file)
     {
         String[] parts = prepareCommand(command, args, file);
         try
         {
             Process p = Runtime.getRuntime().exec(parts);
-            if (p == null) return false;
+            if (p == null)
+            {
+                return false;
+            }
             try
             {
                 int retval = p.exitValue();

@@ -2,56 +2,41 @@ package net.shoreline.client.impl.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.text.*;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
-import net.shoreline.client.api.command.CommandArgumentType;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.render.ClientFormatting;
+import net.shoreline.client.util.text.Formatter;
 
-/**
- * @author linus
- * @since 1.0
- */
 public class HelpCommand extends Command
 {
-
-    /**
-     *
-     */
     public HelpCommand()
     {
-        super("Help", "Displays command functionality", literal("help"));
-    }
-
-    /**
-     * @param command
-     * @return
-     */
-    private static String toHelpMessage(Command command)
-    {
-        return String.format("%s %s- %s", command.getName(),
-                command.getUsage(), command.getDescription());
+        super("help", "Shows a list of commands and their descriptions");
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
-        builder.then(argument("command", CommandArgumentType.command()).executes(c ->
+        argumentBuilder.executes(context ->
         {
-            final Command command = CommandArgumentType.getCommand(c, "command");
-            ChatUtil.clientSendMessage(toHelpMessage(command));
-            return 1;
-        })).executes(c ->
-        {
-            ChatUtil.clientSendMessageRaw("§s[Commands Help]");
-            for (Command c1 : Managers.COMMAND.getCommands())
+            for (Command command : Managers.COMMANDS.getCommands())
             {
-                if (c1 instanceof ModuleCommand)
-                {
-                    continue;
-                }
-                ChatUtil.clientSendMessageRaw(toHelpMessage(c1));
+                MutableText text = Text.literal(ClientFormatting.THEME + Formatter.capitalize(command.getName()));
+                ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, getSuggestion(command));
+                HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(command.getDescription()));
+                Style style = Style.EMPTY.withClickEvent(clickEvent).withHoverEvent(hoverEvent);
+
+                sendClientTextMessage(text.setStyle(style));
             }
+
             return 1;
         });
+    }
+
+    public String getSuggestion(Command command)
+    {
+        return Managers.COMMANDS.getChatPrefix() + command.getName();
     }
 }

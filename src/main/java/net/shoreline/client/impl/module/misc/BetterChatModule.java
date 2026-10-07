@@ -1,153 +1,171 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.client.gui.hud.ChatHudLine;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.gui.chat.ChatHistoryEvent;
-import net.shoreline.client.impl.event.gui.chat.ChatLengthEvent;
-import net.shoreline.client.impl.event.gui.hud.*;
-import net.shoreline.client.util.FormattingUtil;
-import net.shoreline.client.util.chat.ChatUtil;
-import net.shoreline.client.util.render.animation.Easing;
-import net.shoreline.client.util.render.animation.TimeAnimation;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.font.FontManager;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.OpenScreenEvent;
+import net.shoreline.client.impl.event.gui.hud.ChatMessageEvent;
+import net.shoreline.client.impl.event.gui.hud.MessageIndicatorEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderChatEvent;
+import net.shoreline.client.impl.module.client.FontModule;
+import net.shoreline.client.impl.render.animation.Animation;
+import net.shoreline.client.impl.render.ClientFormatting;
+import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Easing;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-//TODO: add easing when linus fixes enumconfig...
-public class BetterChatModule extends ToggleModule
+public class BetterChatModule extends Toggleable
 {
-    Config<Boolean> chatFontConfig = register(new BooleanConfig("ChatFont", "Uses custom font for chat text", false));
-    Config<Timestamp> timestampConfig = register(new EnumConfig<>("Timestamp", "Shows chat timestamps", Timestamp.OFF, Timestamp.values()));
-    Config<AnimationMode> animationConfig = register(new EnumConfig<>("Animation", "Animates the chat", AnimationMode.OFF, AnimationMode.values()));
-    Config<Integer> timeConfig = register(new NumberConfig<>("Anim-Time", "Time for the animation", 0, 200, 1000, () -> false));
-    Config<Boolean> noSignatureConfig = register(new BooleanConfig("NoSignatureIndicator", "Removes the message signature indicator", false));
-    Config<Boolean> infiniteConfig = register(new BooleanConfig("Infinite", "Makes chat length infinite", false));
-    Config<Boolean> keepChatConfig = register(new BooleanConfig("KeepChat", "Maintains chat history", false));
+    public static BetterChatModule INSTANCE;
 
-    public final Map<ChatHudLine.Visible, TimeAnimation> animationMap = new HashMap<>();
+    Config<Boolean> animateConfig = new BooleanConfig.Builder("Animate")
+            .setDescription("Animates the chat hud")
+            .setDefaultValue(true).build();
+    Config<Boolean> timestampConfig = new BooleanConfig.Builder("Timestamp")
+            .setDescription("Adds a timestamp to all messages in chat")
+            .setDefaultValue(false).build();
+    Config<TimeFormat> timeFormat = new EnumConfig.Builder<TimeFormat>("TimeFormat")
+            .setValues(TimeFormat.values())
+            .setDescription("Adds a timestamp to all messages in chat")
+            .setDefaultValue(TimeFormat.MERIDIEM_TIME)
+            .setVisible(() -> timestampConfig.getValue()).build();
+    Config<Integer> chatLength = new NumberConfig.Builder<Integer>("MaxLength")
+            .setMin(100).setMax(1000).setDefaultValue(500)
+            .setDescription("The max number of rows in the chat").build();
+    Config<Boolean> noIndicator = new BooleanConfig.Builder("NoIndicator")
+            .setDescription("Removes the message indicator")
+            .setDefaultValue(false).build();
+    Config<Boolean> saveHistory = new BooleanConfig.Builder("SaveHistory")
+            .setDescription("Saves chat history when switching between worlds")
+            .setDefaultValue(false).build();
+
+    private final Animation chatAnim = new Animation(250L);
+    private final ConcurrentMap<ChatHudLine.Visible, Animation> chatLineAnims = new ConcurrentHashMap<>();
 
     public BetterChatModule()
     {
-        super("BetterChat", "Modifications for the chat", ModuleCategory.MISCELLANEOUS);
+        super("BetterChat", "Improves in-game chat", GuiCategory.MISCELLANEOUS);
+        INSTANCE = this;
     }
 
     @EventListener
-    public void onChatText(ChatMessageEvent event)
+    public void onRenderChatText(RenderChatEvent.Text event)
     {
-        if (timestampConfig.getValue() != Timestamp.OFF)
+        if (event.getChatLine() == null)
         {
-            String string = FormattingUtil.toString(event.getText());
-            if (string.contains(ChatUtil.PREFIX))
-            {
-                return;
-            }
-            String time = new SimpleDateFormat("k:mm").format(new Date());
-            String text = switch (timestampConfig.getValue())
-            {
-                case NORMAL -> "<" + time + ">§r ";
-                case GRAY -> "§8<§7" + time + "§8>§r ";
-                case COLOR -> "§s<" + time + ">§r ";
-                case OFF -> "";
-            };
-            event.cancel();
-            event.setText(Text.of(text + string));
+            return;
         }
-    }
 
-    @EventListener
-    public void onChatLine(ChatLineEvent event)
-    {
-        animationMap.put(event.getChatHudLine(), new TimeAnimation(false, event.getWidth(), 0,
-                timeConfig.getValue(), Easing.LINEAR));
-    }
-
-    @EventListener
-    public void onChatLineRender(RenderChatHudEvent event)
-    {
-        if (animationConfig.getValue() != AnimationMode.OFF)
+        if (animateConfig.getValue() && chatLineAnims.containsKey(event.getChatLine()))
         {
-            TimeAnimation animation = null;
-            if (event.getChatHudLine() != null)
+            Animation anim = chatLineAnims.get(event.getChatLine());
+            anim.setState(true);
+
+            boolean overrideFont = FontModule.INSTANCE.getOverrideChat().getValue();
+            double factor = Easing.EXPO_IN_OUT.ease(anim.getFactor());
+            int width = overrideFont ? FontManager.FONT_RENDERER.getStringWidth(event.getString()) : mc.textRenderer.getWidth(event.getText());
+            int renderX = (int) (event.getX() - (width * (1.0f - factor)));
+            int color = ColorUtil.withTransparency(Colors.WHITE, (event.getU() / 255.0f) * (float) factor);
+
+            event.cancel();
+            if (overrideFont)
             {
-                if (animationMap.containsKey(event.getChatHudLine()))
-                {
-                    animation = animationMap.get(event.getChatHudLine());
-                }
-            }
-            if (animation != null)
+                FontManager.FONT_RENDERER.drawStringWithShadow(event.getContext().getMatrices(), event.getString(), renderX, event.getY(), color);
+            } else
             {
-                animation.setState(true);
-                event.cancel();
-                if (animationConfig.getValue() == AnimationMode.SLIDE)
-                {
-                    event.setAnimation(animation.getCurrent());
-                }
-                else
-                {
-                    event.setAnimation(animation.getFactor());
-                }
-                event.setSlide(animationConfig.getValue() == AnimationMode.SLIDE);
+                event.getContext().drawTextWithShadow(mc.textRenderer, event.getText(), renderX, event.getY(), color);
             }
         }
     }
 
     @EventListener
-    public void onSignatureIndicator(SignatureIndicatorEvent event)
+    public void onRenderChatBackground(RenderChatEvent.Background event)
     {
-        if (noSignatureConfig.getValue())
+        if (animateConfig.getValue())
+        {
+            float factor = (float) Easing.CIRC_IN_OUT.ease(chatAnim.getFactor());
+            event.cancel();
+            Managers.RENDER.drawRect(event.getContext(),
+                    event.getX(),
+                    event.getY(),
+                    event.getWidth(),
+                    -12.0f * factor,
+                    event.getColor());
+        }
+    }
+
+    @EventListener
+    public void onChatMessage(ChatMessageEvent event)
+    {
+        String string = event.getText().getString();
+        if (string.contains(RAW_PREFIX) || string.contains(ERROR_PREFIX) || string.contains(SUCCESS_PREFIX))
+        {
+            return;
+        }
+
+        MutableText chatPrefix = Text.empty();
+        if (timestampConfig.getValue())
+        {
+            String time = LocalTime.now().format(DateTimeFormatter.ofPattern(
+                    timeFormat.getValue() == TimeFormat.MILITARY_TIME ? "k:mm" : "h:mm a", Locale.getDefault()));
+
+            chatPrefix = Text.literal(ClientFormatting.THEME + "<" + time + "> ");
+        }
+
+        event.cancel();
+        event.setText(chatPrefix.append(event.getText()));
+    }
+
+    @EventListener
+    public void onChatLineAdd(ChatMessageEvent.Visible event)
+    {
+        chatLineAnims.put(event.getChatLine(), new Animation(400L));
+    }
+
+    @EventListener
+    public void onMessageIndicator(MessageIndicatorEvent event)
+    {
+        if (noIndicator.getValue())
         {
             event.cancel();
         }
     }
 
     @EventListener
-    public void onChatHistory(ChatHistoryEvent event)
+    public void onChatOpen(OpenScreenEvent event)
     {
-        if (keepChatConfig.getValue())
+        if (event.getScreen() == null && chatAnim.getState())
         {
-            event.cancel();
+            chatAnim.setState(false);
+        } else if (event.getScreen() instanceof ChatScreen)
+        {
+            chatAnim.setState(true);
         }
     }
 
-    @EventListener
-    public void onChatLength(ChatLengthEvent event)
+    public double getChatFactor()
     {
-        if (infiniteConfig.getValue())
-        {
-            event.cancel();
-        }
+        return isEnabled() && animateConfig.getValue() ? Easing.SMOOTH_STEP.ease(chatAnim.getFactor()) : 1.0f;
     }
 
-    @EventListener
-    public void onChatTextRender(ChatTextRenderEvent event)
+    public enum TimeFormat
     {
-        if (chatFontConfig.getValue())
-        {
-            event.cancel();
-        }
-    }
-
-    public enum Timestamp
-    {
-        NORMAL,
-        GRAY,
-        COLOR,
-        OFF
-    }
-
-    public enum AnimationMode
-    {
-        SLIDE,
-        FADE,
-        OFF
+        MILITARY_TIME, MERIDIEM_TIME
     }
 }

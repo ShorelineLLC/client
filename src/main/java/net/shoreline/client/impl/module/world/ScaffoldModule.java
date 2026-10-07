@@ -2,404 +2,310 @@ package net.shoreline.client.impl.module.world;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BlockListConfig;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.render.RenderBuffers;
-import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.BlockPlacerModule;
-import net.shoreline.client.impl.module.client.ColorsModule;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.math.position.PositionUtil;
-import net.shoreline.client.util.player.MovementUtil;
-import net.shoreline.client.util.player.RotationUtil;
-import net.shoreline.client.util.render.animation.Animation;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.config.RegistryConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.event.network.PlayerUpdateEvent;
+import net.shoreline.client.impl.interact.InteractDirection;
+import net.shoreline.client.impl.module.impl.PlacerModule;
+import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.eventbus.annotation.EventListener;
 
-import java.awt.*;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-/**
- * @author xgraza, Shoreline
- * @since 1.0
- */
-public final class ScaffoldModule extends BlockPlacerModule
+public class ScaffoldModule extends PlacerModule
 {
-    Config<Boolean> rotateHoldConfig = register(new BooleanConfig("RotateHold", "Holds rotations to scaffold blocks", false, () -> rotateConfig.getValue()));
-    Config<Boolean> grimConfig = register(new BooleanConfig("Grim", "Uses grim interactions", false));
-    Config<Boolean> grimNewConfig = register(new BooleanConfig("GrimV3", "Uses grim new interactions", false));
-    Config<Selection> selectionConfig = register(new EnumConfig<>("Selection", "The selection of blocks to use for scaffold", Selection.ALL, Selection.values()));
-    Config<List<Block>> whitelistConfig = register(new BlockListConfig<>("Whitelist", "Valid block whitelist", Blocks.DIRT, Blocks.OBSIDIAN));
-    Config<List<Block>> blacklistConfig = register(new BlockListConfig<>("Blacklist", "Valid block blacklist", Blocks.SHULKER_BOX));
-    Config<Boolean> keepYConfig = register(new BooleanConfig("KeepY", "Keeps the same y-level", false));
-    Config<Boolean> towerConfig = register(new BooleanConfig("Tower", "Goes up faster when holding down space", true, () -> !grimNewConfig.getValue()));
-    Config<BlockPicker> pickerConfig = register(new EnumConfig<>("BlockSelection", "How to pick a block from the hotbar", BlockPicker.NORMAL, BlockPicker.values()));
-    Config<Boolean> renderConfig = register(new BooleanConfig("Render", "Renders where scaffold is placing blocks", false));
-    Config<Integer> fadeTimeConfig = register(new NumberConfig<>("Fade-Time", "Timer for the fade", 0, 250, 1000, () -> false));
+    Config<Float> placeRange = new NumberConfig.Builder<Float>("Range")
+            .setMin(1.0f).setMax(6.0f).setDefaultValue(4.0f).setFormat("m")
+            .setDescription("Range to place blocks").build();
+    Config<Boolean> keepYConfig = new BooleanConfig.Builder("KeepY")
+            .setDescription("Maintains the player's y height")
+            .setDefaultValue(false).build();
+    Config<Collection<Block>> blockList = new RegistryConfig.Builder<Block>("Blocks")
+            .setRegistry(Registries.BLOCK)
+            .setValues(Blocks.OBSIDIAN, Blocks.DIRT)
+            .setDescription("The blocks to use for scaffolding").build();
 
-    private final Map<BlockPos, Animation> fadeList = new HashMap<>();
-    private BlockData blockData;
-    private BlockData renderData;
-    private float[] lastAngles;
-    private int groundPosY;
+    private int groundPosY = Integer.MIN_VALUE;
+
+    private BlockPos lastPlacement;
+    private Block currentScaffoldBlock;
 
     public ScaffoldModule()
     {
-        super("Scaffold", "Places blocks at the players feet", ModuleCategory.WORLD, 790);
+        super("Scaffold", new String[] {"BlockFly"}, "Places blocks under the player", GuiCategory.WORLD);
     }
 
     @Override
-    protected void onDisable()
+    public void onDisable()
     {
-        if (mc.player != null)
-        {
-            Managers.INVENTORY.syncToClient();
-        }
-        groundPosY = -1;
-        lastAngles = null;
-        blockData = null;
-        renderData = null;
-        fadeList.clear();
+        groundPosY = Integer.MIN_VALUE;
+        lastPlacement = null;
     }
 
     @EventListener
-    public void onPlayerTick(final PlayerTickEvent event)
+    public void onPlayerUpdate(PlayerUpdateEvent.Pre event)
     {
-
-        if (!multitaskConfig.getValue() && checkMultitask())
+        if (checkNull())
         {
-            blockData = null;
-            renderData = null;
             return;
         }
 
-        BlockSlot blockItem = getBlockSlot();
-        final int slot = blockItem.slot();
+        int slot = findValidBlockSlot();
         if (slot == -1)
         {
-            blockData = null;
-            renderData = null;
-            return;
-        }
-        renderData = getBlockData(false);
-        blockData = getBlockData(rotateHoldConfig.getValue());
-        if (blockData == null)
-        {
-            if (grimNewConfig.getValue() && rotateConfig.getValue())
-            {
-                float yaw = mc.player.getYaw();
-                if (mc.options.forwardKey.isPressed() && !mc.options.backKey.isPressed())
-                {
-                    if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
-                    {
-                        yaw -= 45.0f;
-                    }
-                    else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
-                    {
-                        yaw += 45.0f;
-                    }
-                    // Forward movement - no change to yaw
-                }
-                else if (mc.options.backKey.isPressed() && !mc.options.forwardKey.isPressed())
-                {
-                    yaw += 180.0f;
-                    if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
-                    {
-                        yaw += 45.0f;
-                    }
-                    else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
-                    {
-                        yaw -= 45.0f;
-                    }
-                }
-                else if (mc.options.leftKey.isPressed() && !mc.options.rightKey.isPressed())
-                {
-                    yaw -= 90.0f;
-                }
-                else if (mc.options.rightKey.isPressed() && !mc.options.leftKey.isPressed())
-                {
-                    yaw += 90.0f;
-                }
-                setRotation(MathHelper.wrapDegrees(yaw), 90.0f);
-            }
             return;
         }
 
-        calcRotations(blockData);
-        if (blockData.getAngles() == null)
+        int posY = (int) Math.round(mc.player.getY());
+        if (keepYConfig.getValue() && InputUtil.isInputtingMovement())
         {
-            if (!isGrim() && rotateConfig.getValue() && lastAngles != null)
+            if (mc.player.isOnGround() || groundPosY < mc.world.getBottomY())
             {
-                setRotation(lastAngles[0], lastAngles[1]);
-            }
-            return;
-        }
-
-        if (!isGrim() && Managers.INVENTORY.getServerSlot() != slot)
-        {
-            Managers.INVENTORY.setSlot(slot);
-        }
-
-        Vec3d prevMotion = mc.player.getVelocity();
-        if (stopMotionConfig.getValue())
-        {
-            mc.player.setVelocity(0.0, 0.0, 0.0);
-        }
-
-        boolean result = Managers.INTERACT.placeBlock(blockData.getBlockPos(), blockItem.block(), slot,
-                false, false, false, (state, angles) ->
-        {
-            if (rotateConfig.getValue())
-            {
-                final float[] rotations = blockData.getAngles();
-                if (rotations == null)
-                {
-                    return;
-                }
-                lastAngles = rotations;
-                if (state)
-                {
-                    if (grimConfig.getValue())
-                    {
-                        Managers.ROTATION.setRotationSilent(rotations[0], rotations[1]);
-                    }
-                    else
-                    {
-                        setRotation(rotations[0], rotations[1]);
-                    }
-                }
-                else
-                {
-                    if (grimConfig.getValue())
-                    {
-                        Managers.ROTATION.setRotationSilentSync();
-                    }
-                }
-            }
-        });
-
-        if (result)
-        {
-            if (stopMotionConfig.getValue())
-            {
-                mc.player.setVelocity(prevMotion);
+                groundPosY = posY;
             }
 
-            if (!isGrim() && towerConfig.getValue() && mc.options.jumpKey.isPressed())
-            {
-                final Vec3d velocity = mc.player.getVelocity();
-                final double velocityY = velocity.y;
-                if ((mc.player.isOnGround() || velocityY < 0.1) || velocityY <= 0.16477328182606651)
-                {
-                    mc.player.setVelocity(velocity.x, 0.42f, velocity.z);
-                }
-            }
-        }
-    }
-
-    @EventListener
-    public void onRenderWorld(RenderWorldEvent event)
-    {
-        if (renderConfig.getValue())
-        {
-            RenderBuffers.preRender();
-            for (Map.Entry<BlockPos, Animation> set : fadeList.entrySet())
-            {
-                set.getValue().setState(false);
-                int boxAlpha = (int) (40 * set.getValue().getFactor());
-                int lineAlpha = (int) (100 * set.getValue().getFactor());
-                Color boxColor = ColorsModule.getInstance().getColor(boxAlpha);
-                Color lineColor = ColorsModule.getInstance().getColor(lineAlpha);
-                RenderManager.renderBox(event.getMatrices(), set.getKey(), boxColor.getRGB());
-                RenderManager.renderBoundingBox(event.getMatrices(), set.getKey(), 1.5f, lineColor.getRGB());
-            }
-            RenderBuffers.postRender();
-
-            if (renderData == null || renderData.getHitResult() == null)
-            {
-                return;
-            }
-
-            if (renderConfig.getValue())
-            {
-                Animation animation = new Animation(true, fadeTimeConfig.getValue());
-                fadeList.put(renderData.getBlockPos(), animation);
-            }
-
-            fadeList.entrySet().removeIf(e ->
-                    e.getValue().getFactor() == 0.0);
-        }
-    }
-
-    private void calcRotations(final BlockData blockData)
-    {
-        final BlockPos pos = blockData.getHitResult().getBlockPos();
-        final Direction side = blockData.getHitResult().getSide();
-        final Vec3d basicHitVec = pos.toCenterPos()
-                .add(side.getOffsetX() * 0.5f, side.getOffsetY() * 0.5f, side.getOffsetZ() * 0.5f);
-        blockData.setAngles(RotationUtil.getRotationsTo(mc.player.getEyePos(), basicHitVec));
-        blockData.setHitResult(new BlockHitResult(basicHitVec, side, pos, false));
-    }
-
-    private BlockData getBlockData(boolean hold)
-    {
-        int posY = (int) Math.round(mc.player.getY()) - 1;
-        if (keepYConfig.getValue() && MovementUtil.isInputtingMovement())
-        {
-            if (mc.player.isOnGround() || groundPosY == -1)
-            {
-                groundPosY = (int) Math.floor(mc.player.getY()) - 1;
-            }
             posY = groundPosY;
         }
-        final BlockPos pos = PositionUtil.getRoundedBlockPos(
-                mc.player.getX(), posY, mc.player.getZ());
-        if (!hold && !mc.world.getBlockState(pos).isReplaceable())
+
+        BlockPos pos = new BlockPos(mc.player.getBlockX(), posY, mc.player.getBlockZ());
+        createPlacementsFromPositions(currentScaffoldBlock, getScaffoldPlacements(pos.down()), 4.0);
+        if (placements.isEmpty() || !Managers.INTERACT.startPlacement(slot))
         {
-            return null;
+            return;
         }
-        for (final Direction direction : Direction.values())
+
+        for (BlockPos blockPos : placements)
         {
-            final BlockPos neighbor = pos.offset(direction);
-            if (!mc.world.getBlockState(neighbor).isReplaceable())
+            placeBlock(blockPos, currentScaffoldBlock, true, false);
+            lastPlacement = blockPos;
+        }
+
+        Managers.INTERACT.endPlacement();
+    }
+
+    private int findValidBlockSlot()
+    {
+        for (int i = 0; i < PlayerInventory.getHotbarSize(); i++)
+        {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (stack.getItem() instanceof BlockItem blockItem && isValidBlock(blockItem.getBlock()))
             {
-                return BlockData.basic(neighbor, direction.getOpposite());
+                currentScaffoldBlock = blockItem.getBlock();
+                return i;
             }
         }
-        for (final Direction direction : Direction.values())
+
+        return -1;
+    }
+
+    private boolean isValidBlock(Block block)
+    {
+        return !block.getDefaultState().isReplaceable();
+    }
+
+    private List<BlockPos> getScaffoldPlacements(BlockPos playerPos)
+    {
+        List<BlockPos> placements = new ArrayList<>();
+        placements.add(playerPos);
+
+        if (lastPlacement == null || AirPlaceModule.INSTANCE.isEnabled())
         {
-            final BlockPos neighbor = pos.offset(direction);
-            if (mc.world.getBlockState(neighbor).isReplaceable())
+            return placements;
+        }
+
+        int x0 = lastPlacement.getX();
+        int y0 = lastPlacement.getY();
+        int z0 = lastPlacement.getZ();
+        int x1 = playerPos.getX();
+        int y1 = playerPos.getY();
+        int z1 = playerPos.getZ();
+
+        int dx = x1 - x0;
+        int dy = y1 - y0;
+        int dz = z1 - z0;
+        int sx = Integer.compare(dx, 0);
+        int sy = Integer.compare(dy, 0);
+        int sz = Integer.compare(dz, 0);
+
+        dx = Math.abs(dx);
+        dy = Math.abs(dy);
+        dz = Math.abs(dz);
+
+        int ax = dx << 1;
+        int ay = dy << 1;
+        int az = dz << 1;
+
+        int steps = 0;
+        if (dx >= dy && dx >= dz)
+        {
+            int yd = ay - dx;
+            int zd = az - dx;
+            while (true)
             {
-                for (final Direction direction1 : Direction.values())
+                if (!ensurePlaceableWithSupport(new BlockPos(x0, y0, z0), placements))
                 {
-                    final BlockPos neighbor1 = neighbor.offset(direction1);
-                    if (!mc.world.getBlockState(neighbor1).isReplaceable())
-                    {
-                        return BlockData.basic(neighbor1, direction1.getOpposite());
-                    }
+                    break;
                 }
+
+                if (++steps > 8 || (x0 == x1 && y0 == y1 && z0 == z1))
+                {
+                    break;
+                }
+
+                if (yd >= 0)
+                {
+                    y0 += sy;
+                    yd -= ax;
+                }
+
+                if (zd >= 0)
+                {
+                    z0 += sz;
+                    zd -= ax;
+                }
+
+                x0 += sx;
+                yd += ay;
+                zd += az;
+            }
+        } else if (dy >= dx && dy >= dz)
+        {
+            int xd = ax - dy;
+            int zd = az - dy;
+            while (true)
+            {
+                if (!ensurePlaceableWithSupport(new BlockPos(x0, y0, z0), placements))
+                {
+                    break;
+                }
+
+                if (++steps > 8 || (x0 == x1 && y0 == y1 && z0 == z1))
+                {
+                    break;
+                }
+
+                if (xd >= 0)
+                {
+                    x0 += sx;
+                    xd -= ay;
+                }
+
+                if (zd >= 0)
+                {
+                    z0 += sz;
+                    zd -= ay;
+                }
+
+                y0 += sy;
+                xd += ax;
+                zd += az;
+            }
+        } else
+        {
+            int xd = ax - dz;
+            int yd = ay - dz;
+            while (true)
+            {
+                if (!ensurePlaceableWithSupport(new BlockPos(x0, y0, z0), placements))
+                {
+                    break;
+                }
+
+                if (++steps > 8 || (x0 == x1 && y0 == y1 && z0 == z1))
+                {
+                    break;
+                }
+
+                if (xd >= 0)
+                {
+                    x0 += sx;
+                    xd -= az;
+                }
+
+                if (yd >= 0)
+                {
+                    y0 += sy;
+                    yd -= az;
+                }
+
+                z0 += sz;
+                xd += ax;
+                yd += ay;
             }
         }
+
+        return placements;
+    }
+
+    private boolean ensurePlaceableWithSupport(BlockPos pos, List<BlockPos> out)
+    {
+        if (!mc.world.getBlockState(pos).isReplaceable())
+        {
+            return false;
+        }
+
+        Direction face = InteractDirection.getInteractDirection(pos);
+        if (face != null)
+        {
+            return false;
+        }
+
+        BlockPos support = getSupportingBlock(pos);
+        if (support != null)
+        {
+            double dist = mc.player.squaredDistanceTo(support.toCenterPos());
+            if (!out.contains(support) && dist <= placeRange.getValue() * placeRange.getValue())
+            {
+                out.add(support);
+            }
+        } else
+        {
+            BlockPos down = pos.down();
+            int depth = 0;
+            while (depth++ < 3 && mc.world.getBlockState(down).isReplaceable())
+            {
+                double dist = mc.player.squaredDistanceTo(down.toCenterPos());
+                if (!out.contains(down) && dist <= placeRange.getValue() * placeRange.getValue())
+                {
+                    out.add(down);
+                }
+
+                down = down.down();
+            }
+        }
+
+        double dist = mc.player.squaredDistanceTo(pos.toCenterPos());
+        if (!out.contains(pos) && dist <= placeRange.getValue() * placeRange.getValue())
+        {
+            out.add(pos);
+        }
+
+        return true;
+    }
+
+    private BlockPos getSupportingBlock(BlockPos pos)
+    {
+        for (Direction dir : Direction.Type.HORIZONTAL)
+        {
+            BlockPos blockPos = pos.offset(dir);
+            if (InteractDirection.getInteractDirection(blockPos) != null)
+            {
+                return blockPos;
+            }
+        }
+
         return null;
-    }
-
-    private BlockSlot getBlockSlot()
-    {
-        final ItemStack serverStack = Managers.INVENTORY.getServerItem();
-        if (!serverStack.isEmpty() && serverStack.getItem() instanceof BlockItem blockItem && validScaffoldBlock(blockItem.getBlock()))
-        {
-            Block block1 = blockItem.getBlock();
-            return new BlockSlot(block1, Managers.INVENTORY.getServerSlot());
-        }
-
-        Block block = null;
-        int blockSlot = -1;
-        int count = 0;
-        for (int i = 0; i < 9; ++i)
-        {
-            final ItemStack itemStack = mc.player.getInventory().getStack(i);
-            if (!itemStack.isEmpty() && itemStack.getItem() instanceof BlockItem blockItem && validScaffoldBlock(blockItem.getBlock()))
-            {
-                Block block1 = blockItem.getBlock();
-                if (pickerConfig.getValue() == BlockPicker.NORMAL)
-                {
-                    return new BlockSlot(block1, i);
-                }
-
-                if (blockSlot == -1 || itemStack.getCount() > count)
-                {
-                    block = block1;
-                    blockSlot = i;
-                    count = itemStack.getCount();
-                }
-            }
-        }
-
-        return new BlockSlot(block, blockSlot);
-    }
-
-    private boolean validScaffoldBlock(Block block)
-    {
-        return switch (selectionConfig.getValue())
-        {
-            case WHITELIST -> ((BlockListConfig<?>) whitelistConfig).contains(block);
-            case BLACKLIST -> !((BlockListConfig<?>) blacklistConfig).contains(block);
-            case ALL -> true;
-        };
-    }
-
-    private static class BlockData
-    {
-        private BlockHitResult hitResult;
-        private float[] angles;
-
-        public BlockData(final BlockHitResult hitResult, final float[] angles)
-        {
-            this.hitResult = hitResult;
-            this.angles = angles;
-        }
-
-        public BlockHitResult getHitResult()
-        {
-            return hitResult;
-        }
-
-        public BlockPos getBlockPos()
-        {
-            return hitResult.getBlockPos().offset(hitResult.getSide());
-        }
-
-        public void setHitResult(BlockHitResult hitResult)
-        {
-            this.hitResult = hitResult;
-        }
-
-        public float[] getAngles()
-        {
-            return angles;
-        }
-
-        public void setAngles(float[] angles)
-        {
-            this.angles = angles;
-        }
-
-        public static BlockData basic(final BlockPos pos, final Direction direction)
-        {
-            return new BlockData(new BlockHitResult(pos.toCenterPos(), direction, pos, false), null);
-        }
-    }
-
-    public boolean isGrim()
-    {
-        return grimConfig.getValue() || grimNewConfig.getValue();
-    }
-
-    public enum Selection
-    {
-        WHITELIST,
-        BLACKLIST,
-        ALL
-    }
-
-    private enum BlockPicker
-    {
-        NORMAL,
-        GREATEST
     }
 }

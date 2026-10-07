@@ -2,35 +2,30 @@ package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.entity.player.PlayerModelPart;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.math.NanoTimer;
+import net.shoreline.client.api.math.Timer;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.mixin.accessor.AccessorGameOptions;
-import net.shoreline.client.util.math.timer.CacheTimer;
-import net.shoreline.client.util.math.timer.Timer;
+import net.shoreline.client.impl.imixin.IGameOptions;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
 import java.util.Set;
 
-public class SkinBlinkModule extends ToggleModule
+public class SkinBlinkModule extends Toggleable
 {
-    //
-    Config<Float> speedConfig = register(new NumberConfig<>("Speed", "The speed to toggle the player model parts", 0.0f, 0.1f, 20.0f));
-    Config<Boolean> randomConfig = register(new BooleanConfig("Random", "Randomizes the toggling of each skin model part", false));
-    //
-    private final Timer blinkTimer = new CacheTimer();
-    // The game option parts
+    Config<Integer> blinkDelay = new NumberConfig.Builder<Integer>("Delay")
+            .setMin(100).setMax(2000).setDefaultValue(1000).setFormat("ms")
+            .setDescription("The delay between toggling parts").build();
+
+    private final Timer blinkTimer = new NanoTimer();
+
     private Set<PlayerModelPart> enabledPlayerModelParts;
 
-    /**
-     *
-     */
     public SkinBlinkModule()
     {
-        super("SkinBlink", "Toggles the skin model rendering", ModuleCategory.MISCELLANEOUS);
+        super("SkinBlink", "Toggles skin model parts", GuiCategory.MISCELLANEOUS);
     }
 
     @Override
@@ -40,34 +35,43 @@ public class SkinBlinkModule extends ToggleModule
         {
             return;
         }
-        enabledPlayerModelParts = ((AccessorGameOptions) mc.options).getPlayerModelParts();
+
+        enabledPlayerModelParts = ((IGameOptions) mc.options).getPlayerModelParts();
     }
 
     @Override
     public void onDisable()
     {
-        if (enabledPlayerModelParts == null || mc.options == null)
+        if (enabledPlayerModelParts == null || mc.options == null || mc.player == null)
         {
             return;
         }
+
         for (PlayerModelPart modelPart : PlayerModelPart.values())
         {
-            mc.options.togglePlayerModelPart(modelPart, enabledPlayerModelParts.contains(modelPart));
+            mc.options.setPlayerModelPart(modelPart, enabledPlayerModelParts.contains(modelPart));
         }
+
+        mc.player.networkHandler.syncOptions(mc.options.getSyncedOptions());
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTick(TickEvent.Post event)
     {
-        if (event.getStage() == StageEvent.EventStage.POST &&
-                blinkTimer.passed(speedConfig.getValue() * 1000.0f))
+        if (checkNull())
         {
-            Set<PlayerModelPart> currentModelParts = ((AccessorGameOptions) mc.options).getPlayerModelParts();
+            return;
+        }
+
+        if (blinkTimer.hasPassed(blinkDelay.getValue()))
+        {
+            Set<PlayerModelPart> currentModelParts = ((IGameOptions) mc.options).getPlayerModelParts();
             for (PlayerModelPart modelPart : PlayerModelPart.values())
             {
-                mc.options.togglePlayerModelPart(modelPart, randomConfig.getValue() ?
-                        Math.random() < 0.5 : !currentModelParts.contains(modelPart));
+                mc.options.setPlayerModelPart(modelPart, !currentModelParts.contains(modelPart));
             }
+
+            mc.player.networkHandler.syncOptions(mc.options.getSyncedOptions());
             blinkTimer.reset();
         }
     }

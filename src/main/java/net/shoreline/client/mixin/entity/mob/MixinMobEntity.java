@@ -2,7 +2,7 @@ package net.shoreline.client.mixin.entity.mob;
 
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.PigEntity;
-import net.shoreline.client.impl.event.entity.mob.PigAIEvent;
+import net.shoreline.client.impl.event.network.MountEvent;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +18,7 @@ public class MixinMobEntity
         MobEntity mobEntity = (MobEntity) (Object) this;
         if (mobEntity instanceof PigEntity)
         {
-            PigAIEvent pigAIEvent = new PigAIEvent((PigEntity) mobEntity);
+            MountEvent.PigAI pigAIEvent = new MountEvent.PigAI((PigEntity) mobEntity);
             EventBus.INSTANCE.dispatch(pigAIEvent);
             if (pigAIEvent.isCanceled())
             {

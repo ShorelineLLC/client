@@ -1,141 +1,99 @@
 package net.shoreline.client.impl.module.misc;
 
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.*;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Hand;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.init.Managers;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.Managers;
+import net.shoreline.client.impl.interact.ItemInteraction;
+import net.shoreline.client.impl.inventory.InventoryUtil;
+import net.shoreline.client.util.item.ArmorUtil;
 
-/**
- * @author Shoreline
- * @since 1.0
- */
-public class ChestSwapModule extends ToggleModule
+public class ChestSwapModule extends Toggleable
 {
+    Config<Boolean> fireworkConfig = new BooleanConfig.Builder("AutoFirework")
+            .setDescription("Automatically uses a firework when swapping to elytra")
+            .setDefaultValue(false).build();
 
-    Config<Priority> priorityConfig = register(new EnumConfig<>("Priority", "The chestplate material to prioritize", Priority.NETHERITE, Priority.values()));
-    Config<Boolean> autoFireworkConfig = register(new BooleanConfig("AutoFirework", "Automatically fireworks when swapping to an elytra", false));
+    private Item chestplateItem = Items.DIAMOND_CHESTPLATE;
 
     public ChestSwapModule()
     {
-        super("ChestSwap", "Automatically swaps chestplate", ModuleCategory.MISCELLANEOUS);
+        super("ChestSwap", "Swaps elytra and chestplate", GuiCategory.MISCELLANEOUS);
     }
 
     @Override
     public void onEnable()
     {
-        ItemStack armorStack = mc.player.getInventory().getArmorStack(2);
-        if (armorStack.getItem() instanceof ArmorItem armorItem
-                && armorItem.getSlotType() == EquipmentSlot.CHEST)
+        if (checkNull())
         {
-            int elytraSlot = getElytraSlot();
-            if (elytraSlot != -1)
+            return;
+        }
+
+        PlayerInventory playerInventory = mc.player.getInventory();
+        ItemStack chestStack = mc.player.getEquippedStack(EquipmentSlot.CHEST);
+        if (chestStack.isIn(ItemTags.CHEST_ARMOR))
+        {
+            int slot = InventoryUtil.getItemSlot(Items.ELYTRA);
+            if (slot != -1)
             {
-                Managers.INVENTORY.pickupSlot(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot);
-                Managers.INVENTORY.pickupSlot(6);
-                Managers.INVENTORY.pickupSlot(elytraSlot < 9 ? elytraSlot + 36 : elytraSlot);
-                if (autoFireworkConfig.getValue() && !mc.player.isOnGround())
+                Managers.INVENTORY.clickSwap(slot, 6, Items.ELYTRA);
+
+                if (fireworkConfig.getValue() && !mc.player.isOnGround())
                 {
-                    Managers.NETWORK.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
-                    mc.player.startFallFlying();
-                    int slot = -1;
-                    for (int i = 0; i < 45; i++)
+                    sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING));
+                    mc.player.startGliding();
+
+                    int fireworkSlot = InventoryUtil.getItemSlot(Items.FIREWORK_ROCKET);
+                    if (fireworkSlot != -1 && Managers.INVENTORY.startSwap(fireworkSlot))
                     {
-                        ItemStack stack = mc.player.getInventory().getStack(i);
-                        if (stack.getItem() == Items.FIREWORK_ROCKET)
-                        {
-                            slot = i;
-                            break;
-                        }
-                    }
-                    if (slot == -1)
-                    {
-                        return;
-                    }
-                    if (slot < 9)
-                    {
-                        Managers.INVENTORY.setSlot(slot);
-                        mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                        Managers.INVENTORY.syncToClient();
-                    }
-                    else
-                    {
-                        mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
-                        mc.interactionManager.clickSlot(0, mc.player.getInventory().selectedSlot + 36, 0, SlotActionType.PICKUP, mc.player);
-                        mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
-                        mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                        mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
-                        mc.interactionManager.clickSlot(0, mc.player.getInventory().selectedSlot + 36, 0, SlotActionType.PICKUP, mc.player);
-                        mc.interactionManager.clickSlot(0, slot, 0, SlotActionType.PICKUP, mc.player);
+                        Managers.INTERACT.interactItem(new ItemInteraction(Items.FIREWORK_ROCKET, Hand.MAIN_HAND, true));
+                        Managers.INVENTORY.endSwap();
                     }
                 }
             }
         }
-        else
+
+        else if (chestStack.getItem() == Items.ELYTRA)
         {
-            int chestplateSlot = getChestplateSlot();
-            if (chestplateSlot != -1)
+            int slot = getBestChestplateSlot(playerInventory);
+            if (slot != -1)
             {
-                Managers.INVENTORY.pickupSlot(chestplateSlot < 9 ? chestplateSlot + 36 : chestplateSlot);
-                Managers.INVENTORY.pickupSlot(6);
-                Managers.INVENTORY.pickupSlot(chestplateSlot < 9 ? chestplateSlot + 36 : chestplateSlot);
+                Managers.INVENTORY.clickSwap(slot, 6, chestplateItem);
             }
         }
+
         disable();
     }
 
-    private int getChestplateSlot()
+    private int getBestChestplateSlot(PlayerInventory playerInventory)
     {
         int slot = -1;
-        for (int i = 0; i < 36; i++)
+
+        double armorValue = 0.0;
+        for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++)
         {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() instanceof ArmorItem armorItem
-                    && armorItem.getSlotType() == EquipmentSlot.CHEST)
+            ItemStack stack = playerInventory.getStack(i);
+            if (stack.isIn(ItemTags.CHEST_ARMOR))
             {
-                if (armorItem.getMaterial() == ArmorMaterials.NETHERITE && priorityConfig.getValue() == Priority.NETHERITE)
+                double value = ArmorUtil.getArmorValue(stack);
+                if (value > armorValue)
                 {
                     slot = i;
-                    break;
-                }
-                else if (armorItem.getMaterial() == ArmorMaterials.DIAMOND && priorityConfig.getValue() == Priority.DIAMOND)
-                {
-                    slot = i;
-                    break;
-                }
-                else
-                {
-                    slot = i;
+                    armorValue = value;
+                    chestplateItem = stack.getItem();
                 }
             }
         }
-        return slot;
-    }
 
-    private int getElytraSlot()
-    {
-        int slot = -1;
-        for (int i = 0; i < 36; i++)
-        {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() instanceof ElytraItem)
-            {
-                slot = i;
-                break;
-            }
-        }
         return slot;
-    }
-
-    private enum Priority
-    {
-        NETHERITE,
-        DIAMOND
     }
 }

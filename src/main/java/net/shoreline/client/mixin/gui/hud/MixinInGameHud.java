@@ -1,80 +1,106 @@
 package net.shoreline.client.mixin.gui.hud;
 
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.text.Text;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.shoreline.client.impl.event.gui.hud.RenderCrosshairEvent;
-import net.shoreline.client.impl.event.gui.hud.RenderOverlayEvent;
-import net.shoreline.client.util.Globals;
+import net.shoreline.client.impl.event.gui.hud.HudOverlayEvent;
+import net.shoreline.client.impl.event.gui.hud.OverlayEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderHotbarItemEvent;
+import net.shoreline.client.impl.event.gui.hud.RenderTabEvent;
+import net.shoreline.client.impl.module.misc.BetterTabModule;
 import net.shoreline.eventbus.EventBus;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-/**
- * @author linus
- * @see InGameHud
- * @since 1.0
- */
 @Mixin(InGameHud.class)
-public class MixinInGameHud implements Globals
+public class MixinInGameHud
 {
-    @Shadow
-    @Final
-    private static Identifier PUMPKIN_BLUR;
-    //
     @Shadow
     @Final
     private static Identifier POWDER_SNOW_OUTLINE;
 
-    @Inject(method = "render", at = @At(value = "TAIL"))
-    private void hookRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    @Redirect(
+            method = "renderPlayerList",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z"))
+    private boolean shouldRenderPlayerListHook(KeyBinding instance)
     {
-        RenderOverlayEvent.Post renderOverlayEvent =
-                new RenderOverlayEvent.Post(context, tickCounter.getTickDelta(true));
-        EventBus.INSTANCE.dispatch(renderOverlayEvent);
+        RenderTabEvent event = new RenderTabEvent();
+        event.setPressed(instance.isPressed());
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            return event.isPressed();
+        }
+
+        return instance.isPressed();
     }
 
-//    @Redirect(method = "renderHotbar", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerInventory;selectedSlot:I"))
-//    private int hookRenderHotbar$selectedSlot(PlayerInventory instance) {
-//        return Managers.INVENTORY.getServerSlot();
-//    }
-
-    /**
-     * @param context
-     * @param ci
-     */
-    @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"),
-            cancellable = true)
-    private void hookRenderStatusEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    @ModifyArgs(method = "renderHotbar", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHotbarItem(Lnet/minecraft/client/gui/DrawContext;IILnet/minecraft/client/render/RenderTickCounter;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;I)V",
+            ordinal = 0))
+    private void hookRenderHotbarItem(Args args)
     {
-        RenderOverlayEvent.StatusEffect renderOverlayEvent =
-                new RenderOverlayEvent.StatusEffect(context);
-        EventBus.INSTANCE.dispatch(renderOverlayEvent);
-        if (renderOverlayEvent.isCanceled())
+        ItemStack stack = args.get(5);
+        int seed = (Integer) args.get(6) - 1;
+
+        RenderHotbarItemEvent event = new RenderHotbarItemEvent(seed, stack);
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            args.set(5, event.getStack());
+        }
+    }
+
+    @Inject(method = "render", at = @At(value = "RETURN"))
+    private void hookRender(DrawContext context,
+                            RenderTickCounter tickCounter,
+                            CallbackInfo ci)
+    {
+        EventBus.INSTANCE.dispatch(new HudOverlayEvent.Post(
+                context, tickCounter.getTickDelta(true)));
+    }
+
+    @Inject(method = "renderStatusEffectOverlay", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderStatusEffectOverlay(DrawContext context,
+                                               RenderTickCounter tickCounter,
+                                               CallbackInfo ci)
+    {
+        HudOverlayEvent.Potions event = new HudOverlayEvent.Potions();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
         {
             ci.cancel();
         }
     }
 
-    /**
-     * @param context
-     * @param nauseaStrength
-     * @param ci
-     */
-    @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderHeldItemTooltip", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderHeldItemTooltip(DrawContext context,
+                                           CallbackInfo ci)
+    {
+        HudOverlayEvent.ItemName event = new HudOverlayEvent.ItemName();
+        EventBus.INSTANCE.dispatch(event);
+        if (event.isCanceled())
+        {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderPortalOverlay", at = @At(value = "HEAD"), cancellable = true)
     private void hookRenderPortalOverlay(DrawContext context,
                                          float nauseaStrength,
                                          CallbackInfo ci)
     {
-        RenderOverlayEvent.Portal renderOverlayEvent = new RenderOverlayEvent.Portal(context);
+        OverlayEvent.Portal renderOverlayEvent = new OverlayEvent.Portal();
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled())
         {
@@ -82,18 +108,12 @@ public class MixinInGameHud implements Globals
         }
     }
 
-    /**
-     * @param context
-     * @param scale
-     * @param ci
-     */
-    @Inject(method = "renderSpyglassOverlay", at = @At(value = "HEAD"),
-            cancellable = true)
-    private void hookRenderSpyglassOverlay(DrawContext context, float scale,
+    @Inject(method = "renderSpyglassOverlay", at = @At(value = "HEAD"), cancellable = true)
+    private void hookRenderSpyglassOverlay(DrawContext context,
+                                           float scale,
                                            CallbackInfo ci)
     {
-        RenderOverlayEvent.Spyglass renderOverlayEvent =
-                new RenderOverlayEvent.Spyglass(context);
+        OverlayEvent.Spyglass renderOverlayEvent = new OverlayEvent.Spyglass();
         EventBus.INSTANCE.dispatch(renderOverlayEvent);
         if (renderOverlayEvent.isCanceled())
         {
@@ -101,76 +121,29 @@ public class MixinInGameHud implements Globals
         }
     }
 
-    /**
-     * @param context
-     * @param texture
-     * @param opacity
-     * @param ci
-     */
     @Inject(method = "renderOverlay", at = @At(value = "HEAD"), cancellable = true)
-    private void hookRenderOverlay(DrawContext context, Identifier texture,
-                                   float opacity, CallbackInfo ci)
+    private void hookRenderOverlay(DrawContext context,
+                                   Identifier texture,
+                                   float opacity,
+                                   CallbackInfo ci)
     {
-        if (texture.getPath().equals(PUMPKIN_BLUR.getPath()))
+        if (texture.getPath().equals(POWDER_SNOW_OUTLINE.getPath()))
         {
-            RenderOverlayEvent.Pumpkin renderOverlayEvent =
-                    new RenderOverlayEvent.Pumpkin(context);
+            OverlayEvent.Frostbite renderOverlayEvent = new OverlayEvent.Frostbite();
             EventBus.INSTANCE.dispatch(renderOverlayEvent);
             if (renderOverlayEvent.isCanceled())
             {
                 ci.cancel();
             }
         }
-        else if (texture.getPath().equals(POWDER_SNOW_OUTLINE.getPath()))
-        {
-            RenderOverlayEvent.Frostbite renderOverlayEvent =
-                    new RenderOverlayEvent.Frostbite(context);
-            EventBus.INSTANCE.dispatch(renderOverlayEvent);
-            if (renderOverlayEvent.isCanceled())
-            {
-                ci.cancel();
-            }
-        }
-    }
-
-    /**
-     * @param instance
-     * @param text
-     * @param x
-     * @param y
-     * @param color
-     * @return
-     */
-    @Redirect(method = "renderHeldItemTooltip", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithBackground(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;IIII)I"))
-    private int hookRenderHeldItemTooltip(DrawContext instance, TextRenderer textRenderer, Text text, int x, int y, int width, int color)
-    {
-        RenderOverlayEvent.ItemName renderOverlayEvent =
-                new RenderOverlayEvent.ItemName(instance);
-        EventBus.INSTANCE.dispatch(renderOverlayEvent);
-        if (renderOverlayEvent.isCanceled())
-        {
-            if (renderOverlayEvent.isUpdateXY())
-            {
-                return instance.drawText(mc.textRenderer, text,
-                        renderOverlayEvent.getX(), renderOverlayEvent.getY(), color, true);
-            }
-            return 0;
-        }
-        return instance.drawText(mc.textRenderer, text, x, y, color, true);
-    }
-
-    @Inject(method = "renderMainHud", at = @At(value = "TAIL"))
-    private void hookRenderHotbar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
-    {
-        RenderOverlayEvent.Hotbar hotbar = new RenderOverlayEvent.Hotbar(context);
-        EventBus.INSTANCE.dispatch(hotbar);
     }
 
     @Inject(method = "renderCrosshair", at = @At(value = "HEAD"), cancellable = true)
-    private void hookRenderCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci)
+    private void hookRenderCrosshair(DrawContext context,
+                                     RenderTickCounter tickCounter,
+                                     CallbackInfo ci)
     {
-        RenderCrosshairEvent renderCrosshairEvent = new RenderCrosshairEvent(context);
+        HudOverlayEvent.Crosshair renderCrosshairEvent = new HudOverlayEvent.Crosshair(context);
         EventBus.INSTANCE.dispatch(renderCrosshairEvent);
         if (renderCrosshairEvent.isCanceled())
         {

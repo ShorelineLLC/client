@@ -1,175 +1,140 @@
 package net.shoreline.client.impl.module.render;
 
+import lombok.Getter;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.util.math.Box;
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.ColorConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.api.render.Interpolation;
-import net.shoreline.client.api.render.RenderBuffers;
-import net.shoreline.client.api.render.RenderManager;
-import net.shoreline.client.impl.event.EntityOutlineEvent;
-import net.shoreline.client.impl.event.entity.decoration.TeamColorEvent;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.shoreline.client.api.config.*;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.render.RenderWorldEvent;
-import net.shoreline.client.impl.module.client.SocialsModule;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.entity.EntityUtil;
-import net.shoreline.client.util.render.ColorUtil;
+import net.shoreline.client.impl.module.impl.TargetingModule;
+import net.shoreline.client.impl.render.animation.Animation;
+import net.shoreline.client.impl.render.ColorUtil;
+import net.shoreline.client.impl.render.Easing;
+import net.shoreline.client.impl.render.Interpolation;
 import net.shoreline.eventbus.annotation.EventListener;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class ESPModule extends ToggleModule
+public class ESPModule extends TargetingModule
 {
-    private static ESPModule INSTANCE;
-    //
-    Config<Float> rangeConfig = register(new NumberConfig<>("Range", "The ESP render range", 10.0f, 50.0f, 200.0f));
-    Config<ESPMode> modeConfig = register(new EnumConfig<>("Mode", "ESP rendering mode", ESPMode.BOX, ESPMode.values()));
-    Config<Boolean> fillConfig = register(new BooleanConfig("Fill", "Fills the box render", false, () -> modeConfig.getValue() == ESPMode.BOX));
-    Config<Float> widthConfig = register(new NumberConfig<>("Width", "ESP rendering line width", 0.1f, 2.0f, 5.0f, () -> modeConfig.getValue() == ESPMode.BOX));
-    Config<Boolean> playersConfig = register(new BooleanConfig("Players", "Render players through walls", true));
-    Config<Boolean> selfConfig = register(new BooleanConfig("Self", "Render self through walls", true));
-    Config<Color> playersColorConfig = register(new ColorConfig("PlayersColor", "The render color for players", new Color(200, 60, 60), false, () -> playersConfig.getValue() || selfConfig.getValue()));
-    Config<Boolean> monstersConfig = register(new BooleanConfig("Monsters", "Render monsters through walls", true));
-    Config<Color> monstersColorConfig = register(new ColorConfig("MonstersColor", "The render color for monsters", new Color(200, 60, 60), false, () -> monstersConfig.getValue()));
-    Config<Boolean> animalsConfig = register(new BooleanConfig("Animals", "Render animals through walls", true));
-    Config<Color> animalsColorConfig = register(new ColorConfig("AnimalsColor", "The render color for animals", new Color(0, 200, 0), false, () -> animalsConfig.getValue()));
-    Config<Boolean> vehiclesConfig = register(new BooleanConfig("Vehicles", "Render vehicles through walls", false));
-    Config<Color> vehiclesColorConfig = register(new ColorConfig("VehiclesColor", "The render color for vehicles", new Color(200, 100, 0), false, () -> vehiclesConfig.getValue()));
-    Config<Boolean> itemsConfig = register(new BooleanConfig("Items", "Render dropped items through walls", false));
-    Config<Color> itemsColorConfig = register(new ColorConfig("ItemsColor", "The render color for items", new Color(200, 100, 0), false, () -> itemsConfig.getValue()));
-    Config<Boolean> crystalsConfig = register(new BooleanConfig("EndCrystals", "Render end crystals through walls", false));
-    Config<Color> crystalsColorConfig = register(new ColorConfig("EndCrystalsColor", "The render color for end crystals", new Color(200, 100, 200), false, () -> crystalsConfig.getValue()));
+    public Config<Boolean> items = new BooleanConfig.Builder("Items")
+            .setDefaultValue(true).setDescription("Target Items").build();
+    public Config<Void> targetConfig = new ConfigGroup.Builder("Target")
+            .addAll(targetPlayers, targetHostiles, targetPassives, items).build();
+    public Config<Boolean> fillConfig = new BooleanConfig.Builder("Fill")
+            .setDescription("Fills in the box")
+            .setDefaultValue(true).build();
+    public Config<Float> range = new NumberConfig.Builder<Float>("Range")
+            .setMin(0.f).setDefaultValue(30.0f).setMax(250.f)
+            .setDescription("If entity is within this range we render them").build();
+    public Config<Color> color = new ColorConfig.Builder("Color")
+            .setRgb(0xFFFFFFFF).setTransparency(true).build();
+
+    private final Map<Entity, FadingBox> renderList = new HashMap<>();
 
     public ESPModule()
     {
-        super("ESP", "See entities and objects through walls", ModuleCategory.RENDER);
-        INSTANCE = this;
-    }
-
-    public static ESPModule getInstance()
-    {
-        return INSTANCE;
+        super("ESP", "Highlights entities", GuiCategory.RENDER);
     }
 
     @EventListener
-    public void onRenderWorld(RenderWorldEvent event)
+    public void onRender(RenderWorldEvent.Post event)
     {
-        if (modeConfig.getValue() != ESPMode.BOX)
+        if (checkNull())
         {
             return;
         }
-        RenderBuffers.preRender();
+
+        Set<Entity> current = new HashSet<>();
         for (Entity entity : mc.world.getEntities())
         {
-            if (entity == mc.player)
+            if (!isValid(entity))
             {
                 continue;
             }
-            if (checkESP(entity))
+
+            current.add(entity);
+            if (!renderList.containsKey(entity))
             {
-                Color espColor = getESPColor(entity);
-                Box box = Interpolation.getInterpolatedEntityBox(entity);
-                if (fillConfig.getValue())
-                {
-                    RenderManager.renderBox(event.getMatrices(), box,
-                            ColorUtil.withAlpha(espColor.getRGB(), 60));
-                }
-                RenderManager.renderBoundingBox(event.getMatrices(), box,
-                        widthConfig.getValue(), ColorUtil.withAlpha(espColor.getRGB(), 144));
+                FadingBox box = new FadingBox();
+                box.getAnimation().setState(true);
+                renderList.put(entity, box);
             }
         }
-        RenderBuffers.postRender();
+
+        renderList.keySet().removeIf(e -> !current.contains(e));
+        for (Map.Entry<Entity, FadingBox> entry : renderList.entrySet())
+        {
+            Entity entity = entry.getKey();
+            if (!Managers.RENDER.isVisible(entity.getBoundingBox()))
+            {
+                continue;
+            }
+
+            entry.getValue().setEntity(entity, event.getTickDelta());
+            entry.getValue().render(event.getMatrixStack(), entity.isAlive(), color.getValue());
+        }
     }
 
-    @EventListener
-    public void onEntityOutline(EntityOutlineEvent event)
+    @Override
+    public boolean isValid(Entity entity)
     {
-        if (mc.player != null && modeConfig.getValue() == ESPMode.GLOW && checkESP(event.getEntity()))
+        if (MathHelper.square(range.getValue()) < entity.squaredDistanceTo(mc.player))
         {
-            if (mc.player.squaredDistanceTo(event.getEntity()) > ((NumberConfig) rangeConfig).getValueSq())
+            return false;
+        }
+
+        if (entity instanceof ExperienceBottleEntity
+                || entity instanceof ItemEntity)
+        {
+            return items.getValue();
+        }
+
+        return super.isValid(entity);
+    }
+
+    @Getter
+    private class FadingBox
+    {
+        private final Animation animation = new Animation(false, 500, Easing.LINEAR);
+        private Box bb;
+
+        public void setEntity(Entity entity, float tickDelta)
+        {
+            if (entity == null)
             {
                 return;
             }
-            event.cancel();
-        }
-    }
 
-    @EventListener
-    public void onTeamColor(TeamColorEvent event)
-    {
-        if (mc.player != null && modeConfig.getValue() == ESPMode.GLOW && checkESP(event.getEntity()))
+            Vec3d vec = Interpolation.getRenderPosition(entity, tickDelta);
+            bb = entity.getDimensions(entity.getPose()).getBoxAt(vec);
+        }
+
+        public void render(MatrixStack matrices, boolean shouldRender, Color color)
         {
-            if (mc.player.squaredDistanceTo(event.getEntity()) > ((NumberConfig) rangeConfig).getValueSq())
+            animation.setState(shouldRender);
+            if (bb == null || animation.getFactor() < 0.01)
             {
+                bb = null;
                 return;
             }
-            event.cancel();
-            event.setColor(getESPColor(event.getEntity()).getRGB());
-        }
-    }
 
-    public Color getESPColor(Entity entity)
-    {
-        if (entity instanceof PlayerEntity player)
-        {
-            if (Managers.SOCIAL.isFriend(player.getName()))
+            if (fillConfig.getValue())
             {
-                return SocialsModule.getInstance().getFriendColor();
+                Managers.RENDER.renderBox(matrices, bb, ColorUtil.withTransparency(color.getRGB(), (float) ((color.getAlpha() / 255f) * animation.getFactor())));
             }
-            return playersColorConfig.getValue();
-        }
-        if (EntityUtil.isMonster(entity))
-        {
-            return monstersColorConfig.getValue();
-        }
-        if (EntityUtil.isNeutral(entity) || EntityUtil.isPassive(entity))
-        {
-            return animalsColorConfig.getValue();
-        }
-        if (EntityUtil.isVehicle(entity))
-        {
-            return vehiclesColorConfig.getValue();
-        }
-        if (entity instanceof EndCrystalEntity)
-        {
-            return crystalsColorConfig.getValue();
-        }
-        if (entity instanceof ItemEntity)
-        {
-            return itemsColorConfig.getValue();
-        }
-        return null;
-    }
 
-    public boolean checkESP(Entity entity)
-    {
-        if (entity instanceof PlayerEntity && playersConfig.getValue())
-        {
-            return selfConfig.getValue() || entity != mc.player;
+            Managers.RENDER.renderBoundingBox(matrices, bb, ColorUtil.withTransparency(new Color(color.getRGB(), false).getRGB(), (float) (0.8f * animation.getFactor())));
         }
-        return EntityUtil.isMonster(entity) && monstersConfig.getValue()
-                || (EntityUtil.isNeutral(entity)
-                || EntityUtil.isPassive(entity)) && animalsConfig.getValue()
-                || EntityUtil.isVehicle(entity) && vehiclesConfig.getValue()
-                || entity instanceof EndCrystalEntity && crystalsConfig.getValue()
-                || entity instanceof ItemEntity && itemsConfig.getValue();
-    }
-
-    public enum ESPMode
-    {
-        BOX,
-        GLOW
     }
 }

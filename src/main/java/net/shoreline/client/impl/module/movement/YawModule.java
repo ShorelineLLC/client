@@ -3,54 +3,54 @@ package net.shoreline.client.impl.module.movement;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.LlamaEntity;
 import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.event.MouseEvent;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.entity.LookDirectionEvent;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class YawModule extends ToggleModule
+public class YawModule extends Toggleable
 {
-
-    Config<Boolean> lockConfig = register(new BooleanConfig("Lock", "Locks the yaw in cardinal direction", false));
+    Config<Boolean> lockYaw = new BooleanConfig.Builder("Lock")
+            .setDescription("Locks your yaw")
+            .setDefaultValue(false).build();
 
     public YawModule()
     {
-        super("Yaw", "Locks player yaw to a cardinal axis", ModuleCategory.MOVEMENT);
+        super("Yaw", "Fixes your yaw to a direction", GuiCategory.MOVEMENT);
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTick(TickEvent.Pre event)
     {
-        if (event.getStage() == StageEvent.EventStage.PRE)
+        if (checkNull())
         {
-            float yaw = Math.round(mc.player.getYaw() / 45.0f) * 45.0f;
-            Entity vehicle = mc.player.getVehicle();
-            if (vehicle != null)
-            {
-                vehicle.setYaw(yaw);
-                if (vehicle instanceof LlamaEntity llama)
-                {
-                    llama.setHeadYaw(yaw);
-                }
-                return;
-            }
-            mc.player.setYaw(yaw);
-            mc.player.setHeadYaw(yaw);
+            return;
         }
+
+        float yaw = Math.round(mc.player.getYaw() / 45.0f) * 45.0f;
+        Entity vehicle = mc.player.getVehicle();
+        if (vehicle != null)
+        {
+            vehicle.setYaw(yaw);
+            if (vehicle instanceof LlamaEntity llama)
+            {
+                llama.setHeadYaw(yaw);
+            }
+
+            return;
+        }
+
+        mc.player.setYaw(yaw);
+        mc.player.setHeadYaw(yaw);
     }
 
     @EventListener
-    public void onLookDirection(LookDirectionEvent event)
+    public void onMouseUpdate(MouseEvent event)
     {
-        if (lockConfig.getValue())
+        if (lockYaw.getValue())
         {
             event.cancel();
             float f = (float) event.getCursorDeltaY() * 0.15f;

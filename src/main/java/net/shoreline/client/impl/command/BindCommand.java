@@ -3,63 +3,64 @@ package net.shoreline.client.impl.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.command.CommandSource;
+import net.minecraft.util.Formatting;
 import net.shoreline.client.api.command.Command;
-import net.shoreline.client.api.command.ModuleArgumentType;
+import net.shoreline.client.api.command.argtype.ModuleArgumentType;
+import net.shoreline.client.api.macro.ModuleKeybind;
 import net.shoreline.client.api.module.Module;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.util.KeyboardUtil;
-import net.shoreline.client.util.chat.ChatUtil;
+import net.shoreline.client.api.module.Toggleable;
+import net.shoreline.client.impl.render.ClientFormatting;
+import net.shoreline.client.util.Keyboard;
 import org.lwjgl.glfw.GLFW;
 
-/**
- * @author linus
- * @since 1.0
- */
 public class BindCommand extends Command
 {
-    /**
-     *
-     */
     public BindCommand()
     {
-        super("Bind", "Keybinds a module", literal("bind"));
+        super("bind", new String[] {"keybind"}, "Binds a module to a key");
     }
 
     @Override
-    public void buildCommand(LiteralArgumentBuilder<CommandSource> builder)
+    public void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder)
     {
-        builder.then(argument("module", ModuleArgumentType.module())
-                .then(argument("key", StringArgumentType.string())
+        argumentBuilder.then(buildArgument("module", ModuleArgumentType.module())
+                .then(buildArgument("key", StringArgumentType.string())
                         .executes(c ->
                         {
                             Module module = ModuleArgumentType.getModule(c, "module");
-                            if (module instanceof ToggleModule t)
+                            if (module instanceof Toggleable t)
                             {
                                 final String key = StringArgumentType.getString(c, "key");
                                 if (key == null)
                                 {
-                                    ChatUtil.error("Invalid key!");
+                                    sendErrorChatMessage("Invalid key!");
                                     return 0;
                                 }
-                                int keycode = KeyboardUtil.getKeyCode(key);
+
+                                int keycode = Keyboard.getKeyCode(key);
                                 if (keycode == GLFW.GLFW_KEY_UNKNOWN)
                                 {
-                                    ChatUtil.error("Failed to parse key!");
+                                    sendErrorChatMessage("Failed to parse key!");
                                     return 0;
                                 }
-                                t.keybind(keycode);
-                                ChatUtil.clientSendMessage("§7%s§f is now bound to §s%s", module.getName(), key.toUpperCase());
+
+                                t.setKeybind(new ModuleKeybind(keycode, t));
+                                sendClientChatMessage(Formatting.GRAY + module.getName() + Formatting.RESET + " is now bound to " + ClientFormatting.THEME + key.toUpperCase());
                             }
+
                             return 1;
                         }))
+
                 .executes(c ->
                 {
-                    ChatUtil.error("Must provide a module to keybind!");
+                    sendErrorChatMessage("Must provide a module to keybind!");
                     return 1;
-                })).executes(c ->
-        {
-            ChatUtil.error("Invalid usage! Usage: " + getUsage());
-            return 1;
-        });
+                }))
+
+                .executes(c ->
+                {
+                    sendErrorChatMessage("Invalid usage! Usage: bind <module> <key_name>");
+                    return 1;
+                });
     }
 }

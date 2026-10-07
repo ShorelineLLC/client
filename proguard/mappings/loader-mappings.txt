@@ -1,10 +1,12 @@
-net.shoreline.loader.Loader -> net.shoreline.loader.give up:
-    org.apache.logging.log4j.Logger LOGGER -> a
-    java.lang.String VERSION -> b
-    net.shoreline.loader.session.UserSession SESSION -> c
+net.shoreline.headless.HeadlessAPI -> net.shoreline.loader.d:
+    boolean connected -> a
     void <init>() -> <init>
-    void onPreLaunch() -> onPreLaunch
-    void onInitializeClient() -> onInitializeClient
+    boolean isConnected() -> a
+net.shoreline.loader.Loader -> net.shoreline.loader.give up:
+    org.apache.logging.log4j.Logger LOGGER -> b
+    java.lang.String VERSION -> c
+    net.shoreline.loader.session.UserSession SESSION -> e
+    void <init>() -> <init>
     void onLoad(java.lang.String) -> onLoad
     java.lang.String getRefMapperConfig() -> getRefMapperConfig
     boolean shouldApplyMixin(java.lang.String,java.lang.String) -> shouldApplyMixin
@@ -12,8 +14,8 @@ net.shoreline.loader.Loader -> net.shoreline.loader.give up:
     java.util.List getMixins() -> getMixins
     void preApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> preApply
     void postApply(java.lang.String,org.objectweb.asm.tree.ClassNode,java.lang.String,org.spongepowered.asm.mixin.extensibility.IMixinInfo) -> postApply
-    void loadNatives() -> a
-    java.lang.String getExt() -> b
+    void loadNatives() -> b
+    java.lang.String getExt() -> c
     java.lang.Object performVersionCheck(java.lang.Object) -> d
     java.lang.Object showErrorWindow(java.lang.Object) -> b
     void info(java.lang.String) -> a
@@ -31,14 +33,14 @@ net.shoreline.loader.mixin.MixinServiceExt -> net.shoreline.loader.a:
     java.lang.Object getInternalInputStream(java.lang.Object) -> b
 net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
     java.util.Set REGISTERED_SOUND_FILES -> d
-    net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack parent -> e
+    net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack parent -> f
     void <init>(net.fabricmc.fabric.impl.resource.loader.ModNioResourcePack) -> <init>
     net.minecraft.class_7367 method_14410(java.lang.String[]) -> method_14410
     net.minecraft.class_7367 method_14405(net.minecraft.class_3264,net.minecraft.class_2960) -> method_14405
     java.lang.Object getResourceInternal(java.lang.Object) -> a
     void method_14408(net.minecraft.class_3264,java.lang.String,java.lang.String,net.minecraft.class_3262$class_7664) -> method_14408
     java.util.Set method_14406(net.minecraft.class_3264) -> method_14406
-    java.lang.Object method_14407(net.minecraft.class_3270) -> method_14407
+    java.lang.Object method_14407(net.minecraft.class_7677) -> method_14407
     net.minecraft.class_9224 method_56926() -> method_56926
     net.fabricmc.loader.api.metadata.ModMetadata getFabricModMetadata() -> getFabricModMetadata
     net.fabricmc.fabric.api.resource.ModResourcePack createOverlay(java.lang.String) -> createOverlay
@@ -47,18 +49,18 @@ net.shoreline.loader.resource.ResourcePackExt -> net.shoreline.loader.b:
     java.io.InputStream lambda$open$0(java.io.InputStream) -> lambda$open$0
     void <clinit>() -> <clinit>
 net.shoreline.loader.session.UserSession -> net.shoreline.loader.c:
-    java.lang.String hardwareId -> f
-    java.lang.String username -> g
-    java.lang.String uid -> h
-    java.lang.String usertype -> i
-    java.util.List runningMods -> j
+    java.lang.String hardwareId -> g
+    java.lang.String username -> h
+    java.lang.String uid -> i
+    java.lang.String usertype -> j
+    java.util.List runningMods -> k
     void <init>(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.util.List) -> <init>
-    java.lang.String getHardwareID() -> c
-    java.lang.String getUsername() -> d
-    java.lang.String getUID() -> e
-    java.lang.String getUserType() -> f
-    java.util.List getRunningMods() -> g
-    net.shoreline.loader.session.UserSession load() -> h
+    java.lang.String getHardwareID() -> d
+    java.lang.String getUsername() -> e
+    java.lang.String getUID() -> f
+    java.lang.String getUserType() -> g
+    java.util.List getRunningMods() -> h
+    net.shoreline.loader.session.UserSession load() -> i
     java.lang.Object getUserInfo(java.lang.Object) -> a
     boolean lambda$load$1(java.lang.String) -> d
     java.lang.String lambda$load$0(net.fabricmc.loader.api.ModContainer) -> a

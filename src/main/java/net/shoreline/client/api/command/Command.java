@@ -5,97 +5,46 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import lombok.Getter;
 import net.minecraft.command.CommandSource;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.Globals;
+import net.shoreline.client.api.LoggingFeature;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-/**
- * @author linus
- * @since 1.0
- */
-public abstract class Command implements Globals
+@Getter
+public abstract class Command extends LoggingFeature
 {
-    //
-    private final String name;
-    private final String desc;
-    private final List<LiteralArgumentBuilder<CommandSource>> builders = new ArrayList<>();
+    private final String description;
+    private final Set<LiteralArgumentBuilder<CommandSource>> argumentBuilders = new HashSet<>();
 
-    /**
-     * @param name
-     * @param desc
-     * @param builder
-     */
-    public Command(String name, String desc, LiteralArgumentBuilder<CommandSource> builder)
+    public Command(String name, String description)
     {
-        this.name = name;
-        this.desc = desc;
-        builders.add(builder);
+        super(name);
+        this.description = description;
+        this.argumentBuilders.add(LiteralArgumentBuilder.literal(name));
     }
 
-    public Command(String name, String desc, List<LiteralArgumentBuilder<CommandSource>> builder)
+    public Command(String name, String[] aliases, String description)
     {
-        this.name = name;
-        this.desc = desc;
-        builders.addAll(builder);
-    }
-
-    public abstract void buildCommand(LiteralArgumentBuilder<CommandSource> builder);
-
-    protected static LiteralArgumentBuilder<CommandSource> literal(String name)
-    {
-        return LiteralArgumentBuilder.literal(name);
-    }
-
-    protected static List<LiteralArgumentBuilder<CommandSource>> literal(String... name)
-    {
-        List<LiteralArgumentBuilder<CommandSource>> builders = Lists.newArrayList();
-        for (String s : name)
+        super(name, aliases);
+        this.description = description;
+        this.argumentBuilders.add(LiteralArgumentBuilder.literal(name));
+        for (String alias : aliases)
         {
-            builders.add(LiteralArgumentBuilder.literal(s));
+            argumentBuilders.add(LiteralArgumentBuilder.literal(alias));
         }
-        return builders;
     }
 
-    protected static <T> RequiredArgumentBuilder<CommandSource, T> argument(String name, ArgumentType<T> type)
+    public abstract void buildCommand(LiteralArgumentBuilder<CommandSource> argumentBuilder);
+
+    protected <T> RequiredArgumentBuilder<CommandSource, T> buildArgument(String name, ArgumentType<T> type)
     {
         return RequiredArgumentBuilder.argument(name, type);
     }
 
-    protected static SuggestionProvider<CommandSource> suggest(String... suggestions)
+    protected SuggestionProvider<CommandSource> buildSuggestions(String... suggestions)
     {
         return (context, builder) -> CommandSource.suggestMatching(Lists.newArrayList(suggestions), builder);
-    }
-
-    /**
-     * @return
-     */
-    public List<LiteralArgumentBuilder<CommandSource>> getCommandBuilders()
-    {
-        return builders;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public String getDescription()
-    {
-        return desc;
-    }
-
-    /**
-     * Returns the unique command identifier, used to identify the command in
-     * the chat. Ex: help, prefix, openfolder, etc.
-     *
-     * @return
-     */
-    public String getUsage()
-    {
-        LiteralArgumentBuilder<CommandSource> builder = builders.getFirst();
-        return Managers.COMMAND.getDispatcher().getAllUsage(builder.build(), Managers.COMMAND.getSource(), false)[0];
     }
 }

@@ -1,68 +1,48 @@
 package net.shoreline.client.impl.module.render;
 
-import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.MacroConfig;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.macro.Macro;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
-import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.keyboard.KeyboardInputEvent;
-import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
+import net.shoreline.client.api.macro.HoldKeybind;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.ListeningToggleable;
 import org.lwjgl.glfw.GLFW;
 
-public class ZoomModule extends ToggleModule
+public class ZoomModule extends ListeningToggleable
 {
-    Config<Integer> zoomConfig = register(new NumberConfig<>("Zoom", "The zoom value", 10, 30, 50));
-    Config<Boolean> smoothCameraConfig = register(new BooleanConfig("SmoothCamera", "Adds motion reduction to the camera", true));
-    Config<Macro> zoomKeyConfig = register(new MacroConfig("ZoomKey", "The zoom key bind", new Macro(getId() + "-zoomkey", GLFW.GLFW_KEY_C, () -> {})));
-
-    private boolean flag;
-    private boolean flag1 = true;
-    private boolean isPressed;
-    private int defaultFov = 100;
+    private int prevFov = 100;
 
     public ZoomModule()
     {
-        super("Zoom", "Zooms in the camera perspective", ModuleCategory.RENDER);
+        super("Zoom", "Zooms in the camera", GuiCategory.RENDER);
+        setKeybind(new HoldKeybind(GLFW.GLFW_KEY_C, this));
     }
 
-    @EventListener
-    public void onKey(KeyboardInputEvent event)
+    @Override
+    public void onEnable()
     {
-        if (event.getAction() != GLFW.GLFW_REPEAT && event.getKeycode() == zoomKeyConfig.getValue().getKeycode())
+        if (mc.options == null)
         {
-            isPressed = event.getAction() == GLFW.GLFW_PRESS;
+            return;
         }
+
+        prevFov = mc.options.getFov().getValue();
+
+        if (mc.currentScreen != null)
+        {
+            return;
+        }
+
+        mc.options.smoothCameraEnabled = true;
+        mc.options.getFov().setValue(30);
     }
 
-    @EventListener
-    public void onTick(TickEvent event)
+    @Override
+    public void onDisable()
     {
-        if (event.getStage() == StageEvent.EventStage.PRE && mc.currentScreen == null)
+        if (mc.options == null)
         {
-            if (isPressed)
-            {
-                if (flag1)
-                {
-                    defaultFov = mc.options.getFov().getValue();
-                    flag1 = false;
-                }
-                mc.options.smoothCameraEnabled = smoothCameraConfig.getValue();
-                mc.options.hudHidden = true;
-                mc.options.getFov().setValue(zoomConfig.getValue());
-                flag = true;
-            }
-            else if (flag)
-            {
-                mc.options.smoothCameraEnabled = false;
-                mc.options.hudHidden = false;
-                mc.options.getFov().setValue(defaultFov);
-                flag = false;
-                flag1 = true;
-            }
+            return;
         }
+
+        mc.options.smoothCameraEnabled = false;
+        mc.options.getFov().setValue(prevFov);
     }
 }

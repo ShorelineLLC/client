@@ -1,32 +1,27 @@
 package net.shoreline.client.impl.event.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.math.Vec3d;
+import net.shoreline.eventbus.Event;
 import net.shoreline.eventbus.annotation.Cancelable;
-import net.shoreline.eventbus.event.Event;
 
 @Cancelable
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class SlowMovementEvent extends Event
 {
-    private final BlockState state;
-    private float multiplier = 1.0f;
+    private final BlockState blockState;
+    private Vec3d multiplier;
 
-    public SlowMovementEvent(BlockState state)
+    @Cancelable
+    @RequiredArgsConstructor
+    @Getter
+    public static class Block extends Event
     {
-        this.state = state;
-    }
-
-    public BlockState getState()
-    {
-        return state;
-    }
-
-    public float getMultiplier()
-    {
-        return multiplier;
-    }
-
-    public void setMultiplier(float multiplier)
-    {
-        this.multiplier = multiplier;
+        private final net.minecraft.block.Block block;
     }
 }

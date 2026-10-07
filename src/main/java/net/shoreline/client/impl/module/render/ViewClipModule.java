@@ -1,24 +1,22 @@
 package net.shoreline.client.impl.module.render;
 
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.NumberConfig;
-import net.shoreline.client.api.module.ModuleCategory;
-import net.shoreline.client.api.module.ToggleModule;
+import net.shoreline.client.api.config.NumberConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.api.module.Toggleable;
 import net.shoreline.client.impl.event.render.CameraClipEvent;
 import net.shoreline.eventbus.annotation.EventListener;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class ViewClipModule extends ToggleModule
+public class ViewClipModule extends Toggleable
 {
-
-    Config<Float> distanceConfig = register(new NumberConfig<>("Distance", "The third-person camera clip distance", 1.0f, 3.5f, 20.0f));
+    Config<Float> distanceConfig = new NumberConfig.Builder<Float>("Distance")
+            .setMin(1.0f).setMax(30.0f).setDefaultValue(4.0f).setFormat("m")
+            .setDescription("The camera clip distance").build();
 
     public ViewClipModule()
     {
-        super("ViewClip", "Clips your third-person camera through blocks", ModuleCategory.RENDER);
+        super("ViewClip", new String[] {"CameraClip"},
+                "Clips the third-person camera through blocks", GuiCategory.RENDER);
     }
 
     @EventListener

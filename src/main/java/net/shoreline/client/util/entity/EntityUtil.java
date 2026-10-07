@@ -1,86 +1,62 @@
 package net.shoreline.client.util.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.*;
+import lombok.experimental.UtilityClass;
+import net.minecraft.entity.*;
+import net.minecraft.entity.mob.AmbientEntity;
+import net.minecraft.entity.mob.EndermanEntity;
+import net.minecraft.entity.mob.Monster;
+import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.*;
-import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.entity.vehicle.ChestMinecartEntity;
-import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
-import net.minecraft.entity.vehicle.MinecartEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.shoreline.client.util.Globals;
-import net.shoreline.client.util.chat.ChatUtil;
+import net.minecraft.util.math.Vec3d;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class EntityUtil implements Globals
+import java.util.ArrayList;
+import java.util.List;
+
+@UtilityClass
+public class EntityUtil
 {
-    /**
-     *
-     * @param entity
-     * @return
-     */
-    public static BlockPos getRoundedBlockPos(Entity entity)
+    public boolean isHostile(final Entity entity)
     {
-        return new BlockPos(entity.getBlockX(), (int) Math.round(entity.getY()), entity.getBlockZ());
+        return entity instanceof Monster && !isNeutral(entity);
     }
 
-    /**
-     * @param entity
-     * @return
-     */
-    public static float getHealth(Entity entity)
+    public boolean isPassive(Entity entity)
     {
-        if (entity instanceof LivingEntity e)
-        {
-            return e.getHealth() + e.getAbsorptionAmount();
-        }
-        return 0.0f;
+        return entity instanceof PassiveEntity || entity instanceof AmbientEntity || entity instanceof SquidEntity;
     }
 
-    /**
-     * @param e
-     * @return
-     */
-    public static boolean isMonster(Entity e)
+    public boolean isHostile(EntityType<?> type)
     {
-        return e instanceof Monster && !isNeutralInternal(e);
+        return type.getSpawnGroup() == SpawnGroup.MONSTER;
     }
 
-    private static boolean isNeutralInternal(Entity e)
+    public boolean isPassive(EntityType<?> type)
     {
-        return e instanceof EndermanEntity enderman && !enderman.isAttacking()
-                || e instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()
-                || e instanceof WolfEntity wolf && !wolf.isAttacking()
-                || e instanceof IronGolemEntity ironGolem && !ironGolem.isAttacking()
-                || e instanceof BeeEntity bee && !bee.isAttacking();
+        SpawnGroup group = type.getSpawnGroup();
+        return group == SpawnGroup.CREATURE || group == SpawnGroup.AMBIENT
+                || type == EntityType.SQUID || type == EntityType.GLOW_SQUID;
     }
 
-    /**
-     * @param e
-     * @return
-     */
-    public static boolean isNeutral(Entity e)
+    private boolean isNeutral(Entity entity)
     {
-        return e instanceof EndermanEntity || e instanceof ZombifiedPiglinEntity || e instanceof WolfEntity || e instanceof IronGolemEntity;
+        return entity instanceof EndermanEntity enderman && !enderman.isAttacking()
+                || entity instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()
+                || entity instanceof WolfEntity wolf && !wolf.isAttacking()
+                || entity instanceof IronGolemEntity ironGolem && !ironGolem.isAttacking()
+                || entity instanceof BeeEntity bee && !bee.isAttacking();
     }
 
-    /**
-     * @param e
-     * @return
-     */
-    public static boolean isPassive(Entity e)
+    public BlockPos getRoundedBlockPos(Entity entity)
     {
-        return e instanceof PassiveEntity || e instanceof AmbientEntity || e instanceof SquidEntity;
+        return BlockPos.ofFloored(entity.getBlockX(), Math.round(entity.getY()), entity.getBlockZ());
     }
 
-    public static boolean isVehicle(Entity e)
+    public List<ItemStack> getEquippedItems(LivingEntity entity)
     {
-        return e instanceof BoatEntity || e instanceof MinecartEntity
-                || e instanceof FurnaceMinecartEntity
-                || e instanceof ChestMinecartEntity;
+        final List<ItemStack> stacks = new ArrayList<>();
+        EquipmentSlot.VALUES.forEach(equipmentSlot -> stacks.add(entity.getEquippedStack(equipmentSlot)));
+        return stacks;
     }
 }

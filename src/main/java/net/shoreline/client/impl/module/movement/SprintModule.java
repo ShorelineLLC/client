@@ -1,117 +1,121 @@
 package net.shoreline.client.impl.module.movement;
 
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.util.math.MathHelper;
+import net.shoreline.client.api.config.BooleanConfig;
 import net.shoreline.client.api.config.Config;
-import net.shoreline.client.api.config.setting.BooleanConfig;
-import net.shoreline.client.api.config.setting.EnumConfig;
-import net.shoreline.client.api.module.ModuleCategory;
+import net.shoreline.client.api.config.EnumConfig;
+import net.shoreline.client.api.module.GuiCategory;
+import net.shoreline.client.impl.Managers;
 import net.shoreline.client.impl.event.TickEvent;
-import net.shoreline.client.impl.event.entity.JumpRotationEvent;
-import net.shoreline.client.impl.event.network.PlayerTickEvent;
-import net.shoreline.client.impl.event.network.SprintCancelEvent;
-import net.shoreline.client.impl.module.RotationModule;
-import net.shoreline.client.impl.module.client.AnticheatModule;
-import net.shoreline.client.init.Managers;
-import net.shoreline.client.util.player.MovementUtil;
-import net.shoreline.client.util.player.PlayerUtil;
-import net.shoreline.client.util.string.EnumFormatter;
+import net.shoreline.client.impl.event.entity.PlayerJumpEvent;
+import net.shoreline.client.impl.event.network.StopSprintingEvent;
+import net.shoreline.client.impl.module.combat.util.PhaseUtil;
+import net.shoreline.client.impl.module.impl.MovementModule;
+import net.shoreline.client.impl.module.render.FreecamModule;
+import net.shoreline.client.impl.rotation.ClientRotationEvent;
+import net.shoreline.client.util.text.Formatter;
+import net.shoreline.client.util.input.InputUtil;
 import net.shoreline.eventbus.annotation.EventListener;
-import net.shoreline.eventbus.event.StageEvent;
 
-/**
- * @author linus
- * @since 1.0
- */
-public class SprintModule extends RotationModule
+public class SprintModule extends MovementModule
 {
-    private static SprintModule INSTANCE;
+    Config<SprintMode> modeConfig = new EnumConfig.Builder<SprintMode>("Mode")
+            .setValues(SprintMode.values())
+            .setDescription("The Sprinting mode. Rage allows for multi-directional sprinting")
+            .setDefaultValue(SprintMode.LEGIT).build();
+    Config<Boolean> rotateConfig = new BooleanConfig.Builder("Rotate")
+            .setDescription("Rotates before sprinting horizontally/backwards")
+            .setVisible(() -> modeConfig.getValue().equals(SprintMode.RAGE))
+            .setDefaultValue(false).build();
+    Config<Boolean> jumpFixConfig = new BooleanConfig.Builder("JumpFix")
+            .setDescription("Fixes jumping slowdown in Rage sprint")
+            .setVisible(() -> modeConfig.getValue().equals(SprintMode.RAGE))
+            .setDefaultValue(false).build();
 
-    //
-    Config<SprintMode> modeConfig = register(new EnumConfig<>("Mode", "Sprinting mode. Rage allows for multi-directional sprinting.", SprintMode.LEGIT, SprintMode.values()));
-    Config<Boolean> jumpFixConfig = register(new BooleanConfig("JumpFix", "Fixes jumping slowdown in Rage sprint", true, () -> modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT));
-
-    /**
-     *
-     */
     public SprintModule()
     {
-        super("Sprint", "Automatically sprints", ModuleCategory.MOVEMENT, 110);
-        INSTANCE = this;
-    }
-
-    public static SprintModule getInstance()
-    {
-        return INSTANCE;
+        super("Sprint", "Automatically sprints", GuiCategory.MOVEMENT);
     }
 
     @Override
     public String getModuleData()
     {
-        return EnumFormatter.formatEnum(modeConfig.getValue());
+        return Formatter.formatEnum(modeConfig.getValue());
     }
 
     @EventListener
-    public void onTick(TickEvent event)
+    public void onTickPre(TickEvent.Post event)
     {
-        if (event.getStage() != StageEvent.EventStage.PRE)
+        if (checkNull())
         {
             return;
         }
-        if (canSprint())
+
+        if (!canSprint() || !checkCollisions())
         {
-            float sprintYaw = getSprintYaw(mc.player.getYaw());
-            if (checkSprintAngle(sprintYaw))
+            mc.player.setSprinting(false);
+            return;
+        }
+
+        switch (modeConfig.getValue())
+        {
+            case LEGIT ->
             {
-                return;
-            }
-            switch (modeConfig.getValue())
-            {
-                case LEGIT ->
+                if (mc.player.input.hasForwardMovement())
                 {
-                    if (mc.player.input.hasForwardMovement()
-                            && (!mc.player.horizontalCollision
-                            || mc.player.collidedSoftly))
-                    {
-                        mc.player.setSprinting(true);
-                    }
+                    mc.player.setSprinting(true);
                 }
-                case RAGE, RAGE_STRICT, GRIM -> mc.player.setSprinting(true);
+            }
+
+            case RAGE ->
+            {
+                float sprintYaw = InputUtil.getYawFromInput(mc.player.getYaw());
+                if (rotateConfig.getValue() && !Managers.ROTATION.isFacingYaw(sprintYaw))
+                {
+                    mc.player.setSprinting(false);
+                    return;
+                }
+
+                mc.player.setSprinting(true);
             }
         }
     }
 
     @EventListener
-    public void onSprintCancel(SprintCancelEvent event)
+    public void onClientRotation(ClientRotationEvent event)
     {
-        if (canSprint() && (modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT))
+        if (modeConfig.getValue() != SprintMode.RAGE || !rotateConfig.getValue() || !canSprint())
         {
-            float sprintYaw = getSprintYaw(mc.player.getYaw());
-            if (checkSprintAngle(sprintYaw))
-            {
-                return;
-            }
+            return;
+        }
+
+        if (event.isCanceled() || FreecamModule.INSTANCE.isEnabled())
+        {
+            return;
+        }
+
+        float sprintYaw = InputUtil.getYawFromInput(mc.player.getYaw());
+        event.cancel();
+        event.setYaw(sprintYaw);
+    }
+
+    @EventListener
+    public void onStopSprinting(StopSprintingEvent event)
+    {
+        if (canSprint() && checkCollisions() && modeConfig.getValue() == SprintMode.RAGE)
+        {
             event.cancel();
         }
     }
 
     @EventListener
-    public void onPlayerTick(PlayerTickEvent event)
+    public void onJumpYaw(PlayerJumpEvent.Yaw event)
     {
-        if (canSprint() && modeConfig.getValue() == SprintMode.RAGE_STRICT)
-        {
-            setRotation(getSprintYaw(mc.player.getYaw()), mc.player.getPitch());
-        }
-    }
-
-    @EventListener
-    public void onJumpYaw(JumpRotationEvent event)
-    {
-        if (jumpFixConfig.getValue() && (modeConfig.getValue() == SprintMode.RAGE || modeConfig.getValue() == SprintMode.RAGE_STRICT))
+        if (jumpFixConfig.getValue() && modeConfig.getValue() == SprintMode.RAGE)
         {
             float yaw = event.getYaw();
-            float forward = Math.signum(mc.player.input.movementForward);
-            float strafe = 90.0f * Math.signum(mc.player.input.movementSideways);
+            float forward = Math.signum(mc.player.input.getMovementInput().y);
+            float strafe = 90.0f * Math.signum(mc.player.input.getMovementInput().x);
             if (forward != 0.0f)
             {
                 strafe *= (forward * 0.5f);
@@ -122,86 +126,33 @@ public class SprintModule extends RotationModule
                 yaw -= 180.0f;
             }
 
-            event.cancel();
+            event.receiveCanceled();
             event.setYaw(yaw);
         }
     }
 
     private boolean canSprint()
     {
-        if (AnticheatModule.getInstance().getWebJumpFix() && PlayerUtil.inWeb(1.0))
-        {
-            return false;
-        }
-        return MovementUtil.isInputtingMovement()
+        return InputUtil.isInputtingMovement()
+                && !PhaseUtil.isInsideWeb(mc.player)
                 && !mc.player.isSneaking()
-                && !mc.player.isRiding()
-                && !mc.player.isFallFlying()
+                && mc.player.getVehicle() == null
+                && !mc.player.isGliding()
                 && !mc.player.isTouchingWater()
                 && !mc.player.isInLava()
                 && !mc.player.isHoldingOntoLadder()
                 && !mc.player.hasStatusEffect(StatusEffects.BLINDNESS)
-                && mc.player.getHungerManager().getFoodLevel() > 6.0F;
+                && mc.player.getHungerManager().getFoodLevel() > 6.0f;
     }
 
-    private boolean checkSprintAngle(float sprintYaw)
+    private boolean checkCollisions()
     {
-        if (modeConfig.getValue() == SprintMode.RAGE_STRICT)
-        {
-            return MathHelper.angleBetween(sprintYaw, Managers.ROTATION.getServerYaw()) > 0.0f;
-        }
-        else if (modeConfig.getValue() == SprintMode.GRIM)
-        {
-            return MathHelper.angleBetween(mc.player.getYaw(), Managers.ROTATION.getServerYaw()) > 0.0f;
-        }
-        return false;
+        return !mc.player.horizontalCollision || mc.player.collidedSoftly;
     }
 
-    public float getSprintYaw(float yaw)
-    {
-        boolean forward = mc.options.forwardKey.isPressed();
-        boolean backward = mc.options.backKey.isPressed();
-        boolean left = mc.options.leftKey.isPressed();
-        boolean right = mc.options.rightKey.isPressed();
-        if (forward && !backward)
-        {
-            if (left && !right)
-            {
-                yaw -= 45.0f;
-            }
-            else if (right && !left)
-            {
-                yaw += 45.0f;
-            }
-        }
-        else if (backward && !forward)
-        {
-            yaw += 180.0f;
-            if (left && !right)
-            {
-                yaw += 45.0f;
-            }
-            else if (right && !left)
-            {
-                yaw -= 45.0f;
-            }
-        }
-        else if (left && !right)
-        {
-            yaw -= 90.0f;
-        }
-        else if (right && !left)
-        {
-            yaw += 90.0f;
-        }
-        return MathHelper.wrapDegrees(yaw);
-    }
-
-    public enum SprintMode
+    private enum SprintMode
     {
         LEGIT,
-        RAGE,
-        RAGE_STRICT,
-        GRIM
+        RAGE
     }
 }

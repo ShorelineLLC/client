@@ -1,65 +1,31 @@
 package net.shoreline.client.impl.event.render;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.client.util.math.MatrixStack;
-import net.shoreline.eventbus.event.Event;
+import net.shoreline.eventbus.Event;
+import net.shoreline.eventbus.annotation.Cancelable;
 
-/**
- * @author linus
- * @since 1.0
- */
+@RequiredArgsConstructor
+@Getter
 public class RenderWorldEvent extends Event
 {
-    //
-    private final MatrixStack matrices;
+    private final MatrixStack matrixStack;
     private final float tickDelta;
 
-    /**
-     * @param matrices
-     */
-    public RenderWorldEvent(MatrixStack matrices, float tickDelta)
+    @Cancelable
+    public static class Post extends RenderWorldEvent
     {
-        this.matrices = matrices;
-        this.tickDelta = tickDelta;
-    }
-
-    /**
-     * @return
-     */
-    public MatrixStack getMatrices()
-    {
-        return matrices;
-    }
-
-    /**
-     * @return
-     */
-    public float getTickDelta()
-    {
-        return tickDelta;
-    }
-
-    public static class Game extends RenderWorldEvent
-    {
-
-        /**
-         * @param matrices
-         * @param tickDelta
-         */
-        public Game(MatrixStack matrices, float tickDelta)
+        public Post(MatrixStack matrixStack, float tickDelta)
         {
-            super(matrices, tickDelta);
+            super(matrixStack, tickDelta);
         }
     }
 
-    public static class Hand extends RenderWorldEvent
+    @RequiredArgsConstructor
+    @Getter
+    public static class Resized extends Event
     {
-        /**
-         * @param matrices
-         * @param tickDelta
-         */
-        public Hand(MatrixStack matrices, float tickDelta)
-        {
-            super(matrices, tickDelta);
-        }
+        private final int width, height;
     }
 }

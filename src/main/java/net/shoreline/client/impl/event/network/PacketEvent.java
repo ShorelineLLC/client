@@ -1,95 +1,51 @@
 package net.shoreline.client.impl.event.network;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
-import net.shoreline.client.init.Managers;
+import net.shoreline.eventbus.Event;
 import net.shoreline.eventbus.annotation.Cancelable;
-import net.shoreline.eventbus.event.Event;
 
-/**
- * @author linus
- * @since 1.0
- */
+@RequiredArgsConstructor
+@Getter
 public class PacketEvent extends Event
 {
-    //
     private final Packet<?> packet;
 
-    /**
-     * @param packet
-     */
-    public PacketEvent(Packet<?> packet)
-    {
-        this.packet = packet;
-    }
-
-    /**
-     * @return
-     */
-    public Packet<?> getPacket()
-    {
-        return packet;
-    }
-
-    /**
-     *
-     */
     @Cancelable
+    @Getter
     public static class Inbound extends PacketEvent
     {
-
         private final PacketListener packetListener;
+        private final boolean isBundled;
 
-        /**
-         * @param packet
-         */
-        public Inbound(PacketListener packetListener, Packet<?> packet)
+        public Inbound(PacketListener packetListener, Packet<?> packet, boolean isBundled)
         {
             super(packet);
             this.packetListener = packetListener;
-        }
-
-        public PacketListener getPacketListener()
-        {
-            return packetListener;
+            this.isBundled = isBundled;
         }
     }
 
-    /**
-     *
-     */
     @Cancelable
     public static class Outbound extends PacketEvent
     {
-        //
-        private final boolean cached;
-
-        /**
-         * @param packet
-         */
-        public Outbound(Packet<?> packet)
-        {
+        public Outbound(Packet<?> packet) {
             super(packet);
-            this.cached = Managers.NETWORK.isCached(packet);
-        }
-
-        /**
-         * @return
-         */
-        public boolean isClientPacket()
-        {
-            return cached;
         }
     }
 
-    @Cancelable
-    public static class OutboundPost extends Outbound
+    public static class InboundPost extends PacketEvent
     {
-        /**
-         * @param packet
-         */
-        public OutboundPost(Packet<?> packet)
-        {
+        public InboundPost(Packet<?> packet) {
+            super(packet);
+        }
+    }
+
+    public static class OutboundPost extends PacketEvent
+    {
+        public OutboundPost(Packet<?> packet) {
             super(packet);
         }
     }
