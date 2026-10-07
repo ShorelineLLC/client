@@ -17,7 +17,6 @@ build
 # Other.
 eclipse
 run
-# Mac
 *.DS_Store
 # Rust
 target/
