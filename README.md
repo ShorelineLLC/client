@@ -1,2 +1,1 @@
-![client_icon](https://github.com/pastimee/caspian/assets/68214996/dc5704a7-d7d2-47d1-9793-0ab32f8b59b1)
----
+**Archived (Open Source Feb 2023 - Apr 2024) (Private updates Jun 2024 - Jan 2026)**
